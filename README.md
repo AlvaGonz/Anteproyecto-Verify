@@ -1,11 +1,37 @@
-<div align="center">
+# Enterprise Web App Bootstrap
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Bootstrap de solución para un sistema web moderno enterprise-ready.
 
-  <h1>Built with AI Studio</h2>
+## Arquitectura
+- **Backend**: ASP.NET Core 8 Web API, Clean Architecture.
+- **Frontend**: React 19, TypeScript, Vite.
+- **Infraestructura**: Preparado para Azure SQL y Azure Blob Storage.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Ejecución Local (Docker)
+1. Copiar `.env.example` a `.env`.
+2. Ejecutar `scripts/dev-up.sh` (Linux/Mac) o `scripts/dev-up.ps1` (Windows).
+3. Frontend disponible en `http://localhost:3000`.
+4. Backend API disponible en `http://localhost:5000`.
+5. Health checks en `http://localhost:5000/health` y `http://localhost:5000/api/status`.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Pruebas
+Para ejecutar las pruebas unitarias y de integración del backend:
+```bash
+cd tests/backend/UnitTests
+dotnet test
+cd ../IntegrationTests
+dotnet test
+```
 
-</div>
+Para ejecutar las pruebas del frontend:
+```bash
+cd src/frontend/web
+npm install
+npm run test
+```
+Para generar la migración inicial del modelo de dominio, ejecuta:
+```bash
+cd src/backend
+dotnet ef migrations add InitialDomainModel --project Infrastructure/Infrastructure.csproj --startup-project Api/Api.csproj --output-dir Persistence/Migrations
+dotnet ef database update --project Infrastructure/Infrastructure.csproj --startup-project Api/Api.csproj
+```
