@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ProjectsPublicListPage } from "./ProjectsPublicListPage";
 import { projectsApi } from "../../features/projects/api/projectsApi";
-import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
+import { ProjectStatus, IntegrityStatus, ProjectCategory } from "../../features/projects/types";
 
 vi.mock("../../features/projects/api/projectsApi");
 
@@ -25,6 +25,7 @@ describe("ProjectsPublicListPage", () => {
         codigoInterno: "PRJ-1",
         nombre: "Proyecto Test 1",
         ubicacionTexto: "Ubicacion 1",
+        categoria: ProjectCategory.Residencial,
         estadoProyecto: ProjectStatus.Published,
         estadoIntegridad: IntegrityStatus.Pending,
         usuarioCreadorId: "user1",

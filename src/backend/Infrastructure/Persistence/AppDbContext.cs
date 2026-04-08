@@ -20,6 +20,12 @@ public class AppDbContext : DbContext
     public DbSet<Certificacion> Certificaciones => Set<Certificacion>();
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
 
+    // Validation Entities
+    public DbSet<AlertaValidacion> AlertasValidacion => Set<AlertaValidacion>();
+    public DbSet<ValidacionDgii> ValidacionesDgii => Set<ValidacionDgii>();
+    public DbSet<ValidacionAyuntamiento> ValidacionesAyuntamiento => Set<ValidacionAyuntamiento>();
+    public DbSet<DeteccionDuplicidad> DeteccionesDuplicidad => Set<DeteccionDuplicidad>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
