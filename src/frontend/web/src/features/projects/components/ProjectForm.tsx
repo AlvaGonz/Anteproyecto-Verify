@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto } from "../types";
+import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } from "../types";
 
 interface ProjectFormProps {
   initialData?: ProyectoDto;
@@ -22,6 +22,15 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   const [valorEstimado, setValorEstimado] = useState<number | "">(
     initialData?.valorEstimado || "",
   );
+  const [categoria, setCategoria] = useState<ProjectCategory>(
+    initialData?.categoria || ProjectCategory.Residencial,
+  );
+  const [datosDesarrollador, setDatosDesarrollador] = useState(
+    initialData?.datosDesarrollador || "",
+  );
+  const [designacionCatastral, setDesignacionCatastral] = useState(
+    initialData?.designacionCatastral || "",
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +47,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           ubicacionGps: ubicacionGps || undefined,
           valorEstimado:
             valorEstimado === "" ? undefined : Number(valorEstimado),
+          categoria,
+          datosDesarrollador: datosDesarrollador || undefined,
+          designacionCatastral: designacionCatastral || undefined,
         };
         await onSubmit(updateData);
       } else {
@@ -46,6 +58,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           ubicacionTexto,
           // TODO: Replace with actual logged-in user ID when auth is implemented
           usuarioCreadorId: "00000000-0000-0000-0000-000000000000",
+          categoria,
+          datosDesarrollador: datosDesarrollador || undefined,
+          designacionCatastral: designacionCatastral || undefined,
         };
         await onSubmit(createData);
       }
@@ -92,6 +107,52 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           onChange={(e) => setUbicacionTexto(e.target.value)}
           className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow"
           style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
+          Categoría
+        </label>
+        <select
+          value={categoria}
+          onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)}
+          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow"
+          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
+        >
+          <option value={ProjectCategory.Residencial}>Residencial</option>
+          <option value={ProjectCategory.Comercial}>Comercial</option>
+          <option value={ProjectCategory.Turistico}>Turístico</option>
+          <option value={ProjectCategory.Mixto}>Mixto</option>
+          <option value={ProjectCategory.Otro}>Otro</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
+          Datos del Desarrollador
+        </label>
+        <input
+          type="text"
+          value={datosDesarrollador}
+          onChange={(e) => setDatosDesarrollador(e.target.value)}
+          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow"
+          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
+          placeholder="Nombre de la constructora o desarrollador"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
+          Designación Catastral
+        </label>
+        <input
+          type="text"
+          value={designacionCatastral}
+          onChange={(e) => setDesignacionCatastral(e.target.value)}
+          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow font-mono"
+          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
+          placeholder="Ej: DC-12345"
         />
       </div>
 

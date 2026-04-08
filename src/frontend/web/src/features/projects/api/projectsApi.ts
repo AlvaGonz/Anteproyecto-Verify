@@ -48,6 +48,9 @@ export const projectsApi = {
             codigoInterno: `VF-NEW-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
             nombre: data.nombre,
             ubicacionTexto: data.ubicacionTexto,
+            categoria: data.categoria || 1, // Default to Residencial
+            datosDesarrollador: data.datosDesarrollador,
+            designacionCatastral: data.designacionCatastral,
             estadoProyecto: ProjectStatus.Draft,
             estadoIntegridad: IntegrityStatus.Pending,
             usuarioCreadorId: data.usuarioCreadorId,

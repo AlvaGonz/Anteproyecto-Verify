@@ -41,6 +41,14 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Persistence.INotificacionRepository, Infrastructure.Persistence.Repositories.NotificacionRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IUnitOfWork, Infrastructure.Persistence.Repositories.UnitOfWork>();
 
+        // Document Intelligence
+        services.AddScoped<Application.Abstractions.DocumentIntelligence.IDocumentValidationService, Infrastructure.DocumentIntelligence.MockDocumentValidationService>();
+
+        // Integrations
+        services.AddScoped<Application.Abstractions.Integrations.IDgriService, Infrastructure.Integrations.DgriMockService>();
+        services.AddScoped<Application.Abstractions.Integrations.ICatastroService, Infrastructure.Integrations.CatastroMockService>();
+        services.AddScoped<Application.Services.CatastroComparisonService>();
+
         // External Validation Mocks
         services.Configure<Infrastructure.ExternalValidation.Configuration.ExternalValidationOptions>(configuration.GetSection("ExternalValidation"));
         
@@ -55,6 +63,10 @@ public static class DependencyInjection
 
         // Orchestrator
         services.AddScoped<Application.Services.Validation.IProjectValidationOrchestrator, Application.Services.Validation.ProjectValidationOrchestrator>();
+
+        // Validations
+        services.AddScoped<Application.Features.Validations.Commands.InitiateDgriValidation.InitiateDgriValidationCommandHandler>();
+        services.AddScoped<Application.Features.Validations.Commands.InitiateCatastroValidation.InitiateCatastroValidationCommandHandler>();
 
         // Certifications
         services.AddSingleton<Application.Abstractions.Certifications.ICertificationCodeGenerator, Infrastructure.Certifications.CertificationCodeGenerator>();

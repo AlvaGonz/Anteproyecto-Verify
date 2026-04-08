@@ -17,6 +17,7 @@ public class Validacion : EntityBase
     public ValidationStatus EstadoValidacion { get; private set; }
     public bool? EsLegitimo { get; private set; }
     public string? Detalle { get; private set; }
+    public string? CamposValidadosJson { get; private set; }
 
     // Navigation properties
     public ICollection<Hallazgo> Hallazgos { get; private set; } = new List<Hallazgo>();
@@ -35,11 +36,12 @@ public class Validacion : EntityBase
         EstadoValidacion = ValidationStatus.Pending;
     }
 
-    public void CompleteValidation(bool esLegitimo, string? detalle)
+    public void CompleteValidation(bool esLegitimo, string? detalle, string? camposValidadosJson = null)
     {
         EstadoValidacion = ValidationStatus.Completed;
         EsLegitimo = esLegitimo;
         Detalle = detalle;
+        CamposValidadosJson = camposValidadosJson;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 }

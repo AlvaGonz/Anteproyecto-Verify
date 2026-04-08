@@ -30,22 +30,22 @@ public static class AppDbContextSeeder
                 await context.SaveChangesAsync();
 
                 // 2. Seed Proyectos
-                var proyecto1 = new Proyecto("Torre Bella Vista Piantini", "Ensanche Piantini, Distrito Nacional", "Torre residencial de 15 niveles", devUser.Id);
+                var proyecto1 = new Proyecto("Torre Bella Vista Piantini", "Ensanche Piantini, Distrito Nacional", devUser.Id, ProjectCategory.Residencial, "Constructora ABC", "DC-12345");
                 proyecto1.UpdateStatus(ProjectStatus.Published);
                 
-                var proyecto2 = new Proyecto("Residencial Los Cacicazgos", "Los Cacicazgos, Distrito Nacional", "Complejo de 3 torres", devUser.Id);
+                var proyecto2 = new Proyecto("Residencial Los Cacicazgos", "Los Cacicazgos, Distrito Nacional", devUser.Id, ProjectCategory.Residencial, "Desarrollos Inmobiliarios XYZ", "DC-67890");
                 proyecto2.UpdateStatus(ProjectStatus.Draft);
 
-                var proyecto3 = new Proyecto("Proyecto Costero La Romana", "La Romana, RD", "Villas frente al mar", devUser.Id);
+                var proyecto3 = new Proyecto("Proyecto Costero La Romana", "La Romana, RD", devUser.Id, ProjectCategory.Turistico, "Grupo Turístico del Este", "DC-11223");
                 proyecto3.UpdateStatus(ProjectStatus.UnderReview);
 
-                var proyecto4 = new Proyecto("Plaza Comercial Naco", "Ensanche Naco, Distrito Nacional", "Plaza comercial de 3 niveles con parqueo soterrado", devUser.Id);
+                var proyecto4 = new Proyecto("Plaza Comercial Naco", "Ensanche Naco, Distrito Nacional", devUser.Id, ProjectCategory.Comercial, "Inversiones Comerciales Naco", "DC-44556");
                 proyecto4.UpdateStatus(ProjectStatus.Published);
 
-                var proyecto5 = new Proyecto("Condominio Las Terrenas", "Las Terrenas, Samaná", "Condominio de 20 apartamentos a 5 minutos de la playa", devUser.Id);
+                var proyecto5 = new Proyecto("Condominio Las Terrenas", "Las Terrenas, Samaná", devUser.Id, ProjectCategory.Turistico, "Samaná Real Estate", "DC-77889");
                 proyecto5.UpdateStatus(ProjectStatus.Draft);
 
-                var proyecto6 = new Proyecto("Residencial Santiago Norte", "Gurabo, Santiago de los Caballeros", "Proyecto de casas cerradas", devUser.Id);
+                var proyecto6 = new Proyecto("Residencial Santiago Norte", "Gurabo, Santiago de los Caballeros", devUser.Id, ProjectCategory.Residencial, "Constructora Cibao", "DC-99001");
                 proyecto6.UpdateStatus(ProjectStatus.UnderReview);
 
                 context.Proyectos.AddRange(proyecto1, proyecto2, proyecto3, proyecto4, proyecto5, proyecto6);

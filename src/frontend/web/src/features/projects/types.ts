@@ -5,6 +5,9 @@ export interface ProyectoDto {
   ubicacionTexto: string;
   ubicacionGps?: string;
   valorEstimado?: number;
+  categoria: ProjectCategory;
+  datosDesarrollador?: string;
+  designacionCatastral?: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
   usuarioCreadorId: string;
@@ -16,6 +19,9 @@ export interface CreateProyectoDto {
   nombre: string;
   ubicacionTexto: string;
   usuarioCreadorId: string;
+  categoria?: ProjectCategory;
+  datosDesarrollador?: string;
+  designacionCatastral?: string;
 }
 
 export interface UpdateProyectoDto {
@@ -23,6 +29,17 @@ export interface UpdateProyectoDto {
   ubicacionTexto: string;
   ubicacionGps?: string;
   valorEstimado?: number;
+  categoria: ProjectCategory;
+  datosDesarrollador?: string;
+  designacionCatastral?: string;
+}
+
+export enum ProjectCategory {
+  Residencial = 1,
+  Comercial = 2,
+  Turistico = 3,
+  Mixto = 4,
+  Otro = 99
 }
 
 export enum ProjectStatus {

@@ -7,5 +7,8 @@ public record UpdateProyectoDto(
     string Nombre,
     string UbicacionTexto,
     string? UbicacionGps,
-    decimal? ValorEstimado
+    decimal? ValorEstimado,
+    ProjectCategory Categoria,
+    string? DatosDesarrollador,
+    string? DesignacionCatastral
 );
