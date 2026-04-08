@@ -26,6 +26,12 @@ public class Documento : EntityBase
     public Guid UsuarioCargaId { get; private set; }
     public string? Observaciones { get; private set; }
 
+    // RF-9 Formal validation fields
+    public DocumentFormalStatus? FormalStatus { get; private set; }
+    public DateTime? FechaVencimiento { get; private set; }
+    public string? VersionReglaAplicada { get; private set; }
+    public DateTime? FechaEvaluacion { get; private set; }
+
     // Navigation properties
     public ICollection<Validacion> Validaciones { get; private set; } = new List<Validacion>();
 
@@ -78,6 +84,15 @@ public class Documento : EntityBase
     public void ToggleActive(bool isActive)
     {
         Activo = isActive;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateFormalStatus(DocumentFormalStatus status, DateTime? fechaVencimiento, string versionReglaAplicada)
+    {
+        FormalStatus = status;
+        FechaVencimiento = fechaVencimiento;
+        VersionReglaAplicada = versionReglaAplicada;
+        FechaEvaluacion = DateTime.UtcNow;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 }

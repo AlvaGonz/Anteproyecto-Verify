@@ -16,6 +16,15 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.RequiredMetadata.RequiredMetadataRule>();
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.Validity.ValidityRule>();
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.Consistency.ConsistencyRule>();
+
+        // Validation Handlers
+        services.AddScoped<Application.Features.Validation.Commands.ExecuteDgiiValidation.ExecuteDgiiValidationCommandHandler>();
+        services.AddScoped<Application.Features.Validation.Commands.ExecuteAyuntamientoValidation.ExecuteAyuntamientoValidationCommandHandler>();
+        services.AddScoped<Application.Features.Validation.Commands.CheckDuplicateExpediente.CheckDuplicateExpedienteCommandHandler>();
+        services.AddScoped<Application.Features.Validation.Commands.EvaluateDocumentFormality.EvaluateDocumentFormalityCommandHandler>();
+        services.AddScoped<Application.Features.Validation.Commands.GenerateAlerta.GenerateAlertaCommandHandler>();
+        services.AddScoped<Application.Features.Validation.Queries.GetActiveAlertsByProject.GetActiveAlertsByProjectQueryHandler>();
+
         return services;
     }
 }

@@ -13,11 +13,14 @@ public class Proyecto : EntityBase
     public string? UbicacionGps { get; private set; }
     public decimal? ValorEstimado { get; private set; }
     public string? DatosDesarrollador { get; private set; }
+    public string? RncDesarrollador { get; private set; }
+    public string? Matricula { get; private set; }
     public ProjectCategory Categoria { get; private set; }
     public string? DesignacionCatastral { get; private set; }
     public EstadoJuridico EstadoJuridico { get; private set; } = EstadoJuridico.Pendiente;
     public ProjectStatus EstadoProyecto { get; private set; }
     public IntegrityStatus EstadoIntegridad { get; private set; }
+    public bool SelladoBloqueado { get; private set; }
     
     public Guid UsuarioCreadorId { get; private set; }
     public Usuario UsuarioCreador { get; private set; } = null!;
@@ -72,6 +75,19 @@ public class Proyecto : EntityBase
     public void UpdateEstadoJuridico(EstadoJuridico newStatus)
     {
         EstadoJuridico = newStatus;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void SetSelladoBloqueado(bool bloqueado)
+    {
+        SelladoBloqueado = bloqueado;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateRncYMatricula(string? rnc, string? matricula)
+    {
+        RncDesarrollador = rnc;
+        Matricula = matricula;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

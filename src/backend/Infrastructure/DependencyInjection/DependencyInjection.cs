@@ -39,6 +39,13 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Persistence.IReporteRepository, Infrastructure.Persistence.Repositories.ReporteRepository>();
         services.AddScoped<Application.Abstractions.Persistence.ICertificacionRepository, Infrastructure.Persistence.Repositories.CertificacionRepository>();
         services.AddScoped<Application.Abstractions.Persistence.INotificacionRepository, Infrastructure.Persistence.Repositories.NotificacionRepository>();
+        
+        // New Validation Repositories
+        services.AddScoped<Application.Abstractions.Persistence.IAlertaValidacionRepository, Infrastructure.Persistence.Repositories.AlertaValidacionRepository>();
+        services.AddScoped<Application.Abstractions.Persistence.IValidacionDgiiRepository, Infrastructure.Persistence.Repositories.ValidacionDgiiRepository>();
+        services.AddScoped<Application.Abstractions.Persistence.IValidacionAyuntamientoRepository, Infrastructure.Persistence.Repositories.ValidacionAyuntamientoRepository>();
+        services.AddScoped<Application.Abstractions.Persistence.IDeteccionDuplicidadRepository, Infrastructure.Persistence.Repositories.DeteccionDuplicidadRepository>();
+
         services.AddScoped<Application.Abstractions.Persistence.IUnitOfWork, Infrastructure.Persistence.Repositories.UnitOfWork>();
 
         // Document Intelligence
@@ -85,6 +92,11 @@ public static class DependencyInjection
 
         // Notifications
         services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
+        services.AddScoped<Application.Abstractions.Notifications.IEmailNotificationService, Infrastructure.Services.EmailNotificationService>();
+
+        // External Services
+        services.AddScoped<Application.Abstractions.ExternalServices.IDgiiValidationService, Infrastructure.Services.DgiiValidationService>();
+        services.AddScoped<Application.Abstractions.ExternalServices.IAyuntamientoService, Infrastructure.Services.AyuntamientoService>();
 
         // Exception Handler
         services.AddExceptionHandler<Api.Middleware.GlobalExceptionHandler>();
