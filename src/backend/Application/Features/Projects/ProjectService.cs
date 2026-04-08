@@ -36,7 +36,7 @@ public class ProjectService : IProjectService
 
     public async Task<ProyectoDto> CreateProjectAsync(CreateProyectoDto dto, CancellationToken cancellationToken = default)
     {
-        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId);
+        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
         
         await _proyectoRepository.AddAsync(proyecto, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -52,7 +52,7 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
-        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado);
+        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
         
         _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -85,6 +85,9 @@ public class ProjectService : IProjectService
             proyecto.UbicacionTexto,
             proyecto.UbicacionGps,
             proyecto.ValorEstimado,
+            proyecto.Categoria,
+            proyecto.DatosDesarrollador,
+            proyecto.DesignacionCatastral,
             proyecto.EstadoProyecto,
             proyecto.EstadoIntegridad,
             proyecto.UsuarioCreadorId,

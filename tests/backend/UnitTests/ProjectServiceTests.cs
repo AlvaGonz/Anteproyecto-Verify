@@ -30,7 +30,7 @@ public class ProjectServiceTests
     public async Task CreateProject_ShouldReturnDto_WhenValid()
     {
         // Arrange
-        var dto = new CreateProyectoDto("Test", "Location", Guid.NewGuid());
+        var dto = new CreateProyectoDto("Test", "Location", Guid.NewGuid(), ProjectCategory.Comercial, "DevData", "DC-123");
         _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
@@ -41,6 +41,9 @@ public class ProjectServiceTests
         Assert.NotNull(result);
         Assert.Equal("Test", result.Nombre);
         Assert.Equal("Location", result.UbicacionTexto);
+        Assert.Equal(ProjectCategory.Comercial, result.Categoria);
+        Assert.Equal("DevData", result.DatosDesarrollador);
+        Assert.Equal("DC-123", result.DesignacionCatastral);
         Assert.Equal(ProjectStatus.Draft, result.EstadoProyecto);
     }
 
@@ -50,7 +53,7 @@ public class ProjectServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", "NewDC");
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -63,6 +66,9 @@ public class ProjectServiceTests
         Assert.Equal("New", result.Nombre);
         Assert.Equal("NewLoc", result.UbicacionTexto);
         Assert.Equal(1000, result.ValorEstimado);
+        Assert.Equal(ProjectCategory.Turistico, result.Categoria);
+        Assert.Equal("NewDev", result.DatosDesarrollador);
+        Assert.Equal("NewDC", result.DesignacionCatastral);
     }
 
     [Fact]
@@ -70,7 +76,7 @@ public class ProjectServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", "NewDC");
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Proyecto?)null);
 

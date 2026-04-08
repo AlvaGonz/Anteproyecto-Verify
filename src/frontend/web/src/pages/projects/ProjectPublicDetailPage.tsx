@@ -93,6 +93,22 @@ export const ProjectPublicDetailPage: React.FC = () => {
             </div>
             <div>
               <dt className="text-sm font-medium" style={{ color: 'var(--color-text-main)' }}>
+                Desarrollador
+              </dt>
+              <dd className="mt-1 text-base font-medium" style={{ color: 'var(--color-text-strong)' }}>
+                {project.datosDesarrollador || "No especificado"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium" style={{ color: 'var(--color-text-main)' }}>
+                Designación Catastral
+              </dt>
+              <dd className="mt-1 text-base font-mono" style={{ color: 'var(--color-text-strong)' }}>
+                {project.designacionCatastral || "No especificada"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium" style={{ color: 'var(--color-text-main)' }}>
                 Estado del Proyecto
               </dt>
               <dd className="mt-1 text-base font-semibold" style={{ color: 'var(--color-brand-primary)' }}>
@@ -129,7 +145,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
         </div>
       </div>
 
-      <ProjectDocumentStatus projectId={project.id} />
+      <ProjectDocumentStatus projectId={project.id} projectCategory={project.categoria} />
 
       <div className="mt-10">
         <PublicProjectReport projectId={project.id} />

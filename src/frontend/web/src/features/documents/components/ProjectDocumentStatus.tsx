@@ -2,36 +2,38 @@ import React, { useState, useEffect } from "react";
 import { DocumentDto, DocumentType, DocumentStatus } from "../types";
 import { documentsApi } from "../api/documentsApi";
 import { AlertTriangle, CheckCircle, Clock, FileText, ShieldAlert } from "lucide-react";
+import { ProjectCategory } from "../../projects/types";
 
 interface ProjectDocumentStatusProps {
   projectId: string;
+  projectCategory?: ProjectCategory;
 }
 
 // Map enum to readable names and entities
-const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string }> = {
-  [DocumentType.CertificadoTitulo]: { name: "Certificado de Título (Duplicado del Dueño)", entity: "Registro de Títulos", norm: "Ley 108-05" },
-  [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico + Cargas y Gravámenes", entity: "Registro de Títulos", norm: "Ley 108-05" },
-  [DocumentType.PlanosArquitectonicos]: { name: "Planos Arquitectónicos aprobados", entity: "Ayuntamiento / MOPC", norm: "Ley 687-00" },
-  [DocumentType.PlanoMensuraCatastral]: { name: "Plano de Mensura Catastral", entity: "Tribunal de Tierras", norm: "Ley 108-05" },
-  [DocumentType.PermisoConstruccion]: { name: "Permiso de Construcción vigente", entity: "Ayuntamiento Municipal", norm: "Ordenanzas" },
-  [DocumentType.CertificadoUsoSuelo]: { name: "Certificado de Uso de Suelo / No Objeción Municipal", entity: "Ayuntamiento", norm: "Ordenanzas" },
-  [DocumentType.FormularioFIDVB009]: { name: "Formulario FI-DVB-009 registrado en DGII", entity: "DGII", norm: "Norma Gral. 07-2007" },
-  [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88" },
-  [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02" },
-  [DocumentType.ActaConstitutiva]: { name: "Acta Constitutiva + Estatutos Sociales", entity: "Cámara / Notaría", norm: "Ley 479-08" },
-  [DocumentType.PoderNotarial]: { name: "Poder Notarial del Representante Legal", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
-  [DocumentType.RNC]: { name: "RNC activo + estatus fiscal", entity: "DGII", norm: "-" },
-  [DocumentType.EstadosFinancieros]: { name: "Estados Financieros Auditados", entity: "Firma Auditora Certificada", norm: "-" },
-  [DocumentType.CertificacionesBancarias]: { name: "Certificaciones bancarias / origen de fondos", entity: "Banco / Institución Financiera", norm: "-" },
-  [DocumentType.FormularioKYCAML]: { name: "Formulario de Debida Diligencia KYC/AML", entity: "Propia empresa (sujeto obligado)", norm: "Ley 155-17, Art. 32" },
-  [DocumentType.DeclaracionPEP]: { name: "Declaración PEP", entity: "Propia empresa", norm: "Ley 155-17" },
-  [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
-  [DocumentType.NoObjecionINAPACAASD]: { name: "No objeción INAPA/CAASD", entity: "INAPA / CAASD", norm: "-" },
-  [DocumentType.DocumentosNotariales]: { name: "Documentos notariales firmados digitalmente", entity: "Notaría / e-firma", norm: "Ley 126-02" },
-  [DocumentType.DocumentosSupletorios]: { name: "Documentos supletorios (inmuebles no registrados)", entity: "Tribunal de Tierras", norm: "Ley 108-05" },
+const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
+  [DocumentType.CertificadoTitulo]: { name: "Certificado de Título (Duplicado del Dueño)", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico + Cargas y Gravámenes", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.PlanosArquitectonicos]: { name: "Planos Arquitectónicos aprobados", entity: "Ayuntamiento / MOPC", norm: "Ley 687-00", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.PlanoMensuraCatastral]: { name: "Plano de Mensura Catastral", entity: "Tribunal de Tierras", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.PermisoConstruccion]: { name: "Permiso de Construcción vigente", entity: "Ayuntamiento Municipal", norm: "Ordenanzas", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.CertificadoUsoSuelo]: { name: "Certificado de Uso de Suelo / No Objeción Municipal", entity: "Ayuntamiento", norm: "Ordenanzas", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.FormularioFIDVB009]: { name: "Formulario FI-DVB-009 registrado en DGII", entity: "DGII", norm: "Norma Gral. 07-2007", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.ActaConstitutiva]: { name: "Acta Constitutiva + Estatutos Sociales", entity: "Cámara / Notaría", norm: "Ley 479-08", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.PoderNotarial]: { name: "Poder Notarial del Representante Legal", entity: "Notaría Pública", norm: "Ley 301 Notarial", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.RNC]: { name: "RNC activo + estatus fiscal", entity: "DGII", norm: "-", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.EstadosFinancieros]: { name: "Estados Financieros Auditados", entity: "Firma Auditora Certificada", norm: "-", categories: [2, 3, 4] }, // Only for commercial/touristic/mixed
+  [DocumentType.CertificacionesBancarias]: { name: "Certificaciones bancarias / origen de fondos", entity: "Banco / Institución Financiera", norm: "-", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.FormularioKYCAML]: { name: "Formulario de Debida Diligencia KYC/AML", entity: "Propia empresa (sujeto obligado)", norm: "Ley 155-17, Art. 32", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.DeclaracionPEP]: { name: "Declaración PEP", entity: "Propia empresa", norm: "Ley 155-17", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00", categories: [2, 3, 4] }, // Mostly for commercial/touristic/mixed
+  [DocumentType.NoObjecionINAPACAASD]: { name: "No objeción INAPA/CAASD", entity: "INAPA / CAASD", norm: "-", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.DocumentosNotariales]: { name: "Documentos notariales firmados digitalmente", entity: "Notaría / e-firma", norm: "Ley 126-02", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.DocumentosSupletorios]: { name: "Documentos supletorios (inmuebles no registrados)", entity: "Tribunal de Tierras", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
 };
 
-export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId }) => {
+export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, projectCategory = ProjectCategory.Residencial }) => {
   const [documents, setDocuments] = useState<DocumentDto[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,10 +53,13 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
 
   if (loading) return <div className="py-4 text-center text-sm text-gray-500">Cargando estado de documentos...</div>;
 
-  // Calculate Risk Score
-  const requiredTypes = Object.keys(DOCUMENT_INFO).map(Number);
-  const uploadedDocs = documents.filter(d => d.estadoDocumento !== DocumentStatus.Invalid);
-  const verifiedDocs = documents.filter(d => d.estadoDocumento === DocumentStatus.Valid);
+  // Filter required types based on project category
+  const requiredTypes = Object.keys(DOCUMENT_INFO)
+    .map(Number)
+    .filter(typeId => DOCUMENT_INFO[typeId].categories.includes(projectCategory));
+
+  const uploadedDocs = documents.filter(d => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
+  const verifiedDocs = documents.filter(d => d.estadoDocumento === DocumentStatus.Valid && requiredTypes.includes(d.tipoDocumento));
   
   const missingCount = requiredTypes.length - uploadedDocs.length;
   const pendingVerificationCount = uploadedDocs.length - verifiedDocs.length;
@@ -87,10 +92,10 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
 
   const getStatusText = (typeId: number) => {
     const doc = documents.find(d => d.tipoDocumento === typeId);
-    if (!doc) return <span className="text-gray-500 text-xs font-medium px-2 py-1 bg-gray-100 rounded-full">Faltante</span>;
-    if (doc.estadoDocumento === DocumentStatus.Valid) return <span className="text-green-700 text-xs font-medium px-2 py-1 bg-green-100 rounded-full">Verificado</span>;
-    if (doc.estadoDocumento === DocumentStatus.Invalid) return <span className="text-red-700 text-xs font-medium px-2 py-1 bg-red-100 rounded-full">Inconsistente</span>;
-    return <span className="text-yellow-700 text-xs font-medium px-2 py-1 bg-yellow-100 rounded-full">En Espera</span>;
+    if (!doc) return <span className="text-gray-500 text-xs font-medium px-2 py-1 bg-gray-100 rounded-full">Ausente</span>;
+    if (doc.estadoDocumento === DocumentStatus.Valid) return <span className="text-green-700 text-xs font-medium px-2 py-1 bg-green-100 rounded-full">Presente (Verificado)</span>;
+    if (doc.estadoDocumento === DocumentStatus.Invalid) return <span className="text-red-700 text-xs font-medium px-2 py-1 bg-red-100 rounded-full">Incompleto/Inconsistente</span>;
+    return <span className="text-yellow-700 text-xs font-medium px-2 py-1 bg-yellow-100 rounded-full">Presente (En Espera)</span>;
   };
 
   return (
@@ -101,12 +106,12 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         <div>
           <h3 className="font-bold text-lg">Scoring de Riesgo Documental: {riskLevel}</h3>
           <p className="text-sm mt-1 opacity-90">
-            {missingCount} documentos faltantes, {pendingVerificationCount} en espera de verificación.
+            {missingCount} documentos esenciales ausentes, {pendingVerificationCount} presentes pero en espera de verificación.
             Puntuación de riesgo calculada: {riskScore}/100.
           </p>
           {riskScore > 50 && (
             <div className="mt-2 text-sm font-medium">
-              ⚠️ Alerta: El proyecto no puede alcanzar el Sello de Integridad hasta que se resuelvan los documentos faltantes o inconsistentes.
+              ⚠️ Alerta: El proyecto no puede alcanzar el Sello de Integridad hasta que se resuelvan los documentos ausentes o incompletos.
             </div>
           )}
         </div>
@@ -117,10 +122,10 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200 bg-gray-50">
           <h3 className="text-lg leading-6 font-medium text-gray-900 flex items-center gap-2">
             <FileText className="w-5 h-5 text-gray-500" />
-            Estado de Documentación Requerida
+            Lista de Documentos Esenciales Requeridos
           </h3>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Progreso hacia el sello de integridad VeriFinca.
+            Progreso hacia el sello de integridad VeriFinca ({Math.round((uploadedDocs.length / requiredTypes.length) * 100)}% completado).
           </p>
         </div>
         

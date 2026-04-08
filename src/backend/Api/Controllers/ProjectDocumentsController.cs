@@ -117,4 +117,36 @@ public class ProjectDocumentsController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpGet("required-documents")]
+    [ProducesResponseType(typeof(IEnumerable<RequiredDocumentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRequiredDocuments(Guid projectId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var documents = await _documentService.GetRequiredDocumentsAsync(projectId, cancellationToken);
+            return Ok(documents);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    [HttpGet("diagnostic")]
+    [ProducesResponseType(typeof(Application.DTOs.Projects.ProjectDiagnosticDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProjectDiagnostic(Guid projectId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var diagnostic = await _documentService.GetProjectDiagnosticAsync(projectId, cancellationToken);
+            return Ok(diagnostic);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 }

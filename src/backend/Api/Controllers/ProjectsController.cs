@@ -52,7 +52,7 @@ public class ProjectsController : ControllerBase
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(new { message = ex.Message, field = ex.ParamName });
         }
     }
 

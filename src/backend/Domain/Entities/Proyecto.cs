@@ -12,6 +12,10 @@ public class Proyecto : EntityBase
     public string UbicacionTexto { get; private set; }
     public string? UbicacionGps { get; private set; }
     public decimal? ValorEstimado { get; private set; }
+    public string? DatosDesarrollador { get; private set; }
+    public ProjectCategory Categoria { get; private set; }
+    public string? DesignacionCatastral { get; private set; }
+    public EstadoJuridico EstadoJuridico { get; private set; } = EstadoJuridico.Pendiente;
     public ProjectStatus EstadoProyecto { get; private set; }
     public IntegrityStatus EstadoIntegridad { get; private set; }
     
@@ -27,7 +31,7 @@ public class Proyecto : EntityBase
 
     private Proyecto() { } // For EF Core
 
-    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId)
+    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, ProjectCategory categoria = ProjectCategory.Residencial, string? datosDesarrollador = null, string? designacionCatastral = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -36,12 +40,15 @@ public class Proyecto : EntityBase
         Nombre = nombre;
         UbicacionTexto = ubicacionTexto;
         UsuarioCreadorId = usuarioCreadorId;
+        Categoria = categoria;
+        DatosDesarrollador = datosDesarrollador;
+        DesignacionCatastral = designacionCatastral;
         CodigoInterno = GenerateCode();
         EstadoProyecto = ProjectStatus.Draft;
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
-    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado)
+    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, ProjectCategory categoria, string? datosDesarrollador, string? designacionCatastral)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -50,12 +57,21 @@ public class Proyecto : EntityBase
         UbicacionTexto = ubicacionTexto;
         UbicacionGps = ubicacionGps;
         ValorEstimado = valorEstimado;
+        Categoria = categoria;
+        DatosDesarrollador = datosDesarrollador;
+        DesignacionCatastral = designacionCatastral;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
     public void UpdateStatus(ProjectStatus newStatus)
     {
         EstadoProyecto = newStatus;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateEstadoJuridico(EstadoJuridico newStatus)
+    {
+        EstadoJuridico = newStatus;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
