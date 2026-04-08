@@ -1,0 +1,130 @@
+namespace UnitTests;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Abstractions.Persistence;
+using Application.DTOs;
+using Application.Features.Projects;
+using Domain.Entities;
+using Domain.Enums;
+using Moq;
+using Xunit;
+
+public class ProjectServiceTests
+{
+    private readonly Mock<IProyectoRepository> _proyectoRepositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly ProjectService _projectService;
+
+    public ProjectServiceTests()
+    {
+        _proyectoRepositoryMock = new Mock<IProyectoRepository>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _projectService = new ProjectService(_proyectoRepositoryMock.Object, _unitOfWorkMock.Object);
+    }
+
+    [Fact]
+    public async Task CreateProject_ShouldReturnDto_WhenValid()
+    {
+        // Arrange
+        var dto = new CreateProyectoDto("Test", "Location", Guid.NewGuid());
+        _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        // Act
+        var result = await _projectService.CreateProjectAsync(dto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Test", result.Nombre);
+        Assert.Equal("Location", result.UbicacionTexto);
+        Assert.Equal(ProjectStatus.Draft, result.EstadoProyecto);
+    }
+
+    [Fact]
+    public async Task UpdateProject_ShouldReturnDto_WhenValid()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000);
+        
+        _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        // Act
+        var result = await _projectService.UpdateProjectAsync(id, dto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("New", result.Nombre);
+        Assert.Equal("NewLoc", result.UbicacionTexto);
+        Assert.Equal(1000, result.ValorEstimado);
+    }
+
+    [Fact]
+    public async Task UpdateProject_ShouldThrowKeyNotFound_WhenNotFound()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000);
+        
+        _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Proyecto?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _projectService.UpdateProjectAsync(id, dto));
+    }
+
+    [Fact]
+    public async Task GetVisibleProjects_ShouldReturnOnlyVisible()
+    {
+        // Arrange
+        var user = new Usuario("Test", "test@test.com", "hash", UserRole.Client);
+        var p1 = new Proyecto("P1", "L1", user.Id);
+        p1.UpdateStatus(ProjectStatus.Published);
+        var p2 = new Proyecto("P2", "L2", user.Id);
+        p2.UpdateStatus(ProjectStatus.InReview);
+
+        _proyectoRepositoryMock.Setup(r => r.GetVisibleAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Proyecto> { p1, p2 });
+
+        // Act
+        var result = await _projectService.GetVisibleProjectsAsync();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count());
+    }
+
+    [Fact]
+    public async Task GetProjectById_ShouldReturnDto_WhenExists()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var proyecto = new Proyecto("P1", "L1", Guid.NewGuid());
+        _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
+
+        // Act
+        var result = await _projectService.GetProjectByIdAsync(id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("P1", result.Nombre);
+    }
+
+    [Fact]
+    public async Task GetProjectById_ShouldReturnNull_WhenNotExists()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Proyecto?)null);
+
+        // Act
+        var result = await _projectService.GetProjectByIdAsync(id);
+
+        // Assert
+        Assert.Null(result);
+    }
+}

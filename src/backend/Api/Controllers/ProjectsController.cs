@@ -1,0 +1,92 @@
+namespace Api.Controllers;
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Contracts.Projects;
+using Application.DTOs;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ProjectsController : ControllerBase
+{
+    private readonly IProjectService _projectService;
+
+    public ProjectsController(IProjectService projectService)
+    {
+        _projectService = projectService;
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(CancellationToken cancellationToken)
+    {
+        var projects = await _projectService.GetVisibleProjectsAsync(cancellationToken);
+        return Ok(projects);
+    }
+
+    [HttpGet("{id:guid}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ProyectoDto>> GetProjectById(Guid id, CancellationToken cancellationToken)
+    {
+        var project = await _projectService.GetProjectByIdAsync(id, cancellationToken);
+        if (project == null)
+        {
+            return NotFound();
+        }
+        return Ok(project);
+    }
+
+    [HttpPost]
+    // [Authorize] // TODO: Enable when auth is fully implemented
+    public async Task<ActionResult<ProyectoDto>> CreateProject([FromBody] CreateProyectoDto dto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var project = await _projectService.CreateProjectAsync(dto, cancellationToken);
+            return CreatedAtAction(nameof(GetProjectById), new { id = project.Id }, project);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPut("{id:guid}")]
+    // [Authorize] // TODO: Enable when auth is fully implemented
+    public async Task<ActionResult<ProyectoDto>> UpdateProject(Guid id, [FromBody] UpdateProyectoDto dto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var project = await _projectService.UpdateProjectAsync(id, dto, cancellationToken);
+            return Ok(project);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPatch("{id:guid}/status")]
+    // [Authorize] // TODO: Enable when auth is fully implemented
+    public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] ProjectStatus status, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var project = await _projectService.UpdateProjectStatusAsync(id, status, cancellationToken);
+            return Ok(project);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+}

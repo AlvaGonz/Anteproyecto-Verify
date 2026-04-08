@@ -1,0 +1,83 @@
+namespace Domain.Entities;
+
+using System;
+using System.Collections.Generic;
+using Domain.Common;
+using Domain.Enums;
+
+public class Documento : EntityBase
+{
+    public Guid ProyectoId { get; private set; }
+    public Proyecto Proyecto { get; private set; } = null!;
+
+    public DocumentType TipoDocumento { get; private set; }
+    public string NombreArchivoOriginal { get; private set; }
+    public string NombreArchivoAlmacenado { get; private set; }
+    public string RutaArchivo { get; private set; }
+    public string ContentType { get; private set; }
+    public string Extension { get; private set; }
+    public long TamanoBytes { get; private set; }
+    public DocumentStatus EstadoDocumento { get; private set; }
+    public bool Activo { get; private set; }
+    public int Version { get; private set; }
+    
+    public DateTime? FechaEmision { get; private set; }
+    public string? InstitucionEmisora { get; private set; }
+    public Guid UsuarioCargaId { get; private set; }
+    public string? Observaciones { get; private set; }
+
+    // Navigation properties
+    public ICollection<Validacion> Validaciones { get; private set; } = new List<Validacion>();
+
+    private Documento() { } // For EF Core
+
+    public Documento(
+        Guid proyectoId, 
+        DocumentType tipoDocumento, 
+        string nombreArchivoOriginal, 
+        string nombreArchivoAlmacenado,
+        string rutaArchivo,
+        string contentType,
+        string extension,
+        long tamanoBytes,
+        Guid usuarioCargaId,
+        int version = 1,
+        DateTime? fechaEmision = null,
+        string? institucionEmisora = null,
+        string? observaciones = null)
+    {
+        if (proyectoId == Guid.Empty) throw new ArgumentException("Proyecto requerido", nameof(proyectoId));
+        if (string.IsNullOrWhiteSpace(nombreArchivoOriginal)) throw new ArgumentException("Nombre de archivo requerido", nameof(nombreArchivoOriginal));
+        if (string.IsNullOrWhiteSpace(rutaArchivo)) throw new ArgumentException("Ruta de archivo requerida", nameof(rutaArchivo));
+
+        ProyectoId = proyectoId;
+        TipoDocumento = tipoDocumento;
+        NombreArchivoOriginal = nombreArchivoOriginal;
+        NombreArchivoAlmacenado = nombreArchivoAlmacenado;
+        RutaArchivo = rutaArchivo;
+        ContentType = contentType;
+        Extension = extension;
+        TamanoBytes = tamanoBytes;
+        UsuarioCargaId = usuarioCargaId;
+        Version = version;
+        FechaEmision = fechaEmision;
+        InstitucionEmisora = institucionEmisora;
+        Observaciones = observaciones;
+        
+        EstadoDocumento = DocumentStatus.Uploaded;
+        Activo = true;
+    }
+
+    public void UpdateStatus(DocumentStatus status, string? observaciones = null)
+    {
+        EstadoDocumento = status;
+        if (observaciones != null) Observaciones = observaciones;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void ToggleActive(bool isActive)
+    {
+        Activo = isActive;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+}

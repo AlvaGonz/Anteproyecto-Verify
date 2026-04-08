@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --color-base-bg: #f8f6f7;
+  --color-surface: #f4f1ec;
+  --color-surface-alt: #fbecd7;
+  --color-border-warm: #dad1c8;
+  --color-text-main: #111143;
+  --color-text-strong: #101b3b;
+  --color-brand-primary: #26428b;
+  --color-brand-hover: #223381;
+  --color-accent-cool: #516ac7;
+  --color-info: #9bacd8;
+  --color-accent-warm: #e3af64;
+  --color-highlight: #f98613;
+
+  --shadow-card: 0 4px 12px rgba(16, 27, 59, 0.06), 0 1px 3px rgba(16, 27, 59, 0.04);
+  --shadow-cta: 3px 3px 0px 0px #101b3b;
+  --shadow-cta-hover: 1px 1px 0px 0px #101b3b;
+
+  --radius-small: 0.375rem;
+  --radius-medium: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-feature: 1rem;
+  --radius-section: 1.5rem;
+  --radius-pill: 9999px;
+  
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "General Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-section, .print-section * {
+    visibility: visible;
+  }
+  .print-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-base-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-text-strong);
+}
+
+/* Clay-inspired utilities */
+.clay-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-warm);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.clay-btn-primary {
+  background-color: var(--color-brand-primary);
+  color: #ffffff;
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-cta);
+  border: 1px solid var(--color-text-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clay-btn-primary:hover {
+  background-color: var(--color-brand-hover);
+  box-shadow: var(--shadow-cta-hover);
+  transform: translate(2px, 2px);
+}
+
+.clay-btn-secondary {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid var(--color-border-warm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clay-btn-secondary:hover {
+  background-color: var(--color-border-warm);
+}
