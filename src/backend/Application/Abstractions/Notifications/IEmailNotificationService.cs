@@ -7,4 +7,5 @@ using Domain.Entities;
 public interface IEmailNotificationService
 {
     Task SendCriticalAlertAsync(string recipientEmail, AlertaValidacion alerta, CancellationToken ct = default);
+    Task SendProjectStatusChangeAsync(string recipientEmail, Proyecto proyecto, CancellationToken ct = default);
 }

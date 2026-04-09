@@ -11,7 +11,11 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Accion).IsRequired().HasMaxLength(200);
         builder.Property(a => a.Detalle).HasMaxLength(2000);
+        builder.Property(a => a.Resultado).HasMaxLength(2000);
         builder.Property(a => a.IpOrigen).HasMaxLength(50);
+        builder.Property(a => a.TipoOperacion).IsRequired();
+
+        builder.ToTable(tb => tb.HasTrigger("trg_Auditoria_AppendOnly"));
 
         builder.HasOne(a => a.Usuario)
             .WithMany()

@@ -11,14 +11,24 @@ using Application.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 
+using Application.Abstractions.Notifications;
+
 public class ProjectService : IProjectService
 {
     private readonly IProyectoRepository _proyectoRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IEmailNotificationService _emailNotificationService;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ProjectService(IProyectoRepository proyectoRepository, IUnitOfWork unitOfWork)
+    public ProjectService(
+        IProyectoRepository proyectoRepository, 
+        IUsuarioRepository usuarioRepository,
+        IEmailNotificationService emailNotificationService,
+        IUnitOfWork unitOfWork)
     {
         _proyectoRepository = proyectoRepository;
+        _usuarioRepository = usuarioRepository;
+        _emailNotificationService = emailNotificationService;
         _unitOfWork = unitOfWork;
     }
 
@@ -68,10 +78,21 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
+        var oldStatus = proyecto.Status;
         proyecto.UpdateStatus(status);
         
         _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        if (oldStatus != status && (status == ProjectStatus.Approved || status == ProjectStatus.Rejected))
+        {
+            var usuario = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
+            if (usuario != null && !string.IsNullOrWhiteSpace(usuario.Email))
+            {
+                // Fire and forget or await, depending on requirements. We await here for simplicity.
+                await _emailNotificationService.SendProjectStatusChangeAsync(usuario.Email, proyecto, cancellationToken);
+            }
+        }
 
         return MapToDto(proyecto);
     }
