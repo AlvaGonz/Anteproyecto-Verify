@@ -5,6 +5,7 @@ import {
   FolderKanban,
   FileCheck,
   Settings,
+  ShieldAlert
 } from "lucide-react";
 
 export const Sidebar: React.FC = () => {
@@ -14,6 +15,7 @@ export const Sidebar: React.FC = () => {
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Proyectos", href: "/admin/projects", icon: FolderKanban },
     { name: "Validaciones", href: "/admin/validations", icon: FileCheck },
+    { name: "Reglas de Validación", href: "/admin/rules", icon: ShieldAlert },
     { name: "Configuración", href: "/admin/settings", icon: Settings },
   ];
 

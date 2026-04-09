@@ -7,127 +7,154 @@ import { ProjectDocumentsPage } from "../pages/projects/ProjectDocumentsPage";
 import { ProjectValidationPage } from "../pages/projects/ProjectValidationPage";
 import { ProjectAuditPage } from "../pages/admin/ProjectAuditPage";
 import { ProjectReportsPage } from "../pages/admin/ProjectReportsPage";
+import { RulesManagePage } from "../pages/admin/RulesManagePage";
 import { PublicVerifySearchPage } from "../pages/public/PublicVerifySearchPage";
 import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
+import { PublicVerificationPage } from "../pages/public/PublicVerificationPage";
 
 import { AdminLayout } from "../shared/components/layout/AdminLayout";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
 import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
+import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
 
 export const router = createHashRouter([
   {
-    path: "/verify",
-    element: <PublicVerifySearchPage />,
-  },
-  {
-    path: "/verify/:code",
-    element: <PublicVerifyResultPage />,
-  },
-  {
     path: "/",
-    element: <Navigate to="/projects" replace />,
-  },
-  {
-    path: "/health",
-    element: <HealthPage />,
-  },
-  {
-    path: "/projects",
-    element: <ProjectsPublicListPage />,
-  },
-  {
-    path: "/projects/:id",
-    element: <ProjectPublicDetailPage />,
-  },
-  {
-    path: "/admin",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <Navigate to="/admin/dashboard" replace />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/dashboard",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <DashboardPage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/projects",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <AdminProjectsPage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/projects/new",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <ProjectManagePage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/projects/:id/edit",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <ProjectManagePage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/projects/:id/documents",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <ProjectDocumentsPage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/projects/:id/validations",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <ProjectValidationPage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/projects/:id/audit",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <ProjectAuditPage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/admin/projects/:id/reports",
-    element: (
-      <AuthGuard>
-        <AdminLayout>
-          <ProjectReportsPage />
-        </AdminLayout>
-      </AuthGuard>
-    ),
-  },
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        path: "/consulta-publica",
+        element: <PublicVerificationPage />,
+      },
+      {
+        path: "/verify",
+        element: <PublicVerifySearchPage />,
+      },
+      {
+        path: "/verify/:code",
+        element: <PublicVerifyResultPage />,
+      },
+      {
+        path: "/",
+        element: <Navigate to="/projects" replace />,
+      },
+      {
+        path: "/health",
+        element: <HealthPage />,
+      },
+      {
+        path: "/projects",
+        element: <ProjectsPublicListPage />,
+      },
+      {
+        path: "/projects/:id",
+        element: <ProjectPublicDetailPage />,
+      },
+      {
+        path: "/admin",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <Navigate to="/admin/dashboard" replace />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/dashboard",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <DashboardPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <AdminProjectsPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/new",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <ProjectManagePage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/:id/edit",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <ProjectManagePage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/:id/documents",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <ProjectDocumentsPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/:id/validations",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <ProjectValidationPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/:id/audit",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <ProjectAuditPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/:id/reports",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <ProjectReportsPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/rules",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <RulesManagePage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "*",
+        element: <ErrorBoundary />,
+      }
+    ]
+  }
 ]);

@@ -39,4 +39,50 @@ export const reportsApi = {
     if (!response.ok) throw new Error("Failed to fetch project reports");
     return response.json();
   },
+
+  generatePdf: async (projectId: string, token: string): Promise<Blob> => {
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(new Blob(["Mock PDF Content"], { type: "application/pdf" }));
+        }, 800);
+      });
+    }
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/reports/pdf`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.Mensaje || 'Error al generar el reporte PDF.');
+    }
+
+    return response.blob();
+  },
+
+  generateExcel: async (projectId: string, token: string): Promise<Blob> => {
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(new Blob(["Mock Excel Content"], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+        }, 800);
+      });
+    }
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/reports/excel`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.Mensaje || 'Error al generar el reporte Excel.');
+    }
+
+    return response.blob();
+  }
 };

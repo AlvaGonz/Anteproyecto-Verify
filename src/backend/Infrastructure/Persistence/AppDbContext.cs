@@ -25,6 +25,12 @@ public class AppDbContext : DbContext
     public DbSet<ValidacionDgii> ValidacionesDgii => Set<ValidacionDgii>();
     public DbSet<ValidacionAyuntamiento> ValidacionesAyuntamiento => Set<ValidacionAyuntamiento>();
     public DbSet<DeteccionDuplicidad> DeteccionesDuplicidad => Set<DeteccionDuplicidad>();
+    
+    // RF-11 to RF-15 Entities
+    public DbSet<ConsentimientoFinanciero> ConsentimientosFinancieros => Set<ConsentimientoFinanciero>();
+    public DbSet<ResultadoCrediticio> ResultadosCrediticios => Set<ResultadoCrediticio>();
+    public DbSet<SelloIntegridad> SellosIntegridad => Set<SelloIntegridad>();
+    public DbSet<ReglaValidacion> ReglasValidacion => Set<ReglaValidacion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
