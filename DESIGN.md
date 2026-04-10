@@ -1,75 +1,78 @@
-# Design System: VeriFinca Clay
+# DESIGN.md
 
-This design system is a **Clay-inspired, custom-palette adaptation** tailored for the VeriFinca application.
+## Official Color Palette
 
-## Reference
-This system uses the [Clay design system](https://clayui.com/) as a stylistic reference and inspiration. It is a reinterpretation, not a pixel-for-pixel clone. We preserve the warm editorial atmosphere, playful but controlled color usage, rounded containers, expressive buttons, and tactile elevation, while adapting it to a product-friendly B2B interface that feels human.
+Single source of truth for all project colors. Any color used in frontend, admin, public views, badges, alerts, or status indicators must come from this palette.
 
-## Palette Mapping
-The original Clay palette has been completely replaced with a custom palette. 
+## Brand Intent
 
-**Note on colors:** The provided color `101b3bx` was invalid and has been normalized to `#101b3b`.
+- Legal trust
+- Technical clarity
+- Institutional seriousness
+- Warmth without losing professionalism
 
-### Custom Palette
-- `#101b3b`
-- `#26428b`
-- `#516ac7`
-- `#e3af64`
-- `#f8f6f7`
-- `#fbecd7`
-- `#f98613`
-- `#223381`
-- `#111143`
-- `#9bacd8`
-- `#dad1c8`
-- `#f4f1ec`
+## Official Tokens
 
-### Semantic Roles
-- **Background**: `#f8f6f7` (`--color-base-bg`)
-- **Surface**: `#f4f1ec` (`--color-surface`)
-- **Surface warm alt**: `#fbecd7` (`--color-surface-alt`)
-- **Border**: `#dad1c8` (`--color-border-warm`)
-- **Text primary**: `#111143` (`--color-text-main`)
-- **Text strong/dark**: `#101b3b` (`--color-text-strong`)
-- **Primary brand**: `#26428b` (`--color-brand-primary`)
-- **Primary hover**: `#223381` (`--color-brand-hover`)
-- **Secondary cool accent**: `#516ac7` (`--color-accent-cool`)
-- **Soft info accent**: `#9bacd8` (`--color-info`)
-- **Warm gold accent**: `#e3af64` (`--color-accent-warm`)
-- **Warm orange accent**: `#f98613` (`--color-highlight`)
-
-## Typography
-- **Reference Typography**: Roobert (Display) + Space Mono (Code/Technical).
-- **Implemented Typography**: Inter (Sans/Body) + General Sans (Display) + Space Mono (Technical).
-We preserve the Clay-like contrast of expressive display typography paired with readable UI/body text.
-
-## Border Radius
-A scale inspired by Clay's rounded aesthetic:
-- `small`: 0.375rem
-- `medium`: 0.5rem
-- `card`: 0.75rem
-- `feature`: 1rem
-- `section`: 1.5rem
-- `pill`: 9999px
-
-## Shadows
-A custom shadow system inspired by Clay:
-- `card`: Subtle layered shadow for cards and surfaces.
-- `cta`: Playful hard-offset shadow for primary Call-to-Action buttons.
-- `cta-hover`: Reduced offset shadow for the pressed/hover state of CTAs.
-
-## Interaction
-- **Hover behavior**: Playful rotation and offset shadow reduction is allowed on key CTA buttons only. Do not apply this to every button in the app to maintain enterprise usability.
-- **Reduced motion**: Ensure transitions are smooth and respect reduced-motion preferences.
+| Token | Hex | Purpose |
+|---|---|---|
+| brand-primary | #2c3b4e | Main brand, primary buttons, nav, headers |
+| brand-primary-hover | #1e223d | Hover / pressed state for primary actions |
+| brand-secondary | #a35139 | Secondary accent, institutional highlight |
+| brand-accent | #f54f1b | Strong CTA, critical alerts |
+| brand-accent-soft | #feb161 | Badges, soft highlights, warm emphasis |
+| surface-base | #ede9de | Default app / page background |
+| surface-alt | #e6d5b7 | Cards, panels, grouped content |
+| surface-muted | #c9c1b2 | Borders, dividers, disabled backgrounds |
+| text-strong | #1c2632 | Main text, headings, dense UI |
+| text-on-dark | #ede9de | Text on dark / brand surfaces |
 
 ## Usage Rules
-- **Orange (`#f98613`)**: Use sparingly for highlights, warnings, or key badges.
-- **Gold (`#e3af64`)**: Use for warm accents, secondary badges, or special statuses.
-- **Blue Hierarchy**: Use `#26428b` for primary actions and `#516ac7` for secondary cool accents.
-- **Neutral Surfaces**: Keep main content areas on `#f8f6f7` or `#f4f1ec` to maintain the paper-like editorial feel.
-- **Color Overload**: Avoid using too many accent colors on one screen. Prefer 1 primary accent + 1 warm accent per view.
 
-## Accessibility Notes
-- Maintain readable contrast between text and backgrounds.
-- Preserve keyboard focus states (using standard focus rings).
-- Do not let playful motion harm usability.
+### Buttons
+- Primary: bg `brand-primary`, text `text-on-dark`
+- Primary hover: bg `brand-primary-hover`
+- Secondary: bg `surface-alt`, text `text-strong`, border `surface-muted`
+- Destructive/emphasis: bg `brand-accent`, text `text-on-dark`
+
+### Surfaces
+- App background: `surface-base`
+- Cards / panels: `surface-alt`
+- Borders / dividers: `surface-muted`
+
+### Accents
+- Use `brand-accent` sparingly — only for critical calls to action
+- Use `brand-accent-soft` for status pills and informational states
+- Use `brand-secondary` as restrained secondary, not dominant UI color
+
+## Accessibility Rules
+
+- Never use accent colors as the only source of meaning
+- `text-strong` on light surfaces
+- `text-on-dark` on dark/brand surfaces
+- Avoid long paragraph text in accent colors
+- Maintain strong contrast on buttons, links, status labels
+
+## Status Mapping
+
+| State | Background | Text |
+|---|---|---|
+| Neutral / In Review | surface-muted | text-strong |
+| Attention | brand-accent-soft | text-strong |
+| Critical | brand-accent | text-on-dark |
+| Authority surface | brand-primary | text-on-dark |
+
+## Prohibitions
+
+- Do not introduce unrelated blues, purples, or neon accents
+- Do not mix random grayscale with warm neutrals
+- Do not use `brand-accent` as a global background
+- Do not hardcode hex values inside components
+
+## Future Dark Mode
+
+Derive dark surfaces from:
+- `brand-primary-hover` as dark background
+- `brand-primary` as surface layer
+- `text-on-dark` as text
+
+while preserving the same semantic token mapping.

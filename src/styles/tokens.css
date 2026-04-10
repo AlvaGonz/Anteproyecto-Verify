@@ -1,0 +1,39 @@
+/* VeriFinca / Anteproyecto-Verify — Official Design Tokens
+   Source of truth: DESIGN.md
+   Do not hardcode these values in components.
+   Use var(--color-*) everywhere. */
+
+:root {
+  /* Brand */
+  --color-brand-primary:        #2c3b4e;
+  --color-brand-primary-hover:  #1e223d;
+  --color-brand-secondary:      #a35139;
+  --color-brand-accent:         #f54f1b;
+  --color-brand-accent-soft:    #feb161;
+
+  /* Surfaces */
+  --color-surface-base:         #ede9de;
+  --color-surface-alt:          #e6d5b7;
+  --color-surface-muted:        #c9c1b2;
+
+  /* Text */
+  --color-text-strong:          #1c2632;
+  --color-text-on-dark:         #ede9de;
+
+  /* Semantic aliases — buttons */
+  --btn-primary-bg:             var(--color-brand-primary);
+  --btn-primary-bg-hover:       var(--color-brand-primary-hover);
+  --btn-primary-text:           var(--color-text-on-dark);
+  --btn-secondary-bg:           var(--color-surface-alt);
+  --btn-secondary-text:         var(--color-text-strong);
+  --btn-secondary-border:       var(--color-surface-muted);
+  --btn-accent-bg:              var(--color-brand-accent);
+  --btn-accent-text:            var(--color-text-on-dark);
+
+  /* Semantic aliases — layout */
+  --page-bg:                    var(--color-surface-base);
+  --card-bg:                    var(--color-surface-alt);
+  --border-color:               var(--color-surface-muted);
+  --text-primary:               var(--color-text-strong);
+  --text-inverse:               var(--color-text-on-dark);
+}
