@@ -69,10 +69,13 @@ The system follows a **Clean Architecture** (Backend) and **SPA** (Frontend) app
 
 ## 8. Design & Branding
 Following the **DESIGN.md** specifications:
-*   **Primary Color:** `#2c3b4e` (Institutional seriousness).
-*   **Secondary Color:** `#a35139` (Warm accent).
-*   **Accent Color:** `#f54f1b` (Critical CTAs).
-*   **Background:** `#ede9de` (Surface base).
+-   **Primary Color**: `#F98513` - This is our brand's most distinctive color, used for primary actions, key interactive elements, and prominent branding.
+
+-   **Secondary Color**: `#223382` - A supporting color, suitable for less prominent UI elements, chips, and secondary actions.
+
+-   **Tertiary Color**: `#9BACD8` - An additional accent color, used for highlights, badges, or decorative elements.
+
+-   **Neutral Color**: `#DAD1C8` - This serves as our base for backgrounds, surfaces, and non-chromatic elements, providing a balanced and clean canvas.
 *   **Typography:** Focus on technical clarity and legal trust.
 
 ## 9. Roadmap & Future Features
