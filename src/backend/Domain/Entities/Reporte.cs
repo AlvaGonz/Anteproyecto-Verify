@@ -29,9 +29,24 @@ public class Reporte : EntityBase
         Version = 1;
     }
 
+    public Reporte(Guid proyectoId, Guid? generadoPorUsuarioId, int version)
+    {
+        ProyectoId = proyectoId;
+        GeneradoPorUsuarioId = generadoPorUsuarioId;
+        Version = version;
+        EstadoReporte = ReportStatus.Draft;
+    }
+
     public void MarkAsGenerated(string resumen)
     {
         EstadoReporte = ReportStatus.Generated;
+        Resumen = resumen;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateStatus(ReportStatus status, string resumen, string detalle, bool esApto)
+    {
+        EstadoReporte = status;
         Resumen = resumen;
         UpdatedAtUtc = DateTime.UtcNow;
     }

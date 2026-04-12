@@ -7,11 +7,13 @@ using Domain.Enums;
 
 public class Usuario : EntityBase
 {
-    public string NombreCompleto { get; private set; }
-    public string CorreoElectronico { get; private set; }
-    public string ContrasenaHash { get; private set; }
+    public string NombreCompleto { get; private set; } = null!;
+    public string CorreoElectronico { get; private set; } = null!;
+    public string Email => CorreoElectronico;
+    public string ContrasenaHash { get; private set; } = null!;
     public string? Telefono { get; private set; }
     public string? Cedula { get; private set; }
+    public string? Identificacion => Cedula;
     public UserRole Rol { get; private set; }
     public bool Activo { get; private set; }
 

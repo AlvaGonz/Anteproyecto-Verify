@@ -66,7 +66,7 @@ public class EmitirSelloCommandHandler
         }
 
         // RS2: Validar que no existan hallazgos críticos o altos
-        var reporte = await _reporteBuilder.ConstruirReporteAsync(request.ProyectoId, cancellationToken);
+        var reporte = await _reporteBuilder.BuildReporteAsync(request.ProyectoId, cancellationToken);
         if (!reporte.EsAptoParaSello)
         {
             return new EmitirSelloResultDto

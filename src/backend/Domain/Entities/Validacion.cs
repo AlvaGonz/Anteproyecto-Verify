@@ -13,8 +13,10 @@ public class Validacion : EntityBase
     public Guid? DocumentoId { get; private set; }
     public Documento? Documento { get; private set; }
 
-    public string FuenteValidacion { get; private set; }
+    public string FuenteValidacion { get; private set; } = null!;
     public ValidationStatus EstadoValidacion { get; private set; }
+    public ValidationStatus Estado => EstadoValidacion;
+    public string TipoValidacion => FuenteValidacion;
     public bool? EsLegitimo { get; private set; }
     public string? Detalle { get; private set; }
     public string? CamposValidadosJson { get; private set; }
@@ -36,12 +38,26 @@ public class Validacion : EntityBase
         EstadoValidacion = ValidationStatus.Pending;
     }
 
+    public Validacion(Guid proyectoId)
+    {
+        ProyectoId = proyectoId;
+        FuenteValidacion = "Interna";
+        EstadoValidacion = ValidationStatus.Pending;
+    }
+
     public void CompleteValidation(bool esLegitimo, string? detalle, string? camposValidadosJson = null)
     {
         EstadoValidacion = ValidationStatus.Completed;
         EsLegitimo = esLegitimo;
         Detalle = detalle;
         CamposValidadosJson = camposValidadosJson;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateStatus(ValidationStatus status, bool esLegitimo, int? totalHallazgos = 0, int? hallazgosCriticos = 0, int? hallazgosAltos = 0)
+    {
+        EstadoValidacion = status;
+        EsLegitimo = esLegitimo;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 }

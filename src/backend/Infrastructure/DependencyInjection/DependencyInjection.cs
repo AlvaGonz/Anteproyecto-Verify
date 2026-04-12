@@ -136,9 +136,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Commands.ToggleRuleStatus.ToggleRuleStatusCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
 
-        // Exception Handler
-        services.AddExceptionHandler<Api.Middleware.GlobalExceptionHandler>();
-        services.AddProblemDetails();
+        // End of Infrastructure
 
         return services;
     }

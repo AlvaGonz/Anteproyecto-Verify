@@ -39,17 +39,17 @@ public class GetProjectAuditTrailQueryHandler
         }
 
         return query.OrderByDescending(a => a.FechaEventoUtc).Select(a => new AuditDto(
-            Id: a.Id,
-            ProyectoId: a.ProyectoId,
-            UsuarioId: a.UsuarioId,
-            TipoEvento: a.TipoEvento,
-            Accion: a.Accion,
-            Entidad: a.Entidad,
-            EntidadId: a.EntidadId,
-            Detalle: a.Detalle,
-            IpOrigen: a.IpOrigen,
-            UserAgent: a.UserAgent,
-            FechaEventoUtc: a.FechaEventoUtc
+            a.Id,
+            a.ProyectoId,
+            a.UsuarioId,
+            a.TipoEvento,
+            a.Accion,
+            a.Entidad,
+            a.EntidadId,
+            a.Detalle,
+            a.IpOrigen,
+            a.UserAgent,
+            a.FechaEventoUtc
         ));
     }
 }

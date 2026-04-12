@@ -7,9 +7,9 @@ using Domain.Enums;
 
 public class Proyecto : EntityBase
 {
-    public string CodigoInterno { get; private set; }
-    public string Nombre { get; private set; }
-    public string UbicacionTexto { get; private set; }
+    public string CodigoInterno { get; private set; } = null!;
+    public string Nombre { get; private set; } = null!;
+    public string UbicacionTexto { get; private set; } = null!;
     public string? UbicacionGps { get; private set; }
     public decimal? ValorEstimado { get; private set; }
     public string? DatosDesarrollador { get; private set; }
@@ -17,8 +17,13 @@ public class Proyecto : EntityBase
     public string? Matricula { get; private set; }
     public ProjectCategory Categoria { get; private set; }
     public string? DesignacionCatastral { get; private set; }
+    public string? IdentificacionCatastral => DesignacionCatastral;
+    public Guid PromotorId => UsuarioCreadorId;
+    public string? RncPromotor => RncDesarrollador;
     public EstadoJuridico EstadoJuridico { get; private set; } = EstadoJuridico.Pendiente;
     public ProjectStatus EstadoProyecto { get; private set; }
+    public ProjectStatus Status => EstadoProyecto;
+    public ProjectStatus Estado => EstadoProyecto;
     public IntegrityStatus EstadoIntegridad { get; private set; }
     public bool SelladoBloqueado { get; private set; }
     

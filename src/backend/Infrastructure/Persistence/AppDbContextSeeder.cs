@@ -37,7 +37,7 @@ public static class AppDbContextSeeder
                 proyecto2.UpdateStatus(ProjectStatus.Draft);
 
                 var proyecto3 = new Proyecto("Proyecto Costero La Romana", "La Romana, RD", devUser.Id, ProjectCategory.Turistico, "Grupo Turístico del Este", "DC-11223");
-                proyecto3.UpdateStatus(ProjectStatus.UnderReview);
+                proyecto3.UpdateStatus(ProjectStatus.InReview);
 
                 var proyecto4 = new Proyecto("Plaza Comercial Naco", "Ensanche Naco, Distrito Nacional", devUser.Id, ProjectCategory.Comercial, "Inversiones Comerciales Naco", "DC-44556");
                 proyecto4.UpdateStatus(ProjectStatus.Published);
@@ -46,20 +46,20 @@ public static class AppDbContextSeeder
                 proyecto5.UpdateStatus(ProjectStatus.Draft);
 
                 var proyecto6 = new Proyecto("Residencial Santiago Norte", "Gurabo, Santiago de los Caballeros", devUser.Id, ProjectCategory.Residencial, "Constructora Cibao", "DC-99001");
-                proyecto6.UpdateStatus(ProjectStatus.UnderReview);
+                proyecto6.UpdateStatus(ProjectStatus.InReview);
 
                 context.Proyectos.AddRange(proyecto1, proyecto2, proyecto3, proyecto4, proyecto5, proyecto6);
                 await context.SaveChangesAsync();
 
                 // 3. Seed Documentos
                 var doc1 = new Documento(proyecto1.Id, "Certificado_Titulo_BellaVista.pdf", "application/pdf", 1024 * 1024 * 2, "https://mockstorage.blob.core.windows.net/docs/Certificado_Titulo_BellaVista.pdf", DocumentType.CertificadoTitulo);
-                doc1.UpdateStatus(DocumentStatus.Verified);
+                doc1.UpdateStatus(DocumentStatus.Valid);
 
                 var doc2 = new Documento(proyecto1.Id, "Permiso_Ambiental_BellaVista.pdf", "application/pdf", 1024 * 500, "https://mockstorage.blob.core.windows.net/docs/Permiso_Ambiental_BellaVista.pdf", DocumentType.CertificadoEIA);
-                doc2.UpdateStatus(DocumentStatus.Verified);
+                doc2.UpdateStatus(DocumentStatus.Valid);
 
                 var doc3 = new Documento(proyecto2.Id, "Planos_LosCacicazgos.pdf", "application/pdf", 1024 * 1024 * 5, "https://mockstorage.blob.core.windows.net/docs/Planos_LosCacicazgos.pdf", DocumentType.PlanosArquitectonicos);
-                doc3.UpdateStatus(DocumentStatus.Pending);
+                doc3.UpdateStatus(DocumentStatus.Uploaded);
 
                 context.Documentos.AddRange(doc1, doc2, doc3);
                 await context.SaveChangesAsync();
@@ -75,14 +75,14 @@ public static class AppDbContextSeeder
                 await context.SaveChangesAsync();
 
                 // 5. Seed Hallazgos
-                var hallazgo1 = new Hallazgo(proyecto3.Id, "Permiso de construcción rechazado", "Falta firma del director de planeamiento urbano", FindingSeverity.Critical, "Ayuntamiento");
+                var hallazgo1 = new Hallazgo(proyecto3.Id, null, "Permiso de construcción rechazado", "Falta firma del director de planeamiento urbano", FindingSeverity.Critical, null, "Ayuntamiento");
                 
                 context.Hallazgos.Add(hallazgo1);
                 await context.SaveChangesAsync();
 
                 // 6. Seed Auditorias
-                var audit1 = new Auditoria(proyecto1.Id, devUser.Id, "ProjectCreated", "Create", "Proyecto", proyecto1.Id.ToString(), "Proyecto Torre Bella Vista Piantini creado", "192.168.1.100", "Mozilla/5.0");
-                var audit2 = new Auditoria(proyecto1.Id, adminUser.Id, "ValidationExecuted", "Execute", "Validacion", validacion1.Id.ToString(), "Validación interna ejecutada con resultado: Completado", "10.0.0.5", "Mozilla/5.0");
+                var audit1 = new Auditoria(devUser.Id, "ProjectCreated", "PROYECTO", "Proyecto", proyecto1.Id.ToString(), proyecto1.Id, "Proyecto Torre Bella Vista Piantini creado");
+                var audit2 = new Auditoria(adminUser.Id, "ValidationExecuted", "VALIDACION", "Validacion", validacion1.Id.ToString(), proyecto1.Id, "Validación interna ejecutada con resultado: Completado");
 
                 context.Auditorias.AddRange(audit1, audit2);
                 await context.SaveChangesAsync();
@@ -95,7 +95,7 @@ public static class AppDbContextSeeder
                 await context.SaveChangesAsync();
 
                 // 8. Seed Certificaciones
-                var cert1 = new Certificacion(proyecto1.Id, "VF-2026-ABC123XYZ", "https://verifinca.do/verify/VF-2026-ABC123XYZ");
+                var cert1 = new Certificacion(proyecto1.Id, reporte1.Id, "VF-2026-ABC123XYZ", "https://verifinca.do/verify/VF-2026-ABC123XYZ", 95, IntegrityStatus.Valid, adminUser.Id, 1);
                 cert1.UpdateStatus(CertificationStatus.Vigente, 95, 2);
 
                 context.Certificaciones.Add(cert1);

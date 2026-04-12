@@ -10,8 +10,8 @@ public class ConsentimientoFinanciero : EntityBase
     public Usuario Usuario { get; private set; } = null!;
     
     public DateTime FechaHoraUtc { get; private set; }
-    public string IpOrigen { get; private set; }
-    public string VersionPolitica { get; private set; }
+    public string IpOrigen { get; private set; } = null!;
+    public string VersionPolitica { get; private set; } = null!;
     public EstadoConsentimiento Estado { get; private set; }
     public DateTime FechaExpiracionUtc { get; private set; }
 

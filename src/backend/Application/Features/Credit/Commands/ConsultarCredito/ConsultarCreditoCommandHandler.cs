@@ -80,8 +80,16 @@ public class ConsultarCreditoCommandHandler
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // RS2: Consultar buró
-        var tuResult = await _transUnionService.ConsultarHistorialAsync(promotor.Identificacion, cancellationToken);
+        if (string.IsNullOrWhiteSpace(promotor.Identificacion))
+        {
+            return new ConsultarCreditoResultDto
+            {
+                IsSuccess = false,
+                Mensaje = "El promotor no tiene una identificación (cédula) registrada para la consulta."
+            };
+        }
 
+        var tuResult = await _transUnionService.ConsultarHistorialAsync(promotor.Identificacion, cancellationToken);
         if (!tuResult.IsSuccess)
         {
             return new ConsultarCreditoResultDto

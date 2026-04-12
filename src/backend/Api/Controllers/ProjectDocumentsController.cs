@@ -102,7 +102,7 @@ public class ProjectDocumentsController : ControllerBase
         }
     }
 
-    [PATCH("{documentId}/status")]
+    [HttpPatch("{documentId}/status")]
     [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDocumentStatus(Guid projectId, Guid documentId, [FromBody] UpdateDocumentStatusDto dto)
