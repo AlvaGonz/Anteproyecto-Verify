@@ -4,9 +4,11 @@ services:
   api:
     build:
       context: .
-      dockerfile: docker/api.Dockerfile
+      dockerfile: docker/api.dev.Dockerfile
     ports:
       - "5000:8080"
+    volumes:
+      - .:/src
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     env_file:
@@ -21,11 +23,9 @@ services:
       dockerfile: ../../../docker/web.dev.Dockerfile
     ports:
       - "3000:3000"
-    # volumes:
-    #   - type: bind
-    #     source: ./src/frontend/web
-    #     target: /app
-    #   - /app/node_modules
+    volumes:
+      - ./src/frontend/web:/app
+      - /app/node_modules
     environment:
       - VITE_WATCH_POLLING=true
     env_file:
