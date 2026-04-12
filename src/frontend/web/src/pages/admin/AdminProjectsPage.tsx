@@ -1,9 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ProyectoDto } from "../../features/projects/types";
+import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../features/projects/types";
 import { projectsApi } from "../../features/projects/api/projectsApi";
-import { FolderKanban, Plus, Search } from "lucide-react";
+import { FolderKanban, Plus, Search, ArrowRight, CheckCircle2, AlertTriangle, Timer } from "lucide-react";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+
+const getStatusBadge = (status: ProjectStatus) => {
+  switch (status) {
+    case ProjectStatus.Draft: return { label: "Borrador", cls: "vf-badge-neutral" };
+    case ProjectStatus.Published: return { label: "Publicado", cls: "vf-badge-success" };
+    case ProjectStatus.InReview: return { label: "En Revision", cls: "vf-badge-warning" };
+    case ProjectStatus.Observed: return { label: "Observado", cls: "vf-badge-accent" };
+    case ProjectStatus.Validated: return { label: "Validado", cls: "vf-badge-primary" };
+    case ProjectStatus.Rejected: return { label: "Rechazado", cls: "vf-badge-error" };
+    default: return { label: "Desconocido", cls: "vf-badge-neutral" };
+  }
+};
+
+const getIntegrityIcon = (status: IntegrityStatus) => {
+  switch (status) {
+    case IntegrityStatus.Verified: return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
+    case IntegrityStatus.Failed: return <AlertTriangle className="w-4 h-4 text-red-600" />;
+    default: return <Timer className="w-4 h-4 text-amber-600" />;
+  }
+};
 
 export const AdminProjectsPage: React.FC = () => {
   const [projects, setProjects] = useState<ProyectoDto[]>([]);
@@ -12,138 +32,94 @@ export const AdminProjectsPage: React.FC = () => {
   const { addToast } = useToast();
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    (async () => {
       try {
         const data = await projectsApi.getProjects();
         setProjects(data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
+      } catch {
         addToast("Error al cargar los proyectos", "error");
       } finally {
         setIsLoading(false);
       }
-    };
-    fetchProjects();
+    })();
   }, [addToast]);
 
-  const filteredProjects = projects.filter(
+  const filtered = projects.filter(
     (p) =>
       p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.codigoInterno?.toLowerCase().includes(searchTerm.toLowerCase()),
+      p.codigoInterno?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="sm:flex sm:items-center sm:justify-between mb-8">
+    <div>
+      <div className="sm:flex sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold flex items-center" style={{ color: 'var(--color-text-strong)' }}>
-            <FolderKanban className="mr-3 h-8 w-8" style={{ color: 'var(--color-brand-primary)' }} />
-            Gestión de Proyectos
+          <h1 className="text-2xl font-bold flex items-center gap-3 text-[var(--color-text-strong)]">
+            <FolderKanban className="h-7 w-7 text-[var(--color-brand-primary)]" />
+            Gestion de Proyectos
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'var(--color-text-main)' }}>
-            Lista de todos los proyectos inmobiliarios en el sistema.
+          <p className="mt-1 text-sm text-[var(--color-text-strong)] opacity-60">
+            {projects.length} proyectos en el sistema.
           </p>
         </div>
-        <div className="mt-4 sm:mt-0">
-          <Link
-            to="/admin/projects/new"
-            className="clay-btn-primary"
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Nuevo Proyecto
-          </Link>
-        </div>
+        <Link to="/admin/projects/new" className="vf-btn-primary mt-4 sm:mt-0">
+          <Plus className="w-4 h-4" />
+          Nuevo Proyecto
+        </Link>
       </div>
 
-      <div className="mb-6 relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5" style={{ color: 'var(--color-info)' }} aria-hidden="true" />
-        </div>
+      {/* Search */}
+      <div className="vf-card-flat flex items-center gap-3 px-4 py-3 mb-6">
+        <Search className="h-5 w-5 text-[var(--color-surface-muted)]" />
         <input
           type="text"
-          className="block w-full pl-10 pr-3 py-3 border rounded-lg leading-5 focus:outline-none sm:text-sm transition-shadow"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-          placeholder="Buscar por nombre o código público..."
+          className="vf-input border-0 bg-transparent p-0 focus:ring-0 focus:shadow-none"
+          placeholder="Buscar por nombre o codigo..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12" style={{ color: 'var(--color-text-main)' }}>
+        <div className="text-center py-12 text-[var(--color-text-strong)] opacity-60">
           Cargando proyectos...
         </div>
       ) : (
-        <div className="clay-card overflow-hidden">
-          <ul className="divide-y" style={{ borderColor: 'var(--color-border-warm)' }}>
-            {filteredProjects.length === 0 ? (
-              <li className="px-6 py-12 text-center" style={{ color: 'var(--color-text-main)' }}>
-                No se encontraron proyectos.
-              </li>
-            ) : (
-              filteredProjects.map((project) => (
-                <li key={project.id} style={{ borderBottom: '1px solid var(--color-border-warm)' }}>
+        <div className="vf-card overflow-hidden">
+          {filtered.length === 0 ? (
+            <div className="px-6 py-12 text-center text-[var(--color-text-strong)] opacity-60">
+              No se encontraron proyectos.
+            </div>
+          ) : (
+            <div className="divide-y divide-[var(--color-surface-muted)]/30">
+              {filtered.map((project) => {
+                const badge = getStatusBadge(project.estadoProyecto);
+                return (
                   <Link
+                    key={project.id}
                     to={`/admin/projects/${project.id}/edit`}
-                    className="block transition-colors hover:bg-[var(--color-surface-alt)]"
+                    className="flex items-center justify-between px-5 py-4 hover:bg-[var(--color-surface-base)]/50 transition-colors group"
                   >
-                    <div className="px-6 py-5">
-                      <div className="flex items-center justify-between">
-                        <p className="text-base font-semibold truncate" style={{ color: 'var(--color-brand-primary)' }}>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {getIntegrityIcon(project.estadoIntegridad)}
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[var(--color-text-strong)] truncate group-hover:text-[var(--color-brand-primary)] transition-colors">
                           {project.nombre}
                         </p>
-                        <div className="ml-2 flex-shrink-0 flex">
-                          <p
-                            className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border 
-                            ${
-                              project.estadoProyecto === 0
-                                ? "bg-[var(--color-surface)] text-[var(--color-text-main)] border-[var(--color-border-warm)]"
-                                : project.estadoProyecto === 2
-                                  ? "bg-[var(--color-surface-alt)] text-[var(--color-highlight)] border-[var(--color-highlight)]"
-                                  : project.estadoProyecto === 4
-                                    ? "bg-[#e8ebf4] text-[var(--color-brand-primary)] border-[var(--color-info)]"
-                                    : "bg-[var(--color-surface-alt)] text-[var(--color-text-strong)] border-[var(--color-accent-warm)]"
-                            }`}
-                          >
-                            {project.estadoProyecto === 0
-                              ? "Draft"
-                              : project.estadoProyecto === 1
-                                ? "Published"
-                                : project.estadoProyecto === 2
-                                  ? "In Review"
-                                  : project.estadoProyecto === 3
-                                    ? "Observed"
-                                    : project.estadoProyecto === 4
-                                      ? "Validated"
-                                      : "Rejected"}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-2 sm:flex sm:justify-between">
-                        <div className="sm:flex">
-                          <p className="flex items-center text-sm font-mono" style={{ color: 'var(--color-text-main)' }}>
-                            Código: {project.codigoInterno || "N/A"}
-                          </p>
-                        </div>
-                        <div className="mt-2 flex items-center text-sm font-mono sm:mt-0" style={{ color: 'var(--color-text-main)' }}>
-                          <p>
-                            Actualizado el{" "}
-                            {project.updatedAtUtc
-                              ? new Date(
-                                  project.updatedAtUtc,
-                                ).toLocaleDateString()
-                              : new Date(
-                                  project.createdAtUtc,
-                                ).toLocaleDateString()}
-                          </p>
-                        </div>
+                        <p className="text-xs text-[var(--color-text-strong)] opacity-50 font-mono">
+                          {project.codigoInterno} - Actualizado: {(project.updatedAtUtc ? new Date(project.updatedAtUtc) : new Date(project.createdAtUtc)).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
+                    <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+                      <span className={`vf-badge ${badge.cls}`}>{badge.label}</span>
+                      <ArrowRight className="w-4 h-4 text-[var(--color-surface-muted)] group-hover:text-[var(--color-brand-primary)] transition-colors" />
+                    </div>
                   </Link>
-                </li>
-              ))
-            )}
-          </ul>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

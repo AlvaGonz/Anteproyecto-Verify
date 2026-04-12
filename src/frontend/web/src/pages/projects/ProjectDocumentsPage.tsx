@@ -5,6 +5,7 @@ import { documentsApi } from "../../features/documents/api/documentsApi";
 import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { FileText, ArrowLeft } from "lucide-react";
 
 export const ProjectDocumentsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,9 +28,7 @@ export const ProjectDocumentsPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchDocuments();
-  }, [id]);
+  useEffect(() => { fetchDocuments(); }, [id]);
 
   const handleUpload = async (dto: UploadDocumentDto, file: File) => {
     if (!id) return;
@@ -54,58 +53,44 @@ export const ProjectDocumentsPage: React.FC = () => {
   const handleToggleStatus = async (documentId: string, isActive: boolean) => {
     if (!id) return;
     try {
-      await documentsApi.updateDocumentStatus(id, documentId, {
-        activo: isActive,
-      });
-      addToast(
-        `Documento ${isActive ? "activado" : "desactivado"} exitosamente`,
-        "success",
-      );
+      await documentsApi.updateDocumentStatus(id, documentId, { activo: isActive });
+      addToast(`Documento ${isActive ? "activado" : "desactivado"} exitosamente`, "success");
       await fetchDocuments();
     } catch (err: any) {
-      addToast(
-        err.message || "Error al actualizar el estado del documento",
-        "error",
-      );
+      addToast(err.message || "Error al actualizar el estado", "error");
     }
   };
 
-  if (loading)
-    return <div className="text-center py-12">Cargando documentos...</div>;
+  if (loading) return <div className="text-center py-12 text-[var(--color-text-strong)] opacity-60">Cargando documentos...</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div>
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Gestión Documental
+          <h1 className="text-2xl font-bold text-[var(--color-text-strong)] flex items-center gap-3">
+            <FileText className="w-7 h-7 text-[var(--color-brand-primary)]" />
+            Gestion Documental
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-sm text-[var(--color-text-strong)] opacity-60 mt-1">
             Administra los documentos asociados a este proyecto.
           </p>
         </div>
-        <Link
-          to={`/admin/projects/${id}/edit`}
-          className="text-blue-600 hover:underline text-sm font-medium"
-        >
-          &larr; Volver a Gestión de Proyecto
+        <Link to={`/admin/projects/${id}/edit`} className="vf-btn-secondary">
+          <ArrowLeft className="w-4 h-4" /> Volver
         </Link>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-md">
-          {error}
-        </div>
+        <div className="mb-6 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm">{error}</div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
           <DocumentUploadForm projectId={id!} onUpload={handleUpload} />
         </div>
-
         <div className="lg:col-span-2">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Documentos del Proyecto
+          <h3 className="text-base font-bold text-[var(--color-text-strong)] mb-4">
+            Documentos del Proyecto ({documents.length})
           </h3>
           <ProjectDocumentsList
             documents={documents}

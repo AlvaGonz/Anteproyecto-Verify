@@ -13,24 +13,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   onCancel,
 }) => {
   const [nombre, setNombre] = useState(initialData?.nombre || "");
-  const [ubicacionTexto, setUbicacionTexto] = useState(
-    initialData?.ubicacionTexto || "",
-  );
-  const [ubicacionGps, setUbicacionGps] = useState(
-    initialData?.ubicacionGps || "",
-  );
-  const [valorEstimado, setValorEstimado] = useState<number | "">(
-    initialData?.valorEstimado || "",
-  );
-  const [categoria, setCategoria] = useState<ProjectCategory>(
-    initialData?.categoria || ProjectCategory.Residencial,
-  );
-  const [datosDesarrollador, setDatosDesarrollador] = useState(
-    initialData?.datosDesarrollador || "",
-  );
-  const [designacionCatastral, setDesignacionCatastral] = useState(
-    initialData?.designacionCatastral || "",
-  );
+  const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto || "");
+  const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps || "");
+  const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado || "");
+  const [categoria, setCategoria] = useState<ProjectCategory>(initialData?.categoria || ProjectCategory.Residencial);
+  const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador || "");
+  const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,15 +26,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-
     try {
       if (initialData) {
         const updateData: UpdateProyectoDto = {
-          nombre,
-          ubicacionTexto,
+          nombre, ubicacionTexto,
           ubicacionGps: ubicacionGps || undefined,
-          valorEstimado:
-            valorEstimado === "" ? undefined : Number(valorEstimado),
+          valorEstimado: valorEstimado === "" ? undefined : Number(valorEstimado),
           categoria,
           datosDesarrollador: datosDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
@@ -54,9 +39,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         await onSubmit(updateData);
       } else {
         const createData: CreateProyectoDto = {
-          nombre,
-          ubicacionTexto,
-          // TODO: Replace with actual logged-in user ID when auth is implemented
+          nombre, ubicacionTexto,
           usuarioCreadorId: "00000000-0000-0000-0000-000000000000",
           categoria,
           datosDesarrollador: datosDesarrollador || undefined,
@@ -71,136 +54,79 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     }
   };
 
+  const fieldClass = "vf-input py-2.5";
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-6 max-w-2xl mx-auto p-8 clay-card"
-    >
+    <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto vf-card p-6">
       {error && (
-        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-surface-alt)', color: 'var(--color-error)', border: '1px solid var(--color-error)' }}>
+        <div className="p-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
           {error}
         </div>
       )}
 
       <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
-          Nombre del Proyecto
+        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+          Nombre del Proyecto *
         </label>
-        <input
-          type="text"
-          required
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-        />
+        <input type="text" required value={nombre} onChange={(e) => setNombre(e.target.value)} className={fieldClass} />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
-          Ubicación (Texto)
+        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+          Ubicacion (Texto) *
         </label>
-        <input
-          type="text"
-          required
-          value={ubicacionTexto}
-          onChange={(e) => setUbicacionTexto(e.target.value)}
-          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-        />
+        <input type="text" required value={ubicacionTexto} onChange={(e) => setUbicacionTexto(e.target.value)} className={fieldClass} />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
-          Categoría
+        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+          Categoria
         </label>
-        <select
-          value={categoria}
-          onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)}
-          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-        >
+        <select value={categoria} onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)} className={fieldClass}>
           <option value={ProjectCategory.Residencial}>Residencial</option>
           <option value={ProjectCategory.Comercial}>Comercial</option>
-          <option value={ProjectCategory.Turistico}>Turístico</option>
+          <option value={ProjectCategory.Turistico}>Turistico</option>
           <option value={ProjectCategory.Mixto}>Mixto</option>
           <option value={ProjectCategory.Otro}>Otro</option>
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
-          Datos del Desarrollador
+        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+          Desarrollador
         </label>
-        <input
-          type="text"
-          value={datosDesarrollador}
-          onChange={(e) => setDatosDesarrollador(e.target.value)}
-          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-          placeholder="Nombre de la constructora o desarrollador"
-        />
+        <input type="text" value={datosDesarrollador} onChange={(e) => setDatosDesarrollador(e.target.value)} className={fieldClass} placeholder="Nombre de la constructora o desarrollador" />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
-          Designación Catastral
+        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+          Designacion Catastral
         </label>
-        <input
-          type="text"
-          value={designacionCatastral}
-          onChange={(e) => setDesignacionCatastral(e.target.value)}
-          className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow font-mono"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-          placeholder="Ej: DC-12345"
-        />
+        <input type="text" value={designacionCatastral} onChange={(e) => setDesignacionCatastral(e.target.value)} className={`${fieldClass} font-mono`} placeholder="Ej: DC-12345" />
       </div>
 
       {initialData && (
         <>
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
+            <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
               Coordenadas GPS
             </label>
-            <input
-              type="text"
-              value={ubicacionGps}
-              onChange={(e) => setUbicacionGps(e.target.value)}
-              className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow font-mono"
-              style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-            />
+            <input type="text" value={ubicacionGps} onChange={(e) => setUbicacionGps(e.target.value)} className={`${fieldClass} font-mono`} />
           </div>
-
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-strong)' }}>
-              Valor Estimado
+            <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+              Valor Estimado (DOP)
             </label>
-            <input
-              type="number"
-              value={valorEstimado}
-              onChange={(e) =>
-                setValorEstimado(e.target.value ? Number(e.target.value) : "")
-              }
-              className="block w-full rounded-lg border p-3 focus:outline-none transition-shadow font-mono"
-              style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-warm)', color: 'var(--color-text-strong)' }}
-            />
+            <input type="number" value={valorEstimado} onChange={(e) => setValorEstimado(e.target.value ? Number(e.target.value) : "")} className={`${fieldClass} font-mono`} />
           </div>
         </>
       )}
 
-      <div className="flex justify-end space-x-4 mt-8 pt-6 border-t" style={{ borderColor: 'var(--color-border-warm)' }}>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="clay-btn-secondary"
-        >
+      <div className="flex justify-end gap-3 pt-4 border-t border-[var(--color-surface-muted)]/50">
+        <button type="button" onClick={onCancel} className="vf-btn-secondary">
           Cancelar
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="clay-btn-primary disabled:opacity-50"
-        >
+        <button type="submit" disabled={isSubmitting} className="vf-btn-primary">
           {isSubmitting ? "Guardando..." : "Guardar"}
         </button>
       </div>

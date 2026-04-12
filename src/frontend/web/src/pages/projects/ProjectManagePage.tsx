@@ -4,6 +4,7 @@ import { ProyectoDto, ProjectStatus } from "../../features/projects/types";
 import { projectsApi } from "../../features/projects/api/projectsApi";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { FileText, ShieldCheck, ClipboardList, ArrowRight } from "lucide-react";
 
 export const ProjectManagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,18 +17,16 @@ export const ProjectManagePage: React.FC = () => {
 
   useEffect(() => {
     if (isEditing) {
-      const fetchProject = async () => {
+      (async () => {
         try {
           const data = await projectsApi.getProjectById(id!);
           setProject(data);
-        } catch (err) {
-          console.error("Error fetching project", err);
-          navigate("/projects");
+        } catch {
+          navigate("/admin/projects");
         } finally {
           setLoading(false);
         }
-      };
-      fetchProject();
+      })();
     }
   }, [id, isEditing, navigate]);
 
@@ -42,7 +41,7 @@ export const ProjectManagePage: React.FC = () => {
         addToast("Proyecto creado exitosamente", "success");
         navigate(`/projects/${newProject.id}`);
       }
-    } catch (error) {
+    } catch {
       addToast("Error al guardar el proyecto", "error");
     }
   };
@@ -51,137 +50,103 @@ export const ProjectManagePage: React.FC = () => {
     if (!id) return;
     try {
       await projectsApi.updateProjectStatus(id, status);
-      // Reload project
       const data = await projectsApi.getProjectById(id);
       setProject(data);
       addToast("Estado actualizado exitosamente", "success");
-    } catch (err) {
-      console.error("Error updating status", err);
+    } catch {
       addToast("Error al actualizar el estado", "error");
     }
   };
 
   if (loading)
-    return <div className="text-center py-12" style={{ color: 'var(--color-text-main)' }}>Cargando formulario...</div>;
+    return <div className="text-center py-12 text-[var(--color-text-strong)] opacity-60">Cargando formulario...</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto mb-8">
-        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-strong)' }}>
+    <div>
+      <div className="max-w-2xl mx-auto mb-6">
+        <h1 className="text-2xl font-bold text-[var(--color-text-strong)]">
           {isEditing ? "Editar Proyecto" : "Crear Nuevo Proyecto"}
         </h1>
-        <p className="text-sm mt-2" style={{ color: 'var(--color-text-main)' }}>
-          {isEditing
-            ? "Modifica los datos del proyecto existente."
-            : "Ingresa los datos básicos para registrar un nuevo proyecto."}
+        <p className="text-sm mt-1 text-[var(--color-text-strong)] opacity-60">
+          {isEditing ? "Modifica los datos del proyecto existente." : "Ingresa los datos basicos para registrar un nuevo proyecto."}
         </p>
       </div>
 
       <ProjectForm
         initialData={project}
         onSubmit={handleSubmit}
-        onCancel={() => navigate(isEditing ? `/projects/${id}` : "/projects")}
+        onCancel={() => navigate(isEditing ? `/projects/${id}` : "/admin/projects")}
       />
 
       {isEditing && project && (
-        <div className="max-w-2xl mx-auto mt-8 space-y-6">
-          <div className="clay-card p-6">
-            <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text-strong)' }}>
-              Gestión de Estado
+        <div className="max-w-2xl mx-auto mt-8 space-y-4">
+          {/* Status management */}
+          <div className="vf-card p-5">
+            <h2 className="text-base font-bold text-[var(--color-text-strong)] mb-3">
+              Gestion de Estado
             </h2>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => handleStatusChange(ProjectStatus.Draft)}
-                className="clay-btn-secondary"
-              >
-                Borrador
-              </button>
-              <button
-                onClick={() => handleStatusChange(ProjectStatus.InReview)}
-                className="clay-btn-secondary"
-                style={{ backgroundColor: 'var(--color-surface-alt)', color: 'var(--color-highlight)', borderColor: 'var(--color-highlight)' }}
-              >
-                En Revisión
-              </button>
-              <button
-                onClick={() => handleStatusChange(ProjectStatus.Published)}
-                className="clay-btn-secondary"
-                style={{ backgroundColor: '#e8ebf4', color: 'var(--color-brand-primary)', borderColor: 'var(--color-info)' }}
-              >
-                Publicar
-              </button>
-              <button
-                onClick={() => handleStatusChange(ProjectStatus.Observed)}
-                className="clay-btn-secondary"
-                style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-main)' }}
-              >
-                Observar
-              </button>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {[
+                { status: ProjectStatus.Draft, label: "Borrador" },
+                { status: ProjectStatus.InReview, label: "En Revision" },
+                { status: ProjectStatus.Published, label: "Publicar" },
+                { status: ProjectStatus.Observed, label: "Observar" },
+              ].map((s) => (
+                <button
+                  key={s.status}
+                  onClick={() => handleStatusChange(s.status)}
+                  className="vf-btn-secondary text-sm py-2 px-4"
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
-            <p className="text-sm mt-4" style={{ color: 'var(--color-text-main)' }}>
-              Estado actual:{" "}
-              <strong style={{ color: 'var(--color-text-strong)' }}>{ProjectStatus[project.estadoProyecto]}</strong>
+            <p className="text-xs text-[var(--color-text-strong)] opacity-50">
+              Estado actual: <strong>{ProjectStatus[project.estadoProyecto]}</strong>
             </p>
           </div>
 
-          <div className="clay-card p-6 flex justify-between items-center" style={{ backgroundColor: 'var(--color-surface-alt)' }}>
-            <div>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--color-text-strong)' }}>
-                Expediente Documental
-              </h2>
-              <p className="text-sm mt-1" style={{ color: 'var(--color-text-main)' }}>
-                Gestiona los documentos asociados a este proyecto.
-              </p>
-            </div>
-            <button
-              onClick={() => navigate(`/admin/projects/${id}/documents`)}
-              className="clay-btn-primary"
+          {/* Quick nav cards */}
+          {[
+            {
+              icon: FileText,
+              title: "Expediente Documental",
+              desc: "Gestiona los documentos asociados a este proyecto.",
+              href: `/admin/projects/${id}/documents`,
+              label: "Gestionar Documentos",
+            },
+            {
+              icon: ShieldCheck,
+              title: "Validacion Integral",
+              desc: "Revisa el estado de validacion del expediente.",
+              href: `/admin/projects/${id}/validations`,
+              label: "Ver Validacion",
+            },
+            {
+              icon: ClipboardList,
+              title: "Reportes y Auditoria",
+              desc: "Consulta el historial operativo y reportes.",
+              href: `/admin/projects/${id}/reports`,
+              label: "Ver Reportes",
+            },
+          ].map((item) => (
+            <div
+              key={item.href}
+              className="vf-card p-5 flex items-center justify-between gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform"
+              onClick={() => navigate(item.href)}
             >
-              Gestionar Documentos
-            </button>
-          </div>
-
-          <div className="clay-card p-6 flex justify-between items-center" style={{ backgroundColor: '#e8ebf4' }}>
-            <div>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--color-brand-primary)' }}>
-                Validación Interna
-              </h2>
-              <p className="text-sm mt-1" style={{ color: 'var(--color-brand-primary)' }}>
-                Revisa el estado de validación del expediente.
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-primary)]/10 flex items-center justify-center flex-shrink-0">
+                  <item.icon className="w-5 h-5 text-[var(--color-brand-primary)]" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--color-text-strong)]">{item.title}</h3>
+                  <p className="text-xs text-[var(--color-text-strong)] opacity-50">{item.desc}</p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-[var(--color-surface-muted)]" />
             </div>
-            <button
-              onClick={() => navigate(`/admin/projects/${id}/validations`)}
-              className="clay-btn-primary"
-            >
-              Ver Validación
-            </button>
-          </div>
-
-          <div className="clay-card p-6 flex justify-between items-center">
-            <div>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--color-text-strong)' }}>
-                Reportes y Auditoría
-              </h2>
-              <p className="text-sm mt-1" style={{ color: 'var(--color-text-main)' }}>
-                Consulta el historial operativo y reportes.
-              </p>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => navigate(`/admin/projects/${id}/reports`)}
-                className="clay-btn-primary"
-              >
-                Ver Reportes
-              </button>
-              <button
-                onClick={() => navigate(`/admin/projects/${id}/audit`)}
-                className="clay-btn-secondary"
-              >
-                Ver Auditoría
-              </button>
-            </div>
-          </div>
+          ))}
         </div>
       )}
     </div>
