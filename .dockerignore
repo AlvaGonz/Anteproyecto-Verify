@@ -1,0 +1,12 @@
+**/.git
+**/node_modules
+**/bin
+**/obj
+**/dist
+**/.vscode
+**/.antigravity
+.env
+README.md
+docker-compose.yml
+docker/
+scripts/

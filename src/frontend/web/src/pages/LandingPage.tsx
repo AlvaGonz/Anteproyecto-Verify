@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Search, ChevronLeft, ChevronRight, ArrowRight as ArrowForward, MapPin as LocationOn, Landmark as AccountBalance, Gavel as GavelIcon } from "lucide-react";
-import { 
-  ProjectStatus, 
-  IntegrityStatus, 
-  ProyectoDto 
+import {
+  ProjectStatus,
+  IntegrityStatus,
+  ProyectoDto
 } from "../features/projects/types";
 import { projectsApi } from "../features/projects/api/projectsApi";
 
@@ -54,10 +54,10 @@ const HeroSection: React.FC = () => {
       {/* Background Video Loop */}
       <div className="absolute right-0 top-0 w-full md:w-1/2 h-full -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/40 to-transparent z-10 w-full"></div>
-        <video 
-          autoPlay 
-          muted 
-          loop 
+        <video
+          autoPlay
+          muted
+          loop
           playsInline
           className="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-1000"
         >
@@ -65,7 +65,7 @@ const HeroSection: React.FC = () => {
           Tu navegador no soporta el elemento de video.
         </video>
       </div>
-      
+
       <div className="max-w-4xl space-y-8">
         <div className="space-y-4">
           <span className="text-secondary font-headline font-bold uppercase tracking-widest text-sm bg-secondary-container/20 px-4 py-1.5 rounded-full inline-block">Autoridad Institucional</span>
@@ -73,18 +73,18 @@ const HeroSection: React.FC = () => {
             Consulta la validez legal de cualquier proyecto inmobiliario
           </h1>
         </div>
-        
+
         {/* Search Container */}
         <div className="relative group max-w-2xl">
           <form onSubmit={handleSearch} className="bg-surface-container-lowest p-2 rounded-full flex flex-col sm:flex-row items-center shadow-2xl shadow-[#111144]/10 border border-outline-variant/20 transition-all focus-within:ring-2 focus-within:ring-primary-container">
             <div className="hidden sm:block pl-6 text-outline">
               <Search className="w-6 h-6" />
             </div>
-            <input 
+            <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full bg-transparent border-none focus:ring-0 px-4 py-2 sm:py-0 text-lg font-medium placeholder:text-outline/60 outline-none" 
-              placeholder="Ingresa el codigo o nombre del proyecto" 
+              className="w-full bg-transparent border-none focus:ring-0 px-4 py-2 sm:py-0 text-lg font-medium placeholder:text-outline/60 outline-none"
+              placeholder="Ingresa el codigo o nombre del proyecto"
               type="text"
             />
             <button type="submit" className="w-full sm:w-auto bg-primary-container mt-2 sm:mt-0 text-on-primary-container px-8 py-4 rounded-full font-headline font-bold text-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer flex justify-center items-center gap-2">
@@ -93,9 +93,9 @@ const HeroSection: React.FC = () => {
             </button>
           </form>
         </div>
-        
+
         <p className="text-on-surface-variant text-lg max-w-xl font-light">
-          Acceda a la base de datos mas robusta de validacion institucional en tiempo real. 
+          Acceda a la base de datos mas robusta de validacion institucional en tiempo real.
           Seguridad juridica para inversores y profesionales.
         </p>
       </div>
@@ -126,28 +126,28 @@ const TrustStrip: React.FC = () => (
 /* ===== PROJECTS CAROUSEL ===== */
 const getIntegrityBadge = (status: IntegrityStatus) => {
   switch (status) {
-    case IntegrityStatus.Verified: 
+    case IntegrityStatus.Verified:
       return <span className="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">Verificado</span>;
-    case IntegrityStatus.Failed: 
+    case IntegrityStatus.Failed:
       return <span className="bg-error-container text-on-error-container px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">Observado</span>;
-    default: 
+    default:
       return <span className="bg-secondary-container text-on-secondary-container px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">En revision</span>;
   }
 };
 
 const ProjectShowcaseCard: React.FC<{ project: ProyectoDto }> = ({ project }) => {
-  const imagePlaceholder = project.estadoIntegridad === IntegrityStatus.Verified ? 
+  const imagePlaceholder = project.estadoIntegridad === IntegrityStatus.Verified ?
     "https://lh3.googleusercontent.com/aida-public/AB6AXuA-yxambKq-MDwXrLr8SQMhX9qKEQPzyDfJJoIfq_daCtiVY-rKuihX6J_3NuhCGft1rq5sApK2weuYH47iHLVVCwcWZ7x27ch7lUIgvZ7_6FTF_53MtMQtu7Rmue_DksGm__qlnjlMwJzuAX6DcqtUqifhXSJJTnQnmvwfuGzIeLP809m0AqD2CQlNOVsOfQMqNpd7PnoAIw7OgD7vsM1m_e4BFBkv6AnGLTO9p_Zl_3f6caOQrdBYMZgWskxRMU9JcCBN0wxEuTM"
     : project.estadoIntegridad === IntegrityStatus.Failed ? "https://lh3.googleusercontent.com/aida-public/AB6AXuApNYdq1fBuPkUf27TUYKFLOWUwfdrWhiRz_I8D4gjAWs0q2Ec5jiQD3UcVdsKMBPLpoT-UXCekET20CqAgvoKDYWcDPyCw-gVmj8nQnbAfF4gamkl-fVCxEp2IwU7_vFhDgdXdJ8GtIBlruupWvTx02uyZQ_cXuaYrBAJC7lE3x5iLT03pXZ8BANqxgbRaC3YvKd0HNjAbbp9exzZTgXAt9mMOhz3HDIiTeEAN3kHFRdpwaIxvOQ3cd9dJlVY6FbeUhRXqSolF1KI"
-    : "https://lh3.googleusercontent.com/aida-public/AB6AXuCXVO8D2hnijRbR5NYneAZKuktnR6hSWeBL-o-5zD1IRCRmJF9Scg0xoJu69VwzeiFnB2QYBEc3C2gGzLhP1h9mQGjOw0NjFrJuCTP4aSi7vC6bhR7NsJsNs7Hgu8WjPZ9kqm7LgB08vCWNrbnXpRe27owNMltaZYgcv-g15xirkkF0rK5sxiqgTu5vQXzFLTwD_FXiDvvLb9QHyYQcdeQi2oXIfs6HuRIALXJqzO5lmsvXJ43pOJEUuDLsu9VB9fwxPRGUulT8NL4";
-    
+      : "https://lh3.googleusercontent.com/aida-public/AB6AXuCXVO8D2hnijRbR5NYneAZKuktnR6hSWeBL-o-5zD1IRCRmJF9Scg0xoJu69VwzeiFnB2QYBEc3C2gGzLhP1h9mQGjOw0NjFrJuCTP4aSi7vC6bhR7NsJsNs7Hgu8WjPZ9kqm7LgB08vCWNrbnXpRe27owNMltaZYgcv-g15xirkkF0rK5sxiqgTu5vQXzFLTwD_FXiDvvLb9QHyYQcdeQi2oXIfs6HuRIALXJqzO5lmsvXJ43pOJEUuDLsu9VB9fwxPRGUulT8NL4";
+
   return (
     <Link to={`/projects/${project.id}`} className="min-w-[80vw] md:min-w-[calc(33.333%-22px)] snap-start group bg-surface-container-lowest rounded-lg overflow-hidden border border-outline-variant/30 hover:shadow-xl transition-all duration-300 block">
       <div className="h-64 relative overflow-hidden bg-surface-container">
         <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-transparent"></div>
-        <img 
-          alt={project.nombre} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+        <img
+          alt={project.nombre}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           src={imagePlaceholder}
         />
         <div className="absolute top-4 right-4">
@@ -217,7 +217,7 @@ const ProjectsCarouselSection: React.FC = () => {
             </Link>
           </div>
         </div>
-        
+
         {featuredProjects.length === 0 ? (
           <div className="flex gap-8 overflow-hidden">
             {[1, 2, 3].map(i => (
@@ -235,7 +235,7 @@ const ProjectsCarouselSection: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div 
+          <div
             ref={carouselRef}
             className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-8 pb-4 scroll-smooth"
             style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
@@ -259,7 +259,7 @@ const HowItWorksSection: React.FC = () => (
         <h2 className="text-4xl md:text-5xl font-headline font-bold text-secondary">Transparencia en 3 Pasos</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
+
         <div className="bg-surface p-12 rounded-lg flex flex-col space-y-6 border border-outline-variant/20">
           <div className="w-16 h-16 bg-secondary text-white rounded-2xl flex items-center justify-center font-headline font-black text-2xl">01</div>
           <div className="space-y-2">
@@ -267,7 +267,7 @@ const HowItWorksSection: React.FC = () => (
             <p className="text-on-surface-variant">Localice el proyecto mediante su nombre legal o codigo unico de radicacion nacional.</p>
           </div>
         </div>
-        
+
         <div className="bg-secondary p-12 rounded-lg flex flex-col space-y-6 text-white shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-tr from-[#111144] opacity-50"></div>
           <div className="relative z-10 w-16 h-16 bg-primary-container text-on-primary-container rounded-2xl flex items-center justify-center font-headline font-black text-2xl">02</div>
@@ -276,7 +276,7 @@ const HowItWorksSection: React.FC = () => (
             <p className="text-white/70">Nuestro motor de busqueda conecta con curadurias, notarias y registros publicos en tiempo real.</p>
           </div>
         </div>
-        
+
         <div className="bg-surface p-12 rounded-lg flex flex-col space-y-6 border border-outline-variant/20">
           <div className="w-16 h-16 bg-secondary text-white rounded-2xl flex items-center justify-center font-headline font-black text-2xl">03</div>
           <div className="space-y-2">
@@ -284,7 +284,7 @@ const HowItWorksSection: React.FC = () => (
             <p className="text-on-surface-variant">Obtenga el certificado de validez tecnica y juridica con sello de autoridad institucional.</p>
           </div>
         </div>
-        
+
       </div>
     </div>
   </section>
@@ -297,7 +297,7 @@ const FinalCTASection: React.FC = () => (
       {/* Abstract Geometric Decoration */}
       <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -left-20 -top-20 w-60 h-60 bg-primary-container/20 rounded-full blur-2xl pointer-events-none"></div>
-      
+
       <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
           <h2 className="text-4xl font-headline font-extrabold leading-tight">¿Es usted un profesional inmobiliario?</h2>
@@ -323,14 +323,14 @@ const Footer: React.FC = () => (
         © {new Date().getFullYear()} VeriFinca. Institutional Authority in Real Estate.
       </p>
     </div>
-    
+
     <div className="flex flex-wrap justify-center gap-8">
       <Link to="#" className="text-[#F4F1EC]/60 hover:text-[#F4F1EC] transition-colors">Terminos Legales</Link>
       <Link to="#" className="text-[#F4F1EC]/60 hover:text-[#F4F1EC] transition-colors">Privacidad</Link>
       <Link to="#" className="text-[#F4F1EC]/60 hover:text-[#F4F1EC] transition-colors">Conexiones Institucionales</Link>
       <Link to="#" className="text-[#F4F1EC]/60 hover:text-[#F4F1EC] transition-colors">Soporte</Link>
     </div>
-    
+
     <div className="flex gap-4">
       <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container cursor-pointer transition-all">
         <GavelIcon className="w-5 h-5" />
