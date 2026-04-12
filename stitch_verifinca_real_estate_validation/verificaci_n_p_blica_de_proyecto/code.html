@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VeriFinca | Verificación Pública</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .headline { font-family: 'Manrope', sans-serif; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#28395e",
+                    "surface-tint": "#934b00",
+                    "on-surface-variant": "#564335",
+                    "on-error-container": "#93000a",
+                    "outline": "#8a7263",
+                    "surface-container-high": "#f0e7dd",
+                    "primary-fixed-dim": "#ffb783",
+                    "outline-variant": "#ddc1af",
+                    "on-tertiary-fixed": "#061a3e",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#fff8f3",
+                    "on-background": "#1f1b15",
+                    "background": "#fff8f3",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-dim": "#e2d8cf",
+                    "on-secondary-fixed-variant": "#2f408f",
+                    "on-error": "#ffffff",
+                    "secondary": "#4858a8",
+                    "on-tertiary": "#ffffff",
+                    "primary": "#934b00",
+                    "inverse-on-surface": "#f9efe6",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#99a9ff",
+                    "surface-variant": "#eae1d8",
+                    "on-tertiary-fixed-variant": "#35466c",
+                    "secondary-fixed-dim": "#b9c3ff",
+                    "inverse-surface": "#34302a",
+                    "surface": "#fff8f3",
+                    "tertiary-container": "#92a3cf",
+                    "inverse-primary": "#ffb783",
+                    "on-secondary-fixed": "#001159",
+                    "on-secondary-container": "#2a3a89",
+                    "on-primary-container": "#5d2d00",
+                    "tertiary": "#4d5e85",
+                    "surface-container-highest": "#eae1d8",
+                    "primary-container": "#f98513",
+                    "tertiary-fixed": "#d9e2ff",
+                    "secondary-fixed": "#dee1ff",
+                    "tertiary-fixed-dim": "#b5c6f3",
+                    "surface-container": "#f6ece3",
+                    "on-surface": "#1f1b15",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#fcf2e9",
+                    "primary-fixed": "#ffdcc5",
+                    "on-primary-fixed-variant": "#703700",
+                    "on-primary-fixed": "#301400",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation (Contextual Suppression: Back action priority) -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm font-['Manrope'] font-medium flex justify-between items-center w-full px-6 py-4 max-w-full sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="text-2xl font-bold text-blue-900 dark:text-blue-100">VeriFinca</span>
+<div class="h-6 w-px bg-slate-300"></div>
+<span class="text-slate-600 dark:text-slate-400 text-sm tracking-wide">Verificación pública</span>
+</div>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-orange-500 transition-colors duration-200 ease-in-out" href="#">Platform</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-orange-500 transition-colors duration-200 ease-in-out" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-slate-500 hover:text-primary transition-colors">share</button>
+<button class="material-symbols-outlined text-slate-500 hover:text-primary transition-colors">print</button>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
+<!-- Verification Header Block -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-12">
+<div class="space-y-2">
+<p class="text-sm font-bold uppercase tracking-widest text-primary">Estado de Verificación</p>
+<h1 class="text-5xl md:text-7xl font-extrabold text-blue-900 tracking-tight">VERIFICADO</h1>
+<p class="text-slate-500 font-medium">Emitido el 24 de Octubre, 2023 • 14:32 GMT</p>
+</div>
+<div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm text-center">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1">Código Único</p>
+<p class="text-xl font-mono font-bold text-blue-900 tracking-wider">VF-9928-XQ01</p>
+</div>
+</div>
+<!-- Project Identity Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="col-span-1 md:col-span-2 bg-white rounded-xl p-8 border border-slate-100 shadow-sm flex flex-col justify-between">
+<div>
+<h2 class="text-2xl font-bold text-blue-900 mb-6">Identidad del Proyecto</h2>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary p-2 bg-orange-50 rounded-lg">apartment</span>
+<div>
+<p class="text-xs font-bold text-slate-400 uppercase">Nombre del Proyecto</p>
+<p class="text-lg font-semibold text-blue-900">Residencial Valle Verde - Fase II</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary p-2 bg-orange-50 rounded-lg">location_on</span>
+<div>
+<p class="text-xs font-bold text-slate-400 uppercase">Ubicación</p>
+<p class="text-lg font-semibold text-blue-900">Sector San Isidro, Lote 45-B, Bogotá, Colombia</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary p-2 bg-orange-50 rounded-lg">engineering</span>
+<div>
+<p class="text-xs font-bold text-slate-400 uppercase">Desarrollador</p>
+<p class="text-lg font-semibold text-blue-900">Constructora Horizonte Urbano S.A.S.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-slate-200 rounded-xl overflow-hidden min-h-[300px] relative shadow-inner">
+<img alt="Mapa de ubicación" class="w-full h-full object-cover grayscale contrast-125 opacity-80" data-alt="top-down satellite view of a lush green agricultural plot of land with clear geometric boundaries and surrounding terrain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwDadR5GycTsxtKWHQ1mx3WlwQqFD0EShKQTraEjiSav1RDGruB14p2VZ_ZSqfHifuuzo2UZ4mwjpaxO9sJ27aIGOk02m1tlIVWh9PffAhENGF9PsaV8AL-MyrX118oouH3TlvURcoOlA7kymyldkPMbERfKeN7gEZyc6xmJDVoAuAQYiifctnQlpNrbximjD7RN6zBE1sPo3ocf2iObyoz68L55I_TIvMfZZrq-nwPj2DuPeKUoY6612iYy_uI4a_l5GAsWup2ts"/>
+<div class="absolute inset-0 bg-blue-900/10 mix-blend-multiply"></div>
+<div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-blue-900 shadow-sm">
+                    LOCALIZACIÓN GEORREFERENCIADA
+                </div>
+</div>
+</section>
+<!-- Validation Summary (Bento Style) -->
+<section class="mb-12">
+<h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Resumen de Validación</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-emerald-50 border border-emerald-100 p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-emerald-600 bg-white p-2 rounded-lg shadow-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="font-bold text-emerald-900">Documentación catastral</p>
+<p class="text-sm text-emerald-700">Válida y actualizada</p>
+</div>
+</div>
+</div>
+<div class="bg-emerald-50 border border-emerald-100 p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-emerald-600 bg-white p-2 rounded-lg shadow-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="font-bold text-emerald-900">Certificación de libertad</p>
+<p class="text-sm text-emerald-700">Sin gravámenes vigentes</p>
+</div>
+</div>
+</div>
+<div class="bg-emerald-50 border border-emerald-100 p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-emerald-600 bg-white p-2 rounded-lg shadow-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="font-bold text-emerald-900">Licencias ambientales</p>
+<p class="text-sm text-emerald-700">Resolución 2023-ANLA</p>
+</div>
+</div>
+</div>
+<div class="bg-emerald-50 border border-emerald-100 p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-emerald-600 bg-white p-2 rounded-lg shadow-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="font-bold text-emerald-900">Aportes a seguridad</p>
+<p class="text-sm text-emerald-700">Garantía bancaria activa</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Professional Advice Callout -->
+<aside class="bg-blue-50 border-l-4 border-blue-900 p-8 rounded-r-xl mb-12">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-blue-900">info</span>
+<div>
+<h4 class="font-bold text-blue-900 mb-2">Nota de Cumplimiento</h4>
+<p class="text-blue-800 text-sm leading-relaxed">
+                        Esta página de verificación pública confirma que los documentos listados han sido validados por VeriFinca Platforms Inc. al momento de la emisión. Sin embargo, esta validación no sustituye el asesoramiento legal profesional ni el debido proceso de revisión por parte de su abogado de confianza. Verifique siempre la autenticidad del código QR en el dominio oficial verifinca.com.
+                    </p>
+</div>
+</div>
+</aside>
+<!-- Verification Detail List -->
+<div class="border-t border-slate-200 pt-8 flex flex-col md:flex-row gap-8 items-start md:items-center justify-between opacity-60">
+<div class="text-[10px] text-slate-500 leading-tight max-w-sm">
+                VERIFINCA BLOCKCHAIN ID: 0x82f1...c99a<br/>
+                DIGITAL SIGNATURE: 9a22-334d-bc11-ff02-ae90<br/>
+                IPFS STORAGE HASH: QmXoyp...M82c
+            </div>
+<div class="flex gap-6">
+<img alt="Sello de seguridad" class="h-16 w-16 grayscale mix-blend-multiply" data-alt="official holographic security seal with geometric patterns and government-style insignia on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtYi2I7aHxkNej_E2Uh2izgt5hs9tr9hunoq_Ug8QVFIVUvI6ryL-XSWWD4PpAoYF-3RzgJgGMvE3uucNmEWxLhgAbd2An-HQkA9bg0Vw2qC5xwmsrDbzqtBgFrf6Cwm-COIdvA_QhWZSqBuojZGaXif606oPXLMrSkp88YpZCfKqFOuMngOZqQvrRmLSBRn7vJX6UXAJVjQsLbb5aaQxRJrQm0qNqhgFeZVDK1fjPLoMrUtP1W-NcPLRQQkmSlx0iK0DjzbtpYkQ"/>
+<img alt="QR de Verificación" class="h-16 w-16 grayscale" data-alt="clean black and white qr code on square white background with high contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrjOpxFibLaO0R5rl3T-qDNyxSUj5XIIUFFcszgEHZwbhxpQcaA9h-PDBuExgwOBYhbhY8tTkQiH6plNiEqPA7v_3TTDpv8tgS1i33crF66jTmZVZwmh2Mjor_HAqAAvCHkz2pbULMUdenPLzL2ZA-Uftk8hWzm5Jl1LbET1_wniepnip4tF-0ksc6ObPcuifyBriwKG-o62GmIfuc6HtvDEOPB2XN3glxO_iOJNTEyWyi1hrN5hu2r4nlywyOhX1ubOf0poSE-QM"/>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 w-full py-8 px-12 flex flex-col md:flex-row justify-between items-center font-['Inter'] text-sm">
+<div class="mb-4 md:mb-0">
+<span class="text-lg font-bold text-blue-900 dark:text-blue-100">VeriFinca</span>
+<p class="text-slate-500 dark:text-slate-400 mt-1">© 2024 VeriFinca Platforms Inc. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-200 underline transition-opacity opacity-90 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-200 underline transition-opacity opacity-90 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-200 underline transition-opacity opacity-90 hover:opacity-100" href="#">Security Compliance</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-200 underline transition-opacity opacity-90 hover:opacity-100" href="#">Contact Support</a>
+</div>
+</footer>
+</body></html>

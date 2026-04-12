@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DocumentDto, DocumentType, DocumentStatus } from "../types";
 import { documentsApi } from "../api/documentsApi";
-import { AlertTriangle, CheckCircle, Clock, FileText, ShieldAlert } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { ProjectCategory } from "../../projects/types";
 
 interface ProjectDocumentStatusProps {
@@ -9,7 +9,6 @@ interface ProjectDocumentStatusProps {
   projectCategory?: ProjectCategory;
 }
 
-// Map enum to readable names and entities
 const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
   [DocumentType.CertificadoTitulo]: { name: "Certificado de Título (Duplicado del Dueño)", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico + Cargas y Gravámenes", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
@@ -23,11 +22,11 @@ const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string
   [DocumentType.ActaConstitutiva]: { name: "Acta Constitutiva + Estatutos Sociales", entity: "Cámara / Notaría", norm: "Ley 479-08", categories: [1, 2, 3, 4, 99] },
   [DocumentType.PoderNotarial]: { name: "Poder Notarial del Representante Legal", entity: "Notaría Pública", norm: "Ley 301 Notarial", categories: [1, 2, 3, 4, 99] },
   [DocumentType.RNC]: { name: "RNC activo + estatus fiscal", entity: "DGII", norm: "-", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.EstadosFinancieros]: { name: "Estados Financieros Auditados", entity: "Firma Auditora Certificada", norm: "-", categories: [2, 3, 4] }, // Only for commercial/touristic/mixed
+  [DocumentType.EstadosFinancieros]: { name: "Estados Financieros Auditados", entity: "Firma Auditora Certificada", norm: "-", categories: [2, 3, 4] },
   [DocumentType.CertificacionesBancarias]: { name: "Certificaciones bancarias / origen de fondos", entity: "Banco / Institución Financiera", norm: "-", categories: [1, 2, 3, 4, 99] },
   [DocumentType.FormularioKYCAML]: { name: "Formulario de Debida Diligencia KYC/AML", entity: "Propia empresa (sujeto obligado)", norm: "Ley 155-17, Art. 32", categories: [1, 2, 3, 4, 99] },
   [DocumentType.DeclaracionPEP]: { name: "Declaración PEP", entity: "Propia empresa", norm: "Ley 155-17", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00", categories: [2, 3, 4] }, // Mostly for commercial/touristic/mixed
+  [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00", categories: [2, 3, 4] },
   [DocumentType.NoObjecionINAPACAASD]: { name: "No objeción INAPA/CAASD", entity: "INAPA / CAASD", norm: "-", categories: [1, 2, 3, 4, 99] },
   [DocumentType.DocumentosNotariales]: { name: "Documentos notariales firmados digitalmente", entity: "Notaría / e-firma", norm: "Ley 126-02", categories: [1, 2, 3, 4, 99] },
   [DocumentType.DocumentosSupletorios]: { name: "Documentos supletorios (inmuebles no registrados)", entity: "Tribunal de Tierras", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
@@ -51,9 +50,8 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     fetchDocs();
   }, [projectId]);
 
-  if (loading) return <div className="py-4 text-center text-sm text-gray-500">Cargando estado de documentos...</div>;
+  if (loading) return <div className="py-4 text-center text-sm text-[var(--color-text-strong)] opacity-60">Cargando estado de documentos...</div>;
 
-  // Filter required types based on project category
   const requiredTypes = Object.keys(DOCUMENT_INFO)
     .map(Number)
     .filter(typeId => DOCUMENT_INFO[typeId].categories.includes(projectCategory));
@@ -66,120 +64,88 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
   
   let riskScore = 0;
   let riskLevel = "Bajo";
-  let riskColor = "text-green-600 bg-green-50 border-green-200";
 
   if (missingCount > 10) {
     riskScore = 85;
     riskLevel = "Crítico";
-    riskColor = "text-red-700 bg-red-50 border-red-200";
   } else if (missingCount > 5 || pendingVerificationCount > 5) {
     riskScore = 50;
     riskLevel = "Medio";
-    riskColor = "text-yellow-700 bg-yellow-50 border-yellow-200";
   } else if (missingCount > 0) {
     riskScore = 20;
     riskLevel = "Bajo-Medio";
-    riskColor = "text-blue-700 bg-blue-50 border-blue-200";
   }
 
-  const getStatusIcon = (typeId: number) => {
+  const renderDocItem = (typeId: number) => {
+    const info = DOCUMENT_INFO[typeId];
+    if (!info) return null;
+    
     const doc = documents.find(d => d.tipoDocumento === typeId);
-    if (!doc) return <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-gray-400"></div></div>;
-    if (doc.estadoDocumento === DocumentStatus.Valid) return <CheckCircle className="w-6 h-6 text-green-500" />;
-    if (doc.estadoDocumento === DocumentStatus.Invalid) return <AlertTriangle className="w-6 h-6 text-red-500" />;
-    return <Clock className="w-6 h-6 text-yellow-500" />;
-  };
 
-  const getStatusText = (typeId: number) => {
-    const doc = documents.find(d => d.tipoDocumento === typeId);
-    if (!doc) return <span className="text-gray-500 text-xs font-medium px-2 py-1 bg-gray-100 rounded-full">Ausente</span>;
-    if (doc.estadoDocumento === DocumentStatus.Valid) return <span className="text-green-700 text-xs font-medium px-2 py-1 bg-green-100 rounded-full">Presente (Verificado)</span>;
-    if (doc.estadoDocumento === DocumentStatus.Invalid) return <span className="text-red-700 text-xs font-medium px-2 py-1 bg-red-100 rounded-full">Incompleto/Inconsistente</span>;
-    return <span className="text-yellow-700 text-xs font-medium px-2 py-1 bg-yellow-100 rounded-full">Presente (En Espera)</span>;
+    if (doc?.estadoDocumento === DocumentStatus.Valid) {
+      return (
+        <div key={typeId} className="flex items-center justify-between p-5 bg-surface-container-lowest rounded-lg group hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-4">
+            <div className="bg-primary-container text-on-primary-container p-2 rounded-full">
+              <CheckCircle className="w-5 h-5" />
+            </div>
+            <span className="font-semibold text-on-surface">{info.name}</span>
+          </div>
+          <span className="text-xs font-bold text-on-surface-variant opacity-60">VERIFICADO</span>
+        </div>
+      );
+    }
+    
+    if (doc && doc.estadoDocumento !== DocumentStatus.Invalid) {
+      return (
+        <div key={typeId} className="flex items-center justify-between p-5 bg-surface-container-lowest rounded-lg group hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-4">
+            <div className="bg-tertiary-container text-on-tertiary-container p-2 rounded-full">
+              <Clock className="w-5 h-5" />
+            </div>
+            <span className="font-semibold text-on-surface">{info.name}</span>
+          </div>
+          <span className="text-xs font-bold text-on-surface-variant opacity-60">EN REVISIÓN</span>
+        </div>
+      );
+    }
+
+    return (
+      <div key={typeId} className="flex items-center justify-between p-5 bg-surface-container-lowest border-l-4 border-error rounded-lg opacity-80 mix-blend-luminosity">
+        <div className="flex items-center gap-4">
+          <div className="bg-surface-container-high p-2 rounded-full">
+            <Clock className="w-5 h-5 text-on-surface-variant" />
+          </div>
+          <span className="font-semibold text-on-surface line-through">{info.name}</span>
+        </div>
+        <span className="text-xs font-bold text-error opacity-60">PENDIENTE</span>
+      </div>
+    );
   };
 
   return (
-    <div className="space-y-6 mt-8">
-      {/* Risk Scoring Module */}
-      <div className={`p-4 rounded-lg border ${riskColor} flex items-start gap-4`}>
-        <ShieldAlert className="w-8 h-8 mt-1 flex-shrink-0" />
-        <div>
-          <h3 className="font-bold text-lg">Scoring de Riesgo Documental: {riskLevel}</h3>
-          <p className="text-sm mt-1 opacity-90">
-            {missingCount} documentos esenciales ausentes, {pendingVerificationCount} presentes pero en espera de verificación.
-            Puntuación de riesgo calculada: {riskScore}/100.
-          </p>
-          {riskScore > 50 && (
-            <div className="mt-2 text-sm font-medium">
-              ⚠️ Alerta: El proyecto no puede alcanzar el Sello de Integridad hasta que se resuelvan los documentos ausentes o incompletos.
-            </div>
-          )}
-        </div>
+    <section>
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-3xl font-extrabold text-[#223382] font-headline">Documentación Legal</h2>
+        <span className="text-sm font-medium text-secondary">
+          {Math.round((verifiedDocs.length / requiredTypes.length) * 100)}% verificado
+        </span>
       </div>
 
-      {/* Documents List */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-gray-500" />
-            Lista de Documentos Esenciales Requeridos
-          </h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Progreso hacia el sello de integridad VeriFinca ({Math.round((uploadedDocs.length / requiredTypes.length) * 100)}% completado).
-          </p>
+      {riskScore > 50 && (
+        <div className="mb-6 p-4 rounded-lg bg-error-container text-on-error-container flex items-start gap-3">
+          <AlertTriangle className="w-6 h-6 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-bold">Scoring de Riesgo: {riskLevel}</h4>
+            <p className="text-sm mt-1">Faltan {missingCount} documentos esenciales. Este proyecto no cumple con los estándares mínimos para completar su validación.</p>
+          </div>
         </div>
-        
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
-                  Estado
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Documento / Certificación
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Entidad Emisora
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                  Norma Aplicable
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estatus
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {requiredTypes.map((typeId) => {
-                const info = DOCUMENT_INFO[typeId];
-                if (!info) return null;
-                
-                return (
-                  <tr key={typeId} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusIcon(typeId)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{info.name}</div>
-                      <div className="text-xs text-gray-500 md:hidden mt-1">{info.entity}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                      {info.entity}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono hidden lg:table-cell">
-                      {info.norm}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {getStatusText(typeId)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      )}
+
+      <div className="space-y-4">
+        {requiredTypes.map(renderDocItem)}
       </div>
-    </div>
+    </section>
   );
 };
+

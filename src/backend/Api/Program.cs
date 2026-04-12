@@ -21,3 +21,5 @@ if (useMock)
 app.UseApiMiddleware();
 
 app.Run();
+
+public partial class Program { }

@@ -1,5 +1,16 @@
-import React from "react";
 import { DocumentDto, DocumentType } from "../types";
+import { 
+  FileText, 
+  Download, 
+  Trash2, 
+  RefreshCcw, 
+  CheckCircle, 
+  History,
+  Info,
+  ExternalLink,
+  ShieldCheck,
+  AlertCircle
+} from "lucide-react";
 
 interface ProjectDocumentsListProps {
   documents: DocumentDto[];
@@ -9,25 +20,25 @@ interface ProjectDocumentsListProps {
 
 const DOCUMENT_TYPE_NAMES: Record<number, string> = {
   [DocumentType.CertificadoTitulo]: "Certificado de Título",
-  [DocumentType.CertificacionEstadoJuridico]: "Certificación Estado Jurídico",
+  [DocumentType.CertificacionEstadoJuridico]: "Estado Jurídico",
   [DocumentType.PlanosArquitectonicos]: "Planos Arquitectónicos",
-  [DocumentType.PlanoMensuraCatastral]: "Plano Mensura Catastral",
+  [DocumentType.PlanoMensuraCatastral]: "Plano Mensura",
   [DocumentType.PermisoConstruccion]: "Permiso de Construcción",
-  [DocumentType.CertificadoUsoSuelo]: "Certificado Uso de Suelo",
-  [DocumentType.FormularioFIDVB009]: "Formulario FI-DVB-009",
-  [DocumentType.CertificacionIPI]: "Certificación IPI",
-  [DocumentType.RegistroMercantil]: "Registro Mercantil",
+  [DocumentType.CertificadoUsoSuelo]: "Uso de Suelo",
+  [DocumentType.FormularioFIDVB009]: "FI-DVB-009",
+  [DocumentType.CertificacionIPI]: "IPI",
+  [DocumentType.RegistroMercantil]: "Reg. Mercantil",
   [DocumentType.ActaConstitutiva]: "Acta Constitutiva",
   [DocumentType.PoderNotarial]: "Poder Notarial",
   [DocumentType.RNC]: "RNC",
-  [DocumentType.EstadosFinancieros]: "Estados Financieros",
-  [DocumentType.CertificacionesBancarias]: "Certificaciones Bancarias",
-  [DocumentType.FormularioKYCAML]: "Formulario KYC/AML",
+  [DocumentType.EstadosFinancieros]: "Estados Fin.",
+  [DocumentType.CertificacionesBancarias]: "Cert. Bancarias",
+  [DocumentType.FormularioKYCAML]: "KYC/AML",
   [DocumentType.DeclaracionPEP]: "Declaración PEP",
-  [DocumentType.CertificadoEIA]: "Certificado EIA",
-  [DocumentType.NoObjecionINAPACAASD]: "No objeción INAPA/CAASD",
-  [DocumentType.DocumentosNotariales]: "Documentos Notariales",
-  [DocumentType.DocumentosSupletorios]: "Documentos Supletorios",
+  [DocumentType.CertificadoEIA]: "EIA",
+  [DocumentType.NoObjecionINAPACAASD]: "INAPA/CAASD",
+  [DocumentType.DocumentosNotariales]: "Doc. Notariales",
+  [DocumentType.DocumentosSupletorios]: "Doc. Supletorios",
   [DocumentType.Other]: "Otro",
 };
 
@@ -38,61 +49,127 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
 }) => {
   if (documents.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border">
-        No hay documentos registrados para este proyecto.
+      <div className="vf-card flex flex-col items-center justify-center py-20 text-center animate-fade-in group hover:border-dashed">
+        <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/40 mb-6 group-hover:scale-110 transition-transform">
+           <FileText className="w-10 h-10" />
+        </div>
+        <h4 className="text-xl font-display font-black text-secondary uppercase tracking-tight">Repositorio Vacío</h4>
+        <p className="text-sm text-on-surface-variant font-medium mt-2 max-w-xs mx-auto">
+          Aún no se han digitalizado evidencias para este proyecto. Comience subiendo un documento.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-md border">
-      <ul className="divide-y divide-gray-200">
-        {documents.map((doc) => (
-          <li key={doc.id}>
-            <div className="px-4 py-4 sm:px-6 flex items-center justify-between">
-              <div className="flex flex-col">
-                <p className="text-sm font-medium text-blue-600 truncate">
-                  {doc.nombreArchivoOriginal}
-                </p>
-                <div className="mt-2 flex">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <span className="mr-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                      {DOCUMENT_TYPE_NAMES[doc.tipoDocumento] || "Desconocido"}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-sm font-black text-secondary flex items-center gap-2">
+           <History className="w-4 h-4 text-primary" />
+           EXPEDIENTES DIGITALIZADOS ({documents.length})
+        </h4>
+        <div className="flex items-center gap-4">
+           <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-success"></span>
+              <span className="text-[10px] font-bold text-on-surface-variant">ACTIVO</span>
+           </div>
+           <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-error"></span>
+              <span className="text-[10px] font-bold text-on-surface-variant">DEPRECIADO</span>
+           </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3">
+        {documents.map((doc, idx) => (
+          <div 
+            key={doc.id} 
+            className="vf-card group !p-0 overflow-hidden border-l-4 transition-all duration-300 animate-fade-in-up" 
+            style={{ 
+              animationDelay: `${idx * 100}ms`,
+              borderLeftColor: doc.activo ? "var(--color-success)" : "var(--color-error)"
+            }}
+          >
+            <div className="p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="flex items-center gap-5 flex-1 min-w-0">
+                <div className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center relative flex-shrink-0 border transition-colors ${doc.activo ? "bg-success/[0.03] border-success/10 text-success ring-4 ring-success/[0.02]" : "bg-error/[0.03] border-error/10 text-error ring-4 ring-error/[0.02]"}`}>
+                   <FileText className="w-7 h-7" />
+                   <span className="text-[8px] font-black absolute bottom-1 uppercase">v{doc.version}</span>
+                </div>
+                
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${doc.activo ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
+                       {DOCUMENT_TYPE_NAMES[doc.tipoDocumento] || "DESCONOCIDO"}
                     </span>
-                    <span className="mr-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      v{doc.version}
+                    {doc.activo && (
+                      <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3" /> VERIFICADO
+                      </span>
+                    )}
+                  </div>
+                  <h5 className="text-base font-black text-secondary truncate group-hover:text-primary transition-colors">
+                    {doc.nombreArchivoOriginal}
+                  </h5>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
+                    <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1.5">
+                      <History className="w-3 h-3" /> {new Date(doc.createdAtUtc).toLocaleDateString()}
                     </span>
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${doc.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-                    >
-                      {doc.activo ? "Activo" : "Inactivo"}
+                    <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1.5 uppercase">
+                      <Info className="w-3 h-3" /> {(doc.tamanoBytes / 1024).toFixed(2)} KB
                     </span>
                   </div>
                 </div>
-                <div className="mt-2 text-xs text-gray-500">
-                  Subido el: {new Date(doc.createdAtUtc).toLocaleDateString()} |
-                  Tamaño: {(doc.tamanoBytes / 1024).toFixed(2)} KB
-                </div>
               </div>
 
-              <div className="flex flex-col space-y-2 items-end">
+              <div className="flex items-center gap-2 self-end md:self-center w-full md:w-auto">
                 <button
                   onClick={() => onDownload(doc.id)}
-                  className="text-sm text-blue-600 hover:text-blue-900 font-medium"
+                  className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-surface-container-high hover:bg-primary hover:text-white text-secondary font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2"
                 >
+                  <Download className="w-3.5 h-3.5" />
                   Descargar
                 </button>
+                
                 <button
                   onClick={() => onToggleStatus(doc.id, !doc.activo)}
-                  className={`text-sm font-medium ${doc.activo ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"}`}
+                  className={`flex-1 md:flex-none h-10 px-4 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                    doc.activo 
+                      ? "bg-error/10 text-error hover:bg-error hover:text-white" 
+                      : "bg-success/10 text-success hover:bg-success hover:text-white"
+                  }`}
                 >
-                  {doc.activo ? "Desactivar" : "Activar"}
+                  {doc.activo ? (
+                    <>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Archivar
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCcw className="w-3.5 h-3.5" />
+                      Restaurar
+                    </>
+                  )}
+                </button>
+                
+                <button className="h-10 w-10 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center">
+                   <ExternalLink className="w-4 h-4" />
                 </button>
               </div>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
+      
+      <div className="p-4 rounded-2xl bg-primary/[0.03] border border-primary/10 flex items-start gap-3 mt-8">
+         <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+         <div>
+            <p className="text-xs font-black text-secondary uppercase tracking-tight">Sobre las Versiones</p>
+            <p className="text-[10px] text-on-surface-variant font-medium mt-1">
+              Antigravity Verify mantiene un historial de versiones para cada documento subido. Los documentos archivados no se eliminan, permanecen en el repositorio inmutable para auditoría RI.
+            </p>
+         </div>
+      </div>
     </div>
   );
 };

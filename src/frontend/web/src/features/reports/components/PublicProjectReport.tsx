@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PublicProjectReportDto } from "../types";
 import { reportsApi } from "../api/reportsApi";
+import { Info, Calendar } from "lucide-react";
 
 interface PublicProjectReportProps {
   projectId: string;
@@ -28,63 +29,60 @@ export const PublicProjectReport: React.FC<PublicProjectReportProps> = ({
 
   if (isLoading)
     return (
-      <div className="text-sm text-gray-500">Cargando reporte público...</div>
+      <div className="text-sm text-[var(--color-text-strong)] opacity-60">Cargando reporte público...</div>
     );
   if (!report)
     return (
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-[var(--color-text-strong)] opacity-60">
         No hay reporte público disponible para este proyecto.
       </div>
     );
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg border">
-      <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-        <div>
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Reporte Público Resumido
-          </h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Estado visible del proyecto para terceros.
-          </p>
-        </div>
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+    <div className="bg-surface-container-low rounded-xl p-8 mb-12 shadow-sm border border-outline-variant">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold font-headline text-[#223382]">Reporte Público Resumido</h2>
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-primary-container text-on-primary-container">
           Versión {report.version}
         </span>
       </div>
-      <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-        <dl className="sm:divide-y sm:divide-gray-200">
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">
-              Estado del Proyecto
-            </dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-semibold">
-              {report.estadoProyectoVisible}
-            </dd>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 className="text-sm font-semibold text-secondary uppercase tracking-widest mb-4">Información Clave</h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-surface rounded-lg">
+              <span className="text-on-surface-variant font-medium">Estado del Proyecto</span>
+              <span className="font-bold text-on-surface">{report.estadoProyectoVisible}</span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-surface rounded-lg">
+              <span className="text-on-surface-variant font-medium">Estado Expediente</span>
+              <span className="font-bold text-on-surface">{report.estadoExpedienteVisible}</span>
+            </div>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">
-              Estado del Expediente
-            </dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {report.estadoExpedienteVisible}
-            </dd>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-semibold text-secondary uppercase tracking-widest mb-4">Detalles</h3>
+          
+          <div className="bg-surface p-4 rounded-lg h-full flex flex-col justify-between">
+            <div className="flex gap-3 mb-2">
+              <Info className="w-5 h-5 text-secondary flex-shrink-0" />
+              <p className="text-sm text-on-surface opacity-90 leading-relaxed">
+                {report.resumenPublico}
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-outline-variant opacity-70">
+              <Calendar className="w-4 h-4 text-secondary" />
+              <span className="text-xs font-medium">
+                Actualizado: {new Date(report.ultimaActualizacionUtc).toLocaleDateString()}
+              </span>
+            </div>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Resumen</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {report.resumenPublico}
-            </dd>
-          </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">
-              Última Actualización
-            </dt>
-            <dd className="mt-1 text-sm text-gray-500 sm:mt-0 sm:col-span-2">
-              {new Date(report.ultimaActualizacionUtc).toLocaleString()}
-            </dd>
-          </div>
-        </dl>
+        </div>
       </div>
     </div>
   );

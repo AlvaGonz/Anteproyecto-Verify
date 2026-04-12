@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Integrity Score View - VeriFinca</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#f98513",
+                        "primary-fixed": "#ffdcc5",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#4d5e85",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#b9c3ff",
+                        "outline-variant": "#ddc1af",
+                        "tertiary-fixed-dim": "#b5c6f3",
+                        "on-tertiary-fixed-variant": "#35466c",
+                        "surface-container-low": "#fcf2e9",
+                        "on-primary-fixed-variant": "#703700",
+                        "surface-tint": "#934b00",
+                        "inverse-surface": "#34302a",
+                        "surface-container": "#f6ece3",
+                        "on-surface": "#1f1b15",
+                        "on-primary-container": "#5d2d00",
+                        "surface-bright": "#fff8f3",
+                        "inverse-on-surface": "#f9efe6",
+                        "secondary": "#4858a8",
+                        "secondary-fixed": "#dee1ff",
+                        "surface-container-high": "#f0e7dd",
+                        "tertiary-container": "#92a3cf",
+                        "on-primary-fixed": "#301400",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#eae1d8",
+                        "on-secondary-container": "#2a3a89",
+                        "on-surface-variant": "#564335",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#ffb783",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#28395e",
+                        "on-background": "#1f1b15",
+                        "secondary-container": "#99a9ff",
+                        "surface-dim": "#e2d8cf",
+                        "surface-container-highest": "#eae1d8",
+                        "primary": "#934b00",
+                        "on-secondary-fixed-variant": "#2f408f",
+                        "inverse-primary": "#ffb783",
+                        "on-secondary-fixed": "#001159",
+                        "background": "#fff8f3",
+                        "on-tertiary-fixed": "#061a3e",
+                        "tertiary-fixed": "#d9e2ff",
+                        "surface": "#fff8f3",
+                        "outline": "#8a7263"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .score-gradient {
+            background: conic-gradient(from 180deg at 50% 50%, #f98513 0deg, #f98513 262.8deg, #eae1d8 262.8deg);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- SideNavBar Anchor -->
+<nav class="fixed left-0 top-0 h-full flex flex-col h-screen w-64 border-r border-slate-200 dark:border-slate-800 font-['Manrope'] text-sm font-medium z-50" style="background-color: #223382; border-right-color: rgba(244, 241, 236, 0.1);">
+<div class="p-6"><h1 class="text-lg font-black" style="color: #F4F1EC;">VeriFinca Internal</h1><p class="text-xs mt-1" style="color: rgba(244, 241, 236, 0.7);">Professional Auditor</p></div>
+<div class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-150" href="#" style="color: #F4F1EC;">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-150" href="#" style="color: #F4F1EC;">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+                Property Audit
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-150" href="#" style="color: #F4F1EC;">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+                Validation Log
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 transition-all duration-150" href="#" style="background-color: rgba(255, 255, 255, 0.1); color: #F4F1EC; border-right: 4px solid #F98513;">
+<span class="material-symbols-outlined" data-icon="Assessment" style="font-variation-settings: 'FILL' 1;">assessment</span>
+                Integrity Reports
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-150" href="#" style="color: #F4F1EC;">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</div>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800 space-y-1" style="border-top-color: rgba(244, 241, 236, 0.1);">
+<a class="flex items-center gap-3 px-3 py-2 dark:text-slate-400 hover:bg-slate-100 transition-all" href="#" style="color: #F4F1EC;">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 dark:text-slate-400 hover:bg-slate-100 transition-all" href="#" style="color: #F4F1EC;">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Sign Out
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Header Section -->
+<header class="flex justify-between items-end mb-8 border-b border-outline-variant pb-6">
+<div>
+<nav class="flex items-center gap-2 text-sm text-on-surface-variant mb-2">
+<span>Reports</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+<span>Integrity Score</span>
+</nav>
+<h2 class="text-4xl font-headline font-extrabold text-on-surface tracking-tight">Residencial Valle Verde</h2>
+<div class="flex items-center gap-4 mt-2">
+<span class="flex items-center gap-1 text-sm font-medium text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+                        Last Validation: Oct 24, 2024
+                    </span>
+<span class="h-4 w-px bg-outline-variant"></span>
+<span class="flex items-center gap-1 text-sm font-medium text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="fingerprint">fingerprint</span>
+                        ID: VF-98234-RT
+                    </span>
+</div>
+</div>
+<button class="bg-primary-container text-on-primary-container px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:brightness-95 transition-all shadow-sm">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                Export PDF Report
+            </button>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Main Score Visual (Hero Card) -->
+<section class="col-span-12 lg:col-span-5 bg-surface-container rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-primary-container"></div>
+<div class="relative w-64 h-64 flex items-center justify-center">
+<!-- Progress Ring Representation -->
+<div class="absolute inset-0 rounded-full border-[12px] border-surface-variant"></div>
+<div class="absolute inset-0 rounded-full border-[12px] border-primary-container border-t-transparent border-l-transparent rotate-45"></div>
+<div class="text-center">
+<span class="block text-6xl font-headline font-black text-on-surface">73</span>
+<span class="block text-lg font-medium text-on-surface-variant uppercase tracking-widest">Score / 100</span>
+</div>
+</div>
+<div class="mt-8 px-8 py-3 bg-[#FFB00020] border-2 border-[#FFB000] rounded-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#BF8400]" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="text-xl font-black text-[#BF8400] tracking-tighter">OBSERVADO</span>
+</div>
+</div>
+<p class="mt-6 text-sm text-center text-on-surface-variant max-w-xs">
+                    This property requires immediate attention to resolve critical documentation gaps identified during the last audit.
+                </p>
+</section>
+<!-- Breakdown & Summary -->
+<div class="col-span-12 lg:col-span-7 grid grid-cols-2 gap-6">
+<!-- Category Cards -->
+<div class="bg-white p-5 rounded-xl border border-outline-variant flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-700" data-icon="description">description</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Documental</h4>
+<div class="flex items-center gap-1 mt-1">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="text-xs font-medium text-on-surface-variant">High Integrity</span>
+</div>
+</div>
+</div>
+<span class="text-xl font-headline font-bold text-on-surface">92</span>
+</div>
+<div class="bg-white p-5 rounded-xl border border-outline-variant flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-orange-700" data-icon="map">map</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Catastral</h4>
+<div class="flex items-center gap-1 mt-1">
+<div class="w-2 h-2 rounded-full bg-orange-500"></div>
+<span class="text-xs font-medium text-on-surface-variant">Warning</span>
+</div>
+</div>
+</div>
+<span class="text-xl font-headline font-bold text-on-surface">65</span>
+</div>
+<div class="bg-white p-5 rounded-xl border border-outline-variant flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-700" data-icon="gavel">gavel</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Legal/Registral</h4>
+<div class="flex items-center gap-1 mt-1">
+<div class="w-2 h-2 rounded-full bg-red-500"></div>
+<span class="text-xs font-medium text-on-surface-variant">Critical Issue</span>
+</div>
+</div>
+</div>
+<span class="text-xl font-headline font-bold text-on-surface">48</span>
+</div>
+<div class="bg-white p-5 rounded-xl border border-outline-variant flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-700" data-icon="payments">payments</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Financiera</h4>
+<div class="flex items-center gap-1 mt-1">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="text-xs font-medium text-on-surface-variant">Verified</span>
+</div>
+</div>
+</div>
+<span class="text-xl font-headline font-bold text-on-surface">88</span>
+</div>
+<!-- Executive Summary -->
+<article class="col-span-2 bg-surface-container-low p-6 rounded-xl border border-outline-variant/50">
+<h3 class="font-headline font-bold text-lg mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                        Executive Summary
+                    </h3>
+<p class="text-on-surface-variant leading-relaxed font-body">
+                        The integrity score of <strong class="text-on-surface">73/100</strong> is primarily affected by outstanding fiscal documentation and discrepancies in the legal registration of common areas. Specifically, the <span class="text-orange-700 font-semibold underline decoration-2">Catastral mapping</span> shows a 3.4% variance against physical measurements, and the <span class="text-red-700 font-semibold underline decoration-2">Registral status</span> is marked as 'Pending' due to missing municipal certifications. Action is required before the final closing phase.
+                    </p>
+</article>
+</div>
+<!-- Findings List -->
+<section class="col-span-12 lg:col-span-8 bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center bg-slate-50/50">
+<h3 class="font-headline font-bold text-lg">Top 3 Critical Findings</h3>
+<span class="px-3 py-1 bg-error-container text-on-error-container text-xs font-bold rounded-full uppercase tracking-wider">Priority: High</span>
+</div>
+<div class="divide-y divide-outline-variant">
+<div class="p-5 flex items-start gap-4 group hover:bg-surface-container-lowest transition-colors">
+<div class="mt-1 w-8 h-8 rounded-full bg-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-error text-lg" data-icon="error" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface">Missing Fiscal Solvency Certificate (2023-2024)</h4>
+<span class="text-xs font-medium bg-error/10 text-error px-2 py-0.5 rounded">High Risk</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-1">Proof of property tax payment for the current fiscal period has not been submitted or validated by municipal records.</p>
+</div>
+</div>
+<div class="p-5 flex items-start gap-4 group hover:bg-surface-container-lowest transition-colors">
+<div class="mt-1 w-8 h-8 rounded-full bg-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-error text-lg" data-icon="error" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface">Registry Mismatch: Lot #412 Boundaries</h4>
+<span class="text-xs font-medium bg-error/10 text-error px-2 py-0.5 rounded">High Risk</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-1">The registered square footage differs from the physical survey by 12.4 sqm, causing a title conflict with Lot #413.</p>
+</div>
+</div>
+<div class="p-5 flex items-start gap-4 group hover:bg-surface-container-lowest transition-colors">
+<div class="mt-1 w-8 h-8 rounded-full bg-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-error text-lg" data-icon="error" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface">Unresolved Lien: Construction Loan 2021</h4>
+<span class="text-xs font-medium bg-error/10 text-error px-2 py-0.5 rounded">High Risk</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-1">A prior construction lien remains active on the property title despite claims of full settlement.</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low flex justify-center">
+<button class="text-primary font-bold text-sm flex items-center gap-1 hover:underline">
+                        Ver Hallazgos Completos
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Map/Contextual Image -->
+<section class="col-span-12 lg:col-span-4 h-full min-h-[400px]">
+<div class="w-full h-full rounded-xl overflow-hidden relative shadow-sm border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Modern upscale residential housing complex layout with clean organized streets and manicured lawns from an aerial satellite perspective" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhpVspTCj3bPp1p31rPPkofRM0bBntKeSby_B51I1OfQsnqHud-Rlrzrisuykg_7NKBEzOcKb4P7AWMyOCLSnjqwDIqczwtf8J-rrx8wor1vS4Teyuw-YCWO78jNGPlsEwKCsP2vIjlsO5PtiAQK6ErRAdCfFEus29qqua5ioFyU99GvwADiBGqo-PFHogbCk7WPVc-Vwl8zWlCNlYnJRpswdaktaAVao5s6AgaEKsJKvQDI81OkGzWq3iXuXXfvQu2cnE0sSKKp0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<span class="bg-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-2 inline-block">Audit Zone</span>
+<h4 class="font-headline font-bold text-xl">Site Overview</h4>
+<p class="text-sm opacity-80">Sector 7, North Valley District</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Metadata Footer Section -->
+<footer class="mt-12 pt-8 border-t border-outline-variant text-on-surface-variant flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="flex flex-col gap-1">
+<p class="text-xs font-bold uppercase tracking-widest text-slate-400">Security &amp; Compliance</p>
+<div class="flex items-center gap-6 mt-1">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline">Verification ID</span>
+<span class="text-sm font-medium">VF-8821-XP-2024</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline">Timestamp</span>
+<span class="text-sm font-medium">2024-10-24 14:32:01 UTC</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline">Methodology</span>
+<span class="text-sm font-medium">Standard V2.4</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-4xl text-slate-300" data-icon="verified_user">verified_user</span>
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">VeriFinca Real Estate Validation</p>
+<p class="text-[10px] text-on-surface-variant">© 2024 VeriFinca. All rights reserved.</p>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

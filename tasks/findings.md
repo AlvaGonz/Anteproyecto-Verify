@@ -1,33 +1,39 @@
-# Research & Findings
+# Discovery Findings - VeriFinca
 
-## Project Structure
-- Monorepo-ish structure: Root `package.json` and a dedicated `src/frontend/web` frontend project.
-- Errors in `src/frontend/web` are due to missing `node_modules`.
+## 1. Stack Oficial
+- **Frontend**: React 19, TypeScript, Vite
+- **Backend**: ASP.NET Core 8 Web API
+- **Arquitectura**: Clean Architecture (Backend), SPA (Frontend)
+- **Base de Datos**: Azure SQL (Relational data)
+- **Almacenamiento**: Azure Blob Storage (Document storage)
+- **Seguridad**: AES-256 (at rest), TLS 1.2+ (in transit), MFA, RBAC
 
-## Analysis of Errors
-1. **Module Resolution (Frontend)**: "Cannot find module 'react'" etc. are due to missing local packages.
-2. **Build Error CS0117 (Backend)**: 
-    - `ProjectCategory` was missing the `Industrial` definition.
-    - Resulted in critical failure of `api.Dockerfile` during `dotnet publish`.
-    - **Resolution**: Added `Industrial = 5` to `ProjectCategory.cs`.
-3. **Broken Contracts (Backend Architecture)**:
-    - `Proyecto`: Missing `PromotorId` (Guid) and `RncPromotor` (string).
-    - `Hallazgo`: Constructor mismatch (called with 7 args, defined with 6). Missing `SistemaOrigen` property.
-    - `IReporteBuilder`: Method name mismatch (`ConstruirReporteAsync` vs `BuildReporteAsync`).
-    - `Validacion`: Missing `TipoValidacion` and `Estado` aliases for public queries.
+## 2. Reglas de Negocio del Sistema VeriFinca
+- Validación de proyectos inmobiliarios en República Dominicana para prevención de fraudes.
+- **Diagnóstico Documental**: Identificar y exigir documentación basada en normativas del Registro Inmobiliario (RI).
+- **Validación de Integridad**: OCR para firma, fecha, etc.
+- **Interoperabilidad/Contraste**: RI (títulos/cargas), Catastro (linderos, área), DGII (estatus fiscal).
+- **Mapeo Territorial**: Georreferenciación.
+- **Verificación Crediticia y de Consentimiento**: Aplicación de Ley 172-13.
+- **Sello de Integridad**: Emisión de QR firmado digitalmente (Ley 126-02) al cumplir validaciones.
 
-## Backend Review Findings (Resolved)
-- **Enums**: 
-    - `IntegrityStatus`: Added `Warning` and `Critical`.
-    - `ProjectStatus`: Added `Approved` and `Verified`.
-    - `ProjectCategory`: Added `Industrial`.
-- **Property Mismatches**: 
-    - `Proyecto`: Added `Status`, `Estado`, `PromotorId`, `RncPromotor`, and `IdentificacionCatastral` aliases.
-    - `Usuario`: Added `Email` alias.
-    - `Validacion`: Added `Estado` and `TipoValidacion` aliases.
-- **Entity Consolidation**:
-    - `Hallazgo`: Updated to 7-argument constructor. Added `SistemaOrigen`, `Severity`, `Tipo`, `FuenteValidacion`, and `FechaDeteccionUtc` aliases for compatibility.
-- **API Attributes**: Corrected `[PATCH]` to `[HttpPatch]` in `ProjectDocumentsController`.
-- **Dependencies**: Fixed missing `Microsoft.Extensions.Configuration` in `Application.csproj`.
-- **Usings**: Fixed several missing using directives in Application handlers.
-- **Interfaces**: Renamed `IReporteBuilder.ConstruirReporteAsync` to `BuildReporteAsync`.
+## 3. Estructura Actual de Carpetas Frontend (`src/frontend/web/src/`)
+- `app/`
+- `features/`
+- `infrastructure/`
+- `pages/` (admin, projects, public)
+- `router/`
+- `shared/` (components, security, layouts)
+- `styles/`
+
+## 4. Rutas Existentes
+- **Públicas**: `/`, `/consulta-publica`, `/verify`, `/verify/:code`, `/health`, `/projects`, `/projects/:id`
+- **Administración (Protegidas por AuthGuard)**: 
+  - `/admin/dashboard`
+  - `/admin/projects`
+  - `/admin/projects/new`, `/admin/projects/:id/edit`
+  - `/admin/projects/:id/documents`
+  - `/admin/projects/:id/validations`
+  - `/admin/projects/:id/audit`
+  - `/admin/projects/:id/reports`
+  - `/admin/rules`
