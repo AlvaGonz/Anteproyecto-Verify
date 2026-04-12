@@ -1,175 +1,162 @@
-import React from "react";
-import { FolderKanban, FileCheck, AlertCircle, TrendingUp } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { FolderKanban, FileCheck, AlertCircle, TrendingUp, Plus, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { projectsApi } from "../../projects/api/projectsApi";
+import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../projects/types";
 
 export const DashboardPage: React.FC = () => {
-  // Mock data for the dashboard
+  const [projects, setProjects] = useState<ProyectoDto[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await projectsApi.getProjects();
+        setProjects(data);
+      } catch (e) {
+        console.error("Error loading projects", e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const totalProjects = projects.length;
+  const inReview = projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
+  const observed = projects.filter(p => p.estadoProyecto === ProjectStatus.Observed).length;
+  const verified = projects.filter(p => p.estadoIntegridad === IntegrityStatus.Verified).length;
+
   const stats = [
     {
       name: "Total Proyectos",
-      stat: "12",
+      stat: loading ? "..." : totalProjects.toString(),
       icon: FolderKanban,
-      change: "+2",
-      changeType: "increase",
+      bgColor: "bg-[var(--color-brand-primary)]",
     },
     {
-      name: "En Revisión",
-      stat: "4",
+      name: "En Revision",
+      stat: loading ? "..." : inReview.toString(),
       icon: FileCheck,
-      change: "0",
-      changeType: "neutral",
+      bgColor: "bg-[var(--color-brand-accent-soft)]",
     },
     {
       name: "Observados",
-      stat: "2",
+      stat: loading ? "..." : observed.toString(),
       icon: AlertCircle,
-      change: "-1",
-      changeType: "decrease",
+      bgColor: "bg-[var(--color-brand-secondary)]",
     },
     {
-      name: "Certificados",
-      stat: "6",
+      name: "Verificados",
+      stat: loading ? "..." : verified.toString(),
       icon: TrendingUp,
-      change: "+1",
-      changeType: "increase",
+      bgColor: "bg-emerald-600",
     },
   ];
 
-  const recentActivity = [
-    {
-      id: 1,
-      action: 'Proyecto "Residencial Las Palmas" creado',
-      time: "Hace 2 horas",
-      user: "Admin",
-    },
-    {
-      id: 2,
-      action: 'Documento "Planos Estructurales" subido a "Torre Azul"',
-      time: "Hace 4 horas",
-      user: "Admin",
-    },
-    {
-      id: 3,
-      action: 'Validación completada para "Condominio El Bosque"',
-      time: "Ayer",
-      user: "Sistema",
-    },
-    {
-      id: 4,
-      action: 'Proyecto "Plaza Central" marcado como Observado',
-      time: "Ayer",
-      user: "Admin",
-    },
-  ];
+  const recentProjects = projects
+    .sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime())
+    .slice(0, 5);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
-        Dashboard Operativo
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-[var(--color-text-strong)]">
+          Dashboard Operativo
+        </h1>
+        <Link to="/admin/projects/new" className="vf-btn-primary">
+          <Plus className="w-4 h-4" />
+          Nuevo Proyecto
+        </Link>
+      </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {stats.map((item) => (
-          <div
-            key={item.name}
-            className="relative bg-white pt-5 px-4 pb-12 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden border border-gray-100"
-          >
-            <dt>
-              <div className="absolute bg-indigo-500 rounded-md p-3">
-                <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
-              </div>
-              <p className="ml-16 text-sm font-medium text-gray-500 truncate">
-                {item.name}
-              </p>
-            </dt>
-            <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
-              <p className="text-2xl font-semibold text-gray-900">
-                {item.stat}
-              </p>
-              <p
-                className={`ml-2 flex items-baseline text-sm font-semibold ${
-                  item.changeType === "increase"
-                    ? "text-green-600"
-                    : item.changeType === "decrease"
-                      ? "text-red-600"
-                      : "text-gray-500"
-                }`}
-              >
-                {item.change}
-              </p>
-            </dd>
+          <div key={item.name} className="vf-card p-5 flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl ${item.bgColor} flex items-center justify-center flex-shrink-0`}>
+              <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-sm text-[var(--color-text-strong)] opacity-60">{item.name}</p>
+              <p className="text-2xl font-bold text-[var(--color-text-strong)]">{item.stat}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Activity */}
-        <div className="bg-white shadow rounded-lg border border-gray-100">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Actividad Reciente
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Projects */}
+        <div className="vf-card overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--color-surface-muted)]/50">
+            <h3 className="text-base font-bold text-[var(--color-text-strong)]">
+              Proyectos Recientes
             </h3>
           </div>
-          <ul className="divide-y divide-gray-200">
-            {recentActivity.map((activity) => (
-              <li
-                key={activity.id}
-                className="px-4 py-4 sm:px-6 hover:bg-gray-50"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-indigo-600 truncate">
-                    {activity.action}
-                  </p>
-                  <div className="ml-2 flex-shrink-0 flex">
-                    <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                      {activity.user}
+          <div className="divide-y divide-[var(--color-surface-muted)]/30">
+            {recentProjects.length === 0 ? (
+              <div className="p-5 text-sm text-[var(--color-text-strong)] opacity-50 text-center">
+                No hay proyectos recientes.
+              </div>
+            ) : (
+              recentProjects.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/admin/projects/${p.id}/edit`}
+                  className="flex items-center justify-between px-5 py-3 hover:bg-[var(--color-surface-base)]/50 transition-colors"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--color-text-strong)]">{p.nombre}</p>
+                    <p className="text-xs text-[var(--color-text-strong)] opacity-50">
+                      {new Date(p.createdAtUtc).toLocaleDateString()} - {p.codigoInterno}
                     </p>
                   </div>
-                </div>
-                <div className="mt-2 sm:flex sm:justify-between">
-                  <div className="sm:flex">
-                    <p className="flex items-center text-sm text-gray-500">
-                      {activity.time}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <div className="bg-gray-50 px-4 py-4 sm:px-6 border-t border-gray-200 rounded-b-lg">
-            <div className="text-sm">
-              <Link
-                to="/admin/audit"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Ver todo el historial <span aria-hidden="true">&rarr;</span>
-              </Link>
-            </div>
+                  <ArrowRight className="w-4 h-4 text-[var(--color-surface-muted)]" />
+                </Link>
+              ))
+            )}
+          </div>
+          <div className="px-5 py-3 border-t border-[var(--color-surface-muted)]/50 bg-[var(--color-surface-base)]/30">
+            <Link to="/admin/projects" className="text-sm font-medium text-[var(--color-brand-primary)] hover:underline inline-flex items-center gap-1">
+              Ver todos <ArrowRight className="w-3 h-3" />
+            </Link>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white shadow rounded-lg border border-gray-100">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Acciones Rápidas
+        <div className="vf-card overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--color-surface-muted)]/50">
+            <h3 className="text-base font-bold text-[var(--color-text-strong)]">
+              Acciones Rapidas
             </h3>
           </div>
-          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
               to="/admin/projects/new"
-              className="flex items-center justify-center px-4 py-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              className="vf-card-flat p-4 flex items-center gap-3 hover:bg-[var(--color-surface-muted)]/30 transition-colors group"
             >
-              <FolderKanban className="mr-2 h-5 w-5 text-gray-400" />
-              Nuevo Proyecto
+              <FolderKanban className="w-5 h-5 text-[var(--color-brand-primary)]" />
+              <span className="text-sm font-medium text-[var(--color-text-strong)]">Nuevo Proyecto</span>
             </Link>
             <Link
               to="/admin/projects"
-              className="flex items-center justify-center px-4 py-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              className="vf-card-flat p-4 flex items-center gap-3 hover:bg-[var(--color-surface-muted)]/30 transition-colors group"
             >
-              <FileCheck className="mr-2 h-5 w-5 text-gray-400" />
-              Revisar Expedientes
+              <FileCheck className="w-5 h-5 text-[var(--color-brand-secondary)]" />
+              <span className="text-sm font-medium text-[var(--color-text-strong)]">Revisar Expedientes</span>
+            </Link>
+            <Link
+              to="/admin/rules"
+              className="vf-card-flat p-4 flex items-center gap-3 hover:bg-[var(--color-surface-muted)]/30 transition-colors group"
+            >
+              <AlertCircle className="w-5 h-5 text-[var(--color-brand-accent)]" />
+              <span className="text-sm font-medium text-[var(--color-text-strong)]">Reglas de Validacion</span>
+            </Link>
+            <Link
+              to="/projects"
+              className="vf-card-flat p-4 flex items-center gap-3 hover:bg-[var(--color-surface-muted)]/30 transition-colors group"
+            >
+              <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <span className="text-sm font-medium text-[var(--color-text-strong)]">Ver Sitio Publico</span>
             </Link>
           </div>
         </div>

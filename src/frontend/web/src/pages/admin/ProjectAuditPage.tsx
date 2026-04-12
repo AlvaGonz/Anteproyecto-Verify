@@ -5,6 +5,7 @@ import { auditApi } from "../../features/audit/api/auditApi";
 import { AuditTable } from "../../features/audit/components/AuditTable";
 import { AuditFiltersComponent } from "../../features/audit/components/AuditFilters";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { ClipboardList, Download } from "lucide-react";
 
 export const ProjectAuditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,42 +20,34 @@ export const ProjectAuditPage: React.FC = () => {
     try {
       const data = await auditApi.getProjectAuditTrail(id, currentFilters);
       setLogs(data);
-    } catch (error) {
-      console.error("Error fetching audit trail:", error);
-      addToast("Error al cargar la auditoría", "error");
+    } catch {
+      addToast("Error al cargar la auditoria", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchAudit(filters);
-  }, [id, filters]);
-
-  const handleExport = () => {
-    if (!id) return;
-    window.location.href = auditApi.exportAuditTrailUrl(id);
-  };
+  useEffect(() => { fetchAudit(filters); }, [id, filters]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="md:flex md:items-center md:justify-between mb-6">
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-            Auditoría del Proyecto
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--color-text-strong)] flex items-center gap-3">
+            <ClipboardList className="w-7 h-7 text-[var(--color-brand-primary)]" />
+            Auditoria del Proyecto
+          </h1>
+          <p className="mt-1 text-sm text-[var(--color-text-strong)] opacity-60">
             Historial detallado de eventos y acciones operativas.
           </p>
         </div>
-        <div className="mt-4 flex md:mt-0 md:ml-4">
-          <button
-            onClick={handleExport}
-            className="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Exportar CSV
-          </button>
-        </div>
+        <button
+          onClick={() => id && (window.location.href = auditApi.exportAuditTrailUrl(id))}
+          className="vf-btn-secondary"
+        >
+          <Download className="w-4 h-4" />
+          Exportar CSV
+        </button>
       </div>
 
       <AuditFiltersComponent onFilterChange={setFilters} />

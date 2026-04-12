@@ -1,4 +1,5 @@
 import { createHashRouter, Navigate } from "react-router-dom";
+import { LandingPage } from "../pages/LandingPage";
 import { HealthPage } from "../pages/HealthPage";
 import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage";
 import { ProjectPublicDetailPage } from "../pages/projects/ProjectPublicDetailPage";
@@ -23,6 +24,13 @@ export const router = createHashRouter([
     path: "/",
     errorElement: <ErrorBoundary />,
     children: [
+      /* ===== Landing Page ===== */
+      {
+        index: true,
+        element: <LandingPage />,
+      },
+
+      /* ===== Public Pages ===== */
       {
         path: "/consulta-publica",
         element: <PublicVerificationPage />,
@@ -36,10 +44,6 @@ export const router = createHashRouter([
         element: <PublicVerifyResultPage />,
       },
       {
-        path: "/",
-        element: <Navigate to="/projects" replace />,
-      },
-      {
         path: "/health",
         element: <HealthPage />,
       },
@@ -51,6 +55,8 @@ export const router = createHashRouter([
         path: "/projects/:id",
         element: <ProjectPublicDetailPage />,
       },
+
+      /* ===== Admin Pages ===== */
       {
         path: "/admin",
         element: (
