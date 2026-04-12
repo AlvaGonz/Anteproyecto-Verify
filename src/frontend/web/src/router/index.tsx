@@ -12,6 +12,8 @@ import { RulesManagePage } from "../pages/admin/RulesManagePage";
 import { PublicVerifySearchPage } from "../pages/public/PublicVerifySearchPage";
 import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { PublicVerificationPage } from "../pages/public/PublicVerificationPage";
+import { LoginPage } from "../pages/auth/LoginPage";
+import { RegisterPage } from "../pages/auth/RegisterPage";
 
 import { AdminLayout } from "../shared/components/layout/AdminLayout";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
@@ -34,6 +36,14 @@ export const router = createHashRouter([
       {
         path: "/consulta-publica",
         element: <PublicVerificationPage />,
+      },
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
       },
       {
         path: "/verify",

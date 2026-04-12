@@ -65,24 +65,24 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       )}
 
       <div>
-        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+        <label htmlFor="nombre" className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
           Nombre del Proyecto *
         </label>
-        <input type="text" required value={nombre} onChange={(e) => setNombre(e.target.value)} className={fieldClass} />
+        <input id="nombre" type="text" required value={nombre} onChange={(e) => setNombre(e.target.value)} className={fieldClass} />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
-          Ubicacion (Texto) *
+        <label htmlFor="ubicacion" className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+          Ubicación (Texto) *
         </label>
-        <input type="text" required value={ubicacionTexto} onChange={(e) => setUbicacionTexto(e.target.value)} className={fieldClass} />
+        <input id="ubicacion" type="text" required value={ubicacionTexto} onChange={(e) => setUbicacionTexto(e.target.value)} className={fieldClass} />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+        <label htmlFor="categoria" className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
           Categoria
         </label>
-        <select value={categoria} onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)} className={fieldClass}>
+        <select id="categoria" value={categoria} onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)} className={fieldClass}>
           <option value={ProjectCategory.Residencial}>Residencial</option>
           <option value={ProjectCategory.Comercial}>Comercial</option>
           <option value={ProjectCategory.Turistico}>Turistico</option>
@@ -92,17 +92,17 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+        <label htmlFor="desarrollador" className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
           Desarrollador
         </label>
-        <input type="text" value={datosDesarrollador} onChange={(e) => setDatosDesarrollador(e.target.value)} className={fieldClass} placeholder="Nombre de la constructora o desarrollador" />
+        <input id="desarrollador" type="text" value={datosDesarrollador} onChange={(e) => setDatosDesarrollador(e.target.value)} className={fieldClass} placeholder="Nombre de la constructora o desarrollador" />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
+        <label htmlFor="catastral" className="block text-sm font-semibold text-[var(--color-text-strong)] mb-1.5">
           Designacion Catastral
         </label>
-        <input type="text" value={designacionCatastral} onChange={(e) => setDesignacionCatastral(e.target.value)} className={`${fieldClass} font-mono`} placeholder="Ej: DC-12345" />
+        <input id="catastral" type="text" value={designacionCatastral} onChange={(e) => setDesignacionCatastral(e.target.value)} className={`${fieldClass} font-mono`} placeholder="Ej: DC-12345" />
       </div>
 
       {initialData && (

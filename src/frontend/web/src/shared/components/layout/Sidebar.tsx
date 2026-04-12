@@ -26,17 +26,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
   return (
     <div
-      className="flex flex-col w-64 border-r h-full"
-      style={{
-        backgroundColor: "var(--color-brand-primary)",
-        borderColor: "rgba(255,255,255,0.08)",
-      }}
+      className="flex flex-col w-64 border-r h-full bg-secondary text-white border-white/5"
     >
       {/* Logo */}
-      <div className="flex items-center justify-between h-14 px-5 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        <Link to="/" className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-[var(--color-brand-accent-soft)]" />
-          <span className="font-bold text-lg text-[var(--color-text-on-dark)] tracking-tight">
+      <div className="flex items-center justify-between h-20 px-6 border-b border-white/5">
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+            <Shield className="w-5 h-5 text-on-primary" />
+          </div>
+          <span className="font-display font-black text-xl text-white tracking-tighter">
             VeriFinca
           </span>
         </Link>
@@ -57,15 +55,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                 key={item.name}
                 to={item.href}
                 onClick={onClose}
-                className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 ${
+                className={`group flex items-center px-4 py-3 text-sm font-headline font-bold rounded-xl transition-all duration-200 ${
                   isActive
-                    ? "bg-white/15 text-white"
-                    : "text-white/60 hover:bg-white/8 hover:text-white/90"
+                    ? "bg-white/10 text-white shadow-inner"
+                    : "text-white/60 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <item.icon
-                  className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                    isActive ? "text-[var(--color-brand-accent-soft)]" : "text-white/40 group-hover:text-white/60"
+                  className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${
+                    isActive ? "text-primary" : "text-white/40 group-hover:text-white/80"
                   }`}
                   aria-hidden="true"
                 />
@@ -88,21 +86,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* User */}
-      <div className="flex-shrink-0 flex p-4 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+      <div className="flex-shrink-0 flex p-6 border-t border-white/5 bg-secondary-container/5">
         <div className="flex-shrink-0 w-full group block">
           <div className="flex items-center">
-            <div
-              className="h-9 w-9 rounded-lg flex items-center justify-center text-sm font-bold"
-              style={{
-                backgroundColor: "var(--color-brand-accent-soft)",
-                color: "var(--color-text-strong)",
-              }}
-            >
+            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-sm font-bold text-on-primary shadow-lg">
               AD
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-white">Admin User</p>
-              <p className="text-xs text-white/40">Administrador</p>
+              <p className="text-sm font-bold text-white leading-none">Admin User</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Administrador</p>
             </div>
           </div>
         </div>

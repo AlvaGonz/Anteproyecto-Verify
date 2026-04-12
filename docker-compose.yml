@@ -17,10 +17,17 @@ services:
 
   web:
     build:
-      context: .
-      dockerfile: docker/web.Dockerfile
+      context: ./src/frontend/web
+      dockerfile: ../../../docker/web.dev.Dockerfile
     ports:
-      - "3000:80"
+      - "3000:3000"
+    # volumes:
+    #   - type: bind
+    #     source: ./src/frontend/web
+    #     target: /app
+    #   - /app/node_modules
+    environment:
+      - VITE_WATCH_POLLING=true
     env_file:
       - .env
 

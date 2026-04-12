@@ -10,7 +10,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--color-surface-base)]">
+    <div className="flex h-screen overflow-hidden bg-surface">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
