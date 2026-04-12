@@ -8,6 +8,7 @@ import { ValidationSummary as InternalValidationSummary } from "../../features/v
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
 import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { ShieldCheck, ArrowLeft } from "lucide-react";
 
 export const ProjectValidationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,15 +26,13 @@ export const ProjectValidationPage: React.FC = () => {
       const latestResult = await fullValidationApi.getValidationResult(id);
       setResult(latestResult);
     } catch (err: any) {
-      setError(err.message || "Error al cargar el resultado de validación");
+      setError(err.message || "Error al cargar el resultado de validacion");
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
+  useEffect(() => { fetchData(); }, [id]);
 
   const handleRunValidation = async () => {
     if (!id) return;
@@ -42,84 +41,56 @@ export const ProjectValidationPage: React.FC = () => {
     try {
       const newResult = await fullValidationApi.runValidation(id);
       setResult(newResult);
-      addToast("Validación ejecutada exitosamente", "success");
+      addToast("Validacion ejecutada exitosamente", "success");
     } catch (err: any) {
-      setError(err.message || "Error al ejecutar la validación completa");
-      addToast("Error al ejecutar la validación", "error");
+      setError(err.message || "Error al ejecutar la validacion completa");
+      addToast("Error al ejecutar la validacion", "error");
     } finally {
       setIsEvaluating(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        Cargando resultados...
-      </div>
-    );
-  }
+  if (isLoading) return <div className="p-8 text-center text-[var(--color-text-strong)] opacity-60">Cargando resultados...</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Validación Integral del Proyecto
+          <h1 className="text-2xl font-bold text-[var(--color-text-strong)] flex items-center gap-3">
+            <ShieldCheck className="w-7 h-7 text-[var(--color-brand-primary)]" />
+            Validacion Integral
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            <Link
-              to={`/admin/projects/${id}`}
-              className="text-blue-600 hover:underline"
-            >
-              &larr; Volver al Proyecto
-            </Link>
-          </p>
+          <Link to={`/admin/projects/${id}/edit`} className="text-sm text-[var(--color-brand-primary)] hover:underline inline-flex items-center gap-1 mt-1">
+            <ArrowLeft className="w-3 h-3" /> Volver al Proyecto
+          </Link>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-          <div className="flex">
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          </div>
-        </div>
+        <div className="mb-6 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm">{error}</div>
       )}
 
-      <ValidationRunPanel
-        result={result}
-        isEvaluating={isEvaluating}
-        onRunValidation={handleRunValidation}
-      />
+      <ValidationRunPanel result={result} isEvaluating={isEvaluating} onRunValidation={handleRunValidation} />
 
       {result && (
         <>
           {result.internalValidation && (
             <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                1. Validación Interna (Expediente)
-              </h2>
+              <h2 className="text-lg font-bold text-[var(--color-text-strong)] mb-4">1. Validacion Interna (Expediente)</h2>
               <InternalValidationSummary summary={result.internalValidation} />
-              <ValidationRulesTable
-                results={result.internalValidation.results}
-              />
+              <ValidationRulesTable results={result.internalValidation.results} />
             </div>
           )}
 
           {result.externalSources && result.externalSources.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                2. Validación Externa Institucional
-              </h2>
+              <h2 className="text-lg font-bold text-[var(--color-text-strong)] mb-4">2. Validacion Externa Institucional</h2>
               <ValidationSourcesSummary sources={result.externalSources} />
             </div>
           )}
 
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              3. Certificación
-            </h2>
+            <h2 className="text-lg font-bold text-[var(--color-text-strong)] mb-4">3. Certificacion</h2>
             <CertificationSection projectId={id!} />
           </div>
         </>
