@@ -9,10 +9,10 @@ public class ResultadoRegla : EntityBase
     public Guid ValidacionId { get; private set; }
     public Validacion Validacion { get; private set; } = null!;
 
-    public string RuleCode { get; private set; }
-    public string RuleName { get; private set; }
+    public string RuleCode { get; private set; } = null!;
+    public string RuleName { get; private set; } = null!;
     public RuleStatus Status { get; private set; }
-    public string Message { get; private set; }
+    public string Message { get; private set; } = null!;
     public FindingSeverity? Severity { get; private set; }
     public Guid? RelatedDocumentId { get; private set; }
 

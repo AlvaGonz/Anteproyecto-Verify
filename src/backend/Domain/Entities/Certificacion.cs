@@ -12,13 +12,13 @@ public class Certificacion : EntityBase
     public Guid? ReporteId { get; private set; }
     public Reporte? Reporte { get; private set; }
 
-    public string CodigoVerificacion { get; private set; }
+    public string CodigoVerificacion { get; private set; } = null!;
     public CertificationStatus EstadoCertificacion { get; private set; }
     
     public DateTime FechaEmisionUtc { get; private set; }
     public DateTime? FechaVigenciaUtc { get; private set; }
     
-    public string UrlVerificacion { get; private set; }
+    public string UrlVerificacion { get; private set; } = null!;
     
     public int? ScoreIntegridad { get; private set; }
     public IntegrityStatus EstadoIntegridad { get; private set; }
@@ -59,6 +59,30 @@ public class Certificacion : EntityBase
         EstadoCertificacion = CertificationStatus.Emitido;
         FechaEmisionUtc = DateTime.UtcNow;
         Revocado = false;
+    }
+
+    public Certificacion(Guid proyectoId, string codigoVerificacion, string urlVerificacion)
+    {
+        if (proyectoId == Guid.Empty) throw new ArgumentException("Proyecto requerido", nameof(proyectoId));
+        if (string.IsNullOrWhiteSpace(codigoVerificacion)) throw new ArgumentException("Código requerido", nameof(codigoVerificacion));
+        if (string.IsNullOrWhiteSpace(urlVerificacion)) throw new ArgumentException("URL requerida", nameof(urlVerificacion));
+
+        ProyectoId = proyectoId;
+        CodigoVerificacion = codigoVerificacion;
+        UrlVerificacion = urlVerificacion;
+        EstadoCertificacion = CertificationStatus.Emitido;
+        FechaEmisionUtc = DateTime.UtcNow;
+        Revocado = false;
+        Version = 1;
+        EstadoIntegridad = IntegrityStatus.Valid;
+    }
+
+    public void UpdateStatus(CertificationStatus status, int score, int version)
+    {
+        EstadoCertificacion = status;
+        ScoreIntegridad = score;
+        Version = version;
+        UpdatedAtUtc = DateTime.UtcNow;
     }
 
     public void Revoke(string motivo)

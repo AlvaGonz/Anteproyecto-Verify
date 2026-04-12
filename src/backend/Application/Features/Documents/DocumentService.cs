@@ -10,6 +10,7 @@ using Application.Abstractions.Persistence;
 using Application.Abstractions.Storage;
 using Application.Contracts.Documents;
 using Application.DTOs.Documents;
+using Application.DTOs.Projects;
 using Application.Common.Security;
 using Domain.Entities;
 using Domain.Enums;

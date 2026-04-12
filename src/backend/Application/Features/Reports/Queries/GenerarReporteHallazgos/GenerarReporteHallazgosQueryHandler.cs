@@ -15,6 +15,6 @@ public class GenerarReporteHallazgosQueryHandler
 
     public async Task<ReporteHallazgosDto> Handle(GenerarReporteHallazgosQuery request, CancellationToken cancellationToken)
     {
-        return await _reporteBuilder.ConstruirReporteAsync(request.ProyectoId, cancellationToken);
+        return await _reporteBuilder.BuildReporteAsync(request.ProyectoId, cancellationToken);
     }
 }

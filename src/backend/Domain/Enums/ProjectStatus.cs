@@ -7,5 +7,7 @@ public enum ProjectStatus
     InReview = 2,
     Observed = 3,
     Validated = 4,
+    Approved = 4,
+    Verified = 4,
     Rejected = 5
 }

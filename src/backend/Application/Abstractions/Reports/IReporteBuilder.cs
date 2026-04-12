@@ -1,6 +1,7 @@
 namespace Application.Abstractions.Reports;
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,10 +17,24 @@ public class ReporteHallazgosDto
     public int HallazgosBajos { get; set; }
     public bool EsAptoParaSello { get; set; }
     public string ResumenEjecutivo { get; set; } = string.Empty;
-    public object Detalles { get; set; } = new object(); // Can be a list of detailed findings
+    public object Detalles { get; set; } = new object();
+    public List<ValidacionResumenDto> Validaciones { get; set; } = new List<ValidacionResumenDto>();
+}
+
+public class ValidacionResumenDto
+{
+    public string TipoValidacion { get; set; } = string.Empty;
+    public string Estado { get; set; } = string.Empty;
+    public List<HallazgoResumenDto> Hallazgos { get; set; } = new List<HallazgoResumenDto>();
+}
+
+public class HallazgoResumenDto
+{
+    public string Descripcion { get; set; } = string.Empty;
+    public string Severidad { get; set; } = string.Empty;
 }
 
 public interface IReporteBuilder
 {
-    Task<ReporteHallazgosDto> ConstruirReporteAsync(Guid proyectoId, CancellationToken cancellationToken = default);
+    Task<ReporteHallazgosDto> BuildReporteAsync(Guid proyectoId, CancellationToken cancellationToken = default);
 }

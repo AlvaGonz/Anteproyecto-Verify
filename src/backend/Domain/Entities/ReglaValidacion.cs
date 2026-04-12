@@ -6,9 +6,9 @@ using Domain.Enums;
 
 public class ReglaValidacion : EntityBase
 {
-    public string Nombre { get; private set; }
-    public string Descripcion { get; private set; }
-    public string CondicionLogica { get; private set; }
+    public string Nombre { get; private set; } = null!;
+    public string Descripcion { get; private set; } = null!;
+    public string CondicionLogica { get; private set; } = null!;
     public DocumentType TipoDocumentoAplicable { get; private set; }
     public NivelAlerta NivelAlerta { get; private set; }
     public TipoProyecto TipoProyecto { get; private set; }

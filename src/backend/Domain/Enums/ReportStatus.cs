@@ -4,5 +4,6 @@ public enum ReportStatus
 {
     Draft = 0,
     Generated = 1,
-    Archived = 2
+    Published = 2,
+    Archived = 3
 }

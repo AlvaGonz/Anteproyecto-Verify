@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ProyectoDto,
-  ProjectStatus,
   IntegrityStatus,
   ProjectCategory,
 } from "../../features/projects/types";
@@ -55,8 +54,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
         if (!id) return;
         const data = await projectsApi.getProjectById(id);
         setProject(data);
-      } catch (err: any) {
-        setError(err.message || "Error al cargar el proyecto");
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Error al cargar el proyecto";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

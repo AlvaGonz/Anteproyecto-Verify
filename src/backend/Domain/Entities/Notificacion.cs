@@ -31,4 +31,6 @@ public class Notificacion : EntityBase
     {
         Leida = true;
     }
+
+    public void MarkAsRead() => MarcarComoLeida();
 }

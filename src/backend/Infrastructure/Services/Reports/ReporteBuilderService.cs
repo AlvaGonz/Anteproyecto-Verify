@@ -12,22 +12,25 @@ public class ReporteBuilderService : IReporteBuilder
 {
     private readonly IProyectoRepository _proyectoRepository;
     private readonly IHallazgoRepository _hallazgoRepository;
+    private readonly IValidacionRepository _validacionRepository;
 
     public ReporteBuilderService(
         IProyectoRepository proyectoRepository,
-        IHallazgoRepository hallazgoRepository)
+        IHallazgoRepository hallazgoRepository,
+        IValidacionRepository validacionRepository)
     {
         _proyectoRepository = proyectoRepository;
         _hallazgoRepository = hallazgoRepository;
+        _validacionRepository = validacionRepository;
     }
 
-    public async Task<ReporteHallazgosDto> ConstruirReporteAsync(Guid proyectoId, CancellationToken cancellationToken = default)
+    public async Task<ReporteHallazgosDto> BuildReporteAsync(Guid proyectoId, CancellationToken cancellationToken = default)
     {
         var project = await _proyectoRepository.GetByIdAsync(proyectoId, cancellationToken);
         if (project == null)
             throw new KeyNotFoundException($"Proyecto con ID {proyectoId} no encontrado.");
 
-        var hallazgos = await _hallazgoRepository.GetByProjectIdAsync(proyectoId, cancellationToken);
+        var hallazgos = await _hallazgoRepository.GetByProyectoIdAsync(proyectoId, cancellationToken);
 
         int criticos = hallazgos.Count(h => h.Severity == FindingSeverity.Critical);
         int altos = hallazgos.Count(h => h.Severity == FindingSeverity.High);
@@ -51,6 +54,21 @@ public class ReporteBuilderService : IReporteBuilder
             h.FechaDeteccionUtc
         }).ToList();
 
+        var validaciones = await _validacionRepository.GetByProyectoIdAsync(proyectoId, cancellationToken);
+        
+        var validacionesDto = validaciones.Select(v => new ValidacionResumenDto
+        {
+            TipoValidacion = v.TipoValidacion,
+            Estado = v.Estado.ToString(),
+            Hallazgos = hallazgos
+                .Where(h => h.ValidacionId == v.Id)
+                .Select(h => new HallazgoResumenDto
+                {
+                    Descripcion = h.Descripcion,
+                    Severidad = h.Severity.ToString()
+                }).ToList()
+        }).ToList();
+
         return new ReporteHallazgosDto
         {
             ProyectoId = project.Id,
@@ -63,7 +81,8 @@ public class ReporteBuilderService : IReporteBuilder
             HallazgosBajos = bajos,
             EsAptoParaSello = esApto,
             ResumenEjecutivo = resumen,
-            Detalles = detalles
+            Detalles = detalles,
+            Validaciones = validacionesDto
         };
     }
 }

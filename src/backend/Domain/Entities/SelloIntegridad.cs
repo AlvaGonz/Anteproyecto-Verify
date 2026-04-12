@@ -9,9 +9,9 @@ public class SelloIntegridad : EntityBase
     public Guid ProyectoId { get; private set; }
     public Proyecto Proyecto { get; private set; } = null!;
 
-    public string CodigoSello { get; private set; }
-    public string UrlQr { get; private set; }
-    public string FirmaDigital { get; private set; }
+    public string CodigoSello { get; private set; } = null!;
+    public string UrlQr { get; private set; } = null!;
+    public string FirmaDigital { get; private set; } = null!;
     public DateTime FechaEmisionUtc { get; private set; }
     public DateTime FechaExpiracionUtc { get; private set; }
     public EstadoSello Estado { get; private set; }

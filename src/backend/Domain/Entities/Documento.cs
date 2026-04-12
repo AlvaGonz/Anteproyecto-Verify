@@ -11,11 +11,11 @@ public class Documento : EntityBase
     public Proyecto Proyecto { get; private set; } = null!;
 
     public DocumentType TipoDocumento { get; private set; }
-    public string NombreArchivoOriginal { get; private set; }
-    public string NombreArchivoAlmacenado { get; private set; }
-    public string RutaArchivo { get; private set; }
-    public string ContentType { get; private set; }
-    public string Extension { get; private set; }
+    public string NombreArchivoOriginal { get; private set; } = null!;
+    public string NombreArchivoAlmacenado { get; private set; } = null!;
+    public string RutaArchivo { get; private set; } = null!;
+    public string ContentType { get; private set; } = null!;
+    public string Extension { get; private set; } = null!;
     public long TamanoBytes { get; private set; }
     public DocumentStatus EstadoDocumento { get; private set; }
     public bool Activo { get; private set; }
@@ -70,6 +70,20 @@ public class Documento : EntityBase
         InstitucionEmisora = institucionEmisora;
         Observaciones = observaciones;
         
+        EstadoDocumento = DocumentStatus.Uploaded;
+        Activo = true;
+    }
+
+    public Documento(Guid proyectoId, string nombreArchivoOriginal, string contentType, long tamanoBytes, string rutaArchivo, DocumentType tipoDocumento)
+    {
+        ProyectoId = proyectoId;
+        NombreArchivoOriginal = nombreArchivoOriginal;
+        NombreArchivoAlmacenado = nombreArchivoOriginal;
+        ContentType = contentType;
+        TamanoBytes = tamanoBytes;
+        RutaArchivo = rutaArchivo;
+        TipoDocumento = tipoDocumento;
+        Extension = ".pdf";
         EstadoDocumento = DocumentStatus.Uploaded;
         Activo = true;
     }
