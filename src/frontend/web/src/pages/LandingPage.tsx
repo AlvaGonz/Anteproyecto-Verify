@@ -4,11 +4,11 @@ import {
   Search,
   ArrowRight,
   MapPin,
-  ChevronLeft,
-  ChevronRight,
   Gavel,
   Building2,
 } from "lucide-react";
+import { mockProjects } from "../infrastructure/mock/mockProjects";
+import { ProjectStatus, IntegrityStatus } from "../features/projects/types";
 import { motion } from "framer-motion";
 
 /* ===== MOTION VARIANTS ===== */
@@ -47,7 +47,6 @@ const LandingNav: React.FC = () => {
       <div className="hidden md:flex items-center gap-8">
         {[
           { label: "Servicios", href: "#servicios", isActive: true },
-          { label: "Propiedades", href: "#portafolio", isActive: false },
           { label: "Empresa", href: "#metodologia", isActive: false },
         ].map((item) => (
           <a
@@ -74,7 +73,7 @@ const LandingNav: React.FC = () => {
           to="/register"
           className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-full font-bold active:scale-95 duration-200 transition-transform"
         >
-          Acceso Profesional
+          Registrarse
         </Link>
       </div>
     </nav>
@@ -87,15 +86,16 @@ const HeroSection: React.FC = () => {
 
   return (
     <section className="relative min-h-[870px] flex items-center overflow-hidden px-8 md:px-16 pt-20">
-      {/* Background architectural image/video */}
-      <div className="absolute right-0 top-0 w-full md:w-1/2 h-full -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-surface to-transparent z-10 w-32 md:w-64" />
+      {/* Background architectural video/image — right half on desktop, full-width faded on mobile */}
+      <div className="absolute right-0 top-0 w-full md:w-1/2 h-full z-0 overflow-hidden">
+        {/* Gradient fade from surface into the media */}
+        <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10 w-48 md:w-72" />
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-30 md:opacity-50 grayscale hover:grayscale-0 transition-all duration-700"
+          className="w-full h-full object-cover opacity-40 md:opacity-60 grayscale hover:grayscale-0 transition-all duration-700"
           poster="/media/verifinca_institutional.png"
         >
           <source
@@ -105,10 +105,11 @@ const HeroSection: React.FC = () => {
         </video>
       </div>
 
-      <div className="max-w-4xl space-y-8">
+      <div className="relative z-10 max-w-4xl space-y-8">
         <motion.div {...fadeInUp} className="space-y-4">
+          {/* Institutional authority badge — matching Stitch reference */}
           <h1 className="text-5xl md:text-7xl font-display font-extrabold text-brand-blue leading-[1.1] tracking-tight">
-            Consulta la validez legal de cualquier proyecto inmobiliario en RD
+            Consulta la validez legal de proyectos inmobiliarios en la República Dominicana
           </h1>
         </motion.div>
 
@@ -182,107 +183,53 @@ const TrustStripSection: React.FC = () => (
 );
 
 /* ===== FEATURED PROJECTS CAROUSEL ===== */
-interface ProjectCardData {
-  id: number;
-  title: string;
-  location: string;
-  status: "Verificado" | "En revisión" | "Observado";
-  date: string;
-  image: string;
-}
+/* ===== FEATURED PROJECTS CAROUSEL ===== */
+const validatedProjects = mockProjects
+  .filter(p => p.estadoProyecto === ProjectStatus.Validated && p.estadoIntegridad === IntegrityStatus.Verified)
+  .slice(0, 10);
 
-const SAMPLE_PROJECTS: ProjectCardData[] = [
-  {
-    id: 1,
-    title: "Reserva del Olmo",
-    location: "Santo Domingo, RD",
-    status: "Verificado",
-    date: "Oct 2025",
-    image: "/media/verifinca_institutional.png",
-  },
-  {
-    id: 2,
-    title: "Torres de Vizcaya",
-    location: "Santiago, RD",
-    status: "En revisión",
-    date: "Dic 2025",
-    image: "/media/hero-bg.png",
-  },
-  {
-    id: 3,
-    title: "Distrito Pacífico",
-    location: "Punta Cana, RD",
-    status: "Observado",
-    date: "Ene 2026",
-    image: "/media/verifinca_institutional.png",
-  },
-  {
-    id: 4,
-    title: "Senderos de Oriente",
-    location: "La Romana, RD",
-    status: "Verificado",
-    date: "Feb 2026",
-    image: "/media/hero-bg.png",
-  },
-];
-
-const statusConfig: Record<
-  ProjectCardData["status"],
-  { bg: string; text: string }
-> = {
-  Verificado: {
-    bg: "bg-primary-container",
-    text: "text-on-primary-container",
-  },
-  "En revisión": {
-    bg: "bg-secondary-container",
-    text: "text-on-secondary-container",
-  },
-  Observado: {
-    bg: "bg-error-container",
-    text: "text-on-error-container",
-  },
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("es-ES", { month: "short", year: "numeric" });
 };
 
 const FeaturedProjectsSection: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const scroll = useCallback((direction: "left" | "right") => {
-    if (!carouselRef.current) return;
-    const scrollAmount = direction === "left" ? -400 : 400;
-    carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-  }, []);
+  useEffect(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
+      if (carouselRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          carouselRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          carouselRef.current.scrollBy({ left: 400, behavior: "smooth" });
+        }
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
 
   return (
     <section id="portafolio" className="py-24 px-8 bg-surface">
       <div className="max-w-7xl mx-auto relative">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
           <div className="space-y-4">
-            <span className="label">Portafolio</span>
             <h2 className="text-4xl font-display font-bold text-brand-blue">
               Proyectos Destacados
             </h2>
+            <p className="text-on-surface-variant max-w-2xl">
+              Explora proyectos de alto impacto que han superado nuestro riguroso proceso de validación institucional.
+            </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex gap-2">
-              <button
-                onClick={() => scroll("left")}
-                className="p-2 rounded-full border border-outline-variant/30 text-brand-blue hover:bg-brand-blue hover:text-white transition-colors"
-                aria-label="Proyecto anterior"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => scroll("right")}
-                className="p-2 rounded-full border border-outline-variant/30 text-brand-blue hover:bg-brand-blue hover:text-white transition-colors"
-                aria-label="Proyecto siguiente"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
             <Link
               to="/projects"
-              className="text-secondary font-bold flex items-center gap-2 hover:underline ml-4"
+              className="text-secondary font-bold flex items-center gap-2 hover:underline"
             >
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
@@ -291,9 +238,11 @@ const FeaturedProjectsSection: React.FC = () => {
 
         <div
           ref={carouselRef}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
           className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-8 pb-4 scroll-smooth"
         >
-          {SAMPLE_PROJECTS.map((project) => (
+          {validatedProjects.map((project) => (
             <div
               key={project.id}
               className="min-w-full md:min-w-[calc(33.333%-22px)] snap-start group bg-surface-container-lowest rounded-lg overflow-hidden border border-outline-variant/30 hover:shadow-xl transition-all duration-300 flex-shrink-0"
@@ -301,33 +250,31 @@ const FeaturedProjectsSection: React.FC = () => {
               <div className="h-64 relative overflow-hidden bg-surface-container">
                 <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-transparent" />
                 <img
-                  alt={project.title}
+                  alt={project.nombre}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  src={project.image}
+                  src={project.imagenUrl || "https://images.unsplash.com/photo-1582408921715-18e7806367c1?q=80&w=800&auto=format&fit=crop"}
                 />
                 <div className="absolute top-4 right-4">
                   <span
-                    className={`${statusConfig[project.status].bg} ${statusConfig[project.status].text} px-4 py-1.5 rounded-full text-xs font-bold shadow-lg`}
+                    className="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-full text-xs font-bold shadow-lg"
                   >
-                    {project.status}
+                    Validado
                   </span>
                 </div>
               </div>
               <div className="p-8 space-y-4">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-display font-bold text-brand-blue">
-                    {project.title}
+                  <h3 className="text-xl font-display font-bold text-brand-blue line-clamp-1">
+                    {project.nombre}
                   </h3>
                   <div className="flex items-center text-on-surface-variant text-sm gap-1">
                     <MapPin className="w-3.5 h-3.5" />
-                    {project.location}
+                    <span className="line-clamp-1">{project.ubicacionTexto}</span>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
                   <span className="text-xs font-medium text-outline uppercase tracking-tighter">
-                    {project.status === "Verificado"
-                      ? `Validado: ${project.date}`
-                      : `Estado: ${project.date}`}
+                    Validado: {formatDate(project.updatedAtUtc || "")}
                   </span>
                   <Link
                     to={`/projects/${project.id}`}
@@ -439,8 +386,7 @@ const CtaSection: React.FC = () => (
             ¿Es usted un profesional inmobiliario?
           </h2>
           <p className="text-white/80 text-lg">
-            Únase al portal profesional y obtenga reportes detallados y API para
-            integraciones directas.
+            Únase a VeriFinca y obtenga la confianza de sus clientes y la seguridad de sus inversiones.
           </p>
         </div>
         <div className="flex flex-col md:items-end gap-4">
@@ -451,7 +397,7 @@ const CtaSection: React.FC = () => (
             Solicitar Acceso
           </Link>
           <p className="text-white/60 text-sm text-center md:text-right">
-            Soporte institucional 24/7
+            Soporte 24/7
           </p>
         </div>
       </div>
@@ -463,9 +409,15 @@ const CtaSection: React.FC = () => (
 const LandingFooter: React.FC = () => (
   <footer className="bg-brand-blue-dark text-brand-cream font-sans font-light tracking-wide w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6">
     <div className="flex flex-col items-center md:items-start gap-4">
-      <div className="text-lg font-bold text-brand-cream">VeriFinca</div>
+      <Link to="/" className="flex items-center">
+        <img
+          src="/brand/logotipo/LOGOTIPO WHITE.svg"
+          alt="VeriFinca"
+          className="h-10 w-auto"
+        />
+      </Link>
       <p className="text-brand-cream/60 text-center md:text-left max-w-xs">
-        © 2026 VeriFinca. Institutional Authority in Real Estate.
+        © 2026 VeriFinca. Plataforma de Consulta de Proyectos Inmobiliarios en RD.
       </p>
     </div>
     <div className="flex flex-wrap justify-center gap-8">
