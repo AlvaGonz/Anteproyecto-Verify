@@ -14,6 +14,7 @@ export interface ProyectoDto {
   createdAtUtc: string;
   updatedAtUtc?: string;
   imagenUrl?: string;
+  completionRate?: number;
 }
 
 export interface CreateProyectoDto {

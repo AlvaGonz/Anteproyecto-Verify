@@ -20,6 +20,7 @@ export const mockProjects: ProyectoDto[] = [
     createdAtUtc: "2025-06-15T10:00:00Z",
     updatedAtUtc: "2025-10-20T14:30:00Z",
     imagenUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=800&auto=format&fit=crop",
+    completionRate: 0.95,
   },
   {
     id: "proj-005",
@@ -37,6 +38,7 @@ export const mockProjects: ProyectoDto[] = [
     createdAtUtc: "2025-05-05T10:20:00Z",
     updatedAtUtc: "2025-11-10T09:10:00Z",
     imagenUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop",
+    completionRate: 0.88,
   },
   {
     id: "proj-007",
@@ -54,6 +56,7 @@ export const mockProjects: ProyectoDto[] = [
     createdAtUtc: "2025-08-01T08:00:00Z",
     updatedAtUtc: "2025-12-15T16:45:00Z",
     imagenUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop",
+    completionRate: 0.82,
   },
   {
     id: "proj-008",
@@ -71,6 +74,7 @@ export const mockProjects: ProyectoDto[] = [
     createdAtUtc: "2025-07-10T09:00:00Z",
     updatedAtUtc: "2026-01-08T11:20:00Z",
     imagenUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=800&auto=format&fit=crop",
+    completionRate: 0.75,
   },
   {
     id: "proj-009",
@@ -105,6 +109,7 @@ export const mockProjects: ProyectoDto[] = [
     createdAtUtc: "2025-11-01T10:00:00Z",
     updatedAtUtc: "2026-03-05T15:30:00Z",
     imagenUrl: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
+    completionRate: 0.92,
   },
   {
     id: "proj-011",

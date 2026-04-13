@@ -1,5 +1,3 @@
-import { httpClient } from "../../../infrastructure/api/httpClient";
-
 export interface User {
   id: string;
   email: string;
@@ -16,7 +14,7 @@ export const AuthService = {
   async login(email: string, password: string): Promise<AuthResponse> {
     // In a real app, we would use httpClient.post
     // For now, we simulate a successful login
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         if (email === "admin@verifinca.com" && password === "admin123") {
           resolve({
