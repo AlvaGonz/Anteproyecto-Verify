@@ -1,8 +1,16 @@
 export enum ValidationStatus {
-  Pending = 0,
-  InProgress = 1,
-  Completed = 2,
-  Failed = 3,
+  Pending = 1,
+  InProgress = 2,
+  Success = 3,
+  Warning = 4,
+  Failed = 5,
+}
+
+export enum ValidationExecutionStatus {
+  Pending = 1,
+  Running = 2,
+  Completed = 3,
+  Failed = 4,
 }
 
 export enum RuleStatus {
@@ -17,6 +25,18 @@ export enum FindingSeverity {
   Medium = 2,
   High = 3,
   Critical = 4,
+}
+
+export interface ValidationSourceResult {
+  sourceName: string;
+  status: string;
+  isSuccess: boolean;
+  isMatch: boolean;
+  summary: string;
+  findings: string[];
+  timestampUtc: string;
+  referenceCode?: string;
+  errorMessage?: string;
 }
 
 export interface ValidationRuleResultDto {
@@ -39,6 +59,18 @@ export interface InternalValidationSummaryDto {
   failedCount: number;
   createdAtUtc: string;
   results: ValidationRuleResultDto[];
+}
+
+export interface ValidationExecutionResult {
+  projectId: string;
+  executionId: string;
+  startedAtUtc: string;
+  completedAtUtc: string;
+  overallStatus: ValidationExecutionStatus;
+  isFullyValid: boolean;
+  internalValidation: InternalValidationSummaryDto | null;
+  externalSources: ValidationSourceResult[];
+  errors: string[];
 }
 
 export interface FindingDto {

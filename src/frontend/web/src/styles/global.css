@@ -105,6 +105,39 @@ h1, h2, h3, h4 {
   .vf-glass-card {
     @apply bg-white/70 backdrop-blur-2xl border border-white/20 shadow-premium;
   }
+
+  /* High-Tech HUD Elements */
+  .vf-hud-scanner {
+    @apply relative overflow-hidden bg-[#0A0B1A] border border-[#223382]/30 rounded-xl min-h-[400px];
+  }
+
+  .vf-hud-grid {
+    background-image: linear-gradient(rgba(34, 51, 130, 0.1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(34, 51, 130, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+    @apply absolute inset-0;
+  }
+
+  .vf-scan-line {
+    @apply absolute w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_#F98513];
+    animation: scan 3s linear infinite;
+  }
+
+  .vf-terminal-text {
+    @apply font-mono text-[12px] leading-relaxed tracking-wider;
+    text-shadow: 0 0 5px rgba(249, 133, 19, 0.5);
+  }
+
+  @keyframes scan {
+    0% { top: 0%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .vf-glow-primary {
+    @apply shadow-[0_0_20px_-5px_rgba(249,133,19,0.4)];
+  }
 }
 
 ::-webkit-scrollbar { width: 8px; }

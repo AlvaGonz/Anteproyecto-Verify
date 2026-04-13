@@ -1,4 +1,4 @@
-import { ValidationExecutionResult, ValidationExecutionStatus } from "../../features/validation/types";
+import { ValidationExecutionResult, ValidationExecutionStatus } from "../../features/validations/types";
 import { mockValidaciones } from "./mockValidaciones";
 
 export const mockFullValidations: ValidationExecutionResult[] = [

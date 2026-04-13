@@ -4,7 +4,7 @@ export const mockValidaciones: InternalValidationSummaryDto[] = [
   {
     validacionId: "val-001",
     proyectoId: "proj-001",
-    status: ValidationStatus.Completed,
+    status: ValidationStatus.Success,
     esLegitimo: true,
     passedCount: 5,
     warningCount: 0,
@@ -34,7 +34,7 @@ export const mockValidaciones: InternalValidationSummaryDto[] = [
   {
     validacionId: "val-002",
     proyectoId: "proj-003",
-    status: ValidationStatus.Completed,
+    status: ValidationStatus.Failed,
     esLegitimo: false,
     passedCount: 2,
     warningCount: 1,

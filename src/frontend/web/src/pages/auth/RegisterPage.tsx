@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Shield, Mail, Lock, User, Building, ArrowRight, CheckCircle2, Search, HardHat, Loader2, ShieldCheck, Building2, Zap } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2, ShieldCheck, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 
 export const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [userType, setUserType] = useState<'consultant' | 'developer'>('consultant');
   const navigate = useNavigate();
 
   const handleRegister = (e: React.FormEvent) => {
@@ -150,47 +149,7 @@ export const RegisterPage: React.FC = () => {
         <div className="flex-1 p-12">
           <div className="mb-10 text-center md:text-left">
             <h3 className="text-2xl font-display font-extrabold text-[#223382] tracking-tight">Crear Cuenta</h3>
-            <p className="text-text-secondary mt-1">Selecciona tu perfil profesional</p>
-          </div>
-
-          <div className="mb-7">
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setUserType('consultant')}
-                className={`p-5 rounded-2xl border-[1.5px] transition-all flex flex-col items-center gap-3 group ${userType === 'consultant'
-                  ? 'border-primary bg-primary/5 ring-4 ring-primary/10'
-                  : 'border-border/40 hover:border-border/80 bg-surface-raised/30'
-                  }`}
-              >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${userType === 'consultant' ? 'bg-primary text-white' : 'bg-[#223382]/10 text-[#223382] group-hover:bg-[#223382]/20'
-                  }`}>
-                  <Search className="w-6 h-6" />
-                </div>
-                <div className="text-center">
-                  <span className={`block font-display font-bold text-[14px] ${userType === 'consultant' ? 'text-primary' : 'text-[#223382]'}`}>Consultor inmobiliario</span>
-                  <span className="text-[10px] text-text-secondary leading-tight block mt-0.5 ">Consultas Institucionales</span>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setUserType('developer')}
-                className={`p-5 rounded-2xl border-[1.5px] transition-all flex flex-col items-center gap-3 group ${userType === 'developer'
-                  ? 'border-primary bg-primary/5 ring-4 ring-primary/10'
-                  : 'border-border/40 hover:border-border/80 bg-surface-raised/30'
-                  }`}
-              >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${userType === 'developer' ? 'bg-primary text-white' : 'bg-[#223382]/10 text-[#223382] group-hover:bg-[#223382]/20'
-                  }`}>
-                  <HardHat className="w-6 h-6" />
-                </div>
-                <div className="text-center">
-                  <span className={`block font-display font-bold text-[14px] ${userType === 'developer' ? 'text-primary' : 'text-[#223382]'}`}>Desarrollador inmobiliario</span>
-                  <span className="text-[10px] text-text-secondary leading-tight block mt-0.5">Gestión de Proyectos</span>
-                </div>
-              </button>
-            </div>
+            <p className="text-text-secondary mt-1">Completa tus datos profesionales para comenzar</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
@@ -201,10 +160,7 @@ export const RegisterPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative">
-              <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
-              <input type="text" placeholder="Empresa / Institución" className="vf-input w-full pl-12 h-[52px]" required />
-            </div>
+
 
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
