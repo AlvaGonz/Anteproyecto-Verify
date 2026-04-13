@@ -7,13 +7,15 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
+    publicDir: 'src/frontend/web/public',
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(__dirname, './src/frontend/web/src'),
       },
+      dedupe: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
