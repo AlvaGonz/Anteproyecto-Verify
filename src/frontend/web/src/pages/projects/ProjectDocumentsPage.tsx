@@ -5,15 +5,17 @@ import { documentsApi } from "../../features/documents/api/documentsApi";
 import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { motion } from "framer-motion";
 import { 
-  FileBox, 
   ArrowLeft, 
   ShieldCheck, 
   LayoutDashboard,
   Files,
+  MoreVertical,
+  Clock,
+  HardDrive,
   Search,
-  Filter,
-  MoreVertical
+  Filter
 } from "lucide-react";
 
 export const ProjectDocumentsPage: React.FC = () => {
@@ -117,6 +119,37 @@ export const ProjectDocumentsPage: React.FC = () => {
              <MoreVertical className="w-5 h-5" />
           </button>
         </div>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {[
+          { label: 'Total Archivos', value: documents.length, icon: Files, color: 'text-primary' },
+          { label: 'Sellados Hoy', value: documents.filter(d => new Date(d.createdAtUtc).toDateString() === new Date().toDateString()).length, icon: ShieldCheck, color: 'text-success' },
+          { label: 'Archivados', value: documents.filter(d => !d.activo).length, icon: Clock, color: 'text-warning' },
+          { label: 'Storage', value: `${(documents.reduce((acc, d) => acc + d.tamanoBytes, 0) / (1024 * 1024)).toFixed(2)} MB`, icon: HardDrive, color: 'text-secondary' },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="vf-card relative overflow-hidden group hover:scale-[1.02] transition-transform"
+          >
+            <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:scale-125 group-hover:-rotate-12 transition-transform duration-700">
+               <stat.icon className="w-20 h-20" />
+            </div>
+            <div className="flex items-center gap-4 relative z-10">
+              <div className={`w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center ${stat.color}`}>
+                <stat.icon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mb-1">{stat.label}</p>
+                <h3 className="text-2xl font-display font-black text-secondary tracking-tighter leading-none">{stat.value}</h3>
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
       {error && (

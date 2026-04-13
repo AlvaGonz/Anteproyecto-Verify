@@ -1,7 +1,0 @@
-feat(rf1-rf5): implement project registration, document diagnosis, integrity validation, and external integrations (DGRI + Catastro)
-
-RS1-RS3: Project metadata storage, field validation, UUID generation
-RS4-RS6: Required documents by category, document status, completeness percentage
-RS7-RS9: Document integrity validation with mock OCR adapter
-RS10-RS12: DGRI legal status integration with mock/real adapter
-RS13-RS15: Catastro comparison and automatic finding generation

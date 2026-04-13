@@ -38,6 +38,8 @@ export enum DocumentType {
   NoObjecionINAPACAASD = 18,
   DocumentosNotariales = 19,
   DocumentosSupletorios = 20,
+  ActodeVenta = 21,
+  CopiaCedulaIdentidad = 22,
   Other = 99,
 }
 
