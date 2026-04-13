@@ -338,7 +338,7 @@ const MethodologySection: React.FC = () => (
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
           <div className="space-y-4">
             <span className="text-primary font-black text-xs uppercase tracking-[0.3em]">Fase 01</span>
-            <h3 className="text-3xl md:text-5xl font-display font-black leading-none">Ingesta de <br />Data Maestra</h3>
+            <h3 className="text-3xl md:text-5xl font-display font-black leading-none !text-white">Ingesta de <br />Data Maestra</h3>
           </div>
           <p className="text-white/60 text-lg max-w-sm leading-relaxed">
             Procesamos la documentación legal del proyecto comparándola con repositorios históricos y cartografía digital certificada.
@@ -352,7 +352,7 @@ const MethodologySection: React.FC = () => (
         <motion.div {...fadeInUp} transition={{ delay: 0.1 }} className="bg-gray-50 p-10 rounded-[40px] flex flex-col justify-between border border-gray-100 hover:border-primary/20 transition-all">
           <div className="space-y-4">
             <span className="text-gray-400 font-black text-[10px] uppercase tracking-[0.3em]">Fase 02</span>
-            <h3 className="text-2xl font-bold text-gray-900 leading-tight">Validación <br />Cruzada (API)</h3>
+            <h3 className="text-2xl font-bold text-gray-900 leading-tight">Validación <br />Cruzada</h3>
           </div>
           <p className="text-gray-500 text-sm leading-relaxed">
             Integración directa con organismos de catastro y servicios notariales.

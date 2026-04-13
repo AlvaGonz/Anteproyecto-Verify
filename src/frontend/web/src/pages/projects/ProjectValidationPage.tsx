@@ -9,12 +9,18 @@ import { ValidationSummary as InternalValidationSummary } from "../../features/v
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
 import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle } from "lucide-react";
+import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle, AlertCircle, ListTodo, ClipboardList } from "lucide-react";
+import { FindingsPanel } from "../../features/validations/components/findings/FindingsPanel";
+import { AuditLogList } from "../../features/validations/components/audit/AuditLogList";
+import { FindingDto, AuditLogDto } from "../../features/validations/types";
 
 export const ProjectValidationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { addToast } = useToast();
   const [result, setResult] = useState<ValidationExecutionResult | null>(null);
+  const [findings, setFindings] = useState<FindingDto[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLogDto[]>([]);
+  const [activeTab, setActiveTab] = useState<'analysis' | 'findings' | 'audit'>('analysis');
   const [isLoading, setIsLoading] = useState(true);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,8 +30,14 @@ export const ProjectValidationPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const latestResult = await validationsApi.getValidationResult(id);
+      const [latestResult, projectFindings, logs] = await Promise.all([
+        validationsApi.getValidationResult(id),
+        validationsApi.getProjectFindings(id),
+        validationsApi.getProjectAuditLogs(id)
+      ]);
       setResult(latestResult);
+      setFindings(projectFindings);
+      setAuditLogs(logs);
     } catch (err: any) {
       setError(err.message || "Error al cargar el resultado de validación");
     } finally {
@@ -98,72 +110,130 @@ export const ProjectValidationPage: React.FC = () => {
       {/* HUD Scanner Section */}
       <ValidationHUD isScanning={isEvaluating} onComplete={handleScanComplete} />
 
+      {/* Tabs Navigation */}
+      {!isEvaluating && (
+        <div className="flex items-center gap-1 mb-8 p-1 bg-surface-container-low rounded-2xl w-fit mx-auto sm:mx-0 border border-border/30">
+          <button 
+            onClick={() => setActiveTab('analysis')}
+            className={`px-6 py-2.5 rounded-[12px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'analysis' ? 'bg-secondary text-white shadow-lg' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+          >
+            <ShieldCheck className="w-4 h-4" /> Análisis Integral
+          </button>
+          <button 
+            onClick={() => setActiveTab('findings')}
+            className={`px-6 py-2.5 rounded-[12px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'findings' ? 'bg-secondary text-white shadow-lg' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+          >
+            <ListTodo className="w-4 h-4" /> Hallazgos ({findings.length})
+          </button>
+          <button 
+            onClick={() => setActiveTab('audit')}
+            className={`px-6 py-2.5 rounded-[12px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'audit' ? 'bg-secondary text-white shadow-lg' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+          >
+            <ClipboardList className="w-4 h-4" /> Bitácora ({auditLogs.length})
+          </button>
+        </div>
+      )}
+
       {!isEvaluating && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
           
-          {/* Main Results (Col 1 & 2) */}
+          {/* Main Content Area (Col 1 & 2) */}
           <div className="lg:col-span-2 space-y-10">
-            {result ? (
+            {activeTab === 'analysis' && (
               <>
-                {/* 1. Internal Validation */}
-                <section>
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-1.5 h-6 bg-primary rounded-full" />
-                    <h2 className="h2 italic">01. Análisis de Expediente</h2>
-                  </div>
-                  {result.internalValidation && (
-                    <div className="vf-card p-0 overflow-hidden shadow-premium border-none ring-1 ring-border/50">
-                      <div className="p-6 bg-surface">
-                        <InternalValidationSummary summary={result.internalValidation} />
+                {result ? (
+                  <>
+                    {/* 1. Internal Validation */}
+                    <section>
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-6 bg-primary rounded-full" />
+                          <h2 className="h2 italic">01. Análisis de Expediente</h2>
+                        </div>
+                        <span className="text-[10px] font-black p-1.5 bg-black/5 rounded uppercase">Inmutable</span>
                       </div>
-                      <div className="bg-surface-raised border-t border-border/50">
-                        <ValidationRulesTable results={result.internalValidation.results} />
-                      </div>
-                    </div>
-                  )}
-                </section>
+                      {result.internalValidation && (
+                        <div className="vf-card p-0 overflow-hidden shadow-premium border-none ring-1 ring-border/50">
+                          <div className="p-6 bg-surface">
+                            <InternalValidationSummary summary={result.internalValidation} />
+                          </div>
+                          <div className="bg-surface-raised border-t border-border/50">
+                            <ValidationRulesTable results={result.internalValidation.results} />
+                          </div>
+                        </div>
+                      )}
+                    </section>
 
-                {/* 2. External Sources */}
-                <section>
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-1.5 h-6 bg-primary rounded-full" />
-                    <h2 className="h2 italic">02. Cruce Institucional</h2>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {result.externalSources.map((source, idx) => (
-                      <div key={idx} className="vf-card hover:bg-surface-raised transition-all group overflow-hidden">
-                        <div className="flex justify-between items-start mb-3">
-                          <span className="label-lg text-secondary font-bold tracking-widest uppercase">{source.sourceName}</span>
-                          {source.isMatch ? (
-                            <CheckCircle className="w-5 h-5 text-success" />
-                          ) : (
-                            <AlertTriangle className="w-5 h-5 text-warning" />
-                          )}
-                        </div>
-                        <p className="text-sm text-text-secondary mb-4">{source.summary}</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono p-1 bg-black/5 rounded">{source.referenceCode || 'REF_PENDING'}</span>
-                          <button className="text-primary opacity-0 group-hover:opacity-100 transition-opacity text-xs flex items-center gap-1 font-bold">
-                            DETALLES <ExternalLink className="w-3 h-3" />
-                          </button>
-                        </div>
+                    {/* 2. External Sources */}
+                    <section>
+                      <div className="flex items-center gap-2 mb-6">
+                        <div className="w-1.5 h-6 bg-primary rounded-full" />
+                        <h2 className="h2 italic">02. Cruce Institucional</h2>
                       </div>
-                    ))}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {result.externalSources.map((source, idx) => (
+                          <div key={idx} className="vf-card hover:bg-surface-raised transition-all group overflow-hidden">
+                            <div className="flex justify-between items-start mb-3">
+                              <span className="label-lg text-secondary font-bold tracking-widest uppercase">{source.sourceName}</span>
+                              {source.isMatch ? (
+                                <CheckCircle className="w-5 h-5 text-success" />
+                              ) : (
+                                <AlertTriangle className="w-5 h-5 text-warning" />
+                              )}
+                            </div>
+                            <p className="text-sm text-text-secondary mb-4">{source.summary}</p>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-mono p-1 bg-black/5 rounded">{source.referenceCode || 'REF_PENDING'}</span>
+                              <button className="text-primary opacity-0 group-hover:opacity-100 transition-opacity text-xs flex items-center gap-1 font-bold">
+                                DETALLES <ExternalLink className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  </>
+                ) : (
+                  <div className="vf-card py-20 flex flex-col items-center justify-center border-dashed gap-4 opacity-60">
+                    <FileText className="w-16 h-16 text-border" />
+                    <div className="text-center">
+                      <p className="h2 text-text-secondary">Sin Auditoría Reciente</p>
+                      <p className="body text-sm">Ejecute una nueva validación para ver los resultados institucionales.</p>
+                    </div>
                   </div>
-                </section>
+                )}
               </>
-            ) : (
-              <div className="vf-card py-20 flex flex-col items-center justify-center border-dashed gap-4 opacity-60">
-                <FileText className="w-16 h-16 text-border" />
-                <div className="text-center">
-                  <p className="h2 text-text-secondary">Sin Auditoría Reciente</p>
-                  <p className="body text-sm">Ejecute una nueva validación para ver los resultados institucionales.</p>
+            )}
+
+            {activeTab === 'findings' && (
+              <section>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-6 bg-error rounded-full" />
+                    <h2 className="h2 italic">04. Hallazgos y Discrepancias</h2>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-error/10 text-error uppercase">Audit Mode</span>
+                  </div>
                 </div>
-              </div>
+                <FindingsPanel findings={findings} />
+              </section>
+            )}
+
+            {activeTab === 'audit' && (
+              <section>
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-1.5 h-6 bg-secondary rounded-full" />
+                  <h2 className="h2 italic">05. Bitácora de Inmutabilidad</h2>
+                </div>
+                <div className="vf-card bg-surface p-8 sm:p-10 border-none shadow-sm ring-1 ring-border/50">
+                  <AuditLogList logs={auditLogs} />
+                </div>
+              </section>
             )}
           </div>
 
-          {/* Side Panel (Col 3) */}
+          {/* Side Panel (Col 3) - Remains constant or updates based on state */}
           <div className="space-y-8">
             <section className="sticky top-8">
               <div className="flex items-center gap-2 mb-6">

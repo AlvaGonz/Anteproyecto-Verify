@@ -85,3 +85,24 @@ export interface FindingDto {
   resuelto: boolean;
   createdAtUtc: string;
 }
+
+export enum AuditActionType {
+  DocumentUpload = 1,
+  ValidationRun = 2,
+  StatusChange = 3,
+  CertificationIssued = 4,
+  ObservationCreated = 5,
+  ArchiveDocument = 6,
+}
+
+export interface AuditLogDto {
+  id: string;
+  proyectoId: string;
+  usuarioId: string;
+  usuarioNombre: string;
+  accion: AuditActionType;
+  descripcion: string;
+  fechaUtc: string;
+  metadataJson: string | null;
+  ipAddress: string | null;
+}
