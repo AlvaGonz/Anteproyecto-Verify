@@ -31,14 +31,17 @@ const LandingNav: React.FC = () => {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 flex justify-between items-center px-8 h-20 font-display font-bold tracking-tight transition-all duration-500 ${
-        scrolled
-          ? "bg-brand-blue shadow-2xl shadow-brand-blue-dark/10"
-          : "bg-brand-blue"
-      }`}
+      className={`fixed top-0 w-full z-50 flex justify-between items-center px-8 h-20 font-display font-bold tracking-tight transition-all duration-500 ${scrolled
+        ? "bg-brand-blue shadow-2xl shadow-brand-blue-dark/10"
+        : "bg-brand-blue"
+        }`}
     >
-      <Link to="/" className="text-2xl font-extrabold text-brand-cream">
-        VeriFinca
+      <Link to="/" className="flex items-center">
+        <img
+          src="/brand/isotipo/ISOTIPO NEGRO.svg"
+          alt="VeriFinca"
+          className="h-10 w-auto"
+        />
       </Link>
 
       <div className="hidden md:flex items-center gap-8">
@@ -50,11 +53,10 @@ const LandingNav: React.FC = () => {
           <a
             key={item.label}
             href={item.href}
-            className={`transition-colors duration-300 ${
-              item.isActive
-                ? "text-white border-b-4 border-primary-container pb-1"
-                : "text-brand-cream/80 hover:text-white"
-            }`}
+            className={`transition-colors duration-300 ${item.isActive
+              ? "text-white border-b-4 border-primary-container pb-1"
+              : "text-brand-cream/80 hover:text-white"
+              }`}
           >
             {item.label}
           </a>
@@ -105,11 +107,8 @@ const HeroSection: React.FC = () => {
 
       <div className="max-w-4xl space-y-8">
         <motion.div {...fadeInUp} className="space-y-4">
-          <span className="text-secondary font-display font-bold uppercase tracking-widest text-sm bg-secondary-container/20 px-4 py-1 rounded-full inline-block">
-            Autoridad Institucional
-          </span>
           <h1 className="text-5xl md:text-7xl font-display font-extrabold text-brand-blue leading-[1.1] tracking-tight">
-            Consulta la validez legal de cualquier proyecto inmobiliario
+            Consulta la validez legal de cualquier proyecto inmobiliario en RD
           </h1>
         </motion.div>
 
@@ -165,11 +164,10 @@ const TrustStripSection: React.FC = () => (
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.15 }}
           viewport={{ once: true }}
-          className={`flex flex-col items-center md:items-start space-y-2 ${
-            i === 1
-              ? "border-x-0 md:border-x border-outline-variant/30 px-0 md:px-12"
-              : ""
-          }`}
+          className={`flex flex-col items-center md:items-start space-y-2 ${i === 1
+            ? "border-x-0 md:border-x border-outline-variant/30 px-0 md:px-12"
+            : ""
+            }`}
         >
           <span className="text-4xl font-display font-extrabold text-brand-blue">
             {stat.value}
