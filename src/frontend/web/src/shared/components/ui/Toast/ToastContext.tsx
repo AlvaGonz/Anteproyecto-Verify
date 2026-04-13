@@ -30,11 +30,11 @@ export const useToast = () => {
   return context;
 };
 
-const toastStyles: Record<ToastType, { bg: string; border: string; icon: React.FC<{ className?: string }> }> = {
-  success: { bg: "bg-emerald-50", border: "border-emerald-400", icon: CheckCircle2 },
-  error: { bg: "bg-red-50", border: "border-red-400", icon: XCircle },
-  warning: { bg: "bg-amber-50", border: "border-amber-400", icon: AlertTriangle },
-  info: { bg: "bg-blue-50", border: "border-blue-400", icon: Info },
+const toastStyles: Record<ToastType, { bg: string; border: string; text: string; icon: React.FC<{ className?: string }> }> = {
+  success: { bg: "bg-[#E6F3EF]", border: "border-emerald-500", text: "text-emerald-900", icon: CheckCircle2 },
+  error: { bg: "bg-[#FDECEC]", border: "border-red-500", text: "text-red-900", icon: XCircle },
+  warning: { bg: "bg-[#FEF6E7]", border: "border-amber-500", text: "text-amber-900", icon: AlertTriangle },
+  info: { bg: "bg-[#EBF1FF]", border: "border-blue-500", text: "text-blue-900", icon: Info },
 };
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -55,23 +55,25 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 space-y-3 z-50 pointer-events-none">
+      <div className="fixed top-6 right-6 space-y-3 z-[100] pointer-events-none">
         {toasts.map((toast) => {
           const style = toastStyles[toast.type];
           const Icon = style.icon;
           return (
             <div
               key={toast.id}
-              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 max-w-sm rounded-xl shadow-lg border-l-4 ${style.bg} ${style.border} animate-fade-in-up`}
+              className={`pointer-events-auto flex items-center gap-4 px-5 py-4 min-w-[320px] max-w-sm rounded-2xl shadow-floating border-l-[6px] backdrop-blur-md ${style.bg} ${style.border} animate-in slide-in-from-right fade-in duration-300`}
               role="alert"
             >
-              <Icon className="w-5 h-5 flex-shrink-0 text-[var(--color-text-strong)] opacity-70" />
-              <p className="text-sm font-medium text-[var(--color-text-strong)] flex-1">{toast.message}</p>
+              <div className={`p-2 rounded-full ${style.bg.replace("bg-", "text-").replace("[", "").replace("]", "")} bg-white/50`}>
+                <Icon className={`w-5 h-5 flex-shrink-0 ${style.text}`} />
+              </div>
+              <p className={`text-[14px] font-bold ${style.text} flex-1`}>{toast.message}</p>
               <button
                 onClick={() => removeToast(toast.id)}
-                className="p-1 rounded-lg hover:bg-black/5 transition-colors flex-shrink-0"
+                className="p-2 rounded-xl hover:bg-black/5 transition-colors flex-shrink-0"
               >
-                <X className="w-4 h-4 text-[var(--color-text-strong)] opacity-40" />
+                <X className={`w-4 h-4 ${style.text} opacity-40`} />
               </button>
             </div>
           );

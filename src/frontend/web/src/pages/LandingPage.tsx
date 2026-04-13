@@ -32,13 +32,13 @@ const LandingNav: React.FC = () => {
   return (
     <nav
       className={`fixed top-0 w-full z-50 flex justify-between items-center px-8 h-20 font-display font-bold tracking-tight transition-all duration-500 ${scrolled
-        ? "bg-brand-blue shadow-2xl shadow-brand-blue-dark/10"
-        : "bg-brand-blue"
+        ? "bg-surface shadow-floating border-b border-border/10"
+        : "bg-surface"
         }`}
     >
       <Link to="/" className="flex items-center">
         <img
-          src="/brand/isotipo/ISOTIPO NEGRO.svg"
+          src="/brand/logotipo/LOGOTIPO.svg"
           alt="VeriFinca"
           className="h-10 w-auto"
         />
@@ -53,8 +53,8 @@ const LandingNav: React.FC = () => {
             key={item.label}
             href={item.href}
             className={`transition-colors duration-300 ${item.isActive
-              ? "text-white border-b-4 border-primary-container pb-1"
-              : "text-brand-cream/80 hover:text-white"
+              ? "text-secondary border-b-4 border-primary pb-1"
+              : "text-text-secondary hover:text-secondary"
               }`}
           >
             {item.label}
@@ -65,13 +65,13 @@ const LandingNav: React.FC = () => {
       <div className="flex items-center gap-6">
         <Link
           to="/login"
-          className="hidden md:inline-block text-brand-cream/80 hover:text-white transition-colors text-sm font-semibold"
+          className="bg-secondary text-white px-6 py-2.5 rounded-full font-bold hover:bg-primary active:scale-95 duration-200 transition-all"
         >
           Iniciar sesión
         </Link>
         <Link
           to="/register"
-          className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-full font-bold active:scale-95 duration-200 transition-transform"
+          className="bg-secondary text-white px-6 py-2.5 rounded-full font-bold hover:bg-primary active:scale-95 duration-200 transition-all"
         >
           Registrarse
         </Link>
@@ -108,7 +108,7 @@ const HeroSection: React.FC = () => {
       <div className="relative z-10 max-w-4xl space-y-8">
         <motion.div {...fadeInUp} className="space-y-4">
           {/* Institutional authority badge — matching Stitch reference */}
-          <h1 className="text-5xl md:text-7xl font-display font-extrabold text-brand-blue leading-[1.1] tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-display font-extrabold text-secondary leading-[1.1] tracking-tight">
             Consulta la validez legal de proyectos inmobiliarios en la República Dominicana
           </h1>
         </motion.div>
@@ -155,9 +155,9 @@ const TrustStripSection: React.FC = () => (
   <section className="bg-surface-container-low py-16 px-8 border-y border-outline-variant/10">
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
       {[
-        { value: "500+", label: "Proyectos validados" },
-        { value: "15k", label: "Documentos revisados" },
-        { value: "20+", label: "Instituciones conectadas" },
+        { value: "50+", label: "Proyectos validados" },
+        { value: "1k", label: "Documentos revisados" },
+        { value: "5+", label: "Instituciones conectadas" },
       ].map((stat, i) => (
         <motion.div
           key={stat.label}
@@ -170,7 +170,7 @@ const TrustStripSection: React.FC = () => (
             : ""
             }`}
         >
-          <span className="text-4xl font-display font-extrabold text-brand-blue">
+          <span className="text-4xl font-display font-extrabold text-secondary">
             {stat.value}
           </span>
           <span className="text-on-surface-variant uppercase tracking-widest text-xs font-semibold">
@@ -182,7 +182,6 @@ const TrustStripSection: React.FC = () => (
   </section>
 );
 
-/* ===== FEATURED PROJECTS CAROUSEL ===== */
 /* ===== FEATURED PROJECTS CAROUSEL ===== */
 const validatedProjects = mockProjects
   .filter(p => p.estadoProyecto === ProjectStatus.Validated && p.estadoIntegridad === IntegrityStatus.Verified)
@@ -219,7 +218,7 @@ const FeaturedProjectsSection: React.FC = () => {
       <div className="max-w-7xl mx-auto relative">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
           <div className="space-y-4">
-            <h2 className="text-4xl font-display font-bold text-brand-blue">
+            <h2 className="text-4xl font-display font-bold text-secondary">
               Proyectos Destacados
             </h2>
             <p className="text-on-surface-variant max-w-2xl">
@@ -264,7 +263,7 @@ const FeaturedProjectsSection: React.FC = () => {
               </div>
               <div className="p-8 space-y-4">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-display font-bold text-brand-blue line-clamp-1">
+                  <h3 className="text-4xl font-display font-bold text-secondary line-clamp-1">
                     {project.nombre}
                   </h3>
                   <div className="flex items-center text-on-surface-variant text-sm gap-1">
@@ -298,7 +297,7 @@ const MethodologySection: React.FC = () => (
     <div className="max-w-7xl mx-auto space-y-16">
       <div className="text-center space-y-4">
         <span className="label">Metodología</span>
-        <h2 className="text-4xl md:text-5xl font-display font-bold text-brand-blue">
+        <h2 className="text-4xl md:text-5xl font-display font-bold text-secondary">
           Transparencia en 3 Pasos
         </h2>
       </div>
@@ -313,7 +312,7 @@ const MethodologySection: React.FC = () => (
             01
           </div>
           <div className="space-y-2">
-            <h3 className="text-2xl font-display font-extrabold text-brand-blue">
+            <h3 className="text-2xl font-display font-extrabold text-secondary">
               Buscar
             </h3>
             <p className="text-on-surface-variant">
@@ -329,14 +328,14 @@ const MethodologySection: React.FC = () => (
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15 }}
           viewport={{ once: true }}
-          className="bg-brand-blue p-12 rounded-lg flex flex-col space-y-6 text-white shadow-2xl"
+          className="bg-secondary p-12 rounded-lg flex flex-col space-y-6 text-text-on-primary shadow-2xl"
         >
           <div className="w-16 h-16 bg-primary-container text-on-primary-container rounded-2xl flex items-center justify-center font-display font-black text-2xl">
             02
           </div>
           <div className="space-y-2">
             <h3 className="text-2xl font-display font-extrabold">Consultar</h3>
-            <p className="text-white/70">
+            <p className="text-text-on-primary/70">
               Nuestro motor de búsqueda conecta con curadurías, notarías y
               registros públicos en tiempo real.
             </p>
@@ -355,7 +354,7 @@ const MethodologySection: React.FC = () => (
             03
           </div>
           <div className="space-y-2">
-            <h3 className="text-2xl font-display font-extrabold text-brand-blue">
+            <h3 className="text-2xl font-display font-extrabold text-secondary">
               Verificar
             </h3>
             <p className="text-on-surface-variant">
@@ -407,7 +406,7 @@ const CtaSection: React.FC = () => (
 
 /* ===== FOOTER ===== */
 const LandingFooter: React.FC = () => (
-  <footer className="bg-brand-blue-dark text-brand-cream font-sans font-light tracking-wide w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+  <footer className="bg-text-primary text-surface-raised font-sans font-light tracking-wide w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6">
     <div className="flex flex-col items-center md:items-start gap-4">
       <Link to="/" className="flex items-center">
         <img
@@ -416,7 +415,7 @@ const LandingFooter: React.FC = () => (
           className="h-10 w-auto"
         />
       </Link>
-      <p className="text-brand-cream/60 text-center md:text-left max-w-xs">
+      <p className="text-surface-raised/60 text-center md:text-left max-w-xs">
         © 2026 VeriFinca. Plataforma de Consulta de Proyectos Inmobiliarios en RD.
       </p>
     </div>
@@ -430,17 +429,17 @@ const LandingFooter: React.FC = () => (
         <a
           key={link.label}
           href={link.href}
-          className="text-brand-cream/60 hover:text-brand-cream transition-colors"
+          className="text-surface-raised/60 hover:text-surface-raised transition-colors"
         >
           {link.label}
         </a>
       ))}
     </div>
     <div className="flex gap-4">
-      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container cursor-pointer transition-all">
+      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary text-white cursor-pointer transition-all">
         <Gavel className="w-5 h-5" />
       </div>
-      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container cursor-pointer transition-all">
+      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary text-white cursor-pointer transition-all">
         <Building2 className="w-5 h-5" />
       </div>
     </div>
