@@ -3,12 +3,16 @@ import { router } from "../router";
 import { ToastProvider } from "../shared/components/ui/Toast/ToastContext";
 import { ErrorBoundary } from "./ErrorBoundary";
 
+import { AuthProvider } from "../features/auth/context/AuthContext";
+
 export function App() {
   return (
     <ErrorBoundary>
-      <ToastProvider>
-        <RouterProvider router={router} />
-      </ToastProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
