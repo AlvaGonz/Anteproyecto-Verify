@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Shield, Mail, Lock, User, Building, ArrowRight, CheckCircle2, Search, Code, Loader2, ShieldCheck, Building2 } from "lucide-react";
+import { Shield, Mail, Lock, User, Building, ArrowRight, CheckCircle2, Search, HardHat, Loader2, ShieldCheck, Building2, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const RegisterPage: React.FC = () => {
@@ -98,7 +98,7 @@ export const RegisterPage: React.FC = () => {
               <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-4">
                 Plataforma Certificada
               </div>
-              <h2 className="text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter">
+              <h2 className="text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter !text-white">
                 Integridad <br />
                 <span className="text-primary-light">en cada m².</span>
               </h2>
@@ -114,18 +114,18 @@ export const RegisterPage: React.FC = () => {
                   <ShieldCheck className="w-6 h-6 text-primary-light" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1">Validación Pro</h4>
-                  <p className="text-xs text-white/40 leading-normal">Planos y títulos verificados por protocolos expertos.</p>
+                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1 !text-white">Cifrado de Extremo a Extremo</h4>
+                  <p className="text-xs text-white/80 leading-normal">Sus datos están protegidos por estándares globales de seguridad.</p>
                 </div>
               </div>
 
               <div className="flex gap-5 group cursor-default">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all duration-300">
-                  <Building2 className="w-6 h-6 text-primary-light" />
+                  <Zap className="w-6 h-6 text-primary-light" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1">Gobierno Corporativo</h4>
-                  <p className="text-xs text-white/40 leading-normal">Certificación avalada por protocolos internacionales MP113.</p>
+                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1 !text-white">Acceso Instantáneo</h4>
+                  <p className="text-xs text-white/80 leading-normal">Infraestructura optimizada para una respuesta inmediata.</p>
                 </div>
               </div>
             </div>
@@ -153,7 +153,7 @@ export const RegisterPage: React.FC = () => {
             <p className="text-text-secondary mt-1">Selecciona tu perfil profesional</p>
           </div>
 
-          <div className="mb-0">
+          <div className="mb-7">
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
@@ -183,7 +183,7 @@ export const RegisterPage: React.FC = () => {
               >
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${userType === 'developer' ? 'bg-primary text-white' : 'bg-[#223382]/10 text-[#223382] group-hover:bg-[#223382]/20'
                   }`}>
-                  <Code className="w-6 h-6" />
+                  <HardHat className="w-6 h-6" />
                 </div>
                 <div className="text-center">
                   <span className={`block font-display font-bold text-[14px] ${userType === 'developer' ? 'text-primary' : 'text-[#223382]'}`}>Desarrollador inmobiliario</span>
