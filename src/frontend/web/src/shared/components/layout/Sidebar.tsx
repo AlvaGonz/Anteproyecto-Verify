@@ -5,7 +5,6 @@ import {
   FolderKanban,
   ShieldAlert,
   Settings,
-  Shield,
   X,
   ExternalLink,
 } from "lucide-react";
@@ -30,13 +29,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     >
       {/* Logo */}
       <div className="flex items-center justify-between h-20 px-6 border-b border-white/5">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
-            <Shield className="w-5 h-5 text-on-primary" />
-          </div>
-          <span className="font-display font-black text-xl text-white tracking-tighter">
-            VeriFinca
-          </span>
+        <Link to="/" className="flex items-center group">
+          <img
+            src="/brand/isotipo/ISOTIPO WHITE.svg"
+            alt="VeriFinca"
+            className="h-9 w-auto group-hover:scale-105 transition-transform"
+          />
         </Link>
         {onClose && (
           <button onClick={onClose} className="md:hidden text-white/60 hover:text-white p-1">

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { NotificationBell } from "../../../features/notifications/components/NotificationBell";
-import { Shield, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -22,11 +22,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             </button>
 
             {/* Mobile brand - hidden on desktop as Sidebar has it */}
-            <Link to="/" className="md:hidden flex items-center gap-2">
-              <Shield className="w-6 h-6 text-primary" />
-              <span className="font-display font-black text-lg text-secondary tracking-tighter">
-                VeriFinca
-              </span>
+            <Link to="/" className="md:hidden flex items-center">
+              <img
+                src="/brand/isotipo/ISOTIPO NEGRO.svg"
+                alt="VeriFinca"
+                className="h-8 w-auto"
+              />
             </Link>
           </div>
 
