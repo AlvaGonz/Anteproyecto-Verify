@@ -1,4 +1,5 @@
-import { InternalValidationSummaryDto, FindingDto, ValidationStatus, ValidationExecutionResult, ValidationExecutionStatus } from "../types";
+/** v1.1.1 - Forced Refresh */
+import { InternalValidationSummaryDto, FindingDto, ValidationStatus, ValidationExecutionResult, ValidationExecutionStatus, AuditLogDto, AuditActionType } from "../types";
 import { mockValidaciones } from "../../../infrastructure/mock/mockValidaciones";
 import { mockHallazgos } from "../../../infrastructure/mock/mockHallazgos";
 import { mockFullValidations } from "../../../infrastructure/mock/mockValidation";
@@ -136,6 +137,44 @@ export const validationsApi = {
     );
     if (response.status === 404) return null;
     if (!response.ok) throw new Error("Failed to fetch validation result");
+    return response.json();
+  },
+  getProjectAuditLogs: async (projectId: string): Promise<AuditLogDto[]> => {
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const mockAuditLogs: AuditLogDto[] = [
+            {
+              id: "1",
+              proyectoId: projectId,
+              usuarioId: "u1",
+              usuarioNombre: "Admin VeriFinca",
+              accion: AuditActionType.ValidationRun,
+              descripcion: "Ejecución de auditoría integral completada",
+              fechaUtc: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+              metadataJson: null,
+              ipAddress: "192.168.1.1"
+            },
+            {
+              id: "2",
+              proyectoId: projectId,
+              usuarioId: "u1",
+              usuarioNombre: "Admin VeriFinca",
+              accion: AuditActionType.DocumentUpload,
+              descripcion: "Sumbisión de Certificado de Título para validación",
+              fechaUtc: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+              metadataJson: null,
+              ipAddress: "192.168.1.1"
+            }
+          ];
+          resolve(mockAuditLogs);
+        }, 300);
+      });
+    }
+    const response = await fetch(
+      `${API_BASE_URL}/projects/${projectId}/audit-logs`,
+    );
+    if (!response.ok) throw new Error("Failed to fetch audit logs");
     return response.json();
   },
 };
