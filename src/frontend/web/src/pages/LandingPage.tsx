@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -26,9 +26,9 @@ const fadeInUp = {
 
 /* ===== NAVIGATION ===== */
 const LandingNav: React.FC = () => {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
@@ -86,7 +86,7 @@ const LandingNav: React.FC = () => {
 
 /* ===== HERO SECTION ===== */
 const HeroSection: React.FC = () => {
-  const [code, setCode] = useState("");
+  const [code, setCode] = React.useState("");
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden px-6 md:px-12 pt-20">
