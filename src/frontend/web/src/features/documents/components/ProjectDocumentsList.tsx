@@ -4,7 +4,6 @@ import {
   Download, 
   Trash2, 
   RefreshCcw, 
-  CheckCircle, 
   History,
   Info,
   ExternalLink,

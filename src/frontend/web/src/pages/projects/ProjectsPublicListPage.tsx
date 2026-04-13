@@ -1,229 +1,314 @@
-import React, { useEffect, useState } from "react";
-import { ProyectoDto, ProjectStatus, IntegrityStatus, ProjectCategory } from "../../features/projects/types";
-import { projectsApi } from "../../features/projects/api/projectsApi";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import {
-  Building2,
-  MapPin,
-  ArrowRight,
-  CheckCircle2,
-  AlertTriangle,
-  Timer,
-  Search,
-  QrCode,
-  ChevronLeft,
+import { 
+  Building2, 
+  Search, 
+  MapPin, 
+  Building, 
+  Trees, 
+  LayoutGrid,
+  TrendingUp,
+  ShieldCheck,
+  ArrowUpRight,
+  Globe,
 } from "lucide-react";
+import { projectsApi } from "../../features/projects/api/projectsApi";
+import { ProyectoDto, ProjectStatus, ProjectCategory } from "../../features/projects/types";
+import { motion, AnimatePresence } from "framer-motion";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-const getCategoryLabel = (cat: ProjectCategory) => {
-  switch (cat) {
-    case ProjectCategory.Residencial: return "Residencial";
-    case ProjectCategory.Comercial: return "Comercial";
-    case ProjectCategory.Turistico: return "Turístico";
-    case ProjectCategory.Mixto: return "Mixto";
-    default: return "Otro";
+/** Utility for merging tailwind classes */
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+const Skeleton = ({ className }: { className?: string }) => (
+  <div className={cn("animate-pulse bg-slate-200 rounded-lg", className)}></div>
+);
+
+const CategoryIcon = ({ category }: { category: ProjectCategory }) => {
+  switch (category) {
+    case ProjectCategory.Residencial: return <Building2 className="w-5 h-5" />;
+    case ProjectCategory.Comercial:   return <TrendingUp className="w-5 h-5" />;
+    case ProjectCategory.Turistico:   return <Trees className="w-5 h-5" />;
+    case ProjectCategory.Mixto:       return <LayoutGrid className="w-5 h-5" />;
+    default:                          return <Building className="w-5 h-5" />;
   }
 };
 
-const getStatusInfo = (status: ProjectStatus) => {
-  switch (status) {
-    case ProjectStatus.Published:  return { label: "Publicado",    cls: "bg-primary-container text-on-primary-container" };
-    case ProjectStatus.InReview:   return { label: "En Revisión",  cls: "bg-secondary-container text-on-secondary-container" };
-    case ProjectStatus.Observed:   return { label: "Observado",    cls: "bg-error-container text-on-error-container" };
-    case ProjectStatus.Validated:  return { label: "Validado",     cls: "bg-primary-container text-on-primary-container" };
-    case ProjectStatus.Rejected:   return { label: "Rechazado",    cls: "bg-error-container text-on-error-container" };
-    default:                       return { label: "Borrador",     cls: "bg-surface-container text-on-surface-variant" };
-  }
-};
-
-const getIntegrityInfo = (status: IntegrityStatus) => {
-  switch (status) {
-    case IntegrityStatus.Verified: return { label: "Verificado", icon: CheckCircle2, color: "text-emerald-600" };
-    case IntegrityStatus.Failed:   return { label: "Fallido",    icon: AlertTriangle, color: "text-red-600" };
-    default:                       return { label: "Pendiente",  icon: Timer,         color: "text-amber-600" };
-  }
-};
-
-/* ─── Shared Nav ─── */
-const PageNav: React.FC = () => (
-  <nav className="w-full flex justify-between items-center px-8 h-20 bg-[#223382] shadow-2xl shadow-[#111144]/10 font-['Manrope'] font-bold tracking-tight">
-    <div className="flex items-center gap-4">
-      <Link to="/" className="text-white/70 hover:text-white transition-colors">
-        <ChevronLeft className="w-6 h-6" />
-      </Link>
-      <Link to="/" className="text-2xl font-extrabold text-[#F4F1EC]">VeriFinca</Link>
-    </div>
-    <Link
-      to="/verify"
-      className="hidden md:flex items-center gap-2 bg-[#F98513] text-[#5d2d00] px-6 py-2.5 rounded-full font-bold active:scale-95 duration-200 shadow-md hover:shadow-lg text-sm"
-    >
-      <QrCode className="w-4 h-4" /> Verificar Sello
-    </Link>
-  </nav>
-);
-
-/* ─── Hero banner ─── */
-const PageHero: React.FC = () => (
-  <div className="bg-[#223382] py-20 px-8 relative overflow-hidden">
-    <div className="absolute -right-24 -top-24 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-    <div className="max-w-7xl mx-auto relative z-10">
-      <span className="text-[#F98513] font-bold uppercase tracking-widest text-xs mb-4 block">Directorio Público</span>
-      <h1 className="text-4xl md:text-5xl font-['Manrope'] font-extrabold text-[#F4F1EC] leading-tight mb-4">
-        Proyectos Inmobiliarios
-      </h1>
-      <p className="text-[#F4F1EC]/60 text-lg max-w-xl font-light">
-        Directorio público de proyectos registrados en la plataforma VeriFinca.
-      </p>
-    </div>
-  </div>
-);
-
-/* ─── Skeleton card ─── */
-const SkeletonCard: React.FC = () => (
-  <div className="bg-surface-container-lowest rounded-lg border border-outline-variant/30 p-6 h-[300px] animate-pulse">
-    <div className="h-5 w-24 bg-surface-container rounded-full mb-4" />
-    <div className="h-6 w-3/4 bg-surface-container rounded mb-2" />
-    <div className="h-4 w-1/2 bg-surface-container rounded" />
-  </div>
-);
-
-/* ─── Project card ─── */
-const ProjectCard: React.FC<{ project: ProyectoDto }> = ({ project }) => {
-  const statusInfo = getStatusInfo(project.estadoProyecto);
-  const integrityInfo = getIntegrityInfo(project.estadoIntegridad);
-  const IntIcon = integrityInfo.icon;
-
+const ProjectCard = ({ project }: { project: ProyectoDto }) => {
   return (
-    <Link
-      to={`/projects/${project.id}`}
-      className="group bg-surface-container-lowest rounded-lg border border-outline-variant/30 p-6 flex flex-col h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      whileHover={{ y: -8 }}
+      className="group relative flex flex-col h-full bg-white rounded-[2rem] border border-slate-100 p-7 transition-all duration-500 hover:shadow-premium overflow-hidden"
     >
-      {/* Top row */}
-      <div className="flex items-start justify-between mb-3">
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${statusInfo.cls}`}>
-          {statusInfo.label}
-        </span>
-        <span className="text-xs font-mono text-outline opacity-60">{project.codigoInterno}</span>
-      </div>
-
-      {/* Name & location */}
-      <h3 className="text-lg font-bold text-[#223382] mb-1 font-['Manrope'] group-hover:text-[#F98513] transition-colors">
-        {project.nombre}
-      </h3>
-      <div className="flex items-center gap-1.5 text-sm text-on-surface-variant mb-4">
-        <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-        {project.ubicacionTexto}
-      </div>
-
-      <div className="flex-1" />
-
-      {/* Meta grid */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-surface-container-low rounded-lg px-3 py-2">
-          <div className="text-xs text-on-surface-variant/60 mb-0.5">Categoría</div>
-          <div className="text-sm font-semibold text-on-surface">{getCategoryLabel(project.categoria)}</div>
+      {/* Decorative background element */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors duration-500"></div>
+      
+      <div className="flex justify-between items-start mb-6">
+        <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-secondary border border-slate-100 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-500">
+          <CategoryIcon category={project.categoria} />
         </div>
-        <div className="bg-surface-container-low rounded-lg px-3 py-2">
-          <div className="text-xs text-on-surface-variant/60 mb-0.5">Valor</div>
-          <div className="text-sm font-semibold text-on-surface">
-            {project.valorEstimado ? `$${(project.valorEstimado / 1_000_000).toFixed(1)}M` : "N/D"}
-          </div>
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span className="text-[10px] font-black tracking-widest uppercase">Verificado</span>
         </div>
       </div>
 
-      {/* Footer row */}
-      <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20">
-        <div className={`flex items-center gap-1.5 text-sm font-semibold ${integrityInfo.color}`}>
-          <IntIcon className="w-4 h-4" />
-          {integrityInfo.label}
+      <div className="flex-grow space-y-3">
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Expediente {project.codigoInterno}</p>
+          <h3 className="text-2xl font-display font-black text-secondary leading-tight tracking-tight group-hover:text-primary transition-colors duration-300 italic uppercase">
+            {project.nombre}
+          </h3>
         </div>
-        <span className="text-sm font-medium text-secondary group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-          Detalle <ArrowRight className="w-4 h-4" />
-        </span>
+
+        <div className="flex items-center gap-2 text-slate-500">
+          <MapPin className="w-4 h-4 flex-shrink-0" />
+          <span className="text-sm font-medium line-clamp-1">{project.ubicacionTexto}</span>
+        </div>
       </div>
-    </Link>
+
+      <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Valor Estimado</p>
+          <p className="text-lg font-black text-secondary font-display italic">
+            {project.valorEstimado ? `$${project.valorEstimado.toLocaleString()}` : "TBD"}
+          </p>
+        </div>
+        <Link 
+          to={`/projects/${project.id}`}
+          className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-secondary group-hover:text-white transition-all duration-300"
+        >
+          <ArrowUpRight className="w-5 h-5" />
+        </Link>
+      </div>
+    </motion.div>
   );
 };
 
-/* ─── Main Page ─── */
 export const ProjectsPublicListPage: React.FC = () => {
   const [projects, setProjects] = useState<ProyectoDto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState<number | null>(null);
 
   useEffect(() => {
-    (async () => {
+    const fetchProjects = async () => {
       try {
         const data = await projectsApi.getProjects();
-        setProjects(data);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Error al cargar proyectos";
-        setError(msg);
+        // Solo mostrar los publicados en la lista pública
+        const published = (Array.isArray(data) ? data : []).filter(
+          (p) => p.estadoProyecto === ProjectStatus.Published
+        );
+        setProjects(published);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    fetchProjects();
   }, []);
 
-  const filtered = projects.filter(
-    (p) =>
-      p.nombre.toLowerCase().includes(search.toLowerCase()) ||
-      p.ubicacionTexto.toLowerCase().includes(search.toLowerCase()) ||
-      p.codigoInterno?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProjects = useMemo(() => {
+    return projects.filter(p => {
+      const matchesSearch = p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          p.ubicacionTexto.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = activeCategory === null || p.categoria === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [projects, searchTerm, activeCategory]);
+
+  const categories = [
+    { id: ProjectCategory.Residencial, label: "Residencial", icon: Building2 },
+    { id: ProjectCategory.Comercial, label: "Comercial", icon: TrendingUp },
+    { id: ProjectCategory.Turistico, label: "Turístico", icon: Trees },
+    { id: ProjectCategory.Mixto, label: "Mixto", icon: LayoutGrid },
+  ];
 
   return (
-    <div className="min-h-screen bg-surface font-['Inter'] text-on-surface selection:bg-primary-container selection:text-on-primary-container">
-      <PageNav />
-      <PageHero />
-
-      {/* Content container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Search bar */}
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-full flex items-center gap-3 px-6 py-3 mb-10 shadow-md focus-within:ring-2 focus-within:ring-primary-container transition-all">
-          <Search className="w-5 h-5 text-outline flex-shrink-0" />
-          <input
-            type="text"
-            placeholder="Buscar por nombre, ubicación o código..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent border-none outline-none text-on-surface placeholder:text-outline/60 text-base"
-          />
+    <div className="min-h-screen bg-slate-50 selection:bg-primary selection:text-white antialiased">
+      {/* Dynamic Navigation / Header Area */}
+      <header className="fixed top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6 text-primary" />
+             </div>
+             <div className="text-xl font-display font-black text-secondary tracking-tighter uppercase">
+               Veri<span className="text-primary italic">Finca</span>
+             </div>
+          </div>
+          
+          <div className="hidden md:flex items-center gap-8">
+             <nav className="flex items-center gap-6">
+                <Link to="/projects" className="text-xs font-black uppercase tracking-widest text-secondary border-b-2 border-primary pb-1">Directorio</Link>
+                <a href="#" className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-secondary transition-colors pb-1">Sobre Nosotros</a>
+                <a href="#" className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-secondary transition-colors pb-1">Protocolo</a>
+             </nav>
+             <Link to="/admin" className="h-10 px-5 rounded-xl bg-secondary text-white text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center hover:bg-slate-800 transition-all shadow-lg shadow-secondary/10">
+               Acceso Agente
+             </Link>
+          </div>
         </div>
+      </header>
 
-        {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <span className="sr-only">Cargando proyectos...</span>
-            {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
+      <main className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+        <div className="flex flex-col gap-12">
+          {/* Hero Section */}
+          <div className="space-y-6 text-center max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full border border-primary/20"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Directorio Global de Activos</span>
+            </motion.div>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-5xl md:text-7xl font-display font-black text-secondary leading-none tracking-tighter uppercase italic"
+            >
+              Encuentre Su Próxima <span className="text-primary">Inversión Segura</span>
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-lg text-slate-500 font-medium leading-relaxed"
+            >
+              Acceda al registro oficial de proyectos inmobiliarios verificados bajo el protocolo VeriFinca. Transparencia absoluta en cada activo.
+            </motion.p>
           </div>
-        ) : error ? (
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-8 text-center">
-            <AlertTriangle className="w-10 h-10 text-error mx-auto mb-3" />
-            <p className="text-on-surface font-semibold">{error}</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <Building2 className="w-14 h-14 text-outline mx-auto mb-4 opacity-40" />
-            <p className="text-lg font-medium text-on-surface-variant">No se encontraron proyectos.</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
-            {filtered.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* Footer */}
-      <footer className="bg-[#111144] text-[#F4F1EC] py-10 px-8 flex flex-col md:flex-row justify-between items-center gap-6 font-light tracking-wide">
-        <div className="text-lg font-bold text-[#F4F1EC]">VeriFinca</div>
-        <div className="flex flex-wrap justify-center gap-8 text-[#F4F1EC]/60 text-sm">
-          <Link to="#" className="hover:text-[#F4F1EC] transition-colors">Términos Legales</Link>
-          <Link to="#" className="hover:text-[#F4F1EC] transition-colors">Privacidad</Link>
-          <Link to="#" className="hover:text-[#F4F1EC] transition-colors">Soporte</Link>
+          {/* Filters & Search */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-center bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-md font-sans"
+          >
+            <div className="relative flex-grow group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <input
+                type="text"
+                placeholder="Buscar por nombre, localidad o código..."
+                className="w-full h-14 pl-12 pr-6 rounded-2xl bg-slate-50 border-none ring-0 focus:ring-4 focus:ring-primary/10 transition-all text-secondary font-medium placeholder:text-slate-400 outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <div className="h-10 w-px bg-slate-100 hidden lg:block"></div>
+            
+            <div className="flex flex-wrap items-center gap-3">
+              <button 
+                onClick={() => setActiveCategory(null)}
+                className={cn(
+                  "h-14 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all inline-flex items-center gap-2",
+                  activeCategory === null 
+                    ? "bg-secondary text-white shadow-lg shadow-secondary/20" 
+                    : "bg-slate-50 text-slate-400 hover:bg-slate-100"
+                )}
+              >
+                Todos
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={cn(
+                    "h-14 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all inline-flex items-center gap-3",
+                    activeCategory === cat.id 
+                      ? "bg-secondary text-white shadow-lg shadow-secondary/20" 
+                      : "bg-slate-50 text-slate-400 hover:bg-slate-100"
+                  )}
+                >
+                  <cat.icon className="w-4 h-4" />
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Projects Grid */}
+          <div className="min-h-[400px]">
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="bg-white border border-slate-100 rounded-[2rem] p-8 h-80 space-y-6">
+                    <Skeleton className="h-12 w-12 rounded-2xl" />
+                    <div className="space-y-3">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-8 w-full" />
+                    </div>
+                    <Skeleton className="h-4 w-2/3" />
+                    <div className="pt-6 border-t border-slate-50 flex justify-between">
+                      <Skeleton className="h-10 w-1/3" />
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredProjects.length > 0 ? (
+              <motion.div 
+                layout
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                <AnimatePresence mode="popLayout">
+                  {filteredProjects.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center py-24 text-center space-y-6"
+              >
+                <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
+                  <Search className="w-10 h-10" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-display font-black text-secondary italic tracking-tight uppercase">Sin hallazgos registrales</h3>
+                  <p className="text-slate-400 font-medium max-w-xs mx-auto text-sm">No encontramos proyectos que coincidan con sus criterios de filtrado en nuestra base de datos activa.</p>
+                </div>
+                <button 
+                  onClick={() => { setSearchTerm(""); setActiveCategory(null); }}
+                  className="text-primary font-black uppercase text-[10px] tracking-widest hover:underline"
+                >
+                  Reiniciar filtros
+                </button>
+              </motion.div>
+            )}
+          </div>
         </div>
-        <div className="text-xs text-[#F4F1EC]/40">© {new Date().getFullYear()} VeriFinca.</div>
+      </main>
+
+      <footer className="bg-white border-t border-slate-100 py-12 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="text-xl font-display font-black text-secondary tracking-tighter uppercase opacity-30">
+            Veri<span className="text-primary italic">Finca</span>
+          </div>
+          <div className="flex gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            <a href="#" className="hover:text-secondary transition-colors">Aviso Legal</a>
+            <a href="#" className="hover:text-secondary transition-colors">Privacidad</a>
+            <a href="#" className="hover:text-secondary transition-colors">Contacto</a>
+          </div>
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+            © {new Date().getFullYear()} Protocolo VeriFinca - República Dominicana
+          </div>
+        </div>
       </footer>
     </div>
   );
