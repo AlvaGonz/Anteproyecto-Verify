@@ -78,7 +78,7 @@ export const LoginPage: React.FC = () => {
               <div className="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-widest text-primary-light mb-4">
                 Portal Protegido
               </div>
-              <h2 className="text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter">
+              <h2 className="text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter !text-white">
                 Control <br />
                 Total.
               </h2>
@@ -93,8 +93,8 @@ export const LoginPage: React.FC = () => {
                   <ShieldCheck className="w-6 h-6 text-primary-light" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1">Cifrado de Extremo a Extremo</h4>
-                  <p className="text-xs text-white/40 leading-normal">Sus datos están protegidos por estándares globales de seguridad.</p>
+                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1 !text-white">Cifrado de Extremo a Extremo</h4>
+                  <p className="text-xs text-white/80 leading-normal">Sus datos están protegidos por estándares globales de seguridad.</p>
                 </div>
               </div>
 
@@ -103,8 +103,8 @@ export const LoginPage: React.FC = () => {
                   <Zap className="w-6 h-6 text-primary-light" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1">Acceso Instantáneo</h4>
-                  <p className="text-xs text-white/40 leading-normal">Infraestructura optimizada para una respuesta inmediata.</p>
+                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1 !text-white">Acceso Instantáneo</h4>
+                  <p className="text-xs text-white/80 leading-normal">Infraestructura optimizada para una respuesta inmediata.</p>
                 </div>
               </div>
             </div>
