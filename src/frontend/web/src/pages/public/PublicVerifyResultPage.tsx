@@ -3,10 +3,10 @@ import { useParams, Link } from "react-router-dom";
 import { PublicProjectVerificationDto } from "../../features/public-verification/types";
 import { publicVerificationApi } from "../../features/public-verification/api/publicVerificationApi";
 import { VerificationResultCard } from "../../features/public-verification/components/VerificationResultCard";
-import { 
-  ShieldCheck, 
-  Search, 
-  ArrowLeft, 
+import {
+  ShieldCheck,
+  Search,
+  ArrowLeft,
   ChevronLeft,
   XCircle,
   Loader2,
@@ -27,11 +27,15 @@ export const PublicVerifyResultPage: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await publicVerificationApi.verifyCode(code);
-        if (result) {
-          setData(result);
+        const response = await publicVerificationApi.verifyCode(code);
+        if (response._tag === "Success") {
+          if (response.data) {
+            setData(response.data);
+          } else {
+            setError("El código ingresado no corresponde a ningún proyecto verificado en nuestra plataforma.");
+          }
         } else {
-          setError("El código ingresado no corresponde a ningún proyecto verificado en nuestra plataforma.");
+          setError(response.error.message);
         }
       } catch (err) {
         setError("Error de conexión con el nodo de VeriFinca. Por favor, intente más tarde.");
@@ -70,8 +74,13 @@ export const PublicVerifyResultPage: React.FC = () => {
               <ChevronLeft className="w-6 h-6 text-white" />
             </Link>
             <div className="flex flex-col">
-              <span className="text-white text-xl font-display font-black tracking-tight">VeriFinca</span>
-              <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-[-2px]">Institutional Division</span>
+              <Link to="/" className="flex items-center group">
+                <img
+                  src="/brand/logotipo/LOGOTIPO WHITE.svg"
+                  alt="VeriFinca"
+                  className="h-10 w-auto group-hover:scale-105 transition-transform"
+                />
+              </Link>
             </div>
           </div>
         </nav>
@@ -79,12 +88,12 @@ export const PublicVerifyResultPage: React.FC = () => {
         <div className="flex-1 flex flex-col items-center justify-center px-8 pt-20">
           <div className="max-w-md w-full text-center space-y-8 animate-fade-in-up">
             <div className="relative inline-block">
-               <div className="w-24 h-24 bg-error/10 rounded-3xl flex items-center justify-center border-2 border-error/20">
-                  <ShieldAlert className="w-12 h-12 text-error" />
-               </div>
-               <div className="absolute -top-2 -right-2 w-8 h-8 bg-error rounded-full flex items-center justify-center border-4 border-surface text-white">
-                  <XCircle className="w-4 h-4" />
-               </div>
+              <div className="w-24 h-24 bg-error/10 rounded-3xl flex items-center justify-center border-2 border-error/20">
+                <ShieldAlert className="w-12 h-12 text-error" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-error rounded-full flex items-center justify-center border-4 border-surface text-white">
+                <XCircle className="w-4 h-4" />
+              </div>
             </div>
 
             <div>
@@ -110,9 +119,9 @@ export const PublicVerifyResultPage: React.FC = () => {
             </div>
 
             <div className="pt-8 flex justify-center gap-6 opacity-40">
-               <Globe className="w-5 h-5 text-secondary" />
-               <Lock className="w-5 h-5 text-secondary" />
-               <ShieldCheck className="w-5 h-5 text-secondary" />
+              <Globe className="w-5 h-5 text-secondary" />
+              <Lock className="w-5 h-5 text-secondary" />
+              <ShieldCheck className="w-5 h-5 text-secondary" />
             </div>
           </div>
         </div>
@@ -123,7 +132,7 @@ export const PublicVerifyResultPage: React.FC = () => {
   /* ── Success result ── */
   return (
     <div className="min-h-screen bg-[#F4F1EC] font-sans flex flex-col selection:bg-primary/20 selection:text-primary">
-      
+
       {/* Dynamic Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-secondary/95 backdrop-blur-xl border-b border-white/5 h-20 px-8 flex justify-between items-center transition-all duration-500 print:hidden">
         <div className="flex items-center gap-6">
@@ -137,8 +146,8 @@ export const PublicVerifyResultPage: React.FC = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-4 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
-           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-           <span className="text-white font-mono text-[10px] font-black tracking-widest uppercase">Nodo Activo: VF-DR-01</span>
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-white font-mono text-[10px] font-black tracking-widest uppercase">Nodo Activo: VF-DR-01</span>
         </div>
       </nav>
 
@@ -146,18 +155,18 @@ export const PublicVerifyResultPage: React.FC = () => {
       <main className="flex-1 pt-32 pb-24 px-8 animate-fade-in-up">
         {/* Verification Result Card (Certificate) */}
         <VerificationResultCard data={data} />
-        
+
         {/* Support Section */}
         <div className="max-w-4xl mx-auto mt-16 text-center print:hidden">
           <p className="text-on-surface-variant text-sm font-medium mb-8">
             ¿Tiene dudas sobre este certificado? <a href="#" className="text-secondary font-black underline decoration-primary underline-offset-4">Contacte a Soporte Institucional</a>
           </p>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-30 px-12 grayscale hover:grayscale-0 transition-all duration-500">
-             <div className="h-12 flex items-center justify-center border-r border-outline-variant/20 italic font-black text-secondary">FIDUCIA</div>
-             <div className="h-12 flex items-center justify-center border-r border-outline-variant/20 italic font-black text-secondary">CATASTRO</div>
-             <div className="h-12 flex items-center justify-center border-r border-outline-variant/20 italic font-black text-secondary">PROCONSUMIDOR</div>
-             <div className="h-12 flex items-center justify-center italic font-black text-secondary">DGII</div>
+            <div className="h-12 flex items-center justify-center border-r border-outline-variant/20 italic font-black text-secondary">FIDUCIA</div>
+            <div className="h-12 flex items-center justify-center border-r border-outline-variant/20 italic font-black text-secondary">CATASTRO</div>
+            <div className="h-12 flex items-center justify-center border-r border-outline-variant/20 italic font-black text-secondary">PROCONSUMIDOR</div>
+            <div className="h-12 flex items-center justify-center italic font-black text-secondary">DGII</div>
           </div>
         </div>
       </main>
@@ -165,12 +174,12 @@ export const PublicVerifyResultPage: React.FC = () => {
       {/* Industrial Footer (Visible in Web, Hidden in Print if needed) */}
       <footer className="bg-text-primary py-12 px-8 print:hidden">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">
-           <div className="flex gap-8">
-              <Link to="/verify" className="hover:text-primary transition-colors">Nueva Consulta</Link>
-              <Link to="/" className="hover:text-primary transition-colors">Garantía VeriFinca</Link>
-              <a href="#" className="hover:text-primary transition-colors">Seguridad de Datos</a>
-           </div>
-           <div>República Dominicana · 2026 Institutional Protocol</div>
+          <div className="flex gap-8">
+            <Link to="/verify" className="hover:text-primary transition-colors">Nueva Consulta</Link>
+            <Link to="/" className="hover:text-primary transition-colors">Garantía VeriFinca</Link>
+            <a href="#" className="hover:text-primary transition-colors">Seguridad de Datos</a>
+          </div>
+          <div>República Dominicana · 2026 Institutional Protocol</div>
         </div>
       </footer>
     </div>

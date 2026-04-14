@@ -33,7 +33,10 @@ describe("ProjectsPublicListPage", () => {
       },
     ];
 
-    vi.mocked(projectsApi.getProjects).mockResolvedValue(mockProjects);
+    vi.mocked(projectsApi.getProjects).mockResolvedValue({
+      _tag: "Success",
+      data: mockProjects
+    });
 
     render(
       <MemoryRouter>

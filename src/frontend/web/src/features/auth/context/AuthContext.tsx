@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { AuthService, User } from "../services/AuthService";
+import { AuthService, User, AuthError } from "../services/AuthService";
+import { isSome, isSuccess, isFailure } from "../../../shared/utils/functional";
 
 interface AuthContextType {
   user: User | null;
@@ -7,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  error: AuthError | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,19 +16,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<AuthError | null>(null);
 
   useEffect(() => {
     const initAuth = async () => {
-      try {
-        const currentUser = await AuthService.getCurrentUser();
-        if (currentUser) {
-          setUser(currentUser);
-        }
-      } catch (error) {
-        console.error("Auth initialization failed", error);
-      } finally {
-        setLoading(false);
+      const currentUserOption = await AuthService.getCurrentUser();
+      
+      if (isSome(currentUserOption)) {
+        setUser(currentUserOption.value);
       }
+      
+      setLoading(false);
     };
 
     initAuth();
@@ -34,15 +34,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     setLoading(true);
-    try {
-      const response = await AuthService.login(email, password);
-      localStorage.setItem("vf_token", response.token);
-      setUser(response.user);
-    } catch (error) {
-      throw error;
-    } finally {
-      setLoading(false);
+    setError(null);
+    
+    const result = await AuthService.login(email, password);
+    
+    if (isSuccess(result)) {
+      localStorage.setItem("vf_token", result.data.token);
+      setUser(result.data.user);
+    } else {
+      setError(result.error);
+      throw result.error;
     }
+    
+    setLoading(false);
   };
 
   const logout = () => {
@@ -52,7 +56,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, login, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isAuthenticated: !!user, 
+        loading, 
+        login, 
+        logout,
+        error 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
