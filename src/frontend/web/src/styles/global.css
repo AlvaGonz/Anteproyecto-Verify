@@ -25,6 +25,20 @@
   --color-warning: #F98513;
   --color-outline-variant: #C8BFB5;
 
+  /* Material Design 3 Compatibility Tokens (Stitch Sync) */
+  --color-primary-container: #ffdbbe;
+  --color-on-primary-container: #331600;
+  --color-on-primary-fixed-variant: #703700;
+  --color-secondary-container: #dee0ff;
+  --color-on-secondary-container: #00105c;
+  --color-tertiary-container: #d9e2ff;
+  --color-on-tertiary-container: #001944;
+  --color-tertiary-fixed: #d9e2ff;
+  --color-on-tertiary-fixed-variant: #35456c;
+  --color-surface-container-highest: #f0dfd1;
+  --color-surface-container-high: #f5e5d7;
+  --color-outline: #857361;
+
   /* Typography */
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Manrope", system-ui, sans-serif;
