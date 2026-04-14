@@ -1,89 +1,265 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { CheckCircle2, MapPin, ChevronRight } from "lucide-react";
-import { fadeInUp } from "./motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2, MapPin, ChevronRight, FileCheck } from "lucide-react";
 
-export const FeaturedProjectsSection: React.FC = () => (
-  <section id="proyectos" className="py-32 px-6 bg-[#F4F1EC]">
-    <div className="max-w-7xl mx-auto space-y-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-        <div className="space-y-4">
-          <span className="text-primary font-black text-xs uppercase tracking-[0.3em]">Expose Público</span>
-          <h2 className="text-4xl md:text-6xl font-display font-black text-secondary tracking-tight">
-            Proyectos <span className="italic text-primary">Verificados</span>
-          </h2>
+interface Project {
+  name: string;
+  location: string;
+  image: string;
+  status: string;
+  risk: string;
+  deliveredDocs: number;
+  totalDocs: number;
+}
+
+const ALL_PROJECTS: Project[] = [
+  {
+    name: "Blue Forest Residences",
+    location: "Las Terrenas, Samaná",
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    status: "Auditado",
+    risk: "Bajo",
+    deliveredDocs: 10,
+    totalDocs: 12,
+  },
+  {
+    name: "Sky Tower SD",
+    location: "Naco, Santo Domingo",
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+    status: "En Proceso",
+    risk: "Calculando",
+    deliveredDocs: 5,
+    totalDocs: 10,
+  },
+  {
+    name: "Marina Reef",
+    location: "Cap Cana, La Altagracia",
+    image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=80",
+    status: "Certificado",
+    risk: "Bajo",
+    deliveredDocs: 15,
+    totalDocs: 15,
+  },
+  {
+    name: "Oasis Garden",
+    location: "Punta Cana, La Altagracia",
+    image: "https://images.unsplash.com/photo-1512915922686-57c11f9ad6b3?auto=format&fit=crop&w=800&q=80",
+    status: "Verificado",
+    risk: "Bajo",
+    deliveredDocs: 8,
+    totalDocs: 10,
+  },
+  {
+    name: "Vista Playa",
+    location: "Cabarete, Puerto Plata",
+    image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=800&q=80",
+    status: "Auditado",
+    risk: "Medio",
+    deliveredDocs: 9,
+    totalDocs: 10,
+  },
+  {
+    name: "Central Park SD",
+    location: "Piantini, Santo Domingo",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+    status: "Certificado",
+    risk: "Bajo",
+    deliveredDocs: 18,
+    totalDocs: 20,
+  },
+  {
+    name: "Azure Bay",
+    location: "Juan Dolio, San Pedro",
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    status: "En Revisión",
+    risk: "Bajo",
+    deliveredDocs: 11,
+    totalDocs: 12,
+  },
+  {
+    name: "Emerald Hills",
+    location: "Jarabacoa, La Vega",
+    image: "https://images.unsplash.com/photo-1500382017468-9049fee74a62?auto=format&fit=crop&w=800&q=80",
+    status: "Certificado",
+    risk: "Bajo",
+    deliveredDocs: 10,
+    totalDocs: 10,
+  },
+  {
+    name: "Diamond Plaza",
+    location: "Bella Vista, Santo Domingo",
+    image: "https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=800&q=80",
+    status: "Verificado",
+    risk: "Bajo",
+    deliveredDocs: 4,
+    totalDocs: 5,
+  },
+  {
+    name: "Sunset Villas",
+    location: "Boca Chica, Santo Domingo",
+    image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80",
+    status: "Auditado",
+    risk: "Bajo",
+    deliveredDocs: 12,
+    totalDocs: 15,
+  },
+  {
+    name: "Ocean View Tower",
+    location: "Malecón, Santo Domingo",
+    image: "https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=800&q=80",
+    status: "En Proceso",
+    risk: "Calculando",
+    deliveredDocs: 9,
+    totalDocs: 10,
+  },
+  {
+    name: "Pine Ridge",
+    location: "Santiago de los Caballeros",
+    image: "https://images.unsplash.com/photo-1513584684374-8bdb74838a0f?auto=format&fit=crop&w=800&q=80",
+    status: "Certificado",
+    risk: "Bajo",
+    deliveredDocs: 14,
+    totalDocs: 15,
+  },
+  {
+    name: "Royal Garden",
+    location: "La Romana",
+    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80",
+    status: "Verificado",
+    risk: "Bajo",
+    deliveredDocs: 20,
+    totalDocs: 25,
+  },
+  {
+    name: "Urban Lofts",
+    location: "Gazcue, Santo Domingo",
+    image: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=800&q=80",
+    status: "En Revisión",
+    risk: "Bajo",
+    deliveredDocs: 8,
+    totalDocs: 10,
+  },
+  {
+    name: "Golden Sands",
+    location: "Bávaro, Punta Cana",
+    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+    status: "En Proceso",
+    risk: "Calculando",
+    deliveredDocs: 7,
+    totalDocs: 10,
+  },
+];
+
+export const FeaturedProjectsSection: React.FC = () => {
+  const [isPaused, setIsPaused] = useState(false);
+
+  const filteredProjects = ALL_PROJECTS.filter(
+    (p) => (p.deliveredDocs / p.totalDocs) >= 0.8
+  ).slice(0, 12);
+
+  // Triple the items to ensure smooth infinite loop coverage across screens
+  const carouselItems = [...filteredProjects, ...filteredProjects, ...filteredProjects];
+
+  return (
+    <section id="proyectos" className="py-32 bg-[#F4F1EC] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 mb-20 space-y-20">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="space-y-4">
+            <span className="text-primary font-black text-xs uppercase tracking-[0.3em]">Expose Público</span>
+            <h2 className="text-4xl md:text-6xl font-display font-black text-secondary tracking-tight">
+              Proyectos <span className="italic text-primary">Verificados</span>
+            </h2>
+          </div>
+          <Link to="/portal" className="flex items-center gap-2 text-secondary font-black group">
+            Ver todos los proyectos <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
-        <Link to="/proyectos" className="flex items-center gap-2 text-secondary font-black group">
-          Ver todos los proyectos <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {[
-          {
-            name: "Blue Forest Residences",
-            location: "Las Terrenas, Samaná",
-            image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-            status: "Auditado",
-            risk: "Bajo",
-          },
-          {
-            name: "Sky Tower SD",
-            location: "Naco, Santo Domingo",
-            image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
-            status: "En Proceso",
-            risk: "Calculando",
-          },
-          {
-            name: "Marina Reef",
-            location: "Cap Cana, La Altagracia",
-            image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=80",
-            status: "Certificado",
-            risk: "Bajo",
-          },
-        ].map((project, i) => (
-          <motion.div
-            key={project.name}
-            {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: i * 0.1 }}
-            className="group bg-white rounded-[40px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-secondary/10 transition-all duration-500 hover:-translate-y-2"
-          >
-            <div className="relative h-64 overflow-hidden">
-              <img
-                src={project.image}
-                alt={project.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute top-6 left-6 flex gap-2">
-                <span className="bg-white/90 backdrop-blur shadow-lg px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-secondary tracking-widest">
-                  {project.status}
-                </span>
-              </div>
-            </div>
-            <div className="p-8 space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-2xl font-display font-black text-secondary leading-none">{project.name}</h3>
-                <p className="flex items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide">
-                  <MapPin className="w-3.5 h-3.5 text-primary" />
-                  {project.location}
-                </p>
-              </div>
-              <div className="pt-6 border-t border-gray-50 flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Nivel de Riesgo</p>
-                  <p className="text-secondary font-black flex items-center gap-1">
-                    {project.risk} <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  </p>
+      <div 
+        className="relative"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <motion.div 
+          className="flex gap-8 px-6"
+          animate={{
+            x: isPaused ? undefined : ["0%", "-33.33%"],
+          }}
+          transition={{
+            duration: 40,
+            ease: "linear",
+            repeat: Infinity,
+          }}
+        >
+          {carouselItems.map((project, i) => {
+            const deliveryPercentage = Math.round((project.deliveredDocs / project.totalDocs) * 100);
+            
+            return (
+              <div
+                key={`${project.name}-${i}`}
+                className="flex-shrink-0 w-[400px] group bg-white rounded-[40px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-secondary/10 transition-all duration-500"
+              >
+                <div className="relative h-64 overflow-hidden">
+                  <img
+                    src={project.image}
+                    alt={project.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute top-6 left-6 flex gap-2">
+                    <span className="bg-white/90 backdrop-blur shadow-lg px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-secondary tracking-widest">
+                      {project.status}
+                    </span>
+                  </div>
+                  {/* Delivery Percentage Badge */}
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="bg-secondary/90 backdrop-blur-md p-4 rounded-3xl border border-white/20 shadow-xl">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="flex items-center gap-1.5 text-[10px] font-black text-white/80 uppercase tracking-widest">
+                          <FileCheck className="w-3 h-3" /> Documentación
+                        </span>
+                        <span className="text-xs font-black text-white">{deliveryPercentage}%</span>
+                      </div>
+                      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${deliveryPercentage}%` }}
+                          transition={{ duration: 1, delay: 0.5 }}
+                          className="h-full bg-primary"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <button className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                  <ChevronRight className="w-6 h-6" />
-                </button>
+
+                <div className="p-8 space-y-6">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-display font-black text-secondary leading-none truncate">{project.name}</h3>
+                    <p className="flex items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide">
+                      <MapPin className="w-3.5 h-3.5 text-primary" />
+                      {project.location}
+                    </p>
+                  </div>
+                  
+                  <div className="pt-6 border-t border-gray-50 flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Nivel de Riesgo</p>
+                      <p className="text-secondary font-black flex items-center gap-1">
+                        {project.risk} <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      </p>
+                    </div>
+                    <button className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            );
+          })}
+        </motion.div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
+
