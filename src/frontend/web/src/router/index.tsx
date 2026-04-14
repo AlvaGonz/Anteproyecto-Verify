@@ -11,7 +11,6 @@ import { ProjectReportsPage } from "../pages/admin/ProjectReportsPage";
 import { RulesManagePage } from "../pages/admin/RulesManagePage";
 import { PublicVerifySearchPage } from "../pages/public/PublicVerifySearchPage";
 import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
-import { PublicVerificationPage } from "../pages/public/PublicVerificationPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
 import { ProjectDocumentUploadPage } from "../pages/projects/ProjectDocumentUploadPage";
@@ -38,8 +37,16 @@ export const router = createHashRouter([
 
       /* ===== Public Pages ===== */
       {
+        path: "/portal",
+        element: <ProjectsPublicListPage />,
+      },
+      {
         path: "/consulta-publica",
-        element: <PublicVerificationPage />,
+        element: <Navigate to="/portal" replace />,
+      },
+      {
+        path: "/projects",
+        element: <Navigate to="/portal" replace />,
       },
       {
         path: "/login",
@@ -61,10 +68,7 @@ export const router = createHashRouter([
         path: "/health",
         element: <HealthPage />,
       },
-      {
-        path: "/projects",
-        element: <ProjectsPublicListPage />,
-      },
+
       {
         path: "/projects/:id",
         element: <ProjectPublicDetailPage />,

@@ -29,7 +29,7 @@ export const LandingNav: React.FC = () => {
         {[
           { label: "Servicios", href: "#servicios" },
           { label: "Metodología", href: "#metodologia" },
-          { label: "Proyectos", href: "#proyectos" },
+          { label: "Proyectos", href: "/portal" },
           { label: "Precios", href: "#" },
         ].map((item) => (
           <a
