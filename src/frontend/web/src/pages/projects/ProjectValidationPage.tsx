@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   ValidationExecutionResult 
 } from "../../features/validations/types";
@@ -16,6 +16,7 @@ import { FindingDto, AuditLogDto } from "../../features/validations/types";
 
 export const ProjectValidationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { addToast } = useToast();
   const [result, setResult] = useState<ValidationExecutionResult | null>(null);
   const [findings, setFindings] = useState<FindingDto[]>([]);
@@ -49,8 +50,7 @@ export const ProjectValidationPage: React.FC = () => {
 
   const handleRunValidation = () => {
     if (!id) return;
-    setIsEvaluating(true);
-    setError(null);
+    navigate(`/validations/${id}`);
   };
 
   const handleScanComplete = async () => {

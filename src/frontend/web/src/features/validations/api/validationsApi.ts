@@ -97,8 +97,25 @@ export const validationsApi = {
             completedAtUtc: new Date().toISOString(),
             overallStatus: ValidationExecutionStatus.Completed,
             isFullyValid: true,
-            internalValidation: null,
-            externalSources: [],
+            internalValidation: {
+              validacionId: `val-${Math.random().toString(36).substr(2, 9)}`,
+              proyectoId: projectId,
+              status: ValidationStatus.Completed,
+              esLegitimo: true,
+              passedCount: 3,
+              warningCount: 0,
+              failedCount: 0,
+              createdAtUtc: new Date().toISOString(),
+              results: [
+                { id: "1", nombreRegla: "Identidad del Propietario", passed: true, mensaje: "Coincidencia 100% con padrón electoral." },
+                { id: "2", nombreRegla: "Superficie Catastral", passed: true, mensaje: "Área declarada dentro del margen tolerado (±0.05%)." },
+                { id: "3", nombreRegla: "Gravámenes Vigentes", passed: true, mensaje: "Providencia registral libre de cargas." }
+              ]
+            },
+            externalSources: [
+              { sourceName: "DGII", status: "SUCCESS", dataFound: true, lastUpdate: new Date().toISOString() },
+              { sourceName: "Catastro Nacional", status: "SUCCESS", dataFound: true, lastUpdate: new Date().toISOString() }
+            ],
             errors: []
           };
           localMockFullValidations.push(newValidation);
