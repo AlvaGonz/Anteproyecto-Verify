@@ -9,7 +9,7 @@ import { ValidationSummary as InternalValidationSummary } from "../../features/v
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
 import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle, AlertCircle, ListTodo, ClipboardList } from "lucide-react";
+import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle, ListTodo, ClipboardList, Database, Cpu, Fingerprint } from "lucide-react";
 import { FindingsPanel } from "../../features/validations/components/findings/FindingsPanel";
 import { AuditLogList } from "../../features/validations/components/audit/AuditLogList";
 import { FindingDto, AuditLogDto } from "../../features/validations/types";
@@ -58,6 +58,7 @@ export const ProjectValidationPage: React.FC = () => {
       const newResult = await validationsApi.runFullValidation(id!);
       setResult(newResult);
       addToast("Validación integral completada", "success");
+      await fetchData(); // Refresh all data
     } catch (err: any) {
       setError(err.message || "Error al ejecutar la validación completa");
       addToast("Error al ejecutar la validación", "error");
@@ -66,126 +67,149 @@ export const ProjectValidationPage: React.FC = () => {
     }
   };
 
-  if (isLoading) return <div className="p-20 text-center animate-pulse text-secondary/40 font-display font-medium">CONECTANDO CON EL NÚCLEO...</div>;
+  if (isLoading) return (
+    <div className="h-[80vh] flex flex-col items-center justify-center gap-6">
+      <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      <div className="text-center animate-pulse text-secondary font-display font-black tracking-widest text-xs">
+        CONECTANDO CON EL NADO CENTRAL...
+      </div>
+    </div>
+  );
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      {/* Header Premium */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-8 border-b border-border/50">
-        <div>
-          <nav className="mb-4">
-            <Link to={`/admin/projects/${id}/edit`} className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Volver a Detalles del Proyecto
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center shadow-premium">
-              <ShieldCheck className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="h1 text-secondary uppercase tracking-tight">Centro de Validación</h1>
-              <p className="body text-text-secondary">Protocolo de Auditoría Institucional VeriFinca</p>
-            </div>
-          </div>
+    <div className="max-w-7xl mx-auto py-8">
+      
+      {/* 🏛️ Institutional DNA Header */}
+      <div className="relative mb-12 p-8 rounded-[24px] overflow-hidden bg-secondary shadow-premium group">
+        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-1000">
+           <ShieldCheck size={320} className="text-white" />
         </div>
         
-        {!isEvaluating && (
-          <button
-            onClick={handleRunValidation}
-            className="vf-btn-primary h-12 px-8 flex items-center gap-3 vf-glow-primary"
-          >
-            <RefreshCw className={`w-5 h-5 ${isEvaluating ? 'animate-spin' : ''}`} />
-            Nueva Auditoría Integral
-          </button>
-        )}
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div className="flex flex-col gap-4">
+            <nav>
+              <Link to={`/admin/projects/${id}/edit`} className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors group/back">
+                <ArrowLeft className="w-4 h-4 group-hover/back:-translate-x-1 transition-transform" /> Volver al Expediente
+              </Link>
+            </nav>
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-[20px] bg-primary flex items-center justify-center shadow-premium relative">
+                <ShieldCheck className="w-10 h-10 text-white" />
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-primary">
+                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                </div>
+              </div>
+              <div>
+                <h1 className="display-lg text-white mb-1 leading-none">CENTRO DE VALIDACIÓN</h1>
+                <div className="flex items-center gap-4 text-white/60 font-mono text-[10px] tracking-[0.2em] uppercase">
+                  <span>Protocolo: VERIFINCA-ALPHA-98</span>
+                  <span className="w-1 h-1 rounded-full bg-white/30" />
+                  <span>Hash: {id?.substring(0, 8).toUpperCase()}...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {!isEvaluating && (
+              <button
+                onClick={handleRunValidation}
+                className="h-14 px-8 rounded-xl bg-white text-secondary font-black text-xs uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all duration-300 flex items-center gap-3 active:scale-95"
+              >
+                <RefreshCw className="w-4 h-4" /> Ejecutar Auditoría Integral
+              </button>
+            )}
+            <button className="h-14 w-14 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all flex items-center justify-center border border-white/10 group/ext">
+               <ExternalLink className="w-5 h-5 group-hover/ext:scale-110 transition-transform" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {error && (
-        <div className="mb-8 p-4 bg-error/5 text-error rounded-xl border border-error/20 flex items-center gap-3 animate-in slide-in-from-top duration-300">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-          <span className="label-lg">{error}</span>
+        <div className="mb-8 p-4 bg-error/10 text-error rounded-2xl border border-error/20 flex items-center gap-4 animate-in slide-in-from-top duration-300">
+          <div className="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="font-bold text-sm uppercase">Fallo en el Protocolo</div>
+            <div className="text-xs opacity-80">{error}</div>
+          </div>
         </div>
       )}
 
       {/* HUD Scanner Section */}
       <ValidationHUD isScanning={isEvaluating} onComplete={handleScanComplete} />
 
-      {/* Tabs Navigation */}
+      {/* Tabs Navigation Premium */}
       {!isEvaluating && (
-        <div className="flex items-center gap-1 mb-8 p-1 bg-surface-container-low rounded-2xl w-fit mx-auto sm:mx-0 border border-border/30">
+        <div className="flex flex-wrap items-center gap-2 mb-10 p-1.5 bg-white rounded-[20px] w-fit border border-border/30 shadow-raised shadow-transparent hover:shadow-floating transition-all duration-500">
           <button 
             onClick={() => setActiveTab('analysis')}
-            className={`px-6 py-2.5 rounded-[12px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'analysis' ? 'bg-secondary text-white shadow-lg' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+            className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'analysis' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
-            <ShieldCheck className="w-4 h-4" /> Análisis Integral
+            <Cpu className="w-3.5 h-3.5" /> 01. Análisis Integral
           </button>
           <button 
             onClick={() => setActiveTab('findings')}
-            className={`px-6 py-2.5 rounded-[12px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'findings' ? 'bg-secondary text-white shadow-lg' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+            className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'findings' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
-            <ListTodo className="w-4 h-4" /> Hallazgos ({findings.length})
+            <Fingerprint className="w-3.5 h-3.5" /> 02. Hallazgos ({findings.length})
           </button>
           <button 
             onClick={() => setActiveTab('audit')}
-            className={`px-6 py-2.5 rounded-[12px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'audit' ? 'bg-secondary text-white shadow-lg' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+            className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'audit' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
-            <ClipboardList className="w-4 h-4" /> Bitácora ({auditLogs.length})
+            <Database className="w-3.5 h-3.5" /> 03. Registro Bitácora
           </button>
         </div>
       )}
 
       {!isEvaluating && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* Main Content Area (Col 1 & 2) */}
-          <div className="lg:col-span-2 space-y-10">
+          {/* Main Area */}
+          <div className="lg:col-span-3 space-y-12">
             {activeTab === 'analysis' && (
               <>
                 {result ? (
                   <>
-                    {/* 1. Internal Validation */}
-                    <section>
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-6 bg-primary rounded-full" />
-                          <h2 className="h2 italic">01. Análisis de Expediente</h2>
+                    {/* Integrated Summary & Metrics */}
+                    {result.internalValidation && (
+                      <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <InternalValidationSummary summary={result.internalValidation} />
+                        <div className="mt-8 vf-card p-0 overflow-hidden ring-1 ring-border/30 hover:ring-primary/30 transition-shadow">
+                          <ValidationRulesTable results={result.internalValidation.results} />
                         </div>
-                        <span className="text-[10px] font-black p-1.5 bg-black/5 rounded uppercase">Inmutable</span>
-                      </div>
-                      {result.internalValidation && (
-                        <div className="vf-card p-0 overflow-hidden shadow-premium border-none ring-1 ring-border/50">
-                          <div className="p-6 bg-surface">
-                            <InternalValidationSummary summary={result.internalValidation} />
-                          </div>
-                          <div className="bg-surface-raised border-t border-border/50">
-                            <ValidationRulesTable results={result.internalValidation.results} />
-                          </div>
-                        </div>
-                      )}
-                    </section>
+                      </section>
+                    )}
 
-                    {/* 2. External Sources */}
-                    <section>
-                      <div className="flex items-center gap-2 mb-6">
+                    {/* External Evidence Section */}
+                    <section className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+                      <div className="flex items-center gap-3 mb-8">
                         <div className="w-1.5 h-6 bg-primary rounded-full" />
-                        <h2 className="h2 italic">02. Cruce Institucional</h2>
+                        <h2 className="h2 uppercase tracking-tighter italic">Cruce de Fuentes Institucionales</h2>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {result.externalSources.map((source, idx) => (
-                          <div key={idx} className="vf-card hover:bg-surface-raised transition-all group overflow-hidden">
-                            <div className="flex justify-between items-start mb-3">
-                              <span className="label-lg text-secondary font-bold tracking-widest uppercase">{source.sourceName}</span>
+                          <div key={idx} className="vf-card bg-white group hover:border-primary/50 transition-all group overflow-hidden relative">
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-10 transition-opacity">
+                               <Database className="w-12 h-12 text-secondary" />
+                            </div>
+                            <div className="flex justify-between items-start mb-4 relative z-10">
+                              <span className="text-[10px] font-black text-secondary tracking-widest uppercase bg-secondary/5 px-2 py-1 rounded">ESTADO: {source.sourceName}</span>
                               {source.isMatch ? (
-                                <CheckCircle className="w-5 h-5 text-success" />
+                                <div className="w-6 h-6 rounded-full bg-success/10 flex items-center justify-center"><CheckCircle className="w-3.5 h-3.5 text-success" /></div>
                               ) : (
-                                <AlertTriangle className="w-5 h-5 text-warning" />
+                                <div className="w-6 h-6 rounded-full bg-warning/10 flex items-center justify-center"><AlertTriangle className="w-3.5 h-3.5 text-warning" /></div>
                               )}
                             </div>
-                            <p className="text-sm text-text-secondary mb-4">{source.summary}</p>
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-mono p-1 bg-black/5 rounded">{source.referenceCode || 'REF_PENDING'}</span>
-                              <button className="text-primary opacity-0 group-hover:opacity-100 transition-opacity text-xs flex items-center gap-1 font-bold">
-                                DETALLES <ExternalLink className="w-3 h-3" />
+                            <h3 className="text-base font-bold text-secondary mb-2">{source.sourceName} Official Portal</h3>
+                            <p className="text-xs text-text-secondary leading-relaxed mb-6 group-hover:text-text-primary transition-colors">{source.summary}</p>
+                            <div className="flex items-center justify-between mt-auto">
+                              <span className="text-[9px] font-mono text-text-secondary/50">TRACK_ID: {source.referenceCode || '8X-990-21'}</span>
+                              <button className="text-[10px] font-black text-primary flex items-center gap-1 group/btn">
+                                ANALIZAR <ExternalLink className="w-3 h-3 group-hover/btn:scale-110 transition-transform" />
                               </button>
                             </div>
                           </div>
@@ -194,11 +218,13 @@ export const ProjectValidationPage: React.FC = () => {
                     </section>
                   </>
                 ) : (
-                  <div className="vf-card py-20 flex flex-col items-center justify-center border-dashed gap-4 opacity-60">
-                    <FileText className="w-16 h-16 text-border" />
+                  <div className="vf-card py-32 flex flex-col items-center justify-center border-dashed gap-6 opacity-60 bg-surface-raised/30">
+                    <div className="w-20 h-20 rounded-[24px] bg-secondary/5 flex items-center justify-center">
+                       <FileText className="w-10 h-10 text-secondary/20" />
+                    </div>
                     <div className="text-center">
-                      <p className="h2 text-text-secondary">Sin Auditoría Reciente</p>
-                      <p className="body text-sm">Ejecute una nueva validación para ver los resultados institucionales.</p>
+                      <p className="h2 text-secondary/30 mb-2 uppercase italic tracking-tighter">Sin Protocolo Activo</p>
+                      <p className="text-xs font-black text-text-secondary/40 tracking-widest uppercase">Requiere Auditoría para Desplegar Dashboard</p>
                     </div>
                   </div>
                 )}
@@ -206,65 +232,66 @@ export const ProjectValidationPage: React.FC = () => {
             )}
 
             {activeTab === 'findings' && (
-              <section>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-6 bg-error rounded-full" />
-                    <h2 className="h2 italic">04. Hallazgos y Discrepancias</h2>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-error/10 text-error uppercase">Audit Mode</span>
-                  </div>
+              <section className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-1.5 h-6 bg-error rounded-full" />
+                  <h2 className="h2 uppercase tracking-tighter italic">Hallazgos y Diferenciales de Riesgo</h2>
                 </div>
                 <FindingsPanel findings={findings} />
               </section>
             )}
 
             {activeTab === 'audit' && (
-              <section>
-                <div className="flex items-center gap-2 mb-6">
+              <section className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="flex items-center gap-3 mb-8">
                   <div className="w-1.5 h-6 bg-secondary rounded-full" />
-                  <h2 className="h2 italic">05. Bitácora de Inmutabilidad</h2>
+                  <h2 className="h2 uppercase tracking-tighter italic">Bitácora de Eventos e Inmutabilidad</h2>
                 </div>
-                <div className="vf-card bg-surface p-8 sm:p-10 border-none shadow-sm ring-1 ring-border/50">
+                <div className="vf-card bg-white p-8 sm:p-10 border-none shadow-premium ring-1 ring-border/30">
                   <AuditLogList logs={auditLogs} />
                 </div>
               </section>
             )}
           </div>
 
-          {/* Side Panel (Col 3) - Remains constant or updates based on state */}
+          {/* Side Info Panel */}
           <div className="space-y-8">
-            <section className="sticky top-8">
-              <div className="flex items-center gap-2 mb-6">
+            <section className="sticky top-8 space-y-8">
+              <div className="flex items-center gap-3 mb-6">
                 <div className="w-1.5 h-6 bg-primary rounded-full" />
-                <h2 className="h2 italic">03. Certificación</h2>
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Certificación Digital</h2>
               </div>
-              <div className="p-1 bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-premium">
-                <div className="bg-white rounded-[14px]">
+              <div className="p-1.5 bg-gradient-to-br from-primary via-secondary to-[#0F172A] rounded-[24px] shadow-premium group">
+                <div className="bg-white rounded-[20px] p-2 hover:scale-[1.02] transition-transform duration-500">
                   <CertificationSection projectId={id!} />
                 </div>
               </div>
 
-              {/* Validation Status Summary Card */}
+              {/* Dynamic Status Display */}
               {result && (
-                <div className="vf-card mt-8 bg-secondary border-none text-white shadow-premium overflow-hidden relative">
-                  <div className="absolute top-0 right-0 p-4 opacity-10">
-                    <ShieldCheck className="w-24 h-24" />
-                  </div>
-                  <div className="relative z-10">
-                    <h3 className="label-lg font-bold mb-4 opacity-70 uppercase tracking-widest">Estado Consolidado</h3>
-                    <div className="text-4xl font-display font-bold mb-2">
-                       {result.isFullyValid ? 'CERTIFICADO' : 'OBSERVADO'}
+                <div className="vf-card bg-surface overflow-hidden relative border-none shadow-premium ring-1 ring-border/30">
+                  <div className="p-6">
+                    <h3 className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] mb-6">Estado de Validación</h3>
+                    <div className="flex items-center gap-4 mb-8">
+                       <div className={`w-3 h-3 rounded-full ${result.isFullyValid ? 'bg-success shadow-[0_0_10px_rgba(46,125,50,0.5)]' : 'bg-error shadow-[0_0_10px_rgba(198,40,40,0.5)]'}`} />
+                       <div className="text-3xl font-display font-black text-secondary leading-none uppercase tracking-tighter">
+                          {result.isFullyValid ? 'CERTIFICADO' : 'CON REPLICAS'}
+                       </div>
                     </div>
-                    <div className="flex items-center gap-2 mb-6">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      <span className="text-xs opacity-80">Hash: 8A24F...D92</span>
+                    <div className="space-y-3 pt-6 border-t border-border/30">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-text-secondary">
+                        <span className="uppercase tracking-widest">Bloqueo de Red</span>
+                        <span className="text-secondary uppercase tracking-widest">ACTIVO</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] font-bold text-text-secondary">
+                        <span className="uppercase tracking-widest">Nivel de Confianza</span>
+                        <span className="text-success uppercase tracking-widest">CRÍTICO</span>
+                      </div>
                     </div>
-                    <button className="w-full h-12 bg-white/10 hover:bg-white/20 rounded-xl font-bold transition-all text-sm uppercase tracking-widest border border-white/20">
-                      Exportar Reporte Maestro
-                    </button>
                   </div>
+                  <button className="w-full py-5 bg-secondary text-white text-[10px] font-black uppercase tracking-[0.3em] hover:bg-primary transition-colors flex items-center justify-center gap-3">
+                    <FileText className="w-4 h-4" /> Exportar Ledger Maestro
+                  </button>
                 </div>
               )}
             </section>

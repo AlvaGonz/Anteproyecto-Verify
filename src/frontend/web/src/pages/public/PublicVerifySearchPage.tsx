@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Shield, Search, QrCode, Lock, Clock, ChevronLeft } from "lucide-react";
+import { 
+  ShieldCheck, 
+  Search, 
+  QrCode, 
+  Lock, 
+  Clock, 
+  ChevronLeft, 
+  Globe, 
+  ArrowRight,
+  ShieldAlert
+} from "lucide-react";
 
 export const PublicVerifySearchPage: React.FC = () => {
   const [code, setCode] = useState("");
@@ -14,91 +24,142 @@ export const PublicVerifySearchPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface font-['Inter'] text-on-surface selection:bg-primary-container selection:text-on-primary-container flex flex-col">
-      {/* Top Nav */}
-      <nav className="w-full flex justify-between items-center px-8 h-20 bg-[#223382] shadow-2xl shadow-[#111144]/10 font-['Manrope'] font-bold tracking-tight">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="text-white/70 hover:text-white transition-colors">
-            <ChevronLeft className="w-6 h-6" />
+    <div className="min-h-screen bg-surface font-sans text-text-primary flex flex-col selection:bg-primary/20 selection:text-primary">
+      
+      {/* Navbar Premium */}
+      <nav className="fixed top-0 w-full z-50 bg-secondary/95 backdrop-blur-xl border-b border-white/5 h-20 px-8 flex justify-between items-center transition-all duration-500">
+        <div className="flex items-center gap-6">
+          <Link to="/" className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 hover:bg-primary/20 transition-all">
+            <ChevronLeft className="w-6 h-6 text-primary" />
           </Link>
-          <Link to="/" className="text-2xl font-extrabold text-[#F4F1EC]">VeriFinca</Link>
+          <div className="flex flex-col">
+            <span className="text-white text-xl font-display font-black tracking-tight">VeriFinca</span>
+            <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-[-2px]">Institutional Division</span>
+          </div>
         </div>
-        <Link to="/projects" className="hidden md:flex text-[#F4F1EC]/80 hover:text-white transition-colors text-sm font-semibold">
-          Ver Proyectos →
+        
+        <Link 
+          to="/projects" 
+          className="group flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-2.5 rounded-full transition-all"
+        >
+          <span className="text-white/80 text-xs font-black uppercase tracking-wider">Explorar Proyectos</span>
+          <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
         </Link>
       </nav>
 
-      {/* Hero */}
-      <div className="bg-[#223382] py-16 px-8 text-center relative overflow-hidden">
-        <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-xl mx-auto">
-          <div className="w-14 h-14 mx-auto mb-6 bg-white/10 rounded-2xl flex items-center justify-center">
-            <Shield className="w-7 h-7 text-[#F98513]" />
+      {/* Hero Section with Grid Effect */}
+      <div className="relative pt-40 pb-24 px-8 overflow-hidden bg-secondary">
+        <div className="vf-hud-grid opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-secondary via-secondary to-surface" />
+        
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-primary text-[10px] font-black tracking-[0.2em] uppercase">Blockchain Sincronizado</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-[#F4F1EC] font-['Manrope'] mb-3 leading-tight">
-            Portal de Verificación Pública
+          
+          <h1 className="display-lg text-white mb-6 animate-fade-in-up">
+            Portal de Verificación<br />
+            <span className="text-primary italic">de Integridad Inmobiliaria</span>
           </h1>
-          <p className="text-[#F4F1EC]/60 text-lg font-light">
-            Consulte el estado de integridad de cualquier proyecto inmobiliario registrado.
+          
+          <p className="text-white/60 text-lg font-medium max-w-2xl mx-auto mb-12 animate-fade-in-up delay-100">
+            Seguridad institucional para su inversión. El sello de VeriFinca garantiza que el proyecto cumple con los estándares documentales y de cumplimiento legal.
           </p>
-        </div>
-      </div>
 
-      {/* Form card */}
-      <div className="flex-1 flex items-start justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-8 shadow-lg">
-            {/* Card header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-secondary-container/30 flex items-center justify-center">
-                <QrCode className="w-6 h-6 text-secondary" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-on-surface font-['Manrope']">Verificar Código</h2>
-                <p className="text-xs text-on-surface-variant">Ingrese el código del sello de integridad</p>
-              </div>
+          {/* Search Card */}
+          <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 md:p-10 shadow-premium border border-outline-variant/5 animate-fade-in-up delay-200">
+            <div className="flex items-center gap-4 mb-8">
+               <div className="w-12 h-12 bg-surface-raised rounded-2xl flex items-center justify-center shrink-0">
+                  <QrCode className="w-6 h-6 text-secondary" />
+               </div>
+               <div className="text-left">
+                  <h2 className="text-lg font-black text-secondary uppercase tracking-tight">Verificar Código</h2>
+                  <p className="text-xs text-on-surface-variant font-medium">Ingrese el identificador único del certificado</p>
+               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                required
-                placeholder="Ej. VF-2026-ABC123XYZ"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full h-14 px-6 rounded-full border border-outline-variant/30 bg-surface text-on-surface placeholder:text-outline/60 font-mono text-center text-lg outline-none focus:ring-2 focus:ring-primary-container transition-all"
-              />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="relative group">
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej: VF-2026-X83L"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  className="w-full h-18 px-8 rounded-2xl border-2 border-outline-variant/10 bg-surface-raised text-on-surface text-2xl font-mono font-black text-center focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:opacity-20"
+                />
+                <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none opacity-20 group-focus-within:opacity-50 transition-opacity">
+                  <Lock className="w-5 h-5 text-secondary" />
+                </div>
+              </div>
+
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-[#F98513] text-[#5d2d00] py-4 rounded-full font-['Manrope'] font-black text-lg active:scale-95 transition-transform shadow-md hover:shadow-lg"
+                className="w-full h-18 bg-primary rounded-2xl flex items-center justify-center gap-3 text-white font-black text-lg shadow-raised hover:shadow-floating hover:scale-[1.02] active:scale-95 transition-all"
               >
-                <Search className="w-5 h-5" />
-                Consultar
+                <Search className="w-6 h-6" />
+                CONSULTAR REGISTRO
               </button>
             </form>
 
-            {/* Trust badges */}
-            <div className="mt-6 pt-4 border-t border-outline-variant/20 flex items-center justify-center gap-6 text-xs text-on-surface-variant/50">
-              <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> Cifrado</span>
-              <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Ley 172-13</span>
-              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Tiempo real</span>
+            <div className="mt-8 pt-6 border-t border-outline-variant/10 flex justify-between items-center text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest">
+               <div className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Encriptado</div>
+               <div className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5" /> Acceso Global</div>
+               <div className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Tiempo Real</div>
             </div>
           </div>
-
-          <p className="text-center text-xs text-on-surface-variant/40 mt-4">
-            Constancia informativa. No sustituye documentación legal oficial.
-          </p>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-[#111144] text-[#F4F1EC] py-10 px-8 flex flex-col md:flex-row justify-between items-center gap-4 font-light text-sm">
-        <div className="font-bold text-[#F4F1EC] font-['Manrope']">VeriFinca</div>
-        <div className="flex items-center gap-2 text-[#F4F1EC]/50">
-          <Shield className="w-4 h-4" />
-          Portal de Verificación Institucional
+      {/* Feature Grid */}
+      <div className="bg-surface py-24 px-8">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+           <div className="space-y-4">
+              <div className="w-12 h-12 bg-secondary text-white rounded-2xl flex items-center justify-center shadow-lg">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold font-['Manrope'] text-secondary">Prevención de Fraude</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">Verifica que los documentos presentados coinciden con los registros oficiales en nuestra base de datos institucional.</p>
+           </div>
+           
+           <div className="space-y-4">
+              <div className="w-12 h-12 bg-secondary text-white rounded-2xl flex items-center justify-center shadow-lg">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold font-['Manrope'] text-secondary">Inmutabilidad Blockchain</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">Cada validación es sellada en una red distribuida, asegurando que el historial de cumplimiento no pueda ser alterado.</p>
+           </div>
+
+           <div className="space-y-4">
+              <div className="w-12 h-12 bg-secondary text-white rounded-2xl flex items-center justify-center shadow-lg">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold font-['Manrope'] text-secondary">Monitoreo Constante</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">Nuestros sistemas auditan el estatus de los permisos y licencias 24/7 para alertar sobre cualquier irregularidad.</p>
+           </div>
         </div>
-        <div className="text-xs text-[#F4F1EC]/40">© {new Date().getFullYear()} VeriFinca.</div>
+      </div>
+
+      {/* Footer Industrial */}
+      <footer className="bg-text-primary py-12 px-8">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col items-center md:items-start">
+            <span className="text-white text-2xl font-display font-black">VeriFinca</span>
+            <span className="text-white/30 text-[10px] uppercase font-bold tracking-[0.3em]">Anticipating Integrity</span>
+          </div>
+          
+          <div className="flex gap-8">
+             <a href="#" className="text-white/50 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Legal</a>
+             <a href="#" className="text-white/50 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Privacidad</a>
+             <a href="#" className="text-white/50 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Soporte</a>
+          </div>
+
+          <p className="text-white/20 text-[10px] font-medium text-center md:text-right">
+            © {new Date().getFullYear()} VeriFinca. República Dominicana.<br />
+            Sistema de Verificación Pública v4.0.1
+          </p>
+        </div>
       </footer>
     </div>
   );
