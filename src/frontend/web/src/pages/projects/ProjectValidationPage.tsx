@@ -61,7 +61,7 @@ export const ProjectValidationPage: React.FC = () => {
 
   const handleRunValidation = () => {
     if (!id) return;
-    navigate(`/validations/${id}`);
+    navigate(`/admin/validations/${id}`);
   };
 
   const handleScanComplete = async () => {
@@ -93,7 +93,7 @@ export const ProjectValidationPage: React.FC = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto py-8">
+    <div className="max-w-7xl mx-auto">
       
       {/* 🏛️ Institutional DNA Header */}
       <div className="relative mb-12 p-8 rounded-[24px] overflow-hidden bg-secondary shadow-premium group">
