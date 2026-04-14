@@ -58,3 +58,36 @@ export enum IntegrityStatus {
   Verified = 1,
   Failed = 2,
 }
+
+export interface ValidationDocument {
+  id: string;
+  name: string;
+  status: 'verified' | 'pending' | 'rejected';
+}
+
+export interface ValidationProjectMetadata {
+  developer: string;
+  completionYear: number;
+  registrationNumber: string;
+  propertyType: string;
+}
+
+export interface ValidationTimelineEvent {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  status: 'completed' | 'ongoing' | 'pending';
+}
+
+export interface ValidationProjectData {
+  id: string;
+  name: string;
+  location: string;
+  status: 'approved' | 'pending' | 'rejected';
+  integrityScore: number;
+  riskLevel: 'minimo' | 'medio' | 'alto';
+  metadata: ValidationProjectMetadata;
+  documents: ValidationDocument[];
+  timeline: ValidationTimelineEvent[];
+}
