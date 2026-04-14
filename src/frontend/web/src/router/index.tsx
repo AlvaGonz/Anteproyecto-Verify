@@ -14,6 +14,8 @@ import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { PublicVerificationPage } from "../pages/public/PublicVerificationPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
+import { ProjectValidationResultsPage } from "../pages/projects/ProjectValidationResultsPage";
+import { ProjectDocumentUploadPage } from "../pages/projects/ProjectDocumentUploadPage";
 import { AuditLogPage } from "../features/audit/pages/AuditLogPage";
 
 import { AdminLayout } from "../shared/components/layout/AdminLayout";
@@ -65,6 +67,14 @@ export const router = createHashRouter([
       {
         path: "/projects/:id",
         element: <ProjectPublicDetailPage />,
+      },
+      {
+        path: "/projects/:id/upload",
+        element: (
+          <AuthGuard>
+            <ProjectDocumentUploadPage />
+          </AuthGuard>
+        ),
       },
 
       /* ===== Admin Pages ===== */
