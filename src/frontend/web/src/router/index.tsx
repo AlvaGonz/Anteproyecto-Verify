@@ -14,9 +14,10 @@ import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { PublicVerificationPage } from "../pages/public/PublicVerificationPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
-import { ProjectValidationResultsPage } from "../pages/projects/ProjectValidationResultsPage";
 import { ProjectDocumentUploadPage } from "../pages/projects/ProjectDocumentUploadPage";
 import { AuditLogPage } from "../features/audit/pages/AuditLogPage";
+import { ValidationExecutionPage } from "../features/validations/pages/ValidationExecutionPage";
+import { FindingsPage } from "../features/findings/FindingsPage";
 
 import { AdminLayout } from "../shared/components/layout/AdminLayout";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
@@ -149,6 +150,14 @@ export const router = createHashRouter([
         ),
       },
       {
+        path: "/validations/:projectId",
+        element: (
+          <AuthGuard>
+            <ValidationExecutionPage />
+          </AuthGuard>
+        ),
+      },
+      {
         path: "/admin/projects/:id/audit",
         element: (
           <AuthGuard>
@@ -164,6 +173,16 @@ export const router = createHashRouter([
           <AuthGuard>
             <AdminLayout>
               <ProjectReportsPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/findings/:projectId",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <FindingsPage />
             </AdminLayout>
           </AuthGuard>
         ),
