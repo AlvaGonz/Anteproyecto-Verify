@@ -163,6 +163,15 @@ export const FeaturedProjectsSection: React.FC = () => {
 
   return (
     <section id="proyectos" className="py-32 bg-[#F4F1EC] overflow-hidden">
+      <style>{`
+        @keyframes carousel-scroll {
+          from { transform: translateX(0); }
+          to { transform: translateX(-33.3333%); }
+        }
+        .carousel-track {
+          animation: carousel-scroll 40s linear infinite;
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto px-6 mb-20 space-y-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div className="space-y-4">
@@ -179,20 +188,15 @@ export const FeaturedProjectsSection: React.FC = () => {
 
       <div 
         className="relative"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        <motion.div 
-          className="flex gap-8 px-6"
-          animate={{
-            x: isPaused ? undefined : ["0%", "-33.33%"],
-          }}
-          transition={{
-            duration: 40,
-            ease: "linear",
-            repeat: Infinity,
-          }}
-        >
+         onMouseEnter={() => setIsPaused(true)}
+         onMouseLeave={() => setIsPaused(false)}
+       >
+         <div 
+           className="carousel-track flex gap-8 px-6 w-max"
+           style={{ 
+             animationPlayState: isPaused ? "paused" : "running"
+           }}
+         >
           {carouselItems.map((project, i) => {
             const deliveryPercentage = Math.round((project.deliveredDocs / project.totalDocs) * 100);
             
@@ -209,29 +213,10 @@ export const FeaturedProjectsSection: React.FC = () => {
                   />
                   <div className="absolute top-6 left-6 flex gap-2">
                     <span className="bg-white/90 backdrop-blur shadow-lg px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-secondary tracking-widest">
-                      {project.status}
-                    </span>
-                  </div>
-                  {/* Delivery Percentage Badge */}
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <div className="bg-secondary/90 backdrop-blur-md p-4 rounded-3xl border border-white/20 shadow-xl">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="flex items-center gap-1.5 text-[10px] font-black text-white/80 uppercase tracking-widest">
-                          <FileCheck className="w-3 h-3" /> Documentación
-                        </span>
-                        <span className="text-xs font-black text-white">{deliveryPercentage}%</span>
-                      </div>
-                      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${deliveryPercentage}%` }}
-                          transition={{ duration: 1, delay: 0.5 }}
-                          className="h-full bg-primary"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                       {project.status}
+                     </span>
+                   </div>
+                 </div>
 
                 <div className="p-8 space-y-6">
                   <div className="space-y-2">
@@ -242,23 +227,37 @@ export const FeaturedProjectsSection: React.FC = () => {
                     </p>
                   </div>
                   
-                  <div className="pt-6 border-t border-gray-50 flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Nivel de Riesgo</p>
-                      <p className="text-secondary font-black flex items-center gap-1">
-                        {project.risk} <CheckCircle2 className="w-4 h-4 text-green-500" />
-                      </p>
-                    </div>
-                    <button className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                      <ChevronRight className="w-6 h-6" />
-                    </button>
-                  </div>
+                  <div className="pt-6 border-t border-gray-100 space-y-4">
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-1">
+                         <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Documentación</p>
+                         <div className="flex items-center gap-2">
+                           <p className="text-secondary font-black">{deliveryPercentage}%</p>
+                           <CheckCircle2 className="w-4 h-4 text-green-500" />
+                         </div>
+                       </div>
+                       <Link to="/portal" className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm">
+                         <ChevronRight className="w-6 h-6" />
+                       </Link>
+                     </div>
+                     
+                     <div className="space-y-2">
+                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                         <motion.div 
+                           initial={{ width: 0 }}
+                           whileInView={{ width: `${deliveryPercentage}%` }}
+                           transition={{ duration: 1, delay: 0.2 }}
+                           className="h-full bg-primary"
+                         />
+                       </div>
+                     </div>
+                   </div>
                 </div>
               </div>
             );
           })}
-        </motion.div>
-      </div>
+         </div>
+       </div>
     </section>
   );
 };

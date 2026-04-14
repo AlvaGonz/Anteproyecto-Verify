@@ -154,10 +154,12 @@ export const router = createHashRouter([
         ),
       },
       {
-        path: "/validations/:projectId",
+        path: "/admin/validations/:projectId",
         element: (
           <AuthGuard>
-            <ValidationExecutionPage />
+            <AdminLayout>
+              <ValidationExecutionPage />
+            </AdminLayout>
           </AuthGuard>
         ),
       },

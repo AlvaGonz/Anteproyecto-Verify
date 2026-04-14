@@ -46,7 +46,7 @@ export const PublicVerifySearchPage: React.FC = () => {
         </div>
 
         <Link
-          to="/projects"
+          to="/portal"
           className="group flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-2.5 rounded-full transition-all"
         >
           <span className="text-white/80 text-xs font-black uppercase tracking-wider">Explorar Proyectos</span>
@@ -158,7 +158,7 @@ export const PublicVerifySearchPage: React.FC = () => {
             <div className="space-y-6">
               <h4 className="text-white font-black text-xs uppercase tracking-widest">Navegación</h4>
               <ul className="space-y-4 text-sm font-bold">
-                <li><Link to="/consulta-publica" className="hover:text-primary transition-colors text-white/60">Verificar Proyecto</Link></li>
+                <li><Link to="/portal" className="hover:text-primary transition-colors text-white/60">Verificar Proyecto</Link></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Instituciones</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Portal Auditor</a></li>
               </ul>

@@ -81,9 +81,15 @@ export const HeroSection: React.FC = () => {
             </Link>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest px-4">
-            <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-primary" /> Validación Express</span>
-            <span className="flex items-center gap-1.5 border-l border-gray-200 pl-4"><Lock className="w-3.5 h-3.5 text-primary" /> Conexión Notarial</span>
-            <span className="flex items-center gap-1.5 border-l border-gray-200 pl-4"><Building2 className="w-3.5 h-3.5 text-primary" /> Data Curaduría</span>
+            <Link to="/verify" className="flex items-center gap-1.5 hover:text-primary transition-colors">
+              <Zap className="w-3.5 h-3.5 text-primary" /> Validación Express
+            </Link>
+            <Link to="/portal" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+              <Lock className="w-3.5 h-3.5 text-primary" /> Conexión Notarial
+            </Link>
+            <Link to="/portal" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+              <Building2 className="w-3.5 h-3.5 text-primary" /> Data Curaduría
+            </Link>
           </div>
         </motion.div>
       </div>
