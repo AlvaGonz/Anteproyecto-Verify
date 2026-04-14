@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp, Plus, ArrowRight, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { projectsApi } from "../../projects/api/projectsApi";
 import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../projects/types";
 
