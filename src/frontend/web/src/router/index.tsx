@@ -14,6 +14,7 @@ import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { PublicVerificationPage } from "../pages/public/PublicVerificationPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
+import { AuditLogPage } from "../features/audit/pages/AuditLogPage";
 
 import { AdminLayout } from "../shared/components/layout/AdminLayout";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
@@ -163,6 +164,16 @@ export const router = createHashRouter([
           <AuthGuard>
             <AdminLayout>
               <RulesManagePage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/audit-log",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <AuditLogPage />
             </AdminLayout>
           </AuthGuard>
         ),

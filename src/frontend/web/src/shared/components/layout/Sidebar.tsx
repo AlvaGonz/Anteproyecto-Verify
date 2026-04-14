@@ -8,6 +8,7 @@ import {
   X,
   Plus,
   Compass,
+  History
 } from "lucide-react";
 
 interface SidebarProps {
@@ -21,6 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Expedientes", href: "/admin/projects", icon: FolderKanban },
     { name: "Reglas de Validacion", href: "/admin/rules", icon: ShieldAlert },
+    { name: "Logs de Auditoría", href: "/admin/audit-log", icon: History },
     { name: "Configuracion", href: "/admin/settings", icon: Settings },
   ];
 

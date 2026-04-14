@@ -23,12 +23,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     if (path.includes("/projects") && path.includes("/reports")) return "Reportes y Estadisticas";
     if (path.includes("/projects")) return "Gestion de Expedientes";
     if (path.includes("/rules")) return "Reglas de Validacion";
+    if (path.includes("/admin/audit-log")) return "Registro de Auditoria";
     if (path.includes("/settings")) return "Configuracion";
     return "Administracion";
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F8F9FB]">
+    <div className="flex h-screen overflow-hidden bg-[#FFF8F3]">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div

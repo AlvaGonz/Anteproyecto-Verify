@@ -8,4 +8,9 @@ export interface PublicProjectVerificationDto {
   lastVerifiedUtc?: string;
   isVerifiable: boolean;
   summary: string;
+  developerName?: string;
+  validationDimensions?: {
+    label: string;
+    checked: boolean;
+  }[];
 }
