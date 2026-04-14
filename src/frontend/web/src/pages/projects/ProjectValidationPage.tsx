@@ -31,14 +31,25 @@ export const ProjectValidationPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [latestResult, projectFindings, logs] = await Promise.all([
+      const [res, findingsRes, logsRes] = await Promise.all([
         validationsApi.getValidationResult(id),
         validationsApi.getProjectFindings(id),
         validationsApi.getProjectAuditLogs(id)
       ]);
-      setResult(latestResult);
-      setFindings(projectFindings);
-      setAuditLogs(logs);
+
+      if (res._tag === "Success") {
+        setResult(res.data);
+      } else {
+        setError(res.error.message);
+      }
+
+      if (findingsRes._tag === "Success") {
+        setFindings(findingsRes.data);
+      }
+
+      if (logsRes._tag === "Success") {
+        setAuditLogs(logsRes.data);
+      }
     } catch (err: any) {
       setError(err.message || "Error al cargar el resultado de validación");
     } finally {
@@ -55,10 +66,15 @@ export const ProjectValidationPage: React.FC = () => {
 
   const handleScanComplete = async () => {
     try {
-      const newResult = await validationsApi.runFullValidation(id!);
-      setResult(newResult);
-      addToast("Validación integral completada", "success");
-      await fetchData(); // Refresh all data
+      const response = await validationsApi.runFullValidation(id!);
+      if (response._tag === "Success") {
+        setResult(response.data);
+        addToast("Validación integral completada", "success");
+        await fetchData(); // Refresh all data
+      } else {
+        setError(response.error.message);
+        addToast("Error al ejecutar la validación", "error");
+      }
     } catch (err: any) {
       setError(err.message || "Error al ejecutar la validación completa");
       addToast("Error al ejecutar la validación", "error");

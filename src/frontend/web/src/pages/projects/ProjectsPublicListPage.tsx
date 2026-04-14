@@ -101,14 +101,17 @@ export const ProjectsPublicListPage: React.FC = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const data = await projectsApi.getProjects();
-        // Solo mostrar los publicados en la lista pública
-        const published = (Array.isArray(data) ? data : []).filter(
-          (p) => p.estadoProyecto === ProjectStatus.Published
-        );
-        setProjects(published);
+        const result = await projectsApi.getProjects();
+        if (result._tag === "Success") {
+          const published = result.data.filter(
+            (p) => p.estadoProyecto === ProjectStatus.Published
+          );
+          setProjects(published);
+        } else {
+          console.error("Error fetching projects:", result.error);
+        }
       } catch (error) {
-        console.error("Error fetching projects:", error);
+        console.error("Unexpected error fetching projects:", error);
       } finally {
         setLoading(false);
       }

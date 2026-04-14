@@ -12,10 +12,14 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const data = await projectsApi.getProjects();
-        setProjects(data);
+        const result = await projectsApi.getProjects();
+        if (result._tag === "Success") {
+          setProjects(result.data);
+        } else {
+          console.error("Error loading projects", result.error);
+        }
       } catch (e) {
-        console.error("Error loading projects", e);
+        console.error("Unexpected error loading projects", e);
       } finally {
         setLoading(false);
       }

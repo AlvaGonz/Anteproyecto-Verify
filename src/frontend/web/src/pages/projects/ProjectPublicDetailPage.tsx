@@ -59,8 +59,12 @@ export const ProjectPublicDetailPage: React.FC = () => {
     (async () => {
       try {
         if (!id) return;
-        const data = await projectsApi.getProjectById(id);
-        setProject(data);
+        const result = await projectsApi.getProjectById(id);
+        if (result._tag === "Success") {
+          setProject(result.data);
+        } else {
+          setError(result.error.message || "Error al cargar el proyecto");
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Error al cargar el proyecto";
         setError(errorMessage);

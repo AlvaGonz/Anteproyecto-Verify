@@ -21,7 +21,10 @@ describe("ProjectPublicDetailPage", () => {
       createdAtUtc: new Date().toISOString(),
     };
 
-    vi.mocked(projectsApi.getProjectById).mockResolvedValue(mockProject);
+    vi.mocked(projectsApi.getProjectById).mockResolvedValue({
+      _tag: "Success",
+      data: mockProject
+    });
 
     render(
       <MemoryRouter initialEntries={["/projects/1"]}>

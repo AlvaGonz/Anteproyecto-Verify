@@ -32,11 +32,19 @@ export const ProjectValidationResultsPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const latestSummary = await validationsApi.getLatestInternalValidation(id);
-      setSummary(latestSummary);
-      if (latestSummary) {
-        const projectFindings = await validationsApi.getProjectFindings(id);
-        setFindings(projectFindings.filter((f) => f.validacionId === latestSummary.validacionId));
+      const summaryRes = await validationsApi.getLatestInternalValidation(id);
+
+      if (summaryRes._tag === "Success") {
+        const latestSummary = summaryRes.data;
+        setSummary(latestSummary);
+        if (latestSummary) {
+          const findingsRes = await validationsApi.getProjectFindings(id);
+          if (findingsRes._tag === "Success") {
+            setFindings(findingsRes.data.filter((f) => f.validacionId === latestSummary.validacionId));
+          }
+        }
+      } else {
+        setError(summaryRes.error.message);
       }
     } catch (err: any) {
       setError(err.message || "Error al cargar los resultados de validación");
@@ -52,10 +60,17 @@ export const ProjectValidationResultsPage: React.FC = () => {
     setIsEvaluating(true);
     setError(null);
     try {
-      const newSummary = await validationsApi.runInternalValidation(id);
-      setSummary(newSummary);
-      const projectFindings = await validationsApi.getProjectFindings(id);
-      setFindings(projectFindings.filter((f) => f.validacionId === newSummary.validacionId));
+      const resp = await validationsApi.runInternalValidation(id);
+      if (resp._tag === "Success") {
+        const newSummary = resp.data;
+        setSummary(newSummary);
+        const findingsRes = await validationsApi.getProjectFindings(id);
+        if (findingsRes._tag === "Success") {
+          setFindings(findingsRes.data.filter((f) => f.validacionId === newSummary.validacionId));
+        }
+      } else {
+        setError(resp.error.message);
+      }
     } catch (err: any) {
       setError(err.message || "Error al ejecutar la validación");
     } finally {
