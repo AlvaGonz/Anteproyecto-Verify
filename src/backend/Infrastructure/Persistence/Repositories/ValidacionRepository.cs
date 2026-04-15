@@ -34,6 +34,7 @@ public class ValidacionRepository : IValidacionRepository
     {
         return await _context.Validaciones
             .Include(v => v.ResultadosRegla)
+            .Include(v => v.Sello)
             .Where(v => v.ProyectoId == proyectoId && v.FuenteValidacion == fuenteValidacion)
             .OrderByDescending(v => v.CreatedAtUtc)
             .FirstOrDefaultAsync(cancellationToken);

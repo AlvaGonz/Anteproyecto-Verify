@@ -40,7 +40,7 @@ export const ProjectValidationResultsPage: React.FC = () => {
         if (latestSummary) {
           const findingsRes = await validationsApi.getProjectFindings(id);
           if (findingsRes._tag === "Success") {
-            setFindings(findingsRes.data.filter((f) => f.validacionId === latestSummary.validacionId));
+            setFindings(findingsRes.data.filter((f: FindingDto) => f.validacionId === latestSummary.validacionId));
           }
         }
       } else {
@@ -66,7 +66,7 @@ export const ProjectValidationResultsPage: React.FC = () => {
         setSummary(newSummary);
         const findingsRes = await validationsApi.getProjectFindings(id);
         if (findingsRes._tag === "Success") {
-          setFindings(findingsRes.data.filter((f) => f.validacionId === newSummary.validacionId));
+          setFindings(findingsRes.data.filter((f: FindingDto) => f.validacionId === newSummary.validacionId));
         }
       } else {
         setError(resp.error.message);

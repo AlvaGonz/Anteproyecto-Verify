@@ -9,7 +9,7 @@ import { ValidationSummary as InternalValidationSummary } from "../../features/v
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
 import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle, ListTodo, ClipboardList, Database, Cpu, Fingerprint } from "lucide-react";
+import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle, Database, Cpu, Fingerprint } from "lucide-react";
 import { FindingsPanel } from "../../features/validations/components/findings/FindingsPanel";
 import { AuditLogList } from "../../features/validations/components/audit/AuditLogList";
 import { FindingDto, AuditLogDto } from "../../features/validations/types";

@@ -10,6 +10,8 @@ public class SelloIntegridad : EntityBase
     public Proyecto Proyecto { get; private set; } = null!;
 
     public string CodigoSello { get; private set; } = null!;
+    public string Nombre { get; private set; } = null!;
+    public NivelSelloIntegridad Nivel { get; private set; }
     public string UrlQr { get; private set; } = null!;
     public string FirmaDigital { get; private set; } = null!;
     public DateTime FechaEmisionUtc { get; private set; }
@@ -21,17 +23,22 @@ public class SelloIntegridad : EntityBase
     public SelloIntegridad(
         Guid proyectoId,
         string codigoSello,
+        string nombre,
+        NivelSelloIntegridad nivel,
         string urlQr,
         string firmaDigital,
         int vigenciaMeses = 12)
     {
         if (proyectoId == Guid.Empty) throw new ArgumentException("Proyecto requerido", nameof(proyectoId));
         if (string.IsNullOrWhiteSpace(codigoSello)) throw new ArgumentException("Código de sello requerido", nameof(codigoSello));
+        if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(urlQr)) throw new ArgumentException("URL de QR requerida", nameof(urlQr));
         if (string.IsNullOrWhiteSpace(firmaDigital)) throw new ArgumentException("Firma digital requerida", nameof(firmaDigital));
 
         ProyectoId = proyectoId;
         CodigoSello = codigoSello;
+        Nombre = nombre;
+        Nivel = nivel;
         UrlQr = urlQr;
         FirmaDigital = firmaDigital;
         FechaEmisionUtc = DateTime.UtcNow;

@@ -100,7 +100,7 @@ public class InternalValidationEngine : IInternalValidationEngine
 
     public async Task<InternalValidationSummaryDto?> GetLatestValidationAsync(Guid projectId, CancellationToken cancellationToken = default)
     {
-        var validacion = await _validacionRepository.GetLatestByProjectIdAsync(projectId, "InternalEngine", cancellationToken);
+        var validacion = await GetLatestValidationEntityAsync(projectId, cancellationToken);
         if (validacion == null) return null;
 
         var passed = validacion.ResultadosRegla.Count(r => r.Status == RuleStatus.Passed);
@@ -110,6 +110,11 @@ public class InternalValidationEngine : IInternalValidationEngine
         return MapToSummaryDto(validacion, passed, warning, failed);
     }
 
+    public async Task<Validacion?> GetLatestValidationEntityAsync(Guid projectId, CancellationToken cancellationToken = default)
+    {
+        return await _validacionRepository.GetLatestByProjectIdAsync(projectId, "InternalEngine", cancellationToken);
+    }
+
     private static InternalValidationSummaryDto MapToSummaryDto(Validacion v, int passed, int warning, int failed)
     {
         return new InternalValidationSummaryDto(
@@ -117,6 +122,8 @@ public class InternalValidationEngine : IInternalValidationEngine
             v.ProyectoId,
             v.EstadoValidacion,
             v.EsLegitimo,
+            v.PorcentajeIntegridad,
+            v.SelloNombre,
             passed,
             warning,
             failed,

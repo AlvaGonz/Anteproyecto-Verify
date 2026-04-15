@@ -9,6 +9,8 @@ public record InternalValidationSummaryDto(
     Guid ProyectoId,
     ValidationStatus Status,
     bool? EsLegitimo,
+    double IntegrityScore,
+    string? SelloName,
     int PassedCount,
     int WarningCount,
     int FailedCount,

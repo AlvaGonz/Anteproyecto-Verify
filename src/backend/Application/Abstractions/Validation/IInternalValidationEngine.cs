@@ -9,4 +9,5 @@ public interface IInternalValidationEngine
 {
     Task<InternalValidationSummaryDto> RunValidationAsync(Guid projectId, CancellationToken cancellationToken = default);
     Task<InternalValidationSummaryDto?> GetLatestValidationAsync(Guid projectId, CancellationToken cancellationToken = default);
+    Task<Domain.Entities.Validacion?> GetLatestValidationEntityAsync(Guid projectId, CancellationToken cancellationToken = default);
 }
