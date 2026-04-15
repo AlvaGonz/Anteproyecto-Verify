@@ -44,10 +44,6 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
 
       <div className="flex items-center gap-3">
         {/* VeriFinca AI Status */}
-        <div className="hidden lg:flex items-center gap-2 px-3 py-2 bg-primary/5 border border-primary/10 rounded-xl mr-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-[10px] font-black text-primary uppercase tracking-wider">VeriFinca AI ON</span>
-        </div>
 
         <button className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group">
           <Bell className="w-5 h-5 text-gray-500 group-hover:text-gray-900" />

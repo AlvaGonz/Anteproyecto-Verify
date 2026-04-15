@@ -43,10 +43,6 @@ export const HeroSection: React.FC = () => {
           transition={{ duration: 1 }}
           className="space-y-6"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-black uppercase tracking-widest border border-primary/20">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Autoridad Institucional Inmobiliaria
-          </div>
           <h1 className="text-5xl md:text-8xl font-display font-black text-secondary leading-[0.95] tracking-tight">
             Seguridad técnica y <span className="text-primary italic">jurídica</span> en un clic
           </h1>
