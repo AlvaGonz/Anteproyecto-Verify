@@ -7,6 +7,7 @@ using Application.Abstractions.Persistence;
 using Application.Abstractions.Reports;
 using Application.Abstractions.Services.Crypto;
 using Domain.Entities;
+using Domain.Enums;
 
 public class EmitirSelloResultDto
 {
@@ -88,7 +89,9 @@ public class EmitirSelloCommandHandler
         var nuevoSello = new SelloIntegridad(
             project.Id,
             codigoSello,
-            urlQr,
+            nombre: "Sello Bronce",
+            nivel: NivelSelloIntegridad.Bronce,
+            urlQr: urlQr,
             firmaDigital
         );
 
