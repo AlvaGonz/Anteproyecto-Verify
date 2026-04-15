@@ -104,19 +104,8 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
     <div className="animate-fade-in-up">
       <form
         onSubmit={handleSubmit}
-        className="vf-card p-8 border-dashed border-2 bg-surface-container-lowest/50"
+        className="space-y-6"
       >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-             <Upload className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="text-xl font-display font-black text-secondary tracking-tight">
-              Añadir <span className="text-primary italic">Evidencia</span>
-            </h3>
-            <p className="text-xs text-on-surface-variant font-medium">Sube los documentos legales para validación RI</p>
-          </div>
-        </div>
 
         {error && (
           <div className="mb-6 p-4 bg-error-container/30 border border-error/20 text-error rounded-2xl text-xs font-bold flex items-center gap-3 animate-shake">
@@ -181,8 +170,8 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                       <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
                       <FileText className="w-8 h-8" />
                     </div>
-                    <div>
-                      <p className="text-lg font-black text-secondary tracking-tight max-w-[300px] truncate">{file.name}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base sm:text-lg font-black text-secondary tracking-tight truncate">{file?.name}</p>
                       <div className="flex items-center gap-2 mt-1">
                          <span className="px-2 py-0.5 rounded bg-secondary/10 text-[9px] font-black text-secondary uppercase tracking-widest">
                            {(file.size / 1024 / 1024).toFixed(2)} MB
@@ -212,7 +201,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
               <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.22em] ml-1">
                 Clasificación del Acto Jurídico
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { id: DocumentType.CertificadoTitulo, label: 'Título', icon: Landmark },
                   { id: DocumentType.CertificacionEstadoJuridico, label: 'Estado J.', icon: ShieldCheck },
@@ -223,7 +212,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                     key={cat.id}
                     type="button"
                     onClick={() => setTipoDocumento(cat.id)}
-                    className={`flex flex-col items-center justify-center p-4 rounded-3xl border-2 transition-all gap-2 ${
+                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all gap-2 ${
                       tipoDocumento === cat.id 
                         ? 'border-primary bg-primary/[0.08] text-primary shadow-md' 
                         : 'border-outline-variant/20 bg-surface-container-low text-secondary hover:border-primary/30'
@@ -235,22 +224,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                 ))}
               </div>
               
-              <div className="relative group mt-4">
-                <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
-                <select
-                  value={tipoDocumento}
-                  onChange={(e) => setTipoDocumento(Number(e.target.value))}
-                  className="w-full h-12 pl-12 pr-4 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-bold text-secondary focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none cursor-pointer"
-                >
-                  <option value={DocumentType.CertificadoTitulo}>Certificado de Título</option>
-                  <option value={DocumentType.CertificacionEstadoJuridico}>Certificación de Estado Jurídico</option>
-                  <option value={DocumentType.CopiaCedulaIdentidad}>Copia Cédula / Pasaporte</option>
-                  <option value={DocumentType.PlanosArquitectonicos}>Planos Arquitectónicos</option>
-                  <option value={DocumentType.PlanoMensuraCatastral}>Plano de Mensura Catastral</option>
-                  <option value={DocumentType.ActodeVenta}>Acto de Venta</option>
-                  <option value={DocumentType.Other}>Otro Documento / Evidencia</option>
-                </select>
-              </div>
+
             </div>
 
             <div className="space-y-1.5">
@@ -303,7 +277,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
           </div>
         </div>
 
-        <div className="mt-10 flex justify-end">
+        <div className="mt-8 flex justify-end">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
