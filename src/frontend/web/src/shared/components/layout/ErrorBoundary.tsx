@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouteError, isRouteErrorResponse, Link } from "react-router-dom";
-import { AlertTriangle, Home, Shield } from "lucide-react";
+import { AlertTriangle, Home } from "lucide-react";
 
 export const ErrorBoundary: React.FC = () => {
   const error = useRouteError();
@@ -22,9 +22,14 @@ export const ErrorBoundary: React.FC = () => {
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center mb-8">
-          <Shield className="w-10 h-10 text-[var(--color-brand-primary)] mx-auto" />
-          <span className="text-lg font-bold text-[var(--color-brand-primary)]">VeriFinca</span>
+        <div className="flex justify-center mb-8">
+          <Link to="/">
+            <img
+              src="/brand/isotipo/ISOTIPO WHITE.svg"
+              alt="VeriFinca"
+              className="h-25 w-auto group-hover:scale-105 transition-transform"
+            />
+          </Link>
         </div>
         <div className="vf-card py-8 px-6 text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-[var(--color-brand-accent)] mb-4" />
