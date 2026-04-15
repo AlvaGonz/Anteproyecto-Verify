@@ -72,6 +72,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.ExternalValidation.IExternalProviderResolver, Infrastructure.ExternalValidation.ExternalProviderResolver>();
 
         // Orchestrator
+        services.AddScoped<Application.Services.Validation.IIntegrityScoringService, Application.Services.Validation.IntegrityScoringService>();
         services.AddScoped<Application.Services.Validation.IProjectValidationOrchestrator, Application.Services.Validation.ProjectValidationOrchestrator>();
 
         // Validations

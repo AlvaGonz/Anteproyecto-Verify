@@ -10,6 +10,8 @@ export interface ProyectoDto {
   designacionCatastral?: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
+  integrityScore?: number;
+  sealName?: string;
   usuarioCreadorId: string;
   createdAtUtc: string;
   updatedAtUtc?: string;
@@ -91,3 +93,21 @@ export interface ValidationProjectData {
   documents: ValidationDocument[];
   timeline: ValidationTimelineEvent[];
 }
+
+export type ProjectError = 
+  | { _tag: "NotFound"; id: string }
+  | { _tag: "Unauthorized" }
+  | { _tag: "ValidationError"; errors: string[] }
+  | { _tag: "ServerError"; message: string }
+  | { _tag: "UnknownError"; original: unknown };
+
+export const getProjectErrorMessage = (error: ProjectError): string => {
+  switch (error._tag) {
+    case "NotFound": return `Proyecto no encontrado (ID: ${error.id})`;
+    case "Unauthorized": return "No tiene permisos para realizar esta acción";
+    case "ValidationError": return `Error de validación: ${error.errors.join(", ")}`;
+    case "ServerError": return error.message;
+    case "UnknownError": return "Ocurrió un error inesperado";
+    default: return "Error desconocido";
+  }
+};

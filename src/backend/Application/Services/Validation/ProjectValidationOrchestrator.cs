@@ -30,6 +30,8 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
         IExternalProviderResolver externalProviderResolver,
         IAuditoriaRepository auditoriaRepository,
         IReporteRepository reporteRepository,
+        IIntegrityScoringService scoringService,
+        ISelloIntegridadRepository selloRepository,
         IUnitOfWork unitOfWork)
     {
         _proyectoRepository = proyectoRepository;
@@ -37,6 +39,8 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
         _externalProviderResolver = externalProviderResolver;
         _auditoriaRepository = auditoriaRepository;
         _reporteRepository = reporteRepository;
+        _scoringService = scoringService;
+        _selloRepository = selloRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -133,7 +137,15 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
             }
         }
 
-        // 4. Consolidar resultados
+        // 4. Consolidar resultados y Calcular Score
+        var internalRuleResults = internalResult?.Reglas ?? Enumerable.Empty<ValidationRuleResultDto>();
+        var integridadScore = _scoringService.CalculateScore(internalRuleResults, externalResults);
+        
+        bool hasCriticalFindings = internalRuleResults.Any(r => r.Severity == FindingSeverity.Critical) || 
+                                  externalResults.Any(r => r.Status == "Failed" || r.Status == "Error");
+
+        var sello = _scoringService.DetermineSello(projectId, integridadScore, hasCriticalFindings);
+
         var isFullyValid = internalResult?.EsLegitimo == true && externalResults.All(r => r.IsMatch);
         var overallStatus = errors.Any() ? ValidationExecutionStatus.Failed : ValidationExecutionStatus.Completed;
 
@@ -144,12 +156,36 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
             DateTime.UtcNow,
             overallStatus,
             isFullyValid,
+            integridadScore,
+            sello?.Nombre,
             internalResult,
             externalResults,
             errors
         );
 
-        // 5. Persistir resultado (usando entidad Reporte como contenedor genérico por ahora)
+        // 5. Persistir resultado
+        // Guardar Sello si existe
+        if (sello != null)
+        {
+            await _selloRepository.AddAsync(sello, cancellationToken);
+            // Vincular con la validación interna principal
+            var internalValidation = await _internalValidationEngine.GetLatestValidationEntityAsync(projectId, cancellationToken);
+            if (internalValidation != null)
+            {
+                internalValidation.UpdateIntegrityScore(integridadScore);
+                internalValidation.AssignSello(sello);
+            }
+        }
+        else
+        {
+            // Incluso si no hay sello, actualizamos el score
+            var internalValidation = await _internalValidationEngine.GetLatestValidationEntityAsync(projectId, cancellationToken);
+            if (internalValidation != null)
+            {
+                internalValidation.UpdateIntegrityScore(integridadScore);
+            }
+        }
+
         var reporte = new Reporte(projectId, userId);
         reporte.MarkAsGenerated(JsonSerializer.Serialize(executionResult));
         await _reporteRepository.AddAsync(reporte, cancellationToken);
@@ -159,7 +195,7 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
         _proyectoRepository.Update(proyecto);
 
         // 6. Registrar auditoría final y guardar
-        await LogAuditAsync(projectId, userId, "ValidacionCompletada", $"Validación finalizada. Válido: {isFullyValid}", cancellationToken);
+        await LogAuditAsync(projectId, userId, "ValidacionCompletada", $"Validación finalizada. Score: {integridadScore}%. Sello: {sello?.Nombre ?? "Ninguno"}", cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return executionResult;

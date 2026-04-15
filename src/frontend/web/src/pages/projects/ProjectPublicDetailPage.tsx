@@ -4,6 +4,7 @@ import {
   ProyectoDto,
   IntegrityStatus,
   ProjectCategory,
+  getProjectErrorMessage,
 } from "../../features/projects/types";
 import { projectsApi } from "../../features/projects/api/projectsApi";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
@@ -63,7 +64,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
         if (result._tag === "Success") {
           setProject(result.data);
         } else {
-          setError(result.error.message || "Error al cargar el proyecto");
+          setError(getProjectErrorMessage(result.error));
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Error al cargar el proyecto";

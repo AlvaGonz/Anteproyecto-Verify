@@ -54,6 +54,8 @@ export interface InternalValidationSummaryDto {
   proyectoId: string;
   status: ValidationStatus;
   esLegitimo: boolean | null;
+  integrityScore: number;
+  selloName: string | null;
   passedCount: number;
   warningCount: number;
   failedCount: number;
@@ -68,6 +70,8 @@ export interface ValidationExecutionResult {
   completedAtUtc: string;
   overallStatus: ValidationExecutionStatus;
   isFullyValid: boolean;
+  overallIntegrityScore: number;
+  integritySeal: string | null;
   internalValidation: InternalValidationSummaryDto | null;
   externalSources: ValidationSourceResult[];
   errors: string[];

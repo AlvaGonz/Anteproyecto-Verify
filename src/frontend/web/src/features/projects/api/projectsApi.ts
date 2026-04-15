@@ -4,6 +4,7 @@ import {
   UpdateProyectoDto,
   ProjectStatus,
   IntegrityStatus,
+  ProjectError,
 } from "../types";
 import { mockProjects } from "../../../infrastructure/mock";
 import { Result, success, failure } from "../../../shared/utils/functional";
@@ -15,12 +16,6 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
 // Local state for mocks to allow updates during the session
 let localMockProjects = [...mockProjects];
 
-export type ProjectError = 
-  | { _tag: "NotFound"; id: string }
-  | { _tag: "Unauthorized" }
-  | { _tag: "ValidationError"; errors: string[] }
-  | { _tag: "ServerError"; message: string }
-  | { _tag: "UnknownError"; original: unknown };
 
 export const projectsApi = {
   getProjects: async (): Promise<Result<ProyectoDto[], ProjectError>> => {

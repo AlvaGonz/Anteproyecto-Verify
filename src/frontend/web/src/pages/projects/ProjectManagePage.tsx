@@ -1,10 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ProyectoDto, ProjectStatus } from "../../features/projects/types";
+import { 
+  ProyectoDto, 
+  ProjectStatus, 
+  getProjectErrorMessage, 
+  CreateProyectoDto, 
+  UpdateProyectoDto 
+} from "../../features/projects/types";
 import { projectsApi } from "../../features/projects/api/projectsApi";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { FileText, ShieldCheck, ClipboardList, ArrowRight } from "lucide-react";
+import { isSuccess } from "../../shared/utils/functional";
+
+const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
+  if (!data) {
+    throw new Error("Invalid project data");
+  }
+  // Add more validation logic as needed
+};
+
+const sanitizeStatus = (status: ProjectStatus) => {
+  if (!Object.values(ProjectStatus).includes(status)) {
+    throw new Error("Invalid project status");
+  }
+  return status;
+};
 
 export const ProjectManagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,31 +38,52 @@ export const ProjectManagePage: React.FC = () => {
 
   useEffect(() => {
     if (isEditing) {
-      (async () => {
+      const fetchProject = async () => {
         try {
-          const data = await projectsApi.getProjectById(id!);
-          setProject(data);
-        } catch {
-          navigate("/admin/projects");
+          const result = await projectsApi.getProjectById(id!);
+          if (isSuccess(result)) {
+            setProject(result.data);
+          } else {
+            addToast(getProjectErrorMessage(result.error), "error");
+            navigate("/admin/projects");
+          }
         } finally {
           setLoading(false);
         }
-      })();
+      };
+      fetchProject();
     }
   }, [id, isEditing, navigate]);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: CreateProyectoDto | UpdateProyectoDto) => {
     try {
+      validateProjectData(data);
       if (isEditing) {
-        await projectsApi.updateProject(id!, data);
-        addToast("Proyecto actualizado exitosamente", "success");
-        navigate(`/projects/${id}`);
+        if (data.categoria == null) {
+          throw new Error("Missing required field: categoria");
+        }
+        const updateData = data as UpdateProyectoDto;
+        const result = await projectsApi.updateProject(id!, updateData);
+        if (isSuccess(result)) {
+          addToast("Proyecto actualizado exitosamente", "success");
+          navigate(`/projects/${id}`);
+        } else {
+          addToast(getProjectErrorMessage(result.error), "error");
+        }
       } else {
-        const newProject = await projectsApi.createProject(data);
-        addToast("Proyecto creado exitosamente", "success");
-        navigate(`/projects/${newProject.id}`);
+        if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
+          throw new Error("Missing required field: usuarioCreadorId");
+        }
+        const createData = data as CreateProyectoDto;
+        const result = await projectsApi.createProject(createData);
+        if (isSuccess(result)) {
+          addToast("Proyecto creado exitosamente", "success");
+          navigate(`/projects/${result.data.id}`);
+        } else {
+          addToast(getProjectErrorMessage(result.error), "error");
+        }
       }
-    } catch {
+    } catch (error) {
       addToast("Error al guardar el proyecto", "error");
     }
   };
@@ -49,22 +91,31 @@ export const ProjectManagePage: React.FC = () => {
   const handleStatusChange = async (status: ProjectStatus) => {
     if (!id) return;
     try {
-      await projectsApi.updateProjectStatus(id, status);
-      const data = await projectsApi.getProjectById(id);
-      setProject(data);
-      addToast("Estado actualizado exitosamente", "success");
+      sanitizeStatus(status);
+      const updateResult = await projectsApi.updateProjectStatus(id, status);
+      if (isSuccess(updateResult)) {
+        setProject(updateResult.data);
+        addToast("Estado actualizado exitosamente", "success");
+      } else {
+        addToast(getProjectErrorMessage(updateResult.error), "error");
+      }
     } catch {
       addToast("Error al actualizar el estado", "error");
     }
   };
 
-  if (loading)
-    return <div className="text-center py-12 text-[var(--color-text-strong)] opacity-60">Cargando formulario...</div>;
+  if (loading) {
+    return (
+      <div className="text-center py-12 text-[var(--color-text-strong)] opacity-60">
+        Cargando formulario...
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="max-w-2xl mx-auto mb-6">
-        <h1 className="text-2xl font-bold text-[var(--color-text-strong)]">
+    <div className="max-w-4xl mx-auto p-4">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-[var(--color-text-strong)]">
           {isEditing ? "Editar Proyecto" : "Crear Nuevo Proyecto"}
         </h1>
         <p className="text-sm mt-1 text-[var(--color-text-strong)] opacity-60">
@@ -79,25 +130,20 @@ export const ProjectManagePage: React.FC = () => {
       />
 
       {isEditing && project && (
-        <div className="max-w-2xl mx-auto mt-8 space-y-4">
+        <div className="mt-8 space-y-4">
           {/* Status management */}
-          <div className="vf-card p-5">
+          <div className="bg-[var(--color-surface-primary)] p-5 rounded-lg">
             <h2 className="text-base font-bold text-[var(--color-text-strong)] mb-3">
               Gestion de Estado
             </h2>
             <div className="flex flex-wrap gap-2 mb-3">
-              {[
-                { status: ProjectStatus.Draft, label: "Borrador" },
-                { status: ProjectStatus.InReview, label: "En Revision" },
-                { status: ProjectStatus.Published, label: "Publicar" },
-                { status: ProjectStatus.Observed, label: "Observar" },
-              ].map((s) => (
+              {[ProjectStatus.Draft, ProjectStatus.InReview, ProjectStatus.Published, ProjectStatus.Observed].map((status) => (
                 <button
-                  key={s.status}
-                  onClick={() => handleStatusChange(s.status)}
-                  className="vf-btn-secondary text-sm py-2 px-4"
+                  key={status}
+                  onClick={() => handleStatusChange(status)}
+                  className="bg-[var(--color-brand-primary)]/10 hover:bg-[var(--color-brand-primary)]/20 text-[var(--color-text-strong)] py-2 px-4 rounded-lg"
                 >
-                  {s.label}
+                  {ProjectStatus[status]}
                 </button>
               ))}
             </div>
@@ -107,32 +153,30 @@ export const ProjectManagePage: React.FC = () => {
           </div>
 
           {/* Quick nav cards */}
-          {[
-            {
-              icon: FileText,
-              title: "Expediente Documental",
-              desc: "Gestiona los documentos asociados a este proyecto.",
-              href: `/admin/projects/${id}/documents`,
-              label: "Gestionar Documentos",
-            },
-            {
-              icon: ShieldCheck,
-              title: "Validacion Integral",
-              desc: "Revisa el estado de validacion del expediente.",
-              href: `/admin/projects/${id}/validations`,
-              label: "Ver Validacion",
-            },
-            {
-              icon: ClipboardList,
-              title: "Reportes y Auditoria",
-              desc: "Consulta el historial operativo y reportes.",
-              href: `/admin/projects/${id}/reports`,
-              label: "Ver Reportes",
-            },
-          ].map((item) => (
+          {[{
+            icon: FileText,
+            title: "Expediente Documental",
+            desc: "Gestiona los documentos asociados a este proyecto.",
+            href: `/admin/projects/${id}/documents`,
+            label: "Gestionar Documentos",
+          },
+          {
+            icon: ShieldCheck,
+            title: "Validacion Integral",
+            desc: "Revisa el estado de validacion del expediente.",
+            href: `/admin/projects/${id}/validations`,
+            label: "Ver Validacion",
+          },
+          {
+            icon: ClipboardList,
+            title: "Reportes y Auditoria",
+            desc: "Consulta el historial operativo y reportes.",
+            href: `/admin/projects/${id}/reports`,
+            label: "Ver Reportes",
+          }].map((item) => (
             <div
               key={item.href}
-              className="vf-card p-5 flex items-center justify-between gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform"
+              className="bg-[var(--color-surface-primary)] p-5 rounded-lg flex items-center justify-between gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform"
               onClick={() => navigate(item.href)}
             >
               <div className="flex items-center gap-3">

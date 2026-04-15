@@ -11,6 +11,8 @@ public record ValidationExecutionResult(
     DateTime CompletedAtUtc,
     ValidationExecutionStatus OverallStatus,
     bool IsFullyValid,
+    double IntegridadScore,
+    string? SelloName,
     InternalValidationSummaryDto? InternalValidation,
     List<ValidationSourceResult> ExternalSources,
     List<string> Errors

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Domain.Common;
 using Domain.Enums;
+using Domain.ValueObjects;
 
 public class Validacion : EntityBase
 {
@@ -18,8 +19,17 @@ public class Validacion : EntityBase
     public ValidationStatus Estado => EstadoValidacion;
     public string TipoValidacion => FuenteValidacion;
     public bool? EsLegitimo { get; private set; }
+    public double? PorcentajeIntegridad { get; private set; }
     public string? Detalle { get; private set; }
     public string? CamposValidadosJson { get; private set; }
+
+    // Enterprise Fields (RF-11 to RF-15)
+    private readonly List<DatoValidado> _datosValidados = new();
+    public IReadOnlyCollection<DatoValidado> DatosValidados => _datosValidados.AsReadOnly();
+
+    public SelloIntegridad? Sello { get; private set; }
+    public Guid? SelloId { get; private set; }
+    public string? SelloNombre => Sello?.Nombre;
 
     // Navigation properties
     public ICollection<Hallazgo> Hallazgos { get; private set; } = new List<Hallazgo>();
@@ -45,12 +55,32 @@ public class Validacion : EntityBase
         EstadoValidacion = ValidationStatus.Pending;
     }
 
-    public void CompleteValidation(bool esLegitimo, string? detalle, string? camposValidadosJson = null)
+    public void CompleteValidation(bool esLegitimo, string? detalle, string? camposValidadosJson = null, double? porcentaje = null)
     {
         EstadoValidacion = ValidationStatus.Completed;
         EsLegitimo = esLegitimo;
         Detalle = detalle;
         CamposValidadosJson = camposValidadosJson;
+        PorcentajeIntegridad = porcentaje;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AddDatoValidado(DatoValidado dato)
+    {
+        _datosValidados.Add(dato);
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AssignSello(SelloIntegridad sello)
+    {
+        Sello = sello;
+        SelloId = sello.Id;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateIntegrityScore(double score)
+    {
+        PorcentajeIntegridad = score;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
