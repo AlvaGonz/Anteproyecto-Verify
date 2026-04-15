@@ -122,7 +122,7 @@ public class InternalValidationEngine : IInternalValidationEngine
             v.ProyectoId,
             v.EstadoValidacion,
             v.EsLegitimo,
-            v.PorcentajeIntegridad,
+            v.PorcentajeIntegridad ?? 0.0,
             v.SelloNombre,
             passed,
             warning,

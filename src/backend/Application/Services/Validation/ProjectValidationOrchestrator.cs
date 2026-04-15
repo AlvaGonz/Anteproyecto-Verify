@@ -22,6 +22,8 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
     private readonly IExternalProviderResolver _externalProviderResolver;
     private readonly IAuditoriaRepository _auditoriaRepository;
     private readonly IReporteRepository _reporteRepository;
+    private readonly IIntegrityScoringService _scoringService;
+    private readonly ISelloIntegridadRepository _selloRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public ProjectValidationOrchestrator(
@@ -138,7 +140,7 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
         }
 
         // 4. Consolidar resultados y Calcular Score
-        var internalRuleResults = internalResult?.Reglas ?? Enumerable.Empty<ValidationRuleResultDto>();
+        var internalRuleResults = internalResult?.Results ?? Enumerable.Empty<ValidationRuleResultDto>();
         var integridadScore = _scoringService.CalculateScore(internalRuleResults, externalResults);
         
         bool hasCriticalFindings = internalRuleResults.Any(r => r.Severity == FindingSeverity.Critical) || 

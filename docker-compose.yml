@@ -11,6 +11,7 @@ services:
       - .:/src
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - UseMockData=false
     env_file:
       - .env
     depends_on:
