@@ -84,7 +84,7 @@ export const HeroSection: React.FC = () => {
               <Lock className="w-3.5 h-3.5 text-primary" /> Conexión Notarial
             </Link>
             <Link to="/portal" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
-              <Building2 className="w-3.5 h-3.5 text-primary" /> Data Curaduría
+              <Building2 className="w-3.5 h-3.5 text-primary" /> Data Procuraduría
             </Link>
           </div>
         </motion.div>

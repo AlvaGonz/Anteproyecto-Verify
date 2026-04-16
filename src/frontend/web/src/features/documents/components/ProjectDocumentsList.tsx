@@ -107,7 +107,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                       </span>
                     )}
                   </div>
-                  <h5 className="text-base font-black text-secondary truncate group-hover:text-primary transition-colors">
+                  <h5 className="text-sm sm:text-base font-black text-secondary truncate group-hover:text-primary transition-colors max-w-[200px] sm:max-w-none">
                     {doc.nombreArchivoOriginal}
                   </h5>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
@@ -162,7 +162,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
       
       <div className="p-4 rounded-2xl bg-primary/[0.03] border border-primary/10 flex items-start gap-3 mt-8">
          <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-         <div>
+         <div className="min-w-0 flex-1">
             <p className="text-xs font-black text-secondary uppercase tracking-tight">Sobre las Versiones</p>
             <p className="text-[10px] text-on-surface-variant font-medium mt-1">
               Antigravity Verify mantiene un historial de versiones para cada documento subido. Los documentos archivados no se eliminan, permanecen en el repositorio inmutable para auditoría RI.

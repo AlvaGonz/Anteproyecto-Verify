@@ -66,8 +66,12 @@ export const AdminProjectsPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const data = await projectsApi.getProjects();
-        setProjects(data);
+        const response = await projectsApi.getProjects();
+        if (response._tag === "Success") {
+          setProjects(response.data);
+        } else {
+          addToast("Error al cargar los proyectos", "error");
+        }
       } catch {
         addToast("Error al cargar los proyectos", "error");
       } finally {
