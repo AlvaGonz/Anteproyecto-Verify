@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { DocumentDto, UploadDocumentDto } from "../../features/documents/types";
+import { DocumentDto, UploadDocumentDto, DocumentType } from "../../features/documents/types";
 import { documentsApi } from "../../features/documents/api/documentsApi";
 import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
@@ -15,8 +15,74 @@ import {
   Clock,
   HardDrive,
   Search,
-  Filter
+  Filter,
+  FileCheck2,
+  CheckCircle2,
+  Upload
 } from "lucide-react";
+
+// Configuración de documentos obligatorios para el checklist
+const REQUIRED_DOCUMENTS = [
+  { id: "titulo", label: "Título de Propiedad", category: DocumentType.CertificadoTitulo, categoryLabel: "TITULO", description: "Documento notarial original o copia certificada" },
+  { id: "estado_juridico", label: "Estado Jurídico", category: DocumentType.CertificacionEstadoJuridico, categoryLabel: "ESTADO J.", description: "Certificación de estado legal del inmueble" },
+  { id: "mensura", label: "Plano de Mensura", category: DocumentType.PlanoMensuraCatastral, categoryLabel: "MENSURA", description: "Plano catastral aprobado por autoridad competente" },
+  { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.CopiaCedulaIdentidad, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
+  { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
+];
+
+const RequiredDocumentsList: React.FC<{ documents: DocumentDto[] }> = ({ documents }) => {
+  return (
+    <div className="vf-card p-6 bg-surface-container-low/30 overflow-hidden relative group">
+      <div className="flex items-center gap-3 mb-6 relative z-10">
+        <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+          <FileCheck2 className="w-5 h-5" />
+        </div>
+        <div>
+          <h3 className="text-xl font-display font-black text-secondary tracking-tight">Estatus <span className="text-primary italic">Legal</span></h3>
+          <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mt-1">Checklist de Cumplimiento RI</p>
+        </div>
+      </div>
+
+      <div className="space-y-3 relative z-10">
+        {REQUIRED_DOCUMENTS.map((doc) => {
+          const isUploaded = documents.some(u => u.tipoDocumento === doc.category && u.activo);
+          
+          return (
+            <div 
+              key={doc.id}
+              className={`p-4 rounded-2xl border transition-all flex items-center justify-between group/item ${
+                isUploaded 
+                  ? 'bg-success/5 border-success/20' 
+                  : 'bg-white border-outline-variant/30 hover:border-primary/30'
+              }`}
+            >
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0 ${
+                  isUploaded ? 'bg-success text-white' : 'bg-surface-container-high text-on-surface-variant'
+                }`}>
+                  {isUploaded ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-4 h-4 opacity-40" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs font-black tracking-tight truncate ${isUploaded ? 'text-success' : 'text-secondary'}`}>
+                    {doc.label}
+                  </p>
+                  <p className="text-[10px] font-bold text-on-surface-variant opacity-60 leading-tight truncate">
+                    {doc.description}
+                  </p>
+                </div>
+              </div>
+              <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${
+                isUploaded ? 'bg-success/20 text-success' : 'bg-surface-container-highest text-on-surface-variant'
+              }`}>
+                {doc.categoryLabel}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export const ProjectDocumentsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -87,7 +153,7 @@ export const ProjectDocumentsPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+    <div className="w-full mx-auto animate-fade-in">
       {/* Page Header */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
@@ -159,16 +225,27 @@ export const ProjectDocumentsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-        {/* Forms Section */}
-        <div className="xl:col-span-4 space-y-8">
-          <div className="sticky top-24">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        {/* Column Left: Checklist + Upload Form */}
+        <div className="xl:col-span-4 flex flex-col gap-6">
+          <RequiredDocumentsList documents={documents} />
+
+          <div className="vf-card p-6 border-dashed border-2 bg-surface-container-low/30">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <Upload className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-xl font-display font-black text-secondary tracking-tight">Nueva <span className="text-primary italic">Carga</span></h3>
+                <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mt-1">Añadir evidencia legal</p>
+              </div>
+            </div>
             <DocumentUploadForm projectId={id!} onUpload={handleUpload} />
           </div>
         </div>
 
-        {/* List Section */}
-        <div className="xl:col-span-8 flex flex-col gap-6">
+        {/* Column Right: Document Explorer */}
+        <div className="xl:col-span-8 space-y-6 min-h-[800px]">
           <div className="vf-card !p-3 flex flex-col sm:flex-row items-center gap-3">
              <div className="relative flex-1 group w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
@@ -187,7 +264,7 @@ export const ProjectDocumentsPage: React.FC = () => {
              </button>
           </div>
 
-          <div className="vf-card p-6 min-h-[500px]">
+          <div className="vf-card p-6 min-h-[800px]">
             <ProjectDocumentsList
               documents={filteredDocuments}
               onDownload={handleDownload}
