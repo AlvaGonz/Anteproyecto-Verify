@@ -17,7 +17,9 @@ import {
   MapIcon
 } from "lucide-react";
 import QRCode from "react-qr-code";
-import { PublicVerificationBadge, VerificationStatus } from "./PublicVerificationBadge";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { VerificationStatus } from "./PublicVerificationBadge";
 
 interface VerificationResultCardProps {
   data: PublicProjectVerificationDto;
@@ -289,8 +291,4 @@ export const VerificationResultCard: React.FC<VerificationResultCardProps> = ({
   );
 };
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-type ClassValue = string | number | boolean | undefined | null | { [key: string]: any } | ClassValue[];
+// Helper components or utilities can be added here if needed
