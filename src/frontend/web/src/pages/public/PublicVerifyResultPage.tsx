@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { PublicProjectVerificationDto } from "../../features/public-verification/types";
 import { publicVerificationApi } from "../../features/public-verification/api/publicVerificationApi";
 import { VerificationResultCard } from "../../features/public-verification/components/VerificationResultCard";
@@ -17,9 +17,23 @@ import {
 
 export const PublicVerifyResultPage: React.FC = () => {
   const { code } = useParams<{ code: string }>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const type = searchParams.get("type") || "cert";
+
   const [data, setData] = useState<PublicProjectVerificationDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const getSearchTypeLabel = () => {
+    switch (type) {
+      case "suelo": return "Número de Suelo";
+      case "ipi": return "IPI";
+      case "rnc": return "RNC";
+      case "cedula": return "Cédula";
+      default: return "Sello VeriFinca";
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -27,12 +41,12 @@ export const PublicVerifyResultPage: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await publicVerificationApi.verifyCode(code);
+        const response = await publicVerificationApi.verifyCode(code, type);
         if (response._tag === "Success") {
           if (response.data) {
             setData(response.data);
           } else {
-            setError("El código ingresado no corresponde a ningún proyecto verificado en nuestra plataforma.");
+            setError(`El valor "${code}" no corresponde a ningún ${getSearchTypeLabel()} verificado en nuestra plataforma.`);
           }
         } else {
           setError(response.error.message);
@@ -43,7 +57,7 @@ export const PublicVerifyResultPage: React.FC = () => {
         setIsLoading(false);
       }
     })();
-  }, [code]);
+  }, [code, type]);
 
   /* ── Loading state ── */
   if (isLoading) {

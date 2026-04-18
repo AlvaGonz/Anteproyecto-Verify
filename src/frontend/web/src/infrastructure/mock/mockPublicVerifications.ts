@@ -12,6 +12,9 @@ export const mockPublicProjectVerifications: PublicProjectVerificationDto[] = [
     isVerifiable: true,
     summary: "Proyecto verificado bajo la Ley 189-11 de Desarrollo del Mercado Hipotecario y Fideicomiso. Todos los permisos ambientales y municipales se encuentran vigentes y validados vía blockchain.",
     developerName: "Grupo Inmobiliario del Este S.A.S",
+    numSuelo: "DC-12345",
+    ipi: "IPI-2026-9901",
+    rnc: "101-23456-1",
     validationDimensions: [
       { label: "Titularidad de Tierra", checked: true },
       { label: "Permisos Ambientales", checked: true },
@@ -31,6 +34,9 @@ export const mockPublicProjectVerifications: PublicProjectVerificationDto[] = [
     isVerifiable: true,
     summary: "Edificación completada. Se detectaron observaciones menores en el registro de áreas comunes que están en proceso de rectificación ante las autoridades correspondientes.",
     developerName: "Desarrollos Modernos Metro, SRL",
+    cedula: "001-2233445-6",
+    numSuelo: "DC-67890",
+    ipi: "IPI-2025-4422",
     validationDimensions: [
       { label: "Titularidad de Tierra", checked: true },
       { label: "Permisos Ambientales", checked: true },
@@ -50,6 +56,9 @@ export const mockPublicProjectVerifications: PublicProjectVerificationDto[] = [
     isVerifiable: false,
     summary: "ALERTA: Se han detectado inconsistencias graves entre la documentación legal presentada y los registros en Catastro Nacional. Se recomienda precaución extrema.",
     developerName: "Unknown Developer Group",
+    rnc: "402-998877-5",
+    cedula: "054-0012345-1",
+    numSuelo: "DC-11223",
     validationDimensions: [
       { label: "Titularidad de Tierra", checked: false },
       { label: "Permisos Ambientales", checked: false },
