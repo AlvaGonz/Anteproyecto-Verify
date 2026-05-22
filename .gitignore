@@ -10,6 +10,9 @@ node_modules/
 dist/
 .env
 .env.local
+package-lock.json
+yarn.lock
+.npm/
 
 # OS
 .DS_Store

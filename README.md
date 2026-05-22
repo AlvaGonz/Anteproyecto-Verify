@@ -26,8 +26,8 @@ dotnet test
 Para ejecutar las pruebas del frontend:
 ```bash
 cd src/frontend/web
-npm install
-npm run test
+pnpm install
+pnpm run test
 ```
 Para generar la migración inicial del modelo de dominio, ejecuta:
 ```bash

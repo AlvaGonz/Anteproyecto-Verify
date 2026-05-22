@@ -10,3 +10,6 @@ README.md
 docker-compose.yml
 docker/
 scripts/
+**/package-lock.json
+**/yarn.lock
+**/.npm/

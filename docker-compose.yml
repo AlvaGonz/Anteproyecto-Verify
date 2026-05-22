@@ -20,13 +20,14 @@ services:
 
   web:
     build:
-      context: ./src/frontend/web
-      dockerfile: ../../../docker/web.dev.Dockerfile
+      context: .
+      dockerfile: docker/web.dev.Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./src/frontend/web:/app
+      - ./src/frontend/web:/app/src/frontend/web
       - /app/node_modules
+      - /app/src/frontend/web/node_modules
     environment:
       - VITE_WATCH_POLLING=true
     env_file:
