@@ -55,6 +55,12 @@ function getCodeToExecute() {
   // Case 1: File path provided
   if (args.length > 0 && fs.existsSync(args[0])) {
     const filePath = path.resolve(args[0]);
+    // Guard: only allow files within the skill directory or current working directory
+    const allowedBases = [path.resolve(__dirname), path.resolve(process.cwd())];
+    if (!allowedBases.some(base => filePath.startsWith(base))) {
+      console.error('❌ Path traversal blocked: file must be within skill or working directory');
+      process.exit(1);
+    }
     console.log(`📄 Executing file: ${filePath}`);
     return fs.readFileSync(filePath, 'utf8');
   }

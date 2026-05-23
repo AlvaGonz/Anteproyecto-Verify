@@ -2,6 +2,7 @@
 // Reusable utility functions for Playwright automation
 
 const { chromium, firefox, webkit } = require('playwright');
+const http = require('http');
 
 /**
  * Parse extra HTTP headers from environment variables.
@@ -41,6 +42,12 @@ function getExtraHeadersFromEnv() {
  * @param {Object} options - Additional launch options
  */
 async function launchBrowser(browserType = 'chromium', options = {}) {
+  // Allowlist guard: prevent prototype pollution via bracket notation
+  const VALID_BROWSERS = ['chromium', 'firefox', 'webkit'];
+  if (!VALID_BROWSERS.includes(browserType)) {
+    throw new Error(`Invalid browser type: ${browserType}. Must be one of: ${VALID_BROWSERS.join(', ')}`);
+  }
+
   const defaultOptions = {
     headless: process.env.HEADLESS !== 'false',
     slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
@@ -49,10 +56,6 @@ async function launchBrowser(browserType = 'chromium', options = {}) {
 
   const browsers = { chromium, firefox, webkit };
   const browser = browsers[browserType];
-
-  if (!browser) {
-    throw new Error(`Invalid browser type: ${browserType}`);
-  }
 
   return await browser.launch({ ...defaultOptions, ...options });
 }
@@ -375,7 +378,6 @@ async function createContext(browser, options = {}) {
  * @returns {Promise<Array>} Array of detected server URLs
  */
 async function detectDevServers(customPorts = []) {
-  const http = require('http');
 
   // Common dev server ports
   const commonPorts = [3000, 3001, 3001, 5173, 8080, 8000, 4200, 5000, 9000, 1234];

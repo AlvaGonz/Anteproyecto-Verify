@@ -149,20 +149,27 @@ def main():
         "content": build_message_content(args.prompt, args.input_image),
     })
 
-    response = client.chat.completions.create(
-        model="google/gemini-3-pro-image-preview",
-        messages=messages,
-        extra_body={
-            "modalities": ["image", "text"],
-            # https://openrouter.ai/docs/guides/overview/multimodal/image-generation#image-configuration-options
-            "image_config": {
-                # "aspect_ratio": "16:9",
-                "image_size": image_size,
-            }
-        },
-    )
+    try:
+        response = client.chat.completions.create(
+            model="google/gemini-3-pro-image-preview",
+            messages=messages,
+            max_tokens=4096,
+            extra_body={
+                "modalities": ["image", "text"],
+                # https://openrouter.ai/docs/guides/overview/multimodal/image-generation#image-configuration-options
+                "image_config": {
+                    # "aspect_ratio": "16:9",
+                    "image_size": image_size,
+                }
+            },
+        )
+    except Exception as e:
+        raise SystemExit(f"API call failed: {e}")
 
     message = response.choices[0].message
+    # Check for model refusal before accessing content
+    if hasattr(message, 'refusal') and message.refusal:
+        raise SystemExit(f"Model refused request: {message.refusal}")
     images = getattr(message, "images", None)
     if not images:
         raise SystemExit("No images returned by the API.")

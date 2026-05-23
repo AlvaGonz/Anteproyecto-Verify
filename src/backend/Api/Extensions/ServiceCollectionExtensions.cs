@@ -16,8 +16,14 @@ public static class ServiceCollectionExtensions
         
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll", builder =>
-                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")
+                ?.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                ?? new[] { "http://localhost:5173" };
+
+            options.AddPolicy("AllowFrontend", policy =>
+                policy.WithOrigins(allowedOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
         });
 
         return services;
