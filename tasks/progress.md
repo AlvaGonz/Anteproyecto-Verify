@@ -27,5 +27,13 @@
 - Executed full test suite via `pnpm --filter web-frontend test`.
 - All 22 tests across 7 test suites passed perfectly without any regression or configuration issues.
 
+### [11:30] False IDE Errors & tsbuildinfo Resolution
+- IDE reported cascaded "Cannot find module 'react'" and "implicitly has an 'any' type" warnings referencing non-existent `@types/react@19.2.15` and `@types/node@22.19.19` folders in `.pnpm`.
+- CLI typecheck and build passed 100% cleanly in 4s, indicating that the source code and configuration were fully correct.
+- Identified that the IDE's TS Language Server was reading stale TypeScript build cache files (`.tsbuildinfo`) containing serialized resolved paths to the old packages from a previous package tree structure.
+- Deleted `src/frontend/web/*.tsbuildinfo` and `src/frontend/web/dist-node/*.tsbuildinfo`.
+- Added `"forceConsistentCasingInFileNames": true` to compiler options in both frontend and root `tsconfig.json` files to force the IDE Language Server to flush and re-index the directories.
+- Re-ran frontend build and confirmed clean regeneration of cache and full test verification.
+
 ---
 *Status: Complete*

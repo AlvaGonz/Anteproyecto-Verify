@@ -9,3 +9,4 @@
 
 ## Duplicate/Ambiguous Files
 - Stale cache files and multiple duplicate configurations exist due to untracked/uncleaned node_modules virtual store.
+- **Stale TypeScript Build Cache (`.tsbuildinfo`)**: Stale build cache files (e.g. `tsconfig.node.tsbuildinfo`) in `src/frontend/web` and `dist-node` contained serialized resolved paths to the old packages (like `@types/react@19.2.15` and `@types/node@22.19.19`), causing the editor's TypeScript Language Server to attempt loading non-existent directories and throwing false type errors. Deleting them and running a clean build successfully regenerated correct cache files.

@@ -4,7 +4,7 @@
 Resolve type mismatch errors in the Vite and Vitest configurations, clean up stale package versions in `.pnpm`, and establish a reliable, clean-compiling workspace.
 
 ## Current Phase
-Phase 5: Delivery
+Phase 6: Final Handoff
 
 ## Phases
 
@@ -30,6 +30,13 @@ Phase 5: Delivery
 - [x] Run TypeScript typecheck to verify no compiler errors
 - [x] Build the web frontend via `pnpm --filter web-frontend build`
 - [x] Execute Vitest test suite via `pnpm --filter web-frontend test`
+- **Status:** complete
+
+### Phase 5: Stale IDE Cache Cleanup
+- [x] Identify stale `.tsbuildinfo` files with serialized paths to old packages
+- [x] Delete `*.tsbuildinfo` files in subfolder and `dist-node`
+- [x] Add `forceConsistentCasingInFileNames: true` to trigger TS Server flush
+- [x] Regenerate pristine build cache and verify CLI output
 - **Status:** complete
 
 ## Key Questions
