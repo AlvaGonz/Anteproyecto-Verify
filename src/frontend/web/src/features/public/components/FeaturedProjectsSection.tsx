@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, MapPin, ChevronRight, FileCheck } from "lucide-react";
+import { motion } from "framer-motion";
+import { CheckCircle2, MapPin, ChevronRight } from "lucide-react";
 
 interface Project {
   name: string;

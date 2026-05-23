@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DocumentType, UploadDocumentDto } from "../types";
-import { Upload, FileText, Calendar, Landmark, Info, X, CheckCircle2, ShieldCheck } from "lucide-react";
+import { FileText, Calendar, Landmark, Info, X, CheckCircle2, ShieldCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface DocumentUploadFormProps {
   projectId: string;
@@ -21,6 +22,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const { t } = useTranslation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -134,7 +136,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                   }`}
                 >
                   <label htmlFor="file-upload" className="absolute inset-0 z-10 cursor-pointer">
-                    <span className="sr-only">Subir archivo</span>
+                    <span className="sr-only">{t('documentUpload.uploadFile')}</span>
                   </label>
                   <div className="w-16 h-16 bg-primary-container/20 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 mb-2">
                     <FileText className="w-8 h-8 text-primary" />
@@ -288,12 +290,12 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
             {isSubmitting ? (
               <>
                  <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                 <span className="font-black uppercase tracking-widest text-[11px]">Procesando...</span>
+                 <span className="font-black uppercase tracking-widest text-[11px]">{t('documentUpload.processing')}</span>
               </>
             ) : (
               <>
                  <ShieldCheck className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                 <span className="font-black uppercase tracking-widest text-[11px]">Sellar con VeriFinca</span>
+                 <span className="font-black uppercase tracking-widest text-[11px]">{t('documentUpload.sealBtn')}</span>
               </>
             )}
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>

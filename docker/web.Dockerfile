@@ -8,7 +8,8 @@ COPY src/frontend/web/ ./src/frontend/web/
 WORKDIR /app/src/frontend/web
 RUN pnpm run build
 
-FROM nginx:alpine
+FROM nginxinc/nginx-unprivileged:alpine
 COPY --from=build /app/src/frontend/web/dist /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 8080
+USER nginx
 CMD ["nginx", "-g", "daemon off;"]

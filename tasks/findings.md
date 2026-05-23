@@ -1,10 +1,11 @@
 # Findings: Frontend Technical Debt Audit
 
 ## Structural Discoveries
-- (To be populated during Task 1.1)
+- Stale, orphaned `.pnpm` folders exist in `node_modules/.pnpm` (specifically `vite@5.4.21` and `vite@6.4.2`), causing editor type-check resolution conflicts while the lockfile itself was correctly locked to `vite@6.2.0`.
+- Missing peer dependency alignment/overrides allowed pnpm to fetch and cache these multiple versions previously.
 
 ## Architecture Boundary Violations
-- (To be populated during Phase 2)
+- (To be analyzed in subsequent steps as required)
 
 ## Duplicate/Ambiguous Files
-- (To be populated during Task 2.2)
+- Stale cache files and multiple duplicate configurations exist due to untracked/uncleaned node_modules virtual store.

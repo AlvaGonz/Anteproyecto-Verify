@@ -12,11 +12,13 @@ import {
   AlertCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { LandingNav, LandingFooter, ProjectStatusBadge, VerifySearchForm } from "../../features/public/components";
 import { projectsApi } from "../../features/projects/api/projectsApi";
 import { ProyectoDto, ProjectStatus } from "../../features/projects/types";
 
 export const ProjectsPublicListPage: React.FC = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -74,7 +76,7 @@ export const ProjectsPublicListPage: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
             >
               <ShieldCheck className="w-4 h-4 text-primary" />
-              <span className="text-primary text-[10px] font-black tracking-[0.2em] uppercase">Portal de Transparencia VeriFinca</span>
+              <span className="text-primary text-[10px] font-black tracking-[0.2em] uppercase">{t('projectsList.heroSub')}</span>
             </motion.div>
 
             <motion.h1 
@@ -84,7 +86,7 @@ export const ProjectsPublicListPage: React.FC = () => {
               className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight tracking-tight"
             >
               Cero Incertidumbre En Su <br/>
-              <span className="text-primary italic">Inversión Inmobiliaria</span>
+              <span className="text-primary italic">{t('projectsList.heroTitleHighlight')}</span>
             </motion.h1>
 
             <motion.p 
@@ -111,8 +113,8 @@ export const ProjectsPublicListPage: React.FC = () => {
         <section className="py-20 px-6 max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
             <div>
-              <h2 className="text-3xl font-black text-slate-900 mb-2">Directorio de Proyectos</h2>
-              <p className="text-slate-500 font-medium">Explore proyectos que han pasado por nuestro riguroso proceso de validación.</p>
+              <h2 className="text-3xl font-black text-slate-900 mb-2">{t('projectsList.dirTitle')}</h2>
+              <p className="text-slate-500 font-medium">{t('projectsList.dirDesc')}</p>
             </div>
 
             <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
@@ -138,9 +140,9 @@ export const ProjectsPublicListPage: React.FC = () => {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="bg-transparent text-sm font-bold text-slate-700 focus:outline-none"
                 >
-                  <option value="ALL">TODOS LOS ESTATUS</option>
-                  <option value="CERTIFIED">CERTIFICADOS</option>
-                  <option value="PROCESSING">EN PROCESO</option>
+                  <option value="ALL">{t('projectsList.filterAll')}</option>
+                  <option value="CERTIFIED">{t('projectsList.filterCertified')}</option>
+                  <option value="PROCESSING">{t('projectsList.filterProcessing')}</option>
                 </select>
               </div>
             </div>
@@ -197,7 +199,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                         {/* Integrity Progress */}
                         <div className="space-y-1.5">
                           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            <span>Integridad Validada</span>
+                            <span>{t('projectsList.integrityValidated')}</span>
                             <span className="text-primary">{completion}%</span>
                           </div>
                           <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -233,8 +235,8 @@ export const ProjectsPublicListPage: React.FC = () => {
               <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-6">
                 <AlertCircle size={32} />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
-              <p className="text-slate-500 max-w-xs mx-auto font-medium">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">{t('projectsList.emptyTitle')}</h3>
+              <p className="text-slate-500 max-w-xs mx-auto font-medium">{t('projectsList.emptyDesc')}</p>
               <button 
                 onClick={() => {setSearchQuery(""); setStatusFilter("ALL");}}
                 className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
@@ -265,15 +267,15 @@ export const ProjectsPublicListPage: React.FC = () => {
               <div className="hidden md:flex flex-col gap-6 w-full max-w-xs shrink-0 bg-white/5 backdrop-blur-sm p-8 rounded-[32px] border border-white/10">
                 <div className="flex gap-4 items-center">
                   <div className="w-10 h-10 bg-white text-primary rounded-xl flex items-center justify-center shrink-0"><CheckCircle2 size={20} /></div>
-                  <span className="text-sm font-bold opacity-90 tracking-tight">Debida Diligencia Integral</span>
+                  <span className="text-sm font-bold opacity-90 tracking-tight">{t('projectsList.ctaDiligence')}</span>
                 </div>
                 <div className="flex gap-4 items-center">
                   <div className="w-10 h-10 bg-white text-primary rounded-xl flex items-center justify-center shrink-0"><CheckCircle2 size={20} /></div>
-                  <span className="text-sm font-bold opacity-90 tracking-tight">Sellado Blockchain Inmutable</span>
+                  <span className="text-sm font-bold opacity-90 tracking-tight">{t('projectsList.ctaBlockchain')}</span>
                 </div>
                 <div className="flex gap-4 items-center">
                   <div className="w-10 h-10 bg-white text-primary rounded-xl flex items-center justify-center shrink-0"><CheckCircle2 size={20} /></div>
-                  <span className="text-sm font-bold opacity-90 tracking-tight">Monitoreo 24/7 de Estatus</span>
+                  <span className="text-sm font-bold opacity-90 tracking-tight">{t('projectsList.ctaMonitoring')}</span>
                 </div>
               </div>
             </div>

@@ -1,31 +1,49 @@
-# Task Plan: Frontend Technical Debt Audit
+# Task Plan: Resolve Vite Type Mismatches & Technical Debt Audit
 
-## Status: IN_PROGRESS
-**Target:** src/frontend/web/
-**Branch:** genspark-frontend
-**Date:** 2026-04-14
+## Goal
+Resolve type mismatch errors in the Vite and Vitest configurations, clean up stale package versions in `.pnpm`, and establish a reliable, clean-compiling workspace.
 
----
+## Current Phase
+Phase 5: Delivery
 
-## Phase 1: Context Mapping & Skills Discovery (READ-ONLY)
-- [ ] Task 1.1: Map current structure (package.json, tsconfig, vite.config, directory listing)
-- [ ] Task 1.2: Identify and select agent skills from `.agent/skills/`
-- [ ] Task 1.3: Generate initial `TECH_DEBT_AUDIT.md` report
+## Phases
 
-## Phase 2: Implementation & Safe Cleanup (ATOMIC COMMITS)
-- [ ] Task 2.1: Cleanup build artifacts using `gitignore-cleanup`
-- [ ] Task 2.2: Resolve `vite.config.ts` vs `vite.config.js` conflict
-- [ ] Task 2.3: Audit and document `pages/` vs `features/` consolidation
-- [ ] Task 2.4: Generate missing barrel `index.ts` files
-- [ ] Task 2.5: Audit deep relative imports and TS aliases
-- [ ] Task 2.6: Update `TECH_DEBT_AUDIT.md` with actions and backlog
+### Phase 1: Discovery & Planning
+- [x] Analyze the IDE compilation errors
+- [x] Identify stale Vite versions (`5.4.21` and `6.4.2`) inside `.pnpm`
+- [x] Create and approve the implementation plan
+- **Status:** complete
 
-## Phase 3: Technical Validation & Verification
-- [ ] Task 3.1: Full validation (tsc, lint, build, untracked files)
-- [ ] Task 3.2: Final quality checklist verification
-- [ ] Task 3.3: Final push to `genspark-frontend`
+### Phase 2: Setup Planning Artifacts
+- [x] Initialize `task_plan.md`
+- [x] Initialize `progress.md`
+- [x] Update `findings.md`
+- **Status:** complete
 
----
+### Phase 3: Resolution & Cleanup
+- [x] Add `"vite": "6.2.0"` override to root `package.json`
+- [x] Clean stale `node_modules` folders
+- [x] Run a clean `pnpm install`
+- **Status:** complete
 
-## Error Log
-*(No errors encountered yet)*
+### Phase 4: Testing & Verification
+- [x] Run TypeScript typecheck to verify no compiler errors
+- [x] Build the web frontend via `pnpm --filter web-frontend build`
+- [x] Execute Vitest test suite via `pnpm --filter web-frontend test`
+- **Status:** complete
+
+## Key Questions
+1. Do other workspace packages require overrides? (Currently only `@types/react`, `@types/react-dom`, `tsx`, and `vite` require overrides to prevent mismatches).
+2. Are there unused or dead files to clean up later? (Yes, that will be addressed in a follow-up dead-code cleanup phase if requested).
+
+## Decisions Made
+| Decision | Rationale |
+|----------|-----------|
+| Override `vite` to `6.2.0` | Forces all workspace and nested dependencies to resolve to the exact version declared in `package.json` |
+| Clean delete of `node_modules` | Standard, robust way to eliminate stale, untracked, or orphaned folders in the `.pnpm` virtual store |
+
+## Errors Encountered
+| Error | Attempt | Resolution |
+|-------|---------|------------|
+| Stuck pnpm install (out of memory / paging file too small) | 1       | Terminated background task, will retry after freeing memory / waiting |
+| Build failed with realpath UNKNOWN error on lucide-react | 2       | Logged. Will retry now that I/O has settled, or check for locked handles |

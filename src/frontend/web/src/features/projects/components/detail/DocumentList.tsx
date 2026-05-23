@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ValidationDocument as Document } from '../../types';
 
 interface DocumentListProps {
@@ -8,11 +9,13 @@ interface DocumentListProps {
 }
 
 export const DocumentList: React.FC<DocumentListProps> = ({ documents }) => {
+  const { t } = useTranslation();
+
   return (
     <section>
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-extrabold text-[#223382]">Documentación Legal</h2>
-        <span className="text-sm font-medium text-[#223382]/60">Actualizado: Sep 2024</span>
+        <h2 className="text-3xl font-extrabold text-[#223382]">{t('documentList.title')}</h2>
+        <span className="text-sm font-medium text-[#223382]/60">{t('documentList.updatedAt')}</span>
       </div>
       <div className="space-y-4">
         {documents.map((doc, index) => (
