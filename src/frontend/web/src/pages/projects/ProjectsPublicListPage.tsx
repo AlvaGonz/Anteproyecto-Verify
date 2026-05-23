@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Filter,
@@ -13,54 +13,48 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LandingNav, LandingFooter, ProjectStatusBadge, VerifySearchForm } from "../../features/public/components";
-
-// Mock data for projects (ensure it matches the domain types)
-const MOCK_PROJECTS = [
-  {
-    id: "1",
-    name: "Residencial Terra Noble",
-    location: "Punta Cana, RD",
-    status: "CERTIFIED",
-    imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
-    lastVerification: "2024-03-10",
-    description: "Complejo residencial de lujo con certificación de integridad VeriFinca Oro.",
-    completionPercentage: 85,
-  },
-  {
-    id: "2",
-    name: "Torre San Gerónimo",
-    location: "Santo Domingo, RD",
-    status: "PROCESSING",
-    imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
-    lastVerification: "2024-03-12",
-    description: "Proyecto corporativo en fase final de validación legal y técnica.",
-    completionPercentage: 45,
-  },
-  {
-    id: "3",
-    name: "Plaza Central Mall",
-    location: "Santiago, RD",
-    status: "CERTIFIED",
-    imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
-    lastVerification: "2024-03-08",
-    description: "Centro comercial verificado con protocolos de transparencia institucional.",
-    completionPercentage: 100,
-  }
-];
+import { projectsApi } from "../../features/projects/api/projectsApi";
+import { ProyectoDto, ProjectStatus } from "../../features/projects/types";
 
 export const ProjectsPublicListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [projects, setProjects] = useState<ProyectoDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setIsLoading(true);
+      const result = await projectsApi.getProjects();
+      if (result._tag === "Success") {
+        setProjects(result.data);
+      } else {
+        console.error("Failed to fetch projects");
+      }
+      setIsLoading(false);
+    };
+
+    fetchProjects();
+  }, []);
 
   const filteredProjects = useMemo(() => {
-    return MOCK_PROJECTS.filter((project) => {
-      const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          project.location.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "ALL" || project.status === statusFilter;
+    return projects.filter((project) => {
+      const matchesSearch = project.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          project.ubicacionTexto.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      let matchesStatus = false;
+      if (statusFilter === "ALL") {
+        matchesStatus = true;
+      } else if (statusFilter === "CERTIFIED") {
+        matchesStatus = project.estadoProyecto === ProjectStatus.Validated;
+      } else if (statusFilter === "PROCESSING") {
+        matchesStatus = project.estadoProyecto === ProjectStatus.InReview || project.estadoProyecto === ProjectStatus.Published;
+      }
+
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter, projects]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-primary/10 selection:text-primary">
@@ -154,73 +148,83 @@ export const ProjectsPublicListPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project, idx) => (
-                <motion.div
-                  key={project.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  className="group bg-white rounded-[32px] overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col"
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <img 
-                      src={project.imageUrl} 
-                      alt={project.name} 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute top-6 left-6">
-                      <ProjectStatusBadge status={project.status as any} />
-                    </div>
-                  </div>
-
-                  <div className="p-8 flex flex-col flex-1">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-black text-slate-900 mb-1 group-hover:text-primary transition-colors">{project.name}</h3>
-                        <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wide">
-                          <Building2 size={12} />
-                          {project.location}
-                        </div>
+              {isLoading ? (
+                <div className="col-span-full py-20 flex justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+              ) : filteredProjects.map((project, idx) => {
+                const statusStr = project.estadoProyecto === ProjectStatus.Validated ? "CERTIFIED" : "PROCESSING";
+                const imgUrl = project.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop";
+                const completion = project.completionRate || 0;
+                
+                return (
+                  <motion.div
+                    key={project.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4, delay: idx * 0.05 }}
+                    className="group bg-white rounded-[32px] overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <img 
+                        src={imgUrl} 
+                        alt={project.nombre} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute top-6 left-6">
+                        <ProjectStatusBadge status={statusStr as any} />
                       </div>
                     </div>
 
-                    <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">
-                      {project.description}
-                    </p>
-
-                    <div className="mt-auto space-y-4">
-                      {/* Integrity Progress */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-                          <span>Integridad Validada</span>
-                          <span className="text-primary">{project.completionPercentage}%</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${project.completionPercentage}%` }}
-                            transition={{ duration: 1, delay: 0.5 }}
-                            className="h-full bg-primary"
-                          />
+                    <div className="p-8 flex flex-col flex-1">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="text-xl font-black text-slate-900 mb-1 group-hover:text-primary transition-colors">{project.nombre}</h3>
+                          <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wide">
+                            <Building2 size={12} />
+                            {project.ubicacionTexto}
+                          </div>
                         </div>
                       </div>
 
-                      <Link 
-                        to={`/projects/${project.id}`}
-                        className="flex items-center justify-center gap-2 w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all group/btn"
-                      >
-                        Ver Detalles <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
-                      </Link>
+                      <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">
+                        {project.datosDesarrollador || "Proyecto verificado bajo estrictos estándares de transparencia institucional."}
+                      </p>
+
+                      <div className="mt-auto space-y-4">
+                        {/* Integrity Progress */}
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <span>Integridad Validada</span>
+                            <span className="text-primary">{completion}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${completion}%` }}
+                              transition={{ duration: 1, delay: 0.5 }}
+                              className="h-full bg-primary"
+                            />
+                          </div>
+                        </div>
+
+                        <Link 
+                          to={`/projects/${project.id}`}
+                          className="flex items-center justify-center gap-2 w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all group/btn"
+                        >
+                          Ver Detalles <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
 
-          {filteredProjects.length === 0 && (
+          {!isLoading && filteredProjects.length === 0 && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

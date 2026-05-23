@@ -41,11 +41,8 @@ describe("LandingPage", () => {
 
   it("renders a carousel for featured projects", () => {
     renderPage();
-    // In a carousel, we expect navigation controls (buttons for prev/next)
-    const prevButton = screen.queryByLabelText(/anterior/i);
-    const nextButton = screen.queryByLabelText(/siguiente/i);
-
-    expect(prevButton).toBeInTheDocument();
-    expect(nextButton).toBeInTheDocument();
+    // The carousel is now an infinite scroll marquee without prev/next buttons
+    // We check that at least one of the featured projects is rendered
+    expect(screen.getAllByText(/Blue Forest Residences/i)[0]).toBeInTheDocument();
   });
 });
