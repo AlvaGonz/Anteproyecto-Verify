@@ -19,7 +19,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2025-06-15T10:00:00Z",
     updatedAtUtc: "2025-10-20T14:30:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-001/800/600",
     completionRate: 0.95,
   },
   {
@@ -37,7 +37,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2025-05-05T10:20:00Z",
     updatedAtUtc: "2025-11-10T09:10:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-005/800/600",
     completionRate: 0.88,
   },
   {
@@ -55,7 +55,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-002",
     createdAtUtc: "2025-08-01T08:00:00Z",
     updatedAtUtc: "2025-12-15T16:45:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-007/800/600",
     completionRate: 0.82,
   },
   {
@@ -73,7 +73,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-003",
     createdAtUtc: "2025-07-10T09:00:00Z",
     updatedAtUtc: "2026-01-08T11:20:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-008/800/600",
     completionRate: 0.75,
   },
   {
@@ -91,7 +91,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2025-09-20T07:30:00Z",
     updatedAtUtc: "2026-02-14T13:00:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-009/800/600",
   },
   {
     id: "proj-010",
@@ -108,7 +108,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-002",
     createdAtUtc: "2025-11-01T10:00:00Z",
     updatedAtUtc: "2026-03-05T15:30:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-010/800/600",
     completionRate: 0.92,
   },
   {
@@ -126,7 +126,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-003",
     createdAtUtc: "2025-10-15T08:45:00Z",
     updatedAtUtc: "2026-03-22T10:00:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-011/800/600",
   },
   {
     id: "proj-012",
@@ -143,7 +143,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2025-12-01T12:00:00Z",
     updatedAtUtc: "2026-04-01T09:15:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-012/800/600",
   },
   {
     id: "proj-013",
@@ -160,7 +160,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-002",
     createdAtUtc: "2026-01-10T11:00:00Z",
     updatedAtUtc: "2026-04-10T14:45:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-013/800/600",
   },
   {
     id: "proj-014",
@@ -177,7 +177,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-003",
     createdAtUtc: "2026-02-05T09:30:00Z",
     updatedAtUtc: "2026-04-12T08:00:00Z",
-    imagenUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop",
+    imagenUrl: "https://picsum.photos/seed/proj-014/800/600",
   },
 
   // ═══════════════════════════════════════════════════════
@@ -198,6 +198,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2026-02-10T11:45:00Z",
     updatedAtUtc: "2026-03-15T16:20:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-003/800/600",
   },
   {
     id: "proj-015",
@@ -214,6 +215,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2026-01-20T08:00:00Z",
     updatedAtUtc: "2026-03-28T10:00:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-015/800/600",
   },
   {
     id: "proj-016",
@@ -230,6 +232,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-002",
     createdAtUtc: "2025-12-15T13:00:00Z",
     updatedAtUtc: "2026-02-20T11:30:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-016/800/600",
   },
   {
     id: "proj-017",
@@ -246,6 +249,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-003",
     createdAtUtc: "2026-01-05T07:00:00Z",
     updatedAtUtc: "2026-03-01T09:00:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-017/800/600",
   },
   {
     id: "proj-018",
@@ -262,6 +266,7 @@ export const mockProjects: ProyectoDto[] = [
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2025-11-20T10:00:00Z",
     updatedAtUtc: "2026-02-10T14:00:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-018/800/600",
   },
 
   // ═══════════════════════════════════════════════════════
@@ -281,6 +286,7 @@ export const mockProjects: ProyectoDto[] = [
     estadoIntegridad: IntegrityStatus.Pending,
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2026-03-01T09:15:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-002/800/600",
   },
   {
     id: "proj-004",
@@ -296,6 +302,7 @@ export const mockProjects: ProyectoDto[] = [
     estadoIntegridad: IntegrityStatus.Pending,
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2026-03-20T08:30:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-004/800/600",
   },
   {
     id: "proj-006",
@@ -311,5 +318,6 @@ export const mockProjects: ProyectoDto[] = [
     estadoIntegridad: IntegrityStatus.Pending,
     usuarioCreadorId: "user-dev-001",
     createdAtUtc: "2026-04-01T10:20:00Z",
+    imagenUrl: "https://picsum.photos/seed/proj-006/800/600",
   },
 ];
