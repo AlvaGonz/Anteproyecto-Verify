@@ -4,23 +4,23 @@ using Xunit;
 
 namespace Api.Tests;
 
-public class SwaggerTests : IClassFixture<WebApplicationFactory<Program>>
+public class ApiStatusTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
 
-    public SwaggerTests(WebApplicationFactory<Program> factory)
+    public ApiStatusTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
     }
 
     [Fact]
-    public async Task Get_SwaggerIndex_ReturnsSuccessStatusCode()
+    public async Task Get_ApiStatus_ReturnsSuccessStatusCode()
     {
         // Arrange
         var client = _factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync("/swagger/index.html");
+        var response = await client.GetAsync("/api/status");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
