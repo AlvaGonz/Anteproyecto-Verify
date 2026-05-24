@@ -1,56 +1,49 @@
-# Task Plan: Resolve Vite Type Mismatches & Technical Debt Audit
+# Task Plan: i18n Setup, react-i18next Integration, and AuditLogPage Internationalization
 
 ## Goal
-Resolve type mismatch errors in the Vite and Vitest configurations, clean up stale package versions in `.pnpm`, and establish a reliable, clean-compiling workspace.
+Fix the broken Vite build caused by the missing `react-i18next` dependency and the 500 internal server error on `src/i18n.ts` in `main.tsx`. Standardize translations into static JSON files loaded asynchronously via `i18next-http-backend`, configure TypeScript type safety namespace augmentation, and internationalize `AuditLogPage.tsx` to clear 16 JSX internationalization compiler warnings.
 
 ## Current Phase
-Phase 6: Final Handoff
+Phase 1: Setup & Package Installation
 
 ## Phases
 
-### Phase 1: Discovery & Planning
-- [x] Analyze the IDE compilation errors
-- [x] Identify stale Vite versions (`5.4.21` and `6.4.2`) inside `.pnpm`
-- [x] Create and approve the implementation plan
-- **Status:** complete
+### Phase 1: Package Installation & Base Setup
+- [ ] Run `pnpm add react-i18next i18next i18next-http-backend i18next-browser-languagedetector` in `src/frontend/web`
+- [ ] Verify `node_modules` successfully installs packages with zero workspace conflicts
+- [ ] Configure `src/frontend/web/src/i18n.ts` to use `i18next-http-backend` and `i18next-browser-languagedetector`
+- **Status:** in_progress
 
-### Phase 2: Setup Planning Artifacts
-- [x] Initialize `task_plan.md`
-- [x] Initialize `progress.md`
-- [x] Update `findings.md`
-- **Status:** complete
+### Phase 2: Translation Resource Files & Type Augmentation
+- [ ] Extract the existing translations in `i18n.ts` and migrate them to:
+  - `src/frontend/web/public/locales/es/common.json` (Spanish)
+  - `src/frontend/web/public/locales/en/common.json` (English)
+- [ ] Add new namespaces for the `audit` logging page translations to both JSON files
+- [ ] Create `src/frontend/web/src/react-i18next.d.ts` for typescript namespace augmentation (to ensure types are checked for translation keys)
+- **Status:** pending
 
-### Phase 3: Resolution & Cleanup
-- [x] Add `"vite": "6.2.0"` override to root `package.json`
-- [x] Clean stale `node_modules` folders
-- [x] Run a clean `pnpm install`
-- **Status:** complete
+### Phase 3: Root Application Suspense Wrapper
+- [ ] Open `src/frontend/web/src/main.tsx`
+- [ ] Ensure `import './i18n';` is the first import after React/ReactDOM imports, before `<App />`
+- [ ] Wrap `<App />` in `<React.Suspense>` to handle asynchronous translation file downloading without UI flashing or crashing
+- **Status:** pending
 
-### Phase 4: Testing & Verification
-- [x] Run TypeScript typecheck to verify no compiler errors
-- [x] Build the web frontend via `pnpm --filter web-frontend build`
-- [x] Execute Vitest test suite via `pnpm --filter web-frontend test`
-- **Status:** complete
+### Phase 4: Internationalizing AuditLogPage.tsx
+- [ ] Add `useTranslation` hook inside `AuditLogPage.tsx`
+- [ ] Surgical substitution of all 16 hardcoded Spanish JSX strings with `t('audit.something')` calls
+- [ ] Update both English and Spanish JSON files in `public/locales` to hold the exact values for the 16 substituted strings
+- **Status:** pending
 
-### Phase 5: Stale IDE Cache Cleanup
-- [x] Identify stale `.tsbuildinfo` files with serialized paths to old packages
-- [x] Delete `*.tsbuildinfo` files in subfolder and `dist-node`
-- [x] Add `forceConsistentCasingInFileNames: true` to trigger TS Server flush
-- [x] Regenerate pristine build cache and verify CLI output
-- **Status:** complete
-
-## Key Questions
-1. Do other workspace packages require overrides? (Currently only `@types/react`, `@types/react-dom`, `tsx`, and `vite` require overrides to prevent mismatches).
-2. Are there unused or dead files to clean up later? (Yes, that will be addressed in a follow-up dead-code cleanup phase if requested).
+### Phase 5: Verification & Compilation Test
+- [ ] Run Vite dev server with zero startup errors
+- [ ] Confirm no 500 or 404 errors for locale JSONs in the browser dev tools
+- [ ] Verify UI rendering and functional behavior of `DocumentUploadForm` and `AuditLogPage`
+- [ ] Run `pnpm run build` to verify clean TypeScript compilation and successful bundler build
+- **Status:** pending
 
 ## Decisions Made
 | Decision | Rationale |
 |----------|-----------|
-| Override `vite` to `6.2.0` | Forces all workspace and nested dependencies to resolve to the exact version declared in `package.json` |
-| Clean delete of `node_modules` | Standard, robust way to eliminate stale, untracked, or orphaned folders in the `.pnpm` virtual store |
-
-## Errors Encountered
-| Error | Attempt | Resolution |
-|-------|---------|------------|
-| Stuck pnpm install (out of memory / paging file too small) | 1       | Terminated background task, will retry after freeing memory / waiting |
-| Build failed with realpath UNKNOWN error on lucide-react | 2       | Logged. Will retry now that I/O has settled, or check for locked handles |
+| Use standard `i18next-http-backend` | Avoids large inline translation bundles in JS chunks, enabling faster initial page loads and clean static JSON structure |
+| Wrap in `<React.Suspense>` | Necessary when using `HttpBackend` because translation namespaces are loaded asynchronously at runtime |
+| Add TypeScript Namespace Augmentation | Ensures all translation key paths used with `t()` are type-checked against the actual JSON schema, preventing runtime typo bugs |
