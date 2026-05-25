@@ -1,4 +1,5 @@
-# VeriFinca — Development Progress
+# VeriFinca — Agent Progress Tracker
+> Last updated: 2026-05-25T18:42:00-04:00 by Coder Agent
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
