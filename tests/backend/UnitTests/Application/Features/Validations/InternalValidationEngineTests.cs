@@ -21,7 +21,7 @@ public class InternalValidationEngineTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Location", "Description", Guid.NewGuid());
+        var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid());
         
         var mockProyectoRepo = new Mock<IProyectoRepository>();
         mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);

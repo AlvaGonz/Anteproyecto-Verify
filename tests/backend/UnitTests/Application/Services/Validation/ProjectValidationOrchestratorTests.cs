@@ -24,6 +24,8 @@ public class ProjectValidationOrchestratorTests
     private readonly Mock<IExternalProviderResolver> _mockProviderResolver;
     private readonly Mock<IAuditoriaRepository> _mockAuditoriaRepo;
     private readonly Mock<IReporteRepository> _mockReporteRepo;
+    private readonly Mock<IIntegrityScoringService> _mockScoringService;
+    private readonly Mock<ISelloIntegridadRepository> _mockSelloRepo;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly ProjectValidationOrchestrator _orchestrator;
 
@@ -34,6 +36,8 @@ public class ProjectValidationOrchestratorTests
         _mockProviderResolver = new Mock<IExternalProviderResolver>();
         _mockAuditoriaRepo = new Mock<IAuditoriaRepository>();
         _mockReporteRepo = new Mock<IReporteRepository>();
+        _mockScoringService = new Mock<IIntegrityScoringService>();
+        _mockSelloRepo = new Mock<ISelloIntegridadRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
 
         _orchestrator = new ProjectValidationOrchestrator(
@@ -42,6 +46,8 @@ public class ProjectValidationOrchestratorTests
             _mockProviderResolver.Object,
             _mockAuditoriaRepo.Object,
             _mockReporteRepo.Object,
+            _mockScoringService.Object,
+            _mockSelloRepo.Object,
             _mockUnitOfWork.Object
         );
     }
@@ -54,7 +60,7 @@ public class ProjectValidationOrchestratorTests
         var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid());
         _mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
 
-        var internalSummary = new InternalValidationSummaryDto(Guid.NewGuid(), projectId, ValidationStatus.Completed, true, 5, 0, 0, DateTime.UtcNow, new List<ValidationRuleResultDto>());
+        var internalSummary = new InternalValidationSummaryDto(Guid.NewGuid(), projectId, ValidationStatus.Completed, true, 5.0, null, 0, 0, 0, DateTime.UtcNow, new List<ValidationRuleResultDto>());
         _mockInternalEngine.Setup(e => e.RunValidationAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(internalSummary);
 
         var mockProvider = new Mock<IExternalValidationProvider>();
@@ -87,7 +93,7 @@ public class ProjectValidationOrchestratorTests
         var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid());
         _mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
 
-        var internalSummary = new InternalValidationSummaryDto(Guid.NewGuid(), projectId, ValidationStatus.Completed, true, 5, 0, 0, DateTime.UtcNow, new List<ValidationRuleResultDto>());
+        var internalSummary = new InternalValidationSummaryDto(Guid.NewGuid(), projectId, ValidationStatus.Completed, true, 5.0, null, 0, 0, 0, DateTime.UtcNow, new List<ValidationRuleResultDto>());
         _mockInternalEngine.Setup(e => e.RunValidationAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(internalSummary);
 
         var mockSuccessProvider = new Mock<IExternalValidationProvider>();

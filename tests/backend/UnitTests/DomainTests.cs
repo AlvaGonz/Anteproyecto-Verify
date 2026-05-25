@@ -13,10 +13,10 @@ public class DomainTests
         // Arrange
         var nombre = "Juan Perez";
         var email = "juan@example.com";
-        var rol = UserRole.Client;
+        var rol = UserRole.Consultation;
 
         // Act
-        var usuario = new Usuario(nombre, email, rol);
+        var usuario = new Usuario(nombre, email, "contrasenaHash", rol);
 
         // Assert
         Assert.Equal(nombre, usuario.NombreCompleto);
@@ -51,12 +51,12 @@ public class DomainTests
     {
         // Arrange
         var proyectoId = Guid.NewGuid();
-        var tipo = DocumentType.Identity;
+        var tipo = DocumentType.CertificadoTitulo;
         var nombreArchivo = "cedula.pdf";
         var ruta = "/docs/cedula.pdf";
 
         // Act
-        var documento = new Documento(proyectoId, tipo, nombreArchivo, ruta);
+        var documento = new Documento(proyectoId, nombreArchivo, "application/pdf", 1024, ruta, tipo);
 
         // Assert
         Assert.Equal(proyectoId, documento.ProyectoId);
