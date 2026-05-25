@@ -1,5 +1,7 @@
 # Enterprise Web App Bootstrap
 
+[![CI](https://github.com/AlvaGonz/Anteproyecto-Verify/actions/workflows/ci.yml/badge.svg)](https://github.com/AlvaGonz/Anteproyecto-Verify/actions/workflows/ci.yml)
+
 Bootstrap de solución para un sistema web moderno enterprise-ready.
 
 ## Arquitectura

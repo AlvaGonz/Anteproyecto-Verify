@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   FolderKanban,
   ShieldAlert,
-  Settings,
   X,
   Plus,
   Compass,
@@ -23,7 +22,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { name: "Expedientes", href: "/admin/projects", icon: FolderKanban },
     { name: "Reglas de Validacion", href: "/admin/rules", icon: ShieldAlert },
     { name: "Logs de Auditoría", href: "/admin/audit-log", icon: History },
-    { name: "Configuracion", href: "/admin/settings", icon: Settings },
+    /* TODO: Habilitar cuando el feature esté completo */
+    /* { name: "Configuracion", href: "/admin/settings", icon: Settings }, */
   ];
 
   return (

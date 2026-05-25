@@ -8,6 +8,8 @@ obj/
 # Node
 node_modules/
 dist/
+dist-node/
+tsconfig.tsbuildinfo
 .env
 .env.local
 package-lock.json

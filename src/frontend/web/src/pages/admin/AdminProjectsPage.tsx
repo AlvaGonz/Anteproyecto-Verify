@@ -203,8 +203,12 @@ export const AdminProjectsPage: React.FC = () => {
                     <div className="flex items-start gap-5 min-w-0">
                       <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-inner">
                         <img 
-                          src={project.imagenUrl || "https://images.unsplash.com/photo-1590019158224-399dc0f9fc31?q=80&w=200&auto=format&fit=crop"} 
+                          src={project.imagenUrl || `https://picsum.photos/seed/${project.id}/200/200`} 
                           alt={project.nombre}
+                          onError={(e) => {
+                            e.currentTarget.src = "https://picsum.photos/seed/fallback/200/200";
+                            e.currentTarget.onerror = null;
+                          }}
                           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
                         />
                       </div>

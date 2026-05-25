@@ -116,9 +116,9 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Left Column: File Dropzone */}
-          <div className="lg:col-span-12">
+        <div className="space-y-6">
+          {/* File Dropzone */}
+          <div>
             <AnimatePresence mode="wait">
               {!file ? (
                 <motion.div
@@ -197,9 +197,9 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
             </AnimatePresence>
           </div>
 
-          {/* Right Column: Metadata */}
-          <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2 space-y-3">
+          {/* Metadata Fields */}
+          <div className="space-y-6">
+            <div className="space-y-3">
               <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.22em] ml-1">
                 Clasificación del Acto Jurídico
               </label>
