@@ -14,3 +14,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Bots Data and Temporary files
+**/TMP/
+*.csv
+
