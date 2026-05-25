@@ -6,17 +6,34 @@ import { motion } from "framer-motion";
 export const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate registration
-    setTimeout(() => {
+
+    try {
+      // Trigger the real backend email integration endpoint for UC-01
+      const response = await fetch("http://localhost:5000/api/email-test/uc-01-account-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      
+      if (!response.ok) {
+        console.warn("Backend email test returned an error response:", response.status);
+      }
+    } catch (err) {
+      console.error("Failed to call backend email verification endpoint:", err);
+    } finally {
       setLoading(false);
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
-    }, 2000);
+    }
   };
 
   if (success) {
@@ -156,20 +173,39 @@ export const RegisterPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="relative col-span-2">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
-                <input type="text" placeholder="Nombre completo" className="vf-input w-full pl-12 h-[52px]" required />
+                <input 
+                  type="text" 
+                  placeholder="Nombre completo" 
+                  className="vf-input w-full pl-12 h-[52px]" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required 
+                />
               </div>
             </div>
 
-
-
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
-              <input type="email" placeholder="Correo electrónico" className="vf-input w-full pl-12 h-[52px]" required />
+              <input 
+                type="email" 
+                placeholder="Correo electrónico" 
+                className="vf-input w-full pl-12 h-[52px]" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
             </div>
 
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
-              <input type="password" placeholder="Contraseña de acceso" className="vf-input w-full pl-12 h-[52px]" required />
+              <input 
+                type="password" 
+                placeholder="Contraseña de acceso" 
+                className="vf-input w-full pl-12 h-[52px]" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
             </div>
 
             <div className="pb-2 pt-2">
