@@ -136,6 +136,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Commands.CreateRule.CreateRuleCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.ToggleRuleStatus.ToggleRuleStatusCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
+        services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Infrastructure.Security.BCryptPasswordHasher>();
 
         // End of Infrastructure
 

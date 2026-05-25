@@ -33,14 +33,23 @@ services:
       - .env
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build:
+      context: .
+      dockerfile: docker/SQL_Server/Dockerfile
     ports:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Your_password123
+    volumes:
+      - mssql-data:/var/opt/mssql/data
+      - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     ports:
       - "10000:10000"
+
+volumes:
+  mssql-data:
+
