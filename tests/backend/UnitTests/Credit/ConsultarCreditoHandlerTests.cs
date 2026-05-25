@@ -33,6 +33,7 @@ public class ConsultarCreditoCommandHandlerTests
         _hallazgoRepositoryMock = new Mock<IHallazgoRepository>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         _handler = new ConsultarCreditoCommandHandler(
             _proyectoRepositoryMock.Object,
@@ -49,12 +50,11 @@ public class ConsultarCreditoCommandHandlerTests
     public async Task Handle_ShouldFail_WhenNoConsentimientoVigente()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
-        var promotorId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        
-        var project = new Proyecto("Test", "Loc", promotorId);
         var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Professional);
+        var promotorId = promotor.Id;
+        var project = new Proyecto("Test", "Loc", promotorId);
+        var projectId = project.Id;
+        var userId = Guid.NewGuid();
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);
@@ -78,13 +78,12 @@ public class ConsultarCreditoCommandHandlerTests
     public async Task Handle_ShouldGenerateHallazgo_WhenRiesgoAlto()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
-        var promotorId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        
-        var project = new Proyecto("Test", "Loc", promotorId);
         var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Professional);
         promotor.UpdateContactInfo("809-555-5555", "12345678901");
+        var promotorId = promotor.Id;
+        var project = new Proyecto("Test", "Loc", promotorId);
+        var projectId = project.Id;
+        var userId = Guid.NewGuid();
         var consentimiento = new ConsentimientoFinanciero(promotorId, "1.1.1.1", "v1.0");
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))

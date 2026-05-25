@@ -31,6 +31,7 @@ public class InitiateDgriValidationCommandHandlerTests
         _validacionRepositoryMock = new Mock<IValidacionRepository>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         _handler = new InitiateDgriValidationCommandHandler(
             _dgriServiceMock.Object,
@@ -45,8 +46,8 @@ public class InitiateDgriValidationCommandHandlerTests
     public async Task Handle_ShouldUpdateProjectStatus_WhenDgriReturnsValid()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
         var project = new Proyecto("Test", "Loc", Guid.NewGuid());
+        var projectId = project.Id;
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         
@@ -73,8 +74,8 @@ public class InitiateDgriValidationCommandHandlerTests
     public async Task Handle_ShouldUpdateProjectStatusToConObservaciones_WhenDgriReturnsCargas()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
         var project = new Proyecto("Test", "Loc", Guid.NewGuid());
+        var projectId = project.Id;
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         
