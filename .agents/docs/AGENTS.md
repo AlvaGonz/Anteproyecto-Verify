@@ -11,6 +11,7 @@ Do not optimize for speed at the expense of security or architecture. You are ac
 
 ## 2. 🔌 THE MCP (MODEL CONTEXT PROTOCOL) MANDATE
 Do not guess data schemas, API contracts, or external states. If you need information outside this immediate repository, you MUST attempt to use an available MCP server.
+* **context7-mcp:** Connect via Context7 MCP to get information regarding the programing language syntax, frameworks, libraries, documentation.
 * **Database Changes:** Connect via Postgres/SQL MCP to read actual table schemas before writing migrations.
 * **Issue Tracking:** Connect via GitHub/Linear MCP to read the exact acceptance criteria of the ticket you are working on.
 * **Design Implementation:** Connect via Stitch MCP to extract exact design tokens. Do not hallucinate hex codes or spacing.
