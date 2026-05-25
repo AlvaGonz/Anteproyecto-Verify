@@ -15,9 +15,9 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Bots Data and Temporary files
-**/TMP/
-.csv
-.txt
+# # Bots Data and Temporary files
+# **/TMP/
+# .csv
+# .txt
 
-/Bots
+# /Bots
