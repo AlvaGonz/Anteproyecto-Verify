@@ -17,5 +17,7 @@ Thumbs.db
 
 # Bots Data and Temporary files
 **/TMP/
-*.csv
+.csv
+.txt
 
+/Bots
