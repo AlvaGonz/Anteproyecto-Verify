@@ -7,3 +7,4 @@
 | Resend Email Verification (Smoke Tests) | TRD §11 | axios-implemetiont-test | b2ba56d | 2026-05-25 |
 | Manual Resend Email Testing Console | TRD §11 | axios-implemetiont-test | 9632eaf | 2026-05-25 |
 | Email Use Cases Smoke Verification | TRD §11 | axios-implemetiont-test | Verified | 2026-05-25 |
+| Registration Email Trigger Integration | TRD §11 | axios-implemetiont-test | 31431fd | 2026-05-25 |
