@@ -12,7 +12,6 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   NODE_VERSION: '20.x'
-  # PNPM_VERSION: '9'  # REMOVED: package.json "packageManager" field takes precedence
 
 jobs:
   # ─────────────────────────────────────────────
@@ -49,26 +48,26 @@ jobs:
           dotnet restore tests/backend/UnitTests/UnitTests.csproj
           dotnet restore tests/backend/IntegrationTests/IntegrationTests.csproj
 
-      - name: Build — Api
-        run: dotnet build src/backend/Api/Api.csproj --no-restore --configuration Release
+      - name: Build — Domain
+        run: dotnet build src/backend/Domain/Domain.csproj --no-restore --configuration Release
 
       - name: Build — Application
         run: dotnet build src/backend/Application/Application.csproj --no-restore --configuration Release
 
-      - name: Build — Domain
-        run: dotnet build src/backend/Domain/Domain.csproj --no-restore --configuration Release
-
       - name: Build — Infrastructure
         run: dotnet build src/backend/Infrastructure/Infrastructure.csproj --no-restore --configuration Release
 
-      - name: Build — UnitTests
-        run: dotnet build tests/backend/UnitTests/UnitTests.csproj --no-restore --configuration Release
-
-      - name: Build — IntegrationTests
-        run: dotnet build tests/backend/IntegrationTests/IntegrationTests.csproj --no-restore --configuration Release
+      - name: Build — Api
+        run: dotnet build src/backend/Api/Api.csproj --no-restore --configuration Release
 
       - name: Build — Api.Tests
         run: dotnet build src/backend/Api.Tests/Api.Tests.csproj --no-restore --configuration Release
+
+      - name: Build — Unit Tests
+        run: dotnet build tests/backend/UnitTests/UnitTests.csproj --no-restore --configuration Release
+
+      - name: Build — Integration Tests
+        run: dotnet build tests/backend/IntegrationTests/IntegrationTests.csproj --no-restore --configuration Release
 
       - name: Run Unit Tests
         run: |
@@ -144,8 +143,6 @@ jobs:
       - name: Run tests
         run: pnpm run test --run
         continue-on-error: true
-        # continue-on-error: true temporalmente — solo 2 tests existen ahora
-        # Cambiar a false cuando la cobertura sea adecuada (ITEM 8 del audit)
 
   # ─────────────────────────────────────────────
   # JOB 3: Security — Secret scanning
