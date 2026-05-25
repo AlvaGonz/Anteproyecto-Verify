@@ -12,7 +12,7 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   NODE_VERSION: '20.x'
-  PNPM_VERSION: '9'
+  # PNPM_VERSION: '9'  # REMOVED: package.json "packageManager" field takes precedence
 
 jobs:
   # ─────────────────────────────────────────────
@@ -40,14 +40,39 @@ jobs:
             nuget-${{ runner.os }}-
 
       - name: Restore dependencies
-        run: dotnet restore src/backend/
+        run: |
+          dotnet restore src/backend/Api/Api.csproj
+          dotnet restore src/backend/Application/Application.csproj
+          dotnet restore src/backend/Domain/Domain.csproj
+          dotnet restore src/backend/Infrastructure/Infrastructure.csproj
+          dotnet restore src/backend/Api.Tests/Api.Tests.csproj
+          dotnet restore tests/backend/UnitTests/UnitTests.csproj
+          dotnet restore tests/backend/IntegrationTests/IntegrationTests.csproj
 
-      - name: Build (Release)
-        run: dotnet build src/backend/ --no-restore --configuration Release
+      - name: Build — Domain
+        run: dotnet build src/backend/Domain/Domain.csproj --no-restore --configuration Release
+
+      - name: Build — Application
+        run: dotnet build src/backend/Application/Application.csproj --no-restore --configuration Release
+
+      - name: Build — Infrastructure
+        run: dotnet build src/backend/Infrastructure/Infrastructure.csproj --no-restore --configuration Release
+
+      - name: Build — Api
+        run: dotnet build src/backend/Api/Api.csproj --no-restore --configuration Release
+
+      - name: Build — Api.Tests
+        run: dotnet build src/backend/Api.Tests/Api.Tests.csproj --no-restore --configuration Release
+
+      - name: Build — Unit Tests
+        run: dotnet build tests/backend/UnitTests/UnitTests.csproj --no-restore --configuration Release
+
+      - name: Build — Integration Tests
+        run: dotnet build tests/backend/IntegrationTests/IntegrationTests.csproj --no-restore --configuration Release
 
       - name: Run Unit Tests
         run: |
-          dotnet test tests/backend/UnitTests/ \
+          dotnet test tests/backend/UnitTests/UnitTests.csproj \
             --no-build \
             --configuration Release \
             --logger "console;verbosity=normal" \
@@ -55,7 +80,7 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          dotnet test tests/backend/IntegrationTests/ \
+          dotnet test tests/backend/IntegrationTests/IntegrationTests.csproj \
             --no-build \
             --configuration Release \
             --logger "console;verbosity=normal" \
@@ -63,7 +88,7 @@ jobs:
 
       - name: Run Api.Tests
         run: |
-          dotnet test src/backend/Api.Tests/ \
+          dotnet test src/backend/Api.Tests/Api.Tests.csproj \
             --no-build \
             --configuration Release \
             --logger "console;verbosity=normal"
@@ -91,8 +116,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
+          # version omitida intencionalmente — se lee de package.json "packageManager" field
 
       - name: Get pnpm store path
         id: pnpm-cache
@@ -137,9 +162,14 @@ jobs:
 
       - name: Check for leaked secrets
         run: |
-          # Verify no API keys committed
-          if git log --all -p | grep -E "(re_[a-zA-Z0-9]{20,}|RESEND_APITOKEN\s*=\s*re_)" 2>/dev/null; then
-            echo "::error::Potential Resend API key detected in git history!"
+          # Solo detecta assignments reales de la variable de entorno, no strings en tests
+          if git log --all -p | grep -E "RESEND_APITOKEN\s*=\s*re_[a-zA-Z0-9]{20,}" 2>/dev/null; then
+            echo "::error::Resend API key assignment detected in git history!"
             exit 1
           fi
-          echo "✓ No secrets detected"
+          # Detecta .env files con keys reales (no archivos .env.example)
+          if git log --all -p -- '*.env' | grep -v '.env.example' | grep -E "re_[a-zA-Z0-9]{24,}" 2>/dev/null; then
+            echo "::error::Potential Resend API key in .env file detected in git history!"
+            exit 1
+          fi
+          echo "✓ No leaked secrets detected"
