@@ -1,20 +1,63 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2, ShieldCheck, Zap } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2, ShieldCheck, Zap, Phone, CreditCard, Check, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { AuthService } from "../../features/auth/services/AuthService";
 
 export const RegisterPage: React.FC = () => {
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [cedula, setCedula] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
+  // Password validation criteria in real-time
+  const isMinLength = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+{}|[\]\\:';"<>?,./~|-]/.test(password);
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    // 1. Basic empty validations
+    if (!nombre.trim() || !apellido.trim() || !email.trim() || !password) {
+      setError("Todos los campos obligatorios deben ser completados.");
+      return;
+    }
+
+    // 2. Email format validation
+    if (!email.includes("@") || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Por favor, introduce un correo electrónico válido (debe contener '@' y un dominio correcto).");
+      return;
+    }
+
+    // 3. Password criteria checks
+    if (!isMinLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+      setError("La contraseña no cumple con todos los requisitos de seguridad obligatorios.");
+      return;
+    }
+
+    // 4. Phone format validation
+    const cleanPhone = telefono.replace(/[^0-9]/g, "");
+    if (telefono.trim() && cleanPhone.length !== 10) {
+      setError("El número de teléfono debe tener exactamente 10 dígitos (ej: 809-555-0199).");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -56,9 +99,9 @@ export const RegisterPage: React.FC = () => {
           <div className="w-20 h-20 bg-success-container text-success rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h1 className="text-3xl font-display font-extrabold text-[#223382] mb-4">Solicitud Enviada</h1>
+          <h1 className="text-3xl font-display font-extrabold text-[#223382] mb-4">Registro Exitoso</h1>
           <p className="text-on-surface-variant text-lg leading-relaxed mb-8">
-            Tu solicitud de acceso profesional está siendo revisada por nuestro equipo técnico. Recibirás un correo de confirmación en las próximas 24 horas.
+            Tu cuenta ha sido creada exitosamente. Recibirás un correo de confirmación de acceso en las próximas 24 horas.
           </p>
           <div className="flex flex-col items-center gap-4">
             <span className="text-sm font-semibold text-primary">Redirigiendo al inicio de sesión...</span>
@@ -90,16 +133,6 @@ export const RegisterPage: React.FC = () => {
         transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
         className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none"
       />
-
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative z-10"
-      >
-        {/* Logo moved into sidebar */}
-
-      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -182,9 +215,15 @@ export const RegisterPage: React.FC = () => {
             <p className="text-text-secondary mt-1">Completa tus datos profesionales para comenzar</p>
           </div>
 
+          {error && (
+            <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="relative col-span-2">
+              <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
                 <input 
                   type="text" 
@@ -221,6 +260,35 @@ export const RegisterPage: React.FC = () => {
               />
             </div>
 
+            {/* Premium Live Password Criteria Checker */}
+            {password.length > 0 && (
+              <div className="p-4 bg-slate-50 border border-border/80 rounded-xl space-y-2 text-xs text-text-secondary transition-all animate-in fade-in duration-200">
+                <p className="font-bold text-[#223382] mb-1">Requisitos de seguridad:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2">
+                    {isMinLength ? <Check className="w-4 h-4 text-emerald-500 font-bold" /> : <X className="w-4 h-4 text-rose-400" />}
+                    <span className={isMinLength ? "text-emerald-700 font-medium" : ""}>Mínimo 8 caracteres</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {hasUpper ? <Check className="w-4 h-4 text-emerald-500 font-bold" /> : <X className="w-4 h-4 text-rose-400" />}
+                    <span className={hasUpper ? "text-emerald-700 font-medium" : ""}>Al menos 1 Mayúscula</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {hasLower ? <Check className="w-4 h-4 text-emerald-500 font-bold" /> : <X className="w-4 h-4 text-rose-400" />}
+                    <span className={hasLower ? "text-emerald-700 font-medium" : ""}>Al menos 1 Minúscula</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {hasNumber ? <Check className="w-4 h-4 text-emerald-500 font-bold" /> : <X className="w-4 h-4 text-rose-400" />}
+                    <span className={hasNumber ? "text-emerald-700 font-medium" : ""}>Al menos 1 Número</span>
+                  </div>
+                  <div className="flex items-center gap-2 col-span-2">
+                    {hasSpecial ? <Check className="w-4 h-4 text-emerald-500 font-bold" /> : <X className="w-4 h-4 text-rose-400" />}
+                    <span className={hasSpecial ? "text-emerald-700 font-medium" : ""}>Al menos 1 Carácter Especial (!@#$%^&*-)</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="pb-2 pt-2">
               <label className="flex gap-3 cursor-pointer group">
                 <input type="checkbox" className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary/20" required />
@@ -238,12 +306,12 @@ export const RegisterPage: React.FC = () => {
               className="vf-btn-primary w-full h-[56px] text-base font-bold shadow-floating disabled:opacity-50 mt-4"
             >
               {loading ? (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   Procesando Registro...
                 </span>
               ) : (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   Crear mi cuenta <ArrowRight className="w-5 h-5" />
                 </span>
               )}
@@ -273,7 +341,6 @@ export const RegisterPage: React.FC = () => {
               Google
             </button>
           </div>
-
 
           <div className="mt-8 pt-6 border-t border-border/50 text-center">
             <p className="text-sm text-text-secondary">
