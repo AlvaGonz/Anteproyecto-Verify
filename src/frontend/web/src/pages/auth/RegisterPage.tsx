@@ -1,24 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2, ShieldCheck, Zap, Phone, CreditCard, Check, X } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2, ShieldCheck, Zap, Check, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { AuthService } from "../../features/auth/services/AuthService";
 
 export const RegisterPage: React.FC = () => {
-  const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [cedula, setCedula] = useState("");
-
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -34,7 +27,7 @@ export const RegisterPage: React.FC = () => {
     setError(null);
 
     // 1. Basic empty validations
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || !password) {
+    if (!name.trim() || !email.trim() || !password) {
       setError("Todos los campos obligatorios deben ser completados.");
       return;
     }
@@ -48,13 +41,6 @@ export const RegisterPage: React.FC = () => {
     // 3. Password criteria checks
     if (!isMinLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
       setError("La contraseña no cumple con todos los requisitos de seguridad obligatorios.");
-      return;
-    }
-
-    // 4. Phone format validation
-    const cleanPhone = telefono.replace(/[^0-9]/g, "");
-    if (telefono.trim() && cleanPhone.length !== 10) {
-      setError("El número de teléfono debe tener exactamente 10 dígitos (ej: 809-555-0199).");
       return;
     }
 
