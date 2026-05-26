@@ -82,12 +82,12 @@ export const RegisterPage: React.FC = () => {
 
     setLoading(false);
 
-    if (result.type === "success") {
+    if (result._tag === "Success") {
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
     } else {
-      if (result.value._tag === "NetworkError") {
-        setError(result.value.message);
+      if (result.error._tag === "NetworkError") {
+        setError(result.error.message);
       } else {
         setError("Ocurrió un error inesperado durante el registro.");
       }
