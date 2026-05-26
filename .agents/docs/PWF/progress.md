@@ -1,5 +1,5 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-05-25T19:20:00-04:00 by Coder Agent
+> Last updated: 2026-05-25T20:37:00-04:00 by Coder Agent
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
@@ -9,6 +9,10 @@
 | Manual Resend Email Testing Console | TRD §11 | axios-implemetiont-test | 9632eaf | 2026-05-25 |
 | Email Use Cases Smoke Verification | TRD §11 | axios-implemetiont-test | Verified | 2026-05-25 |
 | Registration Email Trigger Integration | TRD §11 | axios-implemetiont-test | 31431fd | 2026-05-25 |
+| Resend case-sensitivity fix (email.ToLowerInvariant) | TRD §11 | axios-implemetiont-test | — | 2026-05-25 |
+| Docker web container fix (named volumes + entrypoint) | Infra | axios-implemetiont-test | — | 2026-05-25 |
+| Axios client TDD test suite (16 tests — 100% pass) | TRD §13.4 | axios-implemetiont-test | — | 2026-05-25 |
+| AGENTS.md guardrail: tasks/ forbidden for agents | Meta | — | — | 2026-05-25 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
