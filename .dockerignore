@@ -9,6 +9,7 @@
 README.md
 docker-compose.yml
 docker/
+!docker/web-entrypoint.sh
 scripts/
 **/package-lock.json
 **/yarn.lock

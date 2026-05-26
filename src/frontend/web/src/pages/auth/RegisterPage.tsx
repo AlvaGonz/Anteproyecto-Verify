@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2, ShieldCheck, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 
 export const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -10,6 +11,7 @@ export const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,18 +23,29 @@ export const RegisterPage: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify({ email: email.toLowerCase(), name })
       });
       
       if (!response.ok) {
-        console.warn("Backend email test returned an error response:", response.status);
+        let errorMsg = `Error ${response.status}: No se pudo enviar el correo de verificación.`;
+        try {
+          const errorJson = await response.json();
+          if (errorJson && errorJson.error) {
+            errorMsg = errorJson.error;
+          }
+        } catch {}
+        throw new Error(errorMsg);
       }
-    } catch (err) {
-      console.error("Failed to call backend email verification endpoint:", err);
-    } finally {
-      setLoading(false);
+
+      addToast("Cuenta registrada. Correo de verificación enviado exitosamente.", "success");
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
+    } catch (err: any) {
+      console.error("Failed to call backend email verification endpoint:", err);
+      addToast(err.message || "Error al conectar con el servidor backend.", "error");
+    } finally {
+      setLoading(false);
     }
   };
 

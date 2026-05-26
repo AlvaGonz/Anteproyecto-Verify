@@ -72,6 +72,7 @@ describe("apiClient", () => {
 
     expect(logoutSpy).toHaveBeenCalled();
     expect(getAccessToken()).toBeNull();
+    expect(axiosPostMock).toHaveBeenCalled();
 
     window.removeEventListener("auth:logout", logoutSpy);
   });
