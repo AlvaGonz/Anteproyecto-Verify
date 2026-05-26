@@ -228,7 +228,7 @@ describe("apiClient — concurrent 401 request queuing", () => {
       })) as ReturnType<typeof axios.post>
     );
 
-    const [r1, r2] = await Promise.all([
+    const [r1, _r2] = await Promise.all([
       apiClient.get("/queued-1"),
       (async () => {
         // Give request 1 a head-start so it's "refreshing" when request 2 fires
