@@ -25,9 +25,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      # Bind-mount source code for HMR / hot-reload
       - ./src/frontend/web:/app/src/frontend/web
-      - /app/node_modules
-      - /app/src/frontend/web/node_modules
+      # Named volumes keep Linux-native node_modules INSIDE the container
+      # and prevent the Windows host from overwriting them with broken symlinks
+      - web_root_node_modules:/app/node_modules
+      - web_frontend_node_modules:/app/src/frontend/web/node_modules
     environment:
       - VITE_WATCH_POLLING=true
     env_file:
@@ -45,3 +48,8 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite
     ports:
       - "10000:10000"
+
+volumes:
+  web_root_node_modules:
+  web_frontend_node_modules:
+

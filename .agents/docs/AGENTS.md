@@ -40,9 +40,11 @@ When instructed to perform a task, determine which "Role" you are fulfilling and
 
 ### Rule: Mandatory `docs/PWF/progress.md` Update
 
-After every successful feature implementation (i.e., after `dotnet test` passes and `git commit` is executed), the agent **must** update `docs/PWF/progress.md` before ending the session. This is non-negotiable.
+After every successful feature implementation (i.e., after `dotnet test` passes and `git commit` is executed), the agent **must** update `.agents/docs/PWF/progress.md` before ending the session. This is non-negotiable.
 
-**Failure to update `docs/PWF/progress.md` before closing a session = incomplete task.**
+> ⛔ **FORBIDDEN:** Agents **MUST NOT** write to `tasks/` directory. The `tasks/` folder is a human-managed area. Any agent that writes `tasks/progress.md` or any file under `tasks/` is violating this protocol and its output must be discarded.
+
+**Failure to update `.agents/docs/PWF/progress.md` before closing a session = incomplete task.**
 
 ### `docs/PWF/progress.md` Schema (enforced structure)
 

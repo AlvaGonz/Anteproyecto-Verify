@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -136,6 +137,9 @@ jobs:
 
       - name: TypeScript check
         run: pnpm exec tsc --noEmit
+
+      - name: RegisterPage smoke test (TRD registration fields)
+        run: pnpm run test --run src/pages/auth/__tests__/RegisterPage.test.tsx
 
       - name: Build
         run: pnpm run build
