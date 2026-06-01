@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { formatCedula, formatPhone, stripMask } from "../../shared/utils/formatters";
 import {
   Mail,
   Lock,
@@ -60,9 +61,21 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
-    const cleanPhone = telefono.replace(/[^0-9]/g, "");
-    if (telefono.trim() && cleanPhone.length !== 10) {
-      setError("El número de teléfono debe tener exactamente 10 dígitos (ej: 809-555-0199).");
+    const cleanPhone = stripMask(telefono);
+    if (cleanPhone.length > 0) {
+      if (cleanPhone.length !== 10) {
+        setError("El número de teléfono debe tener exactamente 10 dígitos.");
+        return;
+      }
+      if (!/^(809|829|849)/.test(cleanPhone)) {
+        setError("El número de teléfono dominicano debe comenzar con 809, 829 o 849.");
+        return;
+      }
+    }
+
+    const cleanCedula = stripMask(cedula);
+    if (cleanCedula.length > 0 && cleanCedula.length !== 11) {
+      setError("La cédula debe tener exactamente 11 dígitos.");
       return;
     }
 
@@ -73,8 +86,8 @@ export const RegisterPage: React.FC = () => {
       const result = await AuthService.registerAccount({
         email: email.toLowerCase(),
         name: displayName,
-        telefono: telefono.trim() || undefined,
-        cedula: cedula.trim() || undefined,
+        telefono: cleanPhone || undefined,
+        cedula: cleanCedula || undefined,
       });
 
       if (!isSuccess(result)) {
@@ -284,9 +297,10 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Teléfono"
+                  maxLength={14}
                   className="vf-input w-full pl-12 h-[52px]"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
+                  value={formatPhone(telefono)}
+                  onChange={(e) => setTelefono(stripMask(e.target.value))}
                 />
               </div>
               <div className="relative">
@@ -294,9 +308,10 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Cédula"
+                  maxLength={13}
                   className="vf-input w-full pl-12 h-[52px]"
-                  value={cedula}
-                  onChange={(e) => setCedula(e.target.value)}
+                  value={formatCedula(cedula)}
+                  onChange={(e) => setCedula(stripMask(e.target.value))}
                 />
               </div>
             </div>

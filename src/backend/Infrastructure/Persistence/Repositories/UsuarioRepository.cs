@@ -36,4 +36,17 @@ public class UsuarioRepository : IUsuarioRepository
     {
         _context.Usuarios.Update(usuario);
     }
+
+    public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .AnyAsync(u => u.CorreoElectronico.ToLower() == email.ToLower(), cancellationToken);
+    }
+
+    public async Task<bool> ExistsByCedulaAsync(string cedula, CancellationToken cancellationToken = default)
+    {
+        var cleanCedula = cedula.Replace("-", "");
+        return await _context.Usuarios
+            .AnyAsync(u => u.Cedula != null && u.Cedula.Replace("-", "") == cleanCedula, cancellationToken);
+    }
 }

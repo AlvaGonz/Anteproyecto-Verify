@@ -1,5 +1,5 @@
-#if DEBUG
 using Application.Abstractions.Notifications;
+using Application.Abstractions.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -8,6 +8,8 @@ public class EmailTestRequest
 {
     public string? Email { get; set; }
     public string? Name { get; set; }
+    public string? Telefono { get; set; }
+    public string? Cedula { get; set; }
 }
 
 /// <summary>
@@ -22,22 +24,38 @@ public class EmailTestController : ControllerBase
 {
     private readonly IEmailService _emailService;
     private readonly ILogger<EmailTestController> _logger;
+    private readonly IUsuarioRepository _usuarioRepository;
     private const string TestEmail = "adrian.aalvarezgonz@hotmail.com";
 
-    public EmailTestController(IEmailService emailService, ILogger<EmailTestController> logger)
+    public EmailTestController(IEmailService emailService, ILogger<EmailTestController> logger, IUsuarioRepository usuarioRepository)
     {
         _emailService = emailService;
         _logger = logger;
+        _usuarioRepository = usuarioRepository;
     }
 
     /// <summary>UC-01: Verificación de cuenta nueva</summary>
     [HttpPost("uc-01-account-verification")]
     public async Task<IActionResult> TestAccountVerification([FromBody] EmailTestRequest? request)
     {
-        // Normalize to lowercase: Resend sandbox is case-sensitive and only accepts
-        // the exact lowercase email that owns the API token.
-        string recipient = (request?.Email ?? TestEmail).ToLowerInvariant();
-        string name = request?.Name ?? "Adrian Alvarez";
+        if (request == null || string.IsNullOrWhiteSpace(request.Email))
+        {
+            return BadRequest(new { error = "El correo electrónico es requerido." });
+        }
+
+        string recipient = request.Email.ToLowerInvariant();
+        string name = request.Name ?? "Adrian Alvarez";
+
+        // DB duplicate checks against the SQL Server container
+        if (await _usuarioRepository.ExistsByEmailAsync(recipient))
+        {
+            return StatusCode(409, new { error = "El correo electrónico ya está registrado." });
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Cedula) && await _usuarioRepository.ExistsByCedulaAsync(request.Cedula))
+        {
+            return StatusCode(409, new { error = "La cédula ya está registrada en el sistema." });
+        }
         _logger.LogInformation("[EmailTest] Disparando UC-01: AccountVerification → {Email}", recipient);
         try
         {
@@ -155,4 +173,4 @@ public class EmailTestController : ControllerBase
         }
     }
 }
-#endif
+
