@@ -19,7 +19,23 @@ export const PublicVerifyResultPage: React.FC = () => {
   const { code } = useParams<{ code: string }>();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const type = searchParams.get("type") || "cert";
+
+  // Auto-detect type if default is cert but the code matches an official format
+  const getDetectedType = (): string => {
+    const typeParam = searchParams.get("type") || "cert";
+    if (typeParam === "cert" && code) {
+      if (/^\d{3}-\d{7}-\d$/.test(code)) {
+        return "cedula";
+      } else if (/^\d{3}-\d{2}-\d{3}$/.test(code)) {
+        return "suelo";
+      } else if (/^\d-\d{2}-\d{5}-\d$/.test(code)) {
+        return "rnc";
+      }
+    }
+    return typeParam;
+  };
+
+  const type = getDetectedType();
 
   const [data, setData] = useState<PublicProjectVerificationDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +50,7 @@ export const PublicVerifyResultPage: React.FC = () => {
       default: return "Sello VeriFinca";
     }
   };
+
 
   useEffect(() => {
     (async () => {
