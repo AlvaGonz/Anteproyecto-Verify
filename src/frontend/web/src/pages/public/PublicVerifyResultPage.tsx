@@ -3,6 +3,7 @@ import { useParams, Link, useLocation } from "react-router-dom";
 import { PublicProjectVerificationDto } from "../../features/public-verification/types";
 import { publicVerificationApi } from "../../features/public-verification/api/publicVerificationApi";
 import { VerificationResultCard } from "../../features/public-verification/components/VerificationResultCard";
+import { LandingFooter } from "../../features/public/components";
 import {
   ShieldCheck,
   Search,
@@ -101,7 +102,7 @@ export const PublicVerifyResultPage: React.FC = () => {
       <div className="min-h-screen bg-surface flex flex-col selection:bg-error/10 selection:text-error">
         <nav className="fixed top-0 w-full z-50 bg-secondary px-8 h-20 flex justify-between items-center transition-all duration-500">
           <div className="flex items-center gap-6">
-            <Link to="/verify" className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all">
+            <Link to="/projects" className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all">
               <ChevronLeft className="w-6 h-6 text-white" />
             </Link>
             <div className="flex flex-col">
@@ -136,7 +137,7 @@ export const PublicVerifyResultPage: React.FC = () => {
 
             <div className="flex flex-col gap-4">
               <Link
-                to="/verify"
+                to="/projects"
                 className="h-16 bg-primary text-white rounded-2xl flex items-center justify-center gap-3 font-black text-lg shadow-raised hover:shadow-floating hover:scale-[1.02] active:scale-95 transition-all"
               >
                 <Search className="w-6 h-6" /> REINTENTAR BÚSQUEDA
@@ -167,7 +168,7 @@ export const PublicVerifyResultPage: React.FC = () => {
       {/* Dynamic Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-secondary/95 backdrop-blur-xl border-b border-white/5 h-20 px-8 flex justify-between items-center transition-all duration-500 print:hidden">
         <div className="flex items-center gap-6">
-          <Link to="/verify" className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all">
+          <Link to="/projects" className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all">
             <ChevronLeft className="w-6 h-6 text-white" />
           </Link>
           <div className="flex flex-col">
@@ -202,17 +203,10 @@ export const PublicVerifyResultPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Industrial Footer (Visible in Web, Hidden in Print if needed) */}
-      <footer className="bg-text-primary py-12 px-8 print:hidden">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">
-          <div className="flex gap-8">
-            <Link to="/verify" className="hover:text-primary transition-colors">Nueva Consulta</Link>
-            <Link to="/" className="hover:text-primary transition-colors">Garantía VeriFinca</Link>
-            <a href="#" className="hover:text-primary transition-colors">Seguridad de Datos</a>
-          </div>
-          <div>República Dominicana · 2026 Institutional Protocol</div>
-        </div>
-      </footer>
+      {/* Industrial Footer */}
+      <div className="print:hidden">
+        <LandingFooter />
+      </div>
     </div>
   );
 };

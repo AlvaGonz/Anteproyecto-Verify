@@ -303,7 +303,7 @@ export const FeaturedProjectsSection: React.FC = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row sm:items-center gap-6 md:gap-8">
-            <Link to="/portal" className="flex items-center gap-2 text-secondary font-black group whitespace-nowrap">
+            <Link to="/projects" className="flex items-center gap-2 text-secondary font-black group whitespace-nowrap">
               Ver todos los proyectos <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             
@@ -385,7 +385,7 @@ export const FeaturedProjectsSection: React.FC = () => {
                          </div>
                        </div>
                        <Link 
-                         to="/portal" 
+                         to="/projects" 
                          onClick={(e) => {
                            if (hasDragged) {
                              e.preventDefault();

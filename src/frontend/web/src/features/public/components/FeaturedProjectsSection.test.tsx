@@ -150,7 +150,7 @@ describe("FeaturedProjectsSection Component", () => {
 
     if (track) {
       // Find one of the card action buttons/links
-      const link = screen.getAllByRole("link").find(el => el.getAttribute("href") === "/portal");
+      const link = screen.getAllByRole("link").find(el => el.getAttribute("href") === "/projects");
       expect(link).toBeInTheDocument();
 
       if (link) {

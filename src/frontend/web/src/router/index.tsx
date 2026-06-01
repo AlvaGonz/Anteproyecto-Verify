@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { createHashRouter, Navigate } from "react-router-dom";
+import { createHashRouter, Navigate, useParams } from "react-router-dom";
 import { LandingPage } from "../pages/LandingPage";
 import { HealthPage } from "../pages/HealthPage";
 
@@ -13,7 +13,6 @@ import { ProjectValidationPage } from "../pages/projects/ProjectValidationPage";
 import { ProjectAuditPage } from "../pages/admin/ProjectAuditPage";
 import { ProjectReportsPage } from "../pages/admin/ProjectReportsPage";
 import { RulesManagePage } from "../pages/admin/RulesManagePage";
-import { PublicVerifySearchPage } from "../pages/public/PublicVerifySearchPage";
 import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
@@ -27,6 +26,11 @@ import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
 import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
+
+const NavigateToVerifyResult: React.FC = () => {
+  const { code } = useParams<{ code: string }>();
+  return <Navigate to={`/projects/verify/${code}`} replace />;
+};
 
 export const router = createHashRouter([
   {
@@ -58,15 +62,15 @@ export const router = createHashRouter([
       /* ===== Public Pages ===== */
       {
         path: "/portal",
-        element: <ProjectsPublicListPage />,
+        element: <Navigate to="/projects" replace />,
       },
       {
         path: "/consulta-publica",
-        element: <Navigate to="/portal" replace />,
+        element: <Navigate to="/projects" replace />,
       },
       {
         path: "/projects",
-        element: <Navigate to="/portal" replace />,
+        element: <ProjectsPublicListPage />,
       },
       {
         path: "/login",
@@ -78,10 +82,14 @@ export const router = createHashRouter([
       },
       {
         path: "/verify",
-        element: <PublicVerifySearchPage />,
+        element: <Navigate to="/projects" replace />,
       },
       {
         path: "/verify/:code",
+        element: <NavigateToVerifyResult />,
+      },
+      {
+        path: "/projects/verify/:code",
         element: <PublicVerifyResultPage />,
       },
       {

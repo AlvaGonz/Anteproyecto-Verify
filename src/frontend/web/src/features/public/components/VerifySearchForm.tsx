@@ -149,9 +149,9 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     setError(null);
     if (code.trim()) {
       if (searchType.id === "cert") {
-        navigate(`/verify/${code.trim()}`);
+        navigate(`/projects/verify/${code.trim()}`);
       } else {
-        navigate(`/verify/${code.trim()}?type=${searchType.id}`);
+        navigate(`/projects/verify/${code.trim()}?type=${searchType.id}`);
       }
     }
   };

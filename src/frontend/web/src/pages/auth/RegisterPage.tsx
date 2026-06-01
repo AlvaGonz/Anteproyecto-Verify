@@ -380,13 +380,13 @@ export const RegisterPage: React.FC = () => {
                 />
                 <span className="text-[13px] text-text-secondary leading-relaxed group-hover:text-text-primary transition-colors">
                   Acepto los{" "}
-                  <a href="#" className="font-bold text-primary hover:underline">
+                  <Link to="/legal#terminos" className="font-bold text-primary hover:underline">
                     términos de uso
-                  </a>{" "}
+                  </Link>{" "}
                   y la{" "}
-                  <a href="#" className="font-bold text-primary hover:underline">
+                  <Link to="/legal#privacidad" className="font-bold text-primary hover:underline">
                     política de privacidad
-                  </a>
+                  </Link>
                   .
                 </span>
               </label>

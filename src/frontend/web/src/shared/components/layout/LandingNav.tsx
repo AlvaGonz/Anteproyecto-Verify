@@ -27,7 +27,7 @@ export const LandingNav: React.FC = () => {
 
       <div className="hidden lg:flex items-center gap-10">
         {[
-          { label: "Proyectos", href: "/portal" },
+          { label: "Proyectos", href: "/projects" },
           { label: "Precios", href: "/precios" },
           { label: "Legal", href: "/legal" },
         ].map((item) => {
