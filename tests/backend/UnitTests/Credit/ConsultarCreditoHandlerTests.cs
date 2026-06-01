@@ -33,7 +33,6 @@ public class ConsultarCreditoCommandHandlerTests
         _hallazgoRepositoryMock = new Mock<IHallazgoRepository>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         _handler = new ConsultarCreditoCommandHandler(
             _proyectoRepositoryMock.Object,
@@ -50,11 +49,12 @@ public class ConsultarCreditoCommandHandlerTests
     public async Task Handle_ShouldFail_WhenNoConsentimientoVigente()
     {
         // Arrange
-        var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Professional);
-        var promotorId = promotor.Id;
-        var project = new Proyecto("Test", "Loc", promotorId);
-        var projectId = project.Id;
+        var projectId = Guid.NewGuid();
+        var promotorId = Guid.NewGuid();
         var userId = Guid.NewGuid();
+        
+        var project = new Proyecto("Test", "Loc", promotorId);
+        var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Promotor);
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);
@@ -78,12 +78,12 @@ public class ConsultarCreditoCommandHandlerTests
     public async Task Handle_ShouldGenerateHallazgo_WhenRiesgoAlto()
     {
         // Arrange
-        var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Professional);
-        promotor.UpdateContactInfo("809-555-5555", "12345678901");
-        var promotorId = promotor.Id;
-        var project = new Proyecto("Test", "Loc", promotorId);
-        var projectId = project.Id;
+        var projectId = Guid.NewGuid();
+        var promotorId = Guid.NewGuid();
         var userId = Guid.NewGuid();
+        
+        var project = new Proyecto("Test", "Loc", promotorId);
+        var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Promotor);
         var consentimiento = new ConsentimientoFinanciero(promotorId, "1.1.1.1", "v1.0");
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
@@ -93,7 +93,7 @@ public class ConsultarCreditoCommandHandlerTests
         _consentimientoRepositoryMock.Setup(x => x.GetVigenteByUsuarioIdAsync(promotorId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(consentimiento);
 
-        _transUnionServiceMock.Setup(x => x.ConsultarHistorialAsync(promotor.Identificacion!, It.IsAny<CancellationToken>()))
+        _transUnionServiceMock.Setup(x => x.ConsultarHistorialAsync(promotor.Identificacion, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TransUnionResult { IsSuccess = true, NivelRiesgo = NivelRiesgoCrediticio.Alto });
 
         var command = new ConsultarCreditoCommand { ProyectoId = projectId, UsuarioId = userId };

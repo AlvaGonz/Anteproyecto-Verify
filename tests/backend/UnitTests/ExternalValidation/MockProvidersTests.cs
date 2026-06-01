@@ -3,11 +3,10 @@ namespace UnitTests.Infrastructure.ExternalValidation;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using global::Application.DTOs;
-using global::Application.DTOs.ExternalValidation;
-using global::Infrastructure.ExternalValidation;
-using global::Infrastructure.ExternalValidation.Configuration;
-using global::Infrastructure.ExternalValidation.Mocks;
+using Application.DTOs.ExternalValidation;
+using Infrastructure.ExternalValidation;
+using Infrastructure.ExternalValidation.Configuration;
+using Infrastructure.ExternalValidation.Mocks;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -93,7 +92,7 @@ public class MockProvidersTests
     public void ExternalProviderResolver_ShouldResolveCorrectProvider()
     {
         // Arrange
-        var providers = new List<global::Application.Abstractions.ExternalValidation.IExternalValidationProvider>
+        var providers = new List<Application.Abstractions.ExternalValidation.IExternalValidationProvider>
         {
             new MockDgriValidationProvider(_options),
             new MockCatastroValidationProvider(_options)
@@ -113,7 +112,7 @@ public class MockProvidersTests
     public void ExternalProviderResolver_ShouldThrowKeyNotFound_WhenProviderNotRegistered()
     {
         // Arrange
-        var providers = new List<global::Application.Abstractions.ExternalValidation.IExternalValidationProvider>
+        var providers = new List<Application.Abstractions.ExternalValidation.IExternalValidationProvider>
         {
             new MockDgriValidationProvider(_options)
         };

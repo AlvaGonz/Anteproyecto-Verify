@@ -1,7 +1,5 @@
 # Enterprise Web App Bootstrap
 
-[![CI](https://github.com/AlvaGonz/Anteproyecto-Verify/actions/workflows/ci.yml/badge.svg)](https://github.com/AlvaGonz/Anteproyecto-Verify/actions/workflows/ci.yml)
-
 Bootstrap de solución para un sistema web moderno enterprise-ready.
 
 ## Arquitectura
@@ -28,8 +26,8 @@ dotnet test
 Para ejecutar las pruebas del frontend:
 ```bash
 cd src/frontend/web
-pnpm install
-pnpm run test
+npm install
+npm run test
 ```
 Para generar la migración inicial del modelo de dominio, ejecuta:
 ```bash
