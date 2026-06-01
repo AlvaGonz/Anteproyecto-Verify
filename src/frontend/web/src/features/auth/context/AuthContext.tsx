@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { AuthService, User, AuthError } from "../services/AuthService";
-import { isSome, isSuccess } from "../../../shared/utils/functional";
+import { isSome, isSuccess, isFailure } from "../../../shared/utils/functional";
 
 interface AuthContextType {
   user: User | null;

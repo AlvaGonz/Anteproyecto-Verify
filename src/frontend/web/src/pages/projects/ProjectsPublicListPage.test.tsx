@@ -15,7 +15,7 @@ describe("ProjectsPublicListPage", () => {
         <ProjectsPublicListPage />
       </MemoryRouter>,
     );
-    expect(screen.getByText(/Cero Incertidumbre En Su/i)).toBeDefined();
+    expect(screen.getByText(/Encuentre Su Próxima/i)).toBeDefined();
   });
 
   it("renders projects list after loading", async () => {

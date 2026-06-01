@@ -85,8 +85,8 @@ export const DashboardPage: React.FC = () => {
       {/* Stats Section with Premium Gradients */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
         {stats.map((item, idx) => (
-          <motion.div 
-            key={item.name} 
+          <motion.div
+            key={item.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 * idx, duration: 0.5 }}
@@ -107,7 +107,7 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
             <div className="h-1 w-full bg-surface-muted/30">
-              <motion.div 
+              <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: loading ? '0%' : '65%' }}
                 transition={{ delay: 0.5 + 0.1 * idx, duration: 1 }}
@@ -120,7 +120,7 @@ export const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Recent Projects - Spans 2 cols on wide screens */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
@@ -134,16 +134,16 @@ export const DashboardPage: React.FC = () => {
               <p className="text-xs text-on-surface-variant font-medium mt-0.5">Últimas actualizaciones en el sistema</p>
             </div>
             <div className="flex items-center gap-4">
-               <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-black text-secondary uppercase tracking-widest">Salud Promedio</span>
-                  <span className="text-lg font-display font-black text-success leading-none">94.2%</span>
-               </div>
-               <div className="w-10 h-10 rounded-full border-2 border-success/30 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-success" />
-               </div>
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-black text-secondary uppercase tracking-widest">Salud Promedio</span>
+                <span className="text-lg font-display font-black text-success leading-none">94.2%</span>
+              </div>
+              <div className="w-10 h-10 rounded-full border-2 border-success/30 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-success" />
+              </div>
             </div>
           </div>
-          
+
           <div className="divide-y divide-outline-variant/10 flex-1">
             {recentProjects.length === 0 ? (
               <div className="py-20 text-sm text-on-surface-variant opacity-50 text-center flex flex-col items-center gap-3">
@@ -152,49 +152,49 @@ export const DashboardPage: React.FC = () => {
               </div>
             ) : (
               recentProjects.map((p, idx) => (
-                  <motion.div
-                    key={p.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + (idx * 0.05) }}
+                <motion.div
+                  key={p.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + (idx * 0.05) }}
+                >
+                  <Link
+                    to={`/admin/projects/${p.id}/edit`}
+                    className="flex items-center justify-between px-8 py-5 hover:bg-primary/[0.03] transition-all group"
                   >
-                    <Link
-                      to={`/admin/projects/${p.id}/edit`}
-                      className="flex items-center justify-between px-8 py-5 hover:bg-primary/[0.03] transition-all group"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary font-black text-xs group-hover:bg-primary/10 transition-colors">
-                          {p.codigoInterno.substring(0, 2)}
-                        </div>
-                        <div>
-                          <p className="font-bold text-secondary text-lg group-hover:text-primary transition-colors leading-tight">{p.nombre}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                             <span className={`text-[9px] font-black px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant uppercase tracking-tighter`}>
-                               {p.codigoInterno}
-                             </span>
-                             <span className="text-[10px] text-on-surface-variant opacity-60">
-                               Subido el {new Date(p.createdAtUtc).toLocaleDateString()}
-                             </span>
-                          </div>
-                        </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary font-black text-xs group-hover:bg-primary/10 transition-colors">
+                        {p.codigoInterno.substring(0, 2)}
                       </div>
-                      
-                      <div className="flex items-center gap-6">
-                        <div className="hidden sm:block text-right">
-                          <span className={`vf-badge ${p.estadoIntegridad === IntegrityStatus.Verified ? 'vf-badge-success' : 'vf-badge-warning'}`}>
-                            {p.estadoIntegridad}
+                      <div>
+                        <p className="font-bold text-secondary text-lg group-hover:text-primary transition-colors leading-tight">{p.nombre}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant uppercase tracking-tighter`}>
+                            {p.codigoInterno}
+                          </span>
+                          <span className="text-[10px] text-on-surface-variant opacity-60">
+                            Subido el {new Date(p.createdAtUtc).toLocaleDateString()}
                           </span>
                         </div>
-                        <div className="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all text-outline">
-                          <ArrowRight className="w-5 h-5" />
-                        </div>
                       </div>
-                    </Link>
-                  </motion.div>
+                    </div>
+
+                    <div className="flex items-center gap-6">
+                      <div className="hidden sm:block text-right">
+                        <span className={`vf-badge ${p.estadoIntegridad === IntegrityStatus.Verified ? 'vf-badge-success' : 'vf-badge-warning'}`}>
+                          {p.estadoIntegridad}
+                        </span>
+                      </div>
+                      <div className="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all text-outline">
+                        <ArrowRight className="w-5 h-5" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
               ))
             )}
           </div>
-          
+
           <div className="px-8 py-5 border-t border-outline-variant/20 bg-surface-container-lowest">
             <Link to="/admin/projects" className="text-sm font-black text-primary hover:text-primary-hover flex items-center justify-center gap-2 group transition-colors">
               Explorar todos los expedientes <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -206,8 +206,8 @@ export const DashboardPage: React.FC = () => {
         <div className="flex flex-col gap-8 animate-fade-in-up" style={{ animationDelay: "800ms" }}>
           <div className="vf-card p-6">
             <h3 className="text-lg font-display font-black text-secondary tracking-tight mb-5 flex items-center gap-2">
-               Accesos Directos
-               <div className="h-px flex-1 bg-outline-variant/20 ml-2"></div>
+              Accesos Directos
+              <div className="h-px flex-1 bg-outline-variant/20 ml-2"></div>
             </h3>
             <div className="grid grid-cols-1 gap-3">
               <Link
@@ -222,7 +222,7 @@ export const DashboardPage: React.FC = () => {
                   <p className="text-[10px] text-on-surface-variant font-medium">Inicia un nuevo expediente</p>
                 </div>
               </Link>
-              
+
               <Link
                 to="/admin/rules"
                 className="flex items-center gap-4 p-4 rounded-2xl border border-outline-variant/20 hover:border-secondary/50 hover:bg-secondary/[0.02] transition-all group"
@@ -235,7 +235,7 @@ export const DashboardPage: React.FC = () => {
                   <p className="text-[10px] text-on-surface-variant font-medium">Configura normativas RI</p>
                 </div>
               </Link>
-              
+
               <Link
                 to="/projects"
                 className="flex items-center gap-4 p-4 rounded-2xl border border-outline-variant/20 hover:border-success/50 hover:bg-success/[0.02] transition-all group"
@@ -251,7 +251,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
@@ -265,11 +265,11 @@ export const DashboardPage: React.FC = () => {
                 <div className="px-2 py-0.5 rounded bg-primary/20 text-primary text-[8px] font-black uppercase tracking-widest">En Vivo</div>
               </div>
               <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-6">Tendencia de validación semanal</p>
-              
+
               <div className="flex items-end gap-2 h-32 mb-6">
                 {[45, 60, 40, 85, 55, 75, 95].map((h, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                    <motion.div 
+                    <motion.div
                       initial={{ height: 0 }}
                       animate={{ height: `${h}%` }}
                       transition={{ delay: 0.8 + (i * 0.1), duration: 1, ease: "circOut" }}
@@ -284,21 +284,21 @@ export const DashboardPage: React.FC = () => {
                 ))}
               </div>
             </div>
-            
+
             <div className="relative z-10 flex items-center justify-between border-t border-white/5 pt-4">
-               <div>
-                  <p className="text-2xl font-display font-black text-white leading-none">98.2%</p>
-                  <p className="text-[8px] font-black text-white/30 uppercase mt-1 tracking-tighter">Convergencia Catastral</p>
-               </div>
-               <div className="text-right">
-                  <p className="text-2xl font-display font-black text-primary leading-none">+4.5%</p>
-                  <p className="text-[8px] font-black text-white/30 uppercase mt-1 tracking-tighter">Eficiencia Operativa</p>
-               </div>
+              <div>
+                <p className="text-2xl font-display font-black text-white leading-none">98.2%</p>
+                <p className="text-[8px] font-black text-white/30 uppercase mt-1 tracking-tighter">Convergencia Catastral</p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-display font-black text-primary leading-none">+4.5%</p>
+                <p className="text-[8px] font-black text-white/30 uppercase mt-1 tracking-tighter">Eficiencia Operativa</p>
+              </div>
             </div>
 
             {/* Background design element */}
             <div className="absolute -right-6 -bottom-6 opacity-5 rotate-12">
-               <Shield className="w-48 h-48" />
+              <Shield className="w-48 h-48" />
             </div>
           </motion.div>
         </div>

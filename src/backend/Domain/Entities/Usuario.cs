@@ -7,6 +7,8 @@ using Domain.Enums;
 
 public class Usuario : EntityBase
 {
+    public string Nombre { get; private set; } = null!;
+    public string Apellido { get; private set; } = null!;
     public string NombreCompleto { get; private set; } = null!;
     public string CorreoElectronico { get; private set; } = null!;
     public string Email => CorreoElectronico;
@@ -22,16 +24,21 @@ public class Usuario : EntityBase
 
     private Usuario() { } // For EF Core
 
-    public Usuario(string nombreCompleto, string correoElectronico, string contrasenaHash, UserRole rol)
+    public Usuario(string nombre, string apellido, string correoElectronico, string contrasenaHash, UserRole rol, string? telefono = null, string? cedula = null)
     {
-        if (string.IsNullOrWhiteSpace(nombreCompleto)) throw new ArgumentException("Nombre requerido", nameof(nombreCompleto));
+        if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
+        if (string.IsNullOrWhiteSpace(apellido)) throw new ArgumentException("Apellido requerido", nameof(apellido));
         if (string.IsNullOrWhiteSpace(correoElectronico)) throw new ArgumentException("Correo requerido", nameof(correoElectronico));
         if (string.IsNullOrWhiteSpace(contrasenaHash)) throw new ArgumentException("Contraseña requerida", nameof(contrasenaHash));
 
-        NombreCompleto = nombreCompleto;
+        Nombre = nombre;
+        Apellido = apellido;
+        NombreCompleto = $"{nombre} {apellido}";
         CorreoElectronico = correoElectronico;
         ContrasenaHash = contrasenaHash;
         Rol = rol;
+        Telefono = telefono;
+        Cedula = cedula;
         Activo = true;
     }
 

@@ -30,24 +30,33 @@ public static class AppDbContextSeeder
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
-                nombreCompleto: "Admin VeriFinca",
+                nombre: "Admin",
+                apellido: "VeriFinca",
                 correoElectronico: "admin@verifinca.do",
                 contrasenaHash: AdminPasswordHash,
-                rol: UserRole.Administrator);
+                rol: UserRole.Administrator,
+                telefono: "809-555-0100",
+                cedula: "001-0000000-1");
 
             var devUser = await GetOrCreateUsuarioAsync(
                 context,
-                nombreCompleto: "Desarrollador Inmobiliario",
+                nombre: "Desarrollador",
+                apellido: "Inmobiliario",
                 correoElectronico: "dev@constructora.do",
                 contrasenaHash: DevPasswordHash,
-                rol: UserRole.Professional);
+                rol: UserRole.Professional,
+                telefono: "809-555-0200",
+                cedula: "001-0000000-2");
 
             var publicUser = await GetOrCreateUsuarioAsync(
                 context,
-                nombreCompleto: "Usuario Consulta",
+                nombre: "Usuario",
+                apellido: "Consulta",
                 correoElectronico: "consulta@publico.do",
                 contrasenaHash: PublicPasswordHash,
-                rol: UserRole.Consultation);
+                rol: UserRole.Consultation,
+                telefono: "809-555-0300",
+                cedula: "001-0000000-3");
 
             var proyectos = new[]
             {
@@ -180,15 +189,18 @@ public static class AppDbContextSeeder
 
     private static async Task<Usuario> GetOrCreateUsuarioAsync(
         AppDbContext context,
-        string nombreCompleto,
+        string nombre,
+        string apellido,
         string correoElectronico,
         string contrasenaHash,
-        UserRole rol)
+        UserRole rol,
+        string? telefono = null,
+        string? cedula = null)
     {
         var existing = await context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == correoElectronico);
         if (existing != null) return existing;
 
-        var user = new Usuario(nombreCompleto, correoElectronico, contrasenaHash, rol);
+        var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
         context.Usuarios.Add(user);
         await context.SaveChangesAsync();
         return user;

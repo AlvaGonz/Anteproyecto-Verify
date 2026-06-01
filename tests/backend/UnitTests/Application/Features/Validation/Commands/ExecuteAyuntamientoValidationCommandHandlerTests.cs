@@ -28,7 +28,6 @@ public class ExecuteAyuntamientoValidationCommandHandlerTests
         _validacionAyuntamientoRepositoryMock = new Mock<IValidacionAyuntamientoRepository>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         _handler = new ExecuteAyuntamientoValidationCommandHandler(
             _ayuntamientoServiceMock.Object,
@@ -42,9 +41,9 @@ public class ExecuteAyuntamientoValidationCommandHandlerTests
     public async Task Handle_ShouldCallAyuntamientoServiceAndSaveResult()
     {
         // Arrange
+        var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var project = new Proyecto("Test", "Santo Domingo", userId);
-        var projectId = project.Id;
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);

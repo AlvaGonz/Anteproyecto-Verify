@@ -18,7 +18,7 @@ public class PersistenceTests
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
-        var usuario = new Usuario("Test User", "test@example.com", "PasswordHash123", UserRole.Consultation);
+        var usuario = new Usuario("Test User", "test@example.com", UserRole.Client);
 
         // Act
         using (var context = new AppDbContext(options))
@@ -44,7 +44,7 @@ public class PersistenceTests
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
-        var usuario = new Usuario("Test User", "test@example.com", "PasswordHash123", UserRole.Consultation);
+        var usuario = new Usuario("Test User", "test@example.com", UserRole.Client);
         var proyecto = new Proyecto("Test Project", "Test Location", usuario.Id);
 
         // Act

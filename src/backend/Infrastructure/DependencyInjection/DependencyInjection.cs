@@ -7,7 +7,6 @@ using Application.Abstractions.Storage;
 using Infrastructure.Storage;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Resend;
 
 public static class DependencyInjection
 {
@@ -119,19 +118,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Audit.Queries.ExportAuditTrail.ExportAuditTrailQueryHandler>();
 
         // Notifications
-        var resendApiToken = configuration.GetValue<string>("Resend:ApiToken");
-        if (!string.IsNullOrWhiteSpace(resendApiToken))
-        {
-            services.AddResend(options =>
-            {
-                options.ApiToken = resendApiToken;
-            });
-            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Email.ResendEmailService>();
-        }
-        else
-        {
-            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
-        }
+        services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
         services.AddScoped<Application.Abstractions.Notifications.IEmailNotificationService, Infrastructure.Services.EmailNotificationService>();
 
         // External Services
@@ -149,6 +136,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Commands.CreateRule.CreateRuleCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.ToggleRuleStatus.ToggleRuleStatusCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
+        services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Infrastructure.Security.BCryptPasswordHasher>();
 
         // End of Infrastructure
 

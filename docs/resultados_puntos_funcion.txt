@@ -1,0 +1,109 @@
+======================================================================
+ANÁLISIS DE ESTIMACIÓN POR PUNTOS DE FUNCIÓN (FPA)
+PROYECTO: VeriFinca
+======================================================================
+
+1. IDENTIFICACIÓN DE COMPONENTES FUNCIONALES
+----------------------------------------------------------------------
+De acuerdo a los Requisitos Funcionales (RF-1 a RF-20), se clasifican 
+los componentes en los 5 tipos de Puntos de Función:
+
+A. Entradas Externas (EI - External Inputs)
+   - RF-1: Registro de expediente digital del proyecto (Complejidad Alta)
+   - RF-12: Registro de consentimiento informado Ley 172-13 (Complejidad Media)
+   - Configuración de reglas de negocio por administrador (Complejidad Baja)
+
+B. Salidas Externas (EO - External Outputs)
+   - RF-14: Emisión de reporte de hallazgos detallado (Complejidad Alta)
+   - RF-15: Sello de Integridad Digital con QR y firma digital (Complejidad Media)
+   - RF-18: Generación de reportes PDF/Excel de validaciones (Complejidad Baja)
+   - RF-20: Notificaciones por correo electrónico (Complejidad Baja)
+
+C. Consultas Externas (EQ - External Inquiries)
+   - RF-16: Consulta pública de resultado de validación (Complejidad Media)
+   - Consulta de proyectos registrados por el desarrollador (Complejidad Baja)
+
+D. Archivos Lógicos Internos (ILF - Internal Logical Files)
+   - Base de datos de Usuarios y Roles (Complejidad Baja)
+   - Base de datos de Proyectos y Expedientes (Complejidad Alta)
+   - RF-17: Registro de auditoría inmutable (Logs) (Complejidad Media)
+   - Motor de Inferencia / Reglas de negocio (Complejidad Media)
+
+E. Archivos de Interfaz Externa (EIF - External Interface Files)
+   - RF-4: API Registro Inmobiliario (RI) (Complejidad Alta)
+   - RF-5: API Catastro Nacional / Georreferenciación (Complejidad Alta)
+   - RF-6: API Dirección General de Impuestos Internos (DGII) (Complejidad Alta)
+   - RF-13: API Buró de Crédito (TransUnion) (Complejidad Alta)
+   - RF-7: Integración con Ayuntamientos (Complejidad Media)
+
+2. CÁLCULO DE PUNTOS DE FUNCIÓN SIN AJUSTAR (UFP)
+----------------------------------------------------------------------
+Peso por complejidad (Baja, Media, Alta):
+- EI: Baja (3), Media (4), Alta (6)
+- EO: Baja (4), Media (5), Alta (7)
+- EQ: Baja (3), Media (4), Alta (6)
+- ILF: Baja (7), Media (10), Alta (15)
+- EIF: Baja (5), Media (7), Alta (10)
+
+Cálculos:
+EI  = (1x6) + (1x4) + (1x3) = 13
+EO  = (1x7) + (1x5) + (2x4) = 20
+EQ  = (1x4) + (1x3) = 7
+ILF = (1x15) + (2x10) + (1x7) = 42
+EIF = (4x10) + (1x7) = 47
+
+Total UFP = 13 + 20 + 7 + 42 + 47 = 129 Puntos de Función Sin Ajustar
+
+3. FACTORES DE AJUSTE DE VALOR (VAF)
+----------------------------------------------------------------------
+Considerando los 14 factores de características generales del sistema (escala 0-5):
+1. Comunicación de datos (5 - Web/APIs)
+2. Procesamiento distribuido (4 - Azure)
+3. Rendimiento (4 - RNF-6)
+4. Configuración fuertemente utilizada (4)
+5. Tasa de transacciones (3)
+6. Entrada de datos en línea (5)
+7. Eficiencia del usuario final (5 - UI Responsive)
+8. Actualización en línea (4)
+9. Procesamiento complejo (5 - OCR, Motor de reglas)
+10. Reusabilidad (3)
+11. Facilidad de instalación (5 - SaaS)
+12. Facilidad de operación (4)
+13. Múltiples sitios (4)
+14. Facilidad de cambios (4)
+
+Total Grado de Influencia (TDI) = 59
+VAF = 0.65 + (0.01 * TDI) = 0.65 + 0.59 = 1.24
+
+4. PUNTOS DE FUNCIÓN AJUSTADOS (AFP)
+----------------------------------------------------------------------
+AFP = UFP * VAF = 129 * 1.24 = 159.96 Puntos de Función
+
+5. ESTIMACIÓN DE ESFUERZO
+----------------------------------------------------------------------
+Asumiendo un promedio de 8 horas-persona por Punto de Función para un stack moderno (C#, React):
+Esfuerzo total estimado = 160 AFP * 8 = 1,280 horas-persona.
+Dividido entre 2 desarrolladores (Ray y Adrian) = 640 horas por persona.
+A un ritmo de 20 horas semanales por estudiante = 32 semanas de desarrollo puro.
+Dado el esquema de 17 semanas, se requiere alta eficiencia y priorización del MVP.
+
+6. DISTRIBUCIÓN DE DIFICULTAD E IMPORTANCIA
+----------------------------------------------------------------------
+TAREAS DE ALTA DIFICULTAD (Peso: 10-15 puntos) - 45% del esfuerzo
+- Integraciones con APIs gubernamentales (RI, DGII, Catastro).
+- Configuración de Base de Datos y Arquitectura Clean.
+- Algoritmo de extracción OCR y validación documental.
+*Asignación principal: Ray (Debido a su perfil de BD/Backend).*
+
+TAREAS DE MEDIA DIFICULTAD (Peso: 5-7 puntos) - 35% del esfuerzo
+- Desarrollo de formularios de captura complejos (Expediente).
+- Motor de reglas de negocio y sistema de alertas.
+- Generación de Sello Digital (QR/Firma).
+- Testing y QA.
+*Asignación compartida: Adrian (Frontend/Lógica) y Ray (Integración).*
+
+TAREAS DE BAJA DIFICULTAD (Peso: 3-4 puntos) - 20% del esfuerzo
+- Interfaces de consulta pública.
+- Generación de reportes PDF/Excel.
+- UI/UX y diseño responsivo.
+*Asignación principal: Adrian.*

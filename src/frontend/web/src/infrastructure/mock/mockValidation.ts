@@ -9,8 +9,6 @@ export const mockFullValidations: ValidationExecutionResult[] = [
     completedAtUtc: "2026-01-20T10:05:00Z",
     overallStatus: ValidationExecutionStatus.Completed,
     isFullyValid: true,
-    overallIntegrityScore: 100,
-    integritySeal: "Sello de Oro",
     internalValidation: mockValidaciones[0],
     externalSources: [
       {
@@ -43,8 +41,6 @@ export const mockFullValidations: ValidationExecutionResult[] = [
     completedAtUtc: "2026-02-12T10:05:00Z",
     overallStatus: ValidationExecutionStatus.Completed,
     isFullyValid: false,
-    overallIntegrityScore: 40,
-    integritySeal: "Sin Sello",
     internalValidation: mockValidaciones[1],
     externalSources: [
       {

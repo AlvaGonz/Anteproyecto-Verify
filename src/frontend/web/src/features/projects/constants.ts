@@ -19,4 +19,4 @@ export const TOKENS = {
   animation: {
     transition: { type: 'spring', stiffness: 300, damping: 30 },
   }
-} as const;
+};

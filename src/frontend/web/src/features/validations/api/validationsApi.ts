@@ -1,5 +1,5 @@
 /** v1.1.1 - Forced Refresh */
-import { InternalValidationSummaryDto, FindingDto, ValidationStatus, ValidationExecutionResult, ValidationExecutionStatus, AuditLogDto, AuditActionType, RuleStatus } from "../types";
+import { InternalValidationSummaryDto, FindingDto, ValidationStatus, ValidationExecutionResult, ValidationExecutionStatus, AuditLogDto, AuditActionType } from "../types";
 import { mockValidaciones } from "../../../infrastructure/mock/mockValidaciones";
 import { mockHallazgos } from "../../../infrastructure/mock/mockHallazgos";
 import { mockFullValidations } from "../../../infrastructure/mock/mockValidation";
@@ -8,9 +8,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
 
-import { Result } from "../../../shared/utils/functional";
-
-type ApiError = { message: string; status?: number };
+import { Result } from "../../../shared/types/Result";
 
 let localMockValidaciones = [...mockValidaciones];
 let localMockHallazgos = [...mockHallazgos];
@@ -19,7 +17,7 @@ let localMockFullValidations = [...mockFullValidations];
 export const validationsApi = {
   runInternalValidation: async (
     projectId: string,
-  ): Promise<Result<InternalValidationSummaryDto, ApiError>> => {
+  ): Promise<Result<InternalValidationSummaryDto>> => {
     try {
       if (USE_MOCK) {
         const newValidation: InternalValidationSummaryDto = {
@@ -27,8 +25,6 @@ export const validationsApi = {
           proyectoId: projectId,
           status: ValidationStatus.InProgress,
           esLegitimo: null,
-          integrityScore: 0,
-          selloName: null,
           passedCount: 0,
           warningCount: 0,
           failedCount: 0,
@@ -59,7 +55,7 @@ export const validationsApi = {
 
   getLatestInternalValidation: async (
     projectId: string,
-  ): Promise<Result<InternalValidationSummaryDto | null, ApiError>> => {
+  ): Promise<Result<InternalValidationSummaryDto | null>> => {
     try {
       if (USE_MOCK) {
         const projectValidations = localMockValidaciones
@@ -81,7 +77,7 @@ export const validationsApi = {
     }
   },
 
-  getProjectFindings: async (projectId: string): Promise<Result<FindingDto[], ApiError>> => {
+  getProjectFindings: async (projectId: string): Promise<Result<FindingDto[]>> => {
     try {
       if (USE_MOCK) {
         return { _tag: "Success", data: localMockHallazgos.filter(h => h.proyectoId === projectId) };
@@ -101,7 +97,7 @@ export const validationsApi = {
 
   runFullValidation: async (
     projectId: string,
-  ): Promise<Result<ValidationExecutionResult, ApiError>> => {
+  ): Promise<Result<ValidationExecutionResult>> => {
     try {
       if (USE_MOCK) {
         const newValidation: ValidationExecutionResult = {
@@ -111,28 +107,24 @@ export const validationsApi = {
           completedAtUtc: new Date().toISOString(),
           overallStatus: ValidationExecutionStatus.Completed,
           isFullyValid: true,
-          overallIntegrityScore: 100,
-          integritySeal: "Sello de Oro",
           internalValidation: {
             validacionId: `val-${Math.random().toString(36).substr(2, 9)}`,
             proyectoId: projectId,
-            status: ValidationStatus.Success,
+            status: ValidationStatus.Completed,
             esLegitimo: true,
-            integrityScore: 100,
-            selloName: "Sello de Oro",
             passedCount: 3,
             warningCount: 0,
             failedCount: 0,
             createdAtUtc: new Date().toISOString(),
             results: [
-              { id: "1", ruleCode: "VAL-001", ruleName: "Identidad del Propietario", status: RuleStatus.Passed, message: "Coincidencia 100% con padrón electoral.", severity: null, relatedDocumentId: null },
-              { id: "2", ruleCode: "VAL-002", ruleName: "Superficie Catastral", status: RuleStatus.Passed, message: "Área declarada dentro del margen tolerado (±0.05%).", severity: null, relatedDocumentId: null },
-              { id: "3", ruleCode: "VAL-003", ruleName: "Gravámenes Vigentes", status: RuleStatus.Passed, message: "Providencia registral libre de cargas.", severity: null, relatedDocumentId: null }
+              { id: "1", nombreRegla: "Identidad del Propietario", passed: true, mensaje: "Coincidencia 100% con padrón electoral." },
+              { id: "2", nombreRegla: "Superficie Catastral", passed: true, mensaje: "Área declarada dentro del margen tolerado (±0.05%)." },
+              { id: "3", nombreRegla: "Gravámenes Vigentes", passed: true, mensaje: "Providencia registral libre de cargas." }
             ]
           },
           externalSources: [
-            { sourceName: "DGII", status: "SUCCESS", isSuccess: true, isMatch: true, summary: "Datos encontrados", findings: [], timestampUtc: new Date().toISOString() },
-            { sourceName: "Catastro Nacional", status: "SUCCESS", isSuccess: true, isMatch: true, summary: "Datos encontrados", findings: [], timestampUtc: new Date().toISOString() }
+            { sourceName: "DGII", status: "SUCCESS", dataFound: true, lastUpdate: new Date().toISOString() },
+            { sourceName: "Catastro Nacional", status: "SUCCESS", dataFound: true, lastUpdate: new Date().toISOString() }
           ],
           errors: []
         };
@@ -160,7 +152,7 @@ export const validationsApi = {
 
   getValidationResult: async (
     projectId: string,
-  ): Promise<Result<ValidationExecutionResult | null, ApiError>> => {
+  ): Promise<Result<ValidationExecutionResult | null>> => {
     try {
       if (USE_MOCK) {
         const validations = localMockFullValidations
@@ -181,7 +173,7 @@ export const validationsApi = {
       return { _tag: "Failure", error: { message: error instanceof Error ? error.message : "Unknown error" } };
     }
   },
-  getProjectAuditLogs: async (projectId: string): Promise<Result<AuditLogDto[], ApiError>> => {
+  getProjectAuditLogs: async (projectId: string): Promise<Result<AuditLogDto[]>> => {
     try {
       if (USE_MOCK) {
         const mockAuditLogs: AuditLogDto[] = [
