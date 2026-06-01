@@ -2,41 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { LandingNav } from "../../public/components/LandingNav";
 import { LandingFooter } from "../../public/components/LandingFooter";
+import { useAuth } from "../../auth/context/AuthContext";
 import "./PricingPage.module.css";
 
 export const PricingPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
 
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.1,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const elements = entry.target.querySelectorAll(".fade-up, .card-enter");
-          elements.forEach((el) => el.classList.add("is-visible"));
-
-          if (
-            entry.target.classList.contains("fade-up") ||
-            entry.target.classList.contains("card-enter")
-          ) {
-            entry.target.classList.add("is-visible");
-          }
-
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    document.querySelectorAll(".reveal-section").forEach((section) => {
-      observer.observe(section);
-    });
-
-    return () => observer.disconnect();
+    const timer = setTimeout(() => setIsRevealed(true), 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const prices = {
@@ -53,34 +29,30 @@ export const PricingPage: React.FC = () => {
       <main className="flex-grow pt-20">
         {/* 1. Header Section */}
         <section className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center reveal-section">
-          <span className="inline-block text-secondary font-label font-bold tracking-wider text-sm mb-4 uppercase fade-up stagger-1">
+          <span className={`inline-block text-secondary font-sans font-semibold text-[11px] tracking-widest mb-4 uppercase fade-up stagger-1 ${isRevealed ? "is-visible" : ""}`}>
             PLANES Y PRECIOS
           </span>
-          <h1 className="text-4xl md:text-5xl font-headline font-extrabold text-on-surface mb-6 fade-up stagger-2">
+          <h1 className={`text-4xl md:text-5xl font-headline font-extrabold text-on-surface mb-6 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
             Elige el plan ideal para tu operación
           </h1>
-          <p className="text-lg text-on-surface-variant max-w-2xl mx-auto mb-10 font-body fade-up stagger-3">
-            Escala tus validaciones inmobiliarias con planes diseñados para profesionales y empresas en la República
-            Dominicana.
+          <p className={`text-lg text-on-surface-variant max-w-2xl mx-auto mb-10 font-body fade-up stagger-3 ${isRevealed ? "is-visible" : ""}`}>
+            Escala tus validaciones inmobiliarias con planes diseñados para profesionales y empresas en la República Dominicana.
           </p>
 
           {/* Billing Toggle */}
           <div
-            className={`inline-flex bg-surface-variant rounded-full p-1 border border-outline-variant/30 shadow-sm relative toggle-container fade-up stagger-3 ${isAnnual ? "toggle-anual" : ""
-              }`}
+            className={`inline-flex bg-surface-variant rounded-full p-1 border border-outline-variant/30 shadow-sm relative toggle-container fade-up stagger-3 ${isRevealed ? "is-visible" : ""} ${isAnnual ? "toggle-anual" : ""}`}
             id="billingToggle"
           >
             <div className="toggle-slider"></div>
             <button
-              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${!isAnnual ? "text-primary font-bold" : "text-on-surface-variant"
-                }`}
+              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${!isAnnual ? "text-primary font-bold" : "text-on-surface-variant"}`}
               onClick={() => setIsAnnual(false)}
             >
               Mensual
             </button>
             <button
-              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${isAnnual ? "text-primary font-bold" : "text-on-surface-variant"
-                }`}
+              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${isAnnual ? "text-primary font-bold" : "text-on-surface-variant"}`}
               onClick={() => setIsAnnual(true)}
             >
               Anual <span className="text-xs text-primary ml-1">-20%</span>
@@ -92,7 +64,7 @@ export const PricingPage: React.FC = () => {
         <section className="max-w-7xl mx-auto px-6 pb-24 reveal-section">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Card 1: Consulta */}
-            <div className="bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-1 hover:-translate-y-2 hover:shadow-lg transition-all duration-300">
+            <div className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-1 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}>
               <h3 className="text-xl font-headline font-bold text-on-surface mb-2">Consulta</h3>
               <div className="mb-6 flex items-baseline">
                 <span className="text-3xl font-headline font-extrabold">$0</span>
@@ -106,7 +78,7 @@ export const PricingPage: React.FC = () => {
                   <span className="material-symbols-outlined text-primary text-xl check-anim check-delay-1">
                     check_circle
                   </span>
-                  10 consultas /mes
+                  1 consultas /mes
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl check-anim check-delay-2">
@@ -115,20 +87,19 @@ export const PricingPage: React.FC = () => {
                   Datos públicos básicos
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="material-symbols-outlined text-outline text-xl">cancel</span> Validación de
-                  identidad
+                  <span className="material-symbols-outlined text-outline text-xl">cancel</span> Validación de identidad
                 </li>
               </ul>
               <Link
                 to="/register"
-                className="w-full py-3 rounded-lg border border-primary text-primary font-label font-bold hover:bg-primary/5 transition-colors btn-interact text-center block"
+                className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
               >
                 Comenzar gratis
               </Link>
             </div>
 
             {/* Card 2: Profesional (Featured) */}
-            <div className="bg-surface rounded-xl p-8 border-2 border-primary shadow-xl flex flex-col text-left relative transform md:-translate-y-4 card-enter card-stagger-2 hover:-translate-y-6 hover:shadow-2xl transition-all duration-300 z-10">
+            <div className={`bg-surface rounded-xl p-8 border-2 border-primary shadow-xl flex flex-col text-left relative transform md:-translate-y-4 card-enter card-stagger-2 hover:-translate-y-6 hover:shadow-2xl transition-all duration-300 z-10 ${isRevealed ? "is-visible" : ""}`}>
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-on-primary text-xs font-label font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm badge-pulse">
                 MÁS POPULAR
               </div>
@@ -145,7 +116,7 @@ export const PricingPage: React.FC = () => {
                   <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-1">
                     check_circle
                   </span>
-                  150 consultas /mes
+                  25 consultas /mes
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-2">
@@ -175,7 +146,7 @@ export const PricingPage: React.FC = () => {
             </div>
 
             {/* Card 3: Empresa */}
-            <div className="bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-3 hover:-translate-y-2 hover:shadow-lg transition-all duration-300">
+            <div className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-3 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}>
               <h3 className="text-xl font-headline font-bold text-on-surface mb-2">Empresa</h3>
               <div className="mb-6 flex items-baseline">
                 <span className="text-3xl font-headline font-extrabold text-secondary">{prices.empresa}</span>
@@ -189,7 +160,7 @@ export const PricingPage: React.FC = () => {
                   <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-1">
                     check_circle
                   </span>
-                  500 consultas /mes
+                  100 consultas /mes
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-2">
@@ -219,7 +190,7 @@ export const PricingPage: React.FC = () => {
             </div>
 
             {/* Card 4: Enterprise */}
-            <div className="bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300">
+            <div className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}>
               <h3 className="text-xl font-headline font-bold text-on-surface mb-2">Enterprise</h3>
               <div className="mb-6 flex items-baseline">
                 <span className="text-3xl font-headline font-extrabold text-on-surface">{prices.enterprise}</span>
@@ -255,7 +226,7 @@ export const PricingPage: React.FC = () => {
                 </li>
               </ul>
               <Link
-                to="/contacto"
+                to={isAuthenticated ? "/contacto" : "/register?plan=enterprise"}
                 className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-[#dee0ff]"
               >
                 Contactar Ventas
@@ -265,7 +236,7 @@ export const PricingPage: React.FC = () => {
         </section>
 
         {/* 3. Feature Comparison Table */}
-        <section className="max-w-7xl mx-auto px-6 pb-24 hidden md:block reveal-section fade-up">
+        <section className={`max-w-7xl mx-auto px-6 pb-24 hidden md:block reveal-section fade-up ${isRevealed ? "is-visible" : ""}`}>
           <h2 className="text-3xl font-headline font-bold text-center mb-12">Comparativa detallada</h2>
           <div className="bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-sm">
             <table className="w-full text-left border-collapse">
@@ -277,8 +248,11 @@ export const PricingPage: React.FC = () => {
                   <th className="py-4 px-6 font-label font-semibold text-center text-on-surface w-1/5 border-b border-outline-variant">
                     Consulta
                   </th>
-                  <th className="py-4 px-6 font-label font-bold text-center text-primary bg-primary/5 w-1/5 border-b-2 border-primary">
-                    Profesional
+                  <th className="py-4 px-6 font-label font-bold text-center text-on-surface bg-primary/5 w-1/5 border-b-2 border-primary">
+                    <span className="inline-block relative">
+                      Profesional
+                      <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-primary rounded-full"></span>
+                    </span>
                   </th>
                   <th className="py-4 px-6 font-label font-semibold text-center text-secondary w-1/5 border-b border-outline-variant">
                     Empresa
@@ -300,9 +274,9 @@ export const PricingPage: React.FC = () => {
                 </tr>
                 <tr className="bg-surface border-b border-outline-variant/30">
                   <td className="py-3 px-6 text-on-surface">Límite mensual</td>
-                  <td className="py-3 px-6 text-center text-on-surface-variant">10</td>
-                  <td className="py-3 px-6 text-center font-bold text-primary bg-primary/5">150</td>
-                  <td className="py-3 px-6 text-center text-on-surface-variant">500</td>
+                  <td className="py-3 px-6 text-center text-on-surface-variant">1</td>
+                  <td className="py-3 px-6 text-center font-bold text-primary bg-primary/5">25</td>
+                  <td className="py-3 px-6 text-center text-on-surface-variant">100</td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">Ilimitado</td>
                 </tr>
                 <tr className="bg-surface-variant border-b border-outline-variant/30">
@@ -377,7 +351,7 @@ export const PricingPage: React.FC = () => {
         </section>
 
         {/* 4. Trust Strip */}
-        <section className="bg-surface-variant py-8 border-y border-outline-variant/50 reveal-section fade-up">
+        <section className={`bg-surface-variant py-8 border-y border-outline-variant/50 reveal-section fade-up ${isRevealed ? "is-visible" : ""}`}>
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-primary text-2xl">enhanced_encryption</span>
@@ -395,7 +369,7 @@ export const PricingPage: React.FC = () => {
         </section>
 
         {/* 5. Bottom CTA Banner */}
-        <section className="bg-secondary text-on-secondary py-16 px-6 relative overflow-hidden reveal-section fade-up">
+        <section className={`bg-secondary text-on-secondary py-16 px-6 relative overflow-hidden reveal-section fade-up ${isRevealed ? "is-visible" : ""}`}>
           {/* Decorative pattern placeholder */}
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
           <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
@@ -404,8 +378,7 @@ export const PricingPage: React.FC = () => {
                 ¿Necesitas una solución corporativa a gran escala?
               </h2>
               <p className="font-body text-[#dee0ff] opacity-90">
-                Construimos infraestructuras de validación dedicadas para instituciones financieras y grandes firmas de
-                abogados.
+                Construimos infraestructuras de validación dedicadas para instituciones financieras y grandes firmas de abogados.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto shrink-0">
@@ -416,7 +389,7 @@ export const PricingPage: React.FC = () => {
                 Hablar con ventas
               </Link>
               <a
-                href="#"
+                href="https://portal.verifinca.com/legal#terminos"
                 className="bg-transparent border border-outline-variant hover:bg-white/10 text-[#dee0ff] text-on-secondary font-label font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 btn-interact text-center"
               >
                 Ver documentación

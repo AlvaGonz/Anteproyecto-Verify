@@ -5,6 +5,12 @@ import { LandingFooter } from "../../public/components/LandingFooter";
 
 export const LegalPage: React.FC = () => {
   const location = useLocation();
+  const [isRevealed, setIsRevealed] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsRevealed(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   React.useEffect(() => {
     const rawHash = window.location.hash; // e.g. "#/legal#terminos" or "#/legal"
@@ -94,7 +100,7 @@ export const LegalPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="font-body text-on-surface antialiased min-h-screen bg-[#DAD1C8]">
+    <div className="font-body text-on-surface antialiased min-h-screen bg-neutral">
       {/* TopAppBar */}
       <LandingNav />
 
@@ -102,8 +108,8 @@ export const LegalPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Sidebar */}
-          <div className="w-full lg:col-span-3">
-            <nav className="sidebar-bg rounded-xl p-4 sticky top-[88px] z-40 flex flex-row overflow-x-auto gap-3 border border-outline-variant/30 no-scrollbar lg:flex-col lg:p-6 lg:top-[100px] bg-[#F4F1EC]">
+          <div className={`w-full lg:col-span-3 fade-up stagger-1 ${isRevealed ? "is-visible" : ""}`}>
+            <nav className="sidebar-bg rounded-xl p-4 sticky top-[88px] z-40 flex flex-row overflow-x-auto gap-3 border border-outline-variant/30 no-scrollbar lg:flex-col lg:p-6 lg:top-[100px] bg-surface-raised shadow-raised">
               <div className="mb-6 border-b border-outline-variant/30 pb-4 hidden lg:block">
                 <h3 className="font-headline font-bold text-lg text-on-surface">Compliance Center</h3>
                 <p className="font-body text-sm text-on-surface-variant mt-1">v2.4 (RD Compliant)</p>
@@ -169,7 +175,7 @@ export const LegalPage: React.FC = () => {
                 Descargos
               </a>
               <div className="mt-8 pt-6 border-t border-outline-variant/30 flex-shrink-0 ml-auto lg:mt-8 lg:pt-6 lg:border-t lg:ml-0">
-                <button className="w-full border border-outline text-on-surface font-label text-sm font-semibold py-2 px-4 rounded-full hover:bg-surface-container-high transition-colors duration-200 flex items-center justify-center gap-2">
+                <button className="w-full border border-secondary text-secondary font-label text-sm font-semibold py-2.5 px-4 rounded-lg hover:bg-secondary/5 transition-colors duration-200 flex items-center justify-center gap-2">
                   <span className="material-symbols-outlined text-sm">download</span>
                   Download PDF
                 </button>
@@ -180,8 +186,8 @@ export const LegalPage: React.FC = () => {
           {/* Main Content */}
           <main className="lg:col-span-9 max-w-[760px] px-2">
             {/* Header */}
-            <div className="mb-12">
-              <span className="font-label text-xs tracking-wider uppercase font-bold text-primary mb-2 block">
+            <div className={`mb-12 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
+              <span className="font-sans font-semibold text-[11px] tracking-widest uppercase text-secondary mb-2 block">
                 MARCO LEGAL
               </span>
               <h1 className="font-headline text-4xl md:text-5xl font-black text-on-surface mb-4 leading-tight">
@@ -191,7 +197,7 @@ export const LegalPage: React.FC = () => {
                 Operamos bajo el marco legal de la República Dominicana, asegurando la transparencia y la protección de
                 sus datos personales en cada transacción.
               </p>
-              <div className="inline-flex items-center gap-2 bg-[#F4F1EC] px-3 py-1.5 rounded-full border border-outline-variant">
+              <div className="inline-flex items-center gap-2 bg-surface-raised px-3 py-1.5 rounded-full border border-outline-variant">
                 <span className="material-symbols-outlined text-primary text-sm">update</span>
                 <span className="font-label text-sm font-medium text-on-surface-variant">
                   Última actualización: Mayo 2026
@@ -200,7 +206,7 @@ export const LegalPage: React.FC = () => {
             </div>
 
             {/* Section 1: Terms */}
-            <section className="mb-16 scroll-mt-28" id="terminos">
+            <section className={`mb-16 scroll-mt-28 fade-up stagger-3 ${isRevealed ? "is-visible" : ""}`} id="terminos">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Términos de Uso
               </h2>
@@ -217,15 +223,15 @@ export const LegalPage: React.FC = () => {
                 <h3 className="font-headline text-xl font-bold text-on-surface mb-4">Restricciones de uso</h3>
                 <ul className="space-y-3 font-body text-on-surface-variant">
                   <li className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-primary text-sm mt-1">fiber_manual_record</span>
+                    <span className="material-symbols-outlined text-secondary text-sm mt-1">fiber_manual_record</span>
                     <span>Prohibida la extracción automatizada de datos (scraping) sin autorización expresa.</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-primary text-sm mt-1">fiber_manual_record</span>
+                    <span className="material-symbols-outlined text-secondary text-sm mt-1">fiber_manual_record</span>
                     <span>No se permite el uso de la plataforma para fines ilícitos o fraudulentos.</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-primary text-sm mt-1">fiber_manual_record</span>
+                    <span className="material-symbols-outlined text-secondary text-sm mt-1">fiber_manual_record</span>
                     <span>
                       Las cuentas son personales e intransferibles; compartir credenciales resultará en suspensión
                       inmediata.
@@ -236,11 +242,11 @@ export const LegalPage: React.FC = () => {
             </section>
 
             {/* Section 2: Privacy */}
-            <section className="mb-16 scroll-mt-28" id="privacidad">
+            <section className={`mb-16 scroll-mt-28 fade-up stagger-4 ${isRevealed ? "is-visible" : ""}`} id="privacidad">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Política de Privacidad
               </h2>
-              <div className="bg-[#fcf2e9] border-l-4 border-primary-container p-6 rounded-r-xl mb-8">
+              <div className="bg-primary-subtle border-l-4 border-primary p-6 rounded-r-xl mb-8">
                 <h3 className="font-headline text-lg font-bold text-on-surface mb-2 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">info</span>
                   Datos que recopilamos
@@ -263,7 +269,7 @@ export const LegalPage: React.FC = () => {
             </section>
 
             {/* Section 3: Ley 172-13 */}
-            <section className="mb-16 scroll-mt-28" id="ley172">
+            <section className={`mb-16 scroll-mt-28 fade-up stagger-5 ${isRevealed ? "is-visible" : ""}`} id="ley172">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Cumplimiento Ley 172-13
               </h2>
@@ -275,7 +281,7 @@ export const LegalPage: React.FC = () => {
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/50 p-4 rounded-lg">
+                  <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
@@ -284,7 +290,7 @@ export const LegalPage: React.FC = () => {
                       <p className="font-body text-xs text-on-surface-variant mt-0.5">Captura explícita requerida.</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/50 p-4 rounded-lg">
+                  <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
@@ -293,7 +299,7 @@ export const LegalPage: React.FC = () => {
                       <p className="font-body text-xs text-on-surface-variant mt-0.5">Uso limitado al fin declarado.</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/50 p-4 rounded-lg">
+                  <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
@@ -304,7 +310,7 @@ export const LegalPage: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/50 p-4 rounded-lg">
+                  <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
@@ -324,7 +330,7 @@ export const LegalPage: React.FC = () => {
             </section>
 
             {/* Section 4: Data Treatment */}
-            <section className="mb-16 scroll-mt-28" id="datos">
+            <section className={`mb-16 scroll-mt-28 fade-up stagger-6 ${isRevealed ? "is-visible" : ""}`} id="datos">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Tratamiento de Datos
               </h2>
@@ -366,14 +372,14 @@ export const LegalPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <button className="border-2 border-primary text-primary font-label font-bold py-2.5 px-6 rounded-full hover:bg-primary hover:text-on-primary transition-colors duration-200 w-full sm:w-auto">
+                <button className="border border-secondary text-secondary font-label font-bold py-2.5 px-6 rounded-lg hover:bg-secondary/5 transition-colors duration-200 w-full sm:w-auto">
                   Ejercer mis derechos
                 </button>
               </div>
             </section>
 
             {/* Section 5: Cookies */}
-            <section className="mb-16 scroll-mt-28" id="cookies">
+            <section className={`mb-16 scroll-mt-28 fade-up stagger-7 ${isRevealed ? "is-visible" : ""}`} id="cookies">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Uso de Cookies
               </h2>
@@ -384,7 +390,7 @@ export const LegalPage: React.FC = () => {
               </p>
               <div className="overflow-x-auto rounded-xl border border-outline-variant shadow-sm">
                 <table className="w-full text-left font-body text-sm">
-                  <thead className="table-header-bg table-header-text font-headline bg-[#111144] text-white">
+                  <thead className="table-header-bg table-header-text font-headline bg-text-primary text-white">
                     <tr>
                       <th className="px-6 py-4 font-bold">Nombre</th>
                       <th className="px-6 py-4 font-bold">Propósito</th>
@@ -397,7 +403,7 @@ export const LegalPage: React.FC = () => {
                       <td className="px-6 py-4">Mantiene la sesión de usuario activa y segura.</td>
                       <td className="px-6 py-4">Sesión</td>
                     </tr>
-                    <tr className="bg-[#F4F1EC] hover:bg-surface-container">
+                    <tr className="bg-surface-raised hover:bg-surface-container">
                       <td className="px-6 py-4 font-mono text-xs">csrf_token</td>
                       <td className="px-6 py-4">Previene ataques de falsificación de peticiones en sitios cruzados.</td>
                       <td className="px-6 py-4">Sesión</td>
@@ -407,7 +413,7 @@ export const LegalPage: React.FC = () => {
                       <td className="px-6 py-4">Analítica de uso de la plataforma (Google Analytics).</td>
                       <td className="px-6 py-4">2 años</td>
                     </tr>
-                    <tr className="bg-[#F4F1EC] hover:bg-surface-container">
+                    <tr className="bg-surface-raised hover:bg-surface-container">
                       <td className="px-6 py-4 font-mono text-xs">consent_record</td>
                       <td className="px-6 py-4">Almacena las preferencias de privacidad del usuario.</td>
                       <td className="px-6 py-4">1 año</td>
@@ -418,7 +424,7 @@ export const LegalPage: React.FC = () => {
             </section>
 
             {/* Section 6: Disclaimer */}
-            <section className="mb-16 scroll-mt-28" id="descargo">
+            <section className={`mb-16 scroll-mt-28 fade-up stagger-8 ${isRevealed ? "is-visible" : ""}`} id="descargo">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Descargo de Responsabilidad
               </h2>
@@ -447,7 +453,7 @@ export const LegalPage: React.FC = () => {
       </div>
 
       {/* Contact Strip */}
-      <section className="bg-[#223382] w-full py-12 px-4 sm:px-6 lg:px-8 mt-8">
+      <section className="bg-secondary w-full py-12 px-4 sm:px-6 lg:px-8 mt-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-white text-center md:text-left">
             <h3 className="font-headline text-2xl font-bold mb-2">¿Tienes preguntas legales?</h3>
@@ -459,7 +465,7 @@ export const LegalPage: React.FC = () => {
             </a>
           </div>
           <div>
-            <button className="bg-primary-container text-on-primary-container font-label font-bold py-3 px-8 rounded-full hover:bg-primary hover:text-on-primary transition-colors duration-200 shadow-lg whitespace-nowrap w-full md:w-auto">
+            <button className="bg-primary hover:bg-primary-hover text-on-primary font-label font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-raised whitespace-nowrap w-full md:w-auto active:scale-[0.98]">
               Enviar consulta legal
             </button>
           </div>

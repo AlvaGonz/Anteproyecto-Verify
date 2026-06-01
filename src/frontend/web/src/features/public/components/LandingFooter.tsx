@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Gavel, Building2 } from "lucide-react";
 
 export const LandingFooter: React.FC = () => (
   <footer className="bg-secondary pt-24 pb-12 px-6 overflow-hidden relative">
