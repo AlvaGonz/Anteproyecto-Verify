@@ -156,14 +156,6 @@ export const PublicVerifySearchPage: React.FC = () => {
               </p>
             </div>
             <div className="space-y-6">
-              <h4 className="text-white font-black text-xs uppercase tracking-widest">Navegación</h4>
-              <ul className="space-y-4 text-sm font-bold">
-                <li><Link to="/portal" className="hover:text-primary transition-colors text-white/60">Verificar Proyecto</Link></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Instituciones</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Portal Auditor</a></li>
-              </ul>
-            </div>
-            <div className="space-y-6">
               <h4 className="text-white font-black text-xs uppercase tracking-widest">Legal</h4>
               <ul className="space-y-4 text-sm font-bold">
                 <li><a href="#" className="hover:text-primary transition-colors">Términos de Servicio</a></li>
