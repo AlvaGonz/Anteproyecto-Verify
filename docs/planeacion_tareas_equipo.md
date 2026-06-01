@@ -8,7 +8,7 @@ La distribución se ha realizado en base a la estimación de Puntos de Función 
 ## Semana 1
 *Estado actual: Completo*
 
-| Tarea / Actividad | Dificultad (FPA) | Asignado a |
+| Tarea / Actividad | Dificultad (FPA) | Asignado a | 
 | :--- | :---: | :--- |
 | Definición de Arquitectura Clean y Entorno Docker para Backend | Alta | **Ray** |
 | Inicialización de entorno Frontend (React/Vite) y configuración de estado global | Alta | **Adrian** |
