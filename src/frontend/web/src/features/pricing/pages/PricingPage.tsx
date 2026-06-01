@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { LandingNav } from "../../../shared/components/layout/LandingNav";
 import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
 import { useAuth } from "../../../shared/context/AuthContext";
 import "./PricingPage.module.css";
 
+const ICONS = {
+  checkCircle: "check_circle",
+  cancel: "cancel",
+  close: "close",
+  check: "check",
+  enhancedEncryption: "enhanced_encryption",
+  gavel: "gavel",
+  accountBalance: "account_balance",
+};
+
 export const PricingPage: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -30,13 +42,13 @@ export const PricingPage: React.FC = () => {
         {/* 1. Header Section */}
         <section className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center reveal-section">
           <span className={`inline-block text-secondary font-sans font-semibold text-[11px] tracking-widest mb-4 uppercase fade-up stagger-1 ${isRevealed ? "is-visible" : ""}`}>
-            PLANES Y PRECIOS
+            {t("pricing.header.tag")}
           </span>
           <h1 className={`text-4xl md:text-5xl font-headline font-extrabold text-on-surface mb-6 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
-            Elige el plan ideal para tu operación
+            {t("pricing.header.title")}
           </h1>
           <p className={`text-lg text-on-surface-variant max-w-2xl mx-auto mb-10 font-body fade-up stagger-3 ${isRevealed ? "is-visible" : ""}`}>
-            Escala tus validaciones inmobiliarias con planes diseñados para profesionales y empresas en la República Dominicana.
+            {t("pricing.header.desc")}
           </p>
 
           {/* Billing Toggle */}
@@ -49,13 +61,13 @@ export const PricingPage: React.FC = () => {
               className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${!isAnnual ? "text-primary font-bold" : "text-on-surface-variant"}`}
               onClick={() => setIsAnnual(false)}
             >
-              Mensual
+              {t("pricing.header.monthly")}
             </button>
             <button
               className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${isAnnual ? "text-primary font-bold" : "text-on-surface-variant"}`}
               onClick={() => setIsAnnual(true)}
             >
-              Anual <span className="text-xs text-primary ml-1">-20%</span>
+              {t("pricing.header.yearly")} <span className="text-xs text-primary ml-1">-20%</span>
             </button>
           </div>
         </section>
@@ -65,171 +77,173 @@ export const PricingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Card 1: Consulta */}
             <div className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-1 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}>
-              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">Consulta</h3>
+              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">{t("pricing.cards.free.title")}</h3>
               <div className="mb-6 flex items-baseline">
                 <span className="text-3xl font-headline font-extrabold">$0</span>
-                <span className="text-on-surface-variant font-body text-sm ml-2">/mes</span>
+                <span className="text-on-surface-variant font-body text-sm ml-2">{t("pricing.cards.period")}</span>
               </div>
               <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-                Para usuarios ocasionales que necesitan consultas básicas de inmuebles.
+                {t("pricing.cards.free.desc")}
               </p>
               <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl check-anim check-delay-1">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  1 consultas /mes
+                  {t("pricing.cards.free.feature1")}
                 </li>
+
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl check-anim check-delay-2">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Datos públicos básicos
+                  {t("pricing.cards.free.feature2")}
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="material-symbols-outlined text-outline text-xl">cancel</span> Validación de identidad
+                  <span className="material-symbols-outlined text-outline text-xl">{ICONS.cancel}</span> {t("pricing.cards.free.feature3")}
                 </li>
               </ul>
               <Link
                 to="/register"
                 className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
               >
-                Comenzar gratis
+                {t("pricing.cards.free.button")}
               </Link>
             </div>
 
             {/* Card 2: Profesional (Featured) */}
             <div className={`bg-surface rounded-xl p-8 border-2 border-primary shadow-xl flex flex-col text-left relative transform md:-translate-y-4 card-enter card-stagger-2 hover:-translate-y-6 hover:shadow-2xl transition-all duration-300 z-10 ${isRevealed ? "is-visible" : ""}`}>
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-on-primary text-xs font-label font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm badge-pulse">
-                MÁS POPULAR
+                {t("pricing.cards.popular")}
               </div>
-              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">Profesional</h3>
+              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">{t("pricing.cards.pro.title")}</h3>
               <div className="mb-6 flex items-baseline">
                 <span className="text-3xl font-headline font-extrabold text-primary">{prices.profesional}</span>
-                <span className="text-on-surface-variant font-body text-sm ml-2">/mes</span>
+                <span className="text-on-surface-variant font-body text-sm ml-2">{t("pricing.cards.period")}</span>
               </div>
               <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-                Herramientas completas para agentes independientes y pequeñas agencias.
+                {t("pricing.cards.pro.desc")}
               </p>
               <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-1">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  25 consultas /mes
+                  {t("pricing.cards.pro.feature1")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-2">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Reportes detallados PDF
+                  {t("pricing.cards.pro.feature2")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-3">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Alertas de gravámenes
+                  {t("pricing.cards.pro.feature3")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-4">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Soporte prioritario email
+                  {t("pricing.cards.pro.feature4")}
                 </li>
               </ul>
               <Link
                 to="/register?plan=profesional"
                 className="w-full py-3 rounded-lg bg-primary text-on-primary font-label font-bold hover:bg-primary-hover shadow-md transition-colors btn-interact text-center block"
               >
-                Elegir Profesional
+                {t("pricing.cards.pro.button")}
               </Link>
             </div>
 
             {/* Card 3: Empresa */}
             <div className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-3 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}>
-              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">Empresa</h3>
+              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">{t("pricing.cards.empresa.title")}</h3>
               <div className="mb-6 flex items-baseline">
                 <span className="text-3xl font-headline font-extrabold text-secondary">{prices.empresa}</span>
-                <span className="text-on-surface-variant font-body text-sm ml-2">/mes</span>
+                <span className="text-on-surface-variant font-body text-sm ml-2">{t("pricing.cards.period")}</span>
               </div>
               <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-                Volumen alto para inmobiliarias y equipos de analistas.
+                {t("pricing.cards.empresa.desc")}
               </p>
               <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-1">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  100 consultas /mes
+                  {t("pricing.cards.empresa.feature1")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-2">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Multiusuario (hasta 5)
+                  {t("pricing.cards.empresa.feature2")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-3">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  API básica
+                  {t("pricing.cards.empresa.feature3")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-4">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Integración CRM
+                  {t("pricing.cards.empresa.feature4")}
                 </li>
+
               </ul>
               <Link
                 to="/register?plan=empresa"
                 className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
               >
-                Elegir Empresa
+                {t("pricing.cards.empresa.button")}
               </Link>
             </div>
 
             {/* Card 4: Enterprise */}
             <div className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}>
-              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">Enterprise</h3>
+              <h3 className="text-xl font-headline font-bold text-on-surface mb-2">{t("pricing.cards.enterprise.title")}</h3>
               <div className="mb-6 flex items-baseline">
                 <span className="text-3xl font-headline font-extrabold text-on-surface">{prices.enterprise}</span>
-                <span className="text-on-surface-variant font-body text-sm ml-2">/mes</span>
+                <span className="text-on-surface-variant font-body text-sm ml-2">{t("pricing.cards.period")}</span>
               </div>
               <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-                Soluciones a medida para bancos, desarrolladoras y gobierno.
+                {t("pricing.cards.enterprise.desc")}
               </p>
               <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-1">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Consultas ilimitadas
+                  {t("pricing.cards.enterprise.feature1")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-2">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  API Full Access
+                  {t("pricing.cards.enterprise.feature2")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-3">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  Validaciones en lote
+                  {t("pricing.cards.enterprise.feature3")}
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-4">
-                    check_circle
+                    {ICONS.checkCircle}
                   </span>
-                  SLA garantizado 99.9%
+                  {t("pricing.cards.enterprise.feature4")}
                 </li>
               </ul>
               <Link
                 to={isAuthenticated ? "/contacto" : "/register?plan=enterprise"}
                 className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-secondary-container"
               >
-                Contactar Ventas
+                {t("pricing.cards.enterprise.button")}
               </Link>
             </div>
           </div>
@@ -237,28 +251,28 @@ export const PricingPage: React.FC = () => {
 
         {/* 3. Feature Comparison Table */}
         <section className={`max-w-7xl mx-auto px-6 pb-24 hidden md:block reveal-section fade-up ${isRevealed ? "is-visible" : ""}`}>
-          <h2 className="text-3xl font-headline font-bold text-center mb-12">Comparativa detallada</h2>
+          <h2 className="text-3xl font-headline font-bold text-center mb-12">{t("pricing.comparison.title")}</h2>
           <div className="bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-sm">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-surface">
                   <th className="py-4 px-6 font-headline font-bold text-on-surface w-1/5 border-b border-outline-variant">
-                    Características
+                    {t("pricing.comparison.charHeader")}
                   </th>
                   <th className="py-4 px-6 font-label font-semibold text-center text-on-surface w-1/5 border-b border-outline-variant">
-                    Consulta
+                    {t("pricing.cards.free.title")}
                   </th>
                   <th className="py-4 px-6 font-label font-bold text-center text-on-surface bg-primary/5 w-1/5 border-b-2 border-primary">
                     <span className="inline-block relative">
-                      Profesional
+                      {t("pricing.cards.pro.title")}
                       <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-primary rounded-full"></span>
                     </span>
                   </th>
                   <th className="py-4 px-6 font-label font-semibold text-center text-secondary w-1/5 border-b border-outline-variant">
-                    Empresa
+                    {t("pricing.cards.empresa.title")}
                   </th>
                   <th className="py-4 px-6 font-label font-semibold text-center text-on-surface w-1/5 border-b border-outline-variant">
-                    Enterprise
+                    {t("pricing.cards.enterprise.title")}
                   </th>
                 </tr>
               </thead>
@@ -269,29 +283,29 @@ export const PricingPage: React.FC = () => {
                     className="py-2 px-6 font-bold text-on-surface-variant uppercase text-xs tracking-wider"
                     colSpan={5}
                   >
-                    Capacidad de Búsqueda
+                    {t("pricing.comparison.capHeader")}
                   </td>
                 </tr>
                 <tr className="bg-surface border-b border-outline-variant/30">
-                  <td className="py-3 px-6 text-on-surface">Límite mensual</td>
+                  <td className="py-3 px-6 text-on-surface">{t("pricing.comparison.limit")}</td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">1</td>
                   <td className="py-3 px-6 text-center font-bold text-primary bg-primary/5">25</td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">100</td>
-                  <td className="py-3 px-6 text-center text-on-surface-variant">Ilimitado</td>
+                  <td className="py-3 px-6 text-center text-on-surface-variant">{t("pricing.comparison.unlimited")}</td>
                 </tr>
                 <tr className="bg-surface-variant border-b border-outline-variant/30">
-                  <td className="py-3 px-6 text-on-surface">Histórico de títulos</td>
+                  <td className="py-3 px-6 text-on-surface">{t("pricing.comparison.history")}</td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">
-                    <span className="material-symbols-outlined text-outline text-sm">close</span>
+                    <span className="material-symbols-outlined text-outline text-sm">{ICONS.close}</span>
                   </td>
                   <td className="py-3 px-6 text-center text-primary bg-primary/5">
-                    <span className="material-symbols-outlined text-sm">check</span>
+                    <span className="material-symbols-outlined text-sm">{ICONS.check}</span>
                   </td>
                   <td className="py-3 px-6 text-center text-secondary">
-                    <span className="material-symbols-outlined text-sm">check</span>
+                    <span className="material-symbols-outlined text-sm">{ICONS.check}</span>
                   </td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">
-                    <span className="material-symbols-outlined text-sm">check</span>
+                    <span className="material-symbols-outlined text-sm">{ICONS.check}</span>
                   </td>
                 </tr>
                 {/* Group: Integración */}
@@ -300,34 +314,34 @@ export const PricingPage: React.FC = () => {
                     className="py-2 px-6 font-bold text-on-surface-variant uppercase text-xs tracking-wider mt-4"
                     colSpan={5}
                   >
-                    Integración &amp; Datos
+                    {t("pricing.comparison.intHeader")}
                   </td>
                 </tr>
                 <tr className="bg-surface border-b border-outline-variant/30">
-                  <td className="py-3 px-6 text-on-surface">Exportación PDF</td>
+                  <td className="py-3 px-6 text-on-surface">{t("pricing.comparison.pdf")}</td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">
-                    <span className="material-symbols-outlined text-outline text-sm">close</span>
+                    <span className="material-symbols-outlined text-outline text-sm">{ICONS.close}</span>
                   </td>
                   <td className="py-3 px-6 text-center text-primary bg-primary/5">
-                    <span className="material-symbols-outlined text-sm">check</span>
+                    <span className="material-symbols-outlined text-sm">{ICONS.check}</span>
                   </td>
                   <td className="py-3 px-6 text-center text-secondary">
-                    <span className="material-symbols-outlined text-sm">check</span>
+                    <span className="material-symbols-outlined text-sm">{ICONS.check}</span>
                   </td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">
-                    <span className="material-symbols-outlined text-sm">check</span>
+                    <span className="material-symbols-outlined text-sm">{ICONS.check}</span>
                   </td>
                 </tr>
                 <tr className="bg-surface-variant border-b border-outline-variant/30">
-                  <td className="py-3 px-6 text-on-surface">Acceso API</td>
+                  <td className="py-3 px-6 text-on-surface">{t("pricing.comparison.api")}</td>
                   <td className="py-3 px-6 text-center text-on-surface-variant">
-                    <span className="material-symbols-outlined text-outline text-sm">close</span>
+                    <span className="material-symbols-outlined text-outline text-sm">{ICONS.close}</span>
                   </td>
                   <td className="py-3 px-6 text-center text-primary bg-primary/5">
-                    <span className="material-symbols-outlined text-outline text-sm">close</span>
+                    <span className="material-symbols-outlined text-outline text-sm">{ICONS.close}</span>
                   </td>
-                  <td className="py-3 px-6 text-center text-secondary">Básico</td>
-                  <td className="py-3 px-6 text-center text-on-surface-variant">Completo</td>
+                  <td className="py-3 px-6 text-center text-secondary">{t("pricing.comparison.basic")}</td>
+                  <td className="py-3 px-6 text-center text-on-surface-variant">{t("pricing.comparison.complete")}</td>
                 </tr>
                 {/* Group: Soporte */}
                 <tr className="bg-surface-variant">
@@ -335,15 +349,15 @@ export const PricingPage: React.FC = () => {
                     className="py-2 px-6 font-bold text-on-surface-variant uppercase text-xs tracking-wider mt-4"
                     colSpan={5}
                   >
-                    Soporte
+                    {t("pricing.comparison.supportHeader")}
                   </td>
                 </tr>
                 <tr className="bg-surface">
-                  <td className="py-3 px-6 text-on-surface">Nivel de asistencia</td>
-                  <td className="py-3 px-6 text-center text-on-surface-variant">Comunidad</td>
-                  <td className="py-3 px-6 text-center text-primary bg-primary/5">Email (24h)</td>
-                  <td className="py-3 px-6 text-center text-secondary">Prioritario</td>
-                  <td className="py-3 px-6 text-center font-semibold text-on-surface">Account Manager 24/7</td>
+                  <td className="py-3 px-6 text-on-surface">{t("pricing.comparison.supportLevel")}</td>
+                  <td className="py-3 px-6 text-center text-on-surface-variant">{t("pricing.comparison.community")}</td>
+                  <td className="py-3 px-6 text-center text-primary bg-primary/5">{t("pricing.comparison.email")}</td>
+                  <td className="py-3 px-6 text-center text-secondary">{t("pricing.comparison.priority")}</td>
+                  <td className="py-3 px-6 text-center font-semibold text-on-surface">{t("pricing.comparison.manager")}</td>
                 </tr>
               </tbody>
             </table>
@@ -354,16 +368,16 @@ export const PricingPage: React.FC = () => {
         <section className={`bg-surface-variant py-8 border-y border-outline-variant/50 reveal-section fade-up ${isRevealed ? "is-visible" : ""}`}>
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16">
             <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-primary text-2xl">enhanced_encryption</span>
-              <span className="font-headline font-semibold text-on-surface">Datos encriptados</span>
+              <span className="material-symbols-outlined text-primary text-2xl">{ICONS.enhancedEncryption}</span>
+              <span className="font-headline font-semibold text-on-surface">{t("pricing.trust.encrypted")}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-primary text-2xl">gavel</span>
-              <span className="font-headline font-semibold text-on-surface">Cumplimiento Ley 172-13</span>
+              <span className="material-symbols-outlined text-primary text-2xl">{ICONS.gavel}</span>
+              <span className="font-headline font-semibold text-on-surface">{t("pricing.trust.compliance")}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-primary text-2xl">account_balance</span>
-              <span className="font-headline font-semibold text-on-surface">Integración DGII</span>
+              <span className="material-symbols-outlined text-primary text-2xl">{ICONS.accountBalance}</span>
+              <span className="font-headline font-semibold text-on-surface">{t("pricing.trust.dgii")}</span>
             </div>
           </div>
         </section>
@@ -375,10 +389,10 @@ export const PricingPage: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-left md:w-2/3">
               <h2 className="text-3xl font-headline font-bold mb-3 text-white">
-                ¿Necesitas una solución corporativa a gran escala?
+                {t("pricing.cta.title")}
               </h2>
               <p className="font-body text-secondary-container opacity-90">
-                Construimos infraestructuras de validación dedicadas para instituciones financieras y grandes firmas de abogados.
+                {t("pricing.cta.desc")}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto shrink-0">
@@ -386,13 +400,13 @@ export const PricingPage: React.FC = () => {
                 to="/contacto"
                 className="bg-primary hover:bg-primary-hover text-on-primary font-label font-bold px-6 py-3 rounded-lg shadow-md transition-colors flex items-center justify-center gap-2 btn-interact text-center"
               >
-                Hablar con ventas
+                {t("pricing.cta.sales")}
               </Link>
               <a
                 href="https://portal.verifinca.com/legal#terminos"
                 className="bg-transparent border border-outline-variant hover:bg-white/10 text-secondary-container text-on-secondary font-label font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 btn-interact text-center"
               >
-                Ver documentación
+                {t("pricing.cta.docs")}
               </a>
             </div>
           </div>

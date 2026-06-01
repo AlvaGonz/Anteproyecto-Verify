@@ -1,5 +1,5 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-06-01T12:07:00-04:00 by Coder Agent
+> Last updated: 2026-06-01T12:26:00-04:00 by Coder Agent
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
@@ -21,16 +21,17 @@
 | Design System: LegalPage green/error hex → semantic tokens (8 fixes) | DS | feat-frontend | — | 2026-06-01 |
 | Design System: PricingPage hex → text-secondary-container (3 fixes) | DS | feat-frontend | — | 2026-06-01 |
 | Design System: LandingNav rounded-full → rounded-lg | DS | feat-frontend | — | 2026-06-01 |
+| i18n Core: Legal & Pricing inline translation objects | UX / i18n | feat-frontend | — | 2026-06-01 |
+| TDD coverage: LegalPage & PricingPage unit tests (100% pass) | QA | feat-frontend | — | 2026-06-01 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
 
 ## 🔜 Next Up (Prioritized)
-1. i18n Migration — `i18next-http-backend` + `public/locales/{lang}/common.json`
-2. Form Validation with Zod & React Hook Form — TRD §13.3
-3. Client/UI State Management with Zustand — TRD §13.2
-4. Vendor chunk splitting (manualChunks for react-dom, framer-motion)
+1. Form Validation with Zod & React Hook Form — TRD §13.3
+2. Client/UI State Management with Zustand — TRD §13.2
+3. Vendor chunk splitting (manualChunks optimization)
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - [ ] RI API SOAP vs REST endpoint confirmed?

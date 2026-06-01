@@ -1,9 +1,27 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { LandingNav } from "../../../shared/components/layout/LandingNav";
 import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
 
+const ICONS = {
+  gavel: "gavel",
+  privacyTip: "privacy_tip",
+  verifiedUser: "verified_user",
+  database: "database",
+  cookie: "cookie",
+  warning: "warning",
+  download: "download",
+  update: "update",
+  fiberManualRecord: "fiber_manual_record",
+  checkCircle: "check_circle",
+  visibility: "visibility",
+  editDocument: "edit_document",
+  deleteForever: "delete_forever",
+};
+
 export const LegalPage: React.FC = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const [isRevealed, setIsRevealed] = React.useState(false);
 
@@ -111,8 +129,8 @@ export const LegalPage: React.FC = () => {
           <div className={`w-full lg:col-span-3 fade-up stagger-1 ${isRevealed ? "is-visible" : ""}`}>
             <nav className="sidebar-bg rounded-xl p-4 sticky top-[88px] z-40 flex flex-row overflow-x-auto gap-3 border border-outline-variant/30 no-scrollbar lg:flex-col lg:p-6 lg:top-[100px] bg-surface-raised shadow-raised">
               <div className="mb-6 border-b border-outline-variant/30 pb-4 hidden lg:block">
-                <h3 className="font-headline font-bold text-lg text-on-surface">Compliance Center</h3>
-                <p className="font-body text-sm text-on-surface-variant mt-1">v2.4 (RD Compliant)</p>
+                <h3 className="font-headline font-bold text-lg text-on-surface">{t("legal.complianceCenter")}</h3>
+                <p className="font-body text-sm text-on-surface-variant mt-1">{t("legal.complianceVersion")}</p>
               </div>
               <a
                 className="flex items-center gap-3 bg-primary-container text-on-primary-container font-semibold rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
@@ -120,9 +138,9 @@ export const LegalPage: React.FC = () => {
                 onClick={(e) => handleSidebarClick(e, "terminos")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  gavel
+                  {ICONS.gavel}
                 </span>
-                Términos de Uso
+                {t("legal.nav.terms")}
               </a>
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
@@ -130,9 +148,9 @@ export const LegalPage: React.FC = () => {
                 onClick={(e) => handleSidebarClick(e, "privacidad")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  privacy_tip
+                  {ICONS.privacyTip}
                 </span>
-                Política de Privacidad
+                {t("legal.nav.privacy")}
               </a>
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
@@ -140,9 +158,9 @@ export const LegalPage: React.FC = () => {
                 onClick={(e) => handleSidebarClick(e, "ley172")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  verified_user
+                  {ICONS.verifiedUser}
                 </span>
-                Ley 172-13
+                {t("legal.nav.ley172")}
               </a>
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
@@ -150,9 +168,9 @@ export const LegalPage: React.FC = () => {
                 onClick={(e) => handleSidebarClick(e, "datos")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  database
+                  {ICONS.database}
                 </span>
-                Tratamiento de Datos
+                {t("legal.nav.dataTreatment")}
               </a>
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
@@ -160,9 +178,9 @@ export const LegalPage: React.FC = () => {
                 onClick={(e) => handleSidebarClick(e, "cookies")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  cookie
+                  {ICONS.cookie}
                 </span>
-                Uso de Cookies
+                {t("legal.nav.cookies")}
               </a>
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
@@ -170,14 +188,14 @@ export const LegalPage: React.FC = () => {
                 onClick={(e) => handleSidebarClick(e, "descargo")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  warning
+                  {ICONS.warning}
                 </span>
-                Descargos
+                {t("legal.nav.disclaimer")}
               </a>
               <div className="mt-8 pt-6 border-t border-outline-variant/30 flex-shrink-0 ml-auto lg:mt-8 lg:pt-6 lg:border-t lg:ml-0">
                 <button className="w-full border border-secondary text-secondary font-label text-sm font-semibold py-2.5 px-4 rounded-lg hover:bg-secondary/5 transition-colors duration-200 flex items-center justify-center gap-2">
-                  <span className="material-symbols-outlined text-sm">download</span>
-                  Download PDF
+                  <span className="material-symbols-outlined text-sm">{ICONS.download}</span>
+                  {t("legal.nav.downloadPdf")}
                 </button>
               </div>
             </nav>
@@ -188,19 +206,18 @@ export const LegalPage: React.FC = () => {
             {/* Header */}
             <div className={`mb-12 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
               <span className="font-sans font-semibold text-[11px] tracking-widest uppercase text-secondary mb-2 block">
-                MARCO LEGAL
+                {t("legal.header.tag")}
               </span>
               <h1 className="font-headline text-4xl md:text-5xl font-black text-on-surface mb-4 leading-tight">
-                Términos, Privacidad y Cumplimiento
+                {t("legal.header.title")}
               </h1>
               <p className="font-body text-lg text-on-surface-variant mb-6 leading-relaxed">
-                Operamos bajo el marco legal de la República Dominicana, asegurando la transparencia y la protección de
-                sus datos personales en cada transacción.
+                {t("legal.header.subtitle")}
               </p>
               <div className="inline-flex items-center gap-2 bg-surface-raised px-3 py-1.5 rounded-full border border-outline-variant">
-                <span className="material-symbols-outlined text-primary text-sm">update</span>
+                <span className="material-symbols-outlined text-primary text-sm">{ICONS.update}</span>
                 <span className="font-label text-sm font-medium text-on-surface-variant">
-                  Última actualización: Mayo 2026
+                  {t("legal.header.lastUpdate")}
                 </span>
               </div>
             </div>
@@ -208,34 +225,28 @@ export const LegalPage: React.FC = () => {
             {/* Section 1: Terms */}
             <section className={`mb-16 scroll-mt-28 fade-up stagger-3 ${isRevealed ? "is-visible" : ""}`} id="terminos">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
-                Términos de Uso
+                {t("legal.terms.title")}
               </h2>
               <div className="mb-8">
-                <h3 className="font-headline text-xl font-bold text-on-surface mb-4">Alcance del servicio</h3>
+                <h3 className="font-headline text-xl font-bold text-on-surface mb-4">{t("legal.terms.scopeTitle")}</h3>
                 <p className="font-body text-on-surface-variant leading-relaxed mb-4">
-                  VeriFinca proporciona herramientas para la verificación y gestión de propiedades inmobiliarias. El uso
-                  de esta plataforma constituye la aceptación de estos términos en su totalidad. Los servicios
-                  ofrecidos están diseñados para facilitar la debida diligencia, pero no reemplazan el asesoramiento
-                  legal profesional.
+                  {t("legal.terms.scopeDesc")}
                 </p>
               </div>
               <div>
-                <h3 className="font-headline text-xl font-bold text-on-surface mb-4">Restricciones de uso</h3>
+                <h3 className="font-headline text-xl font-bold text-on-surface mb-4">{t("legal.terms.restrictTitle")}</h3>
                 <ul className="space-y-3 font-body text-on-surface-variant">
                   <li className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-secondary text-sm mt-1">fiber_manual_record</span>
-                    <span>Prohibida la extracción automatizada de datos (scraping) sin autorización expresa.</span>
+                    <span className="material-symbols-outlined text-secondary text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                    <span>{t("legal.terms.restrictList.scraping")}</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-secondary text-sm mt-1">fiber_manual_record</span>
-                    <span>No se permite el uso de la plataforma para fines ilícitos o fraudulentos.</span>
+                    <span className="material-symbols-outlined text-secondary text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                    <span>{t("legal.terms.restrictList.illegal")}</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-secondary text-sm mt-1">fiber_manual_record</span>
-                    <span>
-                      Las cuentas son personales e intransferibles; compartir credenciales resultará en suspensión
-                      inmediata.
-                    </span>
+                    <span className="material-symbols-outlined text-secondary text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                    <span>{t("legal.terms.restrictList.accounts")}</span>
                   </li>
                 </ul>
               </div>
@@ -244,26 +255,21 @@ export const LegalPage: React.FC = () => {
             {/* Section 2: Privacy */}
             <section className={`mb-16 scroll-mt-28 fade-up stagger-4 ${isRevealed ? "is-visible" : ""}`} id="privacidad">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
-                Política de Privacidad
+                {t("legal.privacy.title")}
               </h2>
               <div className="bg-primary-subtle border-l-4 border-primary p-6 rounded-r-xl mb-8">
                 <h3 className="font-headline text-lg font-bold text-on-surface mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">info</span>
-                  Datos que recopilamos
+                  <span className="material-symbols-outlined text-primary">{ICONS.privacyTip}</span>
+                  {t("legal.privacy.collectTitle")}
                 </h3>
                 <p className="font-body text-on-surface-variant text-sm leading-relaxed">
-                  Recopilamos información personal necesaria para la prestación del servicio, incluyendo: nombre
-                  completo, cédula de identidad, información de contacto y datos relacionados con las propiedades
-                  consultadas. Esta información se almacena de forma encriptada y segura.
+                  {t("legal.privacy.collectDesc")}
                 </p>
               </div>
               <div>
-                <h3 className="font-headline text-xl font-bold text-on-surface mb-4">Retención de datos</h3>
+                <h3 className="font-headline text-xl font-bold text-on-surface mb-4">{t("legal.privacy.retentionTitle")}</h3>
                 <p className="font-body text-on-surface-variant leading-relaxed">
-                  De conformidad con la <strong className="text-on-surface">Ley 172-13</strong> sobre Protección de
-                  Datos de Carácter Personal, los datos crediticios o de historial generados a través de consultas a
-                  burós de crédito (ej. TransUnion) se retienen únicamente por el período establecido por la ley y se
-                  purgan automáticamente una vez expirado dicho plazo o cuando se revoca el consentimiento del titular.
+                  {t("legal.privacy.retentionDesc")}
                 </p>
               </div>
             </section>
@@ -271,109 +277,107 @@ export const LegalPage: React.FC = () => {
             {/* Section 3: Ley 172-13 */}
             <section className={`mb-16 scroll-mt-28 fade-up stagger-5 ${isRevealed ? "is-visible" : ""}`} id="ley172">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
-                Cumplimiento Ley 172-13
+                {t("legal.ley172.title")}
               </h2>
               <div className="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm mb-6">
                 <div className="mb-6">
-                  <h3 className="font-headline text-xl font-bold text-on-surface">Estado de Cumplimiento</h3>
+                  <h3 className="font-headline text-xl font-bold text-on-surface">{t("legal.ley172.statusTitle")}</h3>
                   <p className="font-body text-sm text-on-surface-variant mt-1">
-                    Métricas de alineación con el marco normativo dominicano.
+                    {t("legal.ley172.statusSubtitle")}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
-                      <span className="material-symbols-outlined">check_circle</span>
+                      <span className="material-symbols-outlined">{ICONS.checkCircle}</span>
                     </div>
                     <div>
-                      <h4 className="font-headline font-bold text-on-surface text-sm">Consentimiento</h4>
-                      <p className="font-body text-xs text-on-surface-variant mt-0.5">Captura explícita requerida.</p>
+                      <h4 className="font-headline font-bold text-on-surface text-sm">{t("legal.ley172.consent")}</h4>
+                      <p className="font-body text-xs text-on-surface-variant mt-0.5">{t("legal.ley172.consentDesc")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
-                      <span className="material-symbols-outlined">check_circle</span>
+                      <span className="material-symbols-outlined">{ICONS.checkCircle}</span>
                     </div>
                     <div>
-                      <h4 className="font-headline font-bold text-on-surface text-sm">Propósito</h4>
-                      <p className="font-body text-xs text-on-surface-variant mt-0.5">Uso limitado al fin declarado.</p>
+                      <h4 className="font-headline font-bold text-on-surface text-sm">{t("legal.ley172.purpose")}</h4>
+                      <p className="font-body text-xs text-on-surface-variant mt-0.5">{t("legal.ley172.purposeDesc")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
-                      <span className="material-symbols-outlined">check_circle</span>
+                      <span className="material-symbols-outlined">{ICONS.checkCircle}</span>
                     </div>
                     <div>
-                      <h4 className="font-headline font-bold text-on-surface text-sm">Acceso</h4>
+                      <h4 className="font-headline font-bold text-on-surface text-sm">{t("legal.ley172.access")}</h4>
                       <p className="font-body text-xs text-on-surface-variant mt-0.5">
-                        Derecho de consulta garantizado.
+                        {t("legal.ley172.accessDesc")}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
                     <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
-                      <span className="material-symbols-outlined">check_circle</span>
+                      <span className="material-symbols-outlined">{ICONS.checkCircle}</span>
                     </div>
                     <div>
-                      <h4 className="font-headline font-bold text-on-surface text-sm">Purga</h4>
+                      <h4 className="font-headline font-bold text-on-surface text-sm">{t("legal.ley172.purge")}</h4>
                       <p className="font-body text-xs text-on-surface-variant mt-0.5">
-                        Eliminación tras período legal.
+                        {t("legal.ley172.purgeDesc")}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
               <p className="font-body text-sm text-on-surface-variant italic">
-                * Plataforma registrada y certificada ante el Instituto Nacional de Protección de los Derechos del
-                Consumidor (Pro Consumidor) y alineada con las normativas del INPD.
+                {t("legal.ley172.footer")}
               </p>
             </section>
 
             {/* Section 4: Data Treatment */}
             <section className={`mb-16 scroll-mt-28 fade-up stagger-6 ${isRevealed ? "is-visible" : ""}`} id="datos">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
-                Tratamiento de Datos
+                {t("legal.dataTreatment.title")}
               </h2>
               <div className="mb-8">
-                <h3 className="font-headline text-xl font-bold text-on-surface mb-3">Base legal</h3>
+                <h3 className="font-headline text-xl font-bold text-on-surface mb-3">{t("legal.dataTreatment.legalBaseTitle")}</h3>
                 <p className="font-body text-on-surface-variant leading-relaxed">
-                  El tratamiento de sus datos se basa en el consentimiento libre, previo, expreso e informado, así como
-                  en la necesidad contractual para la prestación de los servicios solicitados a VeriFinca.
+                  {t("legal.dataTreatment.legalBaseDesc")}
                 </p>
               </div>
               <div className="mb-8">
-                <h3 className="font-headline text-xl font-bold text-on-surface mb-6">Derechos del titular</h3>
+                <h3 className="font-headline text-xl font-bold text-on-surface mb-6">{t("legal.dataTreatment.rightsTitle")}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
                   <div className="bg-surface border border-outline-variant p-5 rounded-xl shadow-sm text-center flex flex-col items-center">
                     <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                      <span className="material-symbols-outlined text-secondary">visibility</span>
+                      <span className="material-symbols-outlined text-secondary">{ICONS.visibility}</span>
                     </div>
-                    <h4 className="font-headline font-bold text-on-surface mb-2">Acceso</h4>
+                    <h4 className="font-headline font-bold text-on-surface mb-2">{t("legal.dataTreatment.legalBaseTitle")}</h4>
                     <p className="font-body text-xs text-on-surface-variant">
-                      Conocer qué datos suyos reposan en nuestras bases de datos.
+                      {t("legal.dataTreatment.accessDesc")}
                     </p>
                   </div>
                   <div className="bg-surface border border-outline-variant p-5 rounded-xl shadow-sm text-center flex flex-col items-center">
                     <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                      <span className="material-symbols-outlined text-secondary">edit_document</span>
+                      <span className="material-symbols-outlined text-secondary">{ICONS.editDocument}</span>
                     </div>
-                    <h4 className="font-headline font-bold text-on-surface mb-2">Rectificación</h4>
+                    <h4 className="font-headline font-bold text-on-surface mb-2">{t("legal.dataTreatment.rectifyTitle")}</h4>
                     <p className="font-body text-xs text-on-surface-variant">
-                      Actualizar o corregir información inexacta o desactualizada.
+                      {t("legal.dataTreatment.rectifyDesc")}
                     </p>
                   </div>
                   <div className="bg-surface border border-outline-variant p-5 rounded-xl shadow-sm text-center flex flex-col items-center">
                     <div className="w-12 h-12 bg-error/10 rounded-full flex items-center justify-center mb-4">
-                      <span className="material-symbols-outlined text-error">delete_forever</span>
+                      <span className="material-symbols-outlined text-error">{ICONS.deleteForever}</span>
                     </div>
-                    <h4 className="font-headline font-bold text-on-surface mb-2">Cancelación</h4>
+                    <h4 className="font-headline font-bold text-on-surface mb-2">{t("legal.dataTreatment.cancelTitle")}</h4>
                     <p className="font-body text-xs text-on-surface-variant">
-                      Solicitar la eliminación de sus datos cuando proceda legalmente.
+                      {t("legal.dataTreatment.cancelDesc")}
                     </p>
                   </div>
                 </div>
                 <button className="border border-secondary text-secondary font-label font-bold py-2.5 px-6 rounded-lg hover:bg-secondary/5 transition-colors duration-200 w-full sm:w-auto">
-                  Ejercer mis derechos
+                  {t("legal.dataTreatment.button")}
                 </button>
               </div>
             </section>
@@ -381,42 +385,40 @@ export const LegalPage: React.FC = () => {
             {/* Section 5: Cookies */}
             <section className={`mb-16 scroll-mt-28 fade-up stagger-7 ${isRevealed ? "is-visible" : ""}`} id="cookies">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
-                Uso de Cookies
+                {t("legal.cookies.title")}
               </h2>
               <p className="font-body text-on-surface-variant leading-relaxed mb-6">
-                Utilizamos cookies estrictamente necesarias para el funcionamiento seguro de la plataforma, así como
-                cookies analíticas para mejorar la experiencia del usuario. A continuación, detallamos las cookies
-                principales utilizadas:
+                {t("legal.cookies.desc")}
               </p>
               <div className="overflow-x-auto rounded-xl border border-outline-variant shadow-sm">
                 <table className="w-full text-left font-body text-sm">
                   <thead className="table-header-bg table-header-text font-headline bg-text-primary text-white">
                     <tr>
-                      <th className="px-6 py-4 font-bold">Nombre</th>
-                      <th className="px-6 py-4 font-bold">Propósito</th>
-                      <th className="px-6 py-4 font-bold">Duración</th>
+                      <th className="px-6 py-4 font-bold">{t("legal.cookies.table.name")}</th>
+                      <th className="px-6 py-4 font-bold">{t("legal.cookies.table.purpose")}</th>
+                      <th className="px-6 py-4 font-bold">{t("legal.cookies.table.duration")}</th>
                     </tr>
                   </thead>
                   <tbody className="bg-surface divide-y divide-outline-variant/30 text-on-surface-variant">
                     <tr className="hover:bg-surface-container-low">
                       <td className="px-6 py-4 font-mono text-xs">session_token</td>
-                      <td className="px-6 py-4">Mantiene la sesión de usuario activa y segura.</td>
-                      <td className="px-6 py-4">Sesión</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.sessionTokenDesc")}</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.session")}</td>
                     </tr>
                     <tr className="bg-surface-raised hover:bg-surface-container">
                       <td className="px-6 py-4 font-mono text-xs">csrf_token</td>
-                      <td className="px-6 py-4">Previene ataques de falsificación de peticiones en sitios cruzados.</td>
-                      <td className="px-6 py-4">Sesión</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.csrfTokenDesc")}</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.session")}</td>
                     </tr>
                     <tr className="hover:bg-surface-container-low">
                       <td className="px-6 py-4 font-mono text-xs">_ga</td>
-                      <td className="px-6 py-4">Analítica de uso de la plataforma (Google Analytics).</td>
-                      <td className="px-6 py-4">2 años</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.gaDesc")}</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.gaDuration")}</td>
                     </tr>
                     <tr className="bg-surface-raised hover:bg-surface-container">
                       <td className="px-6 py-4 font-mono text-xs">consent_record</td>
-                      <td className="px-6 py-4">Almacena las preferencias de privacidad del usuario.</td>
-                      <td className="px-6 py-4">1 año</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.consentRecordDesc")}</td>
+                      <td className="px-6 py-4">{t("legal.cookies.table.consentRecordDuration")}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -426,23 +428,17 @@ export const LegalPage: React.FC = () => {
             {/* Section 6: Disclaimer */}
             <section className={`mb-16 scroll-mt-28 fade-up stagger-8 ${isRevealed ? "is-visible" : ""}`} id="descargo">
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
-                Descargo de Responsabilidad
+                {t("legal.disclaimer.title")}
               </h2>
               <div className="bg-error/10 border-l-4 border-error p-6 rounded-r-xl">
                 <div className="flex gap-4">
-                  <span className="material-symbols-outlined text-error text-3xl flex-shrink-0">warning</span>
+                  <span className="material-symbols-outlined text-error text-3xl flex-shrink-0">{ICONS.warning}</span>
                   <div>
                     <h3 className="font-headline text-lg font-bold text-error mb-2">
-                      Limitación de Garantía Inmobiliaria
+                      {t("legal.disclaimer.warrantyTitle")}
                     </h3>
                     <p className="font-body text-error/90 text-sm leading-relaxed">
-                      La información proporcionada por VeriFinca sobre estados jurídicos de propiedades, cargas,
-                      gravámenes o historiales de propietarios se basa en registros públicos y bases de datos de
-                      terceros. Aunque nos esforzamos por mantener la precisión, VeriFinca no garantiza la exactitud
-                      absoluta de estos datos ni asume responsabilidad por decisiones financieras, legales o
-                      inmobiliarias tomadas exclusivamente basándose en los reportes de la plataforma. Se recomienda
-                      siempre la verificación oficial ante la Jurisdicción Inmobiliaria y la consulta con un abogado
-                      especializado.
+                      {t("legal.disclaimer.warrantyDesc")}
                     </p>
                   </div>
                 </div>
@@ -456,9 +452,9 @@ export const LegalPage: React.FC = () => {
       <section className="bg-secondary w-full py-12 px-4 sm:px-6 lg:px-8 mt-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-white text-center md:text-left">
-            <h3 className="font-headline text-2xl font-bold mb-2">¿Tienes preguntas legales?</h3>
+            <h3 className="font-headline text-2xl font-bold mb-2">{t("legal.cta.title")}</h3>
             <p className="font-body text-sm opacity-90 mb-1">
-              Nuestro equipo de cumplimiento está disponible para aclarar cualquier duda.
+              {t("legal.cta.subtitle")}
             </p>
             <a className="font-body font-semibold hover:underline" href="mailto:legal@verifinca.do">
               legal@verifinca.do
@@ -466,7 +462,7 @@ export const LegalPage: React.FC = () => {
           </div>
           <div>
             <button className="bg-primary hover:bg-primary-hover text-on-primary font-label font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-raised whitespace-nowrap w-full md:w-auto active:scale-[0.98]">
-              Enviar consulta legal
+              {t("legal.cta.button")}
             </button>
           </div>
         </div>
