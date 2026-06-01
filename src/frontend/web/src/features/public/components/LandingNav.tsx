@@ -27,19 +27,24 @@ export const LandingNav: React.FC = () => {
 
       <div className="hidden lg:flex items-center gap-10">
         {[
-          { label: "Servicios", href: "#servicios" },
-          { label: "Metodología", href: "#metodologia" },
           { label: "Proyectos", href: "/portal" },
-          { label: "Precios", href: "#" },
-        ].map((item) => (
-          <a
-            key={item.label}
-            href={item.href}
-            className="text-sm font-bold text-secondary/70 hover:text-secondary transition-colors tracking-tight"
-          >
-            {item.label}
-          </a>
-        ))}
+          { label: "Precios", href: "/precios" },
+          { label: "Legal", href: "/legal" },
+        ].map((item) => {
+          const className = "text-sm font-bold text-secondary/70 hover:text-secondary transition-colors tracking-tight";
+          if (item.href.startsWith("/")) {
+            return (
+              <Link key={item.label} to={item.href} className={className}>
+                {item.label}
+              </Link>
+            );
+          }
+          return (
+            <a key={item.label} href={item.href} className={className}>
+              {item.label}
+            </a>
+          );
+        })}
       </div>
 
       <div className="flex items-center gap-4">
