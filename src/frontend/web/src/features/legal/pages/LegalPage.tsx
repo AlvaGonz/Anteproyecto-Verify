@@ -1,8 +1,59 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { LandingNav } from "../../public/components/LandingNav";
 import { LandingFooter } from "../../public/components/LandingFooter";
 
 export const LegalPage: React.FC = () => {
+  const location = useLocation();
+
+  React.useEffect(() => {
+    const rawHash = window.location.hash; // e.g. "#/legal#terminos" or "#/legal"
+    const hashParts = rawHash.split("#");
+    const elementId = hashParts[2]; // if there is a second hash, like "terminos"
+
+    if (elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    } else if (location.hash) {
+      const elementIdClean = location.hash.replace("#", "");
+      const element = document.getElementById(elementIdClean);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    }
+  }, [location]);
+
+  const handleSidebarClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    // Update hash manually without trigger routing reload
+    window.history.pushState(null, "", `#/legal#${targetId}`);
+
+    // Manually trigger the observer active class updates
+    const navLinks = document.querySelectorAll<HTMLAnchorElement>(".sidebar-bg a");
+    navLinks.forEach((link) => {
+      link.className =
+        "flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2";
+      const icon = link.querySelector<HTMLElement>(".material-symbols-outlined");
+      if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+
+      if (link.getAttribute("href") === `#${targetId}`) {
+        link.className =
+          "flex items-center gap-3 bg-primary-container text-on-primary-container font-semibold rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2";
+        if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+      }
+    });
+  };
+
   React.useEffect(() => {
     const sections = document.querySelectorAll<HTMLElement>("section[id]");
     const navLinks = document.querySelectorAll<HTMLAnchorElement>(".sidebar-bg a");
@@ -60,6 +111,7 @@ export const LegalPage: React.FC = () => {
               <a
                 className="flex items-center gap-3 bg-primary-container text-on-primary-container font-semibold rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
                 href="#terminos"
+                onClick={(e) => handleSidebarClick(e, "terminos")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
                   gavel
@@ -69,6 +121,7 @@ export const LegalPage: React.FC = () => {
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
                 href="#privacidad"
+                onClick={(e) => handleSidebarClick(e, "privacidad")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
                   privacy_tip
@@ -78,6 +131,7 @@ export const LegalPage: React.FC = () => {
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
                 href="#ley172"
+                onClick={(e) => handleSidebarClick(e, "ley172")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
                   verified_user
@@ -87,6 +141,7 @@ export const LegalPage: React.FC = () => {
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
                 href="#datos"
+                onClick={(e) => handleSidebarClick(e, "datos")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
                   database
@@ -96,6 +151,7 @@ export const LegalPage: React.FC = () => {
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
                 href="#cookies"
+                onClick={(e) => handleSidebarClick(e, "cookies")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
                   cookie
@@ -105,6 +161,7 @@ export const LegalPage: React.FC = () => {
               <a
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
                 href="#descargo"
+                onClick={(e) => handleSidebarClick(e, "descargo")}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
                   warning

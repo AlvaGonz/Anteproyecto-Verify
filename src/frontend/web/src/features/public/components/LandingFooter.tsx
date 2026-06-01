@@ -17,9 +17,9 @@ export const LandingFooter: React.FC = () => (
         <div className="space-y-6">
           <h4 className="text-white font-black text-xs uppercase tracking-widest">Legal</h4>
           <ul className="space-y-4 text-sm font-bold">
-            <li><a href="#" className="hover:text-primary transition-colors">Términos de Servicio</a></li>
-            <li><a href="#" className="hover:text-primary transition-colors">Privacidad</a></li>
-            <li><a href="#" className="hover:text-primary transition-colors">Cookies</a></li>
+            <li><Link to="/legal#terminos" className="hover:text-primary transition-colors">Términos de Servicio</Link></li>
+            <li><Link to="/legal#privacidad" className="hover:text-primary transition-colors">Privacidad</Link></li>
+            <li><Link to="/legal#cookies" className="hover:text-primary transition-colors">Cookies</Link></li>
           </ul>
         </div>
       </div>
@@ -28,13 +28,6 @@ export const LandingFooter: React.FC = () => (
         <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
           © 2026 VeriFinca. Construyendo Confianza.
         </p>
-        <div className="flex gap-4">
-          {[Gavel, Building2].map((Icon, i) => (
-            <div key={i} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 cursor-pointer transition-all border border-white/5">
-              <Icon className="w-5 h-5 text-white/40" />
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   </footer>

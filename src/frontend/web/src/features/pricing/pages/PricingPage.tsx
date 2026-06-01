@@ -66,24 +66,21 @@ export const PricingPage: React.FC = () => {
 
           {/* Billing Toggle */}
           <div
-            className={`inline-flex bg-surface-variant rounded-full p-1 border border-outline-variant/30 shadow-sm relative toggle-container fade-up stagger-3 ${
-              isAnnual ? "toggle-anual" : ""
-            }`}
+            className={`inline-flex bg-surface-variant rounded-full p-1 border border-outline-variant/30 shadow-sm relative toggle-container fade-up stagger-3 ${isAnnual ? "toggle-anual" : ""
+              }`}
             id="billingToggle"
           >
             <div className="toggle-slider"></div>
             <button
-              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${
-                !isAnnual ? "text-primary font-bold" : "text-on-surface-variant"
-              }`}
+              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${!isAnnual ? "text-primary font-bold" : "text-on-surface-variant"
+                }`}
               onClick={() => setIsAnnual(false)}
             >
               Mensual
             </button>
             <button
-              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${
-                isAnnual ? "text-primary font-bold" : "text-on-surface-variant"
-              }`}
+              className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${isAnnual ? "text-primary font-bold" : "text-on-surface-variant"
+                }`}
               onClick={() => setIsAnnual(true)}
             >
               Anual <span className="text-xs text-primary ml-1">-20%</span>
@@ -259,7 +256,7 @@ export const PricingPage: React.FC = () => {
               </ul>
               <Link
                 to="/contacto"
-                className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block"
+                className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-[#dee0ff]"
               >
                 Contactar Ventas
               </Link>
@@ -403,7 +400,7 @@ export const PricingPage: React.FC = () => {
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
           <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-left md:w-2/3">
-              <h2 className="text-3xl font-headline font-bold mb-3">
+              <h2 className="text-3xl font-headline font-bold mb-3 text-white">
                 ¿Necesitas una solución corporativa a gran escala?
               </h2>
               <p className="font-body text-[#dee0ff] opacity-90">
@@ -420,7 +417,7 @@ export const PricingPage: React.FC = () => {
               </Link>
               <a
                 href="#"
-                className="bg-transparent border border-outline-variant hover:bg-white/10 text-on-secondary font-label font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 btn-interact text-center"
+                className="bg-transparent border border-outline-variant hover:bg-white/10 text-[#dee0ff] text-on-secondary font-label font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 btn-interact text-center"
               >
                 Ver documentación
               </a>
