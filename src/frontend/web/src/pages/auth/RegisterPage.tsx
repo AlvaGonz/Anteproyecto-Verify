@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import { AuthService } from "../../features/auth/services/AuthService";
+import { isSuccess } from "../../shared/utils/functional";
 
 export const RegisterPage: React.FC = () => {
   const [nombre, setNombre] = useState("");
@@ -70,27 +70,17 @@ export const RegisterPage: React.FC = () => {
 
     try {
       const displayName = `${nombre.trim()} ${apellido.trim()}`;
-      const response = await fetch(`${API_BASE}/email-test/uc-01-account-verification`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.toLowerCase(),
-          name: displayName,
-          telefono: telefono.trim() || undefined,
-          cedula: cedula.trim() || undefined,
-        }),
+      const result = await AuthService.registerAccount({
+        email: email.toLowerCase(),
+        name: displayName,
+        telefono: telefono.trim() || undefined,
+        cedula: cedula.trim() || undefined,
       });
 
-      if (!response.ok) {
-        let errorMsg = `Error ${response.status}: No se pudo enviar el correo de verificación.`;
-        try {
-          const errorJson = await response.json();
-          if (errorJson?.error) {
-            errorMsg = errorJson.error;
-          }
-        } catch {
-          /* ignore parse errors */
-        }
+      if (!isSuccess(result)) {
+        const errorMsg = result.error._tag === "NetworkError"
+          ? result.error.message
+          : "Error al conectar con el servidor backend.";
         throw new Error(errorMsg);
       }
 

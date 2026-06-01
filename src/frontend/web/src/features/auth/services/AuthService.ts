@@ -78,5 +78,44 @@ export const AuthService = {
       name: "Administrador VeriFinca",
       role: "admin",
     });
+  },
+
+  async registerAccount(params: {
+    email: string;
+    name: string;
+    telefono?: string;
+    cedula?: string;
+  }): Promise<Result<{ message: string }, AuthError>> {
+    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+    try {
+      const response = await fetch(`${API_BASE}/email-test/uc-01-account-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: params.email,
+          name: params.name,
+          telefono: params.telefono,
+          cedula: params.cedula,
+        }),
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Error ${response.status}: No se pudo enviar el correo de verificación.`;
+        try {
+          const errorJson = await response.json();
+          if (errorJson?.error) {
+            errorMsg = errorJson.error;
+          }
+        } catch {
+          /* ignore parse errors */
+        }
+        return failure({ _tag: "NetworkError", message: errorMsg });
+      }
+
+      return success({ message: "Cuenta registrada exitosamente." });
+    } catch (e) {
+      return failure({ _tag: "UnknownError", original: e });
+    }
   }
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { LandingNav } from "../../public/components/LandingNav";
-import { LandingFooter } from "../../public/components/LandingFooter";
+import { LandingNav } from "../../../shared/components/layout/LandingNav";
+import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
 
 export const LegalPage: React.FC = () => {
   const location = useLocation();
@@ -282,7 +282,7 @@ export const LegalPage: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
-                    <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
+                    <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
                     <div>
@@ -291,7 +291,7 @@ export const LegalPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
-                    <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
+                    <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
                     <div>
@@ -300,7 +300,7 @@ export const LegalPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
-                    <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
+                    <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
                     <div>
@@ -311,7 +311,7 @@ export const LegalPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 bg-surface-raised border border-outline-variant/50 p-4 rounded-lg">
-                    <div className="bg-green-100 text-green-700 p-2 rounded-full flex-shrink-0">
+                    <div className="bg-success/10 text-success p-2 rounded-full flex-shrink-0">
                       <span className="material-symbols-outlined">check_circle</span>
                     </div>
                     <div>
@@ -428,14 +428,14 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Descargo de Responsabilidad
               </h2>
-              <div className="bg-[#FFEBEE] border-l-4 border-[#C62828] p-6 rounded-r-xl">
+              <div className="bg-error/10 border-l-4 border-error p-6 rounded-r-xl">
                 <div className="flex gap-4">
-                  <span className="material-symbols-outlined text-[#C62828] text-3xl flex-shrink-0">warning</span>
+                  <span className="material-symbols-outlined text-error text-3xl flex-shrink-0">warning</span>
                   <div>
-                    <h3 className="font-headline text-lg font-bold text-[#C62828] mb-2">
+                    <h3 className="font-headline text-lg font-bold text-error mb-2">
                       Limitación de Garantía Inmobiliaria
                     </h3>
-                    <p className="font-body text-[#C62828] text-sm leading-relaxed">
+                    <p className="font-body text-error/90 text-sm leading-relaxed">
                       La información proporcionada por VeriFinca sobre estados jurídicos de propiedades, cargas,
                       gravámenes o historiales de propietarios se basa en registros públicos y bases de datos de
                       terceros. Aunque nos esforzamos por mantener la precisión, VeriFinca no garantiza la exactitud

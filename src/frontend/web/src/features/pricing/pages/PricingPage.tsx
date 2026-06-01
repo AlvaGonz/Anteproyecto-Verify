@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { LandingNav } from "../../public/components/LandingNav";
-import { LandingFooter } from "../../public/components/LandingFooter";
-import { useAuth } from "../../auth/context/AuthContext";
+import { LandingNav } from "../../../shared/components/layout/LandingNav";
+import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
+import { useAuth } from "../../../shared/context/AuthContext";
 import "./PricingPage.module.css";
 
 export const PricingPage: React.FC = () => {
@@ -227,7 +227,7 @@ export const PricingPage: React.FC = () => {
               </ul>
               <Link
                 to={isAuthenticated ? "/contacto" : "/register?plan=enterprise"}
-                className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-[#dee0ff]"
+                className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-secondary-container"
               >
                 Contactar Ventas
               </Link>
@@ -377,7 +377,7 @@ export const PricingPage: React.FC = () => {
               <h2 className="text-3xl font-headline font-bold mb-3 text-white">
                 ¿Necesitas una solución corporativa a gran escala?
               </h2>
-              <p className="font-body text-[#dee0ff] opacity-90">
+              <p className="font-body text-secondary-container opacity-90">
                 Construimos infraestructuras de validación dedicadas para instituciones financieras y grandes firmas de abogados.
               </p>
             </div>
@@ -390,7 +390,7 @@ export const PricingPage: React.FC = () => {
               </Link>
               <a
                 href="https://portal.verifinca.com/legal#terminos"
-                className="bg-transparent border border-outline-variant hover:bg-white/10 text-[#dee0ff] text-on-secondary font-label font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 btn-interact text-center"
+                className="bg-transparent border border-outline-variant hover:bg-white/10 text-secondary-container text-on-secondary font-label font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 btn-interact text-center"
               >
                 Ver documentación
               </a>
