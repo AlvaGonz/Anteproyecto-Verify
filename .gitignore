@@ -21,3 +21,7 @@ Thumbs.db
 # .txt
 
 # /Bots
+
+# Agent Sessions
+.agents/sessions/
+!.agents/sessions/.gitkeep
