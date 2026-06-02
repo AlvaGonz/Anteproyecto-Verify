@@ -259,7 +259,7 @@ category: global-testing
       "Description comes from local version, not global"
     );
 
-    // Count: should have exactly 1 dummy-test-skill
+  // Count: should have exactly 1 dummy-test-skill
     const dummyCount = skills.filter(
       (s) => s.name === "dummy-test-skill"
     ).length;
@@ -267,6 +267,118 @@ category: global-testing
   } finally {
     await rm(globalTempDir, { recursive: true, force: true });
   }
+}
+
+// ── Test 5: Dynamic MCP Discovery & Schema Integration ──
+
+async function testMCPDiscovery() {
+  console.log("\n── Test 5: Dynamic MCP Discovery & Schema Integration ──");
+
+  // Create global gemini folder and dummy mcp.json
+  const globalGeminiDir = join(tempDir, ".gemini");
+  await mkdir(globalGeminiDir, { recursive: true });
+
+  const mcpGlobalContent = {
+    mcpServers: {
+      "postgres-dev": {
+        command: "npx",
+        args: ["postgres-mcp-server"]
+      },
+      "conflict-server": {
+        command: "node",
+        args: ["global-version"]
+      }
+    }
+  };
+
+  await writeFile(
+    join(globalGeminiDir, "mcp.json"),
+    JSON.stringify(mcpGlobalContent),
+    "utf-8"
+  );
+
+  // Create local .cursor folder and dummy mcp.json (for deduplication / local overrides global test)
+  const localCursorDir = join(tempDir, ".cursor");
+  await mkdir(localCursorDir, { recursive: true });
+
+  const mcpLocalContent = {
+    mcpServers: {
+      "sqlite-dev": {
+        command: "npx",
+        args: ["sqlite-mcp-server"]
+      },
+      "conflict-server": {
+        command: "node",
+        args: ["local-version"]
+      }
+    }
+  };
+
+  await writeFile(
+    join(localCursorDir, "mcp.json"),
+    JSON.stringify(mcpLocalContent),
+    "utf-8"
+  );
+
+  // Create a corrupted JSON file to test defensive parsing / crash prevention
+  const localAntigravityDir = join(tempDir, ".antigravity");
+  await mkdir(localAntigravityDir, { recursive: true });
+  await writeFile(
+    join(localAntigravityDir, "mcp.json"),
+    "{ corrupted JSON",
+    "utf-8"
+  );
+
+  // Execute Scanner
+  const { stdout: scanOut } = await execFileAsync(
+    "node",
+    [SCANNER_PATH, "--local", tempDir, "--global", tempDir],
+    { encoding: "utf-8" }
+  );
+
+  const items = JSON.parse(scanOut.trim());
+  assert(Array.isArray(items), "Scanner output with MCP is a JSON array");
+
+  const postgresDev = items.find((i) => i.name === "mcp-postgres-dev");
+  assert(postgresDev !== undefined, "MCP 'postgres-dev' was discovered");
+  assert(postgresDev?.type === "mcp_server", "postgres-dev is marked as mcp_server type");
+  assert(postgresDev?.source === "global", "postgres-dev source is global");
+
+  const sqliteDev = items.find((i) => i.name === "mcp-sqlite-dev");
+  assert(sqliteDev !== undefined, "MCP 'sqlite-dev' was discovered");
+  assert(sqliteDev?.type === "mcp_server", "sqlite-dev is marked as mcp_server type");
+  assert(sqliteDev?.source === "local", "sqlite-dev source is local");
+
+  // Conflict server should be deduplicated and overridden by local
+  const conflicts = items.filter((i) => i.name === "mcp-conflict-server");
+  assert(conflicts.length === 1, "Conflict server is deduplicated to a single entry");
+  assert(conflicts[0]?.source === "local", "Conflict server is overridden by local definition");
+
+  // Execute Registry Pipeline inline
+  const { stdout: regOut } = await execFileAsync(
+    "node",
+    [REGISTRY_PATH, "--inline", "--local", tempDir, "--global", tempDir],
+    { encoding: "utf-8" }
+  );
+
+  const registry = JSON.parse(regOut.trim());
+
+  assert(registry.active_mcp_servers !== undefined, "Registry exposes active_mcp_servers array");
+  assert(Array.isArray(registry.active_mcp_servers), "active_mcp_servers is an array");
+  
+  const pgMcp = registry.active_mcp_servers.find(m => m.name === "mcp-postgres-dev");
+  assert(pgMcp !== undefined, "active_mcp_servers contains 'mcp-postgres-dev'");
+  assert(pgMcp?.status === "active", "postgres-dev has 'active' status");
+
+  const sqliteMcp = registry.active_mcp_servers.find(m => m.name === "mcp-sqlite-dev");
+  assert(sqliteMcp !== undefined, "active_mcp_servers contains 'mcp-sqlite-dev'");
+
+  assert(registry.metadata !== undefined, "Registry contains metadata");
+  assert(registry.metadata.mcp_count === 3, `metadata contains correct mcp_count (expected 3, got ${registry.metadata.mcp_count})`);
+
+  // Ensure standard skills in the same payload are not corrupted
+  const dummySkill = registry.tool_schema.parameters.properties.skill_name.enum.find(e => e === "dummy-test-skill");
+  assert(dummySkill !== undefined, "Standard skill 'dummy-test-skill' is preserved in tool_schema enum");
 }
 
 // ── Main ──────────────────────────────────────────────────────────────
@@ -284,6 +396,7 @@ async function main() {
     await testRealLocalScan();
     await testRegistrySchema();
     await testDeduplication();
+    await testMCPDiscovery();
 
   } finally {
     await cleanup();
@@ -297,6 +410,7 @@ async function main() {
     process.exit(1);
   }
 }
+
 
 main().catch((err) => {
   console.error(`\n💥 FATAL: ${err.message}\n${err.stack}`);
