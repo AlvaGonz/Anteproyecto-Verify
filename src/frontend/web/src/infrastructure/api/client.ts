@@ -13,13 +13,11 @@ const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 15000,
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,
 });
 
-// REQUEST interceptor — attach JWT
+// REQUEST interceptor
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
   return config;
 });
 

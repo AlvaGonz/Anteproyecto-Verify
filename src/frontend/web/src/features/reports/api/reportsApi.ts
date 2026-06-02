@@ -40,7 +40,7 @@ export const reportsApi = {
     return response.json();
   },
 
-  generatePdf: async (projectId: string, token: string): Promise<Blob> => {
+  generatePdf: async (projectId: string): Promise<Blob> => {
     if (USE_MOCK) {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -50,9 +50,7 @@ export const reportsApi = {
     }
     const response = await fetch(`${API_BASE_URL}/projects/${projectId}/reports/pdf`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include'
     });
 
     if (!response.ok) {
@@ -63,7 +61,7 @@ export const reportsApi = {
     return response.blob();
   },
 
-  generateExcel: async (projectId: string, token: string): Promise<Blob> => {
+  generateExcel: async (projectId: string): Promise<Blob> => {
     if (USE_MOCK) {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -73,9 +71,7 @@ export const reportsApi = {
     }
     const response = await fetch(`${API_BASE_URL}/projects/${projectId}/reports/excel`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include'
     });
 
     if (!response.ok) {
@@ -84,5 +80,30 @@ export const reportsApi = {
     }
 
     return response.blob();
+  },
+
+  queryGeminiProxy: async (projectId: string): Promise<string> => {
+    const response = await fetch(`${API_BASE_URL}/gemini/proxy`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: `Generar un resumen ejecutivo y diagnóstico de cumplimiento de validación para el proyecto ${projectId}.`
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) throw new Error("Failed to consult AI Diagnosis proxy");
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "No AI feedback generated.";
   }
 };
