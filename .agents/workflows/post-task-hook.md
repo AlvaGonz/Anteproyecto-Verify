@@ -1,3 +1,7 @@
+---
+id: post-task-hook
+description: Runs automatically after every completed agent task to evaluate quality.
+---
 # Workflow: post-task-hook
 
 ## Trigger
@@ -5,22 +9,37 @@ Runs AUTOMATICALLY after EVERY completed agent task — no exceptions.
 
 ## Steps
 
+0. **Initialize Planning Files** (@planning-with-files)
+   - Create or update `.agents/docs/PWF/task_plan.md` with the workflow ID `post-task-hook`, current objectives, and the checklist of steps below.
+   - GATE: The file `.agents/docs/PWF/task_plan.md` exists and contains all steps. If FAIL → stop and report. Do NOT proceed.
+
 1. **Collect:** What was the task? What files were changed?
+   - GATE: Changed files and task description gathered. If FAIL → stop and report. Do NOT proceed.
+
 2. **Run:**
    ```bash
    python scripts/post_task_loop.py \
      --task "{{TASK_DESCRIPTION}}" \
      --output "{{FILES_CHANGED_AND_WHAT_WAS_DONE}}"
    ```
+   - GATE: Script executes and returns JSON/stdout. If FAIL → stop and report. Do NOT proceed.
+
 3. **Read stdout JSON result.**
+   - GATE: JSON parsed. Score, verdict, and high issues extracted. If FAIL → stop and report. Do NOT proceed.
+
 4. If `high_issues > 0`: Read `tasks/loop-log.md`, address HIGH issues before committing.
+   - GATE: Any HIGH issues addressed. If FAIL → stop and report. Do NOT proceed.
+
 5. If `verdict == PASS` or `high_issues == 0`: Proceed to commit.
+   - GATE: Ready for commit. If FAIL → stop and report. Do NOT proceed.
+
 6. **Commit includes loop result in message body:**
    ```
    type(scope): message
 
    loop: score={{score}} verdict={{verdict}} issues={{issues}}
    ```
+   - GATE: Git commit successfully performed with loop stats. If FAIL → stop and report. Do NOT proceed.
 
 ## Non-Blocking Rule
 

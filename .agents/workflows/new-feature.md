@@ -1,4 +1,5 @@
 ---
+id: new-feature
 description: /new-feature
 ---
 
@@ -8,9 +9,17 @@ TRIGGER: Cuando vas a implementar una nueva funcionalidad
 NOMBRE DE LA FEATURE: [NOMBRE]
 DESCRIPCIÓN: [QUÉ DEBE HACER]
 
+=== PASO 0: INICIALIZAR ARCHIVOS DE PLANIFICACIÓN (@planning-with-files) ===
+Crea o actualiza `.agents/docs/PWF/task_plan.md` con:
+  - ID y nombre del flujo de trabajo (new-feature)
+  - Objetivo de la feature
+  - Lista de fases (FASE A, B, C, D)
+GATE: El archivo `.agents/docs/PWF/task_plan.md` existe y está completo antes de continuar. Si falla → detenerse y reportar. NO proceder.
+
 === FASE A: CONSULTA AL CEREBRO ===
 Ejecuta /consult-brain internamente con el contexto de esta feature.
 Espera el reporte de restricciones antes de continuar.
+GATE: El reporte de restricciones existe y ha sido analizado. Si falla → detenerse y reportar. NO proceder.
 
 === FASE B: GENERACIÓN DE SPEC ===
 Con el contexto del brain, genera un SPEC.md con:
@@ -23,6 +32,7 @@ Con el contexto del brain, genera un SPEC.md con:
 7. Criterios de verificación (cómo sé que funcionó)
 
 ESPERA MI APROBACIÓN DEL SPEC ANTES DE CONTINUAR.
+GATE: SPEC.md aprobado por el usuario. Si falla → detenerse y reportar. NO proceder.
 
 === FASE C: AGENT PROMPT PARA AGENT ===
 Una vez aprobado el spec, genera el bloque "Copy/Paste into IDE":
@@ -43,6 +53,8 @@ Steps:
   3. [...]
 Verification: Ejecuta `npm run lint`. Si pasa sin errores, haz git commit con el tag feat([scope]):
 ---FIN AGENT PROMPT---
+GATE: `npm run lint` pasa sin errores y el commit ha sido realizado con éxito. Si falla → detenerse y reportar. NO proceder.
 
 === FASE D: POST-IMPLEMENTACIÓN ===
 Después del commit, ejecuta /update-brain automáticamente.
+GATE: El cerebro (/update-brain) ha sido actualizado con éxito. Si falla → detenerse y reportar. NO proceder.

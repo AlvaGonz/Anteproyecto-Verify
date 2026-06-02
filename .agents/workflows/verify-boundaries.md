@@ -1,4 +1,5 @@
 ---
+id: verify-boundaries
 description: Verify frontend/backend/DB layer separation is not violated.
 ---
 # /verify-boundaries — Architecture Boundary Verification
@@ -8,25 +9,29 @@ description: Verify frontend/backend/DB layer separation is not violated.
 
 ## Steps
 
+0. **Initialize Planning Files** (@planning-with-files)
+   - Create or update `.agents/docs/PWF/task_plan.md` with the workflow ID `verify-boundaries`, current objectives, and the checklist of steps below.
+   - GATE: The file `.agents/docs/PWF/task_plan.md` exists and contains all steps. If FAIL → stop and report. Do NOT proceed.
+
 1. **Frontend → Backend boundary**: confirm frontend never imports server-side code.
    - Command: `grep -r "from.*server/" src/`
-   - verify: Exit 0 with 0 matches. Any match is a CRITICAL violation — log file + line.
+   - GATE: Exit 0 with 0 matches. Any match is a CRITICAL violation — log file + line. If FAIL → stop and report. Do NOT proceed.
 
 2. **Backend → Frontend boundary**: confirm server never imports frontend files.
    - Command: `grep -rE "from.*['\"]\.\.?/\.\.?/(src|components|features)" server/src/`
-   - verify: 0 matches. Violations flagged immediately.
+   - GATE: 0 matches. Violations flagged immediately. If FAIL → stop and report. Do NOT proceed.
 
 3. **Database access boundary**: confirm Mongoose is only called from module model or service files.
    - Command: `grep -r "\.find\(\|\.findOne\(\|\.save\(\|\.create\(" server/src/ --include="*.ts" | grep -v "modules\|shared/utils"`
-   - verify: 0 matches outside allowed files.
+   - GATE: 0 matches outside allowed files. If FAIL → stop and report. Do NOT proceed.
 
 4. **Business logic in frontend check**: no stat calculations in React components.
    - Command: `grep -r "mean\|stdDev\|variance\|IQR\|outlier" src/features/ --include="*.tsx"`
-   - verify: 0 matches in component files (only allowed in dedicated util files).
+   - GATE: 0 matches in component files (only allowed in dedicated util files). If FAIL → stop and report. Do NOT proceed.
 
 5. **API call isolation**: direct `fetch` or `axios` calls only inside `*Service.ts` files.
    - Command: `grep -rn "fetch(" src/ | grep -v "Service.ts\|service.ts"`
-   - verify: 0 matches.
+   - GATE: 0 matches. If FAIL → stop and report. Do NOT proceed.
 
 6. **Output boundary report**: list each check with CLEAN or VIOLATION + file:line.
-   - verify: Report produced even if all checks are CLEAN.
+   - GATE: Report produced even if all checks are CLEAN. If FAIL → stop and report. Do NOT proceed.
