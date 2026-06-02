@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
         services.AddControllers();
         services.AddProblemDetails();
         services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
         services.AddHealthChecks()
             .AddSqlServer(configuration.GetConnectionString("DefaultConnection") ?? string.Empty, name: "Database")
             .AddCheck("BlobStorage", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Blob storage ready"));
