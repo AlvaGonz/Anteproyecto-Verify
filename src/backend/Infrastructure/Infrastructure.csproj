@@ -15,5 +15,6 @@
     <PackageReference Include="QuestPDF" Version="2024.3.4" />
     <PackageReference Include="ClosedXML" Version="0.102.2" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Resend" Version="0.5.1" />
   </ItemGroup>
 </Project>

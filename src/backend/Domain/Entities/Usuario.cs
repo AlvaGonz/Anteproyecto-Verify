@@ -13,9 +13,9 @@ public class Usuario : EntityBase
     public string CorreoElectronico { get; private set; } = null!;
     public string Email => CorreoElectronico;
     public string ContrasenaHash { get; private set; } = null!;
-    public string? Telefono { get; private set; }
-    public string? Cedula { get; private set; }
-    public string? Identificacion => Cedula;
+    public string Telefono { get; private set; } = null!;
+    public string Cedula { get; private set; } = null!;
+    public string Identificacion => Cedula;
     public UserRole Rol { get; private set; }
     public bool Activo { get; private set; }
 
@@ -24,12 +24,14 @@ public class Usuario : EntityBase
 
     private Usuario() { } // For EF Core
 
-    public Usuario(string nombre, string apellido, string correoElectronico, string contrasenaHash, UserRole rol, string? telefono = null, string? cedula = null)
+    public Usuario(string nombre, string apellido, string correoElectronico, string contrasenaHash, UserRole rol, string telefono, string cedula)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(apellido)) throw new ArgumentException("Apellido requerido", nameof(apellido));
         if (string.IsNullOrWhiteSpace(correoElectronico)) throw new ArgumentException("Correo requerido", nameof(correoElectronico));
         if (string.IsNullOrWhiteSpace(contrasenaHash)) throw new ArgumentException("Contraseña requerida", nameof(contrasenaHash));
+        if (string.IsNullOrWhiteSpace(telefono)) throw new ArgumentException("Teléfono requerido", nameof(telefono));
+        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula requerida", nameof(cedula));
 
         Nombre = nombre;
         Apellido = apellido;
@@ -42,8 +44,10 @@ public class Usuario : EntityBase
         Activo = true;
     }
 
-    public void UpdateContactInfo(string? telefono, string? cedula)
+    public void UpdateContactInfo(string telefono, string cedula)
     {
+        if (string.IsNullOrWhiteSpace(telefono)) throw new ArgumentException("Teléfono requerido", nameof(telefono));
+        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula requerida", nameof(cedula));
         Telefono = telefono;
         Cedula = cedula;
         UpdatedAtUtc = DateTime.UtcNow;

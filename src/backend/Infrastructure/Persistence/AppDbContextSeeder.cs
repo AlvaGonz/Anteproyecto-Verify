@@ -194,8 +194,8 @@ public static class AppDbContextSeeder
         string correoElectronico,
         string contrasenaHash,
         UserRole rol,
-        string? telefono = null,
-        string? cedula = null)
+        string telefono,
+        string cedula)
     {
         var existing = await context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == correoElectronico);
         if (existing != null) return existing;
