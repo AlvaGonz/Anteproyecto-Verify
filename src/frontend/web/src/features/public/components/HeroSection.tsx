@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
+import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const HeroSection: React.FC = () => {
+  const { t } = useTranslation();
   const [code, setCode] = React.useState("");
 
   return (

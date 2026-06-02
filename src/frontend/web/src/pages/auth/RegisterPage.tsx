@@ -15,8 +15,7 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { motion } from "framer-motion";
-import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { motion, AnimatePresence } from "framer-motion";
 import { AuthService } from "../../features/auth/services/AuthService";
 import { isSuccess } from "../../shared/utils/functional";
 
@@ -116,15 +115,12 @@ export const RegisterPage: React.FC = () => {
         throw new Error(errorMsg);
       }
 
-    if (result._tag === "Success") {
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
-    } else {
-      if (result.error._tag === "NetworkError") {
-        setError(result.error.message);
-      } else {
-        setError("Ocurrió un error inesperado durante el registro.");
-      }
+    } catch (err: any) {
+      setError(err.message || "Error al registrar la cuenta.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -385,13 +381,21 @@ export const RegisterPage: React.FC = () => {
                 />
                 <span className="text-[13px] text-text-secondary leading-relaxed group-hover:text-text-primary transition-colors">
                   Acepto los{" "}
-                  <Link to="/legal#terminos" className="font-bold text-primary hover:underline">
+                  <button
+                    type="button"
+                    onClick={() => openModal("terms")}
+                    className="font-bold text-primary hover:underline bg-transparent border-none p-0 cursor-pointer inline"
+                  >
                     términos de uso
-                  </Link>{" "}
+                  </button>{" "}
                   y la{" "}
-                  <Link to="/legal#privacidad" className="font-bold text-primary hover:underline">
+                  <button
+                    type="button"
+                    onClick={() => openModal("privacy")}
+                    className="font-bold text-primary hover:underline bg-transparent border-none p-0 cursor-pointer inline"
+                  >
                     política de privacidad
-                  </Link>
+                  </button>
                   .
                 </span>
               </label>

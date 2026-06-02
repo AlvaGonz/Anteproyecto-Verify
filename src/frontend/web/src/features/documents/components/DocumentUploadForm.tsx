@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DocumentType, UploadDocumentDto } from "../types";
-import { Upload, FileText, Calendar, Landmark, Info, X, CheckCircle2, ShieldCheck } from "lucide-react";
+import { FileText, Calendar, Landmark, Info, X, CheckCircle2, ShieldCheck } from "lucide-react";
 
 interface DocumentUploadFormProps {
   projectId: string;
