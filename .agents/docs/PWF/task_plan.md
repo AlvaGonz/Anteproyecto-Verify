@@ -28,14 +28,14 @@ Fix the GitHub Actions CI workflow failure where `pnpm/action-setup@v4` fails be
 - **Status:** completed
 
 ### Phase 5: Regenerate Outdated pnpm-lock.yaml
-- [ ] Run `pnpm install` at root to synchronize and regenerate `pnpm-lock.yaml` with root `package.json`.
-- [ ] **Gate**: Verify that `pnpm-lock.yaml` is updated and not rejected.
-- **Status:** in_progress
+- [x] Run `pnpm install` at root to synchronize and regenerate `pnpm-lock.yaml` with root `package.json`.
+- [x] **Gate**: Verify that `pnpm-lock.yaml` is updated and not rejected.
+- **Status:** completed
 
 ### Phase 6: Push and Verify CI Green
-- [ ] Commit all changes and push to `feat-frontend` branch.
-- [ ] **Gate**: Monitor GitHub Actions and verify the CI run is fully green.
-- **Status:** pending
+- [x] Commit all changes and push to `feat-frontend` branch.
+- [x] **Gate**: Monitor GitHub Actions and verify the CI run is fully green.
+- **Status:** completed
 
 ---
 

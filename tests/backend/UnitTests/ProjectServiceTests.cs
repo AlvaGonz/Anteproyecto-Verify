@@ -5,25 +5,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Abstractions.Persistence;
-using Application.DTOs;
-using Application.Features.Projects;
+using global::Application.Abstractions.Persistence;
+using global::Application.DTOs;
+using global::Application.Features.Projects;
 using Domain.Entities;
 using Domain.Enums;
 using Moq;
 using Xunit;
 
+using global::Application.Abstractions.Notifications;
+
 public class ProjectServiceTests
 {
     private readonly Mock<IProyectoRepository> _proyectoRepositoryMock;
+    private readonly Mock<IUsuarioRepository> _usuarioRepositoryMock;
+    private readonly Mock<IEmailNotificationService> _emailNotificationServiceMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly ProjectService _projectService;
 
     public ProjectServiceTests()
     {
         _proyectoRepositoryMock = new Mock<IProyectoRepository>();
+        _usuarioRepositoryMock = new Mock<IUsuarioRepository>();
+        _emailNotificationServiceMock = new Mock<IEmailNotificationService>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _projectService = new ProjectService(_proyectoRepositoryMock.Object, _unitOfWorkMock.Object);
+        _projectService = new ProjectService(
+            _proyectoRepositoryMock.Object,
+            _usuarioRepositoryMock.Object,
+            _emailNotificationServiceMock.Object,
+            _unitOfWorkMock.Object);
     }
 
     [Fact]
@@ -88,7 +98,7 @@ public class ProjectServiceTests
     public async Task GetVisibleProjects_ShouldReturnOnlyVisible()
     {
         // Arrange
-        var user = new Usuario("Test", "test@test.com", "hash", UserRole.Client);
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Professional, "123456", "40200000000");
         var p1 = new Proyecto("P1", "L1", user.Id);
         p1.UpdateStatus(ProjectStatus.Published);
         var p2 = new Proyecto("P2", "L2", user.Id);

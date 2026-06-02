@@ -3,10 +3,10 @@ namespace UnitTests;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Abstractions.Integrations;
-using Application.Abstractions.Persistence;
-using Application.DTOs.Integrations;
-using Application.Features.Validations.Commands.InitiateDgriValidation;
+using global::Application.Abstractions.Integrations;
+using global::Application.Abstractions.Persistence;
+using global::Application.DTOs.Integrations;
+using global::Application.Features.Validations.Commands.InitiateDgriValidation;
 using Domain.Entities;
 using Domain.Enums;
 using Moq;
@@ -47,7 +47,7 @@ public class InitiateDgriValidationCommandHandlerTests
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         
-        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(projectId, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new DgriResponseDto
             {
                 IsSuccess = true,
@@ -75,7 +75,7 @@ public class InitiateDgriValidationCommandHandlerTests
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         
-        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(projectId, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new DgriResponseDto
             {
                 IsSuccess = true,

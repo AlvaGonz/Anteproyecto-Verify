@@ -50,11 +50,11 @@ public class ConsultarCreditoCommandHandlerTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var promotorId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         
+        var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.Professional, "8095551212", "40200000000");
+        var promotorId = promotor.Id;
         var project = new Proyecto("Test", "Loc", promotorId);
-        var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Promotor);
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);
@@ -79,11 +79,11 @@ public class ConsultarCreditoCommandHandlerTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var promotorId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         
+        var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.Professional, "8095551212", "40200000000");
+        var promotorId = promotor.Id;
         var project = new Proyecto("Test", "Loc", promotorId);
-        var promotor = new Usuario("Promotor", "promotor@test.com", "123", UserRole.Promotor);
         var consentimiento = new ConsentimientoFinanciero(promotorId, "1.1.1.1", "v1.0");
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))

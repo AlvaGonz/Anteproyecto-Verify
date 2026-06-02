@@ -48,7 +48,7 @@ public class ExecuteAyuntamientoValidationCommandHandlerTests
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);
 
-        _ayuntamientoServiceMock.Setup(x => x.ConsultarLicenciasAsync("Santo Domingo", projectId, It.IsAny<CancellationToken>()))
+        _ayuntamientoServiceMock.Setup(x => x.ConsultarLicenciasAsync("Santo Domingo", It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AyuntamientoQueryResultDto { IsSuccess = true, Result = AyuntamientoValidationResult.Verificado });
 
         var command = new ExecuteAyuntamientoValidationCommand { ProyectoId = projectId, UsuarioId = userId };

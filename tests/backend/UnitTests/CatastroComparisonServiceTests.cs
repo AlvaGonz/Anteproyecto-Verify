@@ -1,8 +1,8 @@
 namespace UnitTests;
 
 using System;
-using Application.DTOs.Integrations;
-using Application.Services;
+using global::Application.DTOs.Integrations;
+using global::Application.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Xunit;
