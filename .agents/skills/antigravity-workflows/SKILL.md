@@ -41,6 +41,13 @@ Read workflows in this order:
    - Validation evidence
    - Remaining risks and next actions
 
+### Playbook Execution Rules (Mandatory Resumability & Idempotency)
+To ensure stability and prevent wasted tokens, execution must behave as a state machine:
+
+1. **State Assessment**: Before commencing any workflow run, the agent MUST read `.agents/docs/PWF/task_plan.md` to check the current session state and audit completed phases.
+2. **Resumable Execution**: If a workflow run was previously interrupted or encountered a failure, the agent MUST resume from the exact failed step or gate. **DO NOT** re-execute or restart previously completed steps or phases.
+3. **Idempotency Rule (Check-Before-Act)**: Every step or phase MUST be executed idempotently. Before writing a file, creating a directory, or executing a command, check if the expected output or state already exists in the environment. If it exists and matches criteria, skip generation and proceed to the next step.
+
 ## Dynamic Generation Protocol
 
 If the user's task or objective does not match any existing workflow in `data/workflows.json`, you must activate the **Dynamic Workflow Generation Engine** in this skill to synthesize a new custom workflow:
@@ -64,6 +71,9 @@ If the user's task or objective does not match any existing workflow in `data/wo
       - Write the newly synthesized workflow file to `.agents/workflows/<id>.md`.
       - Append the new workflow metadata to `data/workflows.json`.
       - Document the new playbook in `docs/WORKFLOWS.md`.
+    f. **Enforce MCP Usage in Dynamic Workflows**:
+       - When synthesizing a new custom workflow, every phase MUST explicitly declare its "Required MCP Tool" if applicable (e.g., `Phase 2: Database Setup [Requires: mssql MCP]`, `Phase 4: Issue Creation [Requires: github-mcp-server/create_issue]`).
+       - The workflow must instruct the executing agent to leverage these active MCP tools exclusively for state modifications, querying, and verification, prohibiting the writing of mock data, hallucinated API structures, or local fallbacks where an active MCP is present.
 3. **Execute the Workflow**:
    - Execute the newly created workflow step-by-step, starting from Step 0.
 
@@ -103,6 +113,7 @@ Use @antigravity-workflows to execute the "Design a DDD Core Domain" workflow fo
 - It depends on the local availability of referenced skills.
 - It does not guarantee success without environment access, credentials, or required infrastructure.
 - For stack-specific browser automation in Go, `go-playwright` may require the corresponding skill to be present in your local skills repository.
+- **Strict Anti-Loop Guardrail (Mandatory)**: To prevent infinite, non-terminating circular execution loops between meta-skills, you MUST enforce a strict Directed Acyclic Graph (DAG) for agent execution. The Orchestrator delegates multi-phase tasks downwards to the Workflows engine. The Workflow executes and runs atomic, domain-specific Skills. **CRITICAL (Anti-Loop Rule)**: A Workflow is strictly forbidden from delegating tasks back upwards to the Orchestrator, either directly or through recursive invocation. Once execution transfers to a Workflow, control flow MUST only move downwards to atomic skills. If a workflow phase fails, the executing agent must report it or trigger manual fallback, but under no circumstances should it call `@antigravity-skill-orchestrator` to resolve a sub-step.
 
 ## Related Skills
 
