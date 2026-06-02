@@ -1,12 +1,10 @@
 namespace UnitTests;
 
 using System;
-using global::Application.DTOs;
 using global::Application.DTOs.Integrations;
 using global::Application.Services;
-using global::Domain.Entities;
-using global::Domain.Enums;
-using global::Infrastructure.Services;
+using Domain.Entities;
+using Domain.Enums;
 using Xunit;
 
 public class CatastroComparisonServiceTests

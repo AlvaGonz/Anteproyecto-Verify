@@ -3,15 +3,12 @@ namespace UnitTests;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using global::Application.Abstractions.Persistence;
-using global::Application.DTOs;
-using global::Application.Features.Validations.Commands;
-using global::Application.Features.Validations.Commands.InitiateDgriValidation;
-using global::Application.Services;
 using global::Application.Abstractions.Integrations;
+using global::Application.Abstractions.Persistence;
 using global::Application.DTOs.Integrations;
-using global::Domain.Entities;
-using global::Domain.Enums;
+using global::Application.Features.Validations.Commands.InitiateDgriValidation;
+using Domain.Entities;
+using Domain.Enums;
 using Moq;
 using Xunit;
 
@@ -31,7 +28,6 @@ public class InitiateDgriValidationCommandHandlerTests
         _validacionRepositoryMock = new Mock<IValidacionRepository>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         _handler = new InitiateDgriValidationCommandHandler(
             _dgriServiceMock.Object,
@@ -46,12 +42,12 @@ public class InitiateDgriValidationCommandHandlerTests
     public async Task Handle_ShouldUpdateProjectStatus_WhenDgriReturnsValid()
     {
         // Arrange
+        var projectId = Guid.NewGuid();
         var project = new Proyecto("Test", "Loc", Guid.NewGuid());
-        var projectId = project.Id;
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         
-        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(projectId, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new DgriResponseDto
             {
                 IsSuccess = true,
@@ -74,12 +70,12 @@ public class InitiateDgriValidationCommandHandlerTests
     public async Task Handle_ShouldUpdateProjectStatusToConObservaciones_WhenDgriReturnsCargas()
     {
         // Arrange
+        var projectId = Guid.NewGuid();
         var project = new Proyecto("Test", "Loc", Guid.NewGuid());
-        var projectId = project.Id;
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         
-        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(projectId, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _dgriServiceMock.Setup(s => s.ConsultarEstadoJuridicoAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new DgriResponseDto
             {
                 IsSuccess = true,

@@ -70,6 +70,27 @@ describe("publicVerificationApi Search Coverage", () => {
     }
   });
 
+  it("should find valid project by Cédula string 'cedula' (001-2233445-6)", async () => {
+    const result = await publicVerificationApi.verifyCode("001-2233445-6", "cedula");
+    expect(isSuccess(result)).toBe(true);
+    if (isSuccess(result)) {
+      expect(result.data).not.toBeNull();
+      expect(result.data?.projectName).toBe("Torre Bella Vista");
+      expect(result.data?.isRegistered).toBe(true);
+    }
+  });
+
+  it("should return simulated unregistered profile for valid format not in db (Cédula: 402-9999999-9)", async () => {
+    const result = await publicVerificationApi.verifyCode("402-9999999-9", "cedula");
+    expect(isSuccess(result)).toBe(true);
+    if (isSuccess(result)) {
+      expect(result.data).not.toBeNull();
+      expect(result.data?.isRegistered).toBe(false);
+      expect(result.data?.projectName).toBe("Persona Física No Registrada");
+      expect(result.data?.integrityStatus).toBe("No Registrado");
+    }
+  });
+
   it("should return null when type and code don't match (Search RNC using Suelo code)", async () => {
     const result = await publicVerificationApi.verifyCode("DC-12345", "rnc");
     expect(isSuccess(result)).toBe(true);

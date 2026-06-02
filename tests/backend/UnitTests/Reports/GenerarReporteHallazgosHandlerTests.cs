@@ -6,10 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using global::Application.Abstractions.Persistence;
 using global::Application.Features.Reports.Queries.GenerarReporteHallazgos;
-using global::Infrastructure.Services;
 using global::Infrastructure.Services.Reports;
-using global::Domain.Entities;
-using global::Domain.Enums;
+using Domain.Entities;
+using Domain.Enums;
 using Moq;
 using Xunit;
 

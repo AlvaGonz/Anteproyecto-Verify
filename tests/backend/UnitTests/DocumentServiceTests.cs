@@ -7,14 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using global::Application.Abstractions.Persistence;
 using global::Application.Features.Documents;
-using global::Domain.Entities;
-using global::Domain.Enums;
+using Domain.Entities;
+using Domain.Enums;
 using Moq;
 using Xunit;
 using global::Application.Abstractions.Storage;
 using global::Application.Abstractions.DocumentIntelligence;
-using global::Application.DTOs;
-using global::Infrastructure.Services;
 
 public class DocumentServiceTests
 {

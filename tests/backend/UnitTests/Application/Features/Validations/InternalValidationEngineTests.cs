@@ -21,7 +21,7 @@ public class InternalValidationEngineTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid());
+        var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid(), ProjectCategory.Residencial, "Description");
         
         var mockProyectoRepo = new Mock<IProyectoRepository>();
         mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
@@ -52,7 +52,7 @@ public class InternalValidationEngineTests
         Assert.NotNull(result);
         Assert.False(result.EsLegitimo);
         Assert.Equal(0, result.PassedCount);
-        Assert.Equal(20, result.FailedCount); // All 20 required documents are missing
+        Assert.Equal(20, result.FailedCount); // 20 required documents are missing
         mockHallazgoRepo.Verify(r => r.AddAsync(It.IsAny<Hallazgo>(), It.IsAny<CancellationToken>()), Times.Exactly(20));
         mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }

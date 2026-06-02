@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -115,8 +116,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
+          version: 9
           run_install: false
-          # version omitida intencionalmente — se lee de package.json "packageManager" field
 
       - name: Get pnpm store path
         id: pnpm-cache
@@ -136,6 +137,9 @@ jobs:
 
       - name: TypeScript check
         run: pnpm exec tsc --noEmit
+
+      - name: RegisterPage smoke test (TRD registration fields)
+        run: pnpm run test --run src/pages/auth/__tests__/RegisterPage.test.tsx
 
       - name: Build
         run: pnpm run build

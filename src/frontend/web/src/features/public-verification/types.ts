@@ -17,4 +17,6 @@ export interface PublicProjectVerificationDto {
     label: string;
     checked: boolean;
   }[];
+  isRegistered?: boolean;
 }
+

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 using global::Application.Abstractions.Persistence;
 using global::Application.DTOs;
 using global::Application.Features.Projects;
-using global::Application.Services;
-using global::Application.Abstractions.Notifications;
-using global::Domain.Entities;
-using global::Domain.Enums;
+using Domain.Entities;
+using Domain.Enums;
 using Moq;
 using Xunit;
+
+using global::Application.Abstractions.Notifications;
 
 public class ProjectServiceTests
 {
@@ -30,9 +30,9 @@ public class ProjectServiceTests
         _emailNotificationServiceMock = new Mock<IEmailNotificationService>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _projectService = new ProjectService(
-            _proyectoRepositoryMock.Object, 
-            _usuarioRepositoryMock.Object, 
-            _emailNotificationServiceMock.Object, 
+            _proyectoRepositoryMock.Object,
+            _usuarioRepositoryMock.Object,
+            _emailNotificationServiceMock.Object,
             _unitOfWorkMock.Object);
     }
 
@@ -98,7 +98,7 @@ public class ProjectServiceTests
     public async Task GetVisibleProjects_ShouldReturnOnlyVisible()
     {
         // Arrange
-        var user = new Usuario("Test", "test@test.com", "hash", UserRole.Consultation);
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Professional, "123456", "40200000000");
         var p1 = new Proyecto("P1", "L1", user.Id);
         p1.UpdateStatus(ProjectStatus.Published);
         var p2 = new Proyecto("P2", "L2", user.Id);

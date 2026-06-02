@@ -39,7 +39,7 @@ export const mockValidaciones: InternalValidationSummaryDto[] = [
     status: ValidationStatus.Failed,
     esLegitimo: false,
     integrityScore: 40,
-    selloName: "Sin Sello",
+    selloName: null,
     passedCount: 2,
     warningCount: 1,
     failedCount: 2,

@@ -5,6 +5,7 @@ import { validationsApi } from "../api/validationsApi";
 import { ValidationHUD } from "../components/ValidationHUD";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { ValidationExecutionResult } from "../types";
+import { isSuccess } from "../../../shared/utils/functional";
 
 export const ValidationExecutionPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -37,12 +38,11 @@ export const ValidationExecutionPage: React.FC = () => {
   const handleValidationComplete = async () => {
     try {
       const response = await validationsApi.runFullValidation(projectId!);
-      if (response._tag === "Success") {
+      if (isSuccess(response)) {
         setResult(response.data);
         addToast("Auditoría integral finalizada con éxito", "success");
       } else {
-        setError(response.error.message || "Fallo crítico en el protocolo de validación");
-        setIsScanning(false);
+        throw new Error(response.error.message);
       }
     } catch (err: any) {
       setError(err.message || "Fallo crítico en el protocolo de validación");

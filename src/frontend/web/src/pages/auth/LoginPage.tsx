@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Loader2, ShieldCheck, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAuth } from "../../features/auth/context/AuthContext";
+import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 
 export const LoginPage: React.FC = () => {

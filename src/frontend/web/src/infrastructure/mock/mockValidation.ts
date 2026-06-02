@@ -10,7 +10,7 @@ export const mockFullValidations: ValidationExecutionResult[] = [
     overallStatus: ValidationExecutionStatus.Completed,
     isFullyValid: true,
     overallIntegrityScore: 100,
-    integritySeal: "Sello de Oro",
+    integritySeal: "VeriFinca Gold",
     internalValidation: mockValidaciones[0],
     externalSources: [
       {
@@ -44,7 +44,7 @@ export const mockFullValidations: ValidationExecutionResult[] = [
     overallStatus: ValidationExecutionStatus.Completed,
     isFullyValid: false,
     overallIntegrityScore: 40,
-    integritySeal: "Sin Sello",
+    integritySeal: null,
     internalValidation: mockValidaciones[1],
     externalSources: [
       {

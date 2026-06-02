@@ -5,8 +5,8 @@ import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const HeroSection: React.FC = () => {
-  const [code, setCode] = React.useState("");
   const { t } = useTranslation();
+  const [code, setCode] = React.useState("");
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden px-6 md:px-12 pt-20">
@@ -46,10 +46,10 @@ export const HeroSection: React.FC = () => {
           className="space-y-6"
         >
           <h1 className="text-5xl md:text-8xl font-display font-black text-secondary leading-[0.95] tracking-tight">
-            {t('hero.titlePrefix')}<span className="text-primary italic">{t('hero.titleHighlight')}</span>{t('hero.titleSuffix')}
+            Seguridad técnica y <span className="text-primary italic">jurídica</span> en un clic
           </h1>
           <p className="text-gray-500 text-lg md:text-xl max-w-xl font-medium leading-relaxed">
-            {t('hero.desc')}
+            La plataforma líder en validación de proyectos inmobiliarios en RD. Conectamos datos institucionales en tiempo real para inversores y desarrolladores.
           </p>
         </motion.div>
 
@@ -66,26 +66,26 @@ export const HeroSection: React.FC = () => {
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder={t('hero.placeholder')}
+                placeholder="Nombre del proyecto o código de radicación..."
                 className="w-full bg-transparent border-none focus:ring-0 px-3 py-4 text-base font-bold placeholder:text-gray-300 outline-none"
               />
             </div>
             <Link
-              to={code ? `/verify/${code}` : "/portal"}
+              to={code ? `/projects/verify/${code}` : "/projects"}
               className="w-full sm:w-auto bg-secondary text-white px-10 py-4 rounded-2xl font-display font-black text-lg hover:bg-primary active:scale-95 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2"
             >
-              {t('hero.searchBtn')}
+              Consultar Ahora
               <ChevronRight className="w-5 h-5" />
             </Link>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest px-4">
-            <Link to="/verify" className="flex items-center gap-1.5 hover:text-primary transition-colors">
+            <Link to="/projects" className="flex items-center gap-1.5 hover:text-primary transition-colors">
               <Zap className="w-3.5 h-3.5 text-primary" /> {t('hero.valExpress')}
             </Link>
-            <Link to="/portal" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+            <Link to="/projects" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
               <Lock className="w-3.5 h-3.5 text-primary" /> {t('hero.connNotarial')}
             </Link>
-            <Link to="/portal" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+            <Link to="/projects" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
               <Building2 className="w-3.5 h-3.5 text-primary" /> {t('hero.dataProcuraduria')}
             </Link>
           </div>

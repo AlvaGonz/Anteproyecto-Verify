@@ -3,7 +3,6 @@ namespace UnitTests.Infrastructure.ExternalValidation;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using global::Application.DTOs;
 using global::Application.DTOs.ExternalValidation;
 using global::Infrastructure.ExternalValidation;
 using global::Infrastructure.ExternalValidation.Configuration;

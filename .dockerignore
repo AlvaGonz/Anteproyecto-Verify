@@ -7,9 +7,6 @@
 **/.antigravity
 .env
 README.md
-docker-compose.yml
-docker/
+docker/*
+!docker/SQL_Server/
 scripts/
-**/package-lock.json
-**/yarn.lock
-**/.npm/

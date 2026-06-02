@@ -120,6 +120,6 @@ describe("VerifySearchForm Validation", () => {
     const submitButton = screen.getByRole("button", { name: /CONSULTAR Sello VeriFinca/i });
     fireEvent.click(submitButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/verify/VF-2026-X83L");
+    expect(mockNavigate).toHaveBeenCalledWith("/projects/verify/VF-2026-X83L");
   });
 });

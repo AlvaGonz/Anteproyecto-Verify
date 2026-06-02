@@ -6,6 +6,7 @@ import {
   success, 
   failure 
 } from "../../../shared/utils/functional";
+import { env } from "../../../infrastructure/config/env";
 
 export interface User {
   id: string;
@@ -60,6 +61,47 @@ export const AuthService = {
     });
   },
 
+  async register(
+    nombre: string,
+    apellido: string,
+    email: string,
+    password: string,
+    telefono?: string,
+    cedula?: string
+  ): Promise<Result<{ message: string; usuarioId?: string }, AuthError>> {
+    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(success({
+            message: "Usuario registrado exitosamente (Mock).",
+            usuarioId: "mock-new-user-guid"
+          }));
+        }, 1000);
+      });
+    }
+
+    try {
+      const response = await fetch(`${env.API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ nombre, apellido, email, password, telefono, cedula })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Error al registrar el usuario" }));
+        return failure({ _tag: "NetworkError", message: errorData.message || "Error al registrar el usuario" });
+      }
+
+      const data = await response.json();
+      return success(data);
+    } catch (e) {
+      return failure({ _tag: "UnknownError", original: e });
+    }
+  },
+
   async logout(): Promise<void> {
     localStorage.removeItem("vf_token");
     return new Promise((resolve) => {
@@ -78,5 +120,44 @@ export const AuthService = {
       name: "Administrador VeriFinca",
       role: "admin",
     });
+  },
+
+  async registerAccount(params: {
+    email: string;
+    name: string;
+    telefono?: string;
+    cedula?: string;
+  }): Promise<Result<{ message: string }, AuthError>> {
+    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+    try {
+      const response = await fetch(`${API_BASE}/email-test/uc-01-account-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: params.email,
+          name: params.name,
+          telefono: params.telefono,
+          cedula: params.cedula,
+        }),
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Error ${response.status}: No se pudo enviar el correo de verificación.`;
+        try {
+          const errorJson = await response.json();
+          if (errorJson?.error) {
+            errorMsg = errorJson.error;
+          }
+        } catch {
+          /* ignore parse errors */
+        }
+        return failure({ _tag: "NetworkError", message: errorMsg });
+      }
+
+      return success({ message: "Cuenta registrada exitosamente." });
+    } catch (e) {
+      return failure({ _tag: "UnknownError", original: e });
+    }
   }
 };
