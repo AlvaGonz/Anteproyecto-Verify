@@ -1,11 +1,11 @@
 ---
-id: restructure-backend
 description: Move and enforce server/src/modules/<domain>/ structure across the backend.
 ---
+
 # /restructure-backend — Domain-Module Directory Restructure
 
 ## Pre-conditions
-- Load `.agent/rules/architecture.md`.
+- Load `.agents/rules/architecture.md`.
   - GATE: `server/src/modules/` directory exists. If FAIL → stop and report. Do NOT proceed.
 
 ## Steps
