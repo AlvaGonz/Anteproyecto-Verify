@@ -8,9 +8,20 @@
       "description": "Guided implementation of a new feature with spec, approval, and post-implementation hooks",
       "trigger": "Cuando vas a implementar una nueva funcionalidad",
       "file": ".agents/workflows/new-feature.md",
-      "phases": ["PASO 0: INICIALIZAR ARCHIVOS DE PLANIFICACIÓN (@planning-with-files)", "FASE A: CONSULTA AL CEREBRO", "FASE B: GENERACIÓN DE SPEC", "FASE C: AGENT PROMPT PARA AGENT", "FASE D: POST-IMPLEMENTACIÓN"],
-      "requires_skills": ["planning-with-files"],
-      "category": "development"
+      "phases": [
+        "PASO 0: INICIALIZAR ARCHIVOS DE PLANIFICACIÓN (@planning-with-files)",
+        "FASE A: CONSULTA AL CEREBRO",
+        "FASE B: GENERACIÓN DE SPEC",
+        "FASE C: AGENT PROMPT PARA AGENT",
+        "FASE D: POST-IMPLEMENTACIÓN"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "development",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "ci-autofix",
@@ -18,9 +29,27 @@
       "description": "Autofix CI failures using GitHub MCP logs + error-pattern-mining + tdd-workflow + critic gate.",
       "trigger": "CI build failure or compilation error detected on GitHub",
       "file": ".agents/workflows/ci-autofix.md",
-      "phases": ["Initialize Planning Files", "Read CI failure logs via GitHub MCP", "Root cause analysis", "Extract error pattern", "Write a failing test", "Apply minimal fix", "Run full validation suite", "Submit to critic gate", "Push fix"],
-      "requires_skills": ["planning-with-files", "error-pattern-mining", "tdd-workflow"],
-      "category": "ci"
+      "phases": [
+        "Initialize Planning Files",
+        "Read CI failure logs via GitHub MCP",
+        "Root cause analysis",
+        "Extract error pattern",
+        "Write a failing test",
+        "Apply minimal fix",
+        "Run full validation suite",
+        "Submit to critic gate",
+        "Push fix"
+      ],
+      "requires_skills": [
+        "planning-with-files",
+        "error-pattern-mining",
+        "tdd-workflow"
+      ],
+      "category": "ci",
+      "requires_mcps": [
+        "mcp-github-mcp-server",
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "debug-session",
@@ -28,9 +57,20 @@
       "description": "Guided debugging of an unexpected error or behavior following ARQ protocol",
       "trigger": "Cuando encuentras un error o comportamiento inesperado",
       "file": ".agents/workflows/debug-session.md",
-      "phases": ["PASO 0: Inicializar archivos de planificación", "PASO 1: Ejecuta /consult-brain", "PASO 2: Analiza el stack trace", "PASO 3: Genera el AGENT PROMPT quirúrgico", "PASO 4: Ejecuta /update-brain"],
-      "requires_skills": ["planning-with-files"],
-      "category": "debugging"
+      "phases": [
+        "PASO 0: Inicializar archivos de planificación",
+        "PASO 1: Ejecuta /consult-brain",
+        "PASO 2: Analiza el stack trace",
+        "PASO 3: Genera el AGENT PROMPT quirúrgico",
+        "PASO 4: Ejecuta /update-brain"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "debugging",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "verify-boundaries",
@@ -38,9 +78,22 @@
       "description": "Verify frontend/backend/DB layer separation is not violated.",
       "trigger": "Before major refactoring or boundary checks",
       "file": ".agents/workflows/verify-boundaries.md",
-      "phases": ["Initialize Planning Files", "Frontend -> Backend boundary", "Backend -> Frontend boundary", "Database access boundary", "Business logic in frontend check", "API call isolation", "Output boundary report"],
-      "requires_skills": ["planning-with-files"],
-      "category": "quality"
+      "phases": [
+        "Initialize Planning Files",
+        "Frontend -> Backend boundary",
+        "Backend -> Frontend boundary",
+        "Database access boundary",
+        "Business logic in frontend check",
+        "API call isolation",
+        "Output boundary report"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "quality",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "audit-chores",
@@ -48,9 +101,24 @@
       "description": "Perform a comprehensive audit of the codebase structure, dead code, and architecture boundaries.",
       "trigger": "Before project cleanup or periodic architecture auditing",
       "file": ".agents/workflows/audit-chores.md",
-      "phases": ["Initialize Planning Files", "Map repository layout", "Read package.json and server/package.json", "Detect unused frontend dependencies", "Detect unused backend dependencies", "Check architecture boundary violations", "Identify monolithic files", "Check LDR domain coverage", "Output AUDIT.md"],
-      "requires_skills": ["planning-with-files"],
-      "category": "quality"
+      "phases": [
+        "Initialize Planning Files",
+        "Map repository layout",
+        "Read package.json and server/package.json",
+        "Detect unused frontend dependencies",
+        "Detect unused backend dependencies",
+        "Check architecture boundary violations",
+        "Identify monolithic files",
+        "Check LDR domain coverage",
+        "Output AUDIT.md"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "quality",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "cleanup-dead-code",
@@ -58,9 +126,23 @@
       "description": "Remove unused files, unreachable code, and stale artifacts from the repo.",
       "trigger": "Periodic cleanup of unused exports, modules, or artifacts",
       "file": ".agents/workflows/cleanup-dead-code.md",
-      "phases": ["Initialize Planning Files", "Identify stale root-level files", "Find unreachable exports", "Remove confirmed dead files", "Remove stale artifacts", "Prune empty directories", "Run lint + typecheck after cleanup", "Commit"],
-      "requires_skills": ["planning-with-files"],
-      "category": "maintenance"
+      "phases": [
+        "Initialize Planning Files",
+        "Identify stale root-level files",
+        "Find unreachable exports",
+        "Remove confirmed dead files",
+        "Remove stale artifacts",
+        "Prune empty directories",
+        "Run lint + typecheck after cleanup",
+        "Commit"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "maintenance",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "restructure-frontend",
@@ -68,9 +150,25 @@
       "description": "Enforce src/features/<domain>/ structure across the frontend codebase.",
       "trigger": "When frontend components need to be reorganized into feature domains",
       "file": ".agents/workflows/restructure-frontend.md",
-      "phases": ["Initialize Planning Files", "Identify all current component files", "Map each component to its target domain", "Move domain components", "Update all import paths", "Move domain-specific hooks", "Confirm src/components/ contains only reusable UI", "Run full test suite", "Commit"],
-      "requires_skills": ["planning-with-files"],
-      "category": "refactoring"
+      "phases": [
+        "Initialize Planning Files",
+        "Identify all current component files",
+        "Map each component to its target domain",
+        "Move domain components",
+        "Update all import paths",
+        "Move domain-specific hooks",
+        "Confirm src/components/ contains only reusable UI",
+        "Run full test suite",
+        "Commit"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "refactoring",
+      "requires_mcps": [
+        "mcp-context7-mcp",
+        "mcp-StitchMCP"
+      ]
     },
     {
       "id": "restructure-backend",
@@ -78,9 +176,25 @@
       "description": "Move and enforce server/src/modules/<domain>/ structure across the backend.",
       "trigger": "When backend modules need to be reorganized into domain directories",
       "file": ".agents/workflows/restructure-backend.md",
-      "phases": ["Initialize Planning Files", "Audit current backend structure", "Map each file to its target domain module", "Move files domain by domain", "Update all import paths", "Verify server/src/shared/", "Register updated routes", "Run backend tests", "Commit"],
-      "requires_skills": ["planning-with-files"],
-      "category": "refactoring"
+      "phases": [
+        "Initialize Planning Files",
+        "Audit current backend structure",
+        "Map each file to its target domain module",
+        "Move files domain by domain",
+        "Update all import paths",
+        "Verify server/src/shared/",
+        "Register updated routes",
+        "Run backend tests",
+        "Commit"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "refactoring",
+      "requires_mcps": [
+        "mcp-context7-mcp",
+        "mcp-mssql"
+      ]
     },
     {
       "id": "memory-sync",
@@ -88,9 +202,22 @@
       "description": "Load cross-session memory and surface top risks from previous sessions.",
       "trigger": "At every session start or gap > 24 hours",
       "file": ".agents/workflows/memory-sync.md",
-      "phases": ["Initialize Planning Files", "Read tasks/session-memory.md", "Surface top 3 risks", "Surface top 3 patterns to avoid", "Load unresolved lessons", "Log", "Global Sync Step"],
-      "requires_skills": ["planning-with-files"],
-      "category": "maintenance"
+      "phases": [
+        "Initialize Planning Files",
+        "Read .agents/sessions/<id_sesion>/session-memory.md",
+        "Surface top 3 risks",
+        "Surface top 3 patterns to avoid",
+        "Load unresolved lessons",
+        "Log",
+        "Global Sync Step"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "maintenance",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "post-task-hook",
@@ -98,9 +225,23 @@
       "description": "Runs automatically after every completed agent task to evaluate quality.",
       "trigger": "Automatically after every completed task",
       "file": ".agents/workflows/post-task-hook.md",
-      "phases": ["Initialize Planning Files", "Collect task details", "Run post task loop script", "Read stdout JSON", "Address HIGH issues", "Proceed to commit", "Perform Git commit with stats"],
-      "requires_skills": ["planning-with-files"],
-      "category": "ci"
+      "phases": [
+        "Initialize Planning Files",
+        "Collect task details",
+        "Run post task loop script",
+        "Read stdout JSON",
+        "Address HIGH issues",
+        "Proceed to commit",
+        "Perform Git commit with stats"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "ci",
+      "requires_mcps": [
+        "mcp-context7-mcp",
+        "mcp-github-mcp-server"
+      ]
     },
     {
       "id": "coverage-backlog",
@@ -108,9 +249,22 @@
       "description": "Generate test specs for low-coverage domains based on coverage gaps.",
       "trigger": "When test coverage drops or backlog is needed",
       "file": ".agents/workflows/coverage-backlog.md",
-      "phases": ["Initialize Planning Files", "Read tasks/TEST-REPORT.md", "Filter domains with < 20% coverage", "Activate coverage-evolution skill", "Write test specs to tasks/test-backlog.md", "Commit"],
-      "requires_skills": ["planning-with-files", "coverage-evolution"],
-      "category": "quality"
+      "phases": [
+        "Initialize Planning Files",
+        "Read .agents/sessions/<id_sesion>/TEST-REPORT.md",
+        "Filter domains with < 20% coverage",
+        "Activate coverage-evolution skill",
+        "Write test specs to .agents/sessions/<id_sesion>/test-backlog.md",
+        "Commit"
+      ],
+      "requires_skills": [
+        "planning-with-files",
+        "coverage-evolution"
+      ],
+      "category": "quality",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "error-digest",
@@ -118,9 +272,20 @@
       "description": "Summarize error patterns to surface top recurring root causes.",
       "trigger": "When analyzing recurring errors over multiple sessions",
       "file": ".agents/workflows/error-digest.md",
-      "phases": ["Initialize Planning Files", "Read tasks/error-patterns.md", "Send to Groq for summary", "Output digest to tasks/error-digest.md", "Surface in next planning brief"],
-      "requires_skills": ["planning-with-files"],
-      "category": "quality"
+      "phases": [
+        "Initialize Planning Files",
+        "Read .agents/sessions/<id_sesion>/error-patterns.md",
+        "Send to Groq for summary",
+        "Output digest to .agents/sessions/<id_sesion>/error-digest.md",
+        "Surface in next planning brief"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "quality",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "evolve-prompts",
@@ -128,9 +293,23 @@
       "description": "Automate the optimization of underperforming agent skills.",
       "trigger": "Periodic audit or low fitness score detection",
       "file": ".agents/workflows/evolve-prompts.md",
-      "phases": ["Initialize Planning Files", "Audit Fitness", "Context Gathering", "EvoPrompt Execution", "Validation", "Deployment", "Logging", "Commit"],
-      "requires_skills": ["planning-with-files"],
-      "category": "maintenance"
+      "phases": [
+        "Initialize Planning Files",
+        "Audit Fitness",
+        "Context Gathering",
+        "EvoPrompt Execution",
+        "Validation",
+        "Deployment",
+        "Logging",
+        "Commit"
+      ],
+      "requires_skills": [
+        "planning-with-files"
+      ],
+      "category": "maintenance",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     },
     {
       "id": "evolve-skills",
@@ -138,9 +317,22 @@
       "description": "Automate the evolution of low-fitness agent skills using scoring.",
       "trigger": "When skills need optimization or have fitness < 60%",
       "file": ".agents/workflows/evolve-skills.md",
-      "phases": ["Initialize Planning Files", "Read tasks/skill-fitness-log.md", "List skills with fitness < 60%", "Activate skill-fitness", "Apply improvements", "Commit"],
-      "requires_skills": ["planning-with-files", "skill-fitness"],
-      "category": "maintenance"
+      "phases": [
+        "Initialize Planning Files",
+        "Read .agents/sessions/<id_sesion>/skill-fitness-log.md",
+        "List skills with fitness < 60%",
+        "Activate skill-fitness",
+        "Apply improvements",
+        "Commit"
+      ],
+      "requires_skills": [
+        "planning-with-files",
+        "skill-fitness"
+      ],
+      "category": "maintenance",
+      "requires_mcps": [
+        "mcp-context7-mcp"
+      ]
     }
   ]
 }
