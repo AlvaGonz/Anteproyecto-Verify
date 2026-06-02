@@ -25,10 +25,12 @@
 | TDD coverage: LegalPage & PricingPage unit tests (100% pass) | QA | feat-frontend | — | 2026-06-01 |
 | pnpm/action-setup@v4 version setup fix in ci.yml | Infra | develop | — | 2026-06-02 |
 | Fix Microsoft.EntityFrameworkCore.InMemory version conflict | Backend | develop | — | 2026-06-02 |
+| Fix Api.Tests missing NuGet dependencies | Backend | develop | — | 2026-06-02 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
+| Sync and regenerate pnpm-lock.yaml | Infra | In progress | None |
 
 ## 🔜 Next Up (Prioritized)
 1. Form Validation with Zod & React Hook Form — TRD §13.3

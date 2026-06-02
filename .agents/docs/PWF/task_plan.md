@@ -22,6 +22,21 @@ Fix the GitHub Actions CI workflow failure where `pnpm/action-setup@v4` fails be
 - [x] **Gate**: Run `dotnet restore` locally and verify that it succeeds with no downgrade warnings or errors.
 - **Status:** completed
 
+### Phase 4: Fix Api.Tests Missing NuGet Package Dependencies
+- [x] Add `Microsoft.AspNetCore.Mvc.Testing` and `NSubstitute` package references to `src/backend/Api.Tests/Api.Tests.csproj`.
+- [x] **Gate**: Run `dotnet build src/backend/Api.Tests/Api.Tests.csproj` locally and verify it builds successfully with 0 errors.
+- **Status:** completed
+
+### Phase 5: Regenerate Outdated pnpm-lock.yaml
+- [ ] Run `pnpm install` at root to synchronize and regenerate `pnpm-lock.yaml` with root `package.json`.
+- [ ] **Gate**: Verify that `pnpm-lock.yaml` is updated and not rejected.
+- **Status:** in_progress
+
+### Phase 6: Push and Verify CI Green
+- [ ] Commit all changes and push to `feat-frontend` branch.
+- [ ] **Gate**: Monitor GitHub Actions and verify the CI run is fully green.
+- **Status:** pending
+
 ---
 
 ## Constraints

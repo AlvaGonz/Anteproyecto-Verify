@@ -33,4 +33,10 @@
 - **Discovery (2026-06-02 NuGet Downgrade)**: The backend job fails during NuGet restore due to a package version downgrade conflict. The `IntegrationTests` project specifies `Microsoft.EntityFrameworkCore.InMemory` version `8.0.0`, but the `Infrastructure` project transitive dependency requires version `>= 8.0.2`.
 - **Solution**: Update `tests/backend/IntegrationTests/IntegrationTests.csproj` on line 23 to request version `8.0.2` of `Microsoft.EntityFrameworkCore.InMemory` explicitly to align with the dependency requirements.
 
+- **Discovery (2026-06-02 Api.Tests NuGet dependencies)**: The `Api.Tests` compilation fails with 9 compiler errors due to missing package references for `Microsoft.AspNetCore.Mvc.Testing` and `NSubstitute` namespaces.
+- **Solution**: Add `<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />` and `<PackageReference Include="NSubstitute" Version="5.0.0" />` to `src/backend/Api.Tests/Api.Tests.csproj`.
+- **Discovery (2026-06-02 Outdated pnpm lockfile)**: In the frontend CI job, `pnpm install --frozen-lockfile` fails because the root `package.json` specifies devDependencies (like `@testing-library/react`, `@types/express`, etc.) that are completely missing or not recorded in the root `pnpm-lock.yaml` file (which contains an empty specifiers object `{}`).
+- **Solution**: Run `pnpm install` locally to update and regenerate `pnpm-lock.yaml`, then commit and push it to sync the dependencies.
+
+
 
