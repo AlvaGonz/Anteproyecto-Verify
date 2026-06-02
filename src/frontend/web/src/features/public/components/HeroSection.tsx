@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
+import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const HeroSection: React.FC = () => {
+  const { t } = useTranslation();
   const [code, setCode] = React.useState("");
 
   return (
@@ -69,7 +71,7 @@ export const HeroSection: React.FC = () => {
               />
             </div>
             <Link
-              to={code ? `/verify/${code}` : "/portal"}
+              to={code ? `/projects/verify/${code}` : "/projects"}
               className="w-full sm:w-auto bg-secondary text-white px-10 py-4 rounded-2xl font-display font-black text-lg hover:bg-primary active:scale-95 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2"
             >
               Consultar Ahora
@@ -77,14 +79,14 @@ export const HeroSection: React.FC = () => {
             </Link>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest px-4">
-            <Link to="/verify" className="flex items-center gap-1.5 hover:text-primary transition-colors">
-              <Zap className="w-3.5 h-3.5 text-primary" /> Validación Express
+            <Link to="/projects" className="flex items-center gap-1.5 hover:text-primary transition-colors">
+              <Zap className="w-3.5 h-3.5 text-primary" /> {t('hero.valExpress')}
             </Link>
-            <Link to="/portal" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
-              <Lock className="w-3.5 h-3.5 text-primary" /> Conexión Notarial
+            <Link to="/projects" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+              <Lock className="w-3.5 h-3.5 text-primary" /> {t('hero.connNotarial')}
             </Link>
-            <Link to="/portal" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
-              <Building2 className="w-3.5 h-3.5 text-primary" /> Data Procuraduría
+            <Link to="/projects" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+              <Building2 className="w-3.5 h-3.5 text-primary" /> {t('hero.dataProcuraduria')}
             </Link>
           </div>
         </motion.div>

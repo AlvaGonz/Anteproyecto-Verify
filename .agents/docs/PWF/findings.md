@@ -25,3 +25,18 @@
   3. Ensure types are correctly augmented for the `'common'` namespace.
   4. Wrap the root component in `<React.Suspense>` to handle async loading of namespaces.
 - **Backend CORS status check**: Checked `ServiceCollectionExtensions.cs` and `ApplicationBuilderExtensions.cs`. Both are using `"AllowFrontend"` correctly. There is no mismatch or build-breaking inconsistency here. It is fully aligned.
+
+## Findings for CI Workflow Fix (2026-06-02)
+- **Root Cause**: The GitHub Actions workflow `.github/workflows/ci.yml` uses `pnpm/action-setup@v4` on lines 116-120 but omits the `version` parameter. Under v4 of this action, auto-detection from the `packageManager` field in `package.json` is not supported unless explicitly specified. Because there is no `packageManager` field in either the root or frontend `package.json` files, the setup step fails immediately.
+- **Solution**: Adding `version: 9` explicitly under the `with` parameters of `pnpm/action-setup@v4` will resolve the issue by ensuring the runner fetches the latest stable pnpm v9.x, which matches our project setup.
+
+- **Discovery (2026-06-02 NuGet Downgrade)**: The backend job fails during NuGet restore due to a package version downgrade conflict. The `IntegrationTests` project specifies `Microsoft.EntityFrameworkCore.InMemory` version `8.0.0`, but the `Infrastructure` project transitive dependency requires version `>= 8.0.2`.
+- **Solution**: Update `tests/backend/IntegrationTests/IntegrationTests.csproj` on line 23 to request version `8.0.2` of `Microsoft.EntityFrameworkCore.InMemory` explicitly to align with the dependency requirements.
+
+- **Discovery (2026-06-02 Api.Tests NuGet dependencies)**: The `Api.Tests` compilation fails with 9 compiler errors due to missing package references for `Microsoft.AspNetCore.Mvc.Testing` and `NSubstitute` namespaces.
+- **Solution**: Add `<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />` and `<PackageReference Include="NSubstitute" Version="5.0.0" />` to `src/backend/Api.Tests/Api.Tests.csproj`.
+- **Discovery (2026-06-02 Outdated pnpm lockfile)**: In the frontend CI job, `pnpm install --frozen-lockfile` fails because the root `package.json` specifies devDependencies (like `@testing-library/react`, `@types/express`, etc.) that are completely missing or not recorded in the root `pnpm-lock.yaml` file (which contains an empty specifiers object `{}`).
+- **Solution**: Run `pnpm install` locally to update and regenerate `pnpm-lock.yaml`, then commit and push it to sync the dependencies.
+
+
+

@@ -116,8 +116,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
+          version: 9
           run_install: false
-          # version omitida intencionalmente — se lee de package.json "packageManager" field
 
       - name: Get pnpm store path
         id: pnpm-cache

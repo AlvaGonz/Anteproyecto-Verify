@@ -1,6 +1,10 @@
-import { createHashRouter, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { createHashRouter, Navigate, useParams } from "react-router-dom";
 import { LandingPage } from "../pages/LandingPage";
 import { HealthPage } from "../pages/HealthPage";
+
+const LegalPage = lazy(() => import("../features/legal").then(m => ({ default: m.LegalPage })));
+const PricingPage = lazy(() => import("../features/pricing").then(m => ({ default: m.PricingPage })));
 import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage";
 import { ProjectPublicDetailPage } from "../pages/projects/ProjectPublicDetailPage";
 import { ProjectManagePage } from "../pages/projects/ProjectManagePage";
@@ -9,7 +13,6 @@ import { ProjectValidationPage } from "../pages/projects/ProjectValidationPage";
 import { ProjectAuditPage } from "../pages/admin/ProjectAuditPage";
 import { ProjectReportsPage } from "../pages/admin/ProjectReportsPage";
 import { RulesManagePage } from "../pages/admin/RulesManagePage";
-import { PublicVerifySearchPage } from "../pages/public/PublicVerifySearchPage";
 import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
@@ -24,6 +27,11 @@ import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
 
+const NavigateToVerifyResult: React.FC = () => {
+  const { code } = useParams<{ code: string }>();
+  return <Navigate to={`/projects/verify/${code}`} replace />;
+};
+
 export const router = createHashRouter([
   {
     path: "/",
@@ -34,19 +42,35 @@ export const router = createHashRouter([
         index: true,
         element: <LandingPage />,
       },
+      {
+        path: "/legal",
+        element: (
+          <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><span className="font-body text-on-surface-variant">Cargando...</span></div>}>
+            <LegalPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/precios",
+        element: (
+          <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><span className="font-body text-on-surface-variant">Cargando...</span></div>}>
+            <PricingPage />
+          </Suspense>
+        ),
+      },
 
       /* ===== Public Pages ===== */
       {
         path: "/portal",
-        element: <ProjectsPublicListPage />,
+        element: <Navigate to="/projects" replace />,
       },
       {
         path: "/consulta-publica",
-        element: <Navigate to="/portal" replace />,
+        element: <Navigate to="/projects" replace />,
       },
       {
         path: "/projects",
-        element: <Navigate to="/portal" replace />,
+        element: <ProjectsPublicListPage />,
       },
       {
         path: "/login",
@@ -58,10 +82,14 @@ export const router = createHashRouter([
       },
       {
         path: "/verify",
-        element: <PublicVerifySearchPage />,
+        element: <Navigate to="/projects" replace />,
       },
       {
         path: "/verify/:code",
+        element: <NavigateToVerifyResult />,
+      },
+      {
+        path: "/projects/verify/:code",
         element: <PublicVerifyResultPage />,
       },
       {

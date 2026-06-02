@@ -1,8 +1,23 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2, ShieldCheck, Zap, Phone, CreditCard, Check, X } from "lucide-react";
+import { formatCedula, formatPhone, stripMask } from "../../shared/utils/formatters";
+import {
+  Mail,
+  Lock,
+  User,
+  ArrowRight,
+  CheckCircle2,
+  Loader2,
+  ShieldCheck,
+  Zap,
+  Phone,
+  CreditCard,
+  Check,
+  X,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthService } from "../../features/auth/services/AuthService";
+import { isSuccess } from "../../shared/utils/functional";
 
 export const RegisterPage: React.FC = () => {
   const [nombre, setNombre] = useState("");
@@ -64,33 +79,48 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
-    if (!isMinLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
-      setError("La contraseña no cumple con todos los requisitos de seguridad obligatorios.");
+    const cleanPhone = stripMask(telefono);
+    if (cleanPhone.length > 0) {
+      if (cleanPhone.length !== 10) {
+        setError("El número de teléfono debe tener exactamente 10 dígitos.");
+        return;
+      }
+      if (!/^(809|829|849)/.test(cleanPhone)) {
+        setError("El número de teléfono dominicano debe comenzar con 809, 829 o 849.");
+        return;
+      }
+    }
+
+    const cleanCedula = stripMask(cedula);
+    if (cleanCedula.length > 0 && cleanCedula.length !== 11) {
+      setError("La cédula debe tener exactamente 11 dígitos.");
       return;
     }
 
     setLoading(true);
 
-    const result = await AuthService.register(
-      nombre.trim(),
-      apellido.trim(),
-      email.trim(),
-      password,
-      telefono.trim(),
-      cedula.trim()
-    );
+    try {
+      const displayName = `${nombre.trim()} ${apellido.trim()}`;
+      const result = await AuthService.registerAccount({
+        email: email.toLowerCase(),
+        name: displayName,
+        telefono: cleanPhone || undefined,
+        cedula: cleanCedula || undefined,
+      });
 
-    setLoading(false);
+      if (!isSuccess(result)) {
+        const errorMsg = result.error._tag === "NetworkError"
+          ? result.error.message
+          : "Error al conectar con el servidor backend.";
+        throw new Error(errorMsg);
+      }
 
-    if (result._tag === "Success") {
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
-    } else {
-      if (result.error._tag === "NetworkError") {
-        setError(result.error.message);
-      } else {
-        setError("Ocurrió un error inesperado durante el registro.");
-      }
+    } catch (err: any) {
+      setError(err.message || "Error al registrar la cuenta.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -277,24 +307,24 @@ export const RegisterPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
-                <input 
-                  type="text" 
-                  placeholder="Teléfono (ej: 8095550199) *" 
-                  className="vf-input w-full pl-12 h-[52px]" 
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                  required 
+                <input
+                  type="text"
+                  placeholder="Teléfono"
+                  maxLength={14}
+                  className="vf-input w-full pl-12 h-[52px]"
+                  value={formatPhone(telefono)}
+                  onChange={(e) => setTelefono(stripMask(e.target.value))}
                 />
               </div>
               <div className="relative">
                 <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
-                <input 
-                  type="text" 
-                  placeholder="Cédula *" 
-                  className="vf-input w-full pl-12 h-[52px]" 
-                  value={cedula}
-                  onChange={(e) => setCedula(e.target.value)}
-                  required 
+                <input
+                  type="text"
+                  placeholder="Cédula"
+                  maxLength={13}
+                  className="vf-input w-full pl-12 h-[52px]"
+                  value={formatCedula(cedula)}
+                  onChange={(e) => setCedula(stripMask(e.target.value))}
                 />
               </div>
             </div>
@@ -351,22 +381,22 @@ export const RegisterPage: React.FC = () => {
                 />
                 <span className="text-[13px] text-text-secondary leading-relaxed group-hover:text-text-primary transition-colors">
                   Acepto los{" "}
-                  <button 
-                    type="button" 
-                    onClick={() => openModal("terms")} 
-                    className="font-bold text-[#223382] hover:underline focus:outline-none"
+                  <button
+                    type="button"
+                    onClick={() => openModal("terms")}
+                    className="font-bold text-primary hover:underline bg-transparent border-none p-0 cursor-pointer inline"
                   >
                     términos de uso
                   </button>{" "}
                   y la{" "}
-                  <button 
-                    type="button" 
-                    onClick={() => openModal("privacy")} 
-                    className="font-bold text-[#223382] hover:underline focus:outline-none"
+                  <button
+                    type="button"
+                    onClick={() => openModal("privacy")}
+                    className="font-bold text-primary hover:underline bg-transparent border-none p-0 cursor-pointer inline"
                   >
                     política de privacidad
-                  </button>{" "}
-                  <span className="text-rose-500">*</span>.
+                  </button>
+                  .
                 </span>
               </label>
             </div>

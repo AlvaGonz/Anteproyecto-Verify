@@ -11,15 +11,19 @@ public class DomainTests
     public void Usuario_Should_Create_With_Valid_Data()
     {
         // Arrange
-        var nombre = "Juan Perez";
+        var nombre = "Juan";
+        var apellido = "Perez";
         var email = "juan@example.com";
-        var rol = UserRole.Client;
+        var hash = "hash";
+        var rol = UserRole.Professional;
+        var telefono = "123456";
+        var cedula = "40200000000";
 
         // Act
-        var usuario = new Usuario(nombre, email, rol);
+        var usuario = new Usuario(nombre, apellido, email, hash, rol, telefono, cedula);
 
         // Assert
-        Assert.Equal(nombre, usuario.NombreCompleto);
+        Assert.Equal("Juan Perez", usuario.NombreCompleto);
         Assert.Equal(email, usuario.CorreoElectronico);
         Assert.Equal(rol, usuario.Rol);
         Assert.True(usuario.Activo);
@@ -51,12 +55,12 @@ public class DomainTests
     {
         // Arrange
         var proyectoId = Guid.NewGuid();
-        var tipo = DocumentType.Identity;
+        var tipo = DocumentType.CertificadoTitulo;
         var nombreArchivo = "cedula.pdf";
         var ruta = "/docs/cedula.pdf";
 
         // Act
-        var documento = new Documento(proyectoId, tipo, nombreArchivo, ruta);
+        var documento = new Documento(proyectoId, nombreArchivo, "application/pdf", 1000, ruta, tipo);
 
         // Assert
         Assert.Equal(proyectoId, documento.ProyectoId);
