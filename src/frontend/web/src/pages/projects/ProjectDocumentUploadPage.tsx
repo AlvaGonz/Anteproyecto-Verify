@@ -10,7 +10,8 @@ import {
   X, 
   Trash2, 
   ArrowRight, 
-  ArrowLeft
+  ArrowLeft,
+  Loader2
 } from "lucide-react";
 import { ProfessionalLayout } from "../../shared/components/layout/ProfessionalLayout";
 import { clsx } from "clsx";
@@ -73,7 +74,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
           {/* Step 2: Active */}
           <div className="flex flex-col items-center gap-2">
             <motion.div 
-              animate={{ scale: [1, 1.2, 1] }}
+              animate={{ ringScale: [1, 1.2, 1] }}
               className="w-10 h-10 rounded-full bg-[#ffdbbe] flex items-center justify-center text-[#331600] shadow-lg ring-8 ring-white"
             >
               <FileText size={20} />

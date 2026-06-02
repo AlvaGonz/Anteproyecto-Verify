@@ -25,47 +25,24 @@ public class MockEmailService : IEmailService
         return Task.CompletedTask;
     }
 
-    public Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, CancellationToken ct = default)
+    public async Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, CancellationToken ct = default)
     {
-        _logger.LogInformation("--- MOCK EMAIL: Account Verification ---");
-        _logger.LogInformation("To: {To}", toEmail);
-        _logger.LogInformation("User: {User}", userName);
-        _logger.LogInformation("Token: {Token}", verificationToken);
-        _logger.LogInformation("----------------------------------------");
-        return Task.CompletedTask;
+        await SendEmailAsync(toEmail, "Verificación de Cuenta", $"Hola {userName}, verifica tu cuenta con token: {verificationToken}", ct);
     }
 
-    public Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, CancellationToken ct = default)
+    public async Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, CancellationToken ct = default)
     {
-        _logger.LogInformation("--- MOCK EMAIL: Document Upload Confirmation ---");
-        _logger.LogInformation("To: {To}", toEmail);
-        _logger.LogInformation("User: {User}", userName);
-        _logger.LogInformation("Project: {Project}", projectName);
-        _logger.LogInformation("Doc Type: {DocType}", documentType);
-        _logger.LogInformation("------------------------------------------------");
-        return Task.CompletedTask;
+        await SendEmailAsync(toEmail, "Confirmación de Documento", $"Hola {userName}, tu documento {documentType} para el proyecto {projectName} fue subido.", ct);
     }
 
-    public Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, CancellationToken ct = default)
+    public async Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, CancellationToken ct = default)
     {
-        _logger.LogInformation("--- MOCK EMAIL: Document Status Update ---");
-        _logger.LogInformation("To: {To}", toEmail);
-        _logger.LogInformation("User: {User}", userName);
-        _logger.LogInformation("Project: {Project}", projectName);
-        _logger.LogInformation("Doc Type: {DocType}", documentType);
-        _logger.LogInformation("Status: {Status}", status);
-        _logger.LogInformation("Rejection Reason: {Reason}", rejectionReason ?? "N/A");
-        _logger.LogInformation("------------------------------------------");
-        return Task.CompletedTask;
+        string reason = rejectionReason != null ? $" Razón: {rejectionReason}" : "";
+        await SendEmailAsync(toEmail, "Estatus de Documento", $"Hola {userName}, el estatus de tu {documentType} en {projectName} es: {status}.{reason}", ct);
     }
 
-    public Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, CancellationToken ct = default)
+    public async Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, CancellationToken ct = default)
     {
-        _logger.LogInformation("--- MOCK EMAIL: Project Created ---");
-        _logger.LogInformation("To: {To}", toEmail);
-        _logger.LogInformation("Owner: {Owner}", ownerName);
-        _logger.LogInformation("Project: {Project} (ID: {ProjId})", projectName, projectId);
-        _logger.LogInformation("-----------------------------------");
-        return Task.CompletedTask;
+        await SendEmailAsync(toEmail, "Proyecto Creado", $"Hola {ownerName}, tu proyecto {projectName} (ID: {projectId}) fue creado.", ct);
     }
 }

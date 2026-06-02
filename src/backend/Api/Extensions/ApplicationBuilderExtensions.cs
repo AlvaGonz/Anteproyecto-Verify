@@ -12,7 +12,7 @@ public static class ApplicationBuilderExtensions
         app.UseExceptionHandler(opt => { }); // Minimal config to satisfy the middleware if ProblemDetails handles it
 
 
-        app.UseCors("AllowFrontend");
+        app.UseCors("AllowAll");
         
         app.MapHealthChecks("/health", new HealthCheckOptions
         {

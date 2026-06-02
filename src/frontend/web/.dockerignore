@@ -5,6 +5,3 @@ dist
 .next
 .vscode
 *.log
-package-lock.json
-yarn.lock
-.npm/

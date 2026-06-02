@@ -21,10 +21,6 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { VerificationStatus } from "./PublicVerificationBadge";
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 interface VerificationResultCardProps {
   data: PublicProjectVerificationDto;
 }

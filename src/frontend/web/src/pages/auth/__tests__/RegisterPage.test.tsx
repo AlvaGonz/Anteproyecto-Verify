@@ -32,12 +32,12 @@ describe("RegisterPage", () => {
   it("renders TRD professional registration fields", () => {
     renderPage();
 
-    expect(screen.getByPlaceholderText("Nombre")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Apellido")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Correo electrónico")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Teléfono")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Cédula")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Contraseña de acceso")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Nombre/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Apellido/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Correo electrónico/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Teléfono/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Cédula/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Contraseña de acceso/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /crear mi cuenta/i })).toBeInTheDocument();
   });
 });

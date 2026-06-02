@@ -1,12 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Search, ShieldCheck, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
 
 export const HeroSection: React.FC = () => {
   const [code, setCode] = React.useState("");
-  const { t } = useTranslation();
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden px-6 md:px-12 pt-20">
@@ -46,10 +44,10 @@ export const HeroSection: React.FC = () => {
           className="space-y-6"
         >
           <h1 className="text-5xl md:text-8xl font-display font-black text-secondary leading-[0.95] tracking-tight">
-            {t('hero.titlePrefix')}<span className="text-primary italic">{t('hero.titleHighlight')}</span>{t('hero.titleSuffix')}
+            Seguridad técnica y <span className="text-primary italic">jurídica</span> en un clic
           </h1>
           <p className="text-gray-500 text-lg md:text-xl max-w-xl font-medium leading-relaxed">
-            {t('hero.desc')}
+            La plataforma líder en validación de proyectos inmobiliarios en RD. Conectamos datos institucionales en tiempo real para inversores y desarrolladores.
           </p>
         </motion.div>
 
@@ -66,7 +64,7 @@ export const HeroSection: React.FC = () => {
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder={t('hero.placeholder')}
+                placeholder="Nombre del proyecto o código de radicación..."
                 className="w-full bg-transparent border-none focus:ring-0 px-3 py-4 text-base font-bold placeholder:text-gray-300 outline-none"
               />
             </div>
@@ -74,7 +72,7 @@ export const HeroSection: React.FC = () => {
               to={code ? `/projects/verify/${code}` : "/projects"}
               className="w-full sm:w-auto bg-secondary text-white px-10 py-4 rounded-2xl font-display font-black text-lg hover:bg-primary active:scale-95 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2"
             >
-              {t('hero.searchBtn')}
+              Consultar Ahora
               <ChevronRight className="w-5 h-5" />
             </Link>
           </div>

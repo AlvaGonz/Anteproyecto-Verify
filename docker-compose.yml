@@ -20,29 +20,31 @@ services:
 
   web:
     build:
-      context: .
-      dockerfile: docker/web.dev.Dockerfile
+      context: ./src/frontend/web
+      dockerfile: ../../../docker/web.dev.Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      # Bind-mount source code for HMR / hot-reload
-      - ./src/frontend/web:/app/src/frontend/web
-      # Named volumes keep Linux-native node_modules INSIDE the container
-      # and prevent the Windows host from overwriting them with broken symlinks
-      - web_root_node_modules:/app/node_modules
-      - web_frontend_node_modules:/app/src/frontend/web/node_modules
+      - ./src/frontend/web:/app
+      - /app/node_modules
     environment:
       - VITE_WATCH_POLLING=true
     env_file:
       - .env
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build:
+      context: .
+      dockerfile: docker/SQL_Server/Dockerfile
+    user: "0:0"
     ports:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Your_password123
+    volumes:
+      - mssql-data:/var/opt/mssql/data
+      - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
@@ -50,6 +52,5 @@ services:
       - "10000:10000"
 
 volumes:
-  web_root_node_modules:
-  web_frontend_node_modules:
+  mssql-data:
 

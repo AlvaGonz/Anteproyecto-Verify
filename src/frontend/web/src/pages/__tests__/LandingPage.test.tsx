@@ -41,8 +41,9 @@ describe("LandingPage", () => {
 
   it("renders a carousel for featured projects", () => {
     renderPage();
-    // The carousel is now an infinite scroll marquee without prev/next buttons
-    // We check that at least one of the featured projects is rendered
-    expect(screen.getAllByText(/Blue Forest Residences/i)[0]).toBeInTheDocument();
+    // Verify that the FeaturedProjectsSection is rendered by looking for its main heading
+    expect(screen.getByRole("heading", { name: /Proyectos Verificados/i })).toBeInTheDocument();
+    // Verify that one of the featured projects from MOCK list is rendered (using getAllByText because projects are duplicated for infinite loop layout)
+    expect(screen.getAllByText("Blue Forest Residences")[0]).toBeInTheDocument();
   });
 });

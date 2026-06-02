@@ -8,14 +8,16 @@ obj/
 # Node
 node_modules/
 dist/
-dist-node/
-tsconfig.tsbuildinfo
 .env
 .env.local
-package-lock.json
-yarn.lock
-.npm/
 
 # OS
 .DS_Store
 Thumbs.db
+
+# # Bots Data and Temporary files
+# **/TMP/
+# .csv
+# .txt
+
+# /Bots

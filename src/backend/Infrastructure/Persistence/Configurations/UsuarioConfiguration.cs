@@ -9,12 +9,14 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
         builder.HasKey(u => u.Id);
-        builder.Property(u => u.NombreCompleto).IsRequired().HasMaxLength(200);
+        builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
+        builder.Property(u => u.Apellido).IsRequired().HasMaxLength(100);
+        builder.Property(u => u.NombreCompleto).HasComputedColumnSql("[Nombre] + ' ' + [Apellido]", stored: true);
         builder.Property(u => u.CorreoElectronico).IsRequired().HasMaxLength(200);
         builder.HasIndex(u => u.CorreoElectronico).IsUnique();
         builder.Property(u => u.ContrasenaHash).IsRequired().HasMaxLength(500);
-        builder.Property(u => u.Telefono).HasMaxLength(50);
-        builder.Property(u => u.Cedula).HasMaxLength(50);
+        builder.Property(u => u.Telefono).IsRequired().HasMaxLength(15);
+        builder.Property(u => u.Cedula).IsRequired().HasMaxLength(15);
         builder.Property(u => u.Rol).IsRequired();
     }
 }

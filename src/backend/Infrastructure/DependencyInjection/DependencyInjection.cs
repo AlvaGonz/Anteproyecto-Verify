@@ -119,18 +119,18 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Audit.Queries.ExportAuditTrail.ExportAuditTrailQueryHandler>();
 
         // Notifications
-        var resendApiToken = configuration.GetValue<string>("Resend:ApiToken");
-        if (!string.IsNullOrWhiteSpace(resendApiToken))
+        if (useMock)
         {
-            services.AddResend(options =>
-            {
-                options.ApiToken = resendApiToken;
-            });
-            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Email.ResendEmailService>();
+            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
         }
         else
         {
-            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
+            var resendToken = configuration.GetValue<string>("Resend:ApiToken") ?? "re_mock_token";
+            services.AddResend(options =>
+            {
+                options.ApiToken = resendToken;
+            });
+            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Email.ResendEmailService>();
         }
         services.AddScoped<Application.Abstractions.Notifications.IEmailNotificationService, Infrastructure.Services.EmailNotificationService>();
 
@@ -149,6 +149,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Commands.CreateRule.CreateRuleCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.ToggleRuleStatus.ToggleRuleStatusCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
+        services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Infrastructure.Security.BCryptPasswordHasher>();
 
         // End of Infrastructure
 

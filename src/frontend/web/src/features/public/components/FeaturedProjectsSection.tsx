@@ -17,7 +17,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Blue Forest Residences",
     location: "Las Terrenas, Samaná",
-    image: "https://picsum.photos/seed/blue-forest/800/600",
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
     status: "Auditado",
     risk: "Bajo",
     deliveredDocs: 10,
@@ -26,7 +26,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Sky Tower SD",
     location: "Naco, Santo Domingo",
-    image: "https://picsum.photos/seed/sky-tower/800/600",
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
     status: "En Proceso",
     risk: "Calculando",
     deliveredDocs: 5,
@@ -35,7 +35,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Marina Reef",
     location: "Cap Cana, La Altagracia",
-    image: "https://picsum.photos/seed/marina-reef/800/600",
+    image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=80",
     status: "Certificado",
     risk: "Bajo",
     deliveredDocs: 15,
@@ -44,7 +44,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Oasis Garden",
     location: "Punta Cana, La Altagracia",
-    image: "https://picsum.photos/seed/oasis-garden/800/600",
+    image: "https://images.unsplash.com/photo-1512915922686-57c11f9ad6b3?auto=format&fit=crop&w=800&q=80",
     status: "Verificado",
     risk: "Bajo",
     deliveredDocs: 8,
@@ -53,7 +53,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Vista Playa",
     location: "Cabarete, Puerto Plata",
-    image: "https://picsum.photos/seed/vista-playa/800/600",
+    image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=800&q=80",
     status: "Auditado",
     risk: "Medio",
     deliveredDocs: 9,
@@ -62,7 +62,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Central Park SD",
     location: "Piantini, Santo Domingo",
-    image: "https://picsum.photos/seed/central-park-sd/800/600",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
     status: "Certificado",
     risk: "Bajo",
     deliveredDocs: 18,
@@ -71,7 +71,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Azure Bay",
     location: "Juan Dolio, San Pedro",
-    image: "https://picsum.photos/seed/azure-bay/800/600",
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
     status: "En Revisión",
     risk: "Bajo",
     deliveredDocs: 11,
@@ -80,7 +80,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Emerald Hills",
     location: "Jarabacoa, La Vega",
-    image: "https://picsum.photos/seed/emerald-hills/800/600",
+    image: "https://images.unsplash.com/photo-1500382017468-9049fee74a62?auto=format&fit=crop&w=800&q=80",
     status: "Certificado",
     risk: "Bajo",
     deliveredDocs: 10,
@@ -89,7 +89,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Diamond Plaza",
     location: "Bella Vista, Santo Domingo",
-    image: "https://picsum.photos/seed/diamond-plaza/800/600",
+    image: "https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=800&q=80",
     status: "Verificado",
     risk: "Bajo",
     deliveredDocs: 4,
@@ -98,7 +98,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Sunset Villas",
     location: "Boca Chica, Santo Domingo",
-    image: "https://picsum.photos/seed/sunset-villas/800/600",
+    image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80",
     status: "Auditado",
     risk: "Bajo",
     deliveredDocs: 12,
@@ -107,7 +107,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Ocean View Tower",
     location: "Malecón, Santo Domingo",
-    image: "https://picsum.photos/seed/ocean-view/800/600",
+    image: "https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=800&q=80",
     status: "En Proceso",
     risk: "Calculando",
     deliveredDocs: 9,
@@ -116,7 +116,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Pine Ridge",
     location: "Santiago de los Caballeros",
-    image: "https://picsum.photos/seed/pine-ridge/800/600",
+    image: "https://images.unsplash.com/photo-1513584684374-8bdb74838a0f?auto=format&fit=crop&w=800&q=80",
     status: "Certificado",
     risk: "Bajo",
     deliveredDocs: 14,
@@ -125,7 +125,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Royal Garden",
     location: "La Romana",
-    image: "https://picsum.photos/seed/royal-garden/800/600",
+    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80",
     status: "Verificado",
     risk: "Bajo",
     deliveredDocs: 20,
@@ -134,7 +134,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Urban Lofts",
     location: "Gazcue, Santo Domingo",
-    image: "https://picsum.photos/seed/urban-lofts/800/600",
+    image: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=800&q=80",
     status: "En Revisión",
     risk: "Bajo",
     deliveredDocs: 8,
@@ -143,7 +143,7 @@ const ALL_PROJECTS: Project[] = [
   {
     name: "Golden Sands",
     location: "Bávaro, Punta Cana",
-    image: "https://picsum.photos/seed/golden-sands/800/600",
+    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
     status: "En Proceso",
     risk: "Calculando",
     deliveredDocs: 7,
@@ -352,10 +352,6 @@ export const FeaturedProjectsSection: React.FC = () => {
                   <img
                     src={project.image}
                     alt={project.name}
-                    onError={(e) => {
-                      e.currentTarget.src = "https://picsum.photos/seed/fallback/800/600";
-                      e.currentTarget.onerror = null;
-                    }}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     draggable={false}
                   />
