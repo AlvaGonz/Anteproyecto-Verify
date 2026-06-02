@@ -333,6 +333,29 @@
       "requires_mcps": [
         "mcp-context7-mcp"
       ]
+    },
+    {
+      "id": "security-audit-cicd",
+      "name": "Security Audit and CI/CD Pipeline Integration",
+      "description": "Perform a comprehensive Security Audit and implement a robust CI/CD pipeline with automated vulnerability scanning.",
+      "trigger": "When requested to perform security audit and setup automated CI/CD pipeline",
+      "file": ".agents/workflows/security-audit-cicd.md",
+      "phases": [
+        "Initialize Planning Files",
+        "Security Audit & Code Review",
+        "Supply Chain & Dependency Audit",
+        "CI/CD Pipeline Implementation",
+        "Verification & Performance Reporting"
+      ],
+      "requires_skills": [
+        "planning-with-files",
+        "owasp-security"
+      ],
+      "category": "security",
+      "requires_mcps": [
+        "mcp-context7-mcp",
+        "mcp-github-mcp-server"
+      ]
     }
   ]
 }
