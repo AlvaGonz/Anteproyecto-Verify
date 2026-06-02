@@ -41,6 +41,32 @@ Read workflows in this order:
    - Validation evidence
    - Remaining risks and next actions
 
+## Dynamic Generation Protocol
+
+If the user's task or objective does not match any existing workflow in `data/workflows.json`, you must activate the **Dynamic Workflow Generation Engine** in this skill to synthesize a new custom workflow:
+
+1. **Attempt Match First**:
+   - Check if any workflow in `data/workflows.json` matches the user's task or objective. If yes, use that.
+2. **If No Match, Synthesize a New Workflow**:
+   a. **Discover Available Skills**:
+      - Run the skill scanner: `node c:/Users/Admin/Desktop/Anteproyecto-Verify/.agents/skills/antigravity-skill-orchestrator/scripts/scanner.mjs` (or use the global path fallback if running outside the workspace).
+      - This scanner outputs all verified local and global skills currently installed.
+   b. **Decompose the Objective**:
+      - Break the user's high-level objective into a logical sequence of phases (e.g., Phase 1: Planning, Phase 2: Design, Phase 3: Building, Phase 4: Verification).
+   c. **Select and Validate Skills**:
+      - For each phase, assign the most appropriate skill discovered from the scanner's output.
+      - **CRITICAL**: Every skill referenced in a dynamically generated workflow MUST exist in the output of `scanner.mjs`. If a phase needs a skill that does not exist, replace it with the closest available skill or mark the phase as `MANUAL` (requiring human intervention). **Never hallucinate or reference non-existent skills.**
+   d. **Incorporate Planning-with-Files & Gates**:
+      - **Mandatory Step 0**: Every dynamically generated workflow MUST start with `Step 0: Initialize Planning Files (@planning-with-files)` to create and populate `.agents/docs/PWF/task_plan.md` before any work begins.
+      - **Validation Gates**: Every phase transition MUST have a formal validation gate (`GATE: [condition]. If FAIL → stop and report. Do NOT proceed.`).
+   e. **Materialize the Workflow**:
+      - Generate a slug/id for the workflow (e.g., `compliance-dashboard-pipeline`).
+      - Write the newly synthesized workflow file to `.agents/workflows/<id>.md`.
+      - Append the new workflow metadata to `data/workflows.json`.
+      - Document the new playbook in `docs/WORKFLOWS.md`.
+3. **Execute the Workflow**:
+   - Execute the newly created workflow step-by-step, starting from Step 0.
+
 ## Default Workflow Routing
 
 - Product delivery request -> `ship-saas-mvp`

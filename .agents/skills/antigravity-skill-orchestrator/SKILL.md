@@ -39,6 +39,31 @@ Before invoking any skills, evaluate the task:
 1. **Is the task simple/contained?** Solve it directly using the agent's ordinary file editing, search, and terminal capabilities.
 2. **Is the task complex/multi-domain?** Only then should you proceed to orchestrate skills.
 
+### Multi-Phase Delegation Rule
+If the task meets ALL of these criteria:
+1. Requires **3+ sequential phases** (e.g., Plan → Build → Test → Deploy)
+2. Spans multiple domains or skill categories
+3. Would require invoking 3+ individual skills in sequence
+
+Then **DO NOT** attempt to orchestrate individual skills. Instead:
+- Invoke `@antigravity-workflows` and pass the user's full objective to it.
+- Let the workflow engine handle phase decomposition, skill selection per phase,
+  validation gates, and session tracking via `@planning-with-files`.
+
+The `@antigravity-workflows` skill is the **highest-level operational manager**
+in the Antigravity hierarchy:
+
+┌──────────────────────────────────────────┐
+│        @antigravity-workflows            │ ← Multi-phase pipelines
+│        (Workflow Engine)                 │
+├──────────────────────────────────────────┤
+│   @antigravity-skill-orchestrator        │ ← Single-phase skill combos
+│   (Skill Combiner)                       │
+├──────────────────────────────────────────┤
+│   Individual Skills                      │ ← Atomic capabilities
+│   (@react-patterns, @tdd, etc.)          │
+└──────────────────────────────────────────┘
+
 ### Dynamic Skill Discovery (SkillScanner)
 The orchestrator uses a runtime `SkillScanner` module (`scripts/scanner.mjs`) to discover skills at execution time. The scanner:
 
@@ -252,5 +277,6 @@ memory_read({ key: "combination-ecommerce-checkout" })
 
 ## Related Skills
 
+- `@antigravity-workflows` — Highest-level meta-skill for orchestrating multi-phase workflows.
 - `@agent-memory-mcp` — Persistent cross-session storage for skill combinations.
 - `@planning-with-files` — Session-level file-based working memory at `.agents/docs/PWF/`.
