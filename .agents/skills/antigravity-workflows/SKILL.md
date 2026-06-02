@@ -40,6 +40,7 @@ Read workflows in this order:
    - Completed artifacts
    - Validation evidence
    - Remaining risks and next actions
+6. **Telemetry & Reporting**: Upon completing or failing the workflow, you MUST read `.agents/templates/workflow_execution_report.md`, populate the YAML metrics with the actual numbers from this session, and save it to `.agents/sessions/<session_id>/workflow_execution_report.md`.
 
 ### Playbook Execution Rules (Mandatory Resumability & Idempotency)
 To ensure stability and prevent wasted tokens, execution must behave as a state machine:
