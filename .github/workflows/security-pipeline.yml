@@ -31,7 +31,7 @@ jobs:
           node-version: '20.x'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@a7487ba2f8e5b7c91cdd7c2ac958ffc34a57e86e # @v4.1.0
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # @v4.1.0
         with:
           version: 9
           run_install: false
@@ -43,7 +43,7 @@ jobs:
 
       # Backend Audit
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@3951f0dfe7a714d2ee5bec13e74d7b39c9c36930 # @v4.3.1
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # @v4.3.1
         with:
           dotnet-version: '8.0.x'
 
