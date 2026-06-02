@@ -25,3 +25,8 @@
   3. Ensure types are correctly augmented for the `'common'` namespace.
   4. Wrap the root component in `<React.Suspense>` to handle async loading of namespaces.
 - **Backend CORS status check**: Checked `ServiceCollectionExtensions.cs` and `ApplicationBuilderExtensions.cs`. Both are using `"AllowFrontend"` correctly. There is no mismatch or build-breaking inconsistency here. It is fully aligned.
+
+## Findings for CI Workflow Fix (2026-06-02)
+- **Root Cause**: The GitHub Actions workflow `.github/workflows/ci.yml` uses `pnpm/action-setup@v4` on lines 116-120 but omits the `version` parameter. Under v4 of this action, auto-detection from the `packageManager` field in `package.json` is not supported unless explicitly specified. Because there is no `packageManager` field in either the root or frontend `package.json` files, the setup step fails immediately.
+- **Solution**: Adding `version: 9` explicitly under the `with` parameters of `pnpm/action-setup@v4` will resolve the issue by ensuring the runner fetches the latest stable pnpm v9.x, which matches our project setup.
+
