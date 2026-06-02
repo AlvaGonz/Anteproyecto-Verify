@@ -24,6 +24,7 @@
 | i18n Core: Legal & Pricing inline translation objects | UX / i18n | feat-frontend | — | 2026-06-01 |
 | TDD coverage: LegalPage & PricingPage unit tests (100% pass) | QA | feat-frontend | — | 2026-06-01 |
 | pnpm/action-setup@v4 version setup fix in ci.yml | Infra | develop | — | 2026-06-02 |
+| Fix Microsoft.EntityFrameworkCore.InMemory version conflict | Backend | develop | — | 2026-06-02 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

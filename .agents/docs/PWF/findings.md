@@ -30,3 +30,7 @@
 - **Root Cause**: The GitHub Actions workflow `.github/workflows/ci.yml` uses `pnpm/action-setup@v4` on lines 116-120 but omits the `version` parameter. Under v4 of this action, auto-detection from the `packageManager` field in `package.json` is not supported unless explicitly specified. Because there is no `packageManager` field in either the root or frontend `package.json` files, the setup step fails immediately.
 - **Solution**: Adding `version: 9` explicitly under the `with` parameters of `pnpm/action-setup@v4` will resolve the issue by ensuring the runner fetches the latest stable pnpm v9.x, which matches our project setup.
 
+- **Discovery (2026-06-02 NuGet Downgrade)**: The backend job fails during NuGet restore due to a package version downgrade conflict. The `IntegrationTests` project specifies `Microsoft.EntityFrameworkCore.InMemory` version `8.0.0`, but the `Infrastructure` project transitive dependency requires version `>= 8.0.2`.
+- **Solution**: Update `tests/backend/IntegrationTests/IntegrationTests.csproj` on line 23 to request version `8.0.2` of `Microsoft.EntityFrameworkCore.InMemory` explicitly to align with the dependency requirements.
+
+

@@ -13,9 +13,14 @@ Fix the GitHub Actions CI workflow failure where `pnpm/action-setup@v4` fails be
 - **Status:** completed
 
 ### Phase 2: Push and Monitor CI
-- [ ] Commit and push the changes.
+- [x] Commit and push the pnpm setup changes.
 - [ ] **Gate**: Check the new CI run on GitHub via `gh run list` and verify it succeeds.
-- **Status:** pending
+- **Status:** in_progress
+
+### Phase 3: Fix NuGet Package Downgrade Conflict in IntegrationTests
+- [x] Change `Microsoft.EntityFrameworkCore.InMemory` version from `8.0.0` to `8.0.2` in `tests/backend/IntegrationTests/IntegrationTests.csproj`.
+- [x] **Gate**: Run `dotnet restore` locally and verify that it succeeds with no downgrade warnings or errors.
+- **Status:** completed
 
 ---
 
