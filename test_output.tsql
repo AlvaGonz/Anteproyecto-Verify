@@ -1,5 +1,11 @@
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_NULLS ON;
+GO
 -- Crear la base de datos
-CREATE DATABASE [verifinca-spm-uce-2026];
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'verifinca-spm-uce-2026')
+BEGIN
+    CREATE DATABASE [verifinca-spm-uce-2026];
+END
 GO
 
 USE [verifinca-spm-uce-2026];

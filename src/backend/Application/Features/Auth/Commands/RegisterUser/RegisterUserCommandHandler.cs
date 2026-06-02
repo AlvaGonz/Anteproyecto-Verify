@@ -66,12 +66,15 @@ public class RegisterUserCommandHandler
         if (!password.Any(c => specialChars.Contains(c)))
             return new RegisterUserResultDto(false, "La contraseña debe contener al menos 1 carácter especial (signo permitido).", null);
 
-        // 4. Validación de Teléfono
-        if (!string.IsNullOrWhiteSpace(request.Telefono))
-        {
-            if (!PhoneRegex.IsMatch(request.Telefono))
-                return new RegisterUserResultDto(false, "El número de teléfono no tiene un formato válido (debe tener 10 dígitos o formato como 809-555-0199).", null);
-        }
+        // 4. Validación de Teléfono y Cédula obligatorios
+        if (string.IsNullOrWhiteSpace(request.Telefono))
+            return new RegisterUserResultDto(false, "El número de teléfono es requerido.", null);
+
+        if (!PhoneRegex.IsMatch(request.Telefono))
+            return new RegisterUserResultDto(false, "El número de teléfono no tiene un formato válido (debe tener 10 dígitos o formato como 809-555-0199).", null);
+
+        if (string.IsNullOrWhiteSpace(request.Cedula))
+            return new RegisterUserResultDto(false, "La cédula es requerida.", null);
 
         // 5. Verificar si el correo ya existe
         var existingUser = await _usuarioRepository.GetByEmailAsync(request.Email, cancellationToken);
@@ -88,8 +91,8 @@ public class RegisterUserCommandHandler
             request.Email.Trim().ToLower(),
             passwordHash,
             UserRole.Professional,
-            request.Telefono?.Trim(),
-            request.Cedula?.Trim()
+            request.Telefono.Trim(),
+            request.Cedula.Trim()
         );
 
         // 8. Guardar en Base de Datos

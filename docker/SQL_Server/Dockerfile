@@ -16,8 +16,9 @@ COPY docker/SQL_Server/entrypoint.sh /usr/config/entrypoint.sh
 # Copy original SQL file from workspace root as fallback for build-time self-containment
 COPY Build-Database-Sql.sql /usr/config/Build-Database-Sql.sql
 
-# Set correct permissions
-RUN chmod +x /usr/config/entrypoint.sh && \
+# Set correct permissions and clean Windows EOL carriage returns
+RUN sed -i -e 's/\r$//' /usr/config/entrypoint.sh && \
+    chmod +x /usr/config/entrypoint.sh && \
     chown -R mssql:root /usr/config
 
 # Expose SQL Server port

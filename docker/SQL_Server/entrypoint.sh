@@ -5,6 +5,9 @@ set -e
 SQL_FILE="/usr/config/Build-Database-Sql.sql"
 TSQL_FILE="/usr/config/Build-Database-Sql.tsql"
 TRANSLATOR="/usr/config/translate.py"
+HASH_FILE="/var/opt/mssql/data/schema_hash.txt"
+CURRENT_HASH=$(md5sum "$SQL_FILE" | awk '{print $1}')
+RECREATE_DB=false
 
 echo "================================================"
 echo "   SQL Server Custom Initialization Startup     "
@@ -16,6 +19,22 @@ if [ -f "$SQL_FILE" ]; then
     echo "[Init] Running translation to T-SQL..."
     python3 "$TRANSLATOR" "$SQL_FILE" "$TSQL_FILE"
     echo "[Init] Translation finished successfully."
+    
+    # Detect schema changes
+    if [ -f "$HASH_FILE" ]; then
+        SAVED_HASH=$(cat "$HASH_FILE")
+        echo "[Init] Saved schema hash: $SAVED_HASH"
+        echo "[Init] Current schema hash: $CURRENT_HASH"
+        if [ "$SAVED_HASH" != "$CURRENT_HASH" ]; then
+            echo "[Init] Schema changes detected! Will drop and recreate the database."
+            RECREATE_DB=true
+        else
+            echo "[Init] No schema changes detected. Keeping existing database."
+        fi
+    else
+        echo "[Init] No schema hash found. This is a fresh initialization."
+        RECREATE_DB=true
+    fi
 else
     echo "[ERROR] SQL file not found at $SQL_FILE!"
     exit 1
@@ -29,8 +48,8 @@ SQL_PID=$!
 # 3. Wait for SQL Server to boot up and be ready
 echo "[Init] Waiting for SQL Server port 1433 to be active..."
 for i in {1..90}; do
-    # Run a simple query to verify server health and authentication
-    if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -Q "SELECT 1" &> /dev/null; then
+    # Run a simple query to verify server health and authentication (using tools18 and trusting self-signed cert)
+    if /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -Q "SELECT 1" -C &> /dev/null; then
         echo "[Init] SQL Server is healthy and ready to accept connections!"
         break
     else
@@ -46,9 +65,17 @@ if ! kill -0 $SQL_PID 2>/dev/null; then
 fi
 
 # 4. Execute the translated T-SQL script
+if [ "$RECREATE_DB" = "true" ]; then
+    echo "[Init] Recreating database because changes were detected or it is a fresh install..."
+    /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -Q "IF EXISTS (SELECT * FROM sys.databases WHERE name = 'verifinca-spm-uce-2026') BEGIN ALTER DATABASE [verifinca-spm-uce-2026] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [verifinca-spm-uce-2026]; END" -C
+fi
+
 echo "[Init] Executing translated T-SQL script to build database..."
-if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -i "$TSQL_FILE"; then
+if /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -i "$TSQL_FILE" -C; then
     echo "[Init] SQL script executed successfully!"
+    # Save the new hash after successful execution
+    echo "$CURRENT_HASH" > "$HASH_FILE"
+    echo "[Init] Schema hash saved successfully: $CURRENT_HASH"
 else
     echo "[WARNING] SQL script execution reported some issues (e.g. objects already existing, which is expected on persistent runs)."
 fi
