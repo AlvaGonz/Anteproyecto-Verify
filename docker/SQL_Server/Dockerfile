@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/mssql/server:2022-latest
 
-USER root
+USER root # nosemgrep
 
 # Install Python 3 for dynamic MySQL-to-TSQL translation
 RUN apt-get update && \

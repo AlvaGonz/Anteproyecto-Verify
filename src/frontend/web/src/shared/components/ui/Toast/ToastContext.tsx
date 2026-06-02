@@ -65,7 +65,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               className={`pointer-events-auto flex items-center gap-4 px-5 py-4 min-w-[320px] max-w-sm rounded-2xl shadow-floating border-l-[6px] backdrop-blur-md ${style.bg} ${style.border} animate-in slide-in-from-right fade-in duration-300`}
               role="alert"
             >
-              <div className={`p-2 rounded-full ${style.bg.replace("bg-", "text-").replace("[", "").replace("]", "")} bg-white/50`}>
+              <div className={`p-2 rounded-full ${style.bg.replace(/bg-/g, "text-").replace(/\[/g, "").replace(/\]/g, "")} bg-white/50`}>
                 <Icon className={`w-5 h-5 flex-shrink-0 ${style.text}`} />
               </div>
               <p className={`text-[14px] font-bold ${style.text} flex-1`}>{toast.message}</p>

@@ -6,4 +6,6 @@ WORKDIR /src/src/backend/Api
 # Expose port
 EXPOSE 8080
 # Run with dotnet watch
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser
 ENTRYPOINT ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:8080"]
