@@ -1,0 +1,13 @@
+{
+  "securecoder.exclude": [
+    "**/node_modules/**",
+    "**/.pnpm/**",
+    "**/dist/**",
+    "**/.cache/**"
+  ],
+  "securecoder.enableForNodeModules": false,
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.pnpm/**": true
+  }
+}
