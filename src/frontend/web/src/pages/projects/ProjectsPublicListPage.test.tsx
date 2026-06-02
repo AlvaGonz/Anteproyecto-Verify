@@ -1,51 +1,32 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ProjectsPublicListPage } from "./ProjectsPublicListPage";
-import { projectsApi } from "../../features/projects/api/projectsApi";
-import { ProjectStatus, IntegrityStatus, ProjectCategory } from "../../features/projects/types";
-
-vi.mock("../../features/projects/api/projectsApi");
 
 describe("ProjectsPublicListPage", () => {
-  it("renders loading state initially", () => {
-    vi.mocked(projectsApi.getProjects).mockReturnValue(new Promise(() => {}));
+  it("renders the directory with hero title and search form", () => {
     render(
       <MemoryRouter>
         <ProjectsPublicListPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
-    expect(screen.getByText(/Encuentre Su Próxima/i)).toBeDefined();
+
+    // Hero title
+    expect(screen.getByText(/Cero Incertidumbre En Su/i)).toBeInTheDocument();
+    // Search input (default VF placeholder)
+    expect(screen.getByPlaceholderText(/Ej: VF-2026-X83L/i)).toBeInTheDocument();
   });
 
-  it("renders projects list after loading", async () => {
-    const mockProjects = [
-      {
-        id: "1",
-        codigoInterno: "PRJ-1",
-        nombre: "Proyecto Test 1",
-        ubicacionTexto: "Ubicacion 1",
-        categoria: ProjectCategory.Residencial,
-        estadoProyecto: ProjectStatus.Published,
-        estadoIntegridad: IntegrityStatus.Pending,
-        usuarioCreadorId: "user1",
-        createdAtUtc: new Date().toISOString(),
-      },
-    ];
-
-    vi.mocked(projectsApi.getProjects).mockResolvedValue({
-      _tag: "Success",
-      data: mockProjects
-    });
-
+  it("renders mock projects list in the directory", () => {
     render(
       <MemoryRouter>
         <ProjectsPublicListPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
-    await waitFor(() => {
-      expect(screen.getByText("Proyecto Test 1")).toBeDefined();
-    });
+    // Mock projects
+    expect(screen.getByText("Residencial Terra Noble")).toBeInTheDocument();
+    expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
+    expect(screen.getByText("Plaza Central Mall")).toBeInTheDocument();
   });
 });

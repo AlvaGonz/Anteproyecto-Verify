@@ -41,11 +41,9 @@ describe("LandingPage", () => {
 
   it("renders a carousel for featured projects", () => {
     renderPage();
-    // In a carousel, we expect navigation controls (buttons for prev/next)
-    const prevButton = screen.queryByLabelText(/anterior/i);
-    const nextButton = screen.queryByLabelText(/siguiente/i);
-
-    expect(prevButton).toBeInTheDocument();
-    expect(nextButton).toBeInTheDocument();
+    // Verify that the FeaturedProjectsSection is rendered by looking for its main heading
+    expect(screen.getByRole("heading", { name: /Proyectos Verificados/i })).toBeInTheDocument();
+    // Verify that one of the featured projects from MOCK list is rendered (using getAllByText because projects are duplicated for infinite loop layout)
+    expect(screen.getAllByText("Blue Forest Residences")[0]).toBeInTheDocument();
   });
 });
