@@ -2,3 +2,4 @@
 *.cs text diff=csharp
 *.ts text
 *.tsx text
+*.sh text eol=lf

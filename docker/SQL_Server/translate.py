@@ -2,7 +2,7 @@ import re
 import sys
 
 def translate_mysql_to_tsql(mysql_content):
-    content = mysql_content
+    content = "SET QUOTED_IDENTIFIER ON;\nSET ANSI_NULLS ON;\nGO\n" + mysql_content
     
     # 1. Enclose verifinca-spm-uce-2026 with brackets and use standard T-SQL conditional database creation
     # Matches both "CREATE DATABASE [verifinca-spm-uce-2026];" and MySQL-style "CREATE DATABASE IF NOT EXISTS `verifinca-spm-uce-2026`;", as well as any following GO.

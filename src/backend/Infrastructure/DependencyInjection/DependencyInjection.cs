@@ -7,6 +7,7 @@ using Application.Abstractions.Storage;
 using Infrastructure.Storage;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Resend;
 
 public static class DependencyInjection
 {
@@ -118,7 +119,19 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Audit.Queries.ExportAuditTrail.ExportAuditTrailQueryHandler>();
 
         // Notifications
-        services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
+        if (useMock)
+        {
+            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
+        }
+        else
+        {
+            var resendToken = configuration.GetValue<string>("Resend:ApiToken") ?? "re_mock_token";
+            services.AddResend(options =>
+            {
+                options.ApiToken = resendToken;
+            });
+            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Email.ResendEmailService>();
+        }
         services.AddScoped<Application.Abstractions.Notifications.IEmailNotificationService, Infrastructure.Services.EmailNotificationService>();
 
         // External Services
