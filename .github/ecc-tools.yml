@@ -1,0 +1,5 @@
+# ECC Tools configuration
+# https://ecc.tools
+
+# Always open pull requests against the develop branch
+base_branch: develop
