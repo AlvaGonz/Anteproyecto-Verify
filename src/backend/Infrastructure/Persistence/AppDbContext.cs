@@ -20,6 +20,15 @@ public class AppDbContext : DbContext
     public DbSet<Certificacion> Certificaciones => Set<Certificacion>();
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
 
+    // Legacy Tables for Admin Settings
+    public DbSet<UsuarioLegacy> UsuariosLegacy => Set<UsuarioLegacy>();
+    public DbSet<Perfil> Perfiles => Set<Perfil>();
+    public DbSet<Permiso> Permisos => Set<Permiso>();
+    public DbSet<Acceso> Accesos => Set<Acceso>();
+    public DbSet<PlanSuscripcion> PlanesSuscripcion => Set<PlanSuscripcion>();
+    public DbSet<Pago> PagosLegacy => Set<Pago>();
+    public DbSet<PerfilPermiso> PerfilPermisos => Set<PerfilPermiso>();
+
     // Validation Entities
     public DbSet<AlertaValidacion> AlertasValidacion => Set<AlertaValidacion>();
     public DbSet<ValidacionDgii> ValidacionesDgii => Set<ValidacionDgii>();

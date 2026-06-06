@@ -3,7 +3,10 @@ namespace Api.Controllers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Abstractions.Persistence;
+using Application.Abstractions.Security;
 using Application.Features.Auth.Commands.RegisterUser;
+using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +15,17 @@ using Microsoft.AspNetCore.Mvc;
 public class AuthController : ControllerBase
 {
     private readonly RegisterUserCommandHandler _registerHandler;
+    private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public AuthController(RegisterUserCommandHandler registerHandler)
+    public AuthController(
+        RegisterUserCommandHandler registerHandler,
+        IUsuarioRepository usuarioRepository,
+        IPasswordHasher passwordHasher)
     {
         _registerHandler = registerHandler;
+        _usuarioRepository = usuarioRepository;
+        _passwordHasher = passwordHasher;
     }
 
     [HttpPost("register")]
@@ -36,21 +46,27 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
         {
             return BadRequest(new { Message = "Email y contraseña son requeridos." });
         }
 
-        // Mock authentication check for the demo
-        if (request.Email == "admin@verifinca.com" && request.Password != "admin123")
+        var user = await _usuarioRepository.GetByEmailAsync(request.Email, cancellationToken);
+        if (user == null)
         {
             return Unauthorized(new { Message = "Credenciales inválidas." });
         }
 
-        // Set JWT inside HttpOnly, Secure, SameSite=Strict cookie
-        var token = "mock-jwt-token-from-cookie";
+        bool isPasswordValid = _passwordHasher.VerifyPassword(request.Password, user.ContrasenaHash);
+        if (!isPasswordValid)
+        {
+            return Unauthorized(new { Message = "Credenciales inválidas." });
+        }
+
+        // Set token as Base64 of the email for identification
+        var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(user.CorreoElectronico));
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
@@ -61,15 +77,23 @@ public class AuthController : ControllerBase
         };
         Response.Cookies.Append("vf_token", token, cookieOptions);
 
+        string roleStr = user.Rol switch
+        {
+            UserRole.Administrator => "admin",
+            UserRole.Professional => "dev",
+            UserRole.Consultation => "validator",
+            _ => "user"
+        };
+
         return Ok(new
         {
             Message = "Inicio de sesión exitoso.",
             User = new
             {
-                Id = "1",
-                Email = request.Email,
-                Name = request.Email == "admin@verifinca.com" ? "Administrador VeriFinca" : "Usuario Demo",
-                Role = request.Email == "admin@verifinca.com" ? "admin" : "user"
+                Id = user.Id.ToString(),
+                Email = user.CorreoElectronico,
+                Name = user.NombreCompleto,
+                Role = roleStr
             }
         });
     }
@@ -89,7 +113,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("me")]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
         var token = Request.Cookies["vf_token"];
         if (string.IsNullOrEmpty(token))
@@ -97,13 +121,35 @@ public class AuthController : ControllerBase
             return Unauthorized(new { Message = "No autenticado." });
         }
 
-        return Ok(new
+        try
         {
-            Id = "1",
-            Email = "admin@verifinca.com",
-            Name = "Administrador VeriFinca",
-            Role = "admin"
-        });
+            var userEmail = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
+            var user = await _usuarioRepository.GetByEmailAsync(userEmail, cancellationToken);
+            if (user == null)
+            {
+                return Unauthorized(new { Message = "Usuario no encontrado." });
+            }
+
+            string roleStr = user.Rol switch
+            {
+                UserRole.Administrator => "admin",
+                UserRole.Professional => "dev",
+                UserRole.Consultation => "validator",
+                _ => "user"
+            };
+
+            return Ok(new
+            {
+                Id = user.Id.ToString(),
+                Email = user.CorreoElectronico,
+                Name = user.NombreCompleto,
+                Role = roleStr
+            });
+        }
+        catch (Exception)
+        {
+            return Unauthorized(new { Message = "Token inválido." });
+        }
     }
 
     [HttpPost("refresh")]

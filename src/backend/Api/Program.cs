@@ -20,7 +20,55 @@ if (app.Environment.IsDevelopment())
     // even when EF migrations tooling isn't installed in the container.
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.EnsureCreatedAsync();
+    
+    if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.SqlServer")
+    {
+        var tableExists = false;
+        try
+        {
+            var conn = db.Database.GetDbConnection();
+            if (conn.State != System.Data.ConnectionState.Open)
+            {
+                await conn.OpenAsync();
+            }
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Usuarios'";
+            var result = await cmd.ExecuteScalarAsync();
+            tableExists = result != null && Convert.ToInt32(result) > 0;
+        }
+        catch
+        {
+            tableExists = false;
+        }
+
+        if (!tableExists)
+        {
+            var createScript = db.Database.GenerateCreateScript();
+            var commands = createScript.Split(new[] { "GO\r\n", "GO\n" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var command in commands)
+            {
+                if (!string.IsNullOrWhiteSpace(command))
+                {
+                    try
+                    {
+                        await db.Database.ExecuteSqlRawAsync(command);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!ex.Message.Contains("already an object named", StringComparison.OrdinalIgnoreCase) && 
+                            !ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
 
     await AppDbContextSeeder.SeedAsync(app.Services);
 }

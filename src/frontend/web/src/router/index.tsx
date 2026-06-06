@@ -13,6 +13,7 @@ import { ProjectValidationPage } from "../pages/projects/ProjectValidationPage";
 import { ProjectAuditPage } from "../pages/admin/ProjectAuditPage";
 import { ProjectReportsPage } from "../pages/admin/ProjectReportsPage";
 import { RulesManagePage } from "../pages/admin/RulesManagePage";
+import { SettingsPage } from "../pages/admin/SettingsPage";
 import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
@@ -227,6 +228,16 @@ export const router = createHashRouter([
           <AuthGuard>
             <AdminLayout>
               <RulesManagePage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/settings",
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <SettingsPage />
             </AdminLayout>
           </AuthGuard>
         ),

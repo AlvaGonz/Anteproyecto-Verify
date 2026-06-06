@@ -34,42 +34,73 @@ let mockSessionUser: User | null = {
 
 export const AuthService = {
   async login(email: string, password: string): Promise<Result<AuthResponse, AuthError>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          if (email === "admin@verifinca.com" && password === "admin123") {
-            const user = {
-              id: "1",
-              email: "admin@verifinca.com",
-              name: "Administrador VeriFinca",
-              role: "admin",
-            };
-            mockSessionUser = user;
-            resolve(success({
-              user,
-              token: "mock-jwt-token",
-            }));
-          } else if (email.includes("error")) {
-            resolve(failure({ _tag: "NetworkError", message: "Error de conexión con el servidor" }));
-          } else {
-            // Allow any login for demo but simulate credential check
-            const user = {
-              id: "2",
-              email: email,
-              name: "Usuario Demo",
-              role: "user",
-            };
-            mockSessionUser = user;
-            resolve(success({
-              user,
-              token: "mock-jwt-token",
-            }));
+    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          try {
+            if (email === "admin@verifinca.com" && password === "admin123") {
+              const user = {
+                id: "1",
+                email: "admin@verifinca.com",
+                name: "Administrador VeriFinca",
+                role: "admin",
+              };
+              mockSessionUser = user;
+              resolve(success({
+                user,
+                token: "mock-jwt-token",
+              }));
+            } else if (email.includes("error")) {
+              resolve(failure({ _tag: "NetworkError", message: "Error de conexión con el servidor" }));
+            } else {
+              // Allow any login for demo but simulate credential check
+              const user = {
+                id: "2",
+                email: email,
+                name: "Usuario Demo",
+                role: "user",
+              };
+              mockSessionUser = user;
+              resolve(success({
+                user,
+                token: "mock-jwt-token",
+              }));
+            }
+          } catch (e) {
+            resolve(failure({ _tag: "UnknownError", original: e }));
           }
-        } catch (e) {
-          resolve(failure({ _tag: "UnknownError", original: e }));
+        }, 1000);
+      });
+    }
+
+    try {
+      const response = await fetch(`${env.API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          return failure({ _tag: "InvalidCredentials" });
         }
-      }, 1000);
-    });
+        const errorData = await response.json().catch(() => ({ message: "Error al iniciar sesión" }));
+        return failure({ _tag: "NetworkError", message: errorData.message || "Error al iniciar sesión" });
+      }
+
+      const data = await response.json();
+      mockSessionUser = data.user;
+      return success({
+        user: data.user,
+        token: "real-cookie-session"
+      });
+    } catch (e) {
+      return failure({ _tag: "UnknownError", original: e });
+    }
   },
 
 
@@ -116,9 +147,22 @@ export const AuthService = {
 
   async logout(): Promise<void> {
     mockSessionUser = null;
-    return new Promise((resolve) => {
-      setTimeout(resolve, 500);
-    });
+    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(resolve, 500);
+      });
+    }
+
+    try {
+      await fetch(`${env.API_URL}/api/auth/logout`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+    } catch {
+      // Ignore errors on logout
+    }
   },
 
   async getCurrentUser(): Promise<Option<User>> {
