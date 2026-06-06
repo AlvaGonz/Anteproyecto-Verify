@@ -1,0 +1,20 @@
+# VeriFinca — Agent Progress Tracker
+> Last updated: 2026-06-06T09:59:00-04:00 by Reviewer/Coder
+
+## ✅ Completed Features
+| Feature | TRD Section | Branch | Commit SHA | Date |
+|---|---|---|---|---|
+| Fix ERR_PACKAGE_PATH_NOT_EXPORTED & Node20 Deprecation | N/A | feat/agent-infrastructure-hardening | 74651a23 | 2026-06-06 |
+
+## 🔄 In Progress
+| Feature | TRD Section | Status | Blocker |
+|---|---|---|---|
+
+## 🔜 Next Up (Prioritized)
+1. Complete verification steps.
+
+## ⚠️ Open Decisions (Human-in-the-Loop Required)
+- None
+
+## 🚫 Known Constraints
+- None
