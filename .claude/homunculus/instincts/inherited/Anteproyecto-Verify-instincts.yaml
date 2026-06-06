@@ -1,0 +1,543 @@
+# Instincts generated from https://github.com/AlvaGonz/Anteproyecto-Verify
+# Generated: 2026-06-06T13:59:28.823Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: Anteproyecto-Verify-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, fix, ci, chore
+
+## Evidence
+
+- 19 commits analyzed
+- Detected conventional commit pattern
+- Examples: feat(agent-infra): session isolation by timestamp, deterministic circuit breaker, Zod skill scanner with anti-injection, fix(security): migrate to httponly cookies and secure api proxy
+
+---
+id: Anteproyecto-Verify-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Commit Length
+
+## Action
+
+Write moderate-length commit messages (~79 characters)
+
+## Evidence
+
+- Average commit message length: 79 chars
+- Based on 19 commits
+
+---
+id: Anteproyecto-Verify-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: Anteproyecto-Verify-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: Anteproyecto-Verify-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: Anteproyecto-Verify-arch-feature-based
+trigger: "when adding a new feature"
+confidence: 0.85
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Arch Feature Based
+
+## Action
+
+Create a new folder in src/features/ with all related code colocated
+
+## Evidence
+
+- Feature-based module organization detected
+- Structure: src/features/[feature-name]/
+
+---
+id: Anteproyecto-Verify-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~14x per month
+- Files: src/frontend/web/src/shared/components/ui/toast/*, **/*.test.*, **/api/**
+
+---
+id: Anteproyecto-Verify-workflow-update-workflow-definition-and-documentation
+trigger: "when doing update workflow definition and documentation"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Workflow Update Workflow Definition And Documentation
+
+## Action
+
+Follow the update-workflow-definition-and-documentation workflow:
+1. Edit or add workflow markdown file(s) in .agents/workflows/
+2. Update workflows.json in .agents/skills/antigravity-workflows/data/
+3. Update or create documentation in .agents/skills/antigravity-workflows/docs/WORKFLOWS.md
+4. Update skills-lock.json if necessary
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: .agents/workflows/*.md, .agents/skills/antigravity-workflows/data/workflows.json, .agents/skills/antigravity-workflows/docs/WORKFLOWS.md
+
+---
+id: Anteproyecto-Verify-workflow-security-pipeline-ci-hardening
+trigger: "when doing security pipeline ci hardening"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Workflow Security Pipeline Ci Hardening
+
+## Action
+
+Follow the security-pipeline-ci-hardening workflow:
+1. Edit .github/workflows/security-pipeline.yml to pin or update action versions/hashes
+2. Optionally add or update .github/dependabot.yml
+3. Commit changes to ensure CI pipeline is secure and up to date
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .github/workflows/security-pipeline.yml, .github/dependabot.yml
+
+---
+id: Anteproyecto-Verify-workflow-meta-skill-orchestrator-update
+trigger: "when doing meta skill orchestrator update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Workflow Meta Skill Orchestrator Update
+
+## Action
+
+Follow the meta-skill-orchestrator-update workflow:
+1. Edit SKILL.md in orchestrator and workflows directories
+2. Update .agents/loop-run-counter.txt for loop/guardrail tracking
+3. Commit changes to ensure orchestrator follows new rules
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: .agents/skills/antigravity-skill-orchestrator/SKILL.md, .agents/skills/antigravity-workflows/SKILL.md, .agents/loop-run-counter.txt
+
+---
+id: Anteproyecto-Verify-workflow-dependency-and-lockfile-update
+trigger: "when doing dependency and lockfile update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Workflow Dependency And Lockfile Update
+
+## Action
+
+Follow the dependency-and-lockfile-update workflow:
+1. Edit package.json and/or src/frontend/web/package.json
+2. Update pnpm-lock.yaml
+3. Commit changes to lockfiles and related config
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: package.json, pnpm-lock.yaml, src/frontend/web/package.json
+
+---
+id: anteproyecto-verify-instinct-file-naming
+trigger: "When creating or renaming files in the codebase"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct File Naming
+
+## Action
+
+Use camelCase for file names
+
+## Evidence
+
+- Pattern in src/frontend/web/src/shared/components/ui/toast/*
+- Naming conventions specified in analysis
+
+---
+id: anteproyecto-verify-instinct-function-naming
+trigger: "When defining functions"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Function Naming
+
+## Action
+
+Use camelCase for function names
+
+## Evidence
+
+- Naming conventions specified in analysis
+- Consistent with TypeScript best practices
+
+---
+id: anteproyecto-verify-instinct-class-naming
+trigger: "When defining classes"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Class Naming
+
+## Action
+
+Use PascalCase for class names
+
+## Evidence
+
+- Naming conventions specified in analysis
+
+---
+id: anteproyecto-verify-instinct-constant-naming
+trigger: "When defining constants"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Constant Naming
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constant names
+
+## Evidence
+
+- Naming conventions specified in analysis
+
+---
+id: anteproyecto-verify-instinct-import-style
+trigger: "When importing modules"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Import Style
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Import style specified in analysis
+
+---
+id: anteproyecto-verify-instinct-export-style
+trigger: "When exporting modules or functions"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Export Style
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Export style specified in analysis
+
+---
+id: anteproyecto-verify-instinct-try-catch-error-handling
+trigger: "When handling errors in code"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Try Catch Error Handling
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Error handling style specified in analysis
+
+---
+id: anteproyecto-verify-instinct-test-location
+trigger: "When adding new tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Test Location
+
+## Action
+
+Place test files alongside the code they test (mixed test location)
+
+## Evidence
+
+- Test location specified as 'mixed' in architecture analysis
+- Pattern in files: **/*.test.*
+
+---
+id: anteproyecto-verify-instinct-test-pattern
+trigger: "When developing a new feature"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Test Pattern
+
+## Action
+
+Add corresponding test files named with .test. in the same or related directory
+
+## Evidence
+
+- Pattern in files: **/*.test.*
+- Workflows involve adding tests after feature implementation
+
+---
+id: anteproyecto-verify-instinct-commit-format
+trigger: "When making a commit"
+confidence: 0.95
+domain: git
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Commit Format
+
+## Action
+
+Use Conventional Commits format with prefixes: feat, fix, ci, chore
+
+## Evidence
+
+- Seen in commit: feat(agent-infra): session isolation by timestamp, deterministic circuit breaker, Zod skill scanner with anti-injection
+- Seen in commit: fix(security): migrate to httponly cookies and secure api proxy
+- Commit prefixes specified in analysis
+
+---
+id: anteproyecto-verify-instinct-commit-length
+trigger: "When writing commit messages"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Commit Length
+
+## Action
+
+Aim for commit messages averaging around 79 characters in length
+
+## Evidence
+
+- Average commit length specified in analysis
+
+---
+id: anteproyecto-verify-instinct-update-workflow-definition
+trigger: "When someone wants to add or update a workflow for agent automation"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Update Workflow Definition
+
+## Action
+
+Edit or add workflow markdown file(s) in .agents/workflows/, update workflows.json, update/create WORKFLOWS.md, update skills-lock.json if necessary
+
+## Evidence
+
+- Workflow: update-workflow-definition-and-documentation
+- Files: .agents/workflows/*.md, .agents/skills/antigravity-workflows/data/workflows.json, .agents/skills/antigravity-workflows/docs/WORKFLOWS.md, skills-lock.json
+
+---
+id: anteproyecto-verify-instinct-security-pipeline-update
+trigger: "When someone needs to improve CI security or update action versions/hashes"
+confidence: 0.98
+domain: workflow
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Security Pipeline Update
+
+## Action
+
+Edit .github/workflows/security-pipeline.yml to pin or update action versions/hashes, optionally update .github/dependabot.yml
+
+## Evidence
+
+- Workflow: security-pipeline-ci-hardening
+- Files: .github/workflows/security-pipeline.yml, .github/dependabot.yml
+
+---
+id: anteproyecto-verify-instinct-meta-skill-orchestrator-update
+trigger: "When someone wants to improve orchestrator logic or enforce new execution rules"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Meta Skill Orchestrator Update
+
+## Action
+
+Edit SKILL.md in orchestrator and workflows directories, update .agents/loop-run-counter.txt for loop/guardrail tracking
+
+## Evidence
+
+- Workflow: meta-skill-orchestrator-update
+- Files: .agents/skills/antigravity-skill-orchestrator/SKILL.md, .agents/skills/antigravity-workflows/SKILL.md, .agents/loop-run-counter.txt
+
+---
+id: anteproyecto-verify-instinct-dependency-lockfile-update
+trigger: "When someone needs to patch vulnerabilities or fix dependency-related CI/build errors"
+confidence: 0.88
+domain: workflow
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Dependency Lockfile Update
+
+## Action
+
+Edit package.json and/or src/frontend/web/package.json, update pnpm-lock.yaml, commit changes to lockfiles and related config
+
+## Evidence
+
+- Workflow: dependency-and-lockfile-update
+- Files: package.json, pnpm-lock.yaml, src/frontend/web/package.json
+
