@@ -6,6 +6,7 @@
 |---|---|---|---|---|
 | Fix ERR_PACKAGE_PATH_NOT_EXPORTED & Node20 Deprecation | N/A | feat/agent-infrastructure-hardening | 74651a23 | 2026-06-06 |
 | Fix react-i18next resolution in container | N/A | develop | bd5fc58f | 2026-06-06 |
+| Remove 'remember me' checkbox | N/A | develop | 57ce09b9 | 2026-06-06 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

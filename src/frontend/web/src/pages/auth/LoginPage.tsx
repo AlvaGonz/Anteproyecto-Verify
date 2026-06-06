@@ -175,17 +175,6 @@ export const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 py-1">
-              <input
-                type="checkbox"
-                id="remember"
-                className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
-              />
-              <label htmlFor="remember" className="text-[13px] font-medium text-text-secondary cursor-pointer select-none">
-                Mantener sesión activa por 30 días
-              </label>
-            </div>
-
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
