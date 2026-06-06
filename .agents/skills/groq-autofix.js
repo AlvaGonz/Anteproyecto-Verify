@@ -80,7 +80,7 @@ RESPONSE FORMAT: Only provide the code inside triple backticks. No explanations.
         fs.writeFileSync(safePath, fixedCode);
         console.log(`✅ Fixed: ${safePath}`);
     } catch (error) {
-        console.error(`❌ Error in ${filePath}:`, error.message);
+        console.error("❌ Error in", filePath, "-", error.message);
     }
 }
 

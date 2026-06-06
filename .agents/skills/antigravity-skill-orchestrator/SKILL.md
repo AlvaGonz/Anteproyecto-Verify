@@ -64,6 +64,13 @@ in the Antigravity hierarchy:
 │   (@react-patterns, @tdd, etc.)          │
 └──────────────────────────────────────────┘
 
+### Strict Anti-Loop Guardrail (Mandatory)
+To prevent infinite, non-terminating circular execution loops between meta-skills, you MUST enforce a strict Directed Acyclic Graph (DAG) for agent execution:
+
+1. The **Orchestrator** is permitted to delegate complex, multi-phase tasks downwards to the **Workflows** engine.
+2. **Workflows** executes and runs atomic, domain-specific **Skills**.
+3. **CRITICAL (Anti-Loop Rule)**: A Workflow is strictly forbidden from delegating tasks back upwards to the Orchestrator, either directly or through recursive invocation. Once execution transfers to a Workflow, control flow MUST only move downwards to atomic skills. If a workflow phase fails, the executing agent must report it or trigger manual fallback, but under no circumstances should it call `@antigravity-skill-orchestrator` to resolve a sub-step.
+
 ### Dynamic Skill Discovery (SkillScanner)
 The orchestrator uses a runtime `SkillScanner` module (`scripts/scanner.mjs`) to discover skills at execution time. The scanner:
 
@@ -134,6 +141,12 @@ The catalog organizes skills across 9 primary categories:
    ```
 3. The scanner outputs a JSON array of `{ name, description, source, path }` objects.
 4. Review the output to understand your available toolbox before making any selection.
+
+### Step 0.5: Discover Active MCPs (Mandatory)
+Before evaluating task complexity or selecting any skill, the orchestrator MUST explicitly query the current system environment for active Model Context Protocol (MCP) servers and tools.
+1. Review all loaded server connections (e.g., `StitchMCP`, `github-mcp-server`, `context7-mcp`, `awesome-copilot`, `mssql`).
+2. Map the active MCP capability namespaces to the required capability domains of the task (e.g., code searching, database access, pull request reading, browser QA).
+3. **Strict Warning Gate**: If a capability domain required for a task (such as DB querying or git operations) lacks an active, responsive MCP connection, the agent MUST immediately raise a warning block to the user detailing the missing server before selecting or executing any skill.
 
 ### Step 1: Task Evaluation & Guardrail Check
 [Triggered when facing a new user request]

@@ -124,17 +124,30 @@ function buildRegistry(skills) {
   const skillNames = [];
   const skillDescriptions = {};
   const skillSources = {};
+  const activeMcpServers = [];
 
-  for (const skill of skills) {
-    if (!skill.name || !skill.description) continue;
+  for (const item of skills) {
+    if (item.type === "mcp_server") {
+      activeMcpServers.push({
+        name: item.name,
+        status: "active",
+      });
+      continue;
+    }
 
-    skillNames.push(skill.name);
-    skillDescriptions[skill.name] = truncateDescription(skill.description, 200);
-    skillSources[skill.name] = skill.source || "unknown";
+    if (!item.name || !item.description) continue;
+
+    skillNames.push(item.name);
+    skillDescriptions[item.name] = truncateDescription(item.description, 200);
+    skillSources[item.name] = item.source || "unknown";
   }
 
   // Sort alphabetically for stable output
   skillNames.sort();
+  activeMcpServers.sort((a, b) => a.name.localeCompare(b.name));
+
+  const localSkillsCount = skills.filter((s) => s.type !== "mcp_server" && s.source === "local").length;
+  const globalSkillsCount = skills.filter((s) => s.type !== "mcp_server" && s.source === "global").length;
 
   return {
     tool_schema: {
@@ -163,10 +176,12 @@ function buildRegistry(skills) {
     },
     skill_descriptions: skillDescriptions,
     skill_sources: skillSources,
+    active_mcp_servers: activeMcpServers,
     metadata: {
       total_skills: skillNames.length,
-      local_count: skills.filter((s) => s.source === "local").length,
-      global_count: skills.filter((s) => s.source === "global").length,
+      local_count: localSkillsCount,
+      global_count: globalSkillsCount,
+      mcp_count: activeMcpServers.length,
       generated_at: new Date().toISOString(),
     },
   };
@@ -196,13 +211,14 @@ async function main() {
   log("Building dynamic skill registry...");
 
   const skills = await readSkillData(opts);
-  log(`Received ${skills.length} skills from scanner`);
+  log(`Received ${skills.length} items from scanner`);
 
   const registry = buildRegistry(skills);
 
   log(
     `Registry built: ${registry.metadata.total_skills} skills ` +
-      `(${registry.metadata.local_count} local, ${registry.metadata.global_count} global)`
+      `(${registry.metadata.local_count} local, ${registry.metadata.global_count} global) ` +
+      `and ${registry.metadata.mcp_count} active MCP servers`
   );
 
   stdout.write(JSON.stringify(registry, null, 2) + "\n");
@@ -212,3 +228,4 @@ main().catch((err) => {
   log(`FATAL: ${err.message}`);
   process.exit(1);
 });
+

@@ -1,23 +1,31 @@
 ---
 id: error-digest
 description: Summarize error patterns to surface top recurring root causes.
+requires_mcps:
+  - mcp-context7-mcp
 ---
 # /error-digest — Error Digest Generation
+
+## Pre-conditions
+## Infrastructure Prerequisites
+- Active MCP servers required: `mcp-context7-mcp`
+  - GATE: Verify active server connection using scanner. If FAIL → stop and report. Do NOT proceed. MAX_RETRIES: 3.
 
 ## Steps
 
 0. **Initialize Planning Files** (@planning-with-files)
-   - Create or update `.agents/docs/PWF/task_plan.md` with the workflow ID `error-digest`, current objectives, and the checklist of steps below.
-   - GATE: The file `.agents/docs/PWF/task_plan.md` exists and contains all steps. If FAIL → stop and report. Do NOT proceed.
+   - Create the isolated session directory at `.agents/sessions/<id_sesion>/`.
+   - Populate `.agents/sessions/<id_sesion>/task_plan.md`, `.agents/sessions/<id_sesion>/findings.md`, and `.agents/sessions/<id_sesion>/progress.md` with the workflow ID `error-digest`, current objectives, and the checklist of steps below before touching any project files.
+   - GATE: The directory `.agents/sessions/<id_sesion>/` and the base planning files (`task_plan.md`, `findings.md`, `progress.md`) exist and contain all initial steps. If FAIL → stop and report. Do NOT proceed. MAX_RETRIES: 3.
 
-1. Read `tasks/error-patterns.md`.
-   - GATE: Error patterns successfully loaded. If FAIL → stop and report. Do NOT proceed.
+1. Read `.agents/sessions/<id_sesion>/error-patterns.md`.
+   - GATE: Error patterns successfully loaded. If FAIL → stop and report. Do NOT proceed. MAX_RETRIES: 3.
 
 2. Send to Groq: "Summarize these error patterns. Surface the top 3 recurring root causes and their recommended fix strategies."
-   - GATE: Summary generated with top 3 root causes and strategies. If FAIL → stop and report. Do NOT proceed.
+   - GATE: Summary generated with top 3 root causes and strategies. If FAIL → stop and report. Do NOT proceed. MAX_RETRIES: 3.
 
-3. Output digest to `tasks/error-digest.md`.
-   - GATE: Digest written to `tasks/error-digest.md` correctly. If FAIL → stop and report. Do NOT proceed.
+3. Output digest to `.agents/sessions/<id_sesion>/error-digest.md`.
+   - GATE: Digest written to `.agents/sessions/<id_sesion>/error-digest.md` correctly. If FAIL → stop and report. Do NOT proceed. MAX_RETRIES: 3.
 
 4. Surface in next planning brief.
-   - GATE: Digest presented in the next planning brief. If FAIL → stop and report. Do NOT proceed.
+   - GATE: Digest presented in the next planning brief. If FAIL → stop and report. Do NOT proceed. MAX_RETRIES: 3.

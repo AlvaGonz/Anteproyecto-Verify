@@ -29,6 +29,7 @@ All workflows follow a rigid, multi-phase operational model designed for securit
 | `error-digest` | Error Digest Generation | Quality QA | Summarizing recurring error patterns from session history | `@planning-with-files` |
 | `evolve-prompts` | LOW-FITNESS Evolution Workflow | Maintenance | Optimizing underperforming agent skill structures | `@planning-with-files` |
 | `evolve-skills` | LOW-FITNESS Skill Evolution | Maintenance | Mutating agent skill prompts with low fitness scores | `@planning-with-files`, `@skill-fitness` |
+| `security-audit-cicd` | Security Audit and CI/CD Integration | Security | Perform a comprehensive Security Audit and implement automated CI/CD pipeline | `@planning-with-files`, `@owasp-security` |
 
 ---
 

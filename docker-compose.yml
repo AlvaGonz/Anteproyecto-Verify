@@ -50,6 +50,11 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite
     ports:
       - "10000:10000"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
 
 volumes:
   mssql-data:

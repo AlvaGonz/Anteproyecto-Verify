@@ -21,35 +21,31 @@ export interface CreateRuleCommand {
 }
 
 export const rulesApi = {
-  getRules: async (token: string): Promise<ReglaValidacionDto[]> => {
+  getRules: async (): Promise<ReglaValidacionDto[]> => {
     const response = await fetch('/api/admin/rules', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include'
     });
     if (!response.ok) throw new Error('Error al obtener las reglas.');
     return response.json();
   },
 
-  createRule: async (command: CreateRuleCommand, token: string): Promise<{ id: string }> => {
+  createRule: async (command: CreateRuleCommand): Promise<{ id: string }> => {
     const response = await fetch('/api/admin/rules', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify(command)
     });
     if (!response.ok) throw new Error('Error al crear la regla.');
     return response.json();
   },
 
-  toggleRule: async (id: string, token: string): Promise<void> => {
+  toggleRule: async (id: string): Promise<void> => {
     const response = await fetch(`/api/admin/rules/${id}/toggle`, {
       method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include'
     });
     if (!response.ok) throw new Error('Error al cambiar el estado de la regla.');
   }

@@ -239,6 +239,54 @@ function log(msg) {
   stderr.write(`[scanner] ${msg}\n`);
 }
 
+// ── MCP Discovery ─────────────────────────────────────────────────────
+
+/**
+ * Scans MCP configuration files and extracts active server metadata.
+ */
+async function scanMCPConfigs(paths, source) {
+  const mcpServers = [];
+  for (const p of paths) {
+    try {
+      let raw;
+      try {
+        raw = await readFile(p, "utf-8");
+      } catch (err) {
+        if (err.code === "ENOENT") continue;
+        throw err;
+      }
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && parsed.mcpServers && typeof parsed.mcpServers === "object") {
+        for (const serverName of Object.keys(parsed.mcpServers)) {
+          mcpServers.push({
+            name: `mcp-${serverName}`,
+            type: "mcp_server",
+            source,
+            path: p
+          });
+        }
+      }
+    } catch (err) {
+      log(`WARN: Failed to parse MCP config at ${p}: ${err.message}`);
+    }
+  }
+  return mcpServers;
+}
+
+function deduplicateMCPServers(mcpServers) {
+  const registry = new Map();
+  const globalMcp = mcpServers.filter(s => s.source === "global");
+  const localMcp = mcpServers.filter(s => s.source === "local");
+
+  for (const s of globalMcp) {
+    registry.set(s.name, s);
+  }
+  for (const s of localMcp) {
+    registry.set(s.name, s);
+  }
+  return Array.from(registry.values());
+}
+
 // ── Main ──────────────────────────────────────────────────────────────
 
 async function main() {
@@ -258,9 +306,50 @@ async function main() {
   log(`Found ${localSkills.length} local skills`);
   log(`Found ${globalSkills.length} global skills`);
 
-  const merged = deduplicateSkills(localSkills, globalSkills);
+  const mergedSkills = deduplicateSkills(localSkills, globalSkills);
+  log(`Total unique skills after deduplication: ${mergedSkills.length}`);
 
-  log(`Total unique skills after deduplication: ${merged.length}`);
+  // Build local MCP config targets
+  const localMcpPaths = [
+    join(cwd(), ".cursor", "mcp.json"),
+    join(cwd(), ".antigravity", "mcp.json"),
+  ];
+  if (opts.localPath) {
+    localMcpPaths.push(
+      join(opts.localPath, "mcp.json"),
+      join(opts.localPath, ".cursor", "mcp.json"),
+      join(opts.localPath, ".antigravity", "mcp.json")
+    );
+  }
+
+  // Build global MCP config targets
+  const userHome = env.USERPROFILE || env.HOME || "";
+  const globalMcpPaths = [
+    join(userHome, ".cursor", "mcp.json"),
+    join(userHome, ".antigravity", "mcp.json"),
+    join(userHome, ".gemini", "mcp.json"),
+  ];
+  if (opts.globalPath) {
+    globalMcpPaths.push(
+      join(opts.globalPath, "mcp.json"),
+      join(opts.globalPath, ".cursor", "mcp.json"),
+      join(opts.globalPath, ".antigravity", "mcp.json"),
+      join(opts.globalPath, ".gemini", "mcp.json")
+    );
+  }
+
+  log(`Scanning MCP configs...`);
+  const [localMcpServers, globalMcpServers] = await Promise.all([
+    scanMCPConfigs(localMcpPaths, "local"),
+    scanMCPConfigs(globalMcpPaths, "global"),
+  ]);
+
+  const rawMcpServers = [...localMcpServers, ...globalMcpServers];
+  const deduppedMcpServers = deduplicateMCPServers(rawMcpServers);
+  log(`Found ${deduppedMcpServers.length} active MCP servers`);
+
+  // Combine both standard skills and discovered MCP servers
+  const merged = [...mergedSkills, ...deduppedMcpServers];
 
   const output = opts.pretty
     ? JSON.stringify(merged, null, 2)
@@ -273,3 +362,5 @@ main().catch((err) => {
   log(`FATAL: ${err.message}`);
   process.exit(1);
 });
+
+

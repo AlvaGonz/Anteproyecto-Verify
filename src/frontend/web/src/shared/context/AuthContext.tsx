@@ -39,7 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const result = await AuthService.login(email, password);
     
     if (isSuccess(result)) {
-      localStorage.setItem("vf_token", result.data.token);
       setUser(result.data.user);
     } else {
       setError(result.error);
@@ -50,7 +49,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("vf_token");
     setUser(null);
     AuthService.logout();
   };

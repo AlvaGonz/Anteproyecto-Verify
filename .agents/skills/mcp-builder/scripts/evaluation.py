@@ -56,6 +56,7 @@ Response Requirements:
 def parse_evaluation_file(file_path: Path) -> list[dict[str, Any]]:
     """Parse XML evaluation file with qa_pair elements."""
     try:
+        import defusedxml.ElementTree as ET
         tree = ET.parse(file_path)
         root = tree.getroot()
         evaluations = []

@@ -38,8 +38,7 @@ export const RulesManagePage: React.FC = () => {
   const fetchRules = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token") || "";
-      const data = await rulesApi.getRules(token);
+      const data = await rulesApi.getRules();
       setRules(data);
     } catch (err: any) {
       console.error(err.message || "Error al conectar con el servidor de inteligencia");
@@ -52,8 +51,7 @@ export const RulesManagePage: React.FC = () => {
 
   const handleToggle = async (id: string, currentName: string, isActivating: boolean) => {
     try {
-      const token = localStorage.getItem("token") || "";
-      await rulesApi.toggleRule(id, token);
+      await rulesApi.toggleRule(id);
       addToast(`Regla "${currentName}" ${isActivating ? 'activada' : 'desactivada'}`, isActivating ? "success" : "info");
       await fetchRules();
     } catch (err: any) {
@@ -64,8 +62,7 @@ export const RulesManagePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token") || "";
-      await rulesApi.createRule(formData, token);
+      await rulesApi.createRule(formData);
       addToast("Parámetro de validación creado correctamente", "success");
       setShowForm(false);
       setFormData({ 
