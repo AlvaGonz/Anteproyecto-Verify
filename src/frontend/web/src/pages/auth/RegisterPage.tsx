@@ -100,13 +100,14 @@ export const RegisterPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const displayName = `${nombre.trim()} ${apellido.trim()}`;
-      const result = await AuthService.registerAccount({
-        email: email.toLowerCase(),
-        name: displayName,
-        telefono: cleanPhone || undefined,
-        cedula: cleanCedula || undefined,
-      });
+      const result = await AuthService.register(
+        nombre.trim(),
+        apellido.trim(),
+        email.toLowerCase(),
+        password,
+        cleanPhone || undefined,
+        cleanCedula || undefined,
+      );
 
       if (!isSuccess(result)) {
         const errorMsg = result.error._tag === "NetworkError"
