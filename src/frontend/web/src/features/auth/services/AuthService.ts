@@ -130,7 +130,14 @@ export const AuthService = {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ nombre, apellido, email, password, telefono, cedula })
+        body: JSON.stringify({ 
+          Nombre: nombre, 
+          Apellido: apellido, 
+          Email: email, 
+          Password: password, 
+          Telefono: telefono ?? null, 
+          Cedula: cedula ?? null 
+        })
       });
 
       if (!response.ok) {
