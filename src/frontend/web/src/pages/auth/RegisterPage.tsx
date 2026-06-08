@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { formatCedula, formatPhone, stripMask } from "../../shared/utils/formatters";
 import {
   Mail,
   Lock,
@@ -18,15 +17,32 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthService } from "../../features/auth/services/AuthService";
 import { isSuccess } from "../../shared/utils/functional";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, RegisterFormData } from "../../schemas/registerSchema";
 
 export const RegisterPage: React.FC = () => {
-  const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [cedula, setCedula] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors: formErrors, isValid }
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    defaultValues: {
+      nombre: "",
+      apellido: "",
+      email: "",
+      password: "",
+      telefono: "",
+      cedula: "",
+    }
+  });
+
+  const password = watch("password", "");
   
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -36,6 +52,22 @@ export const RegisterPage: React.FC = () => {
   const [modalType, setModalType] = useState<"terms" | "privacy" | null>(null);
   const navigate = useNavigate();
 
+  const blockNonDigits = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowed = [
+      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+      'Home', 'End',
+    ];
+    const isDigit = /^\d$/.test(e.key);
+    const isDash = e.key === '-';       // allow dashes for formatted input
+    const isAllowed = allowed.includes(e.key);
+    const isCtrl = e.ctrlKey || e.metaKey; // allow Ctrl+A, Ctrl+C, Ctrl+V, etc.
+
+    if (!isDigit && !isDash && !isAllowed && !isCtrl) {
+      e.preventDefault(); // BLOCK letters and special chars
+    }
+  };
+
   // Password validation criteria in real-time
   const isMinLength = password.length >= 8;
   const hasUpper = /[A-Z]/.test(password);
@@ -43,70 +75,20 @@ export const RegisterPage: React.FC = () => {
   const hasNumber = /[0-9]/.test(password);
   const hasSpecial = /[!@#$%^&*()_+{}|[\]\\:';"<>?,./~|-]/.test(password);
 
-  // Form validity check for the submit button
-  const isFormValid = 
-    nombre.trim().length > 0 &&
-    apellido.trim().length > 0 &&
-    email.trim().length > 0 &&
-    email.includes("@") &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
-    telefono.replace(/[^0-9]/g, "").length === 10 &&
-    cedula.trim().length > 0 &&
-    isMinLength &&
-    hasUpper &&
-    hasLower &&
-    hasNumber &&
-    hasSpecial &&
-    acceptedTerms;
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: RegisterFormData) => {
     setError(null);
-
-    // 1. Double check validations before submitting (for security)
-    if (!acceptedTerms) {
-      setError("Debes aceptar los términos de uso y la política de privacidad para poder crear tu cuenta.");
-      return;
-    }
-
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || !password || !telefono.trim() || !cedula.trim()) {
-      setError("Todos los campos marcados con (*) son obligatorios y deben ser completados.");
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Por favor, introduce un correo electrónico válido (debe contener '@' y un dominio correcto).");
-      return;
-    }
-
-    const cleanPhone = stripMask(telefono);
-    if (cleanPhone.length > 0) {
-      if (cleanPhone.length !== 10) {
-        setError("El número de teléfono debe tener exactamente 10 dígitos.");
-        return;
-      }
-      if (!/^(809|829|849)/.test(cleanPhone)) {
-        setError("El número de teléfono dominicano debe comenzar con 809, 829 o 849.");
-        return;
-      }
-    }
-
-    const cleanCedula = stripMask(cedula);
-    if (cleanCedula.length > 0 && cleanCedula.length !== 11) {
-      setError("La cédula debe tener exactamente 11 dígitos.");
-      return;
-    }
-
     setLoading(true);
 
     try {
+      // Send raw unmasked data to backend (or masked if your backend regex now allows it)
+      // Since backend regex expects dashes, we can send exactly what Zod validated
       const result = await AuthService.register(
-        nombre.trim(),
-        apellido.trim(),
-        email.toLowerCase(),
-        password,
-        cleanPhone || undefined,
-        cleanCedula || undefined,
+        data.nombre.trim(),
+        data.apellido.trim(),
+        data.email.toLowerCase(),
+        data.password,
+        data.telefono || undefined,
+        data.cedula || undefined,
       );
 
       if (!isSuccess(result)) {
@@ -134,7 +116,7 @@ export const RegisterPage: React.FC = () => {
   };
 
   const acceptAndCloseModal = () => {
-    setAcceptedTerms(true);
+    setValue("acceptedTerms", true, { shouldValidate: true });
     setModalType(null);
   };
 
@@ -267,7 +249,7 @@ export const RegisterPage: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
@@ -275,10 +257,9 @@ export const RegisterPage: React.FC = () => {
                   type="text" 
                   placeholder="Nombre *" 
                   className="vf-input w-full pl-12 h-[52px]" 
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  required 
+                  {...register("nombre")}
                 />
+                {formErrors.nombre && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.nombre.message}</span>}
               </div>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
@@ -286,10 +267,9 @@ export const RegisterPage: React.FC = () => {
                   type="text" 
                   placeholder="Apellido *" 
                   className="vf-input w-full pl-12 h-[52px]" 
-                  value={apellido}
-                  onChange={(e) => setApellido(e.target.value)}
-                  required 
+                  {...register("apellido")}
                 />
+                {formErrors.apellido && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.apellido.message}</span>}
               </div>
             </div>
 
@@ -299,10 +279,9 @@ export const RegisterPage: React.FC = () => {
                 type="email" 
                 placeholder="Correo electrónico *" 
                 className="vf-input w-full pl-12 h-[52px]" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required 
+                {...register("email")}
               />
+              {formErrors.email && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.email.message}</span>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -311,22 +290,26 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Teléfono"
-                  maxLength={14}
+                  maxLength={15}
+                  inputMode="numeric"
                   className="vf-input w-full pl-12 h-[52px]"
-                  value={formatPhone(telefono)}
-                  onChange={(e) => setTelefono(stripMask(e.target.value))}
+                  {...register("telefono")}
+                  onKeyDown={blockNonDigits}
                 />
+                {formErrors.telefono && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.telefono.message}</span>}
               </div>
               <div className="relative">
                 <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
                 <input
                   type="text"
                   placeholder="Cédula"
-                  maxLength={13}
+                  maxLength={15}
+                  inputMode="numeric"
                   className="vf-input w-full pl-12 h-[52px]"
-                  value={formatCedula(cedula)}
-                  onChange={(e) => setCedula(stripMask(e.target.value))}
+                  {...register("cedula")}
+                  onKeyDown={blockNonDigits}
                 />
+                {formErrors.cedula && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.cedula.message}</span>}
               </div>
             </div>
 
@@ -336,10 +319,9 @@ export const RegisterPage: React.FC = () => {
                 type="password" 
                 placeholder="Contraseña de acceso *" 
                 className="vf-input w-full pl-12 h-[52px]" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required 
+                {...register("password")}
               />
+              {formErrors.password && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.password.message}</span>}
             </div>
 
             {/* Premium Live Password Criteria Checker */}
@@ -376,9 +358,7 @@ export const RegisterPage: React.FC = () => {
                 <input 
                   type="checkbox" 
                   className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary/20" 
-                  checked={acceptedTerms}
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  required 
+                  {...register("acceptedTerms")}
                 />
                 <span className="text-[13px] text-text-secondary leading-relaxed group-hover:text-text-primary transition-colors">
                   Acepto los{" "}
@@ -403,10 +383,10 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <motion.button
-              whileHover={isFormValid ? { scale: 1.01 } : {}}
-              whileTap={isFormValid ? { scale: 0.99 } : {}}
+              whileHover={isValid ? { scale: 1.01 } : {}}
+              whileTap={isValid ? { scale: 0.99 } : {}}
               type="submit"
-              disabled={loading || !isFormValid}
+              disabled={loading || !isValid}
               className="vf-btn-primary w-full h-[56px] text-base font-bold shadow-floating disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 mt-4"
             >
               {loading ? (
