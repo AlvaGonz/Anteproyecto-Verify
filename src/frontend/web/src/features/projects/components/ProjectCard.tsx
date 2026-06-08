@@ -17,7 +17,7 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const { data: documents = [] } = useDocuments(Number(project.id));
+  const { data: documents = [] } = useDocuments(project.id);
 
   const documentCount = documents.length;
   const allVerified = useMemo(() => {

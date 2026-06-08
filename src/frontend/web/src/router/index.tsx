@@ -28,6 +28,12 @@ import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
 
+// New Pages
+import { CreateProjectPage } from "../pages/projects/CreateProjectPage";
+import { EditProjectPage } from "../pages/projects/EditProjectPage";
+import { UploadDocumentPage } from "../pages/projects/UploadDocumentPage";
+import { CreateValidationPage } from "../pages/projects/CreateValidationPage";
+
 const NavigateToVerifyResult: React.FC = () => {
   const { code } = useParams<{ code: string }>();
   return <Navigate to={`/projects/verify/${code}`} replace />;
@@ -97,16 +103,41 @@ export const router = createHashRouter([
         path: "/health",
         element: <HealthPage />,
       },
-
       {
         path: "/projects/:id",
         element: <ProjectPublicDetailPage />,
       },
+
+      /* ===== New Spec Routes ===== */
       {
-        path: "/projects/:id/upload",
+        path: "/projects/new",
         element: (
           <AuthGuard>
-            <ProjectDocumentUploadPage />
+            <CreateProjectPage />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/projects/:id/edit",
+        element: (
+          <AuthGuard>
+            <EditProjectPage />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/projects/:id/documents/upload",
+        element: (
+          <AuthGuard>
+            <UploadDocumentPage />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/projects/:id/validations/new",
+        element: (
+          <AuthGuard>
+            <CreateValidationPage />
           </AuthGuard>
         ),
       },
@@ -169,6 +200,14 @@ export const router = createHashRouter([
             <AdminLayout>
               <ProjectDocumentsPage />
             </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/:id/upload",
+        element: (
+          <AuthGuard>
+            <ProjectDocumentUploadPage />
           </AuthGuard>
         ),
       },

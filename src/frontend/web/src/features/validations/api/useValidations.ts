@@ -3,10 +3,10 @@ import { apiClient } from "@/infrastructure/api/client";
 import type { ValidationResultDto } from "./types";
 
 export const validationKeys = {
-  byProject: (projectId: number) => ["validations", projectId] as const,
+  byProject: (projectId: string) => ["validations", projectId] as const,
 };
 
-export const useValidations = (projectId: number) =>
+export const useValidations = (projectId: string) =>
   useQuery({
     queryKey: validationKeys.byProject(projectId),
     queryFn: () =>
@@ -14,7 +14,7 @@ export const useValidations = (projectId: number) =>
     enabled: !!projectId,
   });
 
-export const useSubmitValidation = (projectId: number) => {
+export const useSubmitValidation = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Partial<ValidationResultDto>) =>
@@ -24,14 +24,14 @@ export const useSubmitValidation = (projectId: number) => {
   });
 };
 
-export const useLatestInternalValidation = (projectId: number) =>
+export const useLatestInternalValidation = (projectId: string) =>
   useQuery({
     queryKey: ["validations", "internal", "latest", projectId],
     queryFn: () => apiClient.get<any>(`/projects/${projectId}/validations/internal/latest`).then(res => res.data),
     enabled: !!projectId,
   });
 
-export const useRunInternalValidation = (projectId: number) => {
+export const useRunInternalValidation = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => apiClient.post<any>(`/projects/${projectId}/validations/internal/run`, {}).then(res => res.data),
@@ -42,21 +42,21 @@ export const useRunInternalValidation = (projectId: number) => {
   });
 };
 
-export const useFindings = (projectId: number) =>
+export const useFindings = (projectId: string) =>
   useQuery({
     queryKey: ["findings", projectId],
     queryFn: () => apiClient.get<any[]>(`/projects/${projectId}/findings`).then(res => res.data),
     enabled: !!projectId,
   });
 
-export const useValidationResult = (projectId: number) =>
+export const useValidationResult = (projectId: string) =>
   useQuery({
     queryKey: ["validations", "result", projectId],
     queryFn: () => apiClient.get<any>(`/projects/${projectId}/validations/result`).then(res => res.data),
     enabled: !!projectId,
   });
 
-export const useRunFullValidation = (projectId: number) => {
+export const useRunFullValidation = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => apiClient.post<any>(`/projects/${projectId}/validations/run`, {}).then(res => res.data),

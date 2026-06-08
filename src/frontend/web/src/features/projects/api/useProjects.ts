@@ -6,7 +6,7 @@ import { ProjectCategory, ProjectStatus, IntegrityStatus } from "../types";
 
 export const projectKeys = {
   all: ["projects"] as const,
-  detail: (id: number) => ["projects", id] as const,
+  detail: (id: string) => ["projects", id] as const,
 };
 
 const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
@@ -27,7 +27,7 @@ export const useProjects = () =>
     queryFn: () => apiClient.get<ApiProyectoDto[]>("/projects").then(res => res.data.map(mapApiProject)),
   });
 
-export const useProject = (id: number) =>
+export const useProject = (id: string) =>
   useQuery({
     queryKey: projectKeys.detail(id),
     queryFn: () => apiClient.get<ApiProyectoDto>(`/projects/${id}`).then(res => mapApiProject(res.data)),

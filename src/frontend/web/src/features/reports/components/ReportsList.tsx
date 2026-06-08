@@ -7,7 +7,7 @@ interface ReportsListProps {
 }
 
 export const ReportsList: React.FC<ReportsListProps> = ({ projectId }) => {
-  const { data: rawReports = [], isLoading } = useReports(Number(projectId));
+  const { data: rawReports = [], isLoading } = useReports(projectId || "");
 
   // Map API DTO to legacy UI shape
   const reports = React.useMemo(() => {

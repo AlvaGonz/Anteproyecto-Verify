@@ -25,7 +25,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export const ProjectValidationResultsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const projectId = Number(id);
+  const projectId = id || "";
   const { data: latestSummary, isLoading: isSummaryLoading, error: summaryError } = useLatestInternalValidation(projectId);
   const { data: allFindings = [], isLoading: isFindingsLoading } = useFindings(projectId);
   

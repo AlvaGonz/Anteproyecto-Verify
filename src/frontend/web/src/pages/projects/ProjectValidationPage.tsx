@@ -20,7 +20,7 @@ export const ProjectValidationPage: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'analysis' | 'findings' | 'audit'>('analysis');
-  const projectId = Number(id);
+  const projectId = id || "";
   const { data: rawResult, isLoading: isResultLoading, error: resultError } = useValidationResult(projectId);
   const { data: rawFindings = [], isLoading: isFindingsLoading } = useFindings(projectId);
   const { data: rawAuditLogs = [], isLoading: isAuditLoading } = useAuditLog(projectId);

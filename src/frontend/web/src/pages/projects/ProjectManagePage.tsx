@@ -32,14 +32,14 @@ export const ProjectManagePage: React.FC = () => {
   const { addToast } = useToast();
   const isEditing = !!id;
 
-  const { data: rawProject, isLoading: loading } = useProject(Number(id));
+  const { data: rawProject, isLoading: loading } = useProject(id || "");
   const project = rawProject;
   
   const createMutation = useCreateProject();
   
   const qc = useQueryClient();
   const updateMutation = useMutation({
-    mutationFn: (data: { id: number; payload: any }) => 
+    mutationFn: (data: { id: string; payload: any }) => 
       apiClient.put<ProyectoDto>(`/projects/${data.id}`, data.payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
@@ -47,7 +47,7 @@ export const ProjectManagePage: React.FC = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: (data: { id: number; status: string }) => 
+    mutationFn: (data: { id: string; status: string }) => 
       apiClient.patch<ProyectoDto>(`/projects/${data.id}/status`, { status: data.status }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
@@ -61,7 +61,7 @@ export const ProjectManagePage: React.FC = () => {
         if (data.categoria == null) {
           throw new Error("Missing required field: categoria");
         }
-        await updateMutation.mutateAsync({ id: Number(id), payload: data });
+        await updateMutation.mutateAsync({ id: id as string, payload: data });
         addToast("Proyecto actualizado exitosamente", "success");
         navigate(`/projects/${id}`);
       } else {
@@ -87,7 +87,7 @@ export const ProjectManagePage: React.FC = () => {
     try {
       sanitizeStatus(status);
       const apiStatus = status === ProjectStatus.Published ? "Activo" : "Pendiente";
-      await updateStatusMutation.mutateAsync({ id: Number(id), status: apiStatus });
+      await updateStatusMutation.mutateAsync({ id: id as string, status: apiStatus });
       addToast("Estado actualizado exitosamente", "success");
     } catch {
       addToast("Error al actualizar el estado", "error");

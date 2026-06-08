@@ -42,7 +42,7 @@ const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string
 };
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, projectCategory = ProjectCategory.Residencial }) => {
-  const { data: documents = [], isLoading: loading } = useDocuments(Number(projectId));
+  const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
 
   if (loading) return (
     <div className="py-20 flex flex-col items-center gap-4 text-secondary/20">

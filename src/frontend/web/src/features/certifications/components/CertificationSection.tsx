@@ -11,8 +11,8 @@ interface CertificationSectionProps {
 export const CertificationSection: React.FC<CertificationSectionProps> = ({
   projectId,
 }) => {
-  const { data: rawCertification, isLoading, error: queryError } = useCertification(Number(projectId));
-  const issueSealMutation = useIssueSeal(Number(projectId));
+  const { data: rawCertification, isLoading, error: queryError } = useCertification(projectId || "");
+  const issueSealMutation = useIssueSeal(projectId || "");
 
   const certification = React.useMemo(() => {
     if (!rawCertification) return null;

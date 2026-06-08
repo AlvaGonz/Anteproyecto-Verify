@@ -5,7 +5,7 @@ import type { DocumentDto } from "../types";
 import { DocumentStatus } from "../types";
 
 export const documentKeys = {
-  byProject: (projectId: number) => ["documents", projectId] as const,
+  byProject: (projectId: string) => ["documents", projectId] as const,
 };
 
 const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
@@ -26,14 +26,14 @@ const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   createdAtUtc: apiDoc.fechaSubida,
 });
 
-export const useDocuments = (projectId: number) =>
+export const useDocuments = (projectId: string) =>
   useQuery({
     queryKey: documentKeys.byProject(projectId),
     queryFn: () => apiClient.get<ApiDocumentoDto[]>(`/projects/${projectId}/documents`).then(res => res.data.map(mapApiDocument)),
     enabled: !!projectId,
   });
 
-export const useUploadDocument = (projectId: number) => {
+export const useUploadDocument = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (formData: FormData) =>
@@ -44,7 +44,7 @@ export const useUploadDocument = (projectId: number) => {
   });
 };
 
-export const useUpdateDocumentStatus = (projectId: number) => {
+export const useUpdateDocumentStatus = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { documentId: string; activo: boolean }) =>
@@ -53,7 +53,7 @@ export const useUpdateDocumentStatus = (projectId: number) => {
   });
 };
 
-export const useDownloadDocument = (projectId: number) => {
+export const useDownloadDocument = (projectId: string) => {
   return useMutation({
     mutationFn: (documentId: string) =>
       apiClient.get(`/projects/${projectId}/documents/${documentId}/download`, { responseType: "blob" }).then(res => res.data),

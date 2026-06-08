@@ -3,7 +3,7 @@ import { apiClient } from "@/infrastructure/api/client";
 import type { ReporteDto } from "./types";
 import { PublicProjectReportDto } from "../types";
 
-export const useReports = (projectId: number) =>
+export const useReports = (projectId: string) =>
   useQuery({
     queryKey: ["reports", projectId],
     queryFn: () => apiClient.get<ReporteDto[]>(`/projects/${projectId}/reports`).then(res => res.data),

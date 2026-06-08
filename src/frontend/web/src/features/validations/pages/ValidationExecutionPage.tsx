@@ -28,7 +28,7 @@ export const ValidationExecutionPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const runFullValidationMutation = useRunFullValidation(Number(projectId));
+  const runFullValidationMutation = useRunFullValidation(projectId || "");
 
   const startValidation = () => {
     if (!projectId) return;

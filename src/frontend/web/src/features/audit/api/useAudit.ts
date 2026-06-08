@@ -4,10 +4,10 @@ import type { LogProyectoDto } from "./types";
 
 export const auditKeys = {
   global: (filters?: any) => ["audit", "global", filters] as const,
-  byProject: (projectId: number, filters?: any) => ["audit", projectId, filters] as const,
+  byProject: (projectId: string, filters?: any) => ["audit", projectId, filters] as const,
 };
 
-export const useAuditLog = (projectId: number, filters?: any) =>
+export const useAuditLog = (projectId: string, filters?: any) =>
   useQuery({
     queryKey: auditKeys.byProject(projectId, filters),
     queryFn: () => apiClient.get<LogProyectoDto[]>(`/projects/${projectId}/audit`, { params: filters }).then(res => res.data),

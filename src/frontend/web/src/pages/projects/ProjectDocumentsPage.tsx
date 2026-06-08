@@ -86,7 +86,7 @@ const RequiredDocumentsList: React.FC<{ documents: DocumentDto[] }> = ({ documen
 
 export const ProjectDocumentsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const projectId = Number(id);
+  const projectId = id || "";
   const { addToast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState("");

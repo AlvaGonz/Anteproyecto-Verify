@@ -3,17 +3,17 @@ import { apiClient } from "@/infrastructure/api/client";
 import type { SelloIntegridadDto } from "./types";
 
 export const certificationKeys = {
-  byProject: (projectId: number) => ["certifications", projectId] as const,
+  byProject: (projectId: string) => ["certifications", projectId] as const,
 };
 
-export const useCertification = (projectId: number) =>
+export const useCertification = (projectId: string) =>
   useQuery({
     queryKey: certificationKeys.byProject(projectId),
     queryFn: () => apiClient.get<SelloIntegridadDto>(`/projects/${projectId}/seal`).then(res => res.data),
     enabled: !!projectId,
   });
 
-export const useIssueSeal = (projectId: number) => {
+export const useIssueSeal = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => apiClient.post<SelloIntegridadDto>(`/projects/${projectId}/seal`).then(res => res.data),

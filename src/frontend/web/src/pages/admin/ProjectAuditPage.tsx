@@ -10,7 +10,7 @@ export const ProjectAuditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [filters, setFilters] = useState<AuditFilters>({});
   
-  const { data: rawLogs = [], isLoading } = useAuditLog(Number(id), filters);
+  const { data: rawLogs = [], isLoading } = useAuditLog(id || "", filters);
 
   // Map API DTO to legacy DTO expected by UI
   const logs = React.useMemo(() => {
