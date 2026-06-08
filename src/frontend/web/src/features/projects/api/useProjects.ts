@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/infrastructure/api/client";
+import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
 import type { ProyectoDto, CreateProyectoDto } from "../types";
 import { ProjectCategory, ProjectStatus, IntegrityStatus } from "../types";
