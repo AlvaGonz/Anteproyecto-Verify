@@ -10,6 +10,9 @@ node_modules/
 dist/
 .env
 .env.local
+# pnpm is the only allowed package manager — block npm/yarn lockfiles
+package-lock.json
+yarn.lock
 
 # OS
 .DS_Store
