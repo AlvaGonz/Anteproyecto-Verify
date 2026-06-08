@@ -25,55 +25,9 @@ export type AuthError =
   | { _tag: "NetworkError"; message: string }
   | { _tag: "UnknownError"; original: unknown };
 
-let mockSessionUser: User | null = {
-  id: "1",
-  email: "admin@verifinca.com",
-  name: "Administrador VeriFinca",
-  role: "admin",
-};
 
 export const AuthService = {
   async login(email: string, password: string): Promise<Result<AuthResponse, AuthError>> {
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-    if (USE_MOCK) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          try {
-            if (email === "admin@verifinca.com" && password === "admin123") {
-              const user = {
-                id: "1",
-                email: "admin@verifinca.com",
-                name: "Administrador VeriFinca",
-                role: "admin",
-              };
-              mockSessionUser = user;
-              resolve(success({
-                user,
-                token: "mock-jwt-token",
-              }));
-            } else if (email.includes("error")) {
-              resolve(failure({ _tag: "NetworkError", message: "Error de conexión con el servidor" }));
-            } else {
-              // Allow any login for demo but simulate credential check
-              const user = {
-                id: "2",
-                email: email,
-                name: "Usuario Demo",
-                role: "user",
-              };
-              mockSessionUser = user;
-              resolve(success({
-                user,
-                token: "mock-jwt-token",
-              }));
-            }
-          } catch (e) {
-            resolve(failure({ _tag: "UnknownError", original: e }));
-          }
-        }, 1000);
-      });
-    }
-
     try {
       const response = await fetch(`${env.API_URL}/api/auth/login`, {
         method: "POST",
@@ -93,7 +47,6 @@ export const AuthService = {
       }
 
       const data = await response.json();
-      mockSessionUser = data.user;
       return success({
         user: data.user,
         token: "real-cookie-session"
@@ -103,7 +56,6 @@ export const AuthService = {
     }
   },
 
-
   async register(
     nombre: string,
     apellido: string,
@@ -112,18 +64,6 @@ export const AuthService = {
     telefono?: string,
     cedula?: string
   ): Promise<Result<{ message: string; usuarioId?: string }, AuthError>> {
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-    if (USE_MOCK) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(success({
-            message: "Usuario registrado exitosamente (Mock).",
-            usuarioId: "mock-new-user-guid"
-          }));
-        }, 1000);
-      });
-    }
-
     try {
       const response = await fetch(`${env.API_URL}/api/auth/register`, {
         method: "POST",
@@ -153,14 +93,6 @@ export const AuthService = {
   },
 
   async logout(): Promise<void> {
-    mockSessionUser = null;
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-    if (USE_MOCK) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, 500);
-      });
-    }
-
     try {
       await fetch(`${env.API_URL}/api/auth/logout`, {
         method: "POST",
@@ -173,12 +105,6 @@ export const AuthService = {
   },
 
   async getCurrentUser(): Promise<Option<User>> {
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-    if (USE_MOCK) {
-      if (!mockSessionUser) return none();
-      return some(mockSessionUser);
-    }
-
     try {
       const response = await fetch(`${env.API_URL}/api/auth/me`, {
         headers: { 'Content-Type': 'application/json' },

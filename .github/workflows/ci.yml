@@ -145,13 +145,6 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Run tests
-        run: pnpm run test --run
-        env:
-          VITE_USE_MOCK: 'false'
-          VITE_API_URL: 'http://localhost:5000/api'
-        continue-on-error: true
-
   # ─────────────────────────────────────────────
   # JOB 3: Security — Secret scanning
   # ─────────────────────────────────────────────

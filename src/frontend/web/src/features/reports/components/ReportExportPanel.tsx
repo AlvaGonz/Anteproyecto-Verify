@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { reportsApi } from '../api/reportsApi';
+import { useGeneratePdf, useGenerateExcel, useQueryGeminiProxy } from '../api/useReports';
 import { FileDown, FileSpreadsheet, Loader2, Sparkles } from 'lucide-react';
 
 interface ReportExportPanelProps {
@@ -7,21 +7,20 @@ interface ReportExportPanelProps {
 }
 
 export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({ projectId }) => {
-  const [loadingPdf, setLoadingPdf] = useState(false);
-  const [loadingExcel, setLoadingExcel] = useState(false);
-  const [loadingAi, setLoadingAi] = useState(false);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const generatePdfMutation = useGeneratePdf();
+  const generateExcelMutation = useGenerateExcel();
+  const queryGeminiProxyMutation = useQueryGeminiProxy();
+
   const handleExport = async (type: 'pdf' | 'excel') => {
     setError(null);
-    const setLoading = type === 'pdf' ? setLoadingPdf : setLoadingExcel;
-    setLoading(true);
 
     try {
       const blob = type === 'pdf' 
-        ? await reportsApi.generatePdf(projectId)
-        : await reportsApi.generateExcel(projectId);
+        ? await generatePdfMutation.mutateAsync(projectId)
+        : await generateExcelMutation.mutateAsync(projectId);
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -33,24 +32,23 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({ projectId 
       document.body.removeChild(a);
     } catch (err: any) {
       setError(err.message || `Error al generar el reporte ${type.toUpperCase()}`);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleQueryAi = async () => {
     setError(null);
-    setLoadingAi(true);
     setAiResponse(null);
     try {
-      const summary = await reportsApi.queryGeminiProxy(projectId);
+      const summary = await queryGeminiProxyMutation.mutateAsync(projectId);
       setAiResponse(summary);
     } catch (err: any) {
       setError(err.message || 'Error al conectar con el asistente de IA.');
-    } finally {
-      setLoadingAi(false);
     }
   };
+
+  const loadingPdf = generatePdfMutation.isPending;
+  const loadingExcel = generateExcelMutation.isPending;
+  const loadingAi = queryGeminiProxyMutation.isPending;
 
   return (
     <div className="bg-white shadow sm:rounded-lg border border-gray-200 mt-6 overflow-hidden">

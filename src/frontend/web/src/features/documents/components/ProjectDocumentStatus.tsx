@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { DocumentDto, DocumentType, DocumentStatus } from "../types";
-import { documentsApi } from "../api/documentsApi";
+import React from "react";
+import { DocumentType, DocumentStatus } from "../types";
+import { useDocuments } from "../api/useDocuments";
 import { 
   AlertTriangle, 
   Clock, 
@@ -42,22 +42,7 @@ const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string
 };
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, projectCategory = ProjectCategory.Residencial }) => {
-  const [documents, setDocuments] = useState<DocumentDto[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchDocs = async () => {
-      try {
-        const docs = await documentsApi.getProjectDocuments(projectId);
-        setDocuments(docs);
-      } catch (error) {
-        console.error("Error fetching documents:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDocs();
-  }, [projectId]);
+  const { data: documents = [], isLoading: loading } = useDocuments(Number(projectId));
 
   if (loading) return (
     <div className="py-20 flex flex-col items-center gap-4 text-secondary/20">

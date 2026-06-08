@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { settingsApi } from "../../features/settings/api/settingsApi";
-import { UserSettings, ProfilePermissions, SubscriptionPlan } from "../../features/settings/types/settings.types";
-import { isSuccess } from "../../shared/utils/functional";
+// removed
+import { useUsers, useProfiles, usePlans, useUpdateUserRole, useUpdateUserPlan } from "../../features/settings/api/useSettings";
 import { 
   Users, 
   Shield, 
@@ -28,11 +27,16 @@ export const SettingsPage: React.FC = () => {
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<TabId>("users");
-  const [users, setUsers] = useState<UserSettings[]>([]);
-  const [profiles, setProfiles] = useState<ProfilePermissions[]>([]);
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  
+  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers();
+  const { data: profiles = [], isLoading: isLoadingProfiles, refetch: refetchProfiles } = useProfiles();
+  const { data: plans = [], isLoading: isLoadingPlans, refetch: refetchPlans } = usePlans();
+
+  const updateUserRoleMutation = useUpdateUserRole();
+  const updateUserPlanMutation = useUpdateUserPlan();
+
+  const loading = isLoadingUsers || isLoadingProfiles || isLoadingPlans;
+  const updatingUserId = updateUserRoleMutation.isPending || updateUserPlanMutation.isPending ? "updating" : null;
 
   // Security Check: Only admin allowed
   useEffect(() => {
@@ -42,92 +46,27 @@ export const SettingsPage: React.FC = () => {
     }
   }, [user, navigate]);
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const usersResult = await settingsApi.getUsers();
-      const profilesResult = await settingsApi.getProfiles();
-      const plansResult = await settingsApi.getPlans();
-
-      if (isSuccess(usersResult)) {
-        setUsers(usersResult.data);
-      } else {
-        addToast("Error al cargar usuarios", "error");
-      }
-
-      if (isSuccess(profilesResult)) {
-        setProfiles(profilesResult.data);
-      }
-
-      if (isSuccess(plansResult)) {
-        setPlans(plansResult.data);
-      }
-    } catch (error) {
-      addToast("Error de conexión con el servidor", "error");
-    } finally {
-      setLoading(false);
-    }
+  const loadData = () => {
+    refetchUsers();
+    refetchProfiles();
+    refetchPlans();
   };
 
-  useEffect(() => {
-    if (user && user.role === "admin") {
-      loadData();
-    }
-  }, [user]);
-
   const handleRoleChange = async (userId: string, newRole: "admin" | "dev" | "validator" | "user") => {
-    setUpdatingUserId(userId);
     try {
-      const result = await settingsApi.updateUserRole(userId, newRole);
-      if (isSuccess(result)) {
-        addToast("Rol y perfil actualizados exitosamente", "success");
-        // Update local state
-        setUsers(prev => prev.map(u => {
-          if (u.id === userId) {
-            return {
-              ...u,
-              role: newRole,
-              profileName: newRole === "admin" ? "ADMIN" : newRole === "dev" ? "DEVELOPER" : "VALIDATOR"
-            };
-          }
-          return u;
-        }));
-      } else {
-        addToast("Error al actualizar el rol", "error");
-      }
+      await updateUserRoleMutation.mutateAsync({ userId, role: newRole });
+      addToast("Rol y perfil actualizados exitosamente", "success");
     } catch {
       addToast("Error de red al actualizar rol", "error");
-    } finally {
-      setUpdatingUserId(null);
     }
   };
 
   const handlePlanChange = async (userId: string, newPlanId: number) => {
-    setUpdatingUserId(userId);
     try {
-      const result = await settingsApi.updateUserPlan(userId, newPlanId);
-      if (isSuccess(result)) {
-        addToast("Plan de suscripción asignado exitosamente", "success");
-        const selectedPlan = plans.find(p => p.planId === newPlanId);
-        // Update local state
-        setUsers(prev => prev.map(u => {
-          if (u.id === userId && selectedPlan) {
-            return {
-              ...u,
-              planId: newPlanId,
-              planName: selectedPlan.name,
-              planPrice: selectedPlan.price
-            };
-          }
-          return u;
-        }));
-      } else {
-        addToast("Error al actualizar la suscripción", "error");
-      }
+      await updateUserPlanMutation.mutateAsync({ userId, planId: newPlanId });
+      addToast("Plan de suscripción asignado exitosamente", "success");
     } catch {
       addToast("Error de red al actualizar suscripción", "error");
-    } finally {
-      setUpdatingUserId(null);
     }
   };
 

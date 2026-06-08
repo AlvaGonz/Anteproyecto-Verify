@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, Link } from "react-router-dom";
 import {
-  ProyectoDto,
   IntegrityStatus,
   ProjectCategory,
-  getProjectErrorMessage,
 } from "../../features/projects/types";
-import { projectsApi } from "../../features/projects/api/projectsApi";
+import { useProject } from "../../features/projects/api/useProjects";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
 import { LandingFooter } from "../../features/public/components";
@@ -52,28 +50,8 @@ const getIntegrityInfo = (status: IntegrityStatus) => {
 
 export const ProjectPublicDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [project, setProject] = useState<ProyectoDto | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        if (!id) return;
-        const result = await projectsApi.getProjectById(id);
-        if (result._tag === "Success") {
-          setProject(result.data);
-        } else {
-          setError(getProjectErrorMessage(result.error));
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Error al cargar el proyecto";
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id]);
+  const { data: project, isLoading: loading, error: fetchError } = useProject(Number(id));
+  const error = fetchError ? (fetchError as Error).message : null;
 
   if (loading)
     return (

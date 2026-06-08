@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { 
   Download, 
   Search, 
@@ -9,30 +9,36 @@ import {
   ShieldCheck,
   Activity
 } from "lucide-react";
-import { auditApi } from "../api/auditApi";
+import { useGlobalAuditTrail } from "../api/useAudit";
 import { AuditDto, AuditFilters } from "../types";
 
 export const AuditLogPage: React.FC = () => {
-  const [logs, setLogs] = useState<AuditDto[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<AuditFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    fetchLogs();
-  }, [filters]);
+  const { data: rawLogs = [], isLoading: loading } = useGlobalAuditTrail(filters);
 
-  const fetchLogs = async () => {
-    setLoading(true);
-    try {
-      const data = await auditApi.getGlobalAuditTrail(filters);
-      setLogs(data);
-    } catch (error) {
-      console.error("Error fetching logs:", error);
-    } finally {
-      setLoading(false);
+  const logs = React.useMemo(() => {
+    let filtered = rawLogs.map((l: any) => ({
+      ...l,
+      id: String(l.idLog || l.id),
+      proyectoId: String(l.proyectoId || l.projectId),
+      fechaEventoUtc: l.fecha || l.fechaEventoUtc,
+      tipoEvento: l.accion || "General",
+      usuarioId: String(l.idUsuario || ""),
+      userEmail: l.nombreUsuario || "Desconocido",
+      detalle: l.descripcion || "Sin detalles",
+    })) as unknown as AuditDto[];
+
+    if (searchQuery) {
+      filtered = filtered.filter(l => 
+        (l.detalle || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (l.usuarioId || "").toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-  };
+
+    return filtered;
+  }, [rawLogs, searchQuery]);
 
   const getStatusBadge = (tipoEvento: string) => {
     switch (tipoEvento) {

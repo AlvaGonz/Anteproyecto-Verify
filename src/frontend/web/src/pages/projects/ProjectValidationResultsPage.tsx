@@ -4,7 +4,11 @@ import {
   InternalValidationSummaryDto,
   FindingDto,
 } from "../../features/validations/types";
-import { validationsApi } from "../../features/validations/api/validationsApi";
+import {
+  useLatestInternalValidation,
+  useFindings,
+  useRunInternalValidation,
+} from "../../features/validations/api/useValidations";
 import { ValidationSummary } from "../../features/validations/components/ValidationSummary";
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
 import { FindingsList } from "../../features/validations/components/FindingsList";
@@ -21,60 +25,47 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export const ProjectValidationResultsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [summary, setSummary] = useState<InternalValidationSummaryDto | null>(null);
-  const [findings, setFindings] = useState<FindingDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isEvaluating, setIsEvaluating] = useState(false);
+  const projectId = Number(id);
+  const { data: latestSummary, isLoading: isSummaryLoading, error: summaryError } = useLatestInternalValidation(projectId);
+  const { data: allFindings = [], isLoading: isFindingsLoading } = useFindings(projectId);
+  
+  const runValidationMutation = useRunInternalValidation(projectId);
+  
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    if (!id) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const summaryRes = await validationsApi.getLatestInternalValidation(id);
+  const summary = latestSummary ? {
+    ...latestSummary,
+    validacionId: String(latestSummary.idValidacion || latestSummary.validacionId),
+    proyectoId: String(projectId),
+  } as unknown as InternalValidationSummaryDto : null;
 
-      if (summaryRes._tag === "Success") {
-        const latestSummary = summaryRes.data;
-        setSummary(latestSummary);
-        if (latestSummary) {
-          const findingsRes = await validationsApi.getProjectFindings(id);
-          if (findingsRes._tag === "Success") {
-            setFindings(findingsRes.data.filter((f: FindingDto) => f.validacionId === latestSummary.validacionId));
-          }
-        }
-      } else {
-        setError(summaryRes.error.message);
-      }
-    } catch (err: any) {
-      setError(err.message || "Error al cargar los resultados de validación");
-    } finally {
-      setIsLoading(false);
+  const findings = React.useMemo(() => {
+    if (!summary) return [];
+    return allFindings
+      .filter((f: any) => String(f.idValidacion || f.validacionId) === summary.validacionId)
+      .map((f: any) => ({
+        ...f,
+        id: String(f.idHallazgo || f.id),
+        validacionId: String(f.idValidacion || f.validacionId),
+      })) as unknown as FindingDto[];
+  }, [allFindings, summary]);
+
+  const isLoading = isSummaryLoading || isFindingsLoading;
+  const isEvaluating = runValidationMutation.isPending;
+
+  useEffect(() => {
+    if (summaryError) {
+      setError((summaryError as any).message || "Error al cargar los resultados de validación");
     }
-  };
-
-  useEffect(() => { fetchData(); }, [id]);
+  }, [summaryError]);
 
   const handleRunValidation = async () => {
     if (!id) return;
-    setIsEvaluating(true);
     setError(null);
     try {
-      const resp = await validationsApi.runInternalValidation(id);
-      if (resp._tag === "Success") {
-        const newSummary = resp.data;
-        setSummary(newSummary);
-        const findingsRes = await validationsApi.getProjectFindings(id);
-        if (findingsRes._tag === "Success") {
-          setFindings(findingsRes.data.filter((f: FindingDto) => f.validacionId === newSummary.validacionId));
-        }
-      } else {
-        setError(resp.error.message);
-      }
+      await runValidationMutation.mutateAsync();
     } catch (err: any) {
       setError(err.message || "Error al ejecutar la validación");
-    } finally {
-      setIsEvaluating(false);
     }
   };
 

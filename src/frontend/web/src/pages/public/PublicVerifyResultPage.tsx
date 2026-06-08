@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
-import { PublicProjectVerificationDto } from "../../features/public-verification/types";
-import { publicVerificationApi } from "../../features/public-verification/api/publicVerificationApi";
+
+import { usePublicVerification } from "../../features/public-verification/api/usePublicVerification";
 import { VerificationResultCard } from "../../features/public-verification/components/VerificationResultCard";
 import { LandingFooter } from "../../features/public/components";
 import {
@@ -38,10 +38,6 @@ export const PublicVerifyResultPage: React.FC = () => {
 
   const type = getDetectedType();
 
-  const [data, setData] = useState<PublicProjectVerificationDto | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const getSearchTypeLabel = () => {
     switch (type) {
       case "suelo": return "Número de Suelo";
@@ -52,30 +48,8 @@ export const PublicVerifyResultPage: React.FC = () => {
     }
   };
 
-
-  useEffect(() => {
-    (async () => {
-      if (!code) return;
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await publicVerificationApi.verifyCode(code, type);
-        if (response._tag === "Success") {
-          if (response.data) {
-            setData(response.data);
-          } else {
-            setError(`El valor "${code}" no corresponde a ningún ${getSearchTypeLabel()} verificado en nuestra plataforma.`);
-          }
-        } else {
-          setError(response.error.message);
-        }
-      } catch (err) {
-        setError("Error de conexión con el nodo de VeriFinca. Por favor, intente más tarde.");
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [code, type]);
+  const { data = null, isLoading, error: fetchError } = usePublicVerification(code || '');
+  const error = fetchError ? (fetchError as any).message || `El valor "${code}" no corresponde a ningún ${getSearchTypeLabel()} verificado en nuestra plataforma.` : null;
 
   /* ── Loading state ── */
   if (isLoading) {

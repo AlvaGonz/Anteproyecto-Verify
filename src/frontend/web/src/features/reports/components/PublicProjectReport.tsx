@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { PublicProjectReportDto } from "../types";
-import { reportsApi } from "../api/reportsApi";
+import React from "react";
+import { usePublicReport } from "../api/useReports";
 import { Info, Calendar } from "lucide-react";
 
 interface PublicProjectReportProps {
@@ -10,22 +9,7 @@ interface PublicProjectReportProps {
 export const PublicProjectReport: React.FC<PublicProjectReportProps> = ({
   projectId,
 }) => {
-  const [report, setReport] = useState<PublicProjectReportDto | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchReport = async () => {
-      try {
-        const data = await reportsApi.getPublicReport(projectId);
-        setReport(data);
-      } catch (error) {
-        console.error("Error fetching public report:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchReport();
-  }, [projectId]);
+  const { data: report, isLoading } = usePublicReport(projectId);
 
   if (isLoading)
     return (

@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   ProyectoDto, 
   ProjectStatus, 
-  getProjectErrorMessage, 
   CreateProyectoDto, 
-  UpdateProyectoDto 
+  UpdateProyectoDto
 } from "../../features/projects/types";
-import { projectsApi } from "../../features/projects/api/projectsApi";
+import { useProject, useCreateProject } from "../../features/projects/api/useProjects";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { FileText, ShieldCheck, ClipboardList, ArrowRight } from "lucide-react";
-import { isSuccess } from "../../shared/utils/functional";
 
 const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
   if (!data) {
     throw new Error("Invalid project data");
   }
-  // Add more validation logic as needed
 };
 
 const sanitizeStatus = (status: ProjectStatus) => {
@@ -33,27 +32,27 @@ export const ProjectManagePage: React.FC = () => {
   const { addToast } = useToast();
   const isEditing = !!id;
 
-  const [project, setProject] = useState<ProyectoDto | undefined>(undefined);
-  const [loading, setLoading] = useState(isEditing);
-
-  useEffect(() => {
-    if (isEditing) {
-      const fetchProject = async () => {
-        try {
-          const result = await projectsApi.getProjectById(id!);
-          if (isSuccess(result)) {
-            setProject(result.data);
-          } else {
-            addToast(getProjectErrorMessage(result.error), "error");
-            navigate("/admin/projects");
-          }
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProject();
+  const { data: rawProject, isLoading: loading } = useProject(Number(id));
+  const project = rawProject;
+  
+  const createMutation = useCreateProject();
+  
+  const qc = useQueryClient();
+  const updateMutation = useMutation({
+    mutationFn: (data: { id: number; payload: any }) => 
+      apiClient.put<ProyectoDto>(`/projects/${data.id}`, data.payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["projects"] });
     }
-  }, [id, isEditing, navigate]);
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: (data: { id: number; status: string }) => 
+      apiClient.patch<ProyectoDto>(`/projects/${data.id}/status`, { status: data.status }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["projects"] });
+    }
+  });
 
   const handleSubmit = async (data: CreateProyectoDto | UpdateProyectoDto) => {
     try {
@@ -62,26 +61,21 @@ export const ProjectManagePage: React.FC = () => {
         if (data.categoria == null) {
           throw new Error("Missing required field: categoria");
         }
-        const updateData = data as UpdateProyectoDto;
-        const result = await projectsApi.updateProject(id!, updateData);
-        if (isSuccess(result)) {
-          addToast("Proyecto actualizado exitosamente", "success");
-          navigate(`/projects/${id}`);
-        } else {
-          addToast(getProjectErrorMessage(result.error), "error");
-        }
+        await updateMutation.mutateAsync({ id: Number(id), payload: data });
+        addToast("Proyecto actualizado exitosamente", "success");
+        navigate(`/projects/${id}`);
       } else {
         if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
           throw new Error("Missing required field: usuarioCreadorId");
         }
-        const createData = data as CreateProyectoDto;
-        const result = await projectsApi.createProject(createData);
-        if (isSuccess(result)) {
-          addToast("Proyecto creado exitosamente", "success");
-          navigate(`/projects/${result.data.id}`);
-        } else {
-          addToast(getProjectErrorMessage(result.error), "error");
-        }
+        const created = await createMutation.mutateAsync({
+          nombre: data.nombre,
+          ubicacionTexto: data.ubicacionTexto || "",
+          categoria: data.categoria,
+          usuarioCreadorId: data.usuarioCreadorId
+        });
+        addToast("Proyecto creado exitosamente", "success");
+        navigate(`/projects/${created.id}`);
       }
     } catch (error) {
       addToast("Error al guardar el proyecto", "error");
@@ -92,19 +86,15 @@ export const ProjectManagePage: React.FC = () => {
     if (!id) return;
     try {
       sanitizeStatus(status);
-      const updateResult = await projectsApi.updateProjectStatus(id, status);
-      if (isSuccess(updateResult)) {
-        setProject(updateResult.data);
-        addToast("Estado actualizado exitosamente", "success");
-      } else {
-        addToast(getProjectErrorMessage(updateResult.error), "error");
-      }
+      const apiStatus = status === ProjectStatus.Published ? "Activo" : "Pendiente";
+      await updateStatusMutation.mutateAsync({ id: Number(id), status: apiStatus });
+      addToast("Estado actualizado exitosamente", "success");
     } catch {
       addToast("Error al actualizar el estado", "error");
     }
   };
 
-  if (loading) {
+  if (isEditing && loading) {
     return (
       <div className="text-center py-12 text-[var(--color-text-strong)] opacity-60">
         Cargando formulario...

@@ -1,44 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp, Plus, ArrowRight, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { projectsApi } from "../../projects/api/projectsApi";
+import { useProjects } from "../../projects/api/useProjects";
 import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../projects/types";
 
 export const DashboardPage: React.FC = () => {
-  const [projects, setProjects] = useState<ProyectoDto[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const result = await projectsApi.getProjects();
-        if (cancelled) return;
-        if (result._tag === "Success") {
-          setProjects(result.data);
-        } else {
-          console.error("Error loading projects", result.error);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          console.error("Unexpected error loading projects", e);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data: rawProjects = [], isLoading: loading } = useProjects();
+  
+  const projects = React.useMemo(() => {
+    return rawProjects.map((p: any) => ({
+      ...p,
+      id: String(p.idProyecto || p.id),
+      estadoProyecto: p.estadoProyecto as ProjectStatus,
+      estadoIntegridad: p.estadoIntegridad as IntegrityStatus,
+      createdAtUtc: p.fechaCreacion || p.createdAtUtc || new Date().toISOString()
+    })) as unknown as ProyectoDto[];
+  }, [rawProjects]);
 
   const totalProjects = projects.length;
-  const inReview = projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
-  const observed = projects.filter(p => p.estadoProyecto === ProjectStatus.Observed).length;
-  const verified = projects.filter(p => p.estadoIntegridad === IntegrityStatus.Verified).length;
+  const inReview = projects.filter((p: any) => p.estadoProyecto === ProjectStatus.InReview).length;
+  const observed = projects.filter((p: any) => p.estadoProyecto === ProjectStatus.Observed).length;
+  const verified = projects.filter((p: any) => p.estadoIntegridad === IntegrityStatus.Verified).length;
 
   const stats = [
     {

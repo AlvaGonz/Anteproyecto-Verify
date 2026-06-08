@@ -14,53 +14,40 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { LandingNav, LandingFooter, ProjectStatusBadge, VerifySearchForm } from "../../features/public/components";
 
-// Mock data for projects (ensure it matches the domain types)
-const MOCK_PROJECTS = [
-  {
-    id: "1",
-    name: "Residencial Terra Noble",
-    location: "Punta Cana, RD",
-    status: "CERTIFIED",
-    imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
-    lastVerification: "2024-03-10",
-    description: "Complejo residencial de lujo con certificación de integridad VeriFinca Oro.",
-    completionPercentage: 85,
-  },
-  {
-    id: "2",
-    name: "Torre San Gerónimo",
-    location: "Santo Domingo, RD",
-    status: "PROCESSING",
-    imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
-    lastVerification: "2024-03-12",
-    description: "Proyecto corporativo en fase final de validación legal y técnica.",
-    completionPercentage: 45,
-  },
-  {
-    id: "3",
-    name: "Plaza Central Mall",
-    location: "Santiago, RD",
-    status: "CERTIFIED",
-    imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
-    lastVerification: "2024-03-08",
-    description: "Centro comercial verificado con protocolos de transparencia institucional.",
-    completionPercentage: 100,
-  }
-];
+import { useProjects } from "../../features/projects/api/useProjects";
 
 export const ProjectsPublicListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  const { data: rawProjects = [], isLoading } = useProjects();
+
+  const mappedProjects = useMemo(() => {
+    return rawProjects.map((p) => ({
+      id: String(p.id),
+      name: p.nombre,
+      location: p.ubicacionTexto || "Ubicación no especificada",
+      status: p.estadoProyecto === 4 ? "CERTIFIED" : "PROCESSING",
+      imageUrl: p.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
+      lastVerification: p.createdAtUtc ? p.createdAtUtc.split("T")[0] : new Date().toISOString().split("T")[0],
+      description: "", // Removed from backend
+      completionPercentage: p.estadoProyecto === 4 ? 100 : 50,
+    }));
+  }, [rawProjects]);
+
   const filteredProjects = useMemo(() => {
-    return MOCK_PROJECTS.filter((project) => {
+    return mappedProjects.filter((project) => {
       const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           project.location.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "ALL" || project.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, statusFilter]);
+  }, [mappedProjects, searchQuery, statusFilter]);
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500">Cargando proyectos...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-primary/10 selection:text-primary">

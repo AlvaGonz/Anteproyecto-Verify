@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../features/projects/types";
-import { projectsApi } from "../../features/projects/api/projectsApi";
+import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
+import { useProjects } from "../../features/projects/api/useProjects";
 import { 
   FolderKanban, 
   Plus, 
@@ -16,7 +16,6 @@ import {
   FileCheck,
   Building
 } from "lucide-react";
-import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 
 const getStatusBadge = (status: ProjectStatus) => {
   switch (status) {
@@ -57,28 +56,11 @@ const getIntegrityBadge = (status: IntegrityStatus) => {
 };
 
 export const AdminProjectsPage: React.FC = () => {
-  const [projects, setProjects] = useState<ProyectoDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  const { addToast } = useToast();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await projectsApi.getProjects();
-        if (response._tag === "Success") {
-          setProjects(response.data);
-        } else {
-          addToast("Error al cargar los proyectos", "error");
-        }
-      } catch {
-        addToast("Error al cargar los proyectos", "error");
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [addToast]);
+  const { data: rawProjects = [], isLoading } = useProjects();
+  const projects = rawProjects;
 
   const stats = {
     total: projects.length,

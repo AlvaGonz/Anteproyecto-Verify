@@ -1,5 +1,5 @@
 import React from "react";
-import { PublicProjectVerificationDto } from "../types";
+import { PublicVerificationDto, CertificationStatus } from "../../certifications/types";
 import { 
   ShieldCheck, 
   MapPin, 
@@ -26,7 +26,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 interface VerificationResultCardProps {
-  data: PublicProjectVerificationDto;
+  data: PublicVerificationDto;
 }
 
 export const VerificationResultCard: React.FC<VerificationResultCardProps> = ({
@@ -35,25 +35,26 @@ export const VerificationResultCard: React.FC<VerificationResultCardProps> = ({
   const [invited, setInvited] = React.useState(false);
   const [requesting, setRequesting] = React.useState(false);
 
-  const isUnregistered = data.isRegistered === false;
+  const isUnregistered = data.estadoCertificacion === CertificationStatus.Revocado;
 
   const getStatus = (): VerificationStatus => {
     if (isUnregistered) return "pending";
-    if (!data.isVerifiable) return "failed";
-    if (data.integrityStatus === "Consistente") return "verified";
-    if (data.integrityStatus === "Con Observaciones") return "observation";
+    if (data.estadoIntegridad === 1) return "pending";
+    if (data.estadoIntegridad === 2) return "verified";
+    if (data.estadoIntegridad === 3) return "observation";
+    if (data.estadoIntegridad === 4) return "failed";
     return "pending";
   };
 
   const status = getStatus();
 
   // Mock validation items if not present
-  const validationItems = data.validationDimensions || [
+  const validationItems = [
     { label: "Titularidad de Tierra", checked: true },
     { label: "Permisos Ambientales", checked: true },
-    { label: "Licencia de Construcción", checked: data.integrityStatus !== "Inconsistente" },
+    { label: "Licencia de Construcción", checked: data.estadoIntegridad !== 4 },
     { label: "Cumplimiento Ley 189-11", checked: true },
-    { label: "Auditoría Técnica Externa", checked: data.integrityStatus === "Consistente" },
+    { label: "Auditoría Técnica Externa", checked: data.estadoIntegridad === 2 },
   ];
 
   return (
@@ -129,7 +130,7 @@ export const VerificationResultCard: React.FC<VerificationResultCardProps> = ({
                   {isUnregistered ? "CÓDIGO DE CONSULTA" : "CÓDIGO ÚNICO DE REGISTRO"}
                 </span>
                 <div className="bg-primary/20 backdrop-blur-md border border-primary/30 px-4 py-2 rounded-lg">
-                  <span className="text-primary text-xl font-mono font-black">{data.publicCode}</span>
+                  <span className="text-primary text-xl font-mono font-black">{data.codigoVerificacion}</span>
                 </div>
               </div>
             </div>
@@ -189,8 +190,8 @@ export const VerificationResultCard: React.FC<VerificationResultCardProps> = ({
                     <span className="text-[10px] font-bold text-on-surface-variant/50 uppercase tracking-widest block mb-1">
                       {isUnregistered ? "Tipo de Registro" : "Identidad de Proyecto"}
                     </span>
-                    <h3 className="text-lg font-bold text-on-surface leading-tight">{data.projectName}</h3>
-                    <p className="text-xs text-secondary font-bold mt-1">Origen: {data.developerName || "N/A"}</p>
+                    <h3 className="text-lg font-bold text-on-surface leading-tight">{data.nombreProyecto}</h3>
+                    <p className="text-xs text-secondary font-bold mt-1">Origen: {"N/A"}</p>
                  </div>
               </div>
 
@@ -200,7 +201,7 @@ export const VerificationResultCard: React.FC<VerificationResultCardProps> = ({
                  </div>
                  <div>
                     <span className="text-[10px] font-bold text-on-surface-variant/50 uppercase tracking-widest block mb-1">Sectores / Localización</span>
-                    <p className="text-sm font-bold text-on-surface leading-snug">{data.publicLocation}</p>
+                    <p className="text-sm font-bold text-on-surface leading-snug">{data.ubicacion}</p>
                     <div className="flex items-center gap-1.5 mt-2 text-[#223382] hover:underline cursor-pointer">
                        <MapPin className="w-3 h-3" />
                        <span className="text-[10px] font-black uppercase">Ver en Mapa de Catastro</span>
