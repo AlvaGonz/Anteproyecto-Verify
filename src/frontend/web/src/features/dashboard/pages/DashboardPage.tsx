@@ -10,20 +10,29 @@ export const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       try {
         const result = await projectsApi.getProjects();
+        if (cancelled) return;
         if (result._tag === "Success") {
           setProjects(result.data);
         } else {
           console.error("Error loading projects", result.error);
         }
       } catch (e) {
-        console.error("Unexpected error loading projects", e);
+        if (!cancelled) {
+          console.error("Unexpected error loading projects", e);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const totalProjects = projects.length;

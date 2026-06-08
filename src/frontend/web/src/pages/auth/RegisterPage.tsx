@@ -294,7 +294,7 @@ export const RegisterPage: React.FC = () => {
                   inputMode="numeric"
                   className="vf-input w-full pl-12 h-[52px]"
                   {...register("telefono", {
-                    onChange: (e) => {
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       let val = e.target.value.replace(/\D/g, "");
                       if (val.length > 0) {
                         if (val.length <= 3) val = `(${val}`;
@@ -317,7 +317,7 @@ export const RegisterPage: React.FC = () => {
                   inputMode="numeric"
                   className="vf-input w-full pl-12 h-[52px]"
                   {...register("cedula", {
-                    onChange: (e) => {
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       let val = e.target.value.replace(/\D/g, "");
                       if (val.length > 3 && val.length <= 10) val = `${val.slice(0,3)}-${val.slice(3)}`;
                       else if (val.length > 10) val = `${val.slice(0,3)}-${val.slice(3,10)}-${val.slice(10,11)}`;

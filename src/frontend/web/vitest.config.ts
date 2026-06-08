@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   test: {
+    // Use 'threads' pool instead of 'forks' (default on pnpm workspaces on Windows)
+    // 'forks' causes EPERM/UNKNOWN spawn errors due to child_process.fork() restrictions on Windows
+    pool: 'threads',
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/setupTests.ts'],
