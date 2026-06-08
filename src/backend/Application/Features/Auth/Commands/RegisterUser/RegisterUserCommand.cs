@@ -7,8 +7,8 @@ public record RegisterUserCommand(
     string Apellido,
     string Email,
     string Password,
-    string? Telefono = null,
-    string? Cedula = null
+    string Telefono,
+    string Cedula
 );
 
 public record RegisterUserResultDto(

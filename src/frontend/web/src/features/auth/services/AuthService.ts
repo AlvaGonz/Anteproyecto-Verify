@@ -135,8 +135,8 @@ export const AuthService = {
           Apellido: apellido, 
           Email: email, 
           Password: password, 
-          Telefono: telefono ?? null, 
-          Cedula: cedula ?? null 
+          Telefono: telefono ?? "", 
+          Cedula: cedula ?? "" 
         })
       });
 

@@ -30,8 +30,8 @@ export const RegisterPage: React.FC = () => {
     formState: { errors: formErrors, isValid }
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       nombre: "",
       apellido: "",
@@ -290,10 +290,20 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Teléfono"
-                  maxLength={15}
+                  maxLength={14}
                   inputMode="numeric"
                   className="vf-input w-full pl-12 h-[52px]"
-                  {...register("telefono")}
+                  {...register("telefono", {
+                    onChange: (e) => {
+                      let val = e.target.value.replace(/\D/g, "");
+                      if (val.length > 0) {
+                        if (val.length <= 3) val = `(${val}`;
+                        else if (val.length <= 6) val = `(${val.slice(0,3)}) ${val.slice(3)}`;
+                        else val = `(${val.slice(0,3)}) ${val.slice(3,6)}-${val.slice(6,10)}`;
+                      }
+                      setValue("telefono", val, { shouldValidate: true, shouldDirty: true });
+                    }
+                  })}
                   onKeyDown={blockNonDigits}
                 />
                 {formErrors.telefono && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.telefono.message}</span>}
@@ -303,10 +313,17 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Cédula"
-                  maxLength={15}
+                  maxLength={13}
                   inputMode="numeric"
                   className="vf-input w-full pl-12 h-[52px]"
-                  {...register("cedula")}
+                  {...register("cedula", {
+                    onChange: (e) => {
+                      let val = e.target.value.replace(/\D/g, "");
+                      if (val.length > 3 && val.length <= 10) val = `${val.slice(0,3)}-${val.slice(3)}`;
+                      else if (val.length > 10) val = `${val.slice(0,3)}-${val.slice(3,10)}-${val.slice(10,11)}`;
+                      setValue("cedula", val, { shouldValidate: true, shouldDirty: true });
+                    }
+                  })}
                   onKeyDown={blockNonDigits}
                 />
                 {formErrors.cedula && <span className="text-rose-500 text-xs font-medium absolute -bottom-5 left-0">{formErrors.cedula.message}</span>}
