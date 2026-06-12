@@ -1,3 +1,4 @@
+SET QUOTED_IDENTIFIER ON;
 -- Crear la base de datos
 CREATE DATABASE [verifinca-spm-uce-2026];
 GO
@@ -11,7 +12,7 @@ GO
 
 -- Tabla Usuario
 CREATE TABLE Usuario (
-    IdUsuario INT IDENTITY(1,1) PRIMARY KEY,
+    IdUsuario UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     Nombre VARCHAR(100) NOT NULL,
     Apellido VARCHAR(100) NOT NULL,
     NombreCompleto AS (Nombre + ' ' + Apellido) PERSISTED,
@@ -25,30 +26,30 @@ GO
 
 -- Tabla TipoDocumento
 CREATE TABLE TipoDocumento (
-    IdTipoDcumento INT IDENTITY(1,1) PRIMARY KEY,
+    IdTipoDcumento UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     Descripcion VARCHAR(100)
 );
 GO
 
 -- Tabla Permisos
 CREATE TABLE Permisos (
-    IdPermiso INT IDENTITY(1,1) PRIMARY KEY,
+    IdPermiso UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     Descripcion VARCHAR(100)
 );
 GO
 
 -- Tabla Perfiles
 CREATE TABLE Perfiles (
-    IdPerfil INT IDENTITY(1,1) PRIMARY KEY,
+    IdPerfil UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     NombrePerfil VARCHAR(100)
 );
 GO
 
 -- Tabla Acceso
 CREATE TABLE Acceso (
-    IdAcceso INT IDENTITY(1,1) PRIMARY KEY,
-    IdPerfil INT,
-    IdUsuario INT,
+    IdAcceso UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdPerfil UNIQUEIDENTIFIER,
+    IdUsuario UNIQUEIDENTIFIER,
     FOREIGN KEY (IdPerfil) REFERENCES Perfiles(IdPerfil),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
 );
@@ -56,8 +57,8 @@ GO
 
 -- Tabla PerfilPermiso (relación muchos a muchos entre Perfiles y Permisos)
 CREATE TABLE PerfilPermiso (
-    IdPerfil INT,
-    IdPermiso INT,
+    IdPerfil UNIQUEIDENTIFIER,
+    IdPermiso UNIQUEIDENTIFIER,
     PRIMARY KEY (IdPerfil, IdPermiso),
     FOREIGN KEY (IdPerfil) REFERENCES Perfiles(IdPerfil),
     FOREIGN KEY (IdPermiso) REFERENCES Permisos(IdPermiso)
@@ -66,15 +67,15 @@ GO
 
 -- Tabla Provincia
 CREATE TABLE Provincia (
-    IdProvincia INT IDENTITY(1,1) PRIMARY KEY,
+    IdProvincia UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     NombreProvincia VARCHAR(100)
 );
 GO
 
 -- Tabla Municipio
 CREATE TABLE Municipio (
-    IdMunicipio INT IDENTITY(1,1) PRIMARY KEY,
-    IdProvincia INT,
+    IdMunicipio UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProvincia UNIQUEIDENTIFIER,
     NombreMunicipio VARCHAR(100),
     FOREIGN KEY (IdProvincia) REFERENCES Provincia(IdProvincia)
 );
@@ -82,7 +83,7 @@ GO
 
 -- Tabla PlanSuscripcion
 CREATE TABLE PlanSuscripcion (
-    Idsuscripcion INT IDENTITY(1,1) PRIMARY KEY,
+    Idsuscripcion UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     NombrePlan VARCHAR(100),
     Precio DECIMAL(10,2)
 );
@@ -90,8 +91,8 @@ GO
 
 -- Tabla PlanCaracteristica
 CREATE TABLE PlanCaracteristica (
-    IdPlan INT IDENTITY(1,1) PRIMARY KEY,
-    Idsuscripcion INT,
+    IdPlan UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    Idsuscripcion UNIQUEIDENTIFIER,
     Caracteristica VARCHAR(255),
     FOREIGN KEY (Idsuscripcion) REFERENCES PlanSuscripcion(Idsuscripcion)
 );
@@ -99,9 +100,9 @@ GO
 
 -- Tabla ProyectosInmoviliarios
 CREATE TABLE ProyectosInmoviliarios (
-    IdProyecto INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
-    IdMunicipio INT,
+    IdProyecto UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdUsuario UNIQUEIDENTIFIER,
+    IdMunicipio UNIQUEIDENTIFIER,
     NombreProyecto VARCHAR(200),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario),
     FOREIGN KEY (IdMunicipio) REFERENCES Municipio(IdMunicipio)
@@ -110,16 +111,16 @@ GO
 
 -- Tabla TipoInmoviliario
 CREATE TABLE TipoInmoviliario (
-    IdMoviliario INT IDENTITY(1,1) PRIMARY KEY,
+    IdMoviliario UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     Tipo VARCHAR(100)
 );
 GO
 
 -- Tabla Documento
 CREATE TABLE Documento (
-    IdDocumento INT IDENTITY(1,1) PRIMARY KEY,
-    IdProyecto INT,
-    IdTipoDcumento INT,
+    IdDocumento UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProyecto UNIQUEIDENTIFIER,
+    IdTipoDcumento UNIQUEIDENTIFIER,
     RutaDocumento VARCHAR(255),
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto),
     FOREIGN KEY (IdTipoDcumento) REFERENCES TipoDocumento(IdTipoDcumento)
@@ -128,8 +129,8 @@ GO
 
 -- Tabla SelloIntegridad
 CREATE TABLE SelloIntegridad (
-    IdSello INT IDENTITY(1,1) PRIMARY KEY,
-    IdDocumento INT,
+    IdSello UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdDocumento UNIQUEIDENTIFIER,
     HashSello VARCHAR(255),
     FOREIGN KEY (IdDocumento) REFERENCES Documento(IdDocumento)
 );
@@ -137,9 +138,9 @@ GO
 
 -- Tabla LogProyectos
 CREATE TABLE LogProyectos (
-    IdLog INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
-    IdProyecto INT,
+    IdLog UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdUsuario UNIQUEIDENTIFIER,
+    IdProyecto UNIQUEIDENTIFIER,
     FechaHora DATETIME DEFAULT GETDATE(),
     Accion VARCHAR(100),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario),
@@ -153,8 +154,8 @@ GO
 
 -- Tabla EstudioSuelo
 CREATE TABLE EstudioSuelo (
-    IdESuelo INT IDENTITY(1,1) PRIMARY KEY,
-    IdProyecto INT,
+    IdESuelo UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProyecto UNIQUEIDENTIFIER,
     FechaEstudio DATE,
     Resultado TEXT,
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto)
@@ -163,8 +164,8 @@ GO
 
 -- Tabla PermisoSuelo
 CREATE TABLE PermisoSuelo (
-    IdPSuelo INT IDENTITY(1,1) PRIMARY KEY,
-    IdProyecto INT,
+    IdPSuelo UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProyecto UNIQUEIDENTIFIER,
     NumeroPermiso VARCHAR(50),
     FechaEmision DATE,
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto)
@@ -173,8 +174,8 @@ GO
 
 -- Tabla CertiMivhed
 CREATE TABLE CertiMivhed (
-    IdMivhed INT IDENTITY(1,1) PRIMARY KEY,
-    IdProyecto INT,
+    IdMivhed UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProyecto UNIQUEIDENTIFIER,
     Certificado VARCHAR(100),
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto)
 );
@@ -182,8 +183,8 @@ GO
 
 -- Tabla CatastroTitulo
 CREATE TABLE CatastroTitulo (
-    IdCatastroTitulo INT IDENTITY(1,1) PRIMARY KEY,
-    IdProyecto INT,
+    IdCatastroTitulo UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProyecto UNIQUEIDENTIFIER,
     NumeroTitulo VARCHAR(50),
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto)
 );
@@ -191,8 +192,8 @@ GO
 
 -- Tabla TarifaSueloAyuntamiento
 CREATE TABLE TarifaSueloAyuntamiento (
-    IdTarifaAyuntamiento INT IDENTITY(1,1) PRIMARY KEY,
-    IdMunicipio INT,
+    IdTarifaAyuntamiento UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdMunicipio UNIQUEIDENTIFIER,
     Monto DECIMAL(10,2),
     Anio INT,
     FOREIGN KEY (IdMunicipio) REFERENCES Municipio(IdMunicipio)
@@ -201,9 +202,9 @@ GO
 
 -- Tabla AyuntamientoTarifa (relación, según el diagrama)
 CREATE TABLE AyuntamientoTarifa (
-    IdAyuntamiento INT IDENTITY(1,1) PRIMARY KEY,
-    IdTarifaAyuntamiento INT,
-    IdMunicipio INT,
+    IdAyuntamiento UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdTarifaAyuntamiento UNIQUEIDENTIFIER,
+    IdMunicipio UNIQUEIDENTIFIER,
     FOREIGN KEY (IdTarifaAyuntamiento) REFERENCES TarifaSueloAyuntamiento(IdTarifaAyuntamiento),
     FOREIGN KEY (IdMunicipio) REFERENCES Municipio(IdMunicipio)
 );
@@ -211,8 +212,8 @@ GO
 
 -- Tabla SolvenciaFinanciera
 CREATE TABLE SolvenciaFinanciera (
-    IdSolvencia INT IDENTITY(1,1) PRIMARY KEY,
-    IdMoviliario INT,
+    IdSolvencia UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdMoviliario UNIQUEIDENTIFIER,
     FechaEmision DATE,
     Monto DECIMAL(10,2),
     FOREIGN KEY (IdMoviliario) REFERENCES TipoInmoviliario(IdMoviliario)
@@ -221,7 +222,7 @@ GO
 
 -- Tabla ApiGobernanza
 CREATE TABLE ApiGobernanza (
-    IdApiGobernanza INT IDENTITY(1,1) PRIMARY KEY,
+    IdApiGobernanza UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     NombreApi VARCHAR(100),
     Endpoint VARCHAR(255)
 );
@@ -233,8 +234,8 @@ GO
 
 -- Tabla Recibo (pagos)
 CREATE TABLE Recibo (
-    IdPago INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
+    IdPago UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdUsuario UNIQUEIDENTIFIER,
     Monto DECIMAL(10,2),
     FechaPago DATE,
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
@@ -243,10 +244,10 @@ GO
 
 -- Tabla Pagos
 CREATE TABLE Pagos (
-    IdPago INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
-    IdApiGobernanza INT,
-    Idsuscripcion INT,
+    IdPago UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdUsuario UNIQUEIDENTIFIER,
+    IdApiGobernanza UNIQUEIDENTIFIER,
+    Idsuscripcion UNIQUEIDENTIFIER,
     Monto DECIMAL(10,2),
     FechaPago DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario),
@@ -257,10 +258,10 @@ GO
 
 -- Tabla LogPagos
 CREATE TABLE LogPagos (
-    IdLog INT IDENTITY(1,1) PRIMARY KEY,
-    Idpago INT,
-    IdUsuario INT,
-    Idsuscripcion INT,
+    IdLog UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    Idpago UNIQUEIDENTIFIER,
+    IdUsuario UNIQUEIDENTIFIER,
+    Idsuscripcion UNIQUEIDENTIFIER,
     FechaLog DATETIME DEFAULT GETDATE(),
     Estado VARCHAR(50),
     FOREIGN KEY (Idpago) REFERENCES Pagos(IdPago),
@@ -275,17 +276,17 @@ GO
 
 -- Tabla Consultas (base para logs de consultas)
 CREATE TABLE Consultas (
-    IdConsulta INT IDENTITY(1,1) PRIMARY KEY,
+    IdConsulta UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     Descripcion VARCHAR(255)
 );
 GO
 
 -- Tabla FremiunConsultas_Log
 CREATE TABLE FremiunConsultas_Log (
-    IdConsultaLog INT IDENTITY(1,1) PRIMARY KEY,
-    IdProyecto INT,
-    IdConsulta INT,
-    IdUsuario INT,
+    IdConsultaLog UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProyecto UNIQUEIDENTIFIER,
+    IdConsulta UNIQUEIDENTIFIER,
+    IdUsuario UNIQUEIDENTIFIER,
     FechaConsulta DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto),
     FOREIGN KEY (IdConsulta) REFERENCES Consultas(IdConsulta),
@@ -295,9 +296,9 @@ GO
 
 -- Tabla FremiunProyectos_Log
 CREATE TABLE FremiunProyectos_Log (
-    IdProyectoLog INT IDENTITY(1,1) PRIMARY KEY,
-    IdProyecto INT,
-    IdUsuario INT,
+    IdProyectoLog UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdProyecto UNIQUEIDENTIFIER,
+    IdUsuario UNIQUEIDENTIFIER,
     FechaAcceso DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
@@ -306,9 +307,9 @@ GO
 
 -- Tabla LogConsultas
 CREATE TABLE LogConsultas (
-    IdLog INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
-    IdResultado INT,
+    IdLog UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    IdUsuario UNIQUEIDENTIFIER,
+    IdResultado UNIQUEIDENTIFIER,
     FechaConsulta DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
 );
@@ -319,43 +320,43 @@ GO
 -- =============================================
 
 -- Relación entre TipoInmoviliario y ProyectosInmoviliarios (poseen)
-ALTER TABLE TipoInmoviliario ADD IdProyecto INT;
+ALTER TABLE TipoInmoviliario ADD IdProyecto UNIQUEIDENTIFIER;
 GO
 ALTER TABLE TipoInmoviliario ADD FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto);
 GO
 
 -- Relación Recibo con SelloIntegridad
-ALTER TABLE Recibo ADD IdSello INT;
+ALTER TABLE Recibo ADD IdSello UNIQUEIDENTIFIER;
 GO
 ALTER TABLE Recibo ADD FOREIGN KEY (IdSello) REFERENCES SelloIntegridad(IdSello);
 GO
 
 -- Relación ProyectosInmoviliarios con CertiMivhed
-ALTER TABLE ProyectosInmoviliarios ADD IdMivhed INT;
+ALTER TABLE ProyectosInmoviliarios ADD IdMivhed UNIQUEIDENTIFIER;
 GO
 ALTER TABLE ProyectosInmoviliarios ADD FOREIGN KEY (IdMivhed) REFERENCES CertiMivhed(IdMivhed);
 GO
 
 -- Relación ProyectosInmoviliarios con CatastroTitulo
-ALTER TABLE ProyectosInmoviliarios ADD IdCatastroTitulo INT;
+ALTER TABLE ProyectosInmoviliarios ADD IdCatastroTitulo UNIQUEIDENTIFIER;
 GO
 ALTER TABLE ProyectosInmoviliarios ADD FOREIGN KEY (IdCatastroTitulo) REFERENCES CatastroTitulo(IdCatastroTitulo);
 GO
 
 -- Relación ProyectosInmoviliarios con TarifaSueloAyuntamiento
-ALTER TABLE ProyectosInmoviliarios ADD IdTarifaAyuntamiento INT;
+ALTER TABLE ProyectosInmoviliarios ADD IdTarifaAyuntamiento UNIQUEIDENTIFIER;
 GO
 ALTER TABLE ProyectosInmoviliarios ADD FOREIGN KEY (IdTarifaAyuntamiento) REFERENCES TarifaSueloAyuntamiento(IdTarifaAyuntamiento);
 GO
 
 -- Relación Adicional: ProyectosInmoviliarios con PermisoSuelo
-ALTER TABLE ProyectosInmoviliarios ADD IdPSuelo INT;
+ALTER TABLE ProyectosInmoviliarios ADD IdPSuelo UNIQUEIDENTIFIER;
 GO
 ALTER TABLE ProyectosInmoviliarios ADD FOREIGN KEY (IdPSuelo) REFERENCES PermisoSuelo(IdPSuelo);
 GO
 
 -- Relación Adicional: ProyectosInmoviliarios con EstudioSuelo
-ALTER TABLE ProyectosInmoviliarios ADD IdESuelo INT;
+ALTER TABLE ProyectosInmoviliarios ADD IdESuelo UNIQUEIDENTIFIER;
 GO
 ALTER TABLE ProyectosInmoviliarios ADD FOREIGN KEY (IdESuelo) REFERENCES EstudioSuelo(IdESuelo);
 GO
