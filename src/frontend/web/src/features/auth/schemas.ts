@@ -1,5 +1,23 @@
 import { z } from "zod";
 
+// Dominican Cédula check-digit validation algorithm (Luhn mod-10 variant)
+const validateCedulaCheckDigit = (cedula: string): boolean => {
+  const digits = cedula.replace(/\D/g, "");
+  if (digits.length !== 11) return false;
+  
+  const multipliers = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2];
+  let sum = 0;
+  
+  for (let i = 0; i < 10; i++) {
+    let product = parseInt(digits[i], 10) * multipliers[i];
+    if (product >= 10) product -= 9;
+    sum += product;
+  }
+  
+  const checkDigit = (10 - (sum % 10)) % 10;
+  return checkDigit === parseInt(digits[10], 10);
+};
+
 export const loginSchema = z.object({
   email: z
     .string()
@@ -12,25 +30,48 @@ export const loginSchema = z.object({
 });
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
-export const registerSchema = z
-  .object({
-    nombre: z
-      .string()
-      .min(2, "El nombre debe tener al menos 2 caracteres")
-      .max(100, "Nombre demasiado largo"),
-    email: z
-      .string()
-      .min(1, "El correo es requerido")
-      .email("Formato de correo inválido"),
-    password: z
-      .string()
-      .min(8, "Mínimo 8 caracteres")
-      .regex(/[A-Z]/, "Debe contener al menos una mayúscula")
-      .regex(/[0-9]/, "Debe contener al menos un número"),
-    confirmPassword: z.string().min(1, "Confirme su contraseña"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  });
+export const registerSchema = z.object({
+  nombre: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(100, "Nombre demasiado largo")
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "El nombre solo puede contener letras"),
+  apellido: z
+    .string()
+    .min(2, "El apellido debe tener al menos 2 caracteres")
+    .max(100, "Apellido demasiado largo")
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "El apellido solo puede contener letras"),
+  email: z
+    .string()
+    .min(1, "El correo es requerido")
+    .email("Formato de correo inválido"),
+  telefono: z
+    .string()
+    .min(1, "El teléfono es requerido")
+    .refine((val) => {
+      const digits = val.replace(/\D/g, "");
+      return /^(809|829|849)\d{7}$/.test(digits);
+    }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 809-555-0199)"),
+  cedula: z
+    .string()
+    .min(1, "La cédula es requerida")
+    .refine((val) => {
+      const digits = val.replace(/\D/g, "");
+      return /^\d{11}$/.test(digits);
+    }, "La cédula debe tener 11 dígitos")
+    .refine((val) => {
+      const digits = val.replace(/\D/g, "");
+      return validateCedulaCheckDigit(digits);
+    }, "Cédula inválida: el dígito verificador no es correcto"),
+  password: z
+    .string()
+    .min(8, "La contraseña debe tener mínimo 8 caracteres")
+    .regex(/[A-Z]/, "Debe contener al menos una mayúscula")
+    .regex(/[a-z]/, "Debe contener al menos una minúscula")
+    .regex(/[0-9]/, "Debe contener al menos un número")
+    .regex(/[!@#$%^&*\-]/, "Debe contener al menos un carácter especial (!@#$%^&*-)"),
+  acceptedTerms: z
+    .boolean()
+    .refine((val) => val === true, "Debe aceptar los términos de uso y políticas de privacidad"),
+});
 export type RegisterFormValues = z.infer<typeof registerSchema>;

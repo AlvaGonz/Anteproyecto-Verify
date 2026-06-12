@@ -44,9 +44,11 @@ describe("RegisterPage", () => {
     renderPage();
 
     expect(screen.getByLabelText(/Nombre completo/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Apellido/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Correo electrónico/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Teléfono/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Cédula/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Contraseña/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Confirmar contraseña/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /crear cuenta/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /crear mi cuenta/i })).toBeInTheDocument();
   });
 });
