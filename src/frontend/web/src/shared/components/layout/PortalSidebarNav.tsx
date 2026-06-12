@@ -26,7 +26,7 @@ export const PortalSidebarNav: React.FC = () => {
       <div className="px-8 mb-12">
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-             <img src="/brand/isotipo/ISOTIPO WHITE.svg" alt="V" className="w-5" />
+             <img src="/brand/isotipo/ISOTIPO WHITE.optimized.svg" alt="V" className="w-5" />
           </div>
           <span className="text-white font-display font-black text-xl tracking-tight">VeriFinca</span>
         </Link>

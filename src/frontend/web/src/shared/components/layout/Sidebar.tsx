@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-premium-sm group-hover:scale-110 transition-transform">
             <img
-              src="/brand/isotipo/ISOTIPO WHITE.svg"
+              src="/brand/isotipo/ISOTIPO WHITE.optimized.svg"
               alt="VeriFinca"
               className="h-6 w-auto"
             />
