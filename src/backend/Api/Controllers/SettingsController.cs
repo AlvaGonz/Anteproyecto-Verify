@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
-[Route("api/admin/[controller]")]
+[Route("api/admin")]
 public class SettingsController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -63,9 +63,9 @@ public class SettingsController : ControllerBase
         {
             var lu = legacyUsers.FirstOrDefault(l => string.Equals(l.Email, u.Email, StringComparison.OrdinalIgnoreCase));
             
-            int? profileId = null;
+            Guid? profileId = null;
             string profileName = string.Empty;
-            int? planId = null;
+            Guid? planId = null;
             string planName = string.Empty;
             decimal? planPrice = null;
 
@@ -122,7 +122,7 @@ public class SettingsController : ControllerBase
         return Ok(resultList);
     }
 
-    [HttpPut("users/{id}/role")]
+    [HttpPatch("users/{id}/role")]
     public async Task<IActionResult> UpdateUserRole(Guid id, [FromBody] UpdateRoleRequest request, CancellationToken cancellationToken)
     {
         if (!await IsAdminAsync())
@@ -196,7 +196,7 @@ public class SettingsController : ControllerBase
         return Ok(new { Message = "Rol y perfil actualizados exitosamente." });
     }
 
-    [HttpPut("users/{id}/plan")]
+    [HttpPatch("users/{id}/plan")]
     public async Task<IActionResult> UpdateUserPlan(Guid id, [FromBody] UpdatePlanRequest request, CancellationToken cancellationToken)
     {
         if (!await IsAdminAsync())
@@ -204,7 +204,7 @@ public class SettingsController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado. Se requieren permisos de administrador." });
         }
 
-        if (request == null || request.PlanId <= 0)
+        if (request == null || request.PlanId == Guid.Empty)
         {
             return BadRequest(new { Message = "ID de plan inválido." });
         }
@@ -376,5 +376,5 @@ public class UpdateRoleRequest
 
 public class UpdatePlanRequest
 {
-    public int PlanId { get; set; }
+    public Guid PlanId { get; set; }
 }

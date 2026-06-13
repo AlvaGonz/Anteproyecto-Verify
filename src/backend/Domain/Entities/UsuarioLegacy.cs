@@ -2,7 +2,7 @@ namespace Domain.Entities;
 
 public class UsuarioLegacy
 {
-    public int IdUsuario { get; set; }
+    public Guid IdUsuario { get; set; }
     public string Nombre { get; set; } = null!;
     public string Apellido { get; set; } = null!;
     public string NombreCompleto { get; set; } = null!;

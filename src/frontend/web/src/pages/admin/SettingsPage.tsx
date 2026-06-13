@@ -61,7 +61,7 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
-  const handlePlanChange = async (userId: string, newPlanId: number) => {
+  const handlePlanChange = async (userId: string, newPlanId: string) => {
     try {
       await updateUserPlanMutation.mutateAsync({ userId, planId: newPlanId });
       addToast("Plan de suscripción asignado exitosamente", "success");
@@ -236,7 +236,7 @@ export const SettingsPage: React.FC = () => {
                               <label className="text-[10px] font-bold text-text-secondary uppercase">Cambiar Plan</label>
                               <select
                                 value={u.planId || ""}
-                                onChange={(e) => handlePlanChange(u.id, Number(e.target.value))}
+                                onChange={(e) => handlePlanChange(u.id, e.target.value)}
                                 disabled={updatingUserId !== null}
                                 className="vf-input py-1 px-2 text-xs h-8 min-w-[130px]"
                               >

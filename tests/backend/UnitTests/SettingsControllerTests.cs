@@ -89,6 +89,11 @@ public class SettingsControllerTests
     {
         // Arrange
         var dbName = "Settings_GetUsers_Success";
+        var adminProfileId = Guid.NewGuid();
+        var devProfileId = Guid.NewGuid();
+        var freePlanId = Guid.NewGuid();
+        var proPlanId = Guid.NewGuid();
+
         using (var context = CreateDbContext(dbName))
         {
             var admin = new Usuario("Admin", "User", "admin@verifinca.do", "hash", UserRole.Administrator, "123", "123");
@@ -96,12 +101,12 @@ public class SettingsControllerTests
             context.Usuarios.AddRange(admin, dev);
 
             context.Perfiles.AddRange(
-                new Perfil { IdPerfil = 1, NombrePerfil = "ADMIN" },
-                new Perfil { IdPerfil = 2, NombrePerfil = "DEVELOPER" }
+                new Perfil { IdPerfil = adminProfileId, NombrePerfil = "ADMIN" },
+                new Perfil { IdPerfil = devProfileId, NombrePerfil = "DEVELOPER" }
             );
             context.PlanesSuscripcion.AddRange(
-                new PlanSuscripcion { Idsuscripcion = 1, NombrePlan = "Gratuito", Precio = 0.00m },
-                new PlanSuscripcion { Idsuscripcion = 2, NombrePlan = "Profesional", Precio = 3500.00m }
+                new PlanSuscripcion { Idsuscripcion = freePlanId, NombrePlan = "Gratuito", Precio = 0.00m },
+                new PlanSuscripcion { Idsuscripcion = proPlanId, NombrePlan = "Profesional", Precio = 3500.00m }
             );
 
             await context.SaveChangesAsync();
@@ -135,6 +140,10 @@ public class SettingsControllerTests
         // Arrange
         var dbName = "Settings_UpdateUserRole";
         var devUserGuid = Guid.NewGuid();
+        var adminProfileId = Guid.NewGuid();
+        var devProfileId = Guid.NewGuid();
+        var validatorProfileId = Guid.NewGuid();
+
         using (var context = CreateDbContext(dbName))
         {
             var admin = new Usuario("Admin", "User", "admin@verifinca.do", "hash", UserRole.Administrator, "123", "123");
@@ -146,9 +155,9 @@ public class SettingsControllerTests
             context.Usuarios.AddRange(admin, dev);
 
             context.Perfiles.AddRange(
-                new Perfil { IdPerfil = 1, NombrePerfil = "ADMIN" },
-                new Perfil { IdPerfil = 2, NombrePerfil = "DEVELOPER" },
-                new Perfil { IdPerfil = 3, NombrePerfil = "VALIDATOR" }
+                new Perfil { IdPerfil = adminProfileId, NombrePerfil = "ADMIN" },
+                new Perfil { IdPerfil = devProfileId, NombrePerfil = "DEVELOPER" },
+                new Perfil { IdPerfil = validatorProfileId, NombrePerfil = "VALIDATOR" }
             );
 
             await context.SaveChangesAsync();
@@ -178,7 +187,7 @@ public class SettingsControllerTests
 
             var acceso = await context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == legacyUser.IdUsuario);
             Assert.NotNull(acceso);
-            Assert.Equal(3, acceso.IdPerfil); // VALIDATOR profile
+            Assert.Equal(validatorProfileId, acceso.IdPerfil); // VALIDATOR profile
         }
     }
 
@@ -188,6 +197,8 @@ public class SettingsControllerTests
         // Arrange
         var dbName = "Settings_UpdateUserPlan";
         var devUserGuid = Guid.NewGuid();
+        var empresaPlanId = Guid.NewGuid();
+
         using (var context = CreateDbContext(dbName))
         {
             var admin = new Usuario("Admin", "User", "admin@verifinca.do", "hash", UserRole.Administrator, "123", "123");
@@ -196,7 +207,7 @@ public class SettingsControllerTests
             typeof(EntityBase).GetProperty("Id")?.SetValue(dev, devUserGuid);
 
             context.Usuarios.AddRange(admin, dev);
-            context.PlanesSuscripcion.Add(new PlanSuscripcion { Idsuscripcion = 3, NombrePlan = "Empresa", Precio = 10000.00m });
+            context.PlanesSuscripcion.Add(new PlanSuscripcion { Idsuscripcion = empresaPlanId, NombrePlan = "Empresa", Precio = 10000.00m });
 
             await context.SaveChangesAsync();
         }
@@ -207,7 +218,7 @@ public class SettingsControllerTests
             var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("admin@verifinca.do"));
             SetupControllerContext(controller, token);
 
-            var request = new UpdatePlanRequest { PlanId = 3 };
+            var request = new UpdatePlanRequest { PlanId = empresaPlanId };
 
             // Act
             var result = await controller.UpdateUserPlan(devUserGuid, request, CancellationToken.None);
@@ -221,7 +232,7 @@ public class SettingsControllerTests
 
             var pago = await context.PagosLegacy.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
             Assert.NotNull(pago);
-            Assert.Equal(3, pago.Idsuscripcion);
+            Assert.Equal(empresaPlanId, pago.Idsuscripcion);
             Assert.Equal(10000.00m, pago.Monto);
         }
     }

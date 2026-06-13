@@ -5,21 +5,21 @@ export interface UserSettings {
   role: "admin" | "dev" | "validator" | "user";
   telefono: string;
   cedula: string;
-  profileId: number | null;
+  profileId: string | null;
   profileName: string;
-  planId: number | null;
+  planId: string | null;
   planName: string;
   planPrice: number | null;
 }
 
 export interface ProfilePermissions {
-  perfilId: number;
+  perfilId: string;
   name: string;
   permissions: string[];
 }
 
 export interface SubscriptionPlan {
-  planId: number;
+  planId: string;
   name: string;
   price: number;
 }

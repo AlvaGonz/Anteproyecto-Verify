@@ -34,7 +34,7 @@ export const useUpdateUserRole = () => {
 export const useUpdateUserPlan = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, planId }: { userId: string; planId: number }) =>
+    mutationFn: ({ userId, planId }: { userId: string; planId: string }) =>
       apiClient.patch<void>(`/admin/users/${userId}/plan`, { planId }).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["settings", "users"] });

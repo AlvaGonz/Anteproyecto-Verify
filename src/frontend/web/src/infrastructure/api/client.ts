@@ -1,6 +1,9 @@
 import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? import.meta.env.VITE_API_BASE_URL ?? "/api";
+let BASE_URL = import.meta.env.VITE_API_URL ?? import.meta.env.VITE_API_BASE_URL ?? "/api";
+if (BASE_URL && !BASE_URL.endsWith("/api") && !BASE_URL.endsWith("/api/")) {
+  BASE_URL = BASE_URL.replace(/\/$/, "") + "/api";
+}
 
 const instance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
