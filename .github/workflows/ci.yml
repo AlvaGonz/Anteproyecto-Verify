@@ -142,6 +142,14 @@ jobs:
       - name: RegisterPage smoke test (TRD registration fields)
         run: pnpm run test --run src/pages/auth/__tests__/RegisterPage.test.tsx
 
+      - name: Run E2E tests (Playwright)
+        working-directory: .
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm exec playwright test e2e/projects/project-crud.spec.ts
+        env:
+          VITE_USE_MOCK: 'true'
+
       - name: Build
         run: pnpm run build
 
