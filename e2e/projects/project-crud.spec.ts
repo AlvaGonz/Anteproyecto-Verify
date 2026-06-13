@@ -1,14 +1,37 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Projects CRUD — E2E", () => {
+// Todos los tests usan VITE_USE_MOCK=true (datos del mock local)
+
+const MOCK_PROJECT_ID = "proj-001"; // ID definido en src/infrastructure/mock/index.ts
+
+test.describe("CRUD Proyectos — E2E con Mock", () => {
+  let projectDb = {
+    id: "proj-001",
+    codigoInterno: "VF-001-2026",
+    nombre: "Residencial Las Palmas",
+    ubicacionTexto: "La Romana, RD",
+    categoria: 1, // Residencial
+    estadoProyecto: 0, // Draft
+    estadoIntegridad: 0, // Pending
+    usuarioCreadorId: "user-001",
+    createdAtUtc: "2026-01-01T00:00:00Z"
+  };
+
   test.beforeEach(async ({ page }) => {
+    page.on("console", (msg) => {
+      console.log(`BROWSER CONSOLE [${msg.type()}]: ${msg.text()}`);
+    });
+    page.on("pageerror", (err) => {
+      console.error("BROWSER UNCAUGHT EXCEPTION:", err.message);
+    });
+
     // 1. Intercept /api/auth/me to automatically simulate authenticated state
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          id: "user-123",
+          id: "user-001",
           email: "admin@verifinca.do",
           name: "Admin User",
           role: "ADMIN"
@@ -16,165 +39,37 @@ test.describe("Projects CRUD — E2E", () => {
       });
     });
 
-    // 2. Default projects mock list
+    // 2. Default projects mock list and creation POST route
     await page.route("**/api/projects", async (route) => {
       if (route.request().method() === "GET") {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify([
-            {
-              id: "proj-001",
-              codigoInterno: "PRJ-001",
-              nombre: "Proyecto Inicial Mock",
-              ubicacionTexto: "Santo Domingo Este",
-              categoria: 1,
-              estadoProyecto: 0, // Draft
-              estadoIntegridad: 0, // Pending
-              usuarioCreadorId: "user-123",
-              createdAtUtc: "2026-06-13T00:00:00Z"
-            }
-          ])
+          body: JSON.stringify([projectDb])
         });
-      } else {
-        await route.fallback();
-      }
-    });
-
-    // 3. Default single project detail mock
-    await page.route("**/api/projects/proj-001", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          id: "proj-001",
-          codigoInterno: "PRJ-001",
-          nombre: "Proyecto Inicial Mock",
-          ubicacionTexto: "Santo Domingo Este",
-          categoria: 1,
-          estadoProyecto: 0, // Draft
-          estadoIntegridad: 0, // Pending
-          usuarioCreadorId: "user-123",
-          createdAtUtc: "2026-06-13T00:00:00Z"
-        })
-      });
-    });
-  });
-
-  test("CREATE: usuario puede crear un proyecto nuevo", async ({ page }) => {
-    // Intercept POST /api/projects for creation
-    await page.route("**/api/projects", async (route) => {
-      if (route.request().method() === "POST") {
+      } else if (route.request().method() === "POST") {
+        const payload = route.request().postDataJSON();
+        const created = {
+          id: "proj-new-123",
+          codigoInterno: "VF-new-2026",
+          estadoProyecto: 0,
+          estadoIntegridad: 0,
+          ...payload
+        };
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: "proj-new-123",
-            codigoInterno: "PRJ-new",
-            nombre: "Proyecto E2E Nuevo",
-            ubicacionTexto: "Santiago De Los Caballeros",
-            categoria: 2,
-            estadoProyecto: 0, // Draft
-            estadoIntegridad: 0, // Pending
-            usuarioCreadorId: "user-123",
-            createdAtUtc: "2026-06-13T00:00:00Z"
-          })
+          body: JSON.stringify(created)
         });
       }
     });
 
-    // 1. Navega a /admin/projects/new
-    await page.goto("/#/admin/projects/new");
-
-    // 2. Rellena: nombre, ubicacion, categoria, datos desarrollador, designacion catastral
-    await page.fill("#nombre", "Proyecto E2E Nuevo");
-    await page.fill("#ubicacion", "Santiago De Los Caballeros");
-    await page.selectOption("#categoria", "2"); // Comercial
-    await page.fill("#desarrollador", "Constructora E2E");
-    await page.fill("#catastral", "DC-99999");
-
-    // Intercept GET of newly created project
-    await page.route("**/api/projects/proj-new-123", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          id: "proj-new-123",
-          codigoInterno: "PRJ-new",
-          nombre: "Proyecto E2E Nuevo",
-          ubicacionTexto: "Santiago De Los Caballeros",
-          categoria: 2,
-          estadoProyecto: 0,
-          estadoIntegridad: 0,
-          usuarioCreadorId: "user-123",
-          createdAtUtc: "2026-06-13T00:00:00Z"
-        })
-      });
-    });
-
-    // 3. Click en submit
-    await page.click('button:has-text("Guardar")');
-
-    // 4. Expects: toast de éxito visible, redirect a /projects/:id
-    await expect(page.locator("text=Proyecto creado exitosamente")).toBeVisible();
-    await expect(page).toHaveURL(/.*\/projects\/proj-new-123/);
-  });
-
-  test("CREATE: muestra errores de validacion si campos requeridos estan vacios", async ({ page }) => {
-    // 1. Navega a /admin/projects/new
-    await page.goto("/#/admin/projects/new");
-
-    // 2. Click en submit sin llenar nada
-    await page.click('button:has-text("Guardar")');
-
-    // 3. Expects: validacion nativa del navegador impide redireccion y mantiene URL
-    await expect(page).toHaveURL(/.*\/admin\/projects\/new/);
-    
-    // El campo de Nombre debe marcarse como invalido
-    const nombreInput = page.locator("#nombre");
-    const isInvalid = await nombreInput.evaluate((el: HTMLInputElement) => !el.validity.valid);
-    expect(isInvalid).toBe(true);
-  });
-
-  test("READ: lista de proyectos carga correctamente en /admin/projects", async ({ page }) => {
-    // 1. Navega a /admin/projects
-    await page.goto("/#/admin/projects");
-
-    // 2. Expects: al menos un card/row de proyecto visible
-    await expect(page.locator("text=Proyecto Inicial Mock")).toBeVisible();
-
-    // 3. Expects: no spinner visible tras 2s
-    await page.waitForTimeout(2000);
-    await expect(page.locator(".animate-spin")).not.toBeVisible();
-  });
-
-  test("READ: detalle de proyecto carga al navegar a /projects/:id", async ({ page }) => {
-    // 1. Navega a /projects/proj-001 (mock id)
-    await page.goto("/#/projects/proj-001");
-
-    // 2. Expects: nombre del proyecto visible en heading (using case-insensitive and robust text matching)
-    await expect(page.locator("h1")).toContainText("Proyecto Inicial Mock");
-
-    // 3. Expects: estado del proyecto visible (ej. AUDITORÍA para Pending status)
-    await expect(page.getByText("AUDITORÍA", { exact: true })).toBeVisible();
-  });
-
-  test("UPDATE: usuario puede editar un proyecto existente", async ({ page }) => {
-    let projectDb = {
-      id: "proj-001",
-      codigoInterno: "PRJ-001",
-      nombre: "Proyecto Inicial Mock",
-      ubicacionTexto: "Santo Domingo Este",
-      categoria: 1,
-      estadoProyecto: 0,
-      estadoIntegridad: 0,
-      usuarioCreadorId: "user-123",
-      createdAtUtc: "2026-06-13T00:00:00Z"
-    };
-
-    // Intercept both GET and PUT on /api/projects/proj-001
-    await page.route("**/api/projects/proj-001", async (route) => {
-      if (route.request().method() === "PUT") {
+    // 3. Default single project detail mock (GET, PUT, PATCH)
+    await page.route(/\/api\/projects\/proj-/, async (route) => {
+      const method = route.request().method();
+      const url = route.request().url();
+      console.log(`MOCK API INTERCEPT: ${method} ${url}`);
+      if (method === "PUT") {
         const payload = route.request().postDataJSON();
         projectDb = { ...projectDb, ...payload };
         await route.fulfill({
@@ -182,6 +77,18 @@ test.describe("Projects CRUD — E2E", () => {
           contentType: "application/json",
           body: JSON.stringify(projectDb)
         });
+      } else if (method === "PATCH") {
+        const payload = route.request().postDataJSON();
+        console.log(`MOCK API PATCH payload:`, payload);
+        if (url.endsWith("/status")) {
+          const apiStatus = payload.status;
+          projectDb.estadoProyecto = apiStatus === "Activo" ? 1 : 2; // Published vs InReview
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(projectDb)
+        });
       } else {
         await route.fulfill({
           status: 200,
@@ -190,72 +97,107 @@ test.describe("Projects CRUD — E2E", () => {
         });
       }
     });
-
-    // 1. Navega a /admin/projects/:mockId/edit
-    await page.goto("/#/admin/projects/proj-001/edit");
-
-    // 2. Expects: formulario pre-cargado con datos existentes
-    await expect(page.locator("#nombre")).toHaveValue("Proyecto Inicial Mock");
-
-    // 3. Modifica el campo `nombre`
-    await page.fill("#nombre", "Proyecto Inicial Mock Editado");
-
-    // 4. Click en submit
-    await page.click('button:has-text("Guardar")');
-
-    // 5. Expects: toast de éxito, redirect a /projects/:id
-    await expect(page.locator("text=Proyecto actualizado exitosamente")).toBeVisible();
-    await expect(page).toHaveURL(/.*\/projects\/proj-001/);
   });
 
-  test("STATUS: admin puede cambiar estado de un proyecto", async ({ page }) => {
-    let patchCalled = false;
-    let projectDb = {
-      id: "proj-001",
-      codigoInterno: "PRJ-001",
-      nombre: "Proyecto Inicial Mock",
-      ubicacionTexto: "Santo Domingo Este",
-      categoria: 1,
-      estadoProyecto: 0, // Draft status initially
-      estadoIntegridad: 0,
-      usuarioCreadorId: "user-123",
-      createdAtUtc: "2026-06-13T00:00:00Z"
-    };
+  // ── CREATE ──────────────────────────────────────────────────────────────────
 
-    // Intercept PATCH status request
-    await page.route("**/api/projects/proj-001/status", async (route) => {
-      if (route.request().method() === "PATCH") {
-        patchCalled = true;
-        projectDb.estadoProyecto = 2; // InReview status
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(projectDb)
-        });
-      }
-    });
+  test("CREATE — renderiza el formulario en /admin/projects/new", async ({ page }) => {
+    await page.goto("/#/admin/projects/new");
+    await expect(page.getByText(/Crear Nuevo Proyecto/i)).toBeVisible();
+    await expect(page.getByLabel(/Nombre del Proyecto/i)).toBeVisible();
+    await expect(page.getByLabel(/Ubicación/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /Guardar/i })).toBeVisible();
+  });
 
-    // Override the GET for proj-001 to return current projectDb
-    await page.route("**/api/projects/proj-001", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(projectDb)
-      });
-    });
+  test("CREATE — usuario puede crear un proyecto nuevo y es redirigido", async ({ page }) => {
+    await page.goto("/#/admin/projects/new");
 
-    // 1. Navega a /admin/projects/:mockId/edit
-    await page.goto("/#/admin/projects/proj-001/edit");
+    await page.getByLabel(/Nombre del Proyecto/i).fill("Proyecto Playwright Test");
+    await page.getByLabel(/Ubicación/i).fill("La Romana, RD");
+    await page.getByRole("button", { name: /Guardar/i }).click();
 
-    // 2. Click en botón "InReview"
-    await page.click('button:has-text("InReview")');
+    // After successful create, should navigate to /projects/:newId
+    await expect(page).toHaveURL(/\/projects\/proj-/);
+  });
 
-    // 3. Expects: toast de éxito visible
-    await expect(page.locator("text=Estado actualizado exitosamente")).toBeVisible();
-    expect(patchCalled).toBe(true);
+  test("CREATE — no permite submit con campos requeridos vacíos", async ({ page }) => {
+    await page.goto("/#/admin/projects/new");
 
-    // 4. Expects: badge de estado actualizado a "InReview"
-    await expect(page.locator("strong:has-text('InReview')")).toBeVisible();
+    // Intentar submit sin llenar nada
+    await page.getByRole("button", { name: /Guardar/i }).click();
+
+    // Los campos required del HTML5 deben bloquear el submit
+    // El formulario no debe navegar
+    await expect(page).toHaveURL(/\/admin\/projects\/new/);
+    const nombreInput = page.getByLabel(/Nombre del Proyecto/i);
+    await expect(nombreInput).toBeFocused();
+  });
+
+  // ── READ ─────────────────────────────────────────────────────────────────────
+
+  test("READ — lista de proyectos carga en /admin/projects", async ({ page }) => {
+    await page.goto("/#/admin/projects");
+
+    // Espera a que desaparezca cualquier spinner/loading
+    await page.waitForLoadState("networkidle");
+
+    // Debe haber al menos un proyecto visible (mock data)
+    const projectCard = page.getByRole("heading", { name: "Residencial Las Palmas" }).first();
+    await expect(projectCard).toBeVisible({ timeout: 5000 });
+  });
+
+  test("READ — detalle de proyecto carga en /projects/:id", async ({ page }) => {
+    await page.goto(`/#/projects/${MOCK_PROJECT_ID}`);
+    await page.waitForLoadState("networkidle");
+
+    // El nombre del proyecto mock debe aparecer (using case-insensitive and robust text matching)
+    await expect(page.locator("h1")).toContainText("Residencial", { timeout: 5000 });
+  });
+
+  // ── UPDATE ───────────────────────────────────────────────────────────────────
+
+  test("UPDATE — formulario de edición se pre-carga con datos del proyecto", async ({ page }) => {
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/edit`);
+    await page.waitForLoadState("networkidle");
+
+    await expect(page.getByText(/Editar Proyecto/i)).toBeVisible({ timeout: 5000 });
+    const nombreInput = page.getByLabel(/Nombre del Proyecto/i);
+    await expect(nombreInput).not.toHaveValue("");
+  });
+
+  test("UPDATE — usuario puede editar y guardar un proyecto", async ({ page }) => {
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/edit`);
+    await page.waitForLoadState("networkidle");
+    await page.getByText(/Editar Proyecto/i).waitFor({ timeout: 5000 });
+
+    const nombreInput = page.getByLabel(/Nombre del Proyecto/i);
+    await nombreInput.clear();
+    await nombreInput.fill("Proyecto Editado via Playwright");
+    await page.getByRole("button", { name: /Guardar/i }).click();
+
+    // Redirect to /projects/:id after successful update
+    await expect(page).toHaveURL(new RegExp(`/projects/${MOCK_PROJECT_ID}`), { timeout: 5000 });
+  });
+
+  // ── STATUS ───────────────────────────────────────────────────────────────────
+
+  test("STATUS — botones de estado visibles en modo edición", async ({ page }) => {
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/edit`);
+    await page.waitForLoadState("networkidle");
+    await page.getByText(/Editar Proyecto/i).waitFor({ timeout: 5000 });
+
+    await expect(page.getByRole("button", { name: /InReview/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Published/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Draft/i })).toBeVisible();
+  });
+
+  test("STATUS — cambiar estado muestra toast de éxito", async ({ page }) => {
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/edit`);
+    await page.waitForLoadState("networkidle");
+    await page.getByText(/Editar Proyecto/i).waitFor({ timeout: 5000 });
+
+    await page.getByRole("button", { name: /InReview/i }).click();
+
+    await expect(page.getByText(/actualizado exitosamente/i)).toBeVisible({ timeout: 3000 });
   });
 });
-

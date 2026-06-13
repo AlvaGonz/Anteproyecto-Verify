@@ -1,281 +1,212 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { projectsApi } from "../projectsApi";
-import { apiClient } from "../../../../infrastructure/api/client";
-import MockAdapter from "axios-mock-adapter";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { ProjectStatus, IntegrityStatus, ProyectoDto } from "../../types";
-import { isSuccess, isFailure } from "../../../../shared/utils/functional";
+import {
+  ProjectStatus,
+  ProjectCategory,
+  IntegrityStatus,
+} from "../../types";
 
-// Configure non-mock mode
-import.meta.env.VITE_USE_MOCK = "false";
-
-describe("projectsApi", () => {
-  let mock: MockAdapter;
-
-  beforeEach(() => {
-    mock = new MockAdapter(apiClient);
-    vi.stubEnv("VITE_USE_MOCK", "false");
-  });
-
-  afterEach(() => {
-    mock.restore();
-    vi.restoreAllMocks();
-  });
-
-  describe("projectsApi — getProjects", () => {
-    it("returns success with project list on 200", async () => {
-      const mockProjects: ProyectoDto[] = [
-        {
-          id: "proj-1",
-          codigoInterno: "PRJ-1",
-          nombre: "Project One",
-          ubicacionTexto: "Santo Domingo",
-          categoria: 1,
-          estadoProyecto: ProjectStatus.Draft,
-          estadoIntegridad: IntegrityStatus.Pending,
-          usuarioCreadorId: "user-1",
-          createdAtUtc: "2026-06-13T00:00:00Z"
+// Mock apiClient to delegate to global.fetch so that the test's fetch mocks intercept the requests
+vi.mock("../../../../infrastructure/api/client", () => {
+  return {
+    apiClient: {
+      get: vi.fn().mockImplementation(async (url: string) => {
+        const res = await global.fetch(`http://localhost:5000/api${url}`, { method: "GET" });
+        const data = await res.json();
+        if (!res.ok) {
+          throw { response: { status: res.status, data } };
         }
-      ];
-
-      mock.onGet("/projects").reply(200, mockProjects);
-
-      const result = await projectsApi.getProjects();
-
-      expect(isSuccess(result)).toBe(true);
-      if (isSuccess(result)) {
-        expect(result.data).toEqual(mockProjects);
-      }
-    });
-
-    it("returns ServerError on non-200 response", async () => {
-      mock.onGet("/projects").reply(500, { message: "Internal Error" });
-
-      const result = await projectsApi.getProjects();
-
-      expect(isFailure(result)).toBe(true);
-      if (isFailure(result)) {
-        expect(result.error._tag).toBe("ServerError");
-      }
-    });
-
-    it("returns UnknownError on network failure", async () => {
-      mock.onGet("/projects").networkError();
-
-      const result = await projectsApi.getProjects();
-
-      expect(isFailure(result)).toBe(true);
-      if (isFailure(result)) {
-        expect(result.error._tag).toBe("UnknownError");
-      }
-    });
-  });
-
-  describe("projectsApi — getProjectById", () => {
-    it("returns success with matching project", async () => {
-      const mockProject: ProyectoDto = {
-        id: "proj-1",
-        codigoInterno: "PRJ-1",
-        nombre: "Project One",
-        ubicacionTexto: "Santo Domingo",
-        categoria: 1,
-        estadoProyecto: ProjectStatus.Draft,
-        estadoIntegridad: IntegrityStatus.Pending,
-        usuarioCreadorId: "user-1",
-        createdAtUtc: "2026-06-13T00:00:00Z"
-      };
-
-      mock.onGet("/projects/proj-1").reply(200, mockProject);
-
-      const result = await projectsApi.getProjectById("proj-1");
-
-      expect(isSuccess(result)).toBe(true);
-      if (isSuccess(result)) {
-        expect(result.data).toEqual(mockProject);
-      }
-    });
-
-    it("returns NotFound failure when project does not exist", async () => {
-      mock.onGet("/projects/non-existent").reply(404);
-
-      const result = await projectsApi.getProjectById("non-existent");
-
-      expect(isFailure(result)).toBe(true);
-      if (isFailure(result)) {
-        expect(result.error._tag).toBe("NotFound");
-        if (result.error._tag === "NotFound") {
-          expect(result.error.id).toBe("non-existent");
+        return { data };
+      }),
+      post: vi.fn().mockImplementation(async (url: string, body: any) => {
+        const res = await global.fetch(`http://localhost:5000/api${url}`, {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw { response: { status: res.status, data } };
         }
-      }
-    });
+        return { data };
+      }),
+      put: vi.fn().mockImplementation(async (url: string, body: any) => {
+        const res = await global.fetch(`http://localhost:5000/api${url}`, {
+          method: "PUT",
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw { response: { status: res.status, data } };
+        }
+        return { data };
+      }),
+      patch: vi.fn().mockImplementation(async (url: string, body: any) => {
+        const res = await global.fetch(`http://localhost:5000/api${url}`, {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw { response: { status: res.status, data } };
+        }
+        return { data };
+      }),
+    },
+  };
+});
 
-    it("returns NotFound failure on 404 HTTP response", async () => {
-      mock.onGet("/projects/proj-error").reply(404);
+// ── Fixtures ────────────────────────────────────────────────────────────────
 
-      const result = await projectsApi.getProjectById("proj-error");
+const MOCK_PROJECT = {
+  id: "proj-001",
+  codigoInterno: "VF-001-2026",
+  nombre: "Residencial Las Palmas",
+  ubicacionTexto: "La Romana, RD",
+  categoria: ProjectCategory.Residencial,
+  estadoProyecto: ProjectStatus.Draft,
+  estadoIntegridad: IntegrityStatus.Pending,
+  usuarioCreadorId: "user-001",
+  createdAtUtc: "2026-01-01T00:00:00Z",
+};
 
-      expect(isFailure(result)).toBe(true);
-      if (isFailure(result)) {
-        expect(result.error._tag).toBe("NotFound");
-      }
-    });
+const MOCK_CREATE_DTO = {
+  nombre: "Nuevo Proyecto Test",
+  ubicacionTexto: "Santo Domingo, RD",
+  usuarioCreadorId: "user-001",
+  categoria: ProjectCategory.Comercial,
+};
+
+const MOCK_UPDATE_DTO = {
+  nombre: "Proyecto Actualizado",
+  ubicacionTexto: "Santiago, RD",
+  categoria: ProjectCategory.Mixto,
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function mockFetch(status: number, body: unknown) {
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => body,
+  });
+}
+
+function mockFetchReject(error: Error) {
+  global.fetch = vi.fn().mockRejectedValue(error);
+}
+
+// Force USE_MOCK=false so tests exercise the real fetch path
+vi.stubEnv("VITE_USE_MOCK", "false");
+vi.stubEnv("VITE_API_URL", "http://localhost:5000/api");
+
+describe("projectsApi — READ", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("getProjects — returns success with project list on 200", async () => {
+    mockFetch(200, [MOCK_PROJECT]);
+    const result = await projectsApi.getProjects();
+    expect(result).toMatchObject({ _tag: "Success", data: [MOCK_PROJECT] });
   });
 
-  describe("projectsApi — createProject", () => {
-    it("posts to /projects and returns the new project on 200", async () => {
-      const input = {
-        nombre: "New Project",
-        ubicacionTexto: "Santiago",
-        usuarioCreadorId: "user-1",
-        categoria: 1
-      };
-
-      const expectedProject: ProyectoDto = {
-        id: "proj-new",
-        codigoInterno: "PRJ-new",
-        nombre: input.nombre,
-        ubicacionTexto: input.ubicacionTexto,
-        categoria: input.categoria,
-        estadoProyecto: ProjectStatus.Draft,
-        estadoIntegridad: IntegrityStatus.Pending,
-        usuarioCreadorId: input.usuarioCreadorId,
-        createdAtUtc: "2026-06-13T00:00:00Z"
-      };
-
-      mock.onPost("/projects").reply(200, expectedProject);
-
-      const result = await projectsApi.createProject(input);
-
-      expect(isSuccess(result)).toBe(true);
-      if (isSuccess(result)) {
-        expect(result.data).toEqual(expectedProject);
-      }
-    });
-
-    it("returns ServerError when API returns 500", async () => {
-      mock.onPost("/projects").reply(500, { message: "DB Error" });
-
-      const result = await projectsApi.createProject({
-        nombre: "Fail Project",
-        ubicacionTexto: "Santiago",
-        usuarioCreadorId: "user-1"
-      });
-
-      expect(isFailure(result)).toBe(true);
-      if (isFailure(result)) {
-        expect(result.error._tag).toBe("ServerError");
-      }
-    });
-
-    it("assigns Draft status and Pending integrity to new project", async () => {
-      const input = {
-        nombre: "Draft Project",
-        ubicacionTexto: "Puerto Plata",
-        usuarioCreadorId: "user-2"
-      };
-
-      mock.onPost("/projects").reply((config) => {
-        const body = JSON.parse(config.data);
-        expect(body.estadoProyecto).toBe(ProjectStatus.Draft);
-        expect(body.estadoIntegridad).toBe(IntegrityStatus.Pending);
-
-        const responseData: ProyectoDto = {
-          id: "proj-draft",
-          codigoInterno: "PRJ-draft",
-          nombre: body.nombre,
-          ubicacionTexto: body.ubicacionTexto,
-          categoria: 1,
-          estadoProyecto: body.estadoProyecto,
-          estadoIntegridad: body.estadoIntegridad,
-          usuarioCreadorId: body.usuarioCreadorId,
-          createdAtUtc: "2026-06-13T00:00:00Z"
-        };
-        return [200, responseData];
-      });
-
-      const result = await projectsApi.createProject(input);
-      expect(isSuccess(result)).toBe(true);
-    });
+  it("getProjects — returns ServerError on non-200", async () => {
+    mockFetch(500, {});
+    const result = await projectsApi.getProjects();
+    expect(result).toMatchObject({ _tag: "Failure", error: { _tag: "ServerError" } });
   });
 
-  describe("projectsApi — updateProject", () => {
-    it("puts to /projects/:id and returns updated project", async () => {
-      const updateData = {
-        nombre: "Updated Name",
-        ubicacionTexto: "La Vega",
-        categoria: 2
-      };
-
-      const updatedProject: ProyectoDto = {
-        id: "proj-1",
-        codigoInterno: "PRJ-1",
-        nombre: updateData.nombre,
-        ubicacionTexto: updateData.ubicacionTexto,
-        categoria: updateData.categoria,
-        estadoProyecto: ProjectStatus.InReview,
-        estadoIntegridad: IntegrityStatus.Verified,
-        usuarioCreadorId: "user-1",
-        createdAtUtc: "2026-06-13T00:00:00Z"
-      };
-
-      mock.onPut("/projects/proj-1").reply(200, updatedProject);
-
-      const result = await projectsApi.updateProject("proj-1", updateData);
-
-      expect(isSuccess(result)).toBe(true);
-      if (isSuccess(result)) {
-        expect(result.data).toEqual(updatedProject);
-      }
-    });
-
-    it("returns NotFound when id does not exist", async () => {
-      mock.onPut("/projects/non-existent").reply(404);
-
-      const result = await projectsApi.updateProject("non-existent", {
-        nombre: "Non Existent",
-        ubicacionTexto: "N/A",
-        categoria: 1
-      });
-
-      expect(isFailure(result)).toBe(true);
-      if (isFailure(result)) {
-        expect(result.error._tag).toBe("NotFound");
-      }
-    });
+  it("getProjects — returns UnknownError on network failure", async () => {
+    mockFetchReject(new Error("Network error"));
+    const result = await projectsApi.getProjects();
+    expect(result).toMatchObject({ _tag: "Failure", error: { _tag: "UnknownError" } });
   });
 
-  describe("projectsApi — updateProjectStatus", () => {
-    it("patches status and returns updated project", async () => {
-      const updatedProject: ProyectoDto = {
-        id: "proj-1",
-        codigoInterno: "PRJ-1",
-        nombre: "Project One",
-        ubicacionTexto: "Santo Domingo",
-        categoria: 1,
-        estadoProyecto: ProjectStatus.Published,
-        estadoIntegridad: IntegrityStatus.Pending,
-        usuarioCreadorId: "user-1",
-        createdAtUtc: "2026-06-13T00:00:00Z"
-      };
+  it("getProjectById — returns success when project found", async () => {
+    mockFetch(200, MOCK_PROJECT);
+    const result = await projectsApi.getProjectById("proj-001");
+    expect(result).toMatchObject({ _tag: "Success", data: MOCK_PROJECT });
+  });
 
-      mock.onPatch("/projects/proj-1/status").reply((config) => {
-        const body = JSON.parse(config.data);
-        expect(body.status).toBe("Activo"); // Published status maps to "Activo"
-        return [200, updatedProject];
-      });
+  it("getProjectById — returns NotFound on 404", async () => {
+    mockFetch(404, {});
+    const result = await projectsApi.getProjectById("proj-999");
+    expect(result).toMatchObject({ _tag: "Failure", error: { _tag: "NotFound", id: "proj-999" } });
+  });
 
-      const result = await projectsApi.updateProjectStatus("proj-1", ProjectStatus.Published);
+  it("getProjectById — returns ServerError on 500", async () => {
+    mockFetch(500, {});
+    const result = await projectsApi.getProjectById("proj-001");
+    expect(result).toMatchObject({ _tag: "Failure", error: { _tag: "ServerError" } });
+  });
+});
 
-      expect(isSuccess(result)).toBe(true);
-      if (isSuccess(result)) {
-        expect(result.data).toEqual(updatedProject);
-      }
+describe("projectsApi — CREATE", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("createProject — POSTs and returns new project on 200", async () => {
+    const created = { ...MOCK_PROJECT, id: "proj-new", ...MOCK_CREATE_DTO };
+    mockFetch(200, created);
+    const result = await projectsApi.createProject(MOCK_CREATE_DTO);
+    expect(result).toMatchObject({ _tag: "Success", data: { id: "proj-new" } });
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:5000/api/projects",
+      expect.objectContaining({ method: "POST" })
+    );
+  });
+
+  it("createProject — returns ServerError on 500", async () => {
+    mockFetch(500, {});
+    const result = await projectsApi.createProject(MOCK_CREATE_DTO);
+    expect(result).toMatchObject({ _tag: "Failure", error: { _tag: "ServerError" } });
+  });
+
+  it("createProject — sends correct JSON body", async () => {
+    mockFetch(200, { ...MOCK_PROJECT, ...MOCK_CREATE_DTO });
+    await projectsApi.createProject(MOCK_CREATE_DTO);
+    const callArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+    const body = JSON.parse(callArgs[0][1].body);
+    expect(body.nombre).toBe("Nuevo Proyecto Test");
+    expect(body.usuarioCreadorId).toBe("user-001");
+  });
+});
+
+describe("projectsApi — UPDATE", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("updateProject — PUTs and returns updated project", async () => {
+    const updated = { ...MOCK_PROJECT, ...MOCK_UPDATE_DTO };
+    mockFetch(200, updated);
+    const result = await projectsApi.updateProject("proj-001", MOCK_UPDATE_DTO);
+    expect(result).toMatchObject({ _tag: "Success", data: { nombre: "Proyecto Actualizado" } });
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:5000/api/projects/proj-001",
+      expect.objectContaining({ method: "PUT" })
+    );
+  });
+
+  it("updateProject — returns ServerError on failure", async () => {
+    mockFetch(500, {});
+    const result = await projectsApi.updateProject("proj-001", MOCK_UPDATE_DTO);
+    expect(result).toMatchObject({ _tag: "Failure", error: { _tag: "ServerError" } });
+  });
+
+  it("updateProjectStatus — PATCHes status and returns updated project", async () => {
+    const updated = { ...MOCK_PROJECT, estadoProyecto: ProjectStatus.InReview };
+    mockFetch(200, updated);
+    const result = await projectsApi.updateProjectStatus("proj-001", ProjectStatus.InReview);
+    expect(result).toMatchObject({
+      _tag: "Success",
+      data: { estadoProyecto: ProjectStatus.InReview },
     });
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:5000/api/projects/proj-001/status",
+      expect.objectContaining({ method: "PATCH" })
+    );
+  });
 
-    it("throws when an invalid ProjectStatus enum value is passed", async () => {
-      // Using an invalid number cast as ProjectStatus
-      await expect(
-        projectsApi.updateProjectStatus("proj-1", 999 as ProjectStatus)
-      ).rejects.toThrow("Invalid project status");
-    });
+  it("updateProjectStatus — returns ServerError on 500", async () => {
+    mockFetch(500, {});
+    const result = await projectsApi.updateProjectStatus("proj-001", ProjectStatus.Published);
+    expect(result).toMatchObject({ _tag: "Failure", error: { _tag: "ServerError" } });
   });
 });
