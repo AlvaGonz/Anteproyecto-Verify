@@ -174,11 +174,11 @@ export const AdminProjectsPage: React.FC = () => {
                </p>
             </div>
           ) : (
-            filtered.map((project) => {
+            filtered.map((project, index) => {
               const badge = getStatusBadge(project.estadoProyecto);
               return (
                 <div 
-                  key={project.id}
+                  key={`${project.id}-${index}`}
                   className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/20 transition-all group relative overflow-hidden"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

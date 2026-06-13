@@ -1,10 +1,18 @@
+import { ProjectCategory, ProjectStatus, IntegrityStatus } from "../types";
+
 export interface ProyectoDto {
-  idProyecto: number;
+  id: string;
+  codigoInterno: string;
   nombre: string;
-  descripcion: string;
-  estado: "Activo" | "Inactivo" | "Pendiente" | "Completado";
-  fechaCreacion: string; // ISO string
-  idUsuario: number;
-  ubicacion?: string;
-  tipoProyecto?: string;
+  ubicacionTexto: string;
+  ubicacionGps?: string;
+  valorEstimado?: number;
+  categoria: ProjectCategory;
+  datosDesarrollador?: string;
+  designacionCatastral?: string;
+  estadoProyecto: ProjectStatus;
+  estadoIntegridad: IntegrityStatus;
+  usuarioCreadorId: string;
+  createdAtUtc: string;
+  updatedAtUtc?: string;
 }

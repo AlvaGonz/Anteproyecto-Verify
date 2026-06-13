@@ -20,7 +20,7 @@ export const useLogin = () =>
 
 export const useRegister = () =>
   useMutation({
-    mutationFn: (data: Omit<RegisterFormValues, "confirmPassword">) =>
+    mutationFn: (data: Omit<RegisterFormValues, "confirmPassword" | "acceptedTerms">) =>
       apiClient.post<AuthResponse>("/auth/register", data).then(res => res.data),
     onSuccess: (res) => {
       if (res.accessToken) {

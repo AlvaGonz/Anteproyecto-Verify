@@ -70,7 +70,7 @@ public class AuthController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true, // Force secure cookie
+            Secure = Request.IsHttps, // Conditionally secure depending on protocol (HTTP vs HTTPS)
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddHours(2),
             Path = "/"
@@ -104,7 +104,7 @@ public class AuthController : ControllerBase
         Response.Cookies.Delete("vf_token", new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = Request.IsHttps,
             SameSite = SameSiteMode.Strict,
             Path = "/"
         });

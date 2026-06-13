@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
 import type { ProyectoDto, CreateProyectoDto } from "../types";
-import { ProjectCategory, ProjectStatus, IntegrityStatus } from "../types";
+import { ProjectCategory } from "../types";
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -10,15 +10,15 @@ export const projectKeys = {
 };
 
 const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
-  id: String(apiProj.idProyecto),
-  codigoInterno: `PRJ-${apiProj.idProyecto}`, // fallback
+  id: String(apiProj.id),
+  codigoInterno: apiProj.codigoInterno || `PRJ-${apiProj.id}`,
   nombre: apiProj.nombre,
-  ubicacionTexto: apiProj.ubicacion || "",
-  categoria: apiProj.tipoProyecto === "Comercial" ? ProjectCategory.Comercial : ProjectCategory.Residencial,
-  estadoProyecto: apiProj.estado === "Activo" ? ProjectStatus.Published : ProjectStatus.Draft,
-  estadoIntegridad: apiProj.estado === "Activo" ? IntegrityStatus.Verified : IntegrityStatus.Pending,
-  usuarioCreadorId: String(apiProj.idUsuario),
-  createdAtUtc: apiProj.fechaCreacion,
+  ubicacionTexto: apiProj.ubicacionTexto || "",
+  categoria: apiProj.categoria,
+  estadoProyecto: apiProj.estadoProyecto,
+  estadoIntegridad: apiProj.estadoIntegridad,
+  usuarioCreadorId: String(apiProj.usuarioCreadorId),
+  createdAtUtc: apiProj.createdAtUtc,
 });
 
 export const useProjects = () =>
@@ -40,9 +40,11 @@ export const useCreateProject = () => {
     mutationFn: (data: CreateProyectoDto) =>
       apiClient.post<ApiProyectoDto>("/projects", {
         nombre: data.nombre,
-        ubicacion: data.ubicacionTexto,
-        categoria: data.categoria === ProjectCategory.Comercial ? "Comercial" : "Residencial",
-        estado: "Pendiente"
+        ubicacionTexto: data.ubicacionTexto,
+        categoria: data.categoria ?? ProjectCategory.Residencial,
+        usuarioCreadorId: data.usuarioCreadorId,
+        datosDesarrollador: data.datosDesarrollador,
+        designacionCatastral: data.designacionCatastral
       }).then(res => mapApiProject(res.data)),
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
   });
