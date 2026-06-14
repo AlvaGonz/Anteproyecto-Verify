@@ -8,7 +8,7 @@ public class UsuarioLegacyConfiguration : IEntityTypeConfiguration<UsuarioLegacy
 {
     public void Configure(EntityTypeBuilder<UsuarioLegacy> builder)
     {
-        builder.ToTable("Usuario");
+        builder.ToTable("UsuarioLegacy");
         builder.HasKey(u => u.IdUsuario);
         
         builder.Property(u => u.IdUsuario).HasColumnName("IdUsuario").ValueGeneratedOnAdd();

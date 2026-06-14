@@ -16,12 +16,31 @@ CREATE TABLE Usuario (
     Nombre VARCHAR(100) NOT NULL,
     Apellido VARCHAR(100) NOT NULL,
     NombreCompleto AS (Nombre + ' ' + Apellido) PERSISTED,
-    Email VARCHAR(100) NOT NULL UNIQUE CONSTRAINT CK_Usuario_Email CHECK (Email LIKE '%_@__%.__%'),
-    ContrasenaHash VARCHAR(255) NOT NULL,
+    CorreoElectronico VARCHAR(200) NOT NULL UNIQUE CONSTRAINT CK_Usuario_CorreoElectronico CHECK (CorreoElectronico LIKE '%_@__%.__%'),
+    ContrasenaHash VARCHAR(500) NOT NULL,
     Telefono VARCHAR(15) NOT NULL,
-    Cedula VARCHAR(15) NOT NULL
+    Cedula VARCHAR(15) NOT NULL,
+    Rol INT NOT NULL DEFAULT 2,
+    Activo BIT NOT NULL DEFAULT 1,
+    CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAtUtc DATETIME2 NULL
 );
 GO
+
+-- Vista para compatibilidad con entidades Legacy
+CREATE VIEW UsuarioLegacy AS
+SELECT 
+    IdUsuario,
+    Nombre,
+    Apellido,
+    NombreCompleto,
+    CorreoElectronico AS Email,
+    ContrasenaHash,
+    Telefono,
+    Cedula
+FROM Usuario;
+GO
+
 
 
 -- Tabla TipoDocumento
