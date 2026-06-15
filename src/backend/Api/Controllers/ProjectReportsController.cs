@@ -68,6 +68,7 @@ public class ProjectReportsController : ControllerBase
     public async Task<IActionResult> GenerateAiSummary(Guid projectId, CancellationToken ct)
     {
         // Dummy implementation to fix 404 error
+        await Task.CompletedTask;
         return Ok(new { summary = "Resumen generado por IA (Dummy implementation). El proyecto cumple con las normativas básicas, pero presenta algunas observaciones que requieren atención manual." });
     }
 
