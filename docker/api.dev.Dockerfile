@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0
+FROM mcr.azure.cn/dotnet/sdk:8.0
 WORKDIR /src
 # We expect the context to be the project root
 COPY . .

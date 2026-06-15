@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/mssql/server:2022-latest
+FROM mcr.azure.cn/mssql/server:2022-latest
 
 # nosemgrep
 USER root
