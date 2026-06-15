@@ -4,6 +4,7 @@ import { DocumentDto, UploadDocumentDto, DocumentType } from "../../features/doc
 import { useDocuments, useUploadDocument, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
 import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
+import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { motion } from "framer-motion";
 import { 
@@ -224,6 +225,8 @@ export const ProjectDocumentsPage: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
         {/* Column Left: Checklist + Upload Form */}
         <div className="xl:col-span-4 flex flex-col gap-6">
+          <ProjectDiagnosisPanel projectId={projectId} />
+          
           <RequiredDocumentsList documents={documents} />
 
           <div className="vf-card p-6 border-dashed border-2 bg-surface-container-low/30">
