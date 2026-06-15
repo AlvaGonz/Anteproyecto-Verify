@@ -42,31 +42,79 @@ class SecurityGuardrails:
         return hashlib.sha256(content.encode()).hexdigest()[:16]
 
 class CircuitBreaker:
-    def __init__(self, failure_threshold=3, recovery_timeout=30):
+    def __init__(self, operation_id="global", failure_threshold=3, recovery_timeout=30):
+        self.operation_id = operation_id.lower().replace(" ", "_")
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
+        self.lock_dir = os.path.join(".agents", "loop-locks")
+        self.counter_file = os.path.join(".agents", "loop-run-counter.txt")
+        self.lock_file = os.path.join(self.lock_dir, f"{self.operation_id}.lock")
         self.failures = 0
         self.last_failure_time = 0
         self.is_open = False
+        self._load()
+
+    def _load(self):
+        if not os.path.exists(self.lock_dir):
+            os.makedirs(self.lock_dir, exist_ok=True)
+        if os.path.exists(self.lock_file):
+            try:
+                with open(self.lock_file, "r") as f:
+                    self.failures = int(f.read().strip())
+            except Exception:
+                self.failures = 0
+        else:
+            self.failures = 0
+        
+        if self.failures >= self.failure_threshold:
+            self.is_open = True
+            if os.path.exists(self.lock_file):
+                self.last_failure_time = os.path.getmtime(self.lock_file)
+            else:
+                self.last_failure_time = time.time()
+
+    def _save(self):
+        if not os.path.exists(self.lock_dir):
+            os.makedirs(self.lock_dir, exist_ok=True)
+        try:
+            with open(self.lock_file, "w") as f:
+                f.write(str(self.failures))
+            with open(self.counter_file, "w") as f:
+                f.write(str(self.failures))
+        except Exception:
+            pass
 
     def record_failure(self):
         self.failures += 1
         self.last_failure_time = time.time()
         if self.failures >= self.failure_threshold:
             self.is_open = True
+        self._save()
 
     def allow_request(self) -> bool:
+        self._load()
         if not self.is_open:
             return True
         if time.time() - self.last_failure_time > self.recovery_timeout:
             self.is_open = False
             self.failures = 0
+            self._save()
             return True
         return False
 
     def record_success(self):
         self.failures = 0
         self.is_open = False
+        if os.path.exists(self.lock_file):
+            try:
+                os.remove(self.lock_file)
+            except Exception:
+                pass
+        try:
+            with open(self.counter_file, "w") as f:
+                f.write("0")
+        except Exception:
+            pass
 
 class WatchdogAgent:
     def __init__(self, session_path: str):
@@ -1027,7 +1075,7 @@ def main():
     parser = argparse.ArgumentParser(description="Post-Task Validation Loop")
     parser.add_argument("--task", type=str, default="No task description provided")
     parser.add_argument("--output", type=str, default="No output provided")
-    parser.add_argument("--hook-mode", default="ci", choices=["pre-commit","pre-push","ci"])
+    parser.add_argument("--hook-mode", type=str, default="ci", choices=["pre-commit","pre-push","ci"])
     args = parser.parse_args()
 
     hook_mode = os.environ.get("AGENT_HOOK_MODE", args.hook_mode)
@@ -1067,7 +1115,7 @@ def main():
         sys.exit(1)
 
     # Gather context at the very beginning using HookModeAdapter
-    diff_output = HookModeAdapter.get_diff(hook_mode)
+    diff_output = HookModeAdapter.get_diff(args.hook_mode)
 
     # Layer 1 execution
     test_runner = TestSuiteRunner()
@@ -1098,10 +1146,17 @@ def main():
         print(json.dumps({"score": 100, "verdict": "PASS", "high_issues": 0, "message": "GROQ_API_KEY missing, bypassed"}))
         sys.exit(0)
         
-    # Auto-detect latest session directory
+    # Auto-detect session via ACTIVE_SESSION pointer file (fallback to latest session directory)
     sessions_dir = os.path.join(".agents", "sessions")
+    active_ptr = os.path.join(sessions_dir, "ACTIVE_SESSION")
     session_id = None
-    if os.path.exists(sessions_dir):
+    if os.path.exists(active_ptr):
+        try:
+            with open(active_ptr, "r", encoding="utf-8") as f:
+                session_id = f.read().strip()
+        except Exception:
+            pass
+    if not session_id and os.path.exists(sessions_dir):
         subdirs = [os.path.join(sessions_dir, d) for d in os.listdir(sessions_dir) if os.path.isdir(os.path.join(sessions_dir, d))]
         if subdirs:
             latest_session = max(subdirs, key=os.path.getmtime)
@@ -1111,6 +1166,16 @@ def main():
         print(json.dumps({"score": 100, "verdict": "PASS", "high_issues": 0, "message": "No session found, bypassed"}))
         sys.exit(0)
 
+    # Load available skills from registry output
+    skills_context = ""
+    if os.path.exists("skills-lock.json"):
+        try:
+            with open("skills-lock.json", "r", encoding="utf-8") as f:
+                skills_data = json.load(f)
+            skills_context = "\n<SKILLS_REGISTRY>\n" + json.dumps(skills_data.get("skills", []), indent=2) + "\n</SKILLS_REGISTRY>"
+        except Exception:
+            pass
+
     session_path = os.path.join(sessions_dir, session_id)
 
     # Instantiate OWASP security controls
@@ -1118,7 +1183,7 @@ def main():
     dow_guard = DenialOfWalletGuard()
     watchdog = WatchdogAgent(session_path)
     supply_validator = SupplyChainValidator()
-    circuit_breakers = {name: CircuitBreaker() for name in
+    circuit_breakers = {name: CircuitBreaker(name) for name in
       ["Evaluator","Critic","Security Critic","Architecture Critic","Mutator","Validator","Archivist"]}
         
     agents_md = ""
@@ -1165,7 +1230,7 @@ def main():
         if not dow_guard.pre_call_check(len(system_prompt) + len(user_prompt)):
             return "{}" if json_mode else ""
         if agent_name not in circuit_breakers:
-            circuit_breakers[agent_name] = CircuitBreaker()
+            circuit_breakers[agent_name] = CircuitBreaker(agent_name)
         if not circuit_breakers[agent_name].allow_request():
             return "{}" if json_mode else ""
 
@@ -1323,6 +1388,8 @@ def main():
 
     # Agent 1: Evaluator
     evaluator_sys = "You are the Evaluator. Score the work 0-100 based on adherence to the Constitution, OWASP, and Clean Architecture. Output JSON with a 'score' integer."
+    if skills_context:
+        evaluator_sys += skills_context
     eval_res = call_llm(evaluator_sys, context, "Evaluator", json_mode=True)
     try:
         score = int(json.loads(eval_res).get("score", 100))
