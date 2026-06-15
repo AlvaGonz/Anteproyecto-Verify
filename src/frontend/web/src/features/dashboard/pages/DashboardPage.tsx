@@ -23,28 +23,47 @@ export const DashboardPage: React.FC = () => {
   const observed = projects.filter((p: any) => p.estadoProyecto === ProjectStatus.Observed).length;
   const verified = projects.filter((p: any) => p.estadoIntegridad === IntegrityStatus.Verified).length;
 
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const calculateGrowth = (currentNew: number, allTime: number) => {
+    const previous = allTime - currentNew;
+    if (previous === 0) return currentNew > 0 ? "+100%" : "0%";
+    const delta = (currentNew / previous) * 100;
+    return `${delta > 0 ? '+' : ''}${delta.toFixed(1)}%`;
+  };
+
+  const newTotal = projects.filter((p: any) => new Date(p.createdAtUtc) >= thirtyDaysAgo).length;
+  const newInReview = projects.filter((p: any) => p.estadoProyecto === ProjectStatus.InReview && new Date(p.createdAtUtc) >= thirtyDaysAgo).length;
+  const newObserved = projects.filter((p: any) => p.estadoProyecto === ProjectStatus.Observed && new Date(p.createdAtUtc) >= thirtyDaysAgo).length;
+  const newVerified = projects.filter((p: any) => p.estadoIntegridad === IntegrityStatus.Verified && new Date(p.createdAtUtc) >= thirtyDaysAgo).length;
+
   const stats = [
     {
       name: "Total Proyectos",
       stat: loading ? "..." : totalProjects.toString(),
+      delta: calculateGrowth(newTotal, totalProjects),
       icon: FolderKanban,
       bgColor: "bg-secondary",
     },
     {
       name: "En Revision",
       stat: loading ? "..." : inReview.toString(),
+      delta: calculateGrowth(newInReview, inReview),
       icon: FileCheck,
       bgColor: "bg-primary",
     },
     {
       name: "Observados",
       stat: loading ? "..." : observed.toString(),
+      delta: calculateGrowth(newObserved, observed),
       icon: AlertCircle,
       bgColor: "bg-error",
     },
     {
       name: "Verificados",
       stat: loading ? "..." : verified.toString(),
+      delta: calculateGrowth(newVerified, verified),
       icon: TrendingUp,
       bgColor: "bg-success",
     },
@@ -94,7 +113,9 @@ export const DashboardPage: React.FC = () => {
                 <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-1 opacity-70">{item.name}</p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-4xl font-display font-black text-secondary tracking-tighter">{item.stat}</p>
-                  <span className="text-[10px] font-bold text-success flex items-center">+5%</span>
+                  <span className={`text-[10px] font-bold flex items-center ${item.delta.startsWith('+') ? 'text-success' : 'text-on-surface-variant opacity-50'}`}>
+                    {item.delta}
+                  </span>
                 </div>
               </div>
             </div>
@@ -279,11 +300,15 @@ export const DashboardPage: React.FC = () => {
 
             <div className="relative z-10 flex items-center justify-between border-t border-white/5 pt-4">
               <div>
-                <p className="text-2xl font-display font-black text-white leading-none">98.2%</p>
+                <p className="text-2xl font-display font-black text-white leading-none">
+                  {totalProjects > 0 ? ((verified / totalProjects) * 100).toFixed(1) : "0"}%
+                </p>
                 <p className="text-[8px] font-black text-white/30 uppercase mt-1 tracking-tighter">Convergencia Catastral</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-display font-black text-primary leading-none">+4.5%</p>
+                <p className="text-2xl font-display font-black text-primary leading-none">
+                  {stats[3].delta}
+                </p>
                 <p className="text-[8px] font-black text-white/30 uppercase mt-1 tracking-tighter">Eficiencia Operativa</p>
               </div>
             </div>

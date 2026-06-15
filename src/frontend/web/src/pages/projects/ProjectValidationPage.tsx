@@ -29,11 +29,9 @@ export const ProjectValidationPage: React.FC = () => {
 
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (resultError) {
-      setError((resultError as any).message || "Error al cargar el resultado de validación");
-    }
-  }, [resultError]);
+  if (resultError) {
+    throw resultError;
+  }
 
   const result = rawResult ? {
     ...rawResult,
@@ -41,7 +39,8 @@ export const ProjectValidationPage: React.FC = () => {
       ...rawResult.internalValidation,
       validacionId: String(rawResult.internalValidation.idValidacion || rawResult.internalValidation.validacionId),
       proyectoId: String(projectId),
-    } : undefined
+    } : undefined,
+    externalSources: rawResult.externalSources || []
   } as unknown as ValidationExecutionResult : null;
 
   const findings = React.useMemo(() => {

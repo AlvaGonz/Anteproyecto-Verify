@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
+import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { useProjects } from "../../features/projects/api/useProjects";
 import { 
   FolderKanban, 
@@ -17,15 +19,16 @@ import {
   Building
 } from "lucide-react";
 
-const getStatusBadge = (status: ProjectStatus) => {
+const getStatusBadge = (status: ProjectStatus, t: any) => {
+  const label = getStatusLabel(status, t);
   switch (status) {
-    case ProjectStatus.Draft: return { label: "Borrador", cls: "bg-gray-100 text-gray-600 border-gray-200" };
-    case ProjectStatus.Published: return { label: "Publicado", cls: "bg-blue-50 text-blue-600 border-blue-100" };
-    case ProjectStatus.InReview: return { label: "En Revision", cls: "bg-indigo-50 text-indigo-600 border-indigo-100" };
-    case ProjectStatus.Observed: return { label: "Observado", cls: "bg-amber-50 text-amber-600 border-amber-100" };
-    case ProjectStatus.Validated: return { label: "Validado", cls: "bg-emerald-50 text-emerald-600 border-emerald-100" };
-    case ProjectStatus.Rejected: return { label: "Rechazado", cls: "bg-rose-50 text-rose-600 border-rose-100" };
-    default: return { label: "Desconocido", cls: "bg-gray-100 text-gray-600 border-gray-200" };
+    case ProjectStatus.Draft: return { label, cls: "bg-gray-100 text-gray-600 border-gray-200" };
+    case ProjectStatus.Published: return { label, cls: "bg-blue-50 text-blue-600 border-blue-100" };
+    case ProjectStatus.InReview: return { label, cls: "bg-indigo-50 text-indigo-600 border-indigo-100" };
+    case ProjectStatus.Observed: return { label, cls: "bg-amber-50 text-amber-600 border-amber-100" };
+    case ProjectStatus.Validated: return { label, cls: "bg-emerald-50 text-emerald-600 border-emerald-100" };
+    case ProjectStatus.Rejected: return { label, cls: "bg-rose-50 text-rose-600 border-rose-100" };
+    default: return { label, cls: "bg-gray-100 text-gray-600 border-gray-200" };
   }
 };
 
@@ -56,6 +59,7 @@ const getIntegrityBadge = (status: IntegrityStatus) => {
 };
 
 export const AdminProjectsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
   
@@ -185,7 +189,7 @@ export const AdminProjectsPage: React.FC = () => {
             </div>
           ) : (
             filtered.map((project, index) => {
-              const badge = getStatusBadge(project.estadoProyecto);
+              const badge = getStatusBadge(project.estadoProyecto, t);
               return (
                 <div 
                   key={`${project.id}-${index}`}

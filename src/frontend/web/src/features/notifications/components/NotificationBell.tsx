@@ -12,6 +12,7 @@ export const NotificationBell: React.FC = () => {
 
   // Mapping from API model to UI model
   const notifications = React.useMemo(() => {
+    if (!Array.isArray(rawNotifications)) return [];
     return rawNotifications.map((n: any) => ({
       ...n,
       id: String(n.idNotificacion || n.id),

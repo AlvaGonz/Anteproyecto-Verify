@@ -49,8 +49,9 @@ const getIntegrityInfo = (status: IntegrityStatus) => {
 };
 
 export const ProjectPublicDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const { data: project, isLoading: loading, error: fetchError } = useProject(id || "");
+  const { slug, id } = useParams<{ slug?: string; id?: string }>();
+  const identifier = slug || id || "";
+  const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
   const error = fetchError ? (fetchError as Error).message : null;
 
   if (loading)

@@ -105,7 +105,7 @@ export const router = createHashRouter([
         element: <HealthPage />,
       },
       {
-        path: "/projects/:id",
+        path: "/p/:slug",
         element: <ProjectPublicDetailPage />,
       },
 

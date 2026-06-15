@@ -195,7 +195,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                       </div>
 
                       <Link 
-                        to={`/projects/${project.id}`}
+                        to={`/p/${project.id}`}
                         className="flex items-center justify-center gap-2 w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all group/btn"
                       >
                         Ver Detalles <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />

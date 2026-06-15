@@ -1,6 +1,7 @@
 import React from "react";
 import { User, Bell, Menu, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { NotificationBell } from "../../../features/notifications/components/NotificationBell";
 
 interface HeaderProps {
   title: string;
@@ -58,10 +59,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
       <div className="flex items-center gap-3">
         {/* VeriFinca AI Status */}
 
-        <button className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group">
-          <Bell className="w-5 h-5 text-gray-500 group-hover:text-gray-900" />
-          <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
-        </button>
+        <NotificationBell />
         
         <div className="h-8 w-px bg-gray-100 mx-2"></div>
 

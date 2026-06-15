@@ -21,6 +21,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type TabId = "users" | "permissions" | "plans";
 
+const permissionLabels: Record<string, string> = {
+  "GestionarUsuarios": "Gestión de Usuarios",
+  "ConfigurarReglas": "Configuración de Reglas",
+  "VisualizarAuditoria": "Visualización de Auditoría",
+  "CrearProyectos": "Creación de Proyectos",
+  "ValidarProyectos": "Validación de Proyectos"
+};
+
 export const SettingsPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -285,7 +293,7 @@ export const SettingsPage: React.FC = () => {
                       {p.permissions.map((perm, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-xs text-text-primary">
                           <Check className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                          <span className="font-medium font-mono">{perm}</span>
+                          <span className="font-medium font-mono">{permissionLabels[perm] || perm}</span>
                         </li>
                       ))}
                       {p.permissions.length === 0 && (

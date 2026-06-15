@@ -1,11 +1,13 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   ProyectoDto, 
   ProjectStatus, 
   CreateProyectoDto, 
   UpdateProyectoDto
 } from "../../features/projects/types";
+import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { useProject, useCreateProject } from "../../features/projects/api/useProjects";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
@@ -28,6 +30,7 @@ const sanitizeStatus = (status: ProjectStatus) => {
 
 export const ProjectManagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const isEditing = !!id;
@@ -133,12 +136,12 @@ export const ProjectManagePage: React.FC = () => {
                   onClick={() => handleStatusChange(status)}
                   className="bg-[var(--color-brand-primary)]/10 hover:bg-[var(--color-brand-primary)]/20 text-[var(--color-text-strong)] py-2 px-4 rounded-lg"
                 >
-                  {ProjectStatus[status]}
+                  {getStatusLabel(status, t)}
                 </button>
               ))}
             </div>
             <p className="text-xs text-[var(--color-text-strong)] opacity-50">
-              Estado actual: <strong>{ProjectStatus[project.estadoProyecto]}</strong>
+              Estado actual: <strong>{getStatusLabel(project.estadoProyecto, t)}</strong>
             </p>
           </div>
 
