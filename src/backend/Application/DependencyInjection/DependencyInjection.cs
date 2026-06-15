@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Validation.Commands.GenerateAlerta.GenerateAlertaCommandHandler>();
         services.AddScoped<Application.Features.Validation.Queries.GetActiveAlertsByProject.GetActiveAlertsByProjectQueryHandler>();
         services.AddScoped<Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler>();
+        services.AddScoped<Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler>();
 
         return services;
     }
