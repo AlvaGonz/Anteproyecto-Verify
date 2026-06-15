@@ -14,7 +14,7 @@ builder.Services.AddApiServices(builder.Configuration);
 var app = builder.Build();
 
 var useMock = builder.Configuration.GetValue<bool>("UseMockData");
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() && useMock)
 {
     // In local/dev we ensure the database exists so Docker bootstraps cleanly
     // even when EF migrations tooling isn't installed in the container.
