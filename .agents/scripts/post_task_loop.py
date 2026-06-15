@@ -11,6 +11,7 @@ import hashlib
 import concurrent.futures
 import threading
 from datetime import datetime
+from dataclasses import dataclass
 
 class SecurityGuardrails:
     INJECTION_PATTERNS = [
@@ -277,7 +278,14 @@ class AgentHandoffRouter:
 class MagenticOrchestrator:
     """Azure Magentic Pattern: builds minimal task ledger based on diff complexity."""
     
-    def build_ledger(self, routing_decision: dict, diff: str) -> list:
+    def build_ledger(self, routing_decision: dict, diff: str, override_agents: list = None) -> list:
+        if override_agents is not None:
+            ledger = ["Layer1:Tests", "Evaluator"]
+            ledger += [a for a in override_agents if a not in ledger]
+            if "Archivist" not in ledger:
+                ledger.append("Archivist")
+            return ledger
+
         complexity = routing_decision.get("complexity_score", 0)
         ledger = ["Layer1:Tests", "Evaluator"]  # Always required
         
@@ -382,6 +390,13 @@ class ReviewdogFormatter:
         except Exception:
             pass
 
+    def write_to_stderr(self, issues: list):
+        rdjson = self.to_rdjson(issues)
+        try:
+            print(json.dumps(rdjson), file=sys.stderr)
+        except Exception:
+            pass
+
 # ── NUEVA CLASE: Danger Policy Evaluator ────────────────────────
 class DangerPolicyEvaluator:
     """
@@ -435,6 +450,15 @@ class DangerPolicyEvaluator:
         
         return {"issues": policies, "lines_changed": lines_changed,
                 "block": block, "critical_files_touched": critical_touched}
+
+
+@dataclass
+class AgentResult:
+    agent_name: str
+    issues: list
+    confidence: float
+    requires_handoff: bool
+    metadata: dict
 
 
 def safe_parse_issues(res: str) -> list:
@@ -504,9 +528,26 @@ def run_critics_parallel(call_llm, context, owasp_skill_content, routed_model, l
         for future in concurrent.futures.as_completed(futures):
             name = futures[future]
             try:
-                results[name] = safe_parse_issues(future.result())
+                raw_res = future.result()
+                raw_issues = safe_parse_issues(raw_res)
             except Exception:
-                results[name] = []
+                raw_issues = []
+                raw_res = ""
+            
+            if len(raw_issues) == 0:
+                confidence = 1.0
+            elif len(raw_issues) > 3:
+                confidence = 0.5
+            else:
+                confidence = 0.8
+
+            results[name] = AgentResult(
+                agent_name=name,
+                issues=raw_issues,
+                confidence=confidence,
+                requires_handoff=False,
+                metadata={"raw_length": len(raw_res)}
+            )
 
     return results
 
@@ -1387,14 +1428,46 @@ def main():
     context = ContextCompactor().compact(context, guardrails)
 
     # Agent 1: Evaluator
-    evaluator_sys = "You are the Evaluator. Score the work 0-100 based on adherence to the Constitution, OWASP, and Clean Architecture. Output JSON with a 'score' integer."
+    evaluator_sys = """You are the Evaluator. Score on EXACTLY 4 dimensions (0-25 each):
+1. OWASP_COMPLIANCE (0-25)
+2. ARCHITECTURE_QUALITY (0-25)
+3. TEST_COVERAGE (0-25)
+4. CONSTITUTION_ADHERENCE (0-25)
+Output JSON: {"owasp": N, "architecture": N, "tests": N, "constitution": N,
+"total": N, "rationale": "one sentence per dimension"}"""
     if skills_context:
         evaluator_sys += skills_context
     eval_res = call_llm(evaluator_sys, context, "Evaluator", json_mode=True)
     try:
-        score = int(json.loads(eval_res).get("score", 100))
+        score = int(json.loads(eval_res).get("total", 100))
     except:
         score = 100
+
+    def route_after_evaluator(score: int, routing_decision: dict) -> list:
+        if score < 40:
+            return ["Critic", "SecurityCritic", "ArchitectureCritic", "AdversarialReview"]
+        if routing_decision.get("complexity_score", 0) >= 2:
+            return ["SecurityCritic", "ArchitectureCritic"]
+        return ["Critic"]
+
+    # Dynamic routing edge condition: override ledger
+    dynamic_agents = route_after_evaluator(score, routing_decision)
+    ledger = orchestrator.build_ledger(routing_decision, diff_redacted, override_agents=dynamic_agents)
+
+    # Log dynamic ledger override
+    log_entry_dynamic = {
+        "timestamp": datetime.now().isoformat(),
+        "agent": "MagenticOrchestrator:Dynamic",
+        "model": "rule-based",
+        "system": "Dynamic ledger override",
+        "user": json.dumps({"ledger": ledger, "score": score})
+    }
+    try:
+        with log_lock:
+            with open(os.path.join(session_path, "prompt-log.jsonl"), "a", encoding="utf-8") as f:
+                f.write(json.dumps(log_entry_dynamic) + "\n")
+    except Exception:
+        pass
 
     # Agent 2: Critics (Parallel Sectioning, Step 2)
     owasp_skill_content = ""
@@ -1407,9 +1480,9 @@ def main():
         pass
 
     critic_results = run_critics_parallel(call_llm, context, owasp_skill_content, routed_model, ledger)
-    issues_list1 = critic_results.get("Critic", [])
-    issues_list2 = critic_results.get("Security Critic", [])
-    issues_list3 = critic_results.get("Architecture Critic", [])
+    issues_list1 = critic_results.get("Critic").issues if critic_results.get("Critic") else []
+    issues_list2 = critic_results.get("Security Critic").issues if critic_results.get("Security Critic") else []
+    issues_list3 = critic_results.get("Architecture Critic").issues if critic_results.get("Architecture Critic") else []
 
     # Combine issues
     issues_list.extend(issues_list1 + issues_list2 + issues_list3)
@@ -1521,6 +1594,7 @@ def main():
         path=os.path.join(session_path, "reviewdog.json")
     )
     reviewdog_formatter.write(issues_list, path="reviewdog.json")
+    reviewdog_formatter.write_to_stderr(issues_list)
 
     log_content = f"# Loop Log\nDate: {datetime.now().isoformat()}\nScore: {score}\nVerdict: {verdict}\n\n## Issues\n{json.dumps(issues_list, indent=2)}\n\n## Mutations proposed\n{mutations}\n\n## Validation\n{validation}\n"
     with open(os.path.join(session_path, "loop-log.md"), "w", encoding="utf-8") as f:
