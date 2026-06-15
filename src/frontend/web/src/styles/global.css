@@ -18,16 +18,20 @@
   --color-border: #C8BFB5;
   --color-primary-hover: #E07610;
   --color-primary-subtle: #FEF0E0;
+  --color-on-surface: #111144;
+  --color-surface-variant: #F4F1EC;
+  --color-on-surface-variant: #564335;
+  --color-background: #DAD1C8;
   
   /* Status Colors */
   --color-success: #2E7D32;
   --color-error: #C62828;
   --color-warning: #F98513;
-  --color-outline-variant: #C8BFB5;
+  --color-outline-variant: #ddc1af;
 
   /* Material Design 3 Compatibility Tokens (Stitch Sync) */
-  --color-primary-container: #ffdbbe;
-  --color-on-primary-container: #331600;
+  --color-primary-container: #F98513;
+  --color-on-primary-container: #FFFFFF;
   --color-on-primary-fixed-variant: #703700;
   --color-secondary-container: #dee0ff;
   --color-on-secondary-container: #00105c;
@@ -36,12 +40,15 @@
   --color-tertiary-fixed: #d9e2ff;
   --color-on-tertiary-fixed-variant: #35456c;
   --color-surface-container-highest: #f0dfd1;
-  --color-surface-container-high: #f5e5d7;
+  --color-surface-container-high: #f0e7dd;
   --color-outline: #857361;
 
   /* Typography */
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Manrope", system-ui, sans-serif;
+  --font-headline: "Manrope", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-label: "Inter", system-ui, sans-serif;
 
   /* Shadows — MP113 Elevations */
   --shadow-flat: none;

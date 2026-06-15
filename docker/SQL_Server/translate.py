@@ -9,7 +9,7 @@ def translate_mysql_to_tsql(mysql_content):
     db_create_pattern = r'CREATE\s+DATABASE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"\'\[]?verifinca-spm-uce-2026[`"\'\]]?;(?:\s*\bGO\b)?'
     db_create_replacement = """IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'verifinca-spm-uce-2026')
 BEGIN
-    CREATE DATABASE [verifinca-spm-uce-2026];
+    EXEC('CREATE DATABASE [verifinca-spm-uce-2026]');
 END
 GO"""
     content = re.sub(db_create_pattern, db_create_replacement, content, flags=re.IGNORECASE)

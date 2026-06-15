@@ -25,62 +25,32 @@ export type AuthError =
   | { _tag: "NetworkError"; message: string }
   | { _tag: "UnknownError"; original: unknown };
 
+
 export const AuthService = {
   async login(email: string, password: string): Promise<Result<AuthResponse, AuthError>> {
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-    if (USE_MOCK) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          try {
-            if (email === "admin@verifinca.com" && password === "admin123") {
-              resolve(success({
-                user: {
-                  id: "1",
-                  email: "admin@verifinca.com",
-                  name: "Administrador VeriFinca",
-                  role: "admin",
-                },
-                token: "mock-jwt-token",
-              }));
-            } else if (email.includes("error")) {
-              resolve(failure({ _tag: "NetworkError", message: "Error de conexión con el servidor" }));
-            } else {
-              resolve(success({
-                user: {
-                  id: "2",
-                  email: email,
-                  name: "Usuario Demo",
-                  role: "user",
-                },
-                token: "mock-jwt-token",
-              }));
-            }
-          } catch (e) {
-            resolve(failure({ _tag: "UnknownError", original: e }));
-          }
-        }, 1000);
-      });
-    }
-
     try {
       const response = await fetch(`${env.API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: "include"
       });
 
       if (!response.ok) {
-        if (response.status === 401 || response.status === 400) {
+        if (response.status === 401) {
           return failure({ _tag: "InvalidCredentials" });
         }
-        const errorData = await response.json().catch(() => ({ message: "Error de inicio de sesión" }));
+        const errorData = await response.json().catch(() => ({ message: "Error al iniciar sesión" }));
         return failure({ _tag: "NetworkError", message: errorData.message || "Error al iniciar sesión" });
       }
 
       const data = await response.json();
-      return success(data as AuthResponse);
+      return success({
+        user: data.user,
+        token: "real-cookie-session"
+      });
     } catch (e) {
       return failure({ _tag: "UnknownError", original: e });
     }
@@ -94,25 +64,20 @@ export const AuthService = {
     telefono?: string,
     cedula?: string
   ): Promise<Result<{ message: string; usuarioId?: string }, AuthError>> {
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-    if (USE_MOCK) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(success({
-            message: "Usuario registrado exitosamente (Mock).",
-            usuarioId: "mock-new-user-guid"
-          }));
-        }, 1000);
-      });
-    }
-
     try {
       const response = await fetch(`${env.API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ nombre, apellido, email, password, telefono, cedula })
+        body: JSON.stringify({ 
+          Nombre: nombre, 
+          Apellido: apellido, 
+          Email: email, 
+          Password: password, 
+          Telefono: telefono ?? "", 
+          Cedula: cedula ?? "" 
+        })
       });
 
       if (!response.ok) {
@@ -128,19 +93,25 @@ export const AuthService = {
   },
 
   async logout(): Promise<void> {
-    localStorage.removeItem("vf_token");
-    localStorage.removeItem("vf_user");
-    return new Promise((resolve) => {
-      setTimeout(resolve, 500);
-    });
+    try {
+      await fetch(`${env.API_URL}/api/auth/logout`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+    } catch {
+      // Ignore errors on logout
+    }
   },
 
   async getCurrentUser(): Promise<Option<User>> {
-    const token = localStorage.getItem("vf_token");
-    const userJson = localStorage.getItem("vf_user");
-    if (!token || !userJson) return none();
     try {
-      const user = JSON.parse(userJson) as User;
+      const response = await fetch(`${env.API_URL}/api/auth/me`, {
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+      if (!response.ok) return none();
+      const user = await response.json();
       return some(user);
     } catch {
       return none();

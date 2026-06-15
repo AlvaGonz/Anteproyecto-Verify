@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   ValidationExecutionResult 
 } from "../../features/validations/types";
-import { validationsApi } from "../../features/validations/api/validationsApi";
+import { useValidationResult, useFindings, useRunFullValidation } from "../../features/validations/api/useValidations";
+import { useAuditLog } from "../../features/audit/api/useAudit";
 import { ValidationHUD } from "../../features/validations/components/ValidationHUD";
 import { ValidationSummary as InternalValidationSummary } from "../../features/validations/components/ValidationSummary";
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
+import { AdminErrorFallback } from "../../components/ui/AdminErrorFallback";
 import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle, Database, Cpu, Fingerprint } from "lucide-react";
@@ -18,46 +20,54 @@ export const ProjectValidationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const [result, setResult] = useState<ValidationExecutionResult | null>(null);
-  const [findings, setFindings] = useState<FindingDto[]>([]);
-  const [auditLogs, setAuditLogs] = useState<AuditLogDto[]>([]);
   const [activeTab, setActiveTab] = useState<'analysis' | 'findings' | 'audit'>('analysis');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isEvaluating, setIsEvaluating] = useState(false);
+  const projectId = id || "";
+  const { data: rawResult, isLoading: isResultLoading, error: resultError } = useValidationResult(projectId);
+  const { data: rawFindings = [], isLoading: isFindingsLoading } = useFindings(projectId);
+  const { data: rawAuditLogs = [], isLoading: isAuditLoading } = useAuditLog(projectId);
+
+  const runFullValidationMutation = useRunFullValidation(projectId);
+
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    if (!id) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [res, findingsRes, logsRes] = await Promise.all([
-        validationsApi.getValidationResult(id),
-        validationsApi.getProjectFindings(id),
-        validationsApi.getProjectAuditLogs(id)
-      ]);
+  if (resultError) {
+    return <AdminErrorFallback error={resultError} />;
+  }
 
-      if (res._tag === "Success") {
-        setResult(res.data);
-      } else {
-        setError(res.error.message);
-      }
+  const result = rawResult ? {
+    ...rawResult,
+    internalValidation: rawResult.internalValidation ? {
+      ...rawResult.internalValidation,
+      validacionId: String(rawResult.internalValidation.idValidacion || rawResult.internalValidation.validacionId),
+      proyectoId: String(projectId),
+    } : undefined,
+    externalSources: rawResult.externalSources || []
+  } as unknown as ValidationExecutionResult : null;
 
-      if (findingsRes._tag === "Success") {
-        setFindings(findingsRes.data);
-      }
+  const findings = React.useMemo(() => {
+    return rawFindings.map((f: any) => ({
+      ...f,
+      id: String(f.idHallazgo || f.id),
+      validacionId: String(f.idValidacion || f.validacionId),
+    })) as unknown as FindingDto[];
+  }, [rawFindings]);
 
-      if (logsRes._tag === "Success") {
-        setAuditLogs(logsRes.data);
-      }
-    } catch (err: any) {
-      setError(err.message || "Error al cargar el resultado de validación");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const auditLogs = React.useMemo(() => {
+    return rawAuditLogs.map((l: any) => ({
+      ...l,
+      id: String(l.idLog || l.id),
+      projectId: String(projectId),
+      timestamp: l.fecha,
+      action: l.accion,
+      module: l.modulo,
+      userId: String(l.idUsuario),
+      userEmail: l.usuario || "Desconocido",
+      details: l.detalles || "Sin detalles"
+    })) as unknown as AuditLogDto[];
+  }, [rawAuditLogs, projectId]);
 
-  useEffect(() => { fetchData(); }, [id]);
+  const isLoading = isResultLoading || isFindingsLoading || isAuditLoading;
+  const isEvaluating = runFullValidationMutation.isPending;
 
   const handleRunValidation = () => {
     if (!id) return;
@@ -65,21 +75,13 @@ export const ProjectValidationPage: React.FC = () => {
   };
 
   const handleScanComplete = async () => {
+    setError(null);
     try {
-      const response = await validationsApi.runFullValidation(id!);
-      if (response._tag === "Success") {
-        setResult(response.data);
-        addToast("Validación integral completada", "success");
-        await fetchData(); // Refresh all data
-      } else {
-        setError(response.error.message);
-        addToast("Error al ejecutar la validación", "error");
-      }
+      await runFullValidationMutation.mutateAsync();
+      addToast("Validación integral completada", "success");
     } catch (err: any) {
       setError(err.message || "Error al ejecutar la validación completa");
       addToast("Error al ejecutar la validación", "error");
-    } finally {
-      setIsEvaluating(false);
     }
   };
 

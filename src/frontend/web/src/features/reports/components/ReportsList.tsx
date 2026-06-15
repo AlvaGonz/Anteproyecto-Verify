@@ -1,31 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { ProjectReportDto } from "../types";
-import { reportsApi } from "../api/reportsApi";
-import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
+import { useReports } from "../api/useReports";
 
 interface ReportsListProps {
   projectId: string;
 }
 
 export const ReportsList: React.FC<ReportsListProps> = ({ projectId }) => {
-  const [reports, setReports] = useState<ProjectReportDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { addToast } = useToast();
+  const { data: rawReports = [], isLoading } = useReports(projectId || "");
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const data = await reportsApi.getProjectReports(projectId);
-        setReports(data);
-      } catch (error) {
-        console.error("Error fetching reports:", error);
-        addToast("Error al cargar los reportes", "error");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchReports();
-  }, [projectId]);
+  // Map API DTO to legacy UI shape
+  const reports = React.useMemo(() => {
+    return rawReports.map(r => ({
+      ...r,
+      id: String(r.idReporte),
+      version: 1, // Fallback since API doesn't return version
+      estadoReporte: r.estado,
+      resumen: "Reporte general de auditoría", // Fallback
+      createdAtUtc: r.fechaGeneracion,
+    })) as unknown as ProjectReportDto[];
+  }, [rawReports]);
 
   if (isLoading)
     return (

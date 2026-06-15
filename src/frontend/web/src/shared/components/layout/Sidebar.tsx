@@ -10,6 +10,7 @@ import {
   Compass,
   History
 } from "lucide-react";
+import { useProjects } from "../../../features/projects/api/useProjects";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -17,6 +18,8 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
+  const { data: projects } = useProjects();
+  const projectCount = projects?.length || 0;
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -38,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-premium-sm group-hover:scale-110 transition-transform">
             <img
-              src="/brand/isotipo/ISOTIPO WHITE.svg"
+              src="/brand/isotipo/ISOTIPO WHITE.optimized.svg"
               alt="VeriFinca"
               className="h-6 w-auto"
             />
@@ -84,8 +87,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                   aria-hidden="true"
                 />
                 {item.name}
-                {item.name === "Expedientes" && (
-                   <span className="ml-auto text-[9px] font-black bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">12</span>
+                {item.name === "Expedientes" && projectCount > 0 && (
+                   <span className="ml-auto text-[9px] font-black bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">{projectCount}</span>
                 )}
               </Link>
             );

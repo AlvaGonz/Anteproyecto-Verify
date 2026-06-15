@@ -1,0 +1,19 @@
+# .pre-commit-config.yaml
+repos:
+  - repo: local
+    hooks:
+      - id: agent-firewall
+        name: "🔍 Post-Task Agent Firewall"
+        language: python
+        entry: python .agents/scripts/post_task_loop.py --hook-mode pre-commit
+        # We pass task and output default context
+        args:
+          - "--task"
+          - "pre-commit check"
+          - "--output"
+          - "staged changes"
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+        types: [python, javascript, typescript]
+        verbose: true

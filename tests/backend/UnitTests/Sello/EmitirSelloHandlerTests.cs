@@ -54,7 +54,7 @@ public class EmitirSelloCommandHandlerTests
             .ReturnsAsync(project);
         _selloRepositoryMock.Setup(x => x.GetByProyectoIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((SelloIntegridad?)null);
-        _reporteBuilderMock.Setup(x => x.ConstruirReporteAsync(projectId, It.IsAny<CancellationToken>()))
+        _reporteBuilderMock.Setup(x => x.BuildReporteAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ReporteHallazgosDto { EsAptoParaSello = false });
 
         var command = new EmitirSelloCommand { ProyectoId = projectId, UsuarioId = userId };
@@ -80,7 +80,7 @@ public class EmitirSelloCommandHandlerTests
             .ReturnsAsync(project);
         _selloRepositoryMock.Setup(x => x.GetByProyectoIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((SelloIntegridad?)null);
-        _reporteBuilderMock.Setup(x => x.ConstruirReporteAsync(projectId, It.IsAny<CancellationToken>()))
+        _reporteBuilderMock.Setup(x => x.BuildReporteAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ReporteHallazgosDto { EsAptoParaSello = true });
         _firmaDigitalServiceMock.Setup(x => x.FirmarDatosAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("mock_signature");

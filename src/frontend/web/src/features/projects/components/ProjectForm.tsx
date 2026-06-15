@@ -12,29 +12,40 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [nombre, setNombre] = useState(initialData?.nombre || "");
-  const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto || "");
-  const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps || "");
-  const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado || "");
-  const [categoria, setCategoria] = useState<ProjectCategory>(initialData?.categoria || ProjectCategory.Residencial);
-  const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador || "");
-  const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral || "");
+  const [nombre, setNombre] = useState(initialData?.nombre ?? "");
+  const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto ?? "");
+  const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps ?? "");
+  const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado ?? "");
+  const [categoria, setCategoria] = useState<ProjectCategory>(initialData?.categoria ?? ProjectCategory.Residencial);
+  const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador ?? "");
+  const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    if (!nombre.trim()) {
+      setError("El Nombre del Proyecto es requerido.");
+      return;
+    }
+    if (!ubicacionTexto.trim()) {
+      setError("La Ubicación es requerida.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
     try {
       if (initialData) {
         const updateData: UpdateProyectoDto = {
           nombre, ubicacionTexto,
-          ubicacionGps: ubicacionGps || undefined,
+          ubicacionGps: ubicacionGps,
           valorEstimado: valorEstimado === "" ? undefined : Number(valorEstimado),
           categoria,
-          datosDesarrollador: datosDesarrollador || undefined,
-          designacionCatastral: designacionCatastral || undefined,
+          datosDesarrollador: datosDesarrollador,
+          designacionCatastral: designacionCatastral,
         };
         await onSubmit(updateData);
       } else {
@@ -42,8 +53,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           nombre, ubicacionTexto,
           usuarioCreadorId: "00000000-0000-0000-0000-000000000000",
           categoria,
-          datosDesarrollador: datosDesarrollador || undefined,
-          designacionCatastral: designacionCatastral || undefined,
+          datosDesarrollador: datosDesarrollador,
+          designacionCatastral: designacionCatastral,
         };
         await onSubmit(createData);
       }
@@ -57,7 +68,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   const fieldClass = "vf-input py-2.5";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto vf-card p-6">
+    <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto vf-card p-6" noValidate>
       {error && (
         <div className="p-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
           {error}

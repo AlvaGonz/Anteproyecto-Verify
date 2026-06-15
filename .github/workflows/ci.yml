@@ -13,6 +13,7 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   NODE_VERSION: '20.x'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   # ─────────────────────────────────────────────
@@ -116,8 +117,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
+          version: 9
           run_install: false
-          # version omitida intencionalmente — se lee de package.json "packageManager" field
 
       - name: Get pnpm store path
         id: pnpm-cache
@@ -141,12 +142,16 @@ jobs:
       - name: RegisterPage smoke test (TRD registration fields)
         run: pnpm run test --run src/pages/auth/__tests__/RegisterPage.test.tsx
 
+      - name: Run E2E tests (Playwright)
+        working-directory: .
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm exec playwright test e2e/projects/project-crud.spec.ts
+        env:
+          VITE_USE_MOCK: 'true'
+
       - name: Build
         run: pnpm run build
-
-      - name: Run tests
-        run: pnpm run test --run
-        continue-on-error: true
 
   # ─────────────────────────────────────────────
   # JOB 3: Security — Secret scanning

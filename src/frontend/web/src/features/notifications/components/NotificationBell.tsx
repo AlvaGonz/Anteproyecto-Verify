@@ -1,27 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
 import { NotificationDto } from "../types";
-import { notificationsApi } from "../api/notificationsApi";
+import { useNotifications, useMarkAsRead } from "../api/useNotifications";
 
 export const NotificationBell: React.FC = () => {
-  const [notifications, setNotifications] = useState<NotificationDto[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const fetchNotifications = async () => {
-    try {
-      const data = await notificationsApi.getMyNotifications(true);
-      setNotifications(data);
-    } catch (error) {
-      console.error("Error fetching notifications", error);
-    }
-  };
+  const { data: rawNotifications = [] } = useNotifications(true);
+  const markAsReadMutation = useMarkAsRead();
 
-  useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  // Mapping from API model to UI model
+  const notifications = React.useMemo(() => {
+    if (!Array.isArray(rawNotifications)) return [];
+    return rawNotifications.map((n: any) => ({
+      ...n,
+      id: String(n.idNotificacion || n.id),
+      usuarioId: String(n.idUsuario || n.usuarioId),
+      fechaUtc: n.fechaCreacionUtc || n.fechaUtc,
+      tipo: n.tipoNotificacion || n.tipo,
+    })) as unknown as NotificationDto[];
+  }, [rawNotifications]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,8 +34,7 @@ export const NotificationBell: React.FC = () => {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      await notificationsApi.markAsRead(id);
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      await markAsReadMutation.mutateAsync(Number(id));
     } catch (error) {
       console.error("Error marking as read", error);
     }

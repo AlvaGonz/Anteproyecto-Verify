@@ -1,8 +1,28 @@
 FROM node:22-alpine
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-# We don't copy the rest here, we will mount it as a volume in docker-compose
+
+RUN mkdir -p /app/node_modules && chown -R appuser:appgroup /app
+
+USER appuser
+
+# Copy lockfile and manifest first (cache layer)
+COPY --chown=appuser:appgroup package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=appuser:appgroup src/frontend/web/package.json ./src/frontend/web/
+
+# Install with frozen lockfile — reproducible and pnpm-only, filter by web-frontend
+RUN pnpm install --filter web-frontend --frozen-lockfile
+
+# Copy the rest of the workspace source code
+COPY --chown=appuser:appgroup src/frontend/web ./src/frontend/web
+
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+
+WORKDIR /app/src/frontend/web
+
+CMD ["pnpm", "run", "dev"]

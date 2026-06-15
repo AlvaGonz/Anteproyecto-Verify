@@ -76,7 +76,7 @@ describe("apiClient — request interceptor", () => {
     expect(capturedAuth).toBeUndefined();
   });
 
-  it("attaches Bearer token on request when accessToken is set", async () => {
+  it("does not attach Bearer token on request because we use HttpOnly cookies", async () => {
     setAccessToken("test-token");
     let capturedAuth: string | undefined;
     mock.onGet("/with-token").reply((config) => {
@@ -86,7 +86,7 @@ describe("apiClient — request interceptor", () => {
 
     await apiClient.get("/with-token");
 
-    expect(capturedAuth).toBe("Bearer test-token");
+    expect(capturedAuth).toBeUndefined();
   });
 });
 

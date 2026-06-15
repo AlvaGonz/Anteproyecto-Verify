@@ -5,14 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Abstractions.Persistence;
-using Application.Features.Documents;
+using global::Application.Abstractions.Persistence;
+using global::Application.Features.Documents;
 using Domain.Entities;
 using Domain.Enums;
 using Moq;
 using Xunit;
-using Application.Abstractions.Storage;
-using Application.Abstractions.DocumentIntelligence;
+using global::Application.Abstractions.Storage;
+using global::Application.Abstractions.DocumentIntelligence;
 
 public class DocumentServiceTests
 {

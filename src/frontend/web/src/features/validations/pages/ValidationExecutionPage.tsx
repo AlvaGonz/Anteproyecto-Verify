@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { ShieldCheck, Cpu, Database, Activity, Lock, Globe, Terminal, ArrowRight, AlertCircle, RefreshCw, Layers } from "lucide-react";
-import { validationsApi } from "../api/validationsApi";
+import { useParams, Link } from "react-router-dom";
+import { ShieldCheck, Cpu, Activity, Lock, Globe, Terminal, ArrowRight, AlertCircle, RefreshCw, Layers } from "lucide-react";
+import { useRunFullValidation } from "../api/useValidations";
 import { ValidationHUD } from "../components/ValidationHUD";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { ValidationExecutionResult } from "../types";
 
 export const ValidationExecutionPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const navigate = useNavigate();
   const { addToast } = useToast();
   
   const [isScanning, setIsScanning] = useState(false);
@@ -29,6 +28,8 @@ export const ValidationExecutionPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const runFullValidationMutation = useRunFullValidation(projectId || "");
+
   const startValidation = () => {
     if (!projectId) return;
     setError(null);
@@ -37,11 +38,9 @@ export const ValidationExecutionPage: React.FC = () => {
 
   const handleValidationComplete = async () => {
     try {
-      const response = await validationsApi.runFullValidation(projectId!);
-      setResult(response);
+      const data = await runFullValidationMutation.mutateAsync();
+      setResult(data);
       addToast("Auditoría integral finalizada con éxito", "success");
-      // Optional: Auto redirect after few seconds
-      // setTimeout(() => navigate(`/admin/projects/${projectId}/validations`), 3000);
     } catch (err: any) {
       setError(err.message || "Fallo crítico en el protocolo de validación");
       setIsScanning(false);

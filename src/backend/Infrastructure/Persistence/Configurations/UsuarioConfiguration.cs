@@ -9,10 +9,8 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
         builder.ToTable("Usuario");
-
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnName("IdUsuario");
-
         builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Apellido).IsRequired().HasMaxLength(100);
         builder.Property(u => u.NombreCompleto).HasComputedColumnSql("[Nombre] + ' ' + [Apellido]", stored: true);

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { CertificationDto } from "../types";
-import { certificationsApi } from "../api/certificationsApi";
+import { useCertification, useIssueSeal } from "../api/useCertifications";
 import { CertificationQr } from "./CertificationQr";
 import { CertificationStatusBadge } from "./CertificationStatusBadge";
 
@@ -11,29 +11,27 @@ interface CertificationSectionProps {
 export const CertificationSection: React.FC<CertificationSectionProps> = ({
   projectId,
 }) => {
-  const [certification, setCertification] = useState<CertificationDto | null>(
-    null,
-  );
-  const [isLoading, setIsLoading] = useState(true);
-  const [isIssuing, setIsIssuing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data: rawCertification, isLoading, error: queryError } = useCertification(projectId || "");
+  const issueSealMutation = useIssueSeal(projectId || "");
 
-  const fetchCertification = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const cert = await certificationsApi.getCurrentCertification(projectId);
-      setCertification(cert);
-    } catch (err: any) {
-      setError(err.message || "Error al cargar la certificación.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const certification = React.useMemo(() => {
+    if (!rawCertification) return null;
+    return {
+      ...rawCertification,
+      id: String(rawCertification.idSello),
+      proyectoId: String(rawCertification.idProyecto),
+      codigoVerificacion: rawCertification.codigoQR,
+      estadoCertificacion: rawCertification.estado === "Activo" ? 2 : rawCertification.estado === "Revocado" ? 4 : 3,
+      fechaEmisionUtc: rawCertification.fechaEmision,
+      fechaVigenciaUtc: rawCertification.fechaExpiracion,
+      urlVerificacion: rawCertification.urlVerificacion,
+      estadoIntegridad: 2,
+      revocado: rawCertification.estado === "Revocado",
+    } as unknown as CertificationDto;
+  }, [rawCertification]);
 
-  useEffect(() => {
-    fetchCertification();
-  }, [projectId]);
+  const error = queryError?.message || issueSealMutation.error?.message || null;
+  const isIssuing = issueSealMutation.isPending;
 
   const handleIssue = async () => {
     if (
@@ -46,20 +44,14 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
       return;
     }
 
-    setIsIssuing(true);
-    setError(null);
     try {
-      const newCert = await certificationsApi.issueCertification(projectId);
-      setCertification(newCert);
+      await issueSealMutation.mutateAsync();
     } catch (err: any) {
-      setError(err.message || "Error al emitir la certificación.");
-    } finally {
-      setIsIssuing(false);
+      console.error("Error al emitir la certificación.", err);
     }
   };
 
   const handleDownload = () => {
-    // Implementación básica de impresión para la constancia
     window.print();
   };
 

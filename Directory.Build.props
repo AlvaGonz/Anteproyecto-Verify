@@ -5,4 +5,8 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <ItemGroup>
+    <Watch Remove="**/bin/**/*" />
+    <Watch Remove="**/obj/**/*" />
+  </ItemGroup>
 </Project>

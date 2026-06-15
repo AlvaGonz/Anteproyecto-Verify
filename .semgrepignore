@@ -1,0 +1,9 @@
+# Agent skill files — not production code, not user-facing
+.agents/
+
+# Seeder BCrypt hashes are example/seed data, not real secrets
+src/backend/Infrastructure/Persistence/AppDbContextSeeder.cs
+
+# circuit-breaker.mjs uses http for localhost health checks only (internal)
+# This is intentional — not public traffic
+scripts/circuit-breaker.mjs

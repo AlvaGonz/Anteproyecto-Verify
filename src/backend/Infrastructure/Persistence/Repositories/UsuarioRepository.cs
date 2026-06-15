@@ -24,7 +24,7 @@ public class UsuarioRepository : IUsuarioRepository
     public async Task<Usuario?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.CorreoElectronico == email, cancellationToken);
+            .FirstOrDefaultAsync(u => u.CorreoElectronico.ToLower() == email.ToLower(), cancellationToken);
     }
 
     public async Task AddAsync(Usuario usuario, CancellationToken cancellationToken = default)
@@ -35,5 +35,18 @@ public class UsuarioRepository : IUsuarioRepository
     public void Update(Usuario usuario)
     {
         _context.Usuarios.Update(usuario);
+    }
+
+    public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .AnyAsync(u => u.CorreoElectronico.ToLower() == email.ToLower(), cancellationToken);
+    }
+
+    public async Task<bool> ExistsByCedulaAsync(string cedula, CancellationToken cancellationToken = default)
+    {
+        var cleanCedula = cedula.Replace("-", "");
+        return await _context.Usuarios
+            .AnyAsync(u => u.Cedula != null && u.Cedula.Replace("-", "") == cleanCedula, cancellationToken);
     }
 }

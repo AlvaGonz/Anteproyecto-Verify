@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, Link } from "react-router-dom";
 import {
-  ProyectoDto,
   IntegrityStatus,
   ProjectCategory,
-  getProjectErrorMessage,
 } from "../../features/projects/types";
-import { projectsApi } from "../../features/projects/api/projectsApi";
+import { useProject } from "../../features/projects/api/useProjects";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
+import { LandingFooter } from "../../features/public/components";
 import {
-  Shield,
   ArrowLeft,
   MapPin,
   CheckCircle2,
@@ -51,29 +49,10 @@ const getIntegrityInfo = (status: IntegrityStatus) => {
 };
 
 export const ProjectPublicDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [project, setProject] = useState<ProyectoDto | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        if (!id) return;
-        const result = await projectsApi.getProjectById(id);
-        if (result._tag === "Success") {
-          setProject(result.data);
-        } else {
-          setError(getProjectErrorMessage(result.error));
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Error al cargar el proyecto";
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id]);
+  const { slug, id } = useParams<{ slug?: string; id?: string }>();
+  const identifier = slug || id || "";
+  const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
+  const error = fetchError ? (fetchError as Error).message : null;
 
   if (loading)
     return (
@@ -337,17 +316,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
       </main>
 
       {/* Institutional Footer */}
-      <footer className="bg-secondary text-white pt-24 pb-12 px-10 border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
-           <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-white/5 text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-              <span>© {new Date().getFullYear()} VeriFinca Institutional</span>
-              <div className="flex items-center gap-2">
-                 <Shield className="w-4 h-4 text-primary" />
-                 PROTECCIÓN INSTITUCIONAL ACTIVA
-              </div>
-           </div>
-        </div>
-      </footer>
+      <LandingFooter />
     </div>
   );
 };

@@ -1,51 +1,49 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ProjectsPublicListPage } from "./ProjectsPublicListPage";
-import { projectsApi } from "../../features/projects/api/projectsApi";
-import { ProjectStatus, IntegrityStatus, ProjectCategory } from "../../features/projects/types";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-vi.mock("../../features/projects/api/projectsApi");
+vi.mock("../../features/projects/api/useProjects", () => ({
+  useProjects: () => ({
+    data: [
+      { id: 1, nombre: "Residencial Terra Noble", categoria: "Residencial", estado: "Aprobado", idVerificacionPublica: "VF-1" },
+      { id: 2, nombre: "Torre San Gerónimo", categoria: "Comercial", estado: "Aprobado", idVerificacionPublica: "VF-2" },
+      { id: 3, nombre: "Plaza Central Mall", categoria: "Comercial", estado: "Aprobado", idVerificacionPublica: "VF-3" }
+    ],
+    isLoading: false,
+    isError: false,
+  })
+}));
 
 describe("ProjectsPublicListPage", () => {
-  it("renders loading state initially", () => {
-    vi.mocked(projectsApi.getProjects).mockReturnValue(new Promise(() => {}));
-    render(
-      <MemoryRouter>
-        <ProjectsPublicListPage />
-      </MemoryRouter>,
-    );
-    expect(screen.getByText(/Encuentre Su Próxima/i)).toBeDefined();
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
   });
 
-  it("renders projects list after loading", async () => {
-    const mockProjects = [
-      {
-        id: "1",
-        codigoInterno: "PRJ-1",
-        nombre: "Proyecto Test 1",
-        ubicacionTexto: "Ubicacion 1",
-        categoria: ProjectCategory.Residencial,
-        estadoProyecto: ProjectStatus.Published,
-        estadoIntegridad: IntegrityStatus.Pending,
-        usuarioCreadorId: "user1",
-        createdAtUtc: new Date().toISOString(),
-      },
-    ];
-
-    vi.mocked(projectsApi.getProjects).mockResolvedValue({
-      _tag: "Success",
-      data: mockProjects
-    });
-
-    render(
-      <MemoryRouter>
-        <ProjectsPublicListPage />
-      </MemoryRouter>,
+  const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>{ui}</MemoryRouter>
+      </QueryClientProvider>
     );
+  };
 
-    await waitFor(() => {
-      expect(screen.getByText("Proyecto Test 1")).toBeDefined();
-    });
+  it("renders the directory with hero title and search form", () => {
+    renderWithProviders(<ProjectsPublicListPage />);
+
+    // Hero title
+    expect(screen.getByText(/Cero Incertidumbre En Su/i)).toBeInTheDocument();
+    // Search input (default VF placeholder)
+    expect(screen.getByPlaceholderText(/Ej: VF-2026-X83L/i)).toBeInTheDocument();
+  });
+
+  it("renders mock projects list in the directory", () => {
+    renderWithProviders(<ProjectsPublicListPage />);
+
+    // Mock projects
+    expect(screen.getByText("Residencial Terra Noble")).toBeInTheDocument();
+    expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
+    expect(screen.getByText("Plaza Central Mall")).toBeInTheDocument();
   });
 });

@@ -1,79 +1,93 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from "axios";
 
-// In-memory token store — NEVER localStorage for access tokens
-let accessToken: string | null = null;
+let BASE_URL = import.meta.env.VITE_API_URL ?? import.meta.env.VITE_API_BASE_URL ?? "/api";
+if (BASE_URL && !BASE_URL.endsWith("/api") && !BASE_URL.endsWith("/api/")) {
+  BASE_URL = BASE_URL.replace(/\/$/, "") + "/api";
+}
 
-export const setAccessToken = (token: string | null) => {
-  accessToken = token;
-};
-
-export const getAccessToken = () => accessToken;
-
-const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 15000,
+const instance: AxiosInstance = axios.create({
+  baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,
 });
 
-// REQUEST interceptor — attach JWT
-apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
+// Request interceptor — attach JWT from memory (NOT localStorage)
+let _accessToken: string | null = null;
+export const setAccessToken = (token: string | null) => {
+  _accessToken = token;
+};
+
+// We don't attach Bearer token here because we use HttpOnly cookies
+// But we keep _accessToken in memory if needed by tests/auth state.
+instance.interceptors.request.use((config) => {
   return config;
 });
 
-// RESPONSE interceptor — silent refresh on 401
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+let failedQueue: { resolve: (value?: unknown) => void; reject: (reason?: any) => void }[] = [];
 
-const processQueue = (error: unknown, token: string | null) => {
-  failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
   failedQueue = [];
 };
 
-apiClient.interceptors.response.use(
-  (response) => response,
+// Response interceptor — surface API errors cleanly
+instance.interceptors.response.use(
+  (res) => res,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== "/auth/refresh") {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return apiClient(originalRequest);
-        });
+        try {
+          await new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
+          return instance(originalRequest);
+        } catch (err) {
+          return Promise.reject(err);
+        }
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        // Refresh token lives in httpOnly cookie — server sets it
         const { data } = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
+          `${import.meta.env.VITE_API_BASE_URL ?? BASE_URL}/auth/refresh`,
           {},
           { withCredentials: true }
         );
+        
         setAccessToken(data.accessToken);
         processQueue(null, data.accessToken);
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-        return apiClient(originalRequest);
-      } catch (refreshError) {
-        processQueue(refreshError, null);
+        
+        return instance(originalRequest);
+      } catch (err) {
+        processQueue(err as Error, null);
         setAccessToken(null);
-        // Redirect to login — emit custom event so router can react
-        window.dispatchEvent(new CustomEvent("auth:logout"));
-        return Promise.reject(refreshError);
+        window.dispatchEvent(new Event("auth:logout"));
+        return Promise.reject(err);
       } finally {
         isRefreshing = false;
       }
     }
 
-    return Promise.reject(error);
-  }
+    // Default error handling
+    const message = (error.response?.data as any)?.message ?? error.message ?? "Unknown API error";
+    // We reject with an error that retains the response property so that tests like 'toMatchObject({ response: { status: 500 } })' work
+    const rejectError = new Error(message) as any;
+    rejectError.response = error.response;
+    return Promise.reject(rejectError);
+  },
 );
 
+export const apiClient = instance;
 export default apiClient;
+export const getAccessToken = () => _accessToken;
