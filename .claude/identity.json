@@ -2,7 +2,7 @@
   "version": "2.0",
   "technicalLevel": "technical",
   "preferredStyle": {
-    "verbosity": "moderate",
+    "verbosity": "minimal",
     "codeComments": true,
     "explanations": true
   },
@@ -11,5 +11,5 @@
     "vite"
   ],
   "suggestedBy": "ecc-tools-repo-analysis",
-  "createdAt": "2026-06-06T13:59:28.823Z"
+  "createdAt": "2026-06-15T21:56:48.766Z"
 }
