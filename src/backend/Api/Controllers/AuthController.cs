@@ -54,7 +54,7 @@ public class AuthController : ControllerBase
         }
 
         var user = await _usuarioRepository.GetByEmailAsync(request.Email, cancellationToken);
-        if (user == null)
+        if (user == null || !user.Activo)
         {
             return Unauthorized(new { Message = "Credenciales inválidas." });
         }

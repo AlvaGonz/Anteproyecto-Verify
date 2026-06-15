@@ -15,6 +15,13 @@ services:
     depends_on:
       - sqlserver
       - azurite
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 256M
 
   web:
     build:
@@ -30,6 +37,13 @@ services:
       - VITE_WATCH_POLLING=true
     env_file:
       - .env
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 128M
 
   sqlserver:
     build:
@@ -44,6 +58,13 @@ services:
     volumes:
       - mssql-data:/var/opt/mssql/data
       - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 512M
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
@@ -54,6 +75,13 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 64M
 
 volumes:
   mssql-data:
