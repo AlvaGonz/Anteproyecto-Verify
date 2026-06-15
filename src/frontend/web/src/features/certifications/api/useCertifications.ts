@@ -16,6 +16,7 @@ export const useCertification = (projectId: string) =>
 export const useIssueSeal = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['certificationKeys'],
     mutationFn: () => apiClient.post<SelloIntegridadDto>(`/projects/${projectId}/seal`).then(res => res.data),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: certificationKeys.byProject(projectId) }),

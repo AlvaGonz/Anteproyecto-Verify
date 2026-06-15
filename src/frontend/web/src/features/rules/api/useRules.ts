@@ -32,6 +32,7 @@ export const useRules = () =>
 export const useCreateRule = () => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useRules'],
     mutationFn: (command: CreateRuleCommand) =>
       apiClient.post<{ id: string }>("/admin/rules", command).then(res => res.data),
     onSuccess: () => {
@@ -43,6 +44,7 @@ export const useCreateRule = () => {
 export const useToggleRule = () => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useToggleRule'],
     mutationFn: (id: string) =>
       apiClient.patch<void>(`/admin/rules/${id}/toggle`, {}).then(res => res.data),
     onSuccess: () => {

@@ -153,7 +153,7 @@ export const ProjectDocumentsPage: React.FC = () => {
       {/* Page Header */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
              <Link to="/admin/projects" className="text-on-surface-variant hover:text-primary transition-colors">
                 <LayoutDashboard className="w-4 h-4" />
              </Link>
@@ -241,7 +241,7 @@ export const ProjectDocumentsPage: React.FC = () => {
         </div>
 
         {/* Column Right: Document Explorer */}
-        <div className="xl:col-span-8 space-y-6 min-h-[800px]">
+        <div className="xl:col-span-8 space-y-6 lg:min-h-[800px]">
           <div className="vf-card !p-3 flex flex-col sm:flex-row items-center gap-3">
              <div className="relative flex-1 group w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
@@ -260,7 +260,7 @@ export const ProjectDocumentsPage: React.FC = () => {
              </button>
           </div>
 
-          <div className="vf-card p-6 min-h-[800px]">
+          <div className="vf-card p-6 lg:min-h-[800px]">
             <ProjectDocumentsList
               documents={filteredDocuments}
               onDownload={handleDownload}

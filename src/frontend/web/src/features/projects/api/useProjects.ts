@@ -37,6 +37,7 @@ export const useProject = (id: string) =>
 export const useCreateProject = () => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['projectKeys'],
     mutationFn: (data: CreateProyectoDto) =>
       apiClient.post<ApiProyectoDto>("/projects", {
         nombre: data.nombre,

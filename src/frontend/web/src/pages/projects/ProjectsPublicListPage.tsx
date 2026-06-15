@@ -46,7 +46,48 @@ export const ProjectsPublicListPage: React.FC = () => {
   }, [mappedProjects, searchQuery, statusFilter]);
 
   if (isLoading) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500">Cargando proyectos...</div>;
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-primary/10 selection:text-primary">
+        <LandingNav />
+        <main className="flex-1">
+          <section className="relative pt-40 pb-20 px-6 bg-slate-900 overflow-hidden">
+            <div className="relative z-10 max-w-7xl mx-auto flex flex-col items-center text-center">
+              <div className="w-64 h-8 bg-slate-800 animate-pulse rounded-full mb-8"></div>
+              <div className="w-3/4 max-w-3xl h-16 md:h-24 bg-slate-800 animate-pulse rounded-3xl mb-6"></div>
+              <div className="w-1/2 max-w-xl h-10 bg-slate-800 animate-pulse rounded-xl mb-12"></div>
+              <div className="w-full max-w-2xl h-16 bg-slate-800 animate-pulse rounded-2xl"></div>
+            </div>
+          </section>
+          <section className="py-20 px-6 max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+              <div className="space-y-3 w-full max-w-sm">
+                <div className="h-10 bg-slate-200 animate-pulse rounded-xl w-3/4"></div>
+                <div className="h-6 bg-slate-200 animate-pulse rounded-lg w-full"></div>
+              </div>
+              <div className="w-64 h-12 bg-slate-200 animate-pulse rounded-2xl"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white rounded-[32px] overflow-hidden border border-slate-100 flex flex-col animate-pulse">
+                  <div className="aspect-[16/10] bg-slate-200 w-full" />
+                  <div className="p-8 flex flex-col flex-1 space-y-4">
+                    <div className="h-6 bg-slate-200 rounded-lg w-3/4" />
+                    <div className="h-4 bg-slate-200 rounded-lg w-1/2" />
+                    <div className="space-y-2 mt-4">
+                      <div className="h-4 bg-slate-200 rounded-lg w-full" />
+                      <div className="h-4 bg-slate-200 rounded-lg w-5/6" />
+                    </div>
+                    <div className="mt-auto pt-6">
+                      <div className="h-14 bg-slate-200 rounded-2xl w-full" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+      </div>
+    );
   }
 
   return (

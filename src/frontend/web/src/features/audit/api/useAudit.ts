@@ -22,6 +22,7 @@ export const useGlobalAuditTrail = (filters?: any) =>
 
 export const useExportGlobalAudit = () =>
   useMutation({
+    mutationKey: ['auditKeys'],
     mutationFn: async () => {
       const response = await apiClient.get(`/reports/global-audit`, { responseType: 'blob' }).then(res => res.data);
       return response as Blob;

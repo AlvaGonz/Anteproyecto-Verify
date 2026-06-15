@@ -85,7 +85,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2 group/btn">
             <Link
-              to={`/projects/${project.id}`}
+              to={`/p/${project.id}`}
               className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 hover:gap-4 transition-all"
             >
               Auditar Proyecto <ChevronRight className="w-4 h-4" />

@@ -17,6 +17,7 @@ export const useValidations = (projectId: string) =>
 export const useSubmitValidation = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['validationKeys'],
     mutationFn: (data: Partial<ValidationResultDto>) =>
       apiClient.post<ValidationResultDto>(`/projects/${projectId}/validations`, data).then(res => res.data),
     onSuccess: () =>
@@ -34,6 +35,7 @@ export const useLatestInternalValidation = (projectId: string) =>
 export const useRunInternalValidation = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useLatestInternalValidation'],
     mutationFn: () => apiClient.post<any>(`/projects/${projectId}/validations/internal/run`, {}).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["validations", "internal", "latest", projectId] });
@@ -59,6 +61,7 @@ export const useValidationResult = (projectId: string) =>
 export const useRunFullValidation = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useFindings'],
     mutationFn: () => apiClient.post<any>(`/projects/${projectId}/validations/run`, {}).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["validations", "result", projectId] });

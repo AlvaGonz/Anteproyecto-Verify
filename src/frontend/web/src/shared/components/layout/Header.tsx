@@ -11,6 +11,19 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   const navigate = useNavigate();
 
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const value = e.currentTarget.value.trim();
@@ -48,11 +61,16 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
         <div className="relative w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Buscar expedientes, folios o propietarios..."
-            className="w-full h-11 pl-11 pr-4 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all group-hover:bg-gray-100"
+            className="w-full h-11 pl-11 pr-14 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all group-hover:bg-gray-100"
             onKeyDown={handleSearch}
           />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none opacity-50 group-focus-within:opacity-100 transition-opacity">
+            <kbd className="px-1.5 py-0.5 text-[10px] font-black font-sans text-gray-500 bg-white border border-gray-200 rounded shadow-sm">⌘</kbd>
+            <kbd className="px-1.5 py-0.5 text-[10px] font-black font-sans text-gray-500 bg-white border border-gray-200 rounded shadow-sm">K</kbd>
+          </div>
         </div>
       </div>
 

@@ -36,6 +36,7 @@ export const useDocuments = (projectId: string) =>
 export const useUploadDocument = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['documentKeys'],
     mutationFn: (formData: FormData) =>
       apiClient.post<ApiDocumentoDto>(`/projects/${projectId}/documents`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
@@ -47,6 +48,7 @@ export const useUploadDocument = (projectId: string) => {
 export const useUpdateDocumentStatus = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useUpdateDocumentStatus'],
     mutationFn: (data: { documentId: string; activo: boolean }) =>
       apiClient.patch(`/projects/${projectId}/documents/${data.documentId}/status`, { activo: data.activo }).then(res => res.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
@@ -55,6 +57,7 @@ export const useUpdateDocumentStatus = (projectId: string) => {
 
 export const useDownloadDocument = (projectId: string) => {
   return useMutation({
+    mutationKey: ['useDownloadDocument'],
     mutationFn: (documentId: string) =>
       apiClient.get(`/projects/${projectId}/documents/${documentId}/download`, { responseType: "blob" }).then(res => res.data),
     onSuccess: (data: any) => {

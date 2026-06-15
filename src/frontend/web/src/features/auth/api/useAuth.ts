@@ -9,6 +9,7 @@ interface AuthResponse {
 
 export const useLogin = () =>
   useMutation({
+    mutationKey: ['useLogin'],
     mutationFn: (data: LoginFormValues) =>
       apiClient.post<AuthResponse>("/auth/login", data).then(res => res.data),
     onSuccess: (res) => {
@@ -20,6 +21,7 @@ export const useLogin = () =>
 
 export const useRegister = () =>
   useMutation({
+    mutationKey: ['useRegister'],
     mutationFn: (data: Omit<RegisterFormValues, "confirmPassword" | "acceptedTerms">) =>
       apiClient.post<AuthResponse>("/auth/register", data).then(res => res.data),
     onSuccess: (res) => {
@@ -31,6 +33,7 @@ export const useRegister = () =>
 
 export const useLogout = () =>
   useMutation({
+    mutationKey: ['useLogout'],
     mutationFn: () => apiClient.post("/auth/logout").then(res => res.data),
     onSuccess: () => setAccessToken(null),
   });

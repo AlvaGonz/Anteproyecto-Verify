@@ -12,13 +12,13 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [nombre, setNombre] = useState(initialData?.nombre || "");
-  const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto || "");
-  const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps || "");
-  const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado || "");
-  const [categoria, setCategoria] = useState<ProjectCategory>(initialData?.categoria || ProjectCategory.Residencial);
-  const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador || "");
-  const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral || "");
+  const [nombre, setNombre] = useState(initialData?.nombre ?? "");
+  const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto ?? "");
+  const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps ?? "");
+  const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado ?? "");
+  const [categoria, setCategoria] = useState<ProjectCategory>(initialData?.categoria ?? ProjectCategory.Residencial);
+  const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador ?? "");
+  const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,11 +41,11 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       if (initialData) {
         const updateData: UpdateProyectoDto = {
           nombre, ubicacionTexto,
-          ubicacionGps: ubicacionGps || undefined,
+          ubicacionGps: ubicacionGps,
           valorEstimado: valorEstimado === "" ? undefined : Number(valorEstimado),
           categoria,
-          datosDesarrollador: datosDesarrollador || undefined,
-          designacionCatastral: designacionCatastral || undefined,
+          datosDesarrollador: datosDesarrollador,
+          designacionCatastral: designacionCatastral,
         };
         await onSubmit(updateData);
       } else {
@@ -53,8 +53,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           nombre, ubicacionTexto,
           usuarioCreadorId: "00000000-0000-0000-0000-000000000000",
           categoria,
-          datosDesarrollador: datosDesarrollador || undefined,
-          designacionCatastral: designacionCatastral || undefined,
+          datosDesarrollador: datosDesarrollador,
+          designacionCatastral: designacionCatastral,
         };
         await onSubmit(createData);
       }

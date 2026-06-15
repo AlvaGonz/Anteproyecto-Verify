@@ -12,6 +12,7 @@ export const useNotifications = (unreadOnly: boolean = false) =>
 export const useMarkAsRead = () => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useNotifications'],
     mutationFn: (id: number) =>
       apiClient.patch(`/notifications/${id}/read`).then(res => res.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),

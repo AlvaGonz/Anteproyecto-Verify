@@ -12,22 +12,25 @@ export const useReports = (projectId: string) =>
 
 export const useGeneratePdf = () =>
   useMutation({
+    mutationKey: ['useReports'],
     mutationFn: async (projectId: string | number) => {
-      const response = await apiClient.get(`/projects/${projectId}/reports/pdf`, { responseType: 'blob' }).then(res => res.data);
+      const response = await apiClient.post(`/projects/${projectId}/reports/pdf`, {}, { responseType: 'blob' }).then(res => res.data);
       return response as Blob;
     },
   });
 
 export const useGenerateExcel = () =>
   useMutation({
+    mutationKey: ['useGenerateExcel'],
     mutationFn: async (projectId: string | number) => {
-      const response = await apiClient.get(`/projects/${projectId}/reports/excel`, { responseType: 'blob' }).then(res => res.data);
+      const response = await apiClient.post(`/projects/${projectId}/reports/excel`, {}, { responseType: 'blob' }).then(res => res.data);
       return response as Blob;
     },
   });
 
 export const useQueryGeminiProxy = () =>
   useMutation({
+    mutationKey: ['useQueryGeminiProxy'],
     mutationFn: async (projectId: string | number) => {
       const response = await apiClient.post<{ summary: string }>(`/projects/${projectId}/reports/ai-summary`).then(res => res.data);
       return response.summary;

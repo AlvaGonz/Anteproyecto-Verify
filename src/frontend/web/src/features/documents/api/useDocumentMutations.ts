@@ -6,6 +6,7 @@ import type { DocumentoDto } from "./types";
 export const useUploadDocument = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useUploadDocument'],
     mutationFn: (formData: FormData) =>
       apiClient.post<DocumentoDto>(
         `/projects/${projectId}/documents`,

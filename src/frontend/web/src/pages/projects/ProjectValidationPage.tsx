@@ -8,6 +8,7 @@ import { useAuditLog } from "../../features/audit/api/useAudit";
 import { ValidationHUD } from "../../features/validations/components/ValidationHUD";
 import { ValidationSummary as InternalValidationSummary } from "../../features/validations/components/ValidationSummary";
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
+import { AdminErrorFallback } from "../../components/ui/AdminErrorFallback";
 import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle, ExternalLink, AlertTriangle, Database, Cpu, Fingerprint } from "lucide-react";
@@ -30,7 +31,7 @@ export const ProjectValidationPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   if (resultError) {
-    throw resultError;
+    return <AdminErrorFallback error={resultError} />;
   }
 
   const result = rawResult ? {

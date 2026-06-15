@@ -6,6 +6,7 @@ import type { CreateValidationFormValues } from "../schemas";
 export const useSubmitValidation = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useSubmitValidation'],
     mutationFn: (data: CreateValidationFormValues) =>
       apiClient.post(`/projects/${projectId}/validations`, data).then(res => res.data),
     onSuccess: () =>

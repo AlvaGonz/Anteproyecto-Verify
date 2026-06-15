@@ -23,6 +23,7 @@ export const usePlans = () =>
 export const useUpdateUserRole = () => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useUsers'],
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       apiClient.patch<void>(`/admin/users/${userId}/role`, { role }).then(res => res.data),
     onSuccess: () => {
@@ -34,6 +35,7 @@ export const useUpdateUserRole = () => {
 export const useUpdateUserPlan = () => {
   const qc = useQueryClient();
   return useMutation({
+    mutationKey: ['useUpdateUserPlan'],
     mutationFn: ({ userId, planId }: { userId: string; planId: string }) =>
       apiClient.patch<void>(`/admin/users/${userId}/plan`, { planId }).then(res => res.data),
     onSuccess: () => {

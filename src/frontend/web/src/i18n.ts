@@ -217,6 +217,15 @@ const resources = {
           docs: "Ver documentación"
         }
       },
+      status: {
+        draft: "Borrador",
+        published: "Publicado",
+        inReview: "En Revisión",
+        observed: "Con Observaciones",
+        validated: "Validado",
+        rejected: "Rechazado",
+        unknown: "Desconocido"
+      },
     },
   },
   en: {
@@ -433,6 +442,15 @@ const resources = {
           sales: "Talk to sales",
           docs: "View documentation"
         }
+      },
+      status: {
+        draft: "Draft",
+        published: "Published",
+        inReview: "In Review",
+        observed: "With Observations",
+        validated: "Validated",
+        rejected: "Rejected",
+        unknown: "Unknown"
       },
     },
   },
