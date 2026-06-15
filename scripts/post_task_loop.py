@@ -246,6 +246,149 @@ class MagenticOrchestrator:
     def should_run_mutation_loop(self, high_issues: list) -> bool:
         return len(high_issues) > 0
 
+# ── NUEVA CLASE: Integración pre-commit hook mode ───────────────
+class HookModeAdapter:
+    """
+    Adapta el script para funcionar en 3 contextos:
+    - pre-commit: diff = staged (git diff --cached)
+    - pre-push: diff = HEAD vs origin  
+    - ci: diff = HEAD
+    Ref: pre-commit/pre-commit hook stage contracts
+    """
+    @staticmethod
+    def get_diff(hook_mode: str = "ci") -> str:
+        commands = {
+            "pre-commit": ["git", "diff", "--cached"],
+            "pre-push":   ["git", "diff", "origin/HEAD...HEAD"],
+            "ci":         ["git", "diff", "HEAD"]
+        }
+        cmd = commands.get(hook_mode, commands["ci"])
+        try:
+            return subprocess.check_output(cmd, encoding="utf-8",
+                                           errors="replace",
+                                           stderr=subprocess.STDOUT)
+        except Exception:
+            return ""
+
+# ── NUEVA CLASE: Conventional Commits (Commitizen) ──────────────
+class CommitMessageValidator:
+    """Gate determinístico pre-LLM. Falla rápido en mensajes no convencionales."""
+    PATTERN = re.compile(
+        r'^(feat|fix|security|refactor|test|docs|chore|ci|build|perf)'
+        r'(\([a-z0-9/_-]+\))?(!)?:\s.{1,100}$'
+    )
+    def validate(self, commit_msg: str) -> dict:
+        msg = commit_msg.strip().splitlines()[0] if commit_msg else ""
+        if not msg:
+            return {"valid": True, "block": False, "reason": "No commit message"}
+        match = self.PATTERN.match(msg)
+        return {
+            "valid": bool(match),
+            "is_breaking": "!" in msg,
+            "block": not bool(match),
+            "reason": ("✅ Conventional" if match
+                       else f"❌ Use: type(scope): description. Got: '{msg}'")
+        }
+
+# ── NUEVA CLASE: Reviewdog Output Formatter ─────────────────────
+class ReviewdogFormatter:
+    """
+    Convierte issues_list al formato RDJSON de reviewdog para PR annotations.
+    Ref: https://github.com/reviewdog/reviewdog#input-format
+    """
+    SEVERITY_MAP = {"HIGH": "ERROR", "CRITICAL": "ERROR",
+                    "MEDIUM": "WARNING", "LOW": "INFO"}
+    
+    def to_rdjson(self, issues: list, repo_url: str = "") -> dict:
+        diagnostics = []
+        for issue in issues:
+            file_path = issue.get("file", "")
+            if not file_path or file_path in ["UNKNOWN", "DIFF",
+                                               "WatchdogAgent", "test_suite"]:
+                continue
+            diagnostics.append({
+                "message": f"[{issue.get('severity')}] {issue.get('description','')}",
+                "location": {
+                    "path": file_path,
+                    "range": {"start": {"line": 1, "column": 1}}
+                },
+                "severity": self.SEVERITY_MAP.get(issue.get("severity",""), "WARNING"),
+                "code": {
+                    "value": issue.get("owasp_category", "AGENT-FIREWALL"),
+                    "url": "https://owasp.org/www-project-top-ten/"
+                }
+            })
+        return {
+            "source": {"name": "agent-firewall", "url": repo_url},
+            "diagnostics": diagnostics
+        }
+    
+    def write(self, issues: list, path: str = "reviewdog.json"):
+        rdjson = self.to_rdjson(issues)
+        try:
+            dir_name = os.path.dirname(path)
+            if dir_name and not os.path.exists(dir_name):
+                os.makedirs(dir_name, exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(rdjson, f, indent=2)
+        except Exception:
+            pass
+
+# ── NUEVA CLASE: Danger Policy Evaluator ────────────────────────
+class DangerPolicyEvaluator:
+    """
+    Evalúa reglas de gobernanza de PR (equivalente a Dangerfile) en Python puro.
+    Ref: https://github.com/danger/danger
+    """
+    MAX_LINES_WARN  = 400
+    MAX_LINES_BLOCK = 800
+    CRITICAL_FILES  = [
+        "scripts/post_task_loop.py", ".agents/docs/AGENTS.md",
+        ".env.example", ".env", "package.json", "requirements.txt"
+    ]
+    
+    def evaluate(self, diff: str, pr_title: str = "", pr_body: str = "") -> dict:
+        lines_changed = sum(1 for l in diff.splitlines()
+                            if l.startswith(("+", "-")) and not l.startswith(("+++", "---")))
+        
+        modified_files = [l[6:] for l in diff.splitlines() if l.startswith("+++ b/")]
+        critical_touched = [f for f in modified_files if f in self.CRITICAL_FILES]
+        
+        has_code  = any(re.search(r'\.(py|ts|js)$', f) for f in modified_files)
+        has_tests = any(re.search(r'(test_|\.test\.|\.spec\.)', f) for f in modified_files)
+        
+        policies = []
+        block = False
+        
+        if lines_changed > self.MAX_LINES_BLOCK:
+            policies.append({"severity": "HIGH",
+                             "description": f"PR exceeds {self.MAX_LINES_BLOCK} lines ({lines_changed}). Split required.",
+                             "file": "PR", "owasp_category": "DangerPolicy:PRSize"})
+            block = True
+        elif lines_changed > self.MAX_LINES_WARN:
+            policies.append({"severity": "MEDIUM",
+                             "description": f"Large PR: {lines_changed} lines. Consider splitting.",
+                             "file": "PR", "owasp_category": "DangerPolicy:PRSize"})
+        
+        if critical_touched:
+            policies.append({"severity": "MEDIUM",
+                             "description": f"Critical files modified: {', '.join(critical_touched)}. Requires 2 reviewers.",
+                             "file": "PR", "owasp_category": "DangerPolicy:CriticalFiles"})
+        
+        if has_code and not has_tests:
+            policies.append({"severity": "MEDIUM",
+                             "description": "Code changes detected without corresponding test files.",
+                             "file": "PR", "owasp_category": "DangerPolicy:NoTests"})
+        
+        if pr_body and len(pr_body.strip()) < 20:
+            policies.append({"severity": "LOW",
+                             "description": "PR description too short. Add context for reviewers.",
+                             "file": "PR", "owasp_category": "DangerPolicy:NoPRBody"})
+        
+        return {"issues": policies, "lines_changed": lines_changed,
+                "block": block, "critical_files_touched": critical_touched}
+
+
 def safe_parse_issues(res: str) -> list:
     try:
         data = json.loads(res)
@@ -424,7 +567,8 @@ def build_audit_report(
     score, verdict, issues_list, high_issues, mutations, validation,
     iteration_log, trust_metadata_dict, routing_decision, dow_guard,
     watchdog_result, verdict_ok, supply_chain_status, session_nonce,
-    run_start_time, test_result, coverage_result, adversarial_result
+    run_start_time, test_result, coverage_result, adversarial_result,
+    commit_result, danger_result
 ) -> str:
 
     run_duration = round(time.time() - run_start_time, 2)
@@ -531,6 +675,8 @@ def build_audit_report(
 | **Quality Score** | {score}/100 |
 | **Run Duration** | {run_duration}s |
 | **Routing Decision** | {routing_decision.get('rationale', '—')} |
+| **Commit Convention** | {commit_result.get('reason', '—')} |
+| **PR Policy (Danger)** | {len(danger_result.get('issues', []))} policy issues |
 
 ---
 {test_section}
@@ -881,16 +1027,47 @@ def main():
     parser = argparse.ArgumentParser(description="Post-Task Validation Loop")
     parser.add_argument("--task", type=str, default="No task description provided")
     parser.add_argument("--output", type=str, default="No output provided")
+    parser.add_argument("--hook-mode", default="ci", choices=["pre-commit","pre-push","ci"])
     args = parser.parse_args()
 
+    hook_mode = os.environ.get("AGENT_HOOK_MODE", args.hook_mode)
     run_start_time = time.time() # Step 7
 
-    # Gather context at the very beginning
-    diff_output = ""
-    try:
-        diff_output = subprocess.check_output(["git", "diff", "HEAD"], encoding="utf-8", errors="replace", stderr=subprocess.STDOUT)
-    except Exception:
-        pass
+    # Validate commit message (Commitizen)
+    commit_msg = ""
+    if args.task and not args.task.startswith("No task description"):
+        commit_msg = args.task
+    else:
+        try:
+            commit_msg = subprocess.check_output(
+                ["git", "log", "-1", "--pretty=%s"], encoding="utf-8"
+            ).strip()
+        except Exception:
+            pass
+    commit_validator = CommitMessageValidator()
+    commit_result = commit_validator.validate(commit_msg)
+
+    if commit_result["block"]:
+        result = {
+            "score": 0,
+            "verdict": "BLOCK",
+            "high_issues": 1,
+            "issues": [{
+                "severity": "HIGH",
+                "description": commit_result["reason"],
+                "file": "COMMIT_MSG",
+                "owasp_category": "Commitzen:Validation"
+            }],
+            "message": commit_result["reason"],
+            "test_verdict": "⚠️ Bypassed (commit message invalid)",
+            "adversarial_verdict": "🔴 BLOCK — Critical findings, do not merge",
+            "coverage_ratio": 0.0
+        }
+        print(json.dumps(result))
+        sys.exit(1)
+
+    # Gather context at the very beginning using HookModeAdapter
+    diff_output = HookModeAdapter.get_diff(hook_mode)
 
     # Layer 1 execution
     test_runner = TestSuiteRunner()
@@ -1068,6 +1245,32 @@ def main():
     coverage_result = coverage_reviewer.analyze(diff_redacted)
     issues_list.extend(coverage_result.get("issues", []))
 
+    # Danger Policy Evaluation (pre-LLM)
+    danger_evaluator = DangerPolicyEvaluator()
+    danger_result = danger_evaluator.evaluate(
+        diff_redacted, 
+        pr_title=args.task, 
+        pr_body=args.output
+    )
+    issues_list.extend(danger_result["issues"])
+
+    # If danger blocks (exceeds hard maximum size): fail-fast without LLM
+    if danger_result["block"]:
+        result = {
+            "score": 0,
+            "verdict": "BLOCK",
+            "high_issues": len([i for i in issues_list if i.get("severity") in ["HIGH", "CRITICAL"]]),
+            "issues": issues_list,
+            "usage": dow_guard.get_usage_summary(),
+            "routing": {"model": "bypassed", "complexity_score": 0, "triggers": [], "rationale": "Bypassed due to PR policy violation (too large)"},
+            "iterations": 0,
+            "test_verdict": test_result.get("verdict"),
+            "adversarial_verdict": "🔴 BLOCK — PR policy blocked",
+            "coverage_ratio": coverage_result.get("coverage_ratio", 0.0)
+        }
+        print(json.dumps(result))
+        sys.exit(1)
+
     # 1. Routing decision (Step 1)
     router = DiffRouter()
     routing_decision = router.route(diff_redacted)
@@ -1235,12 +1438,22 @@ def main():
         run_start_time=run_start_time,
         test_result=test_result,
         coverage_result=coverage_result,
-        adversarial_result=adversarial_result
+        adversarial_result=adversarial_result,
+        commit_result=commit_result,
+        danger_result=danger_result
     )
 
     # File Outputs
     with open("validation-report.md", "w", encoding="utf-8") as f:
         f.write(report_content)
+
+    # Generate reviewdog JSON outputs (INSERCIÓN 5)
+    reviewdog_formatter = ReviewdogFormatter()
+    reviewdog_formatter.write(
+        issues_list, 
+        path=os.path.join(session_path, "reviewdog.json")
+    )
+    reviewdog_formatter.write(issues_list, path="reviewdog.json")
 
     log_content = f"# Loop Log\nDate: {datetime.now().isoformat()}\nScore: {score}\nVerdict: {verdict}\n\n## Issues\n{json.dumps(issues_list, indent=2)}\n\n## Mutations proposed\n{mutations}\n\n## Validation\n{validation}\n"
     with open(os.path.join(session_path, "loop-log.md"), "w", encoding="utf-8") as f:
