@@ -1,0 +1,358 @@
+# Instincts generated from https://github.com/AlvaGonz/Anteproyecto-Verify
+# Generated: 2026-06-15T21:34:10.468Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: Anteproyecto-Verify-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat
+
+## Evidence
+
+- 1 commits analyzed
+- Detected conventional commit pattern
+- Examples: feat: implement user authentication system with login and registration commands, database seeder, and frontend integration
+
+---
+id: Anteproyecto-Verify-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Commit Length
+
+## Action
+
+Write detailed commit messages (~122 characters for first line)
+
+## Evidence
+
+- Average commit message length: 122 chars
+- Based on 1 commits
+
+---
+id: Anteproyecto-Verify-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Naming Files
+
+## Action
+
+Use PascalCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: PascalCase
+
+---
+id: Anteproyecto-Verify-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: Anteproyecto-Verify-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: Anteproyecto-Verify-arch-feature-based
+trigger: "when adding a new feature"
+confidence: 0.85
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Arch Feature Based
+
+## Action
+
+Create a new folder in src/features/ with all related code colocated
+
+## Evidence
+
+- Feature-based module organization detected
+- Structure: src/features/[feature-name]/
+
+---
+id: Anteproyecto-Verify-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: anteproyecto-verify-instinct-class-naming
+trigger: "When creating a new class in C#"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Class Naming
+
+## Action
+
+Name the class using PascalCase
+
+## Evidence
+
+- Pattern: namingConventions.classes = PascalCase
+
+---
+id: anteproyecto-verify-instinct-function-naming
+trigger: "When defining a function in C#"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Function Naming
+
+## Action
+
+Name the function using camelCase
+
+## Evidence
+
+- Pattern: namingConventions.functions = camelCase
+
+---
+id: anteproyecto-verify-instinct-constant-naming
+trigger: "When declaring a constant in C#"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Constant Naming
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE
+
+## Evidence
+
+- Pattern: namingConventions.constants = SCREAMING_SNAKE_CASE
+
+---
+id: anteproyecto-verify-instinct-file-naming
+trigger: "When creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct File Naming
+
+## Action
+
+Name the file using PascalCase
+
+## Evidence
+
+- Pattern: namingConventions.files = PascalCase
+
+---
+id: anteproyecto-verify-instinct-import-style
+trigger: "When importing modules"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Import Style
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern: importStyle = relative
+
+---
+id: anteproyecto-verify-instinct-export-style
+trigger: "When exporting modules or functions"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Export Style
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern: exportStyle = named
+
+---
+id: anteproyecto-verify-instinct-commit-format
+trigger: "When writing a git commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Commit Format
+
+## Action
+
+Use the conventional commit format with a 'feat' prefix for new features
+
+## Evidence
+
+- Pattern: commits.type = conventional
+- Pattern: commits.prefixes includes 'feat'
+- Example: 'feat: implement user authentication system...'
+
+---
+id: anteproyecto-verify-instinct-commit-length
+trigger: "When writing a git commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Commit Length
+
+## Action
+
+Write detailed commit messages averaging around 120 characters
+
+## Evidence
+
+- Pattern: commits.averageLength = 122
+
+---
+id: anteproyecto-verify-instinct-test-location
+trigger: "When adding new tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Test Location
+
+## Action
+
+Place tests in a separate directory from source code
+
+## Evidence
+
+- Pattern: architecture.folderStructure.testLocation = separate
+
+---
+id: anteproyecto-verify-instinct-feature-modules
+trigger: "When organizing code modules"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Feature Modules
+
+## Action
+
+Group modules by feature
+
+## Evidence
+
+- Pattern: architecture.moduleOrganization = feature-based
+
+---
+id: anteproyecto-verify-instinct-error-handling
+trigger: "When handling errors in code"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: AlvaGonz/Anteproyecto-Verify
+---
+
+# Anteproyecto Verify Instinct Error Handling
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Pattern: errorHandling.style = try-catch
+
