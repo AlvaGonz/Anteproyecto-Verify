@@ -1444,7 +1444,7 @@ def main():
     )
 
     # File Outputs
-    with open("validation-report.md", "w", encoding="utf-8") as f:
+    with open(".agents/validation-report.md", "w", encoding="utf-8") as f:
         f.write(report_content)
 
     # Generate reviewdog JSON outputs (INSERCIÓN 5)

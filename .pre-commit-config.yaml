@@ -5,7 +5,7 @@ repos:
       - id: agent-firewall
         name: "🔍 Post-Task Agent Firewall"
         language: python
-        entry: python scripts/post_task_loop.py --hook-mode pre-commit
+        entry: python .agents/scripts/post_task_loop.py --hook-mode pre-commit
         # We pass task and output default context
         args:
           - "--task"

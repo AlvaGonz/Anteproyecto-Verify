@@ -20,9 +20,9 @@ has_test_changes = !git.modified_files.grep(/(test_|\.test\.|\.spec\.)/).empty?
 warn "⚠️ Cambios de código sin tests correspondientes detectados." if has_source_changes && !has_test_changes
 
 # ── Regla 4: Leer validation-report.md del CI ────────────────────
-if File.exist?("validation-report.md")
-  report = File.read("validation-report.md")
-  fail "🔴 Agent Firewall: FAIL verdict detectado. Ver `validation-report.md`." if report.include?("❌ FAIL") || report.include?("BLOCK")
+if File.exist?(".agents/validation-report.md")
+  report = File.read(".agents/validation-report.md")
+  fail "🔴 Agent Firewall: FAIL verdict detectado. Ver `.agents/validation-report.md`." if report.include?("❌ FAIL") || report.include?("BLOCK")
   message "✅ Agent Firewall: PASS" if report.include?("✅ PASS")
 end
 
