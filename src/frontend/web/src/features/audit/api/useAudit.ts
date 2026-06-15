@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import type { LogProyectoDto } from "./types";
 
@@ -18,5 +18,13 @@ export const useGlobalAuditTrail = (filters?: any) =>
   useQuery({
     queryKey: auditKeys.global(filters),
     queryFn: () => apiClient.get<LogProyectoDto[]>(`/admin/audit`, { params: filters }).then(res => res.data),
+  });
+
+export const useExportGlobalAudit = () =>
+  useMutation({
+    mutationFn: async () => {
+      const response = await apiClient.get(`/reports/global-audit`, { responseType: 'blob' }).then(res => res.data);
+      return response as Blob;
+    },
   });
 

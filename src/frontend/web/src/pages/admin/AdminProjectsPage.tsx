@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
 import { useProjects } from "../../features/projects/api/useProjects";
 import { 
@@ -56,8 +56,18 @@ const getIntegrityBadge = (status: IntegrityStatus) => {
 };
 
 export const AdminProjectsPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('q') || "";
+  
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [activeFilter, setActiveFilter] = useState<string>("all");
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q !== null) {
+      setSearchTerm(q);
+    }
+  }, [searchParams]);
 
   const { data: rawProjects = [], isLoading } = useProjects();
   const projects = rawProjects;

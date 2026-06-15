@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   Activity
 } from "lucide-react";
-import { useGlobalAuditTrail } from "../api/useAudit";
+import { useGlobalAuditTrail, useExportGlobalAudit } from "../api/useAudit";
 import { AuditDto, AuditFilters } from "../types";
 
 export const AuditLogPage: React.FC = () => {
@@ -17,6 +17,23 @@ export const AuditLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: rawLogs = [], isLoading: loading } = useGlobalAuditTrail(filters);
+  const exportMutation = useExportGlobalAudit();
+
+  const handleExport = async () => {
+    try {
+      const blob = await exportMutation.mutateAsync();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit-log-${new Date().toISOString().split('T')[0]}.pdf`; // Or whichever format it is
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Failed to export logs", error);
+    }
+  };
 
   const logs = React.useMemo(() => {
     let filtered = rawLogs.map((l: any) => ({
@@ -71,9 +88,13 @@ export const AuditLogPage: React.FC = () => {
             Historial completo de eventos críticos y acciones administrativas del sistema.
           </p>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-xl font-sans font-bold text-sm text-secondary hover:bg-surface-raised transition-all shadow-raised hover:shadow-floating">
+        <button 
+          onClick={handleExport}
+          disabled={exportMutation.isPending}
+          className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-xl font-sans font-bold text-sm text-secondary hover:bg-surface-raised transition-all shadow-raised hover:shadow-floating disabled:opacity-50"
+        >
           <Download className="w-4 h-4" />
-          Exportar Logs
+          {exportMutation.isPending ? "Exportando..." : "Exportar Logs"}
         </button>
       </div>
 

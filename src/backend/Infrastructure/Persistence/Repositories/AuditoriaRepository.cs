@@ -25,6 +25,11 @@ public class AuditoriaRepository : IAuditoriaRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Auditoria>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Auditorias.ToListAsync(cancellationToken);
+    }
+
     public async Task AddAsync(Auditoria auditoria, CancellationToken cancellationToken = default)
     {
         await _context.Auditorias.AddAsync(auditoria, cancellationToken);

@@ -1,5 +1,6 @@
 import React from "react";
 import { User, Bell, Menu, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   title: string;
@@ -7,6 +8,17 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const value = e.currentTarget.value.trim();
+      if (value) {
+        navigate(`/admin/projects?q=${encodeURIComponent(value)}`);
+      }
+    }
+  };
+
   return (
     <header className="sticky top-0 z-20 w-full h-20 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-8">
       <div className="flex items-center gap-4">
@@ -38,6 +50,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
             type="text"
             placeholder="Buscar expedientes, folios o propietarios..."
             className="w-full h-11 pl-11 pr-4 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all group-hover:bg-gray-100"
+            onKeyDown={handleSearch}
           />
         </div>
       </div>

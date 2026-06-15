@@ -115,8 +115,12 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Reports.Queries.GenerarReporteHallazgos.GenerarReporteHallazgosQueryHandler>();
         services.AddScoped<Application.Features.Reports.Queries.GetPublicProjectReport.GetPublicProjectReportQueryHandler>();
         services.AddScoped<Application.Features.Reports.Queries.GetProjectReports.GetProjectReportsQueryHandler>();
+        
+        // Audit Queries
         services.AddScoped<Application.Features.Audit.Queries.GetProjectAuditTrail.GetProjectAuditTrailQueryHandler>();
         services.AddScoped<Application.Features.Audit.Queries.ExportAuditTrail.ExportAuditTrailQueryHandler>();
+        services.AddScoped<Application.Features.Audit.Queries.GetGlobalAuditTrail.GetGlobalAuditTrailQueryHandler>();
+        services.AddScoped<Application.Features.Audit.Queries.ExportGlobalAuditTrail.ExportGlobalAuditTrailQueryHandler>();
 
         // Notifications
         if (useMock)

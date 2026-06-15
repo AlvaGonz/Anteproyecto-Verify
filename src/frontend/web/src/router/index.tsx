@@ -33,6 +33,7 @@ import { CreateProjectPage } from "../pages/projects/CreateProjectPage";
 import { EditProjectPage } from "../pages/projects/EditProjectPage";
 import { UploadDocumentPage } from "../pages/projects/UploadDocumentPage";
 import { CreateValidationPage } from "../pages/projects/CreateValidationPage";
+import { AdminErrorFallback } from "../components/ui/AdminErrorFallback";
 
 const NavigateToVerifyResult: React.FC = () => {
   const { code } = useParams<{ code: string }>();
@@ -144,7 +145,16 @@ export const router = createHashRouter([
 
       /* ===== Admin Pages ===== */
       {
+        path: "/admin/expedientes",
+        element: <Navigate to="/admin/projects" replace />,
+      },
+      {
+        path: "/admin/validation-rules",
+        element: <Navigate to="/admin/rules" replace />,
+      },
+      {
         path: "/admin",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -155,6 +165,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/dashboard",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -165,6 +176,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -175,6 +187,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects/new",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -185,6 +198,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects/:id/edit",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -195,6 +209,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects/:id/documents",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -205,6 +220,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects/:id/upload",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <ProjectDocumentUploadPage />
@@ -213,6 +229,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects/:id/validations",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -223,6 +240,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/validations/:projectId",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -233,6 +251,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects/:id/audit",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -243,6 +262,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/projects/:id/reports",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -253,6 +273,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/findings/:projectId",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -263,6 +284,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/rules",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -273,6 +295,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/settings",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
@@ -283,6 +306,7 @@ export const router = createHashRouter([
       },
       {
         path: "/admin/audit-log",
+        errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
