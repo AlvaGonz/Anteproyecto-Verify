@@ -13,16 +13,12 @@ using Microsoft.Extensions.Logging;
 
 public static class AppDbContextSeeder
 {
-    // These are bcrypt hashes (not plaintext). They are for demo/dev only.
-    private const string AdminPasswordHash = "$2b$12$h2YwQd3lYqHnQF4I6fHh3OQ7l.1h7jvHcYJc9h1QG5c9YQd7h3q1e"; // "Admin123!" (example)
-    private const string DevPasswordHash = "$2b$12$U3qg2fZbYtT9k4Fh0v7wceYQ7TnJ4Nw6o2mS1s6qGQxP9uYp2xE3u"; // "Dev123!" (example)
-    private const string PublicPasswordHash = "$2b$12$wq9eYx1T4q2kQ8hYy8yG2eYQ7TnJ4Nw6o2mS1s6qGQxP9uYp2xE3u"; // "Consulta123!" (example)
-
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<AppDbContext>>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<Application.Abstractions.Security.IPasswordHasher>();
 
         try
         {
@@ -33,7 +29,7 @@ public static class AppDbContextSeeder
                 nombre: "Admin",
                 apellido: "VeriFinca",
                 correoElectronico: "admin@verifinca.do",
-                contrasenaHash: AdminPasswordHash,
+                contrasenaHash: passwordHasher.HashPassword("Admin123!"),
                 rol: UserRole.Administrator,
                 telefono: "809-555-0100",
                 cedula: "001-0000000-1");
@@ -43,7 +39,7 @@ public static class AppDbContextSeeder
                 nombre: "Desarrollador",
                 apellido: "Inmobiliario",
                 correoElectronico: "dev@constructora.do",
-                contrasenaHash: DevPasswordHash,
+                contrasenaHash: passwordHasher.HashPassword("Dev123!"),
                 rol: UserRole.Professional,
                 telefono: "809-555-0200",
                 cedula: "001-0000000-2");
@@ -53,7 +49,7 @@ public static class AppDbContextSeeder
                 nombre: "Usuario",
                 apellido: "Consulta",
                 correoElectronico: "consulta@publico.do",
-                contrasenaHash: PublicPasswordHash,
+                contrasenaHash: passwordHasher.HashPassword("Consulta123!"),
                 rol: UserRole.Consultation,
                 telefono: "809-555-0300",
                 cedula: "001-0000000-3");
@@ -198,7 +194,18 @@ public static class AppDbContextSeeder
         string cedula)
     {
         var existing = await context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == correoElectronico);
-        if (existing != null) return existing;
+        if (existing != null)
+        {
+            context.Entry(existing).Property("Nombre").CurrentValue = nombre;
+            context.Entry(existing).Property("Apellido").CurrentValue = apellido;
+            context.Entry(existing).Property("Telefono").CurrentValue = telefono;
+            context.Entry(existing).Property("Cedula").CurrentValue = cedula;
+            context.Entry(existing).Property("Rol").CurrentValue = rol;
+            context.Entry(existing).Property("ContrasenaHash").CurrentValue = contrasenaHash;
+            
+            await context.SaveChangesAsync();
+            return existing;
+        }
 
         var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
         context.Usuarios.Add(user);

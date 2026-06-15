@@ -11,14 +11,18 @@ GO
 
 -- Tabla Usuario
 CREATE TABLE Usuario (
-    IdUsuario INT IDENTITY(1,1) PRIMARY KEY,
+    IdUsuario UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     Nombre VARCHAR(100) NOT NULL,
     Apellido VARCHAR(100) NOT NULL,
     NombreCompleto AS (Nombre + ' ' + Apellido) PERSISTED,
     Email VARCHAR(100) NOT NULL UNIQUE CONSTRAINT CK_Usuario_Email CHECK (Email LIKE '%_@__%.__%'),
     ContrasenaHash VARCHAR(255) NOT NULL,
     Telefono VARCHAR(15) NOT NULL,
-    Cedula VARCHAR(15) NOT NULL
+    Cedula VARCHAR(15) NOT NULL,
+    Rol INT NOT NULL DEFAULT 2,
+    Activo BIT NOT NULL DEFAULT 1,
+    CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAtUtc DATETIME2 NULL
 );
 GO
 
@@ -48,7 +52,7 @@ GO
 CREATE TABLE Acceso (
     IdAcceso INT IDENTITY(1,1) PRIMARY KEY,
     IdPerfil INT,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     FOREIGN KEY (IdPerfil) REFERENCES Perfiles(IdPerfil),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
 );
@@ -100,7 +104,7 @@ GO
 -- Tabla ProyectosInmoviliarios
 CREATE TABLE ProyectosInmoviliarios (
     IdProyecto INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     IdMunicipio INT,
     NombreProyecto VARCHAR(200),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario),
@@ -138,7 +142,7 @@ GO
 -- Tabla LogProyectos
 CREATE TABLE LogProyectos (
     IdLog INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     IdProyecto INT,
     FechaHora DATETIME DEFAULT GETDATE(),
     Accion VARCHAR(100),
@@ -234,7 +238,7 @@ GO
 -- Tabla Recibo (pagos)
 CREATE TABLE Recibo (
     IdPago INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     Monto DECIMAL(10,2),
     FechaPago DATE,
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
@@ -244,7 +248,7 @@ GO
 -- Tabla Pagos
 CREATE TABLE Pagos (
     IdPago INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     IdApiGobernanza INT,
     Idsuscripcion INT,
     Monto DECIMAL(10,2),
@@ -259,7 +263,7 @@ GO
 CREATE TABLE LogPagos (
     IdLog INT IDENTITY(1,1) PRIMARY KEY,
     Idpago INT,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     Idsuscripcion INT,
     FechaLog DATETIME DEFAULT GETDATE(),
     Estado VARCHAR(50),
@@ -285,7 +289,7 @@ CREATE TABLE FremiunConsultas_Log (
     IdConsultaLog INT IDENTITY(1,1) PRIMARY KEY,
     IdProyecto INT,
     IdConsulta INT,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     FechaConsulta DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto),
     FOREIGN KEY (IdConsulta) REFERENCES Consultas(IdConsulta),
@@ -297,7 +301,7 @@ GO
 CREATE TABLE FremiunProyectos_Log (
     IdProyectoLog INT IDENTITY(1,1) PRIMARY KEY,
     IdProyecto INT,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     FechaAcceso DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmoviliarios(IdProyecto),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
@@ -307,7 +311,7 @@ GO
 -- Tabla LogConsultas
 CREATE TABLE LogConsultas (
     IdLog INT IDENTITY(1,1) PRIMARY KEY,
-    IdUsuario INT,
+    IdUsuario UNIQUEIDENTIFIER,
     IdResultado INT,
     FechaConsulta DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)

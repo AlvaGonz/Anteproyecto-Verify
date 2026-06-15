@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSuccess(result)) {
       localStorage.setItem("vf_token", result.data.token);
+      localStorage.setItem("vf_user", JSON.stringify(result.data.user));
       setUser(result.data.user);
     } else {
       setError(result.error);
@@ -51,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     localStorage.removeItem("vf_token");
+    localStorage.removeItem("vf_user");
     setUser(null);
     AuthService.logout();
   };

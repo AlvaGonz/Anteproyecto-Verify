@@ -17,7 +17,7 @@ public class RegisterUserCommandHandler
     private readonly IUnitOfWork _unitOfWork;
 
     private static readonly Regex EmailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex PhoneRegex = new Regex(@"^\+?[0-9]{1,3}?[-.\s]?([0-9]{3})[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$", RegexOptions.Compiled);
+    private static readonly Regex PhoneRegex = new Regex(@"^(?:\+?[0-9]{1,3}[-.\s]?)?([0-9]{3})[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$", RegexOptions.Compiled);
 
     public RegisterUserCommandHandler(
         IUsuarioRepository usuarioRepository,

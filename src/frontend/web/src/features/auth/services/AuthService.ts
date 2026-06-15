@@ -27,38 +27,63 @@ export type AuthError =
 
 export const AuthService = {
   async login(email: string, password: string): Promise<Result<AuthResponse, AuthError>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          if (email === "admin@verifinca.com" && password === "admin123") {
-            resolve(success({
-              user: {
-                id: "1",
-                email: "admin@verifinca.com",
-                name: "Administrador VeriFinca",
-                role: "admin",
-              },
-              token: "mock-jwt-token",
-            }));
-          } else if (email.includes("error")) {
-            resolve(failure({ _tag: "NetworkError", message: "Error de conexión con el servidor" }));
-          } else {
-            // Allow any login for demo but simulate credential check
-            resolve(success({
-              user: {
-                id: "2",
-                email: email,
-                name: "Usuario Demo",
-                role: "user",
-              },
-              token: "mock-jwt-token",
-            }));
+    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          try {
+            if (email === "admin@verifinca.com" && password === "admin123") {
+              resolve(success({
+                user: {
+                  id: "1",
+                  email: "admin@verifinca.com",
+                  name: "Administrador VeriFinca",
+                  role: "admin",
+                },
+                token: "mock-jwt-token",
+              }));
+            } else if (email.includes("error")) {
+              resolve(failure({ _tag: "NetworkError", message: "Error de conexión con el servidor" }));
+            } else {
+              resolve(success({
+                user: {
+                  id: "2",
+                  email: email,
+                  name: "Usuario Demo",
+                  role: "user",
+                },
+                token: "mock-jwt-token",
+              }));
+            }
+          } catch (e) {
+            resolve(failure({ _tag: "UnknownError", original: e }));
           }
-        } catch (e) {
-          resolve(failure({ _tag: "UnknownError", original: e }));
+        }, 1000);
+      });
+    }
+
+    try {
+      const response = await fetch(`${env.API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 400) {
+          return failure({ _tag: "InvalidCredentials" });
         }
-      }, 1000);
-    });
+        const errorData = await response.json().catch(() => ({ message: "Error de inicio de sesión" }));
+        return failure({ _tag: "NetworkError", message: errorData.message || "Error al iniciar sesión" });
+      }
+
+      const data = await response.json();
+      return success(data as AuthResponse);
+    } catch (e) {
+      return failure({ _tag: "UnknownError", original: e });
+    }
   },
 
   async register(
@@ -104,6 +129,7 @@ export const AuthService = {
 
   async logout(): Promise<void> {
     localStorage.removeItem("vf_token");
+    localStorage.removeItem("vf_user");
     return new Promise((resolve) => {
       setTimeout(resolve, 500);
     });
@@ -111,14 +137,13 @@ export const AuthService = {
 
   async getCurrentUser(): Promise<Option<User>> {
     const token = localStorage.getItem("vf_token");
-    if (!token) return none();
-    
-    // Simulate fetching user from session
-    return some({
-      id: "1",
-      email: "admin@verifinca.com",
-      name: "Administrador VeriFinca",
-      role: "admin",
-    });
+    const userJson = localStorage.getItem("vf_user");
+    if (!token || !userJson) return none();
+    try {
+      const user = JSON.parse(userJson) as User;
+      return some(user);
+    } catch {
+      return none();
+    }
   }
 };
