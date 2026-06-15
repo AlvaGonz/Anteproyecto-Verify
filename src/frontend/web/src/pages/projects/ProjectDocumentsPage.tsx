@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { DocumentDto, UploadDocumentDto, DocumentType } from "../../features/documents/types";
-import { documentsApi } from "../../features/documents/api/documentsApi";
+import { useDocuments, useUploadDocument, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
 import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
@@ -86,34 +86,31 @@ const RequiredDocumentsList: React.FC<{ documents: DocumentDto[] }> = ({ documen
 
 export const ProjectDocumentsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const projectId = id || "";
   const { addToast } = useToast();
-  const [documents, setDocuments] = useState<DocumentDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  
   const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchDocuments = async () => {
-    if (!id) return;
-    try {
-      setLoading(true);
-      const data = await documentsApi.getProjectDocuments(id);
-      setDocuments(data);
-      setError(null);
-    } catch (err: any) {
-      setError(err.message || "Error al cargar los documentos");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: rawDocuments = [], isLoading: loading, error: fetchError } = useDocuments(projectId);
+  const error = fetchError ? (fetchError as Error).message : null;
 
-  useEffect(() => { fetchDocuments(); }, [id]);
+  const uploadMutation = useUploadDocument(projectId);
+  const downloadMutation = useDownloadDocument(projectId);
+  const statusMutation = useUpdateDocumentStatus(projectId);
+
+  const documents = rawDocuments;
 
   const handleUpload = async (dto: UploadDocumentDto, file: File) => {
     if (!id) return;
     try {
-      await documentsApi.uploadDocument(id, dto, file);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("tipoDocumento", String(dto.tipoDocumento));
+      formData.append("observaciones", dto.observaciones || "");
+      if (dto.fechaEmision) formData.append("fechaEmision", dto.fechaEmision);
+      if (dto.institucionEmisora) formData.append("institucionEmisora", dto.institucionEmisora);
+      await uploadMutation.mutateAsync(formData);
       addToast("Expediente digitalizado exitosamente", "success");
-      await fetchDocuments();
     } catch (err: any) {
       addToast(err.message || "Error al procesar el expediente", "error");
     }
@@ -122,7 +119,7 @@ export const ProjectDocumentsPage: React.FC = () => {
   const handleDownload = async (documentId: string) => {
     if (!id) return;
     try {
-      await documentsApi.downloadDocument(id, documentId);
+      await downloadMutation.mutateAsync(documentId);
     } catch (err: any) {
       addToast("Error al obtener la descarga segura", "error");
     }
@@ -131,9 +128,8 @@ export const ProjectDocumentsPage: React.FC = () => {
   const handleToggleStatus = async (documentId: string, isActive: boolean) => {
     if (!id) return;
     try {
-      await documentsApi.updateDocumentStatus(id, documentId, { activo: isActive });
+      await statusMutation.mutateAsync({ documentId, activo: isActive });
       addToast(`Estado de certificación ${isActive ? "reanudado" : "suspendido"}`, isActive ? "success" : "info");
-      await fetchDocuments();
     } catch (err: any) {
       addToast("Error al modificar el estado de validez", "error");
     }
@@ -157,7 +153,7 @@ export const ProjectDocumentsPage: React.FC = () => {
       {/* Page Header */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
              <Link to="/admin/projects" className="text-on-surface-variant hover:text-primary transition-colors">
                 <LayoutDashboard className="w-4 h-4" />
              </Link>
@@ -245,7 +241,7 @@ export const ProjectDocumentsPage: React.FC = () => {
         </div>
 
         {/* Column Right: Document Explorer */}
-        <div className="xl:col-span-8 space-y-6 min-h-[800px]">
+        <div className="xl:col-span-8 space-y-6 lg:min-h-[800px]">
           <div className="vf-card !p-3 flex flex-col sm:flex-row items-center gap-3">
              <div className="relative flex-1 group w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
@@ -264,7 +260,7 @@ export const ProjectDocumentsPage: React.FC = () => {
              </button>
           </div>
 
-          <div className="vf-card p-6 min-h-[800px]">
+          <div className="vf-card p-6 lg:min-h-[800px]">
             <ProjectDocumentsList
               documents={filteredDocuments}
               onDownload={handleDownload}

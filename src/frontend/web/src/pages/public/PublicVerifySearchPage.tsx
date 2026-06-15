@@ -37,7 +37,7 @@ export const PublicVerifySearchPage: React.FC = () => {
           <div className="flex flex-col">
             <Link to="/" className="flex items-center group">
               <img
-                src="/brand/logotipo/LOGOTIPO WHITE.svg"
+                src="/brand/logotipo/LOGOTIPO WHITE.optimized.svg"
                 alt="VeriFinca"
                 className="h-10 w-auto group-hover:scale-105 transition-transform"
               />

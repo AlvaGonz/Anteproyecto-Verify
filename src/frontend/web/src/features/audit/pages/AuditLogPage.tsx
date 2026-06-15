@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { 
   Download, 
   Search, 
@@ -9,30 +9,53 @@ import {
   ShieldCheck,
   Activity
 } from "lucide-react";
-import { auditApi } from "../api/auditApi";
+import { useGlobalAuditTrail, useExportGlobalAudit } from "../api/useAudit";
 import { AuditDto, AuditFilters } from "../types";
 
 export const AuditLogPage: React.FC = () => {
-  const [logs, setLogs] = useState<AuditDto[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<AuditFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    fetchLogs();
-  }, [filters]);
+  const { data: rawLogs = [], isLoading: loading } = useGlobalAuditTrail(filters);
+  const exportMutation = useExportGlobalAudit();
 
-  const fetchLogs = async () => {
-    setLoading(true);
+  const handleExport = async () => {
     try {
-      const data = await auditApi.getGlobalAuditTrail(filters);
-      setLogs(data);
+      const blob = await exportMutation.mutateAsync();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit-log-${new Date().toISOString().split('T')[0]}.pdf`; // Or whichever format it is
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
-      console.error("Error fetching logs:", error);
-    } finally {
-      setLoading(false);
+      console.error("Failed to export logs", error);
     }
   };
+
+  const logs = React.useMemo(() => {
+    let filtered = rawLogs.map((l: any) => ({
+      ...l,
+      id: String(l.idLog || l.id),
+      proyectoId: String(l.proyectoId || l.projectId),
+      fechaEventoUtc: l.fecha || l.fechaEventoUtc,
+      tipoEvento: l.accion || "General",
+      usuarioId: String(l.idUsuario || ""),
+      userEmail: l.nombreUsuario || "Desconocido",
+      detalle: l.descripcion || "Sin detalles",
+    })) as unknown as AuditDto[];
+
+    if (searchQuery) {
+      filtered = filtered.filter(l => 
+        (l.detalle || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (l.usuarioId || "").toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return filtered;
+  }, [rawLogs, searchQuery]);
 
   const getStatusBadge = (tipoEvento: string) => {
     switch (tipoEvento) {
@@ -65,9 +88,13 @@ export const AuditLogPage: React.FC = () => {
             Historial completo de eventos críticos y acciones administrativas del sistema.
           </p>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-xl font-sans font-bold text-sm text-secondary hover:bg-surface-raised transition-all shadow-raised hover:shadow-floating">
+        <button 
+          onClick={handleExport}
+          disabled={exportMutation.isPending}
+          className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-xl font-sans font-bold text-sm text-secondary hover:bg-surface-raised transition-all shadow-raised hover:shadow-floating disabled:opacity-50"
+        >
           <Download className="w-4 h-4" />
-          Exportar Logs
+          {exportMutation.isPending ? "Exportando..." : "Exportar Logs"}
         </button>
       </div>
 

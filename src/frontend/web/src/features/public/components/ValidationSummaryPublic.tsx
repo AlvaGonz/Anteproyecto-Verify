@@ -1,5 +1,9 @@
 import React from 'react';
-import { DimensionResumenDto } from '../api/publicApi';
+
+export interface DimensionResumenDto {
+  dimension: string;
+  resultado: string;
+}
 
 interface ValidationSummaryPublicProps {
   dimensiones: DimensionResumenDto[];

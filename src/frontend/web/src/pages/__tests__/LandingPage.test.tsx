@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { LandingPage } from "../LandingPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, vi } from "vitest";
 
 // Mock framer-motion to avoid animation issues in tests
@@ -19,11 +20,15 @@ vi.mock("framer-motion", async () => {
 });
 
 describe("LandingPage", () => {
+  const queryClient = new QueryClient();
+  
   const renderPage = () => {
     return render(
-      <BrowserRouter>
-        <LandingPage />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <LandingPage />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   };
 
@@ -31,8 +36,9 @@ describe("LandingPage", () => {
     renderPage();
     const video = document.querySelector("video");
     expect(video).toBeTruthy();
-    const source = video?.querySelector("source");
-    expect(source?.getAttribute("src")).toBe("/media/landing_Sketch_to_finished_202604121407.mp4");
+    const sources = video?.querySelectorAll("source");
+    expect(sources?.[0]?.getAttribute("src")).toBe("/media/landing_Sketch_to_finished_202604121407.webm");
+    expect(sources?.[1]?.getAttribute("src")).toBe("/media/landing_Sketch_to_finished_202604121407.optimized.mp4");
 
     // Check for visibility fix: Video should have a higher z-index or not be obscured
     // In tests we can check the className for the fix

@@ -3,6 +3,11 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { FeaturedProjectsSection } from "./FeaturedProjectsSection";
 import { MemoryRouter } from "react-router-dom";
+import { useProjects } from "../../projects/api/useProjects";
+
+vi.mock("../../projects/api/useProjects", () => ({
+  useProjects: vi.fn(),
+}));
 
 // Mock IntersectionObserver for JSDOM / Framer Motion
 class MockIntersectionObserver {
@@ -35,6 +40,18 @@ describe("FeaturedProjectsSection Component", () => {
     // Mock the HTMLDivElement prototype scrollBy method
     scrollByMock = vi.fn();
     HTMLDivElement.prototype.scrollBy = scrollByMock;
+
+    vi.mocked(useProjects).mockReturnValue({
+      data: [
+        { id: "1", nombre: "Blue Forest Residences", ubicacionTexto: "Location 1", imagenUrl: "img1", estadoProyecto: 1, completionRate: 0.85 }, // 8.5/10 => ~85%
+        { id: "2", nombre: "Marina Reef", ubicacionTexto: "Location 2", imagenUrl: "img2", estadoProyecto: 1, completionRate: 1.0 }, // 10/10 => 100%
+        { id: "3", nombre: "Vista Playa", ubicacionTexto: "Location 3", imagenUrl: "img3", estadoProyecto: 1, completionRate: 0.9 }, // 9/10 => 90%
+        { id: "4", nombre: "Central Park SD", ubicacionTexto: "Location 4", imagenUrl: "img4", estadoProyecto: 1, completionRate: 0.9 }, // 9/10 => 90%
+        { id: "5", nombre: "Sky Tower SD", ubicacionTexto: "Location 5", imagenUrl: "img5", estadoProyecto: 1, completionRate: 0.5 }, // 5/10 => 50%
+      ],
+      isLoading: false,
+      error: null,
+    } as any);
   });
 
   afterEach(() => {

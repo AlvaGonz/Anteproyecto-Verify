@@ -1,6 +1,7 @@
 namespace Application.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
+using FluentValidation;
 
 public static class DependencyInjection
 {
@@ -11,6 +12,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Contracts.Documents.IDocumentService, Application.Features.Documents.DocumentService>();
 
         // Validation Engine
+        services.AddValidatorsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
         services.AddScoped<Application.Abstractions.Validation.IInternalValidationEngine, Application.Services.Validation.InternalValidationEngine>();
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.RequiredDocuments.RequiredDocumentsRule>();
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.RequiredMetadata.RequiredMetadataRule>();
@@ -25,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Validation.Commands.GenerateAlerta.GenerateAlertaCommandHandler>();
         services.AddScoped<Application.Features.Validation.Queries.GetActiveAlertsByProject.GetActiveAlertsByProjectQueryHandler>();
         services.AddScoped<Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler>();
+        services.AddScoped<Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler>();
 
         return services;
     }

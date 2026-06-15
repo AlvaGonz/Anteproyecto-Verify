@@ -1,0 +1,74 @@
+# .github/workflows/agent-loop-review.yml
+name: Agent Firewall Review
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  agent-review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Agent Firewall
+        id: agent
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          node scripts/session-init.mjs
+          node scripts/registry.mjs
+          python scripts/post_task_loop.py \
+            --task "${{ github.event.pull_request.title }}" \
+            --output "${{ github.event.pull_request.body }}" \
+            > agent-output.json 2>&1 || true
+          
+      - name: Convert to reviewdog format
+        run: |
+          # Transforma el JSON de issues al formato RDJSON de reviewdog
+          python - <<'EOF'
+          import json, sys
+          
+          with open("agent-output.json") as f:
+            data = json.load(f)
+          
+          diagnostics = []
+          for issue in data.get("issues", []):
+            file_path = issue.get("file", "")
+            if not file_path or file_path in ["UNKNOWN", "DIFF", "WatchdogAgent"]:
+              continue
+            diagnostics.append({
+              "message": f"[{issue.get('severity')}] {issue.get('description')}",
+              "location": {"path": file_path, "range": {"start": {"line": 1}}},
+              "severity": "ERROR" if issue.get("severity") in ["HIGH", "CRITICAL"] else "WARNING",
+              "code": {"value": issue.get("owasp_category", "AGENT"), "url": "https://owasp.org/"}
+            })
+          
+          rdjson = {"source": {"name": "agent-firewall", "url": "https://github.com/AlvaGonz/Anteproyecto-Verify"}, "diagnostics": diagnostics}
+          with open("reviewdog.json", "w") as f:
+            json.dump(rdjson, f)
+          EOF
+
+      - uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Post review comments
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat reviewdog.json | reviewdog \
+            -f rdjson \
+            -name="agent-firewall" \
+            -reporter=github-pr-review \
+            -filter-mode=diff_context \
+            -fail-on-error

@@ -7,7 +7,7 @@ export const LandingFooter: React.FC = () => (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-white/60">
         <div className="md:col-span-2 space-y-8">
           <Link to="/">
-            <img src="/brand/logotipo/LOGOTIPO WHITE.svg" alt="VeriFinca" className="h-12 w-auto" />
+            <img src="/brand/logotipo/LOGOTIPO WHITE.optimized.svg" alt="VeriFinca" className="h-12 w-auto" />
           </Link>
           <p className="text-lg max-w-md leading-relaxed text-white/40 font-medium">
             Construyendo infraestructuras de confianza para el futuro inmobiliario de la República Dominicana.

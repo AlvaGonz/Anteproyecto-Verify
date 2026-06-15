@@ -25,7 +25,7 @@ export const ErrorBoundary: React.FC = () => {
         <div className="flex justify-center mb-8">
           <Link to="/">
             <img
-              src="/brand/isotipo/ISOTIPO WHITE.svg"
+              src="/brand/isotipo/ISOTIPO WHITE.optimized.svg"
               alt="VeriFinca"
               className="h-25 w-auto group-hover:scale-105 transition-transform"
             />

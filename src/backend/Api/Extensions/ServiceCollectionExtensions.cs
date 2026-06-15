@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddProblemDetails();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+        services.AddHttpClient(); // Register HttpClient for external API calls and proxy
         services.AddHealthChecks()
             .AddSqlServer(configuration.GetConnectionString("DefaultConnection") ?? string.Empty, name: "Database")
             .AddCheck("BlobStorage", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Blob storage ready"));
@@ -18,7 +19,10 @@ public static class ServiceCollectionExtensions
         services.AddCors(options =>
         {
             options.AddPolicy("AllowAll", builder =>
-                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+                builder.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://localhost:3000", "https://localhost:3000")
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .AllowCredentials());
         });
 
         return services;

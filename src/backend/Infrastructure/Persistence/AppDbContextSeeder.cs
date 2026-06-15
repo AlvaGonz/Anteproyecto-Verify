@@ -13,16 +13,12 @@ using Microsoft.Extensions.Logging;
 
 public static class AppDbContextSeeder
 {
-    // These are bcrypt hashes (not plaintext). They are for demo/dev only.
-    private const string AdminPasswordHash = "$2b$12$h2YwQd3lYqHnQF4I6fHh3OQ7l.1h7jvHcYJc9h1QG5c9YQd7h3q1e"; // "Admin123!" (example)
-    private const string DevPasswordHash = "$2b$12$U3qg2fZbYtT9k4Fh0v7wceYQ7TnJ4Nw6o2mS1s6qGQxP9uYp2xE3u"; // "Dev123!" (example)
-    private const string PublicPasswordHash = "$2b$12$wq9eYx1T4q2kQ8hYy8yG2eYQ7TnJ4Nw6o2mS1s6qGQxP9uYp2xE3u"; // "Consulta123!" (example)
-
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<AppDbContext>>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<Application.Abstractions.Security.IPasswordHasher>();
 
         try
         {
@@ -33,7 +29,7 @@ public static class AppDbContextSeeder
                 nombre: "Admin",
                 apellido: "VeriFinca",
                 correoElectronico: "admin@verifinca.do",
-                contrasenaHash: AdminPasswordHash,
+                contrasenaHash: passwordHasher.HashPassword("Admin123!"),
                 rol: UserRole.Administrator,
                 telefono: "809-555-0100",
                 cedula: "001-0000000-1");
@@ -43,7 +39,7 @@ public static class AppDbContextSeeder
                 nombre: "Desarrollador",
                 apellido: "Inmobiliario",
                 correoElectronico: "dev@constructora.do",
-                contrasenaHash: DevPasswordHash,
+                contrasenaHash: passwordHasher.HashPassword("Dev123!"),
                 rol: UserRole.Professional,
                 telefono: "809-555-0200",
                 cedula: "001-0000000-2");
@@ -53,7 +49,7 @@ public static class AppDbContextSeeder
                 nombre: "Usuario",
                 apellido: "Consulta",
                 correoElectronico: "consulta@publico.do",
-                contrasenaHash: PublicPasswordHash,
+                contrasenaHash: passwordHasher.HashPassword("Consulta123!"),
                 rol: UserRole.Consultation,
                 telefono: "809-555-0300",
                 cedula: "001-0000000-3");
@@ -179,6 +175,142 @@ public static class AppDbContextSeeder
                 ruta: $"/admin/projects/{p3.Id}",
                 markRead: true);
 
+            // Seeding Legacy Profiles, Permissions, and Plans
+            if (!await context.Perfiles.AnyAsync())
+            {
+                logger.LogInformation("Seeding legacy profiles...");
+                var adminPerfil = new Perfil { NombrePerfil = "ADMIN" };
+                var devPerfil = new Perfil { NombrePerfil = "DEVELOPER" };
+                var valPerfil = new Perfil { NombrePerfil = "VALIDATOR" };
+                context.Perfiles.AddRange(adminPerfil, devPerfil, valPerfil);
+                await context.SaveChangesAsync();
+            }
+
+            if (!await context.Permisos.AnyAsync())
+            {
+                logger.LogInformation("Seeding legacy permissions...");
+                var perm1 = new Permiso { Descripcion = "GestionarUsuarios" };
+                var perm2 = new Permiso { Descripcion = "ConfigurarReglas" };
+                var perm3 = new Permiso { Descripcion = "VisualizarAuditoria" };
+                var perm4 = new Permiso { Descripcion = "CrearProyectos" };
+                var perm5 = new Permiso { Descripcion = "ValidarProyectos" };
+                context.Permisos.AddRange(perm1, perm2, perm3, perm4, perm5);
+                await context.SaveChangesAsync();
+            }
+
+            if (!await context.PerfilPermisos.AnyAsync())
+            {
+                logger.LogInformation("Seeding legacy profile-permission relations...");
+                var perfiles = await context.Perfiles.ToListAsync();
+                var permisos = await context.Permisos.ToListAsync();
+
+                var admin = perfiles.FirstOrDefault(p => p.NombrePerfil == "ADMIN");
+                var dev = perfiles.FirstOrDefault(p => p.NombrePerfil == "DEVELOPER");
+                var val = perfiles.FirstOrDefault(p => p.NombrePerfil == "VALIDATOR");
+
+                if (admin != null)
+                {
+                    foreach (var perm in permisos)
+                    {
+                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = admin.IdPerfil, IdPermiso = perm.IdPermiso });
+                    }
+                }
+                if (dev != null)
+                {
+                    var pCrear = permisos.FirstOrDefault(p => p.Descripcion == "CrearProyectos");
+                    if (pCrear != null)
+                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = dev.IdPerfil, IdPermiso = pCrear.IdPermiso });
+                }
+                if (val != null)
+                {
+                    var pCrear = permisos.FirstOrDefault(p => p.Descripcion == "CrearProyectos");
+                    var pVal = permisos.FirstOrDefault(p => p.Descripcion == "ValidarProyectos");
+                    if (pCrear != null)
+                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = val.IdPerfil, IdPermiso = pCrear.IdPermiso });
+                    if (pVal != null)
+                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = val.IdPerfil, IdPermiso = pVal.IdPermiso });
+                }
+                await context.SaveChangesAsync();
+            }
+
+            if (!await context.PlanesSuscripcion.AnyAsync())
+            {
+                logger.LogInformation("Seeding legacy subscription plans...");
+                context.PlanesSuscripcion.AddRange(
+                    new PlanSuscripcion { NombrePlan = "Gratuito", Precio = 0.00m },
+                    new PlanSuscripcion { NombrePlan = "Profesional", Precio = 3500.00m },
+                    new PlanSuscripcion { NombrePlan = "Empresa", Precio = 10000.00m },
+                    new PlanSuscripcion { NombrePlan = "Enterprise", Precio = 30000.00m }
+                );
+                await context.SaveChangesAsync();
+            }
+
+            // Sync default seeded users to legacy Usuario, Acceso, and Pagos
+            var users = await context.Usuarios.ToListAsync();
+            var perfilesList = await context.Perfiles.ToListAsync();
+            var planesList = await context.PlanesSuscripcion.ToListAsync();
+
+            var adminLegacyProfile = perfilesList.FirstOrDefault(p => p.NombrePerfil == "ADMIN");
+            var devLegacyProfile = perfilesList.FirstOrDefault(p => p.NombrePerfil == "DEVELOPER");
+            var valLegacyProfile = perfilesList.FirstOrDefault(p => p.NombrePerfil == "VALIDATOR");
+
+            var freePlan = planesList.FirstOrDefault(p => p.NombrePlan == "Gratuito");
+            var proPlan = planesList.FirstOrDefault(p => p.NombrePlan == "Profesional");
+
+            foreach (var u in users)
+            {
+                var existingLegacy = await context.UsuariosLegacy.FirstOrDefaultAsync(ul => ul.Email == u.Email);
+                if (existingLegacy == null)
+                {
+                    var legacyUser = new UsuarioLegacy
+                    {
+                        Nombre = u.Nombre,
+                        Apellido = u.Apellido,
+                        Email = u.Email,
+                        ContrasenaHash = u.ContrasenaHash,
+                        Telefono = u.Telefono,
+                        Cedula = u.Cedula
+                    };
+                    context.UsuariosLegacy.Add(legacyUser);
+                    await context.SaveChangesAsync();
+                    existingLegacy = legacyUser;
+                }
+
+                var hasAcceso = await context.Accesos.AnyAsync(a => a.IdUsuario == existingLegacy.IdUsuario);
+                if (!hasAcceso)
+                {
+                    var targetPerfil = u.Rol switch
+                    {
+                        UserRole.Administrator => adminLegacyProfile,
+                        UserRole.Professional => devLegacyProfile,
+                        UserRole.Consultation => valLegacyProfile,
+                        _ => devLegacyProfile
+                    };
+
+                    if (targetPerfil != null)
+                    {
+                        context.Accesos.Add(new Acceso { IdUsuario = existingLegacy.IdUsuario, IdPerfil = targetPerfil.IdPerfil });
+                    }
+                }
+
+                var hasPagos = await context.PagosLegacy.AnyAsync(p => p.IdUsuario == existingLegacy.IdUsuario);
+                if (!hasPagos)
+                {
+                    var targetPlan = u.Rol == UserRole.Administrator ? proPlan : freePlan;
+                    if (targetPlan != null)
+                    {
+                        context.PagosLegacy.Add(new Pago
+                        {
+                            IdUsuario = existingLegacy.IdUsuario,
+                            Idsuscripcion = targetPlan.Idsuscripcion,
+                            Monto = targetPlan.Precio,
+                            FechaPago = DateTime.UtcNow
+                        });
+                    }
+                }
+            }
+            await context.SaveChangesAsync();
+
             logger.LogInformation("Prototype demo data seeding completed successfully.");
         }
         catch (Exception ex)
@@ -198,7 +330,18 @@ public static class AppDbContextSeeder
         string cedula)
     {
         var existing = await context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == correoElectronico);
-        if (existing != null) return existing;
+        if (existing != null)
+        {
+            context.Entry(existing).Property("Nombre").CurrentValue = nombre;
+            context.Entry(existing).Property("Apellido").CurrentValue = apellido;
+            context.Entry(existing).Property("Telefono").CurrentValue = telefono;
+            context.Entry(existing).Property("Cedula").CurrentValue = cedula;
+            context.Entry(existing).Property("Rol").CurrentValue = rol;
+            context.Entry(existing).Property("ContrasenaHash").CurrentValue = contrasenaHash;
+            
+            await context.SaveChangesAsync();
+            return existing;
+        }
 
         var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
         context.Usuarios.Add(user);

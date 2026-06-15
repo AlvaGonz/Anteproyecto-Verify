@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { ProyectoDto, ProjectStatus } from "../types";
 import { Link } from "react-router-dom";
-import { documentsApi } from "../../documents/api/documentsApi";
+import { useDocuments } from "../../documents/api/useDocuments";
 import { DocumentStatus } from "../../documents/types";
 import { 
   ShieldCheck, 
@@ -17,23 +17,12 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const [documentCount, setDocumentCount] = useState<number | null>(null);
-  const [allVerified, setAllVerified] = useState<boolean>(false);
+  const { data: documents = [] } = useDocuments(project.id);
 
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        const docs = await documentsApi.getProjectDocuments(project.id);
-        setDocumentCount(docs.length);
-        const isAllVerified = docs.length >= 20 && docs.every(d => d.estadoDocumento === DocumentStatus.Valid);
-        setAllVerified(isAllVerified);
-      } catch (error) {
-        setDocumentCount(0);
-        setAllVerified(false);
-      }
-    };
-    fetchDocuments();
-  }, [project.id]);
+  const documentCount = documents.length;
+  const allVerified = useMemo(() => {
+    return documents.length >= 20 && documents.every((d: any) => d.estadoDocumento === DocumentStatus.Valid);
+  }, [documents]);
 
   const isValidated = project.estadoProyecto === ProjectStatus.Validated && allVerified;
 
@@ -96,7 +85,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2 group/btn">
             <Link
-              to={`/projects/${project.id}`}
+              to={`/p/${project.id}`}
               className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 hover:gap-4 transition-all"
             >
               Auditar Proyecto <ChevronRight className="w-4 h-4" />

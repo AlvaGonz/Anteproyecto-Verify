@@ -1,5 +1,72 @@
-# ECC Tools configuration
-# https://ecc.tools
+# ECC Tools Configuration
+# This file configures ECC (Enhanced Coding Context) for the Antigravity IDE.
+# Antigravity IDE uses the `.agent/` directory convention.
 
-# Always open pull requests against the develop branch
-base_branch: develop
+version: "1.0"
+
+# Primary install target: Antigravity IDE
+target: antigravity
+
+# IDE configuration
+ide:
+  name: antigravity
+  # Antigravity IDE uses the `.agent/` directory for agent configuration
+  agent_dir: .agent
+  rules_dir: .agent/rules
+  workflows_dir: .agent/workflows
+  skills_dir: .agent/skills
+  # NOT using Codex (.codex/) or Claude Code (.claude/) directories
+  disabled_targets:
+    - claude
+    - codex
+
+# ECC Feature flags
+features:
+  skills: true
+  workflows: true
+  rules: true
+  planning_with_files: true
+  owasp_security: true
+  session_protocol: true
+
+# MCP servers used by workflows
+mcp_servers:
+  - name: mcp-context7-mcp
+    required_by:
+      - security-audit-cicd
+      - new-feature
+  - name: mcp-github-mcp-server
+    required_by:
+      - security-audit-cicd
+      - new-feature
+      - ci-autofix
+      - coverage-backlog
+
+# Workflow registry
+workflows:
+  - audit-chores
+  - ci-autofix
+  - cleanup-dead-code
+  - coverage-backlog
+  - debug-session
+  - error-digest
+  - evolve-skills
+  - memory-sync
+  - new-feature
+  - post-task-hook
+  - restructure-backend
+  - restructure-frontend
+  - security-audit-cicd
+
+# Core skills (referenced by @-tags in workflows)
+skills:
+  - antigravity-skill-orchestrator
+  - antigravity-workflows
+  - owasp-security
+  - planning-with-files
+
+# Rules applied globally
+rules:
+  - git-conventions
+  - security
+  - session-protocol

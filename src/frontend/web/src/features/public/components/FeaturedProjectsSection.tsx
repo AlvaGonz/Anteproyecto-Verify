@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
+import { useProjects } from "../../projects/api/useProjects";
+
 interface Project {
   name: string;
   location: string;
@@ -12,144 +14,6 @@ interface Project {
   deliveredDocs: number;
   totalDocs: number;
 }
-
-const ALL_PROJECTS: Project[] = [
-  {
-    name: "Blue Forest Residences",
-    location: "Las Terrenas, Samaná",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-    status: "Auditado",
-    risk: "Bajo",
-    deliveredDocs: 10,
-    totalDocs: 12,
-  },
-  {
-    name: "Sky Tower SD",
-    location: "Naco, Santo Domingo",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
-    status: "En Proceso",
-    risk: "Calculando",
-    deliveredDocs: 5,
-    totalDocs: 10,
-  },
-  {
-    name: "Marina Reef",
-    location: "Cap Cana, La Altagracia",
-    image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=80",
-    status: "Certificado",
-    risk: "Bajo",
-    deliveredDocs: 15,
-    totalDocs: 15,
-  },
-  {
-    name: "Oasis Garden",
-    location: "Punta Cana, La Altagracia",
-    image: "https://images.unsplash.com/photo-1512915922686-57c11f9ad6b3?auto=format&fit=crop&w=800&q=80",
-    status: "Verificado",
-    risk: "Bajo",
-    deliveredDocs: 8,
-    totalDocs: 10,
-  },
-  {
-    name: "Vista Playa",
-    location: "Cabarete, Puerto Plata",
-    image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=800&q=80",
-    status: "Auditado",
-    risk: "Medio",
-    deliveredDocs: 9,
-    totalDocs: 10,
-  },
-  {
-    name: "Central Park SD",
-    location: "Piantini, Santo Domingo",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
-    status: "Certificado",
-    risk: "Bajo",
-    deliveredDocs: 18,
-    totalDocs: 20,
-  },
-  {
-    name: "Azure Bay",
-    location: "Juan Dolio, San Pedro",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
-    status: "En Revisión",
-    risk: "Bajo",
-    deliveredDocs: 11,
-    totalDocs: 12,
-  },
-  {
-    name: "Emerald Hills",
-    location: "Jarabacoa, La Vega",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fee74a62?auto=format&fit=crop&w=800&q=80",
-    status: "Certificado",
-    risk: "Bajo",
-    deliveredDocs: 10,
-    totalDocs: 10,
-  },
-  {
-    name: "Diamond Plaza",
-    location: "Bella Vista, Santo Domingo",
-    image: "https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=800&q=80",
-    status: "Verificado",
-    risk: "Bajo",
-    deliveredDocs: 4,
-    totalDocs: 5,
-  },
-  {
-    name: "Sunset Villas",
-    location: "Boca Chica, Santo Domingo",
-    image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80",
-    status: "Auditado",
-    risk: "Bajo",
-    deliveredDocs: 12,
-    totalDocs: 15,
-  },
-  {
-    name: "Ocean View Tower",
-    location: "Malecón, Santo Domingo",
-    image: "https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=800&q=80",
-    status: "En Proceso",
-    risk: "Calculando",
-    deliveredDocs: 9,
-    totalDocs: 10,
-  },
-  {
-    name: "Pine Ridge",
-    location: "Santiago de los Caballeros",
-    image: "https://images.unsplash.com/photo-1513584684374-8bdb74838a0f?auto=format&fit=crop&w=800&q=80",
-    status: "Certificado",
-    risk: "Bajo",
-    deliveredDocs: 14,
-    totalDocs: 15,
-  },
-  {
-    name: "Royal Garden",
-    location: "La Romana",
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80",
-    status: "Verificado",
-    risk: "Bajo",
-    deliveredDocs: 20,
-    totalDocs: 25,
-  },
-  {
-    name: "Urban Lofts",
-    location: "Gazcue, Santo Domingo",
-    image: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=800&q=80",
-    status: "En Revisión",
-    risk: "Bajo",
-    deliveredDocs: 8,
-    totalDocs: 10,
-  },
-  {
-    name: "Golden Sands",
-    location: "Bávaro, Punta Cana",
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
-    status: "En Proceso",
-    risk: "Calculando",
-    deliveredDocs: 7,
-    totalDocs: 10,
-  },
-];
 
 export const FeaturedProjectsSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -161,7 +25,33 @@ export const FeaturedProjectsSection: React.FC = () => {
   const [scrollLeftVal, setScrollLeftVal] = useState(0);
   const [hasDragged, setHasDragged] = useState(false);
 
-  const filteredProjects = ALL_PROJECTS.filter(
+  const { data: realProjects = [] } = useProjects();
+  
+  const formattedProjects: Project[] = realProjects.map(p => ({
+    name: p.nombre,
+    location: p.ubicacionTexto,
+    image: p.imagenUrl || "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    status: p.estadoProyecto === 1 ? "Publicado" : "En Proceso",
+    risk: "Calculando",
+    deliveredDocs: p.completionRate ? Math.round(p.completionRate * 10) : 5,
+    totalDocs: 10,
+  }));
+
+  const fallbackProjects: Project[] = [
+    {
+      name: "Blue Forest Residences",
+      location: "Las Terrenas, Samaná",
+      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      status: "Auditado",
+      risk: "Bajo",
+      deliveredDocs: 10,
+      totalDocs: 12,
+    }
+  ];
+
+  const projectsToUse = formattedProjects.length > 0 ? formattedProjects : fallbackProjects;
+
+  const filteredProjects = projectsToUse.filter(
     (p) => (p.deliveredDocs / p.totalDocs) >= 0.8
   ).slice(0, 12);
 

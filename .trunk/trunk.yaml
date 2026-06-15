@@ -1,0 +1,40 @@
+# .trunk/trunk.yaml
+version: 0.1
+
+cli:
+  version: 1.22.1
+
+plugins:
+  sources:
+    - id: trunk
+      ref: v1.6.0
+      uri: https://github.com/trunk-io/plugins
+
+lint:
+  enabled:
+    - bandit@1.7.5       # Python security (complementa al SecurityCritic)
+    - ruff@0.4.2          # Python lint rápido
+    - eslint@8.57.0       # JS/TS
+    - prettier@3.2.5
+    - markdownlint@0.39.0
+
+  definitions:
+    # El agente como un linter custom de Trunk
+    - name: agent-firewall
+      files: [python, javascript, typescript]
+      commands:
+        - name: lint
+          # Trunk pasa el archivo como ${target}
+          run: >
+            python scripts/post_task_loop.py
+            --task "trunk-check on ${target}"
+            --output "single-file check"
+          output: pass_fail
+          success_codes: [0]
+          run_when: [ci]
+
+actions:
+  enabled:
+    - trunk-announce
+    - trunk-check-pre-push  # Corre agent-firewall antes del push
+    - trunk-fmt-pre-commit  # Formatea antes del commit

@@ -1,163 +1,92 @@
-import {
-  ProyectoDto,
-  CreateProyectoDto,
-  UpdateProyectoDto,
-  ProjectStatus,
+import { apiClient } from "../../../infrastructure/api/client";
+import { 
+  ProyectoDto, 
+  CreateProyectoDto, 
+  UpdateProyectoDto, 
+  ProjectStatus, 
   IntegrityStatus,
-  ProjectError,
+  ProjectError 
 } from "../types";
-import { mockProjects } from "../../../infrastructure/mock";
-import { Result, success, failure } from "../../../shared/utils/functional";
+import { success, failure, Result } from "../../../shared/utils/functional";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-
-// Local state for mocks to allow updates during the session
-let localMockProjects = [...mockProjects];
-
+const mapError = (error: any, id?: string): ProjectError => {
+  if (error?.response) {
+    const status = error.response.status;
+    const message = error.response.data?.message || error.message || "API error";
+    if (status === 404) {
+      return { _tag: "NotFound", id: id || "" };
+    }
+    if (status === 401 || status === 403) {
+      return { _tag: "Unauthorized" };
+    }
+    if (status === 400) {
+      return { _tag: "ValidationError", errors: error.response.data?.errors || [message] };
+    }
+    return { _tag: "ServerError", message };
+  }
+  return { _tag: "UnknownError", original: error };
+};
 
 export const projectsApi = {
-  getProjects: async (): Promise<Result<ProyectoDto[], ProjectError>> => {
+  async getProjects(): Promise<Result<ProyectoDto[], ProjectError>> {
     try {
-      if (USE_MOCK) {
-        return new Promise((resolve) => 
-          setTimeout(() => resolve(success([...localMockProjects])), 500)
-        );
+      const response = await apiClient.get<ProyectoDto[]>("/projects");
+      return success(response.data);
+    } catch (error: any) {
+      const mapped = mapError(error);
+      if (mapped._tag === "UnknownError") {
+        return failure(mapped);
       }
-      const response = await fetch(`${API_BASE_URL}/projects`);
-      if (!response.ok) return failure({ _tag: "ServerError", message: "Failed to fetch projects" });
-      const data = await response.json();
-      return success(data);
-    } catch (e) {
-      return failure({ _tag: "UnknownError", original: e });
+      return failure({ _tag: "ServerError", message: error.message || "Server Error" });
     }
   },
 
-  getProjectById: async (id: string): Promise<Result<ProyectoDto, ProjectError>> => {
+  async getProjectById(id: string): Promise<Result<ProyectoDto, ProjectError>> {
     try {
-      if (USE_MOCK) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const project = localMockProjects.find((p) => p.id === id);
-            if (project) resolve(success({ ...project }));
-            else resolve(failure({ _tag: "NotFound", id }));
-          }, 300);
-        });
-      }
-      const response = await fetch(`${API_BASE_URL}/projects/${id}`);
-      if (response.status === 404) return failure({ _tag: "NotFound", id });
-      if (!response.ok) return failure({ _tag: "ServerError", message: "Failed to fetch project" });
-      const data = await response.json();
-      return success(data);
-    } catch (e) {
-      return failure({ _tag: "UnknownError", original: e });
+      const response = await apiClient.get<ProyectoDto>(`/projects/${id}`);
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error, id));
     }
   },
 
-  createProject: async (data: CreateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> => {
+  async createProject(data: CreateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
     try {
-      if (USE_MOCK) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const newProject: ProyectoDto = {
-              id: `proj-${Math.random().toString(36).substr(2, 9)}`,
-              codigoInterno: `VF-NEW-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
-              nombre: data.nombre,
-              ubicacionTexto: data.ubicacionTexto,
-              categoria: data.categoria || 1, // Default to Residencial
-              datosDesarrollador: data.datosDesarrollador,
-              designacionCatastral: data.designacionCatastral,
-              estadoProyecto: ProjectStatus.Draft,
-              estadoIntegridad: IntegrityStatus.Pending,
-              usuarioCreadorId: data.usuarioCreadorId,
-              createdAtUtc: new Date().toISOString(),
-            };
-            localMockProjects.push(newProject);
-            resolve(success({ ...newProject }));
-          }, 500);
-        });
+      const payload = {
+        ...data,
+        estadoProyecto: ProjectStatus.Draft,
+        estadoIntegridad: IntegrityStatus.Pending,
+      };
+      const response = await apiClient.post<ProyectoDto>("/projects", payload);
+      return success(response.data);
+    } catch (error: any) {
+      const mapped = mapError(error);
+      if (mapped._tag === "ServerError") {
+        return failure(mapped);
       }
-      const response = await fetch(`${API_BASE_URL}/projects`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) return failure({ _tag: "ServerError", message: "Failed to create project" });
-      const result = await response.json();
-      return success(result);
-    } catch (e) {
-      return failure({ _tag: "UnknownError", original: e });
+      return failure({ _tag: "ServerError", message: error.message || "Server Error" });
     }
   },
 
-  updateProject: async (
-    id: string,
-    data: UpdateProyectoDto,
-  ): Promise<Result<ProyectoDto, ProjectError>> => {
+  async updateProject(id: string, data: UpdateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
     try {
-      if (USE_MOCK) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const index = localMockProjects.findIndex((p) => p.id === id);
-            if (index !== -1) {
-              localMockProjects[index] = {
-                ...localMockProjects[index],
-                ...data,
-                updatedAtUtc: new Date().toISOString(),
-              };
-              resolve(success({ ...localMockProjects[index] }));
-            } else {
-              resolve(failure({ _tag: "NotFound", id }));
-            }
-          }, 500);
-        });
-      }
-      const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) return failure({ _tag: "ServerError", message: "Failed to update project" });
-      const result = await response.json();
-      return success(result);
-    } catch (e) {
-      return failure({ _tag: "UnknownError", original: e });
+      const response = await apiClient.put<ProyectoDto>(`/projects/${id}`, data);
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error, id));
     }
   },
 
-  updateProjectStatus: async (
-    id: string,
-    status: ProjectStatus,
-  ): Promise<Result<ProyectoDto, ProjectError>> => {
-    try {
-      if (USE_MOCK) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const index = localMockProjects.findIndex((p) => p.id === id);
-            if (index !== -1) {
-              localMockProjects[index] = {
-                ...localMockProjects[index],
-                estadoProyecto: status,
-                updatedAtUtc: new Date().toISOString(),
-              };
-              resolve(success({ ...localMockProjects[index] }));
-            } else {
-              resolve(failure({ _tag: "NotFound", id }));
-            }
-          }, 500);
-        });
-      }
-      const response = await fetch(`${API_BASE_URL}/projects/${id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(status),
-      });
-      if (!response.ok) return failure({ _tag: "ServerError", message: "Failed to update status" });
-      const result = await response.json();
-      return success(result);
-    } catch (e) {
-      return failure({ _tag: "UnknownError", original: e });
+  async updateProjectStatus(id: string, status: ProjectStatus): Promise<Result<ProyectoDto, ProjectError>> {
+    if (!Object.values(ProjectStatus).includes(status) || typeof status !== "number") {
+      throw new Error("Invalid project status");
     }
-  },
+    try {
+      const apiStatus = status === ProjectStatus.Published ? "Activo" : "Pendiente";
+      const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, { status: apiStatus });
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error, id));
+    }
+  }
 };

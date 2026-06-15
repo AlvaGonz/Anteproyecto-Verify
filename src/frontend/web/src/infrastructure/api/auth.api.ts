@@ -12,8 +12,8 @@ export interface LoginResponse {
 
 export const authApi = {
   login: (body: LoginRequest) =>
-    apiClient.post<LoginResponse>("/auth/login", body).then((r) => r.data),
-  logout: () => apiClient.post("/auth/logout").then((r) => r.data),
+    apiClient.post<LoginResponse>("/auth/login", body).then((r: { data: LoginResponse }) => r.data),
+  logout: () => apiClient.post("/auth/logout").then((r: { data: unknown }) => r.data),
   refresh: () =>
-    apiClient.post<LoginResponse>("/auth/refresh", {}, { withCredentials: true }).then((r) => r.data),
+    apiClient.post<LoginResponse>("/auth/refresh", {}, { withCredentials: true }).then((r: { data: LoginResponse }) => r.data),
 };

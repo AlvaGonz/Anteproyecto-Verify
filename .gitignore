@@ -10,6 +10,12 @@ node_modules/
 dist/
 .env
 .env.local
+.env.development
+.env.staging
+.env.production
+# pnpm is the only allowed package manager — block npm/yarn lockfiles
+package-lock.json
+yarn.lock
 
 # OS
 .DS_Store
@@ -21,3 +27,7 @@ Thumbs.db
 # .txt
 
 # /Bots
+
+# Agent Sessions
+.agents/sessions/
+!.agents/sessions/.gitkeep

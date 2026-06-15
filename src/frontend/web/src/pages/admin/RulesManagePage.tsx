@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { rulesApi, ReglaValidacionDto, CreateRuleCommand } from "../../features/rules/api/rulesApi";
+import React, { useState } from "react";
+import { useRules, useCreateRule, useToggleRule, CreateRuleCommand, ReglaValidacionDto } from "../../features/rules/api/useRules";
 import { 
   Plus, 
   Power, 
@@ -20,9 +20,18 @@ import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 
 export const RulesManagePage: React.FC = () => {
   const { addToast } = useToast();
-  const [rules, setRules] = useState<ReglaValidacionDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  // error state removed as it is never read
+  const { data: rawRules = [], isLoading: loading } = useRules();
+  const createRuleMutation = useCreateRule();
+  const toggleRuleMutation = useToggleRule();
+
+  const rules = React.useMemo(() => {
+    return rawRules.map((r: any) => ({
+      ...r,
+      id: String(r.idRegla || r.id),
+      activa: r.activa ?? r.isActive,
+    })) as unknown as ReglaValidacionDto[];
+  }, [rawRules]);
+
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -35,27 +44,10 @@ export const RulesManagePage: React.FC = () => {
     tipoProyecto: 1,
   });
 
-  const fetchRules = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("token") || "";
-      const data = await rulesApi.getRules(token);
-      setRules(data);
-    } catch (err: any) {
-      console.error(err.message || "Error al conectar con el servidor de inteligencia");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { fetchRules(); }, []);
-
   const handleToggle = async (id: string, currentName: string, isActivating: boolean) => {
     try {
-      const token = localStorage.getItem("token") || "";
-      await rulesApi.toggleRule(id, token);
+      await toggleRuleMutation.mutateAsync(id);
       addToast(`Regla "${currentName}" ${isActivating ? 'activada' : 'desactivada'}`, isActivating ? "success" : "info");
-      await fetchRules();
     } catch (err: any) {
       addToast(err.message, "error");
     }
@@ -64,8 +56,7 @@ export const RulesManagePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token") || "";
-      await rulesApi.createRule(formData, token);
+      await createRuleMutation.mutateAsync(formData);
       addToast("Parámetro de validación creado correctamente", "success");
       setShowForm(false);
       setFormData({ 
@@ -76,7 +67,6 @@ export const RulesManagePage: React.FC = () => {
         nivelAlerta: 2, 
         tipoProyecto: 1 
       });
-      await fetchRules();
     } catch (err: any) {
       addToast(err.message, "error");
     }
@@ -131,7 +121,9 @@ export const RulesManagePage: React.FC = () => {
         {[
           { label: 'Reglas Activas', value: rules.filter(r => r.activa).length, icon: Zap, color: 'text-primary' },
           { label: 'Criticas', value: rules.filter(r => r.nivelAlerta === "Critica").length, icon: AlertOctagon, color: 'text-error' },
+          // ⚠️ HUMAN REVIEW: Mock value
           { label: 'Consistencia', value: '98.4%', icon: CheckCircle2, color: 'text-success' },
+          // ⚠️ HUMAN REVIEW: Mock value
           { label: 'Versión Motor', value: 'v2.4.0', icon: Settings2, color: 'text-secondary' },
         ].map((stat, i) => (
           <motion.div

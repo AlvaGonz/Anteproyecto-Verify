@@ -1,3 +1,4 @@
+// @deprecated — Use features/projects/api/projectsApi.ts. This file will be deleted in the next cleanup sprint.
 import apiClient from "./client";
 
 export interface ProjectSummary {
@@ -10,7 +11,7 @@ export interface ProjectSummary {
 }
 
 export const projectsApi = {
-  list: () => apiClient.get<ProjectSummary[]>("/projects").then((r) => r.data),
+  list: () => apiClient.get<ProjectSummary[]>("/projects").then((r: { data: ProjectSummary[] }) => r.data),
   getById: (id: string) =>
-    apiClient.get<ProjectSummary>(`/projects/${id}`).then((r) => r.data),
+    apiClient.get<ProjectSummary>(`/projects/${id}`).then((r: { data: ProjectSummary }) => r.data),
 };

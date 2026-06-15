@@ -19,7 +19,7 @@ export const LandingNav: React.FC = () => {
     >
       <Link to="/" className="flex items-center group">
         <img
-          src="/brand/logotipo/LOGOTIPO.svg"
+          src="/brand/logotipo/LOGOTIPO.optimized.svg"
           alt="VeriFinca"
           className="h-10 w-auto group-hover:scale-105 transition-transform"
         />

@@ -25,40 +25,35 @@ export type AuthError =
   | { _tag: "NetworkError"; message: string }
   | { _tag: "UnknownError"; original: unknown };
 
+
 export const AuthService = {
   async login(email: string, password: string): Promise<Result<AuthResponse, AuthError>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          if (email === "admin@verifinca.com" && password === "admin123") {
-            resolve(success({
-              user: {
-                id: "1",
-                email: "admin@verifinca.com",
-                name: "Administrador VeriFinca",
-                role: "admin",
-              },
-              token: "mock-jwt-token",
-            }));
-          } else if (email.includes("error")) {
-            resolve(failure({ _tag: "NetworkError", message: "Error de conexión con el servidor" }));
-          } else {
-            // Allow any login for demo but simulate credential check
-            resolve(success({
-              user: {
-                id: "2",
-                email: email,
-                name: "Usuario Demo",
-                role: "user",
-              },
-              token: "mock-jwt-token",
-            }));
-          }
-        } catch (e) {
-          resolve(failure({ _tag: "UnknownError", original: e }));
+    try {
+      const response = await fetch(`${env.API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          return failure({ _tag: "InvalidCredentials" });
         }
-      }, 1000);
-    });
+        const errorData = await response.json().catch(() => ({ message: "Error al iniciar sesión" }));
+        return failure({ _tag: "NetworkError", message: errorData.message || "Error al iniciar sesión" });
+      }
+
+      const data = await response.json();
+      return success({
+        user: data.user,
+        token: "real-cookie-session"
+      });
+    } catch (e) {
+      return failure({ _tag: "UnknownError", original: e });
+    }
   },
 
   async register(
@@ -69,25 +64,20 @@ export const AuthService = {
     telefono?: string,
     cedula?: string
   ): Promise<Result<{ message: string; usuarioId?: string }, AuthError>> {
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-    if (USE_MOCK) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(success({
-            message: "Usuario registrado exitosamente (Mock).",
-            usuarioId: "mock-new-user-guid"
-          }));
-        }, 1000);
-      });
-    }
-
     try {
       const response = await fetch(`${env.API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ nombre, apellido, email, password, telefono, cedula })
+        body: JSON.stringify({ 
+          Nombre: nombre, 
+          Apellido: apellido, 
+          Email: email, 
+          Password: password, 
+          Telefono: telefono ?? "", 
+          Cedula: cedula ?? "" 
+        })
       });
 
       if (!response.ok) {
@@ -103,61 +93,28 @@ export const AuthService = {
   },
 
   async logout(): Promise<void> {
-    localStorage.removeItem("vf_token");
-    return new Promise((resolve) => {
-      setTimeout(resolve, 500);
-    });
+    try {
+      await fetch(`${env.API_URL}/api/auth/logout`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+    } catch {
+      // Ignore errors on logout
+    }
   },
 
   async getCurrentUser(): Promise<Option<User>> {
-    const token = localStorage.getItem("vf_token");
-    if (!token) return none();
-    
-    // Simulate fetching user from session
-    return some({
-      id: "1",
-      email: "admin@verifinca.com",
-      name: "Administrador VeriFinca",
-      role: "admin",
-    });
-  },
-
-  async registerAccount(params: {
-    email: string;
-    name: string;
-    telefono?: string;
-    cedula?: string;
-  }): Promise<Result<{ message: string }, AuthError>> {
-    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-
     try {
-      const response = await fetch(`${API_BASE}/email-test/uc-01-account-verification`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: params.email,
-          name: params.name,
-          telefono: params.telefono,
-          cedula: params.cedula,
-        }),
+      const response = await fetch(`${env.API_URL}/api/auth/me`, {
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
       });
-
-      if (!response.ok) {
-        let errorMsg = `Error ${response.status}: No se pudo enviar el correo de verificación.`;
-        try {
-          const errorJson = await response.json();
-          if (errorJson?.error) {
-            errorMsg = errorJson.error;
-          }
-        } catch {
-          /* ignore parse errors */
-        }
-        return failure({ _tag: "NetworkError", message: errorMsg });
-      }
-
-      return success({ message: "Cuenta registrada exitosamente." });
-    } catch (e) {
-      return failure({ _tag: "UnknownError", original: e });
+      if (!response.ok) return none();
+      const user = await response.json();
+      return some(user);
+    } catch {
+      return none();
     }
   }
 };

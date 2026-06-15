@@ -52,4 +52,10 @@ public class Usuario : EntityBase
         Cedula = cedula;
         UpdatedAtUtc = DateTime.UtcNow;
     }
+
+    public void UpdateRol(UserRole rol)
+    {
+        Rol = rol;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
 }
