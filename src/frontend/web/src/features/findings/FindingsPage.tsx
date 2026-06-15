@@ -37,7 +37,7 @@ export const FindingsPage = () => {
       title: f.titulo,
       description: f.descripcion,
       severity: severityMap[f.severidad] || FindingSeverity.MEDIUM,
-      source: "Internal", // Mocked source as API doesn't have it
+      source: "Internal", // ⚠️ HUMAN REVIEW: Mocked source as API doesn't have it
       date: f.fechaDeteccion,
       status: statusMap[f.estado] || FindingStatus.PENDING,
     }));
@@ -61,7 +61,7 @@ export const FindingsPage = () => {
       medium,
       low,
       resolved,
-      integrityScore: 84, // Hardcoded placeholder
+      integrityScore: 84, // ⚠️ HUMAN REVIEW: Hardcoded placeholder
       integrityTrend: -4,
     };
   }, [mappedFindings]);

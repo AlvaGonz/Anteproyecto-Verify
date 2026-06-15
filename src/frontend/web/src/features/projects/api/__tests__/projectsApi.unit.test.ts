@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { projectsApi } from "../projectsApi";
 import {
   ProjectStatus,
@@ -11,7 +11,7 @@ vi.mock("../../../../infrastructure/api/client", () => {
   return {
     apiClient: {
       get: vi.fn().mockImplementation(async (url: string) => {
-        const res = await global.fetch(`http://localhost:5000/api${url}`, { method: "GET" });
+        const res = await globalThis.fetch(`http://localhost:5000/api${url}`, { method: "GET" });
         const data = await res.json();
         if (!res.ok) {
           throw { response: { status: res.status, data } };
@@ -19,7 +19,7 @@ vi.mock("../../../../infrastructure/api/client", () => {
         return { data };
       }),
       post: vi.fn().mockImplementation(async (url: string, body: any) => {
-        const res = await global.fetch(`http://localhost:5000/api${url}`, {
+        const res = await globalThis.fetch(`http://localhost:5000/api${url}`, {
           method: "POST",
           body: JSON.stringify(body),
         });
@@ -30,7 +30,7 @@ vi.mock("../../../../infrastructure/api/client", () => {
         return { data };
       }),
       put: vi.fn().mockImplementation(async (url: string, body: any) => {
-        const res = await global.fetch(`http://localhost:5000/api${url}`, {
+        const res = await globalThis.fetch(`http://localhost:5000/api${url}`, {
           method: "PUT",
           body: JSON.stringify(body),
         });
@@ -41,7 +41,7 @@ vi.mock("../../../../infrastructure/api/client", () => {
         return { data };
       }),
       patch: vi.fn().mockImplementation(async (url: string, body: any) => {
-        const res = await global.fetch(`http://localhost:5000/api${url}`, {
+        const res = await globalThis.fetch(`http://localhost:5000/api${url}`, {
           method: "PATCH",
           body: JSON.stringify(body),
         });
@@ -85,7 +85,7 @@ const MOCK_UPDATE_DTO = {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function mockFetch(status: number, body: unknown) {
-  global.fetch = vi.fn().mockResolvedValue({
+  globalThis.fetch = vi.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
     status,
     json: async () => body,
@@ -93,7 +93,7 @@ function mockFetch(status: number, body: unknown) {
 }
 
 function mockFetchReject(error: Error) {
-  global.fetch = vi.fn().mockRejectedValue(error);
+  globalThis.fetch = vi.fn().mockRejectedValue(error);
 }
 
 // Force USE_MOCK=false so tests exercise the real fetch path
@@ -148,7 +148,7 @@ describe("projectsApi — CREATE", () => {
     mockFetch(200, created);
     const result = await projectsApi.createProject(MOCK_CREATE_DTO);
     expect(result).toMatchObject({ _tag: "Success", data: { id: "proj-new" } });
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:5000/api/projects",
       expect.objectContaining({ method: "POST" })
     );
@@ -163,7 +163,7 @@ describe("projectsApi — CREATE", () => {
   it("createProject — sends correct JSON body", async () => {
     mockFetch(200, { ...MOCK_PROJECT, ...MOCK_CREATE_DTO });
     await projectsApi.createProject(MOCK_CREATE_DTO);
-    const callArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+    const callArgs = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls;
     const body = JSON.parse(callArgs[0][1].body);
     expect(body.nombre).toBe("Nuevo Proyecto Test");
     expect(body.usuarioCreadorId).toBe("user-001");
@@ -178,7 +178,7 @@ describe("projectsApi — UPDATE", () => {
     mockFetch(200, updated);
     const result = await projectsApi.updateProject("proj-001", MOCK_UPDATE_DTO);
     expect(result).toMatchObject({ _tag: "Success", data: { nombre: "Proyecto Actualizado" } });
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:5000/api/projects/proj-001",
       expect.objectContaining({ method: "PUT" })
     );
@@ -198,7 +198,7 @@ describe("projectsApi — UPDATE", () => {
       _tag: "Success",
       data: { estadoProyecto: ProjectStatus.InReview },
     });
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:5000/api/projects/proj-001/status",
       expect.objectContaining({ method: "PATCH" })
     );

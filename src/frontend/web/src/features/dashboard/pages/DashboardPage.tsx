@@ -149,6 +149,7 @@ export const DashboardPage: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-black text-secondary uppercase tracking-widest">Salud Promedio</span>
+                {/* ⚠️ HUMAN REVIEW: Mock value */}
                 <span className="text-lg font-display font-black text-success leading-none">94.2%</span>
               </div>
               <div className="w-10 h-10 rounded-full border-2 border-success/30 flex items-center justify-center">

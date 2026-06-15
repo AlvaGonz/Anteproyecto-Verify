@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { LandingPage } from "../LandingPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, vi } from "vitest";
 
 // Mock framer-motion to avoid animation issues in tests
@@ -19,11 +20,15 @@ vi.mock("framer-motion", async () => {
 });
 
 describe("LandingPage", () => {
+  const queryClient = new QueryClient();
+  
   const renderPage = () => {
     return render(
-      <BrowserRouter>
-        <LandingPage />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <LandingPage />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   };
 

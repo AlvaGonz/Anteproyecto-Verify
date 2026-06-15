@@ -1,6 +1,5 @@
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProjectManagePage } from "../ProjectManagePage";
 import { projectsApi } from "../../../features/projects/api/projectsApi";
 import { useProject, useCreateProject } from "../../../features/projects/api/useProjects";
@@ -9,6 +8,10 @@ import { ProjectStatus, IntegrityStatus, ProyectoDto } from "../../../features/p
 import { success, failure } from "../../../shared/utils/functional";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: (key: string, defaultValue: string) => defaultValue || key }),
+}));
 
 // Setup router mocks
 const mockNavigate = vi.fn();
@@ -180,7 +183,7 @@ describe("ProjectManagePage", () => {
         codigoInterno: "PRJ-new",
         nombre: "Test Project",
         ubicacionTexto: "Santo Domingo",
-        categoria: ProjectStatus.Draft,
+        categoria: ProjectCategory.Residencial,
         estadoProyecto: ProjectStatus.Draft,
         estadoIntegridad: IntegrityStatus.Pending,
         usuarioCreadorId: "user-123",
@@ -209,7 +212,7 @@ describe("ProjectManagePage", () => {
         codigoInterno: "PRJ-new",
         nombre: "Test Project",
         ubicacionTexto: "Santo Domingo",
-        categoria: ProjectStatus.Draft,
+        categoria: ProjectCategory.Residencial,
         estadoProyecto: ProjectStatus.Draft,
         estadoIntegridad: IntegrityStatus.Pending,
         usuarioCreadorId: "user-123",
@@ -265,7 +268,7 @@ describe("ProjectManagePage", () => {
 
     beforeEach(() => {
       mockParams = { id: "proj-001" };
-      vi.mocked(apiClient.put).mockImplementation(async (url, payload) => {
+      vi.mocked(apiClient.put).mockImplementation(async (_url, payload: any) => {
         const result = await projectsApi.updateProject("proj-001", payload);
         if (result._tag === "Success") return { data: result.data };
         throw new Error(result.error._tag);
@@ -281,7 +284,7 @@ describe("ProjectManagePage", () => {
     it("shows loading state while fetching", () => {
       vi.mocked(useProject).mockReturnValue({ data: undefined, isLoading: true } as any);
       renderPage();
-      expect(screen.getByText(/Cargando formulario.../i)).toBeInTheDocument();
+      expect(screen.getByTestId("project-form-skeleton")).toBeInTheDocument();
     });
 
     it("navigates to /admin/projects and shows error if getProjectById fails", () => {
@@ -398,7 +401,7 @@ describe("ProjectManagePage", () => {
     beforeEach(() => {
       mockParams = { id: "proj-001" };
       vi.mocked(useProject).mockReturnValue({ data: mockExisting, isLoading: false } as any);
-      vi.mocked(apiClient.patch).mockImplementation(async (url, payload) => {
+      vi.mocked(apiClient.patch).mockImplementation(async (url, payload: any) => {
         const parts = url.split("/");
         const id = parts[2];
         const statusStr = payload.status;
@@ -411,10 +414,10 @@ describe("ProjectManagePage", () => {
 
     it("renders all four status buttons when project is loaded", () => {
       renderPage();
-      expect(screen.getByRole("button", { name: "Draft" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "InReview" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Published" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Observed" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "status.draft" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "status.inReview" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "status.published" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "status.observed" })).toBeInTheDocument();
     });
 
     it("calls updateProjectStatus with correct status on button click", async () => {
@@ -422,7 +425,7 @@ describe("ProjectManagePage", () => {
       vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue(success(mockUpdated));
 
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Published" }));
+      fireEvent.click(screen.getByRole("button", { name: "status.published" }));
 
       await waitFor(() => {
         expect(projectsApi.updateProjectStatus).toHaveBeenCalledWith(
@@ -437,7 +440,7 @@ describe("ProjectManagePage", () => {
       vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue(success(mockUpdated));
 
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "InReview" }));
+      fireEvent.click(screen.getByRole("button", { name: "status.inReview" }));
 
       await waitFor(() => {
         expect(mockAddToast).toHaveBeenCalledWith("Estado actualizado exitosamente", "success");
@@ -450,7 +453,7 @@ describe("ProjectManagePage", () => {
       );
 
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Published" }));
+      fireEvent.click(screen.getByRole("button", { name: "status.published" }));
 
       await waitFor(() => {
         expect(mockAddToast).toHaveBeenCalledWith("Error al actualizar el estado", "error");

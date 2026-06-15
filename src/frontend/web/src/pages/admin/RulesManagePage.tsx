@@ -121,7 +121,9 @@ export const RulesManagePage: React.FC = () => {
         {[
           { label: 'Reglas Activas', value: rules.filter(r => r.activa).length, icon: Zap, color: 'text-primary' },
           { label: 'Criticas', value: rules.filter(r => r.nivelAlerta === "Critica").length, icon: AlertOctagon, color: 'text-error' },
+          // ⚠️ HUMAN REVIEW: Mock value
           { label: 'Consistencia', value: '98.4%', icon: CheckCircle2, color: 'text-success' },
+          // ⚠️ HUMAN REVIEW: Mock value
           { label: 'Versión Motor', value: 'v2.4.0', icon: Settings2, color: 'text-secondary' },
         ].map((stat, i) => (
           <motion.div

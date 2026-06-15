@@ -48,7 +48,7 @@ export const VerificationResultCard: React.FC<VerificationResultCardProps> = ({
 
   const status = getStatus();
 
-  // Mock validation items if not present
+  // ⚠️ HUMAN REVIEW: Mock validation items if not present
   const validationItems = [
     { label: "Titularidad de Tierra", checked: true },
     { label: "Permisos Ambientales", checked: true },

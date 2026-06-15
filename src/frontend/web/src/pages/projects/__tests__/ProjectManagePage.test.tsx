@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -41,13 +41,16 @@ const wrapApiCall = (fn: any) => {
   };
 };
 
-vi.mock("../../../features/projects/api/useProjects", () => {
-  const { useEffect, useState } = require("react");
-  const { useNavigate } = require("react-router-dom");
+vi.mock("../../../features/projects/api/useProjects", async () => {
+  const react = await vi.importActual<any>("react");
+  const router = await vi.importActual<any>("react-router-dom");
+  const useEffect = react.useEffect;
+  const useState = react.useState;
+  const useNavigate = router.useNavigate;
   return {
     useProject: (id: string) => {
       const navigate = useNavigate();
-      const [data, setData] = useState<any>(undefined);
+      const [data, setData] = useState(undefined as any);
       const [isLoading, setIsLoading] = useState(true);
 
       useEffect(() => {
@@ -278,7 +281,7 @@ describe("ProjectManagePage — EDIT mode", () => {
   it("shows loading state while fetching", () => {
     vi.mocked(projectsApi.getProjectById).mockReturnValue(new Promise(() => {})); // never resolves
     renderEdit();
-    expect(screen.getByText(/Cargando formulario/i)).toBeInTheDocument();
+    expect(screen.getByTestId("project-form-skeleton")).toBeInTheDocument();
   });
 
   it("navigates to /admin/projects when getProjectById returns NotFound", async () => {
