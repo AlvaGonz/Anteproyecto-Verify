@@ -4,150 +4,166 @@
 > Auto-generated skill from repository analysis
 
 ## Overview
-
-This skill teaches the core development patterns and workflows used in the Anteproyecto-Verify repository, a TypeScript project built with the Vite framework. It covers coding conventions, commit style, workflow automation, dependency management, and testing approaches. By following these guidelines, contributors can ensure consistency, maintainability, and security throughout the codebase.
+This skill outlines the core development patterns, coding conventions, and collaborative workflows for the Anteproyecto-Verify repository. The project is a TypeScript codebase built with Vite, emphasizing modular skills and workflows for agent-based systems. It follows conventional commit standards, enforces consistent code style, and integrates robust testing and security practices.
 
 ## Coding Conventions
 
-**File Naming**
-- Use camelCase for file names.
-  - Example: `userProfile.ts`, `authService.test.ts`
-
-**Import Style**
-- Use relative imports for internal modules.
-  - Example:
-    ```typescript
-    import { validateUser } from './utils/validateUser';
-    ```
-
-**Export Style**
-- Prefer named exports.
-  - Example:
-    ```typescript
-    // In userService.ts
-    export function getUser(id: string) { ... }
-    export const USER_ROLE = 'admin';
-    ```
-
-**Commit Messages**
-- Use [Conventional Commits](https://www.conventionalcommits.org/).
-- Prefixes: `feat`, `fix`, `ci`, `chore`
-- Example:
+- **File Naming:**  
+  Use `camelCase` for file names.  
+  _Example:_  
   ```
-  feat(auth): add JWT token validation to login flow
-  fix(profile): correct avatar rendering on mobile
+  agentScanner.ts
+  skillRegistry.ts
+  ```
+
+- **Import Style:**  
+  Always use relative imports.  
+  _Example:_  
+  ```typescript
+  import { scanAgent } from './agentScanner';
+  ```
+
+- **Export Style:**  
+  Use named exports for all modules.  
+  _Example:_  
+  ```typescript
+  // skillRegistry.ts
+  export function registerSkill(skill: Skill) { ... }
+  ```
+
+- **Commit Messages:**  
+  Follow [Conventional Commits](https://www.conventionalcommits.org/):  
+  - Prefixes: `feat`, `fix`, `refactor`, `ci`, `chore`, `test`
+  - Keep messages concise (average ~79 characters)
+  _Example:_  
+  ```
+  feat: add agent skill registry with dynamic loading
+  fix: correct scanner path resolution in agent workflow
   ```
 
 ## Workflows
 
-### Update Workflow Definition and Documentation
-**Trigger:** When adding or updating a workflow for agent automation  
-**Command:** `/update-workflow`
+### Add or Update Agent Skill
+**Trigger:** When introducing a new skill or updating an existing skill's logic or documentation  
+**Command:** `/add-skill`
 
-1. Edit or add workflow markdown file(s) in `.agents/workflows/`.
-2. Update `workflows.json` in `.agents/skills/antigravity-workflows/data/`.
-3. Update or create documentation in `.agents/skills/antigravity-workflows/docs/WORKFLOWS.md`.
-4. Update `skills-lock.json` if necessary.
-5. Commit all changes together to keep definitions, docs, and lock files in sync.
+1. Create or update `SKILL.md` in `.agents/skills/<skill-name>/`.
+2. Add or update supporting scripts (e.g., `scanner.mjs`, `registry.mjs`, `test-scanner.mjs`).
+3. Update or add reference files (`examples.md`, `findings.md`, `progress.md`, `task_plan.md`).
+4. Update documentation and templates as needed.
+5. If relevant, update workflows or integration points.
 
-**Example:**
-```bash
-# Add a new workflow
-vim .agents/workflows/new-agent-workflow.md
-
-# Update the JSON data
-vim .agents/skills/antigravity-workflows/data/workflows.json
-
-# Update documentation
-vim .agents/skills/antigravity-workflows/docs/WORKFLOWS.md
-
-# Update lockfile if needed
-vim skills-lock.json
-
-git add .
-git commit -m "feat(workflow): add new agent workflow and update docs"
+_Example file structure:_
+```
+.agents/skills/skillName/
+  ├── SKILL.md
+  ├── scripts/
+  │     ├── scanner.mjs
+  │     └── registry.mjs
+  ├── references/
+  │     ├── examples.md
+  │     └── findings.md
+  └── templates/
+        └── template.md
 ```
 
 ---
 
-### Security Pipeline CI Hardening
-**Trigger:** When improving CI security or updating action versions/hashes  
-**Command:** `/update-security-pipeline`
+### Update or Add Agent Workflow
+**Trigger:** When defining a new agent workflow or updating an existing workflow's steps or documentation  
+**Command:** `/add-workflow`
 
-1. Edit `.github/workflows/security-pipeline.yml` to pin or update action versions/hashes.
-2. Optionally add or update `.github/dependabot.yml` for automated dependency checks.
-3. Commit changes to ensure the CI pipeline is secure and up to date.
+1. Create or update workflow markdown files in `.agents/workflows/` or `.agent/workflows/`.
+2. Update `workflows.json` or similar data files if the workflow is referenced programmatically.
+3. Update `WORKFLOWS.md` or other summary documentation.
+4. If relevant, update skill documentation to reflect new workflow capabilities.
 
-**Example:**
+_Example:_
+```
+.agents/workflows/scan-and-report.md
+.agents/skills/skillName/data/workflows.json
+.agents/skills/skillName/docs/WORKFLOWS.md
+```
+
+---
+
+### Security Pipeline Hardening
+**Trigger:** When enhancing CI/CD security or updating security pipeline dependencies  
+**Command:** `/harden-security-pipeline`
+
+1. Update `.github/workflows/security-pipeline.yml` to pin or update action SHAs/tags.
+2. Add or update `dependabot.yml` for automated dependency updates.
+3. Update or add related documentation or workflow markdown files.
+4. Patch dependencies in `package.json` or `pnpm-lock.yaml` if needed.
+
+_Example:_
 ```yaml
 # .github/workflows/security-pipeline.yml
-- uses: actions/checkout@v4
-- uses: actions/setup-node@v3
-```
-```bash
-git add .github/workflows/security-pipeline.yml .github/dependabot.yml
-git commit -m "ci(security): pin action versions and update dependabot config"
+uses: actions/checkout@v3
 ```
 
 ---
 
-### Meta-Skill Orchestrator Update
-**Trigger:** When improving orchestrator logic or enforcing new execution rules  
-**Command:** `/update-meta-skill`
+### Codebase Audit and Refactor
+**Trigger:** When refactoring core configuration, cleaning up the codebase, or generating an audit  
+**Command:** `/codebase-audit`
 
-1. Edit `SKILL.md` in orchestrator and workflows directories.
-2. Update `.agents/loop-run-counter.txt` for loop/guardrail tracking.
-3. Commit changes to ensure orchestrator follows new rules.
+1. Refactor configuration files (e.g., migrate `vite.config.js` to `vite.config.ts`).
+2. Update `tsconfig` or related build configuration.
+3. Generate or update `AUDIT.md` with codebase health or audit results.
+4. Verify all tests pass and no legacy files remain.
 
-**Example:**
-```bash
-vim .agents/skills/antigravity-skill-orchestrator/SKILL.md
-vim .agents/skills/antigravity-workflows/SKILL.md
-vim .agents/loop-run-counter.txt
+_Example:_
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
 
-git add .
-git commit -m "chore(orchestrator): update SKILL docs and loop counter"
+export default defineConfig({
+  // Vite config options
+});
 ```
 
 ---
 
-### Dependency and Lockfile Update
-**Trigger:** When patching vulnerabilities or fixing dependency-related CI/build errors  
-**Command:** `/update-deps`
+### Dependency and Container Security Update
+**Trigger:** When patching vulnerabilities or improving Docker/container security  
+**Command:** `/update-dependencies`
 
-1. Edit `package.json` and/or `src/frontend/web/package.json` to update dependencies.
-2. Update `pnpm-lock.yaml` to reflect new dependency versions.
-3. Commit changes to lockfiles and related config.
+1. Update `package.json` and `pnpm-lock.yaml` to patch vulnerabilities.
+2. Update Dockerfiles and `docker-compose.yml` for improved security (e.g., run as non-root).
+3. Suppress or address security scanner warnings (e.g., `.semgrepignore`).
+4. Update related documentation or skill scripts if needed.
 
-**Example:**
-```bash
-pnpm update
-git add package.json pnpm-lock.yaml src/frontend/web/package.json
-git commit -m "fix(deps): update dependencies and lockfile for security patch"
+_Example:_
+```dockerfile
+# docker/Dockerfile
+FROM node:18-alpine
+USER node
 ```
 
 ## Testing Patterns
 
-- Test files use the `*.test.*` pattern (e.g., `userService.test.ts`).
-- The specific testing framework is not specified; check for `jest`, `vitest`, or similar in `package.json`.
-- Tests are colocated with source files or in dedicated test directories.
+- **Framework:** [Playwright](https://playwright.dev/)
+- **Test File Pattern:** All tests are placed in files matching `*.test.tsx`.
+- **Example Test:**
+  ```typescript
+  // agentScanner.test.tsx
+  import { test, expect } from '@playwright/test';
+  import { scanAgent } from './agentScanner';
 
-**Example:**
-```typescript
-// userService.test.ts
-import { getUser } from './userService';
-
-test('should fetch user by ID', () => {
-  expect(getUser('123')).toEqual({ id: '123', name: 'Alice' });
-});
-```
+  test('should scan agent successfully', async () => {
+    const result = await scanAgent('agent-123');
+    expect(result).toBeTruthy();
+  });
+  ```
 
 ## Commands
 
-| Command                  | Purpose                                                        |
-|--------------------------|----------------------------------------------------------------|
-| /update-workflow         | Add or update agent workflow definitions and documentation      |
-| /update-security-pipeline| Update and secure CI pipeline configurations                   |
-| /update-meta-skill       | Update orchestrator logic, docs, and guardrail tracking        |
-| /update-deps             | Update dependencies and lockfiles to patch vulnerabilities     |
+| Command                | Purpose                                                          |
+|------------------------|------------------------------------------------------------------|
+| /add-skill             | Add or update an agent skill, including documentation and scripts|
+| /add-workflow          | Create or modify agent workflows and documentation               |
+| /harden-security-pipeline | Harden CI/CD security and update pipeline dependencies        |
+| /codebase-audit        | Audit or refactor the codebase and update configuration          |
+| /update-dependencies   | Patch dependencies and harden container security                 |
 ```
