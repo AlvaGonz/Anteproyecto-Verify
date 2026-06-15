@@ -135,6 +135,23 @@ class SupplyChainValidator:
             }
         return {"valid": True, "hash": actual_hash}
 
+class ContextCompactor:
+    """Azure: 'Monitor accumulated context size and use compaction techniques.'"""
+    MAX_CONTEXT_CHARS = 12_000
+
+    def compact(self, context: str, guardrails: SecurityGuardrails = None) -> str:
+        if len(context) <= self.MAX_CONTEXT_CHARS:
+            return context
+        # Keep: XML-tagged sections. Truncate: raw diff.
+        sections = re.findall(r'<(DIFF|TASK|OUTPUT|CONSTITUTION)>(.*?)</\1>', context, re.DOTALL)
+        if not sections:
+            return context[:self.MAX_CONTEXT_CHARS]
+        compacted = ""
+        for tag, content in sections:
+            limit = 4000 if tag == "DIFF" else 2000
+            compacted += f"<{tag}>\n{content[:limit]}\n</{tag}>\n\n"
+        return compacted
+
 class DiffRouter:
     """Anthropic Routing Pattern: decide model complexity before expensive calls."""
 
@@ -174,6 +191,61 @@ class DiffRouter:
             "rationale": f"Score={complexity_score} → {'PRIMARY (security-sensitive patterns found)' if model == api_primary else 'FAST (low-risk changes)'}"
         }
 
+class AgentHandoffRouter:
+    """Azure Handoff Pattern: routes diff to specialist agents dynamically."""
+    
+    DOMAIN_PROMPTS = {
+        "auth": "You are the Auth Security Specialist. Focus EXCLUSIVELY on: "
+                "JWT validation, session management, cookie security, CSRF, OAuth flows. "
+                "Output MUST be in JSON format matching the schema: { 'issues': [ {'severity':'HIGH|MEDIUM|LOW', 'description':..., 'file':..., 'owasp_category':'AuthSecurity:<type>'} ] }",
+        "database": "You are the DB Security Specialist. Focus EXCLUSIVELY on: "
+                    "SQL injection, ORM misuse, raw queries, connection string exposure. "
+                    "Output MUST be in JSON format matching the schema: { 'issues': [ {'severity':'HIGH|MEDIUM|LOW', 'description':..., 'file':..., 'owasp_category':'SqlInjection:<type>'} ] }",
+        "infra": "You are the Infra Security Specialist. Focus EXCLUSIVELY on: "
+                 "subprocess calls, exec/eval, shell injection, path traversal, file permissions. "
+                 "Output MUST be in JSON format matching the schema: { 'issues': [ {'severity':'HIGH|MEDIUM|LOW', 'description':..., 'file':..., 'owasp_category':'InfraSecurity:<type>'} ] }",
+    }
+    
+    def detect_domains(self, diff: str) -> list:
+        domains = []
+        if re.search(r'(auth|jwt|token|session|cookie|login|refresh)', diff, re.IGNORECASE):
+            domains.append("auth")
+        if re.search(r'(sql|query|execute|cursor|orm|model\.)', diff, re.IGNORECASE):
+            domains.append("database")
+        if re.search(r'(subprocess|exec|eval|shell|__import__|os\.system)', diff, re.IGNORECASE):
+            domains.append("infra")
+        return domains
+
+    def run(self, call_llm_fn, context: str, routed_model: str, diff: str) -> list:
+        domains = self.detect_domains(diff)
+        combined_issues = []
+        for domain in domains:
+            sys_prompt = self.DOMAIN_PROMPTS[domain]
+            res = call_llm_fn(sys_prompt, context, f"HandoffRouter:{domain}", model=routed_model, json_mode=True, temperature=0.0)
+            issues = safe_parse_issues(res)
+            combined_issues.extend(issues)
+        return combined_issues
+
+class MagenticOrchestrator:
+    """Azure Magentic Pattern: builds minimal task ledger based on diff complexity."""
+    
+    def build_ledger(self, routing_decision: dict, diff: str) -> list:
+        complexity = routing_decision.get("complexity_score", 0)
+        ledger = ["Layer1:Tests", "Evaluator"]  # Always required
+        
+        if complexity >= 2:  # Security-sensitive
+            ledger += ["SecurityCritic", "ArchitectureCritic", "AdversarialReview"]
+        elif complexity >= 1:
+            ledger += ["Critic", "ArchitectureCritic"]
+        else:
+            ledger += ["Critic"]  # Minimal: low-risk change
+        
+        ledger.append("Archivist")  # Always final
+        return ledger
+    
+    def should_run_mutation_loop(self, high_issues: list) -> bool:
+        return len(high_issues) > 0
+
 def safe_parse_issues(res: str) -> list:
     try:
         data = json.loads(res)
@@ -188,7 +260,7 @@ def safe_parse_issues(res: str) -> list:
         return parsed
     except: return []
 
-def run_critics_parallel(call_llm, context, owasp_skill_content, routed_model):
+def run_critics_parallel(call_llm, context, owasp_skill_content, routed_model, ledger):
     """Anthropic Parallelization (Sectioning): independent critics run concurrently."""
     
     critic_tasks = {
@@ -218,11 +290,25 @@ def run_critics_parallel(call_llm, context, owasp_skill_content, routed_model):
         ),
     }
 
+    # Filter tasks based on ledger membership
+    name_map = {
+        "Critic": "Critic",
+        "SecurityCritic": "Security Critic",
+        "ArchitectureCritic": "Architecture Critic",
+    }
+    filtered_tasks = {
+        k: v for k, v in critic_tasks.items()
+        if any(ledger_name for ledger_name, mapped_key in name_map.items() if mapped_key == k and ledger_name in ledger)
+    }
+
     results = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+    if not filtered_tasks:
+        return results
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(filtered_tasks)) as executor:
         futures = {
             executor.submit(call_llm, sys_p, usr_p, name, model, True): name
-            for name, (sys_p, usr_p, model) in critic_tasks.items()
+            for name, (sys_p, usr_p, model) in filtered_tasks.items()
         }
         for future in concurrent.futures.as_completed(futures):
             name = futures[future]
@@ -265,9 +351,18 @@ def run_mutation_loop(call_llm, high_issues, context, diff_safe, max_iterations=
 
         # Validator independently verifies (with full context — ASI03)
         validator_sys = (
-            "You are the Validator. Independently verify proposed mutations against the original diff. "
-            "For each mutation: (1) Does it address the stated issue? (2) Does it introduce new risks? "
-            "Reply: VERDICT: YES|NO\nREASON: <brief>\nUNRESOLVED: <list any issues still not fixed>"
+            "You are the Validator. Independently verify proposed mutations against the original diff.\n"
+            "Apply the following 3-criteria validation rubric:\n"
+            "1. Resolution Integrity: Does the mutation fully resolve the root cause of all detected high-severity issues?\n"
+            "2. Regressional Safety: Does the mutation avoid introducing any new bugs, OWASP/ASI security risks, or vulnerabilities?\n"
+            "3. Architectural & Style Adherence: Does the mutation comply with clean architecture and project coding guidelines?\n\n"
+            "Provide an evaluation for each criteria and then output a final decision line.\n"
+            "Reply strictly in this format:\n"
+            "EVALUATION:\n"
+            "<your assessment of each criterion>\n\n"
+            "VERDICT: YES|NO\n"
+            "REASON: <brief explanation>\n"
+            "UNRESOLVED: <list any issues still not fixed>"
         )
         validator_prompt = (
             f"ORIGINAL DIFF:\n{diff_safe}\n\n"
@@ -526,6 +621,18 @@ GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL_PRIMARY = os.environ.get("GROQ_MODEL_PRIMARY", "llama-3.3-70b-versatile")
 MODEL_FAST = os.environ.get("GROQ_MODEL_FAST", "llama-3.1-8b-instant")
 
+AGENT_TEMPERATURES = {
+    "Evaluator": 0.0,       # Deterministic scoring
+    "Critic": 0.0,          # Deterministic criticism
+    "Security Critic": 0.0, # Deterministic security review
+    "Mutator": 0.4,         # Diverse fix proposals
+    "Validator": 0.0,       # Deterministic validation
+    "Archivist": 0.2,       # Slightly creative lesson extraction
+    "Adversarial:Saboteur": 0.5,  # Adversarial diversity
+    "Adversarial:NewHire": 0.4,
+    "Adversarial:SecurityAuditor": 0.0,
+}
+
 class TestSuiteRunner:
     """
     Layer 1 - Five-Layer Quality Gate (Kagin007).
@@ -781,7 +888,7 @@ def main():
     # Gather context at the very beginning
     diff_output = ""
     try:
-        diff_output = subprocess.check_output(["git", "diff", "HEAD"], text=True, stderr=subprocess.STDOUT)
+        diff_output = subprocess.check_output(["git", "diff", "HEAD"], encoding="utf-8", errors="replace", stderr=subprocess.STDOUT)
     except Exception:
         pass
 
@@ -860,7 +967,7 @@ def main():
     log_lock = threading.Lock()
 
     # Helper function to call Groq with integration of new guards
-    def call_llm(system_prompt, user_prompt, agent_name, model=MODEL_PRIMARY, json_mode=False):
+    def call_llm(system_prompt, user_prompt, agent_name, model=MODEL_PRIMARY, json_mode=False, temperature=None):
         # Prompt logging
         log_entry = {
             "timestamp": datetime.now().isoformat(),
@@ -880,6 +987,8 @@ def main():
         # Check budget & circuit breakers
         if not dow_guard.pre_call_check(len(system_prompt) + len(user_prompt)):
             return "{}" if json_mode else ""
+        if agent_name not in circuit_breakers:
+            circuit_breakers[agent_name] = CircuitBreaker()
         if not circuit_breakers[agent_name].allow_request():
             return "{}" if json_mode else ""
 
@@ -888,13 +997,18 @@ def main():
             "Content-Type": "application/json",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
+        
+        # Resolve temperature dynamically if not explicitly specified
+        if temperature is None:
+            temperature = AGENT_TEMPERATURES.get(agent_name, 0.1)
+            
         data = {
             "model": model,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            "temperature": 0.1
+            "temperature": temperature
         }
         if json_mode:
             data["response_format"] = {"type": "json_object"}
@@ -975,13 +1089,34 @@ def main():
     except Exception:
         pass
 
+    # Instantiate MagenticOrchestrator and build/log ledger
+    orchestrator = MagenticOrchestrator()
+    ledger = orchestrator.build_ledger(routing_decision, diff_redacted)
+
+    log_entry_ledger = {
+        "timestamp": datetime.now().isoformat(),
+        "agent": "MagenticOrchestrator",
+        "model": "rule-based",
+        "system": "Building task ledger",
+        "user": json.dumps({"ledger": ledger})
+    }
+    try:
+        log_file = os.path.join(session_path, "prompt-log.jsonl")
+        with log_lock:
+            with open(log_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(log_entry_ledger) + "\n")
+    except Exception:
+        pass
+
     # Wrap safe inputs in XML tags
     diff_safe = f"<DIFF>\n{diff_redacted[:8000]}\n</DIFF>"
     task_safe = f"<TASK>\n{task_sanitized}\n</TASK>"
     output_safe = f"<OUTPUT>\n{output_sanitized}\n</OUTPUT>"
+    constitution_safe = f"<CONSTITUTION>\n{agents_md}\n</CONSTITUTION>"
 
     # Context string
-    context = f"{task_safe}\n\n{output_safe}\n\n{diff_safe}\n\nCONSTITUTION:\n{agents_md}"
+    context = f"{task_safe}\n\n{output_safe}\n\n{diff_safe}\n\n{constitution_safe}"
+    context = ContextCompactor().compact(context, guardrails)
 
     # Agent 1: Evaluator
     evaluator_sys = "You are the Evaluator. Score the work 0-100 based on adherence to the Constitution, OWASP, and Clean Architecture. Output JSON with a 'score' integer."
@@ -1001,13 +1136,17 @@ def main():
     except Exception:
         pass
 
-    critic_results = run_critics_parallel(call_llm, context, owasp_skill_content, routed_model)
+    critic_results = run_critics_parallel(call_llm, context, owasp_skill_content, routed_model, ledger)
     issues_list1 = critic_results.get("Critic", [])
     issues_list2 = critic_results.get("Security Critic", [])
     issues_list3 = critic_results.get("Architecture Critic", [])
 
     # Combine issues
     issues_list.extend(issues_list1 + issues_list2 + issues_list3)
+
+    # Run handoff router for detected domains and extend issues_list
+    handoff_issues = AgentHandoffRouter().run(call_llm, context, routed_model, diff_redacted)
+    issues_list.extend(handoff_issues)
         
     # Verify issue files exist (Ground Truth, Step 3)
     issues_list = verify_issue_files_ground_truth(issues_list)
@@ -1032,25 +1171,40 @@ def main():
         verdict = "FAIL" if len(high_issues) > 0 else "PASS"
 
     # Layer 5: Adversarial Review
-    adversarial_agent = AdversarialReviewAgent()
-    adversarial_result = adversarial_agent.run(call_llm, context, routed_model)
-    # Add promoted issues to issues_list
-    issues_list.extend(adversarial_result.get("promoted_issues", []))
-    # Re-run ground truth after adding adversarial issues
-    issues_list = verify_issue_files_ground_truth(issues_list)
-    # Re-resolve high_issues and verdict
-    high_issues = [i for i in issues_list if i.get("severity") in ["HIGH", "CRITICAL"]]
-    verdict = "FAIL" if high_issues else "PASS"
+    if "AdversarialReview" in ledger:
+        adversarial_agent = AdversarialReviewAgent()
+        adversarial_result = adversarial_agent.run(call_llm, context, routed_model)
+        # Add promoted issues to issues_list
+        issues_list.extend(adversarial_result.get("promoted_issues", []))
+        # Re-run ground truth after adding adversarial issues
+        issues_list = verify_issue_files_ground_truth(issues_list)
+        # Re-resolve high_issues and verdict
+        high_issues = [i for i in issues_list if i.get("severity") in ["HIGH", "CRITICAL"]]
+        verdict = "FAIL" if high_issues else "PASS"
+    else:
+        adversarial_result = {
+            "persona_results": {},
+            "promoted_issues": [],
+            "block_verdict": "🟢 SKIPPED — (minimal complexity change)",
+            "personas_ran": []
+        }
 
     # Mutation loop (Step 4)
     mutations, validation, iteration_log = run_mutation_loop(
         call_llm, high_issues, context, diff_safe, max_iterations=3
     )
 
+    if high_issues:
+        normalized_val = validation.strip().upper()
+        if not ("VERDICT: YES" in normalized_val or normalized_val.startswith("YES") or "VERDICT:YES" in normalized_val):
+            verdict = "BLOCK"
+
     # Agent 5: Archivist
     archivist_sys = "You are the Archivist. Extract 1-3 generalized, short bullet-point lessons from these issues to avoid them in the future."
     archivist_prompt = f"ISSUES:\n{json.dumps(issues_list)}"
-    lessons = call_llm(archivist_sys, archivist_prompt, "Archivist", model=MODEL_PRIMARY) if issues_list else ""
+    lessons = ""
+    if "Archivist" in ledger and issues_list:
+        lessons = call_llm(archivist_sys, archivist_prompt, "Archivist", model=MODEL_PRIMARY)
 
     # Build trust metadata dictionary
     trust_metadata_dict = {
