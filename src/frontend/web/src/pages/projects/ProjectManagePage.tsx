@@ -99,8 +99,25 @@ export const ProjectManagePage: React.FC = () => {
 
   if (isEditing && loading) {
     return (
-      <div className="text-center py-12 text-[var(--color-text-strong)] opacity-60">
-        Cargando formulario...
+      <div className="max-w-4xl mx-auto p-4 animate-pulse">
+        <div className="mb-6 space-y-3">
+          <div className="h-8 bg-gray-200 rounded-md w-1/3"></div>
+          <div className="h-4 bg-gray-200 rounded-md w-1/2"></div>
+        </div>
+        <div className="vf-card p-6 space-y-5">
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-10 bg-gray-200 rounded-md w-full"></div>
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-10 bg-gray-200 rounded-md w-full"></div>
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-10 bg-gray-200 rounded-md w-full"></div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -117,6 +134,7 @@ export const ProjectManagePage: React.FC = () => {
       </div>
 
       <ProjectForm
+        key={project?.id || 'new'}
         initialData={project}
         onSubmit={handleSubmit}
         onCancel={() => navigate(isEditing ? `/projects/${id}` : "/admin/projects")}

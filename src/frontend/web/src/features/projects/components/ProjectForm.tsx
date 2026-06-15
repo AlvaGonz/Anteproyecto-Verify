@@ -24,6 +24,17 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    if (!nombre.trim()) {
+      setError("El Nombre del Proyecto es requerido.");
+      return;
+    }
+    if (!ubicacionTexto.trim()) {
+      setError("La Ubicación es requerida.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
     try {
@@ -57,7 +68,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   const fieldClass = "vf-input py-2.5";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto vf-card p-6">
+    <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto vf-card p-6" noValidate>
       {error && (
         <div className="p-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
           {error}
