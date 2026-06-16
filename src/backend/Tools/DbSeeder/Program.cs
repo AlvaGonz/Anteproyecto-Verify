@@ -41,15 +41,15 @@ try
             {
                 await db.Database.ExecuteSqlRawAsync(batch);
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore errors like already existing tables or constraints
+                logger.LogWarning(ex, "Error ignoring duplicate table or constraint in batch execution");
             }
         }
     }
-    catch
+    catch (Exception ex)
     {
-        // Fallback
+        logger.LogWarning(ex, "Fallback in case script generation fails");
     }
 
     await AppDbContextSeeder.SeedAsync(host.Services);

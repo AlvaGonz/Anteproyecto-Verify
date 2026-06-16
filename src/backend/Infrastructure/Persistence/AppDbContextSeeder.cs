@@ -266,6 +266,7 @@ public static class AppDbContextSeeder
                     {
                         Nombre = u.Nombre,
                         Apellido = u.Apellido,
+                        NombreCompleto = $"{u.Nombre} {u.Apellido}",
                         Email = u.Email,
                         ContrasenaHash = u.ContrasenaHash,
                         Telefono = u.Telefono,

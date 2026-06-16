@@ -9,23 +9,21 @@ using Application.Features.Auth.Commands.RegisterUser;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly RegisterUserCommandHandler _registerHandler;
-    private readonly IUsuarioRepository _usuarioRepository;
-    private readonly IPasswordHasher _passwordHasher;
+    private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
 
     public AuthController(
         RegisterUserCommandHandler registerHandler,
-        IUsuarioRepository usuarioRepository,
-        IPasswordHasher passwordHasher)
+        Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler)
     {
         _registerHandler = registerHandler;
-        _usuarioRepository = usuarioRepository;
-        _passwordHasher = passwordHasher;
+        _loginHandler = loginHandler;
     }
 
     [HttpPost("register")]
@@ -46,54 +44,39 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login([FromBody] Application.Features.Auth.Commands.LoginUser.LoginUserCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+        var result = await _loginHandler.Handle(request, cancellationToken);
+        if (!result.IsSuccess)
         {
-            return BadRequest(new { Message = "Email y contraseña son requeridos." });
+            return Unauthorized(new { Message = result.ErrorMessage });
         }
 
-        var user = await _usuarioRepository.GetByEmailAsync(request.Email, cancellationToken);
-        if (user == null || !user.Activo)
+        var responseData = result.Data;
+        if (responseData == null)
         {
-            return Unauthorized(new { Message = "Credenciales inválidas." });
+            return Unauthorized(new { Message = "Error al obtener datos de sesión." });
         }
 
-        bool isPasswordValid = _passwordHasher.VerifyPassword(request.Password, user.ContrasenaHash);
-        if (!isPasswordValid)
-        {
-            return Unauthorized(new { Message = "Credenciales inválidas." });
-        }
-
-        // Set token as Base64 of the email for identification
-        var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(user.CorreoElectronico));
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = Request.IsHttps, // Conditionally secure depending on protocol (HTTP vs HTTPS)
+            Secure = Request.IsHttps,
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddHours(2),
             Path = "/"
         };
-        Response.Cookies.Append("vf_token", token, cookieOptions);
-
-        string roleStr = user.Rol switch
-        {
-            UserRole.Administrator => "admin",
-            UserRole.Professional => "dev",
-            UserRole.Consultation => "validator",
-            _ => "user"
-        };
+        Response.Cookies.Append("vf_token", responseData.Token, cookieOptions);
 
         return Ok(new
         {
             Message = "Inicio de sesión exitoso.",
             User = new
             {
-                Id = user.Id.ToString(),
-                Email = user.CorreoElectronico,
-                Name = user.NombreCompleto,
-                Role = roleStr
+                Id = responseData.User.Id.ToString(),
+                Email = responseData.User.Email,
+                Name = responseData.User.Name,
+                Role = responseData.User.Role
             }
         });
     }
@@ -112,44 +95,27 @@ public class AuthController : ControllerBase
         return Ok(new { Message = "Sesión cerrada exitosamente." });
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
+    public IActionResult GetCurrentUser()
     {
-        var token = Request.Cookies["vf_token"];
-        if (string.IsNullOrEmpty(token))
+        var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub);
+        var emailClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Email) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email);
+        var nameClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Name) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Name);
+        var roleClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role);
+
+        if (string.IsNullOrEmpty(idClaim) || string.IsNullOrEmpty(emailClaim))
         {
-            return Unauthorized(new { Message = "No autenticado." });
+            return Unauthorized(new { Message = "Token inválido o incompleto." });
         }
 
-        try
+        return Ok(new
         {
-            var userEmail = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
-            var user = await _usuarioRepository.GetByEmailAsync(userEmail, cancellationToken);
-            if (user == null)
-            {
-                return Unauthorized(new { Message = "Usuario no encontrado." });
-            }
-
-            string roleStr = user.Rol switch
-            {
-                UserRole.Administrator => "admin",
-                UserRole.Professional => "dev",
-                UserRole.Consultation => "validator",
-                _ => "user"
-            };
-
-            return Ok(new
-            {
-                Id = user.Id.ToString(),
-                Email = user.CorreoElectronico,
-                Name = user.NombreCompleto,
-                Role = roleStr
-            });
-        }
-        catch (Exception)
-        {
-            return Unauthorized(new { Message = "Token inválido." });
-        }
+            Id = idClaim,
+            Email = emailClaim,
+            Name = nameClaim ?? string.Empty,
+            Role = roleClaim ?? "user"
+        });
     }
 
     [HttpPost("refresh")]
@@ -171,8 +137,4 @@ public class AuthController : ControllerBase
     }
 }
 
-public class LoginRequest
-{
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
+

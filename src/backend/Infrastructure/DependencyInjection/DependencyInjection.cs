@@ -18,16 +18,9 @@ public static class DependencyInjection
         services.Configure<AzureBlobOptions>(configuration.GetSection("AzureBlob"));
 
         var useMock = configuration.GetValue<bool>("UseMockData");
-        if (useMock)
-        {
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseInMemoryDatabase("VeriFincaMockDb"));
-        }
-        else
-        {
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-        }
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IBlobStorageService, AzureBlobStorageService>();
 
@@ -168,6 +161,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Commands.CreateRule.CreateRuleCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.ToggleRuleStatus.ToggleRuleStatusCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
+        services.AddSingleton<Application.Abstractions.Security.IJwtTokenGenerator, Infrastructure.Security.JwtTokenGenerator>();
         services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Infrastructure.Security.BCryptPasswordHasher>();
 
         // End of Infrastructure

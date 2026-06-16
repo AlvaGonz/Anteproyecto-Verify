@@ -14,7 +14,7 @@ public static class ApplicationBuilderExtensions
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseCors("AllowAll");
+        app.UseCors("ViteDev");
         
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
@@ -37,6 +37,8 @@ public static class ApplicationBuilderExtensions
             });
         });
 
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
 
         return app;

@@ -2,12 +2,55 @@ namespace Api.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Threading.Tasks;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
+        
+        var jwtSecret = configuration["Jwt:Key"]
+            ?? throw new InvalidOperationException("Jwt:Key is not configured in appsettings.");
+
+        var jwtIssuer = configuration["Jwt:Issuer"] ?? "VeriFinca";
+        var jwtAudience = configuration["Jwt:Audience"] ?? "VeriFincaUsers";
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+            };
+            
+            // Extract token from cookie vf_token if present
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    if (context.Request.Cookies.TryGetValue("vf_token", out var token))
+                    {
+                        context.Token = token;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
+
         services.AddProblemDetails();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -18,8 +61,8 @@ public static class ServiceCollectionExtensions
         
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll", builder =>
-                builder.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://localhost:3000", "https://localhost:3000")
+            options.AddPolicy("ViteDev", builder =>
+                builder.WithOrigins("http://localhost:5173", "http://localhost:3000")
                        .AllowAnyMethod()
                        .AllowAnyHeader()
                        .AllowCredentials());
