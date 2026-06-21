@@ -20,13 +20,13 @@ describe("ProjectForm", () => {
     const submitButton = screen.getByRole("button", { name: /Guardar/i });
 
     fireEvent.change(nameInput, { target: { value: "Nuevo Proyecto" } });
-    fireEvent.change(locationInput, { target: { value: "Nueva Ubicacion" } });
+    fireEvent.change(locationInput, { target: { value: "Distrito Nacional" } });
     fireEvent.click(submitButton);
 
     expect(handleSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         nombre: "Nuevo Proyecto",
-        ubicacionTexto: "Nueva Ubicacion",
+        ubicacionTexto: "Distrito Nacional",
       }),
     );
   });

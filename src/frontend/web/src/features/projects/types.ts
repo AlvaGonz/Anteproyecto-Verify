@@ -26,6 +26,7 @@ export interface CreateProyectoDto {
   categoria?: ProjectCategory;
   datosDesarrollador?: string;
   designacionCatastral?: string;
+  ubicacionGps?: string;
 }
 
 export interface UpdateProyectoDto {

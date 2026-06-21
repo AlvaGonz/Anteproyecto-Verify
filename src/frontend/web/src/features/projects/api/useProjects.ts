@@ -14,7 +14,11 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   codigoInterno: apiProj.codigoInterno || `PRJ-${apiProj.id}`,
   nombre: apiProj.nombre,
   ubicacionTexto: apiProj.ubicacionTexto || "",
+  ubicacionGps: apiProj.ubicacionGps,
+  valorEstimado: apiProj.valorEstimado,
   categoria: apiProj.categoria,
+  datosDesarrollador: apiProj.datosDesarrollador,
+  designacionCatastral: apiProj.designacionCatastral,
   estadoProyecto: apiProj.estadoProyecto,
   estadoIntegridad: apiProj.estadoIntegridad,
   usuarioCreadorId: String(apiProj.usuarioCreadorId),
@@ -45,7 +49,8 @@ export const useCreateProject = () => {
         categoria: data.categoria ?? ProjectCategory.Residencial,
         usuarioCreadorId: data.usuarioCreadorId,
         datosDesarrollador: data.datosDesarrollador,
-        designacionCatastral: data.designacionCatastral
+        designacionCatastral: data.designacionCatastral,
+        ubicacionGps: data.ubicacionGps
       }).then(res => mapApiProject(res.data)),
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
   });

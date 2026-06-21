@@ -123,13 +123,13 @@ export const ProjectManagePage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[var(--color-text-strong)]">
+    <div className="max-w-6xl mx-auto p-4">
+      <div className="mb-8 text-center animate-fade-in">
+        <h1 className="text-4xl font-extrabold text-[var(--color-text-strong)] tracking-tight">
           {isEditing ? "Editar Proyecto" : "Crear Nuevo Proyecto"}
         </h1>
-        <p className="text-sm mt-1 text-[var(--color-text-strong)] opacity-60">
-          {isEditing ? "Modifica los datos del proyecto existente." : "Ingresa los datos basicos para registrar un nuevo proyecto."}
+        <p className="text-base mt-2 text-[var(--color-text-strong)] opacity-70">
+          {isEditing ? "Modifica los datos del proyecto existente." : "Ingresa los datos básicos para registrar un nuevo proyecto."}
         </p>
       </div>
 

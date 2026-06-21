@@ -47,6 +47,10 @@ public class ProjectService : IProjectService
     public async Task<ProyectoDto> CreateProjectAsync(CreateProyectoDto dto, CancellationToken cancellationToken = default)
     {
         var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
+        if (!string.IsNullOrEmpty(dto.UbicacionGps))
+        {
+            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
+        }
         
         await _proyectoRepository.AddAsync(proyecto, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

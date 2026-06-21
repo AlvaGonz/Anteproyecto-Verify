@@ -26,5 +26,6 @@ public record CreateProyectoDto(
     Guid UsuarioCreadorId,
     ProjectCategory Categoria = ProjectCategory.Residencial,
     string? DatosDesarrollador = null,
-    string? DesignacionCatastral = null
+    string? DesignacionCatastral = null,
+    string? UbicacionGps = null
 );

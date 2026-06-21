@@ -16,7 +16,7 @@ CREATE TABLE Usuario (
     Nombre VARCHAR(100) NOT NULL,
     Apellido VARCHAR(100) NOT NULL,
     NombreCompleto AS (Nombre + ' ' + Apellido) PERSISTED,
-    CorreoElectronico VARCHAR(200) NOT NULL UNIQUE CONSTRAINT CK_Usuario_CorreoElectronico CHECK (CorreoElectronico LIKE '%_@__%.__%'),
+    Email VARCHAR(200) NOT NULL UNIQUE CONSTRAINT CK_Usuario_Email CHECK (Email LIKE '%_@__%.__%'),
     ContrasenaHash VARCHAR(500) NOT NULL,
     Telefono VARCHAR(15) NOT NULL,
     Cedula VARCHAR(15) NOT NULL,
@@ -34,7 +34,7 @@ SELECT
     Nombre,
     Apellido,
     NombreCompleto,
-    CorreoElectronico AS Email,
+    Email,
     ContrasenaHash,
     Telefono,
     Cedula
@@ -87,8 +87,45 @@ GO
 -- Tabla Provincia
 CREATE TABLE Provincia (
     IdProvincia UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    NombreProvincia VARCHAR(100)
+    NombreProvincia VARCHAR(100) NOT NULL,
+    Latitud DECIMAL(18,10) NULL,
+    Longitud DECIMAL(18,10) NULL
 );
+GO
+
+-- Seeding Provincia table with Dominican Republic provinces and centroids
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Distrito Nacional', 18.47186, -69.93988);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Azua', 18.45320, -70.73490);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Baoruco', 18.50000, -71.30000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Barahona', 18.20850, -71.10080);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Dajabón', 19.54000, -71.70000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Duarte', 19.30000, -70.25000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('El Seibo', 18.76000, -69.04000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Elías Piña', 18.88000, -71.68000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Espaillat', 19.50000, -70.50000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Hato Mayor', 18.76000, -69.25000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Hermanas Mirabal', 19.38000, -70.35000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Independencia', 18.40000, -71.60000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('La Altagracia', 18.61890, -68.70830);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('La Romana', 18.42730, -68.97280);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('La Vega', 19.22000, -70.53000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('María Trinidad Sánchez', 19.38000, -69.95000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Monseñor Nouel', 18.91000, -70.43000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Monte Cristi', 19.72000, -71.58000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Monte Plata', 18.80700, -69.78900);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Pedernales', 18.03000, -71.74000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Peravia', 18.28000, -70.33000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Puerto Plata', 19.79340, -70.68840);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Samaná', 19.20000, -69.33000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('San Cristóbal', 18.41667, -70.10000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('San José de Ocoa', 18.55000, -70.50000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('San Juan', 18.80580, -71.22990);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('San Pedro de Macorís', 18.45390, -69.30820);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Sánchez Ramírez', 19.00160, -70.14920);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Santiago', 19.45170, -70.69703);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Santiago Rodríguez', 19.48000, -71.34000);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Santo Domingo', 18.54118, -69.83988);
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES ('Valverde', 19.58000, -71.07000);
 GO
 
 -- Tabla Municipio

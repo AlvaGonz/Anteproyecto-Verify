@@ -226,7 +226,8 @@ describe("ProjectManagePage — CREATE mode", () => {
     renderCreate();
 
     await user.type(screen.getByLabelText(/Nombre del Proyecto/i), "Test Project");
-    await user.type(screen.getByLabelText(/Ubicación/i), "Santiago, RD");
+    const select = screen.getByLabelText(/Ubicación/i);
+    await user.selectOptions(select, "Santiago");
     await user.click(screen.getByRole("button", { name: /Guardar/i }));
 
     await waitFor(() => {
@@ -244,7 +245,8 @@ describe("ProjectManagePage — CREATE mode", () => {
     renderCreate();
 
     await user.type(screen.getByLabelText(/Nombre del Proyecto/i), "Bad Project");
-    await user.type(screen.getByLabelText(/Ubicación/i), "Nowhere");
+    const select = screen.getByLabelText(/Ubicación/i);
+    await user.selectOptions(select, "Santiago");
     await user.click(screen.getByRole("button", { name: /Guardar/i }));
 
     await waitFor(() => {
