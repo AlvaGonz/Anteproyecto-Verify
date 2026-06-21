@@ -5,7 +5,8 @@ import {
   UpdateProyectoDto, 
   ProjectStatus, 
   IntegrityStatus,
-  ProjectError 
+  ProjectError,
+  DocumentDiagnosisDto
 } from "../types";
 import { success, failure, Result } from "../../../shared/utils/functional";
 
@@ -84,6 +85,16 @@ export const projectsApi = {
     try {
       const apiStatus = status === ProjectStatus.Published ? "Activo" : "Pendiente";
       const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, { status: apiStatus });
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error, id));
+    }
+  },
+
+  async getProjectDiagnosis(id: string): Promise<Result<DocumentDiagnosisDto, ProjectError>> {
+    try {
+      // The backend route is /api/projects/{projectId}/documents/diagnosis
+      const response = await apiClient.get<DocumentDiagnosisDto>(`/projects/${id}/documents/diagnosis`);
       return success(response.data);
     } catch (error: any) {
       return failure(mapError(error, id));

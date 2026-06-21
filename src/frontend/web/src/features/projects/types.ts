@@ -111,3 +111,13 @@ export const getProjectErrorMessage = (error: ProjectError): string => {
     default: return "Error desconocido";
   }
 };
+
+export interface DocumentDiagnosisDto {
+  projectId: string;
+  score: number;
+  summary: string;
+  missingDocuments: string[];
+  recommendations: string[];
+  provider: string;
+  generatedAt: string;
+}

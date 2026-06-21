@@ -50,3 +50,14 @@ export const useCreateProject = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
   });
 };
+
+export const useProjectDiagnosis = () => {
+  return useMutation({
+    mutationKey: ['projectDiagnosis'],
+    mutationFn: async (id: string) => {
+      // We will just return the diagnosis result directly from api
+      const response = await apiClient.get(`/projects/${id}/documents/diagnosis`);
+      return response.data;
+    }
+  });
+};

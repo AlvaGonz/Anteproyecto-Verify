@@ -11,13 +11,16 @@ public class LoginUserCommandHandler
 {
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
     public LoginUserCommandHandler(
         IUsuarioRepository usuarioRepository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        IJwtTokenGenerator jwtTokenGenerator)
     {
         _usuarioRepository = usuarioRepository;
         _passwordHasher = passwordHasher;
+        _jwtTokenGenerator = jwtTokenGenerator;
     }
 
     public async Task<LoginUserResultDto> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -47,7 +50,7 @@ public class LoginUserCommandHandler
             roleStr
         );
 
-        var token = $"session_{Guid.NewGuid().ToString("N")}";
+        var token = _jwtTokenGenerator.GenerateToken(user);
         var response = new LoginUserResponseDto(userDto, token);
 
         return new LoginUserResultDto(true, null, response);
