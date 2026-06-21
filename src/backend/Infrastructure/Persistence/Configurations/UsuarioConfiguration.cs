@@ -15,7 +15,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.Apellido).IsRequired().HasMaxLength(100);
         builder.Property(u => u.NombreCompleto).HasComputedColumnSql("[Nombre] + ' ' + [Apellido]", stored: true);
         
-        builder.Property(u => u.CorreoElectronico).HasColumnName("Email").IsRequired().HasMaxLength(200);
+        builder.Property(u => u.CorreoElectronico).HasColumnName("CorreoElectronico").IsRequired().HasMaxLength(200);
         builder.HasIndex(u => u.CorreoElectronico).IsUnique();
         
         builder.Property(u => u.ContrasenaHash).IsRequired().HasMaxLength(500);

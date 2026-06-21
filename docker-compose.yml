@@ -7,6 +7,14 @@ services:
       - "5000:8080"
     volumes:
       - .:/src
+      - /src/src/backend/Domain/bin
+      - /src/src/backend/Domain/obj
+      - /src/src/backend/Application/bin
+      - /src/src/backend/Application/obj
+      - /src/src/backend/Infrastructure/bin
+      - /src/src/backend/Infrastructure/obj
+      - /src/src/backend/Api/bin
+      - /src/src/backend/Api/obj
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - UseMockData=false
@@ -61,20 +69,19 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
-          cpus: "1.0"
+          memory: 3G
+          cpus: "1.5"
         reservations:
-          memory: 512M
+          memory: 2G
 
   azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
+    build:
+      context: .
+      dockerfile: docker/azurite.Dockerfile
     ports:
       - "10000:10000"
     security_opt:
       - no-new-privileges:true
-    read_only: true
-    tmpfs:
-      - /tmp
     deploy:
       resources:
         limits:
@@ -85,4 +92,3 @@ services:
 
 volumes:
   mssql-data:
-
