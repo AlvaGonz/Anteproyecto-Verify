@@ -14,7 +14,7 @@ builder.Services.AddApiServices(builder.Configuration);
 var app = builder.Build();
 
 var useMock = builder.Configuration.GetValue<bool>("UseMockData");
-if (app.Environment.IsDevelopment() && useMock)
+if (app.Environment.IsDevelopment())
 {
     // In local/dev we ensure the database exists so Docker bootstraps cleanly
     // even when EF migrations tooling isn't installed in the container.
@@ -93,7 +93,10 @@ if (app.Environment.IsDevelopment() && useMock)
         // Fallback in case script generation fails (e.g. SQLite mock)
     }
 
-    await AppDbContextSeeder.SeedAsync(app.Services);
+    if (useMock)
+    {
+        await AppDbContextSeeder.SeedAsync(app.Services);
+    }
 }
 else if (useMock)
 {
