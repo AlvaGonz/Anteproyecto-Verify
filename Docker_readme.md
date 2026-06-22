@@ -89,7 +89,7 @@ A continuación se detalla el paso a paso del flujo del sistema al ejecutar `doc
 Una vez finalizado el Paso 4, puedes iniciar sesión inmediatamente con:
 * **Desarrollador Inmobiliario (Professional)**:
   * **Usuario:** `dev@constructora.do`
-  * **Contraseña:** `Dev123!`
+  * **Contraseña:** `Dev1234!`
 * **Administrador (Administrator)**:
   * **Usuario:** `admin@verifinca.do`
   * **Contraseña:** `Admin123!`

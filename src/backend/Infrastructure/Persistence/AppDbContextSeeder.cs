@@ -41,7 +41,7 @@ public static class AppDbContextSeeder
                 nombre: "Desarrollador",
                 apellido: "Inmobiliario",
                 correoElectronico: "dev@constructora.do",
-                contrasenaHash: passwordHasher.HashPassword("Dev123!"),
+                contrasenaHash: passwordHasher.HashPassword("Dev1234!"),
                 rol: UserRole.Professional,
                 telefono: "809-555-0200",
                 cedula: "001-0000000-2");

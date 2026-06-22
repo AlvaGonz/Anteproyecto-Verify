@@ -37,7 +37,7 @@ export const RegisterForm = () => {
   const onSubmit = (data: RegisterFormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { acceptedTerms: _, ...submitData } = data;
-    register_(submitData, { onSuccess: () => navigate("/admin/dashboard") });
+    register_(submitData, { onSuccess: () => navigate("/login") });
   };
 
   const password = watch("password") || "";

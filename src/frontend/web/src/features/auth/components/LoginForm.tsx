@@ -18,7 +18,12 @@ export const LoginForm = () => {
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = (data: LoginFormValues) =>
-    login(data, { onSuccess: () => navigate("/admin/dashboard") });
+    login(data, { 
+      onSuccess: () => {
+        window.location.hash = "/admin/dashboard";
+        window.location.reload();
+      }
+    });
 
   return (
     <div className="w-full">

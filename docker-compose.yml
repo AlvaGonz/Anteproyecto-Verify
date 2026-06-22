@@ -64,18 +64,18 @@ services:
       - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "Your_password123", "-Q", "SELECT 1", "-C"]
+      test: ["CMD-SHELL", "test -f /tmp/db_ready && /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Your_password123' -Q 'SELECT 1' -C"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 15s
+      start_period: 45s
     deploy:
       resources:
         limits:
-          memory: 1G
-          cpus: "1.0"
+          memory: 2G
+          cpus: "1.5"
         reservations:
-          memory: 512M
+          memory: 1G
 
   azurite:
     build:
