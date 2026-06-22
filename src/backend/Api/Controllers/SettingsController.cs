@@ -291,7 +291,7 @@ public class SettingsController : ControllerBase
 
     private async Task<bool> IsAdminAsync()
     {
-        var token = Request.Cookies["vf_token"];
+        var token = Request.Cookies["jwt"];
         if (string.IsNullOrEmpty(token)) return false;
 
         try

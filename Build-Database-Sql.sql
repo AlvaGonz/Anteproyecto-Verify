@@ -22,6 +22,9 @@ CREATE TABLE Usuario (
     Cedula VARCHAR(15) NOT NULL,
     Rol INT NOT NULL DEFAULT 2,
     Activo BIT NOT NULL DEFAULT 1,
+    EmailVerificado BIT NOT NULL DEFAULT 0,
+    TokenVerificacion VARCHAR(MAX) NULL,
+    TokenVerificacionExpiraUtc DATETIME2 NULL,
     CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
     UpdatedAtUtc DATETIME2 NULL
 );

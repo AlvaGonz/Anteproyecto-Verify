@@ -37,12 +37,12 @@ public static class ServiceCollectionExtensions
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
             };
             
-            // Extract token from cookie vf_token if present
+            // Extract token from cookie jwt if present
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
                 {
-                    if (context.Request.Cookies.TryGetValue("vf_token", out var token))
+                    if (context.Request.Cookies.TryGetValue("jwt", out var token))
                     {
                         context.Token = token;
                     }

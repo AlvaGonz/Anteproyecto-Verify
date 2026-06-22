@@ -27,17 +27,17 @@ public class DevToolsController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(email))
         {
-            return BadRequest("Email is required.");
+            return BadRequest(new { Message = "Email is required." });
         }
 
         var user = await _context.Usuarios
-            .Where(u => u.Email == email)
-            .OrderByDescending(u => u.FechaRegistroUtc)
+            .Where(u => u.CorreoElectronico == email)
+            .OrderByDescending(u => u.CreatedAtUtc)
             .FirstOrDefaultAsync();
 
         if (user == null)
         {
-            return NotFound($"User with email '{email}' not found.");
+            return NotFound(new { Message = $"User with email '{email}' not found." });
         }
 
         if (string.IsNullOrEmpty(user.TokenVerificacion))

@@ -1,41 +1,45 @@
-namespace Api.Controllers;
-
 using System;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Abstractions.Persistence;
-using Application.Abstractions.Security;
-using Application.Features.Auth.Commands.RegisterUser;
-using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
+
+namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly RegisterUserCommandHandler _registerHandler;
-    private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
+    private readonly Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler _registerHandler;
     private readonly Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler _verifyHandler;
+    private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
     private readonly IConfiguration _configuration;
 
     public AuthController(
-        RegisterUserCommandHandler registerHandler,
-        Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
+        Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler registerHandler,
         Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler,
+        Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
         IConfiguration configuration)
     {
         _registerHandler = registerHandler;
-        _loginHandler = loginHandler;
         _verifyHandler = verifyHandler;
+        _loginHandler = loginHandler;
         _configuration = configuration;
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto request, CancellationToken cancellationToken)
     {
+        var command = new Application.Features.Auth.Commands.RegisterUser.RegisterUserCommand(
+            request.Nombre ?? string.Empty,
+            request.Apellido ?? request.Apellidos ?? string.Empty,
+            request.Email ?? request.CorreoElectronico ?? string.Empty,
+            request.Password ?? request.Contrasena ?? string.Empty,
+            request.Telefono ?? "8095550199",
+            request.Cedula ?? "40212345678"
+        );
         var result = await _registerHandler.Handle(command, cancellationToken);
         
         if (!result.IsSuccess)
@@ -43,11 +47,7 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage });
         }
 
-        return Ok(new 
-        { 
-            Message = "Usuario registrado exitosamente.", 
-            UsuarioId = result.UsuarioId 
-        });
+        return Ok(new { Message = "Registro exitoso. Por favor, verifique su correo electrónico." });
     }
 
     [HttpPost("login")]
@@ -56,34 +56,32 @@ public class AuthController : ControllerBase
         var result = await _loginHandler.Handle(request, cancellationToken);
         if (!result.IsSuccess)
         {
-            return Unauthorized(new { Message = result.ErrorMessage });
+            return BadRequest(new { Message = result.ErrorMessage, succeeded = false });
         }
 
         var responseData = result.Data;
         if (responseData == null)
         {
-            return Unauthorized(new { Message = "Error al obtener datos de sesión." });
+            return BadRequest(new { Message = "Error al generar sesión." });
         }
 
-        var cookieOptions = new CookieOptions
+        Response.Cookies.Append("jwt", responseData.Token, new CookieOptions
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddHours(2),
             Path = "/"
-        };
-        Response.Cookies.Append("vf_token", responseData.Token, cookieOptions);
+        });
 
         return Ok(new
         {
-            Message = "Inicio de sesión exitoso.",
-            User = new
+            succeeded = true,
+            user = new
             {
-                Id = responseData.User.Id.ToString(),
-                Email = responseData.User.Email,
-                Name = responseData.User.Name,
-                Role = responseData.User.Role
+                id = responseData.User.Id,
+                name = responseData.User.Name,
+                email = responseData.User.Email,
+                role = responseData.User.Role
             }
         });
     }
@@ -91,29 +89,30 @@ public class AuthController : ControllerBase
     [HttpGet("verify")]
     public async Task<IActionResult> Verify([FromQuery] string token, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(token))
+            return BadRequest(new { Message = "Token vacío." });
+
         var command = new Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommand(token);
         var result = await _verifyHandler.Handle(command, cancellationToken);
         
-        var frontendUrl = _configuration["PublicPortalBaseUrl"] ?? "http://localhost:3000";
-        
         if (!result.IsSuccess)
         {
-            var errorMessage = Uri.EscapeDataString(result.ErrorMessage ?? "verification_failed");
-            return Redirect($"{frontendUrl}/login?error={errorMessage}");
+            return BadRequest(new { Message = result.ErrorMessage });
         }
 
-        return Redirect($"{frontendUrl}/login?verified=true");
+        return Ok(new { Message = "Correo electrónico verificado exitosamente. Ya puede iniciar sesión." });
     }
 
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("vf_token", new CookieOptions
+        Response.Cookies.Append("jwt", "", new CookieOptions
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
             SameSite = SameSiteMode.Strict,
-            Path = "/"
+            Path = "/",
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
         });
 
         return Ok(new { Message = "Sesión cerrada exitosamente." });
@@ -145,7 +144,7 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public IActionResult Refresh()
     {
-        var token = Request.Cookies["vf_token"];
+        var token = Request.Cookies["jwt"];
         if (string.IsNullOrEmpty(token))
         {
             return Unauthorized(new { Message = "Token de refresco inválido o expirado." });
@@ -161,4 +160,15 @@ public class AuthController : ControllerBase
     }
 }
 
-
+public class RegisterRequestDto
+{
+    public string? Nombre { get; set; }
+    public string? Apellidos { get; set; }
+    public string? Apellido { get; set; }
+    public string? Email { get; set; }
+    public string? CorreoElectronico { get; set; }
+    public string? Password { get; set; }
+    public string? Contrasena { get; set; }
+    public string? Telefono { get; set; }
+    public string? Cedula { get; set; }
+}

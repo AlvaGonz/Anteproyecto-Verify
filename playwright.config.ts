@@ -6,17 +6,38 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: [["html", { open: "never" }], ["list"]],
+  globalSetup: './e2e/global-setup.ts',
+  reporter: [["html", { open: "never", outputFolder: "playwright-report" }], ["list"]],
   use: {
-    baseURL: "http://localhost:5173",
+    baseURL: process.env.API_BASE_URL ?? "http://localhost:5000",
+    extraHTTPHeaders: { 'Content-Type': 'application/json' },
+    ignoreHTTPSErrors: true,
     screenshot: "only-on-failure",
     video: "retain-on-failure",
     trace: "on-first-retry",
   },
   projects: [
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: "api",
+      testDir: "./e2e/api",
+      use: {
+        baseURL: process.env.API_BASE_URL ?? "http://localhost:5000",
+      },
+    },
+    {
+      name: "auth",
+      testDir: "./e2e/auth",
+      use: {
+        baseURL: process.env.API_BASE_URL ?? "http://localhost:5000",
+      },
+    },
+    {
+      name: "frontend",
+      testDir: "./e2e/projects",
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: process.env.FRONTEND_URL ?? "http://localhost:5173",
+      },
     },
   ],
   webServer: {

@@ -90,8 +90,8 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
 
         <button className="flex items-center gap-3 pl-2 pr-1 py-1 hover:bg-gray-50 rounded-2xl transition-colors group">
            <div className="flex flex-col items-end hidden sm:flex">
-              <span className="text-xs font-bold text-gray-900">{user?.name || "Admin_Verifinca"}</span>
-              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{user?.role || "Verificado"}</span>
+              <span className="text-xs font-bold text-gray-900">{user?.name || "Usuario"}</span>
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{user?.role || "Invitado"}</span>
            </div>
            <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200 group-hover:border-primary/30 transition-colors">
               {user ? (

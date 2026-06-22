@@ -31,3 +31,8 @@ Thumbs.db
 # Agent Sessions
 .agents/sessions/
 !.agents/sessions/.gitkeep
+
+# Playwright Test Outputs
+playwright-report/
+test-results/
+

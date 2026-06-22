@@ -135,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <div className="flex items-center gap-3">
           <div className="relative">
              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-sm font-black text-white shadow-lg overflow-hidden border border-white/10">
-                {user ? getInitials(user.name) : "AD"}
+                {user ? getInitials(user.name) : "US"}
              </div>
              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-success rounded-full border-2 border-secondary overflow-hidden"></div>
           </div>
