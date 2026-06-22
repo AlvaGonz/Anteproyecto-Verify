@@ -15,9 +15,9 @@ public static class EmailTemplates
     private const string BorderLine = "#E2E8F0";
 
     // ── Logo Image (ISOTIPO.png) ────────────────────────────────────────────────
-    // Nota: Cambiar http://localhost:5173 por el dominio de producción cuando se despliegue.
+    // Nota: Cambiar http://localhost:3000 por el dominio de producción cuando se despliegue.
     private const string LogoImg = @"
-        <img src=""http://localhost:5173/brand/isotipo/ISOTIPO.png"" width=""36"" height=""36"" alt=""VeriFinca Logo"" style=""display:inline-block;vertical-align:middle;border-radius:8px;"" />";
+        <img src=""http://localhost:3000/brand/isotipo/ISOTIPO.png"" width=""36"" height=""36"" alt=""VeriFinca Logo"" style=""display:inline-block;vertical-align:middle;border-radius:8px;"" />";
 
     // ── Wrapper ──────────────────────────────────────────────────────────────
     private static string BuildEmailWrapper(string title, string preHeader, string contentHtml)
@@ -186,7 +186,7 @@ public static class EmailTemplates
     // ════════════════════════════════════════════════════════════════════════
     public static string GetAccountVerificationEmail(string userName, string verificationToken)
     {
-        string verificationUrl = $"http://localhost:5173/#/verify-email?token={verificationToken}";
+        string verificationUrl = $"http://localhost:3000/#/verify-email?token={verificationToken}";
 
         string content = $@"
             <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>
@@ -277,7 +277,7 @@ public static class EmailTemplates
             {statusSection}
 
             <div style=""text-align:center;"">
-                {CtaButton("http://localhost:5173/dashboard", "Ir al Panel de Control")}
+                {CtaButton("http://localhost:3000/dashboard", "Ir al Panel de Control")}
             </div>";
 
         return BuildEmailWrapper(
@@ -293,7 +293,7 @@ public static class EmailTemplates
     // ════════════════════════════════════════════════════════════════════════
     public static string GetProjectCreatedEmail(string ownerName, string projectName, string projectId)
     {
-        string projectUrl = $"http://localhost:5173/projects/{projectId}";
+        string projectUrl = $"http://localhost:3000/projects/{projectId}";
 
         string infoInner = $@"
             <strong style=""color:{Navy};"">Nombre del Proyecto</strong><br>
@@ -324,4 +324,5 @@ public static class EmailTemplates
             content);
     }
 }
+
 
