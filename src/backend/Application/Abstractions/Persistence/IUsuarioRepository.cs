@@ -13,4 +13,5 @@ public interface IUsuarioRepository
     void Update(Usuario usuario);
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<bool> ExistsByCedulaAsync(string cedula, CancellationToken cancellationToken = default);
+    Task<Usuario?> GetByVerificationTokenAsync(string token, CancellationToken cancellationToken = default);
 }

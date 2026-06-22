@@ -17,8 +17,6 @@ public static class DependencyInjection
         services.Configure<AzureSqlOptions>(configuration.GetSection("AzureSql"));
         services.Configure<AzureBlobOptions>(configuration.GetSection("AzureBlob"));
 
-        var useMock = configuration.GetValue<bool>("UseMockData");
-
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
@@ -116,19 +114,12 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Audit.Queries.ExportGlobalAuditTrail.ExportGlobalAuditTrailQueryHandler>();
 
         // Notifications
-        if (useMock)
+        var resendToken = configuration.GetValue<string>("Resend:ApiToken") ?? "re_mock_token";
+        services.AddResend(options =>
         {
-            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Services.MockEmailService>();
-        }
-        else
-        {
-            var resendToken = configuration.GetValue<string>("Resend:ApiToken") ?? "re_mock_token";
-            services.AddResend(options =>
-            {
-                options.ApiToken = resendToken;
-            });
-            services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Email.ResendEmailService>();
-        }
+            options.ApiToken = resendToken;
+        });
+        services.AddScoped<Application.Abstractions.Notifications.IEmailService, Infrastructure.Email.ResendEmailService>();
         services.AddScoped<Application.Abstractions.Notifications.IEmailNotificationService, Infrastructure.Services.EmailNotificationService>();
 
         // External Services

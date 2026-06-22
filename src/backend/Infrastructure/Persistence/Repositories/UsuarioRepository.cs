@@ -49,4 +49,10 @@ public class UsuarioRepository : IUsuarioRepository
         return await _context.Usuarios
             .AnyAsync(u => u.Cedula != null && u.Cedula.Replace("-", "") == cleanCedula, cancellationToken);
     }
+
+    public async Task<Usuario?> GetByVerificationTokenAsync(string token, CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .FirstOrDefaultAsync(u => u.TokenVerificacion == token, cancellationToken);
+    }
 }

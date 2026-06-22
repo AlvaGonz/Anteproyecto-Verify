@@ -17,13 +17,16 @@ public class AuthController : ControllerBase
 {
     private readonly RegisterUserCommandHandler _registerHandler;
     private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
+    private readonly Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler _verifyHandler;
 
     public AuthController(
         RegisterUserCommandHandler registerHandler,
-        Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler)
+        Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
+        Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler)
     {
         _registerHandler = registerHandler;
         _loginHandler = loginHandler;
+        _verifyHandler = verifyHandler;
     }
 
     [HttpPost("register")]
@@ -79,6 +82,23 @@ public class AuthController : ControllerBase
                 Role = responseData.User.Role
             }
         });
+    }
+
+    [HttpGet("verify")]
+    public async Task<IActionResult> Verify([FromQuery] string token, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommand(token);
+        var result = await _verifyHandler.Handle(command, cancellationToken);
+        
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
+
+        // Ideally redirect to a frontend success page: 
+        // return Redirect("http://localhost:5173/login?verified=true");
+        // For now, return a JSON success response
+        return Ok(new { Message = "Correo electrónico verificado exitosamente. Ya puede iniciar sesión." });
     }
 
     [HttpPost("logout")]

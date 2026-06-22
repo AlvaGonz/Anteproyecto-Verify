@@ -10,6 +10,7 @@ using Application.Abstractions.Security;
 using Domain.Entities;
 using Domain.Enums;
 using FluentValidation;
+using Application.Abstractions.Notifications;
 
 public class RegisterUserCommandHandler
 {
@@ -17,17 +18,20 @@ public class RegisterUserCommandHandler
     private readonly IPasswordHasher _passwordHasher;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<RegisterUserCommand> _validator;
+    private readonly IEmailService _emailService;
 
     public RegisterUserCommandHandler(
         IUsuarioRepository usuarioRepository,
         IPasswordHasher passwordHasher,
         IUnitOfWork unitOfWork,
-        IValidator<RegisterUserCommand> validator)
+        IValidator<RegisterUserCommand> validator,
+        IEmailService emailService)
     {
         _usuarioRepository = usuarioRepository;
         _passwordHasher = passwordHasher;
         _unitOfWork = unitOfWork;
         _validator = validator;
+        _emailService = emailService;
     }
 
     public async Task<RegisterUserResultDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -58,9 +62,18 @@ public class RegisterUserCommandHandler
             request.Cedula!.Trim()
         );
 
-        // 8. Guardar en Base de Datos
+        // 8. Generar token de verificación
+        user.GenerarTokenVerificacion();
+
+        // 9. Guardar en Base de Datos
         await _usuarioRepository.AddAsync(user, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // 10. Enviar email de verificación
+        if (user.TokenVerificacion != null)
+        {
+            await _emailService.SendAccountVerificationAsync(user.Email, user.Nombre, user.TokenVerificacion, cancellationToken);
+        }
 
         return new RegisterUserResultDto(true, null, user.Id);
     }

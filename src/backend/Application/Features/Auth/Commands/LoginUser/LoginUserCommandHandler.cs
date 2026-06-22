@@ -38,6 +38,9 @@ public class LoginUserCommandHandler
         if (!user.Activo)
             return new LoginUserResultDto(false, "La cuenta de usuario está inactiva.", null);
 
+        if (!user.EmailVerificado)
+            return new LoginUserResultDto(false, "Debe verificar su correo electrónico antes de iniciar sesión.", null);
+
         var isPasswordValid = _passwordHasher.VerifyPassword(request.Password, user.ContrasenaHash);
         if (!isPasswordValid)
             return new LoginUserResultDto(false, "El correo electrónico o la contraseña son incorrectos.", null);

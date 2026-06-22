@@ -18,6 +18,9 @@ public class Usuario : EntityBase
     public string Identificacion => Cedula;
     public UserRole Rol { get; private set; }
     public bool Activo { get; private set; }
+    public bool EmailVerificado { get; private set; }
+    public string? TokenVerificacion { get; private set; }
+    public DateTime? TokenVerificacionExpiraUtc { get; private set; }
 
     // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
@@ -42,6 +45,7 @@ public class Usuario : EntityBase
         Telefono = telefono;
         Cedula = cedula;
         Activo = true;
+        EmailVerificado = false;
     }
 
     public void UpdateContactInfo(string telefono, string cedula)
@@ -57,5 +61,29 @@ public class Usuario : EntityBase
     {
         Rol = rol;
         UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void GenerarTokenVerificacion()
+    {
+        TokenVerificacion = Guid.NewGuid().ToString("N");
+        TokenVerificacionExpiraUtc = DateTime.UtcNow.AddHours(24);
+    }
+
+    public bool VerificarEmail(string token)
+    {
+        if (EmailVerificado) return true;
+        
+        if (string.IsNullOrWhiteSpace(token) || 
+            TokenVerificacion != token || 
+            DateTime.UtcNow > TokenVerificacionExpiraUtc)
+        {
+            return false;
+        }
+
+        EmailVerificado = true;
+        TokenVerificacion = null;
+        TokenVerificacionExpiraUtc = null;
+        UpdatedAtUtc = DateTime.UtcNow;
+        return true;
     }
 }
