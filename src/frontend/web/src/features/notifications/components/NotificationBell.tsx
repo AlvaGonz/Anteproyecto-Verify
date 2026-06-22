@@ -44,47 +44,47 @@ export const NotificationBell: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg text-[var(--color-text-strong)] opacity-60 hover:opacity-100 hover:bg-[var(--color-surface-muted)]/30 transition-all relative"
+        className="p-2 rounded-lg text-text-primary opacity-60 hover:opacity-100 hover:bg-surface-raised/30 transition-all relative"
       >
         <span className="sr-only">Ver notificaciones</span>
         <Bell className="h-5 w-5" aria-hidden="true" />
         {notifications.length > 0 && (
-          <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-[var(--color-brand-accent)]" />
+          <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-primary" />
         )}
       </button>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-xl shadow-lg bg-[var(--color-surface-alt)] border border-[var(--color-surface-muted)] z-50 overflow-hidden">
-          <div className="py-3 px-4 border-b border-[var(--color-surface-muted)]/50 flex justify-between items-center">
-            <h3 className="text-sm font-bold text-[var(--color-text-strong)]">Notificaciones</h3>
-            <span className="text-xs text-[var(--color-text-strong)] opacity-50">
+        <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-xl shadow-lg bg-surface border border-border z-50 overflow-hidden">
+          <div className="py-3 px-4 border-b border-border/50 flex justify-between items-center">
+            <h3 className="text-sm font-bold text-text-primary">Notificaciones</h3>
+            <span className="text-xs text-text-primary opacity-50">
               {notifications.length} nuevas
             </span>
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-4 text-sm text-[var(--color-text-strong)] opacity-50 text-center">
+              <div className="p-4 text-sm text-text-primary opacity-50 text-center">
                 No hay notificaciones nuevas.
               </div>
             ) : (
-              <div className="divide-y divide-[var(--color-surface-muted)]/30">
+              <div className="divide-y divide-border/30">
                 {notifications.map((notification) => (
-                  <div key={notification.id} className="p-3 hover:bg-[var(--color-surface-base)]/50 transition-colors">
+                  <div key={notification.id} className="p-3 hover:bg-surface-raised/50 transition-colors">
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex-1">
-                        <p className="text-xs font-semibold text-[var(--color-brand-primary)]">
+                        <p className="text-xs font-semibold text-primary">
                           {notification.tipo}
                         </p>
-                        <p className="text-sm text-[var(--color-text-strong)] mt-0.5">
+                        <p className="text-sm text-text-primary mt-0.5">
                           {notification.mensaje}
                         </p>
-                        <p className="text-xs text-[var(--color-text-strong)] opacity-40 mt-1">
+                        <p className="text-xs text-text-primary opacity-40 mt-1">
                           {new Date(notification.fechaUtc).toLocaleString()}
                         </p>
                       </div>
                       <button
                         onClick={() => handleMarkAsRead(notification.id)}
-                        className="text-xs text-[var(--color-brand-primary)] hover:underline flex-shrink-0"
+                        className="text-xs text-primary hover:underline flex-shrink-0"
                       >
                         Leida
                       </button>

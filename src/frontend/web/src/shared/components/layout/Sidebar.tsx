@@ -11,6 +11,7 @@ import {
   History
 } from "lucide-react";
 import { useProjects } from "../../../features/projects/api/useProjects";
+import { useAuth } from "../../context/AuthContext";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -20,6 +21,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const { data: projects } = useProjects();
   const projectCount = projects?.length || 0;
+  const { user } = useAuth();
+
+  const getInitials = (name: string) => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, 2).toUpperCase();
+  };
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -124,13 +135,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <div className="flex items-center gap-3">
           <div className="relative">
              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-sm font-black text-white shadow-lg overflow-hidden border border-white/10">
-                AD
+                {user ? getInitials(user.name) : "AD"}
              </div>
              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-success rounded-full border-2 border-secondary overflow-hidden"></div>
           </div>
           <div className="flex flex-col min-w-0">
-            <p className="text-sm font-bold text-white leading-tight truncate">Administrador</p>
-            <p className="text-[9px] text-white/30 font-black uppercase tracking-widest mt-0.5">VeriFinca Global</p>
+            <p className="text-sm font-bold text-white leading-tight truncate">{user?.name || "Administrador"}</p>
+            <p className="text-[9px] text-white/30 font-black uppercase tracking-widest mt-0.5">{user?.role || "VeriFinca Global"}</p>
           </div>
         </div>
       </div>

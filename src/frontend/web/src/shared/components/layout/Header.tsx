@@ -2,6 +2,7 @@ import React from "react";
 import { User, Menu, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { NotificationBell } from "../../../features/notifications/components/NotificationBell";
+import { useAuth } from "../../context/AuthContext";
 
 interface HeaderProps {
   title: string;
@@ -10,6 +11,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -31,6 +33,15 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
         navigate(`/admin/projects?q=${encodeURIComponent(value)}`);
       }
     }
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, 2).toUpperCase();
   };
 
   return (
@@ -64,13 +75,9 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
             ref={searchInputRef}
             type="text"
             placeholder="Buscar expedientes, folios o propietarios..."
-            className="w-full h-11 pl-11 pr-14 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all group-hover:bg-gray-100"
+            className="w-full h-11 pl-11 pr-4 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all group-hover:bg-gray-100"
             onKeyDown={handleSearch}
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none opacity-50 group-focus-within:opacity-100 transition-opacity">
-            <kbd className="px-1.5 py-0.5 text-[10px] font-black font-sans text-gray-500 bg-white border border-gray-200 rounded shadow-sm">⌘</kbd>
-            <kbd className="px-1.5 py-0.5 text-[10px] font-black font-sans text-gray-500 bg-white border border-gray-200 rounded shadow-sm">K</kbd>
-          </div>
         </div>
       </div>
 
@@ -83,11 +90,15 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
 
         <button className="flex items-center gap-3 pl-2 pr-1 py-1 hover:bg-gray-50 rounded-2xl transition-colors group">
            <div className="flex flex-col items-end hidden sm:flex">
-              <span className="text-xs font-bold text-gray-900">Admin_Verifinca</span>
-              <span className="text-[9px] font-black text-primary uppercase tracking-widest">Verificado</span>
+              <span className="text-xs font-bold text-gray-900">{user?.name || "Admin_Verifinca"}</span>
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{user?.role || "Verificado"}</span>
            </div>
            <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200 group-hover:border-primary/30 transition-colors">
-              <User className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+              {user ? (
+                <span className="text-sm font-black text-gray-600">{getInitials(user.name)}</span>
+              ) : (
+                <User className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+              )}
            </div>
         </button>
       </div>
