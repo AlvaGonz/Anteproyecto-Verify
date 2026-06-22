@@ -61,13 +61,13 @@ export const LegalPage: React.FC = () => {
     const navLinks = document.querySelectorAll<HTMLAnchorElement>(".sidebar-bg a");
     navLinks.forEach((link) => {
       link.className =
-        "flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2";
+        "group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug";
       const icon = link.querySelector<HTMLElement>(".material-symbols-outlined");
       if (icon) icon.style.fontVariationSettings = "'FILL' 0";
 
       if (link.getAttribute("href") === `#${targetId}`) {
         link.className =
-          "flex items-center gap-3 bg-primary-container text-on-primary-container font-semibold rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2";
+          "group flex items-start gap-3 text-primary bg-primary/10 font-semibold rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug ring-1 ring-primary/20";
         if (icon) icon.style.fontVariationSettings = "'FILL' 1";
       }
     });
@@ -90,13 +90,13 @@ export const LegalPage: React.FC = () => {
 
           navLinks.forEach((link) => {
             link.className =
-              "flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-variant rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2";
+              "group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug";
             const icon = link.querySelector<HTMLElement>(".material-symbols-outlined");
             if (icon) icon.style.fontVariationSettings = "'FILL' 0";
 
             if (link.getAttribute("href") === `#${id}`) {
               link.className =
-                "flex items-center gap-3 bg-primary-container text-on-primary-container font-semibold rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2";
+                "group flex items-start gap-3 text-primary bg-primary/10 font-semibold rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug ring-1 ring-primary/20";
               if (icon) icon.style.fontVariationSettings = "'FILL' 1";
             }
           });
@@ -124,47 +124,47 @@ export const LegalPage: React.FC = () => {
                 <p className="font-body text-sm text-on-surface-variant mt-1">v1.1.0 — Updated: 2026-06-22</p>
               </div>
               <a
-                className="flex items-center gap-3 bg-primary-container text-on-primary-container font-semibold rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
+                className="group flex items-start gap-3 text-primary bg-primary/10 font-semibold rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug ring-1 ring-primary/20"
                 href="#terminos"
                 onClick={(e) => handleSidebarClick(e, "terminos")}
               >
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
                   {ICONS.gavel}
                 </span>
                 Términos de Servicio
               </a>
               <a
-                className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
                 href="#privacidad"
                 onClick={(e) => handleSidebarClick(e, "privacidad")}
               >
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
                   {ICONS.privacyTip}
                 </span>
                 Política de Privacidad
               </a>
               <a
-                className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
                 href="#dpa"
                 onClick={(e) => handleSidebarClick(e, "dpa")}
               >
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
                   {ICONS.assignment}
                 </span>
                 Acuerdo de Procesamiento de Datos (DPA)
               </a>
               <a
-                className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg p-3 transition-all duration-150 scale-95 active:scale-100 font-body text-sm leading-relaxed whitespace-nowrap flex-shrink-0 px-4 py-2"
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
                 href="#sla"
                 onClick={(e) => handleSidebarClick(e, "sla")}
               >
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
                   {ICONS.timer}
                 </span>
                 Acuerdo de Nivel de Servicio (SLA)
               </a>
               <div className="mt-8 pt-6 border-t border-outline-variant/30 flex-shrink-0 ml-auto lg:mt-8 lg:pt-6 lg:border-t lg:ml-0">
-                <button className="w-full border border-secondary text-secondary font-label text-sm font-semibold py-2.5 px-4 rounded-lg hover:bg-secondary/5 transition-colors duration-200 flex items-center justify-center gap-2">
+                <button className="w-full bg-surface border border-outline-variant text-on-surface hover:bg-surface-container hover:text-primary font-label text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-sm">
                   <span className="material-symbols-outlined text-sm">{ICONS.download}</span>
                   Descargar PDF
                 </button>
