@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { loginSchema, type LoginFormValues } from "../schemas";
 import { useLogin } from "../api/useAuth";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const verified = searchParams.get("verified") === "true";
+  const verificationError = searchParams.get("error");
+  
   const { mutate: login, isPending, error } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -30,6 +34,18 @@ export const LoginForm = () => {
       {error && (
         <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
           {(error as Error).message || "Error de autenticación. Verifique sus credenciales."}
+        </div>
+      )}
+
+      {verified && (
+        <div className="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
+          ¡Correo electrónico verificado con éxito! Ya puede iniciar sesión.
+        </div>
+      )}
+
+      {verificationError && (
+        <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
+          {verificationError}
         </div>
       )}
 

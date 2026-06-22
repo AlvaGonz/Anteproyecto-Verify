@@ -10,6 +10,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,15 +19,18 @@ public class AuthController : ControllerBase
     private readonly RegisterUserCommandHandler _registerHandler;
     private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
     private readonly Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler _verifyHandler;
+    private readonly IConfiguration _configuration;
 
     public AuthController(
         RegisterUserCommandHandler registerHandler,
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
-        Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler)
+        Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler,
+        IConfiguration configuration)
     {
         _registerHandler = registerHandler;
         _loginHandler = loginHandler;
         _verifyHandler = verifyHandler;
+        _configuration = configuration;
     }
 
     [HttpPost("register")]
@@ -90,15 +94,15 @@ public class AuthController : ControllerBase
         var command = new Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommand(token);
         var result = await _verifyHandler.Handle(command, cancellationToken);
         
+        var frontendUrl = _configuration["PublicPortalBaseUrl"] ?? "http://localhost:3000";
+        
         if (!result.IsSuccess)
         {
-            return BadRequest(new { Message = result.ErrorMessage });
+            var errorMessage = Uri.EscapeDataString(result.ErrorMessage ?? "verification_failed");
+            return Redirect($"{frontendUrl}/login?error={errorMessage}");
         }
 
-        // Ideally redirect to a frontend success page: 
-        // return Redirect("http://localhost:5173/login?verified=true");
-        // For now, return a JSON success response
-        return Ok(new { Message = "Correo electrónico verificado exitosamente. Ya puede iniciar sesión." });
+        return Redirect($"{frontendUrl}/login?verified=true");
     }
 
     [HttpPost("logout")]
