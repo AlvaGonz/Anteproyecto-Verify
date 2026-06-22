@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
@@ -58,16 +58,21 @@ export const ProjectManagePage: React.FC = () => {
     }
   });
 
-  const handleDelete = async () => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = () => {
     if (!id) return;
-    if (window.confirm("¿Está seguro de que desea eliminar este proyecto? Esta acción no se puede deshacer.")) {
-      try {
-        await deleteMutation.mutateAsync(id);
-        addToast("Proyecto eliminado exitosamente", "success");
-        navigate("/admin/projects");
-      } catch (error) {
-        addToast("Error al eliminar el proyecto", "error");
-      }
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setShowDeleteConfirm(false);
+    try {
+      await deleteMutation.mutateAsync(id as string);
+      addToast("Proyecto eliminado exitosamente", "success");
+      navigate("/admin/projects");
+    } catch (error) {
+      addToast("Error al eliminar el proyecto", "error");
     }
   };
 
@@ -85,7 +90,7 @@ export const ProjectManagePage: React.FC = () => {
         if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
           throw new Error("Missing required field: usuarioCreadorId");
         }
-        await createMutation.mutateAsync({
+        const newProj = await createMutation.mutateAsync({
           nombre: data.nombre,
           ubicacionTexto: data.ubicacionTexto || "",
           categoria: data.categoria,
@@ -96,7 +101,7 @@ export const ProjectManagePage: React.FC = () => {
           ubicacionGps: data.ubicacionGps
         });
         addToast("Proyecto creado exitosamente", "success");
-        navigate("/admin/projects");
+        navigate(`/projects/${newProj.id}`);
       }
     } catch (error) {
       addToast("Error al guardar el proyecto", "error");
@@ -142,6 +147,50 @@ export const ProjectManagePage: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-4">
+
+      {/* ── Inline Delete Confirmation Modal ── */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-red-600 text-2xl">⚠</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-gray-900">Eliminar Proyecto</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer.</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-700">
+              ¿Está seguro de que desea eliminar este proyecto permanentemente? Todos los datos asociados serán borrados.
+            </p>
+            <div className="flex gap-3 justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-6 py-3 rounded-xl font-bold text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="px-6 py-3 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-8 text-center animate-fade-in">
         <h1 className="text-4xl font-extrabold text-[var(--color-text-strong)] tracking-tight">
           {isEditing ? "Editar Proyecto" : "Crear Nuevo Proyecto"}

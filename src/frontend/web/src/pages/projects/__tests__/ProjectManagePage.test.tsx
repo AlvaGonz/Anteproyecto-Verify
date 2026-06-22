@@ -114,6 +114,13 @@ vi.mock("../../../features/projects/api/useProjects", async () => {
           throw new Error(res.error.message || "Failed");
         }
       };
+    },
+    useDeleteProject: () => {
+      return {
+        mutateAsync: async (id: string) => {
+          return {};
+        }
+      };
     }
   };
 });
