@@ -14,7 +14,9 @@ const ICONS = {
   checkCircle: "check_circle",
   download: "download",
   assignment: "assignment",
-  timer: "timer"
+  timer: "timer",
+  menu_book: "menu_book",
+  visibility: "visibility"
 };
 
 export const LegalPage: React.FC = () => {
@@ -163,6 +165,16 @@ export const LegalPage: React.FC = () => {
                 </span>
                 Acuerdo de Nivel de Servicio (SLA)
               </a>
+              <a
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
+                href="#marco-legal"
+                onClick={(e) => handleSidebarClick(e, "marco-legal")}
+              >
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
+                  {ICONS.menu_book}
+                </span>
+                Marco Normativo
+              </a>
               <div className="mt-8 pt-6 border-t border-outline-variant/30 flex-shrink-0 ml-auto lg:mt-8 lg:pt-6 lg:border-t lg:ml-0">
                 <button className="w-full bg-surface border border-outline-variant text-on-surface hover:bg-surface-container hover:text-primary font-label text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-sm">
                   <span className="material-symbols-outlined text-sm">{ICONS.download}</span>
@@ -254,6 +266,37 @@ export const LegalPage: React.FC = () => {
                   <p className="font-body text-on-surface-variant leading-relaxed">
                     La plataforma actúa exclusivamente como una herramienta de verificación documental y automatizada. <strong>No constituye un garante legal del título de propiedad</strong> ni reemplaza el debido proceso notarial y judicial.
                   </p>
+                </div>
+
+                <div className="bg-amber-50 dark:bg-amber-900/10 border-l-4 border-amber-500 p-6 rounded-r-xl">
+                  <h3 className="font-headline text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-amber-600 text-[22px]">
+                      {ICONS.gavel}
+                    </span>
+                    6.1 Exoneración de Responsabilidad Financiera y Material (No-Intermediación)
+                  </h3>
+                  <p className="font-body text-on-surface-variant leading-relaxed mb-4">
+                    <strong>VeriFinca es una plataforma tecnológica de análisis y cotejo documental automatizado.</strong> La emisión del Sello de Integridad Digital bajo la <strong>Ley 126-02</strong> certifica única y exclusivamente que la documentación legal, financiera y de propiedad cargada por el Desarrollador coincide con los registros públicos consultados en las APIs oficiales del Estado Dominicano al momento exacto de la consulta (<em>Tiempo T</em>).
+                  </p>
+                  <p className="font-body text-on-surface-variant font-semibold mb-3">VeriFinca <strong>NO</strong> garantiza, ni asume responsabilidad civil ni penal por:</p>
+                  <ul className="space-y-3 font-body text-on-surface-variant text-sm pl-2">
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-amber-500 text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                      <span>La veracidad material de los documentos analizados si estos fueron falsificados en origen con metodologías capaces de evadir los controles estándar de OCR e Inteligencia Artificial.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-amber-500 text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                      <span>El cese operativo, la insolvencia sobrevenida, la quiebra financiera o el incumplimiento de los tiempos de entrega del proyecto inmobiliario por parte del Desarrollador.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-amber-500 text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                      <span>Conflictos de linderos latentes, vicios ocultos de construcción, revocaciones posteriores de licencias municipales o ambientales no reflejadas en los sistemas públicos al momento de la consulta.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-amber-500 text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                      <span>El uso de VeriFinca constituye una herramienta de <strong>Debida Diligencia (Due Diligence)</strong> y no sustituye en ningún caso el asesoramiento legal independiente, notarial, ni las determinaciones definitivas de los <strong>Tribunales de Tierras de la República Dominicana</strong>.</span>
+                    </li>
+                  </ul>
                 </div>
 
                 <div>
@@ -425,6 +468,37 @@ export const LegalPage: React.FC = () => {
                     </li>
                   </ul>
                 </div>
+
+                <div className="bg-primary-subtle border-l-4 border-primary p-6 rounded-r-xl">
+                  <h3 className="font-headline text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[22px]">{ICONS.verifiedUser}</span>
+                    5. Consentimiento Expreso para Consulta a Buró de Crédito (TransUnion — Ley 172-13)
+                  </h3>
+                  <p className="font-body text-on-surface-variant leading-relaxed mb-4">
+                    Conforme al <strong>Artículo 8 de la Ley 172-13</strong> sobre Protección de Datos Personales, la consulta del historial crediticio de un Desarrollador ante <strong>TransUnion República Dominicana</strong> requiere un consentimiento que sea simultáneamente: <strong>previo, explícito, informado e individualmente revocable</strong>.
+                  </p>
+                  <ul className="space-y-3 font-body text-on-surface-variant text-sm pl-2 mb-4">
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-primary text-sm mt-1">{ICONS.checkCircle}</span>
+                      <span><strong>Flujo del Gestor de Consentimiento:</strong> El Desarrollador debe aceptar de forma expresa e individual un formulario de autorización específico para la consulta crediticia, separado de los Términos de Servicio generales, antes de que se inicie cualquier proceso de verificación financiera.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-primary text-sm mt-1">{ICONS.checkCircle}</span>
+                      <span><strong>Alcance limitado de la consulta:</strong> La consulta a TransUnion se limita estrictamente a la verificación de la capacidad financiera para el proyecto declarado. El puntaje crediticio y el reporte en formato raw <strong>nunca se almacenan</strong> en las bases de datos de VeriFinca; solo se persiste el resultado booleano de la verificación (Aprobado / Observado) y la fecha de consulta.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-primary text-sm mt-1">{ICONS.checkCircle}</span>
+                      <span><strong>Derecho de revocación:</strong> El Desarrollador puede revocar este consentimiento en cualquier momento desde el panel de su cuenta (Configuración → Privacidad → Revocar Acceso Crediticio). La revocación no tiene efecto retroactivo sobre las verificaciones ya completadas.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-primary text-sm mt-1">{ICONS.checkCircle}</span>
+                      <span><strong>Prohibición de almacenamiento:</strong> Está técnica y contractualmente prohibido almacenar, replicar o transmitir a terceros los reportes de crédito completos emitidos por TransUnion. El incumplimiento constituye una infracción al <strong>Art. 25 de la Ley 172-13</strong> y podrá ser sancionado ante el Instituto Nacional de Protección de Datos (INPD) cuando este entre en funciones.</span>
+                    </li>
+                  </ul>
+                  <p className="font-body text-xs text-on-surface-variant italic">
+                    Para ejercer el derecho de acceso a los datos consultados ante TransUnion, el titular puede dirigirse directamente a: <strong>legal@verifinca.do</strong> indicando en el asunto "Solicitud Habeas Data — Reporte Crediticio".
+                  </p>
+                </div>
               </div>
             </section>
 
@@ -589,20 +663,177 @@ export const LegalPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-headline text-xl font-bold text-on-surface mb-3">6. Exclusiones</h3>
-                  <p className="font-body text-on-surface-variant leading-relaxed mb-3">
-                    Las siguientes interrupciones <strong>no</strong> contabilizarán en el cálculo del SLA del 99.2% de VeriFinca:
+                  <h3 className="font-headline text-xl font-bold text-on-surface mb-3">6. Exclusiones del SLA y Modo Degradado Técnico</h3>
+                  <p className="font-body text-on-surface-variant leading-relaxed mb-4">
+                    Las siguientes interrupciones <strong>no</strong> contabilizarán en el cálculo del SLA del 99.2% de VeriFinca, sin que ello dé lugar a créditos de consumo ni acciones de responsabilidad contractual:
                   </p>
-                  <ul className="space-y-3 font-body text-on-surface-variant pl-2">
+                  <ul className="space-y-3 font-body text-on-surface-variant pl-2 mb-6">
                     <li className="flex items-start gap-3">
                       <span className="material-symbols-outlined text-secondary text-sm mt-1">{ICONS.fiberManualRecord}</span>
-                      <span>Eventos de fuerza mayor (desastres naturales, cortes de internet nacionales).</span>
+                      <span>Eventos de fuerza mayor (desastres naturales, cortes de internet nacionales, actos de autoridad gubernamental).</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="material-symbols-outlined text-secondary text-sm mt-1">{ICONS.fiberManualRecord}</span>
-                      <span>Interrupciones o caídas de APIs de terceros (Registro Inmobiliario, DGII, TransUnion, servicios de Microsoft Azure a nivel regional).</span>
+                      <span><strong>Caídas o degradación de APIs de organismos gubernamentales dominicanos</strong>: Registro Inmobiliario (RI), Dirección General de Impuestos Internos (DGII), Catastro Nacional, Ministerio de Medio Ambiente, o cualquier otro nodo del Estado.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-secondary text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                      <span>Interrupciones de sub-procesadores externos: TransUnion, Stripe, y Microsoft Azure a nivel de región de Azure.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-secondary text-sm mt-1">{ICONS.fiberManualRecord}</span>
+                      <span>Mantenimiento planificado notificado con ≥ 48 horas de anticipación.</span>
                     </li>
                   </ul>
+
+                  <div className="bg-surface-raised border border-outline-variant rounded-xl p-5">
+                    <h4 className="font-headline text-base font-bold text-on-surface mb-3 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-secondary text-[18px]">{ICONS.timer}</span>
+                      Protocolo de Modo Degradado Técnico (MDT)
+                    </h4>
+                    <p className="font-body text-sm text-on-surface-variant leading-relaxed mb-3">
+                      Cuando una o más APIs gubernamentales no estén disponibles, VeriFinca activará automáticamente el <strong>Modo Degradado Técnico (MDT)</strong>, bajo las siguientes condiciones:
+                    </p>
+                    <ul className="space-y-2 font-body text-sm text-on-surface-variant pl-2">
+                      <li className="flex items-start gap-3">
+                        <span className="material-symbols-outlined text-primary text-sm mt-0.5">{ICONS.checkCircle}</span>
+                        <span>Las funciones de consulta y carga de documentos continuarán operativas. Los resultados de verificación que dependan del nodo gubernamental caído serán marcados con estado "<strong>Pendiente de Validación Oficial</strong>" y no como rechazados.</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="material-symbols-outlined text-primary text-sm mt-0.5">{ICONS.checkCircle}</span>
+                        <span>Se notificará al usuario mediante un banner en la interfaz identificando cuál servicio gubernamental específico está no disponible y el tiempo estimado de restauración, si lo hubiere.</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="material-symbols-outlined text-primary text-sm mt-0.5">{ICONS.checkCircle}</span>
+                        <span>El tiempo transcurrido en MDT por causa de indisponibilidad gubernamental <strong>no se computa</strong> contra el 99.2% de uptime ni activa compensaciones contractuales por créditos de consumo.</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="material-symbols-outlined text-primary text-sm mt-0.5">{ICONS.checkCircle}</span>
+                        <span>VeriFinca publicará un registro histórico de incidentes en MDT en el endpoint público <code className="font-mono text-xs bg-surface-container px-1.5 py-0.5 rounded">/health</code> de la plataforma.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 5: Marco Normativo */}
+            <section className={`mb-16 scroll-mt-28 fade-up stagger-7 ${isRevealed ? "is-visible" : ""}`} id="marco-legal">
+              <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
+                Marco Normativo de Referencia
+              </h2>
+              <p className="font-body text-on-surface-variant leading-relaxed mb-8">
+                La operación de VeriFinca está gobernada por el siguiente conjunto de leyes, reglamentos y estándares técnicos internacionales. Esta tabla es informativa y no exhaustiva.
+              </p>
+
+              <div className="space-y-6">
+                {/* Local RD */}
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[20px]">{ICONS.menu_book}</span>
+                    I. Marco Legal Local — República Dominicana
+                  </h3>
+                  <div className="overflow-x-auto rounded-xl border border-outline-variant shadow-sm">
+                    <table className="w-full text-left font-body text-sm">
+                      <thead className="bg-surface-variant/30 text-on-surface">
+                        <tr>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Norma</th>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Aplicación en VeriFinca</th>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Fuente</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-surface divide-y divide-outline-variant/30 text-on-surface-variant">
+                        <tr className="hover:bg-surface-container-low">
+                          <td className="px-5 py-4 font-semibold text-on-surface">Ley 126-02</td>
+                          <td className="px-5 py-4">Validez del Sello de Integridad, equivalencia funcional de firma digital, QR como documento electrónico.</td>
+                          <td className="px-5 py-4 font-mono text-xs">Gaceta Oficial 10164 — 4 sep 2002. Decreto 335-03.</td>
+                        </tr>
+                        <tr className="bg-surface-raised hover:bg-surface-container">
+                          <td className="px-5 py-4 font-semibold text-on-surface">Ley 53-07</td>
+                          <td className="px-5 py-4">Marco penal para scraping ilegal, inyección SQL, suplantación de identidad y sabotaje informático.</td>
+                          <td className="px-5 py-4 font-mono text-xs">Gaceta Oficial 10416 — 23 abr 2007.</td>
+                        </tr>
+                        <tr className="hover:bg-surface-container-low">
+                          <td className="px-5 py-4 font-semibold text-on-surface">Ley 172-13</td>
+                          <td className="px-5 py-4">Recolección y tratamiento de PII (Cédula, GPS, crédito). Consentimiento expreso para TransUnion. Habeas Data.</td>
+                          <td className="px-5 py-4 font-mono text-xs">Gaceta Oficial 10737 — 13 dic 2013.</td>
+                        </tr>
+                        <tr className="bg-surface-raised hover:bg-surface-container">
+                          <td className="px-5 py-4 font-semibold text-on-surface">Ley 155-17</td>
+                          <td className="px-5 py-4">Obligaciones AML/CFT del sector inmobiliario. Due Diligence de promotores contra lavado de activos.</td>
+                          <td className="px-5 py-4 font-mono text-xs">Gaceta Oficial 10884 — 1 jun 2017.</td>
+                        </tr>
+                        <tr className="hover:bg-surface-container-low">
+                          <td className="px-5 py-4 font-semibold text-on-surface">Ley 358-05</td>
+                          <td className="px-5 py-4">Transparencia en la prestación del servicio. Prohíbe publicidad engañosa sobre el alcance del Sello.</td>
+                          <td className="px-5 py-4 font-mono text-xs">Gaceta Oficial 10336 — 9 sep 2005.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* International */}
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary text-[20px]">{ICONS.menu_book}</span>
+                    II. Marco Legal Internacional — Extraterritorialidad
+                  </h3>
+                  <div className="overflow-x-auto rounded-xl border border-outline-variant shadow-sm">
+                    <table className="w-full text-left font-body text-sm">
+                      <thead className="bg-surface-variant/30 text-on-surface">
+                        <tr>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Norma</th>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Aplicación en VeriFinca</th>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Jurisdicción</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-surface divide-y divide-outline-variant/30 text-on-surface-variant">
+                        <tr className="hover:bg-surface-container-low">
+                          <td className="px-5 py-4 font-semibold text-on-surface">GDPR (UE) 2016/679</td>
+                          <td className="px-5 py-4">Privacidad por diseño, notificación de brechas ≤ 72 h (Art. 33), revisión humana de decisiones IA (Art. 22). Solo aplica a ciudadanos UE.</td>
+                          <td className="px-5 py-4 font-mono text-xs">Unión Europea</td>
+                        </tr>
+                        <tr className="bg-surface-raised hover:bg-surface-container">
+                          <td className="px-5 py-4 font-semibold text-on-surface">FTC Safeguards Rule</td>
+                          <td className="px-5 py-4">Salvaguardas técnicas para datos financieros de consumidores EE.UU. Reporte electrónico a FTC ≤ 30 días si ≥500 afectados. Solo aplica a ciudadanos EE.UU.</td>
+                          <td className="px-5 py-4 font-mono text-xs">EE.UU. — 16 CFR Part 314</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Technical Standards */}
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.verifiedUser}</span>
+                    III. Estándares Técnicos de Ciberseguridad
+                  </h3>
+                  <div className="overflow-x-auto rounded-xl border border-outline-variant shadow-sm">
+                    <table className="w-full text-left font-body text-sm">
+                      <thead className="bg-surface-variant/30 text-on-surface">
+                        <tr>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Estándar</th>
+                          <th className="px-5 py-4 font-bold border-b border-outline-variant/30">Aplicación en VeriFinca</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-surface divide-y divide-outline-variant/30 text-on-surface-variant">
+                        <tr className="hover:bg-surface-container-low">
+                          <td className="px-5 py-4 font-semibold text-on-surface">PCI-DSS v4.0</td>
+                          <td className="px-5 py-4">Tokenización de pagos vía Stripe. SAQ-A: VeriFinca no almacena ni transmite PAN. Cifrado en tránsito TLS 1.2+.</td>
+                        </tr>
+                        <tr className="bg-surface-raised hover:bg-surface-container">
+                          <td className="px-5 py-4 font-semibold text-on-surface">ISO/IEC 27001:2022</td>
+                          <td className="px-5 py-4">SGSI para el backend Azure. Control A.5.34 (Privacidad y PII). Auditoría continua de accesos.</td>
+                        </tr>
+                        <tr className="hover:bg-surface-container-low">
+                          <td className="px-5 py-4 font-semibold text-on-surface">CIS Controls v8</td>
+                          <td className="px-5 py-4">Control 01 (Inventario de Activos), Control 07 (Gestión de Vulnerabilidades), Control 16 (Seguridad de Aplicaciones Web — OWASP).</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </section>
