@@ -5,12 +5,43 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProjectManagePage } from "../ProjectManagePage";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
+import { AuthProvider } from "../../../shared/context/AuthContext";
 import { projectsApi } from "../../../features/projects/api/projectsApi";
 import {
   ProjectStatus,
   ProjectCategory,
   IntegrityStatus,
 } from "../../../features/projects/types";
+
+// ── Leaflet mocks (jsdom has no canvas/layout engine) ──────────────────────
+vi.mock("leaflet", () => ({
+  default: {
+    Icon: { Default: { prototype: {}, mergeOptions: vi.fn() } },
+    map: vi.fn(() => ({
+      setView: vi.fn().mockReturnThis(),
+      on: vi.fn().mockReturnThis(),
+      addLayer: vi.fn(),
+      remove: vi.fn(),
+      flyTo: vi.fn(),
+      invalidateSize: vi.fn(),
+    })),
+    tileLayer: vi.fn(() => ({ addTo: vi.fn() })),
+    marker: vi.fn(() => ({ addTo: vi.fn(), setLatLng: vi.fn() })),
+  },
+}));
+vi.mock("leaflet/dist/leaflet.css", () => ({}));
+vi.mock("leaflet/dist/images/marker-icon-2x.png", () => ({ default: "" }));
+vi.mock("leaflet/dist/images/marker-icon.png", () => ({ default: "" }));
+vi.mock("leaflet/dist/images/marker-shadow.png", () => ({ default: "" }));
+
+// ── AuthService mock (AuthProvider inside ProjectForm needs this) ───────────
+vi.mock("../../../features/auth/services/AuthService", () => ({
+  AuthService: {
+    getCurrentUser: vi.fn().mockResolvedValue({ _tag: "None" }),
+    login: vi.fn(),
+    logout: vi.fn(),
+  },
+}));
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -168,27 +199,31 @@ const MOCK_PROJECT = {
 
 const renderCreate = () =>
   render(
-    <MemoryRouter initialEntries={["/admin/projects/new"]}>
-      <ToastProvider>
-        <Routes>
-          <Route path="/admin/projects/new" element={<ProjectManagePage />} />
-          <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
-        </Routes>
-      </ToastProvider>
-    </MemoryRouter>
+    <AuthProvider>
+      <MemoryRouter initialEntries={["/admin/projects/new"]}>
+        <ToastProvider>
+          <Routes>
+            <Route path="/admin/projects/new" element={<ProjectManagePage />} />
+            <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
+          </Routes>
+        </ToastProvider>
+      </MemoryRouter>
+    </AuthProvider>
   );
 
 const renderEdit = (id = "proj-001") =>
   render(
-    <MemoryRouter initialEntries={[`/admin/projects/${id}/edit`]}>
-      <ToastProvider>
-        <Routes>
-          <Route path="/admin/projects/:id/edit" element={<ProjectManagePage />} />
-          <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
-          <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
-        </Routes>
-      </ToastProvider>
-    </MemoryRouter>
+    <AuthProvider>
+      <MemoryRouter initialEntries={[`/admin/projects/${id}/edit`]}>
+        <ToastProvider>
+          <Routes>
+            <Route path="/admin/projects/:id/edit" element={<ProjectManagePage />} />
+            <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
+            <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
+          </Routes>
+        </ToastProvider>
+      </MemoryRouter>
+    </AuthProvider>
   );
 
 // ── CREATE MODE ───────────────────────────────────────────────────────────────

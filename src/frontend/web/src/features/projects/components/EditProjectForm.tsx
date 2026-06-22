@@ -38,7 +38,7 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
     });
 
   const onSubmit = (data: UpdateProjectFormValues) =>
-    updateProject(data, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/projects/${project.id}`) });
+    updateProject(data, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/p/${project.id}`) });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>

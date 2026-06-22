@@ -1,7 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } from "../types";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { MapPin, Globe, Compass, Navigation } from "lucide-react";
+import { apiClient } from "@/infrastructure/api/client";
+
+// Fix Leaflet default marker icon paths broken by Vite's asset bundler
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+});
 
 interface ProjectFormProps {
   initialData?: ProyectoDto;
@@ -47,8 +62,8 @@ const PROVINCIAS: ProvinciaInfo[] = [
   { nombre: "Sánchez Ramírez", lat: 19.00160, lng: -70.14920, dcPrefix: "DC-28" },
   { nombre: "Santiago", lat: 19.45170, lng: -70.69703, dcPrefix: "DC-29" },
   { nombre: "Santiago Rodríguez", lat: 19.48000, lng: -71.34000, dcPrefix: "DC-30" },
-  { nombre: "Santo Domingo", lat: 18.54118659239565, lng: -69.4181733044046, dcPrefix: "DC-31" },
-  { nombre: "Valverde", lat: 19.58000, lng: -71.07000, dcPrefix: "DC-32" }
+  { nombre: "Santo Domingo", lat: 18.54119, lng: -69.41817, dcPrefix: "DC-31" },
+  { nombre: "Valverde", lat: 19.58000, lng: -71.07000, dcPrefix: "DC-32" },
 ];
 
 export const ProjectForm: React.FC<ProjectFormProps> = ({
@@ -56,99 +71,189 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  let user: any = null;
-  try {
-    const auth = useAuth();
-    user = auth ? auth.user : null;
-  } catch (e) {
-    // Fallback when rendered without AuthProvider in unit tests
-  }
-  
-  // Fields State
+  // useAuth must be called unconditionally at the top level (React rules).
+  // In unit tests the component is wrapped in a test AuthProvider, so this is safe.
+  const { user } = useAuth();
+
+  // ── Fields State ──────────────────────────────────────────────────────────
   const [nombre, setNombre] = useState(initialData?.nombre ?? "");
   const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto ?? "");
   const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps ?? "");
   const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado ?? "");
   const [categoria, setCategoria] = useState<ProjectCategory>(initialData?.categoria ?? ProjectCategory.Residencial);
   const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador ?? "");
+  const [rncDesarrollador, setRncDesarrollador] = useState(initialData?.rncDesarrollador ?? "");
   const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");
-  
-  // Interaction and Submission states
+
+  // RNC Lookup States
+  const [isSearchingRnc, setIsSearchingRnc] = useState(false);
+  const [rncError, setRncError] = useState<string | null>(null);
+
+  const handleRncSearch = async (rncValue: string) => {
+    const cleaned = rncValue.replace(/[- ]/g, "").trim();
+    if (!cleaned) return;
+
+    setIsSearchingRnc(true);
+    setRncError(null);
+
+    try {
+      const response = await apiClient.get(`/dgii/rnc/${cleaned}`);
+      if (response.data && response.data.nombreRazonSocial) {
+        setDatosDesarrollador(response.data.nombreRazonSocial);
+      }
+    } catch (err: any) {
+      console.error("Error fetching RNC:", err);
+      setRncError("RNC/Cédula no registrado o inválido");
+    } finally {
+      setIsSearchingRnc(false);
+    }
+  };
+
+  // ── Validation State ──────────────────────────────────────────────────────
   const [nombreTouched, setNombreTouched] = useState(false);
   const [ubicacionTouched, setUbicacionTouched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Map elements
+  // ── Map State ─────────────────────────────────────────────────────────────
   const [activeMapTab, setActiveMapTab] = useState<"leaflet" | "official">("leaflet");
-  const mapRef = useRef<any>(null);
-  const markerRef = useRef<any>(null);
 
-  // Initialize and update Leaflet Map
+  // Leaflet refs
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const leafletMapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+
+  // RI iframe ref (for postMessage targeting)
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Keep a ref to the latest ubicacionTexto so the postMessage listener
+  // always has the current province without needing to re-register
+  const ubicacionTextoRef = useRef(ubicacionTexto);
+  useEffect(() => { ubicacionTextoRef.current = ubicacionTexto; }, [ubicacionTexto]);
+
+  // ── Leaflet: Initialize map once on mount ─────────────────────────────────
   useEffect(() => {
-    const L = (window as any).L;
-    if (!L) return;
+    if (!mapContainerRef.current || leafletMapRef.current) return;
 
-    // Wait until DOM ref is available and map isn't initialized yet
-    if (!mapRef.current) {
-      const defaultCenter = [18.7357, -70.1627]; // Dominican Republic center
-      const map = L.map("leaflet-map-container").setView(defaultCenter, 8);
+    const defaultCenter: L.LatLngTuple = [18.7357, -70.1627]; // DR center
+    const map = L.map(mapContainerRef.current, { zoomControl: true }).setView(defaultCenter, 8);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+      maxZoom: 18,
+    }).addTo(map);
 
-      mapRef.current = map;
+    leafletMapRef.current = map;
 
-      // Handle map clicks to drop marker & capture coordinates + parcel designation
-      map.on("click", (e: any) => {
-        const { lat, lng } = e.latlng;
-        const coordsStr = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-        setUbicacionGps(coordsStr);
+    // Click to drop marker + capture GPS + generate catastral code
+    map.on("click", (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+      setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
-        // Auto generate realistic parcel number based on province prefix
-        const randomParcel = Math.floor(Math.random() * 500) + 1;
-        const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTexto);
-        const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
-        setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+      const randomParcel = Math.floor(Math.random() * 500) + 1;
+      const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+      const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
+      setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
 
-        // Set or update marker
-        if (markerRef.current) {
-          markerRef.current.setLatLng([lat, lng]);
-        } else {
-          markerRef.current = L.marker([lat, lng]).addTo(map);
-        }
-      });
-    } else {
-      // Map already initialized. If province is selected, fly to centroid
-      const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTexto);
-      if (matchedProv) {
-        mapRef.current.flyTo([matchedProv.lat, matchedProv.lng], 11);
-
-        // Place or move marker to centroid
-        if (markerRef.current) {
-          markerRef.current.setLatLng([matchedProv.lat, matchedProv.lng]);
-        } else {
-          markerRef.current = L.marker([matchedProv.lat, matchedProv.lng]).addTo(mapRef.current);
-        }
+      if (markerRef.current) {
+        markerRef.current.setLatLng([lat, lng]);
+      } else {
+        markerRef.current = L.marker([lat, lng]).addTo(map);
       }
+    });
+
+    // Settle layout then force a size recalculation
+    setTimeout(() => { map.invalidateSize(); }, 250);
+
+    return () => {
+      map.remove();
+      leafletMapRef.current = null;
+      markerRef.current = null;
+    };
+  }, []);
+
+  // ── Leaflet: Fly to province centroid when selection changes ──────────────
+  useEffect(() => {
+    const map = leafletMapRef.current;
+    if (!map || !ubicacionTexto) return;
+
+    const prov = PROVINCIAS.find(p => p.nombre === ubicacionTexto);
+    if (!prov) return;
+
+    map.flyTo([prov.lat, prov.lng], 11, { duration: 1.2 });
+
+    if (markerRef.current) {
+      markerRef.current.setLatLng([prov.lat, prov.lng]);
+    } else {
+      markerRef.current = L.marker([prov.lat, prov.lng]).addTo(map);
     }
   }, [ubicacionTexto]);
 
-  // Recalculate sizes when map tab changes to prevent broken/gray tiles in Leaflet
+  // ── Leaflet: Fix tile rendering when switching back to Leaflet tab ────────
   useEffect(() => {
-    if (activeMapTab === "leaflet" && mapRef.current) {
-      setTimeout(() => {
-        mapRef.current.invalidateSize();
-      }, 100);
+    const map = leafletMapRef.current; // capture before async timeout
+    if (activeMapTab === "leaflet" && map) {
+      const timer = setTimeout(() => { map.invalidateSize(); }, 150);
+      return () => clearTimeout(timer);
     }
   }, [activeMapTab]);
 
+  // ── postMessage bridge: Respond to RI page's geoPermission request ────────
+  // The RI engineers built this bridge (see /ConsultaGeografica source lines
+  // 1257–1307): the iframe fires { event: 'geoPermission' } to window.parent
+  // (which is our app). We reply with province centroid coordinates, and their
+  // showPosition() pans the Google Maps instance to our selected location.
+  const handleRiPostMessage = useCallback((event: MessageEvent) => {
+    // Only handle messages from the RI portal
+    if (!event.origin.includes("ri.gob.do") && event.origin !== "null") return;
+    if (event.data?.event !== "geoPermission") return;
+
+    const prov = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+    const lat = prov?.lat ?? 18.7357;
+    const lng = prov?.lng ?? -70.1627;
+
+    // Reply to the iframe with our province coordinates
+    const target = iframeRef.current?.contentWindow ?? (event.source as Window);
+    if (target) {
+      target.postMessage(
+        {
+          event: "geolocation",
+          type: "geoPermissionGranted",
+          latitude: lat,
+          longitude: lng,
+        },
+        "https://servicios.ri.gob.do"
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("message", handleRiPostMessage);
+    return () => window.removeEventListener("message", handleRiPostMessage);
+  }, [handleRiPostMessage]);
+
+  // When user switches to RI tab AND a province is selected, reload the iframe
+  // so the RI page re-fires geoPermission with our new province in scope
+  useEffect(() => {
+    if (activeMapTab === "official" && iframeRef.current && ubicacionTexto) {
+      // Small delay to let the iframe become visible before triggering reload
+      const timer = setTimeout(() => {
+        if (iframeRef.current) {
+          iframeRef.current.src = "https://servicios.ri.gob.do/ConsultaGeografica";
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [activeMapTab, ubicacionTexto]);
+
+  // ── Form submission ───────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
 
     if (!nombre.trim() || !ubicacionTexto.trim()) {
+      setNombreTouched(true);
+      setUbicacionTouched(true);
       setError("Por favor complete los campos obligatorios (*).");
       return;
     }
@@ -158,22 +263,24 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     try {
       if (initialData) {
         const updateData: UpdateProyectoDto = {
-          nombre, 
+          nombre,
           ubicacionTexto,
           ubicacionGps: ubicacionGps || undefined,
           valorEstimado: valorEstimado === "" ? undefined : Number(valorEstimado),
           categoria,
           datosDesarrollador: datosDesarrollador || undefined,
+          rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
         };
         await onSubmit(updateData);
       } else {
         const createData: CreateProyectoDto = {
-          nombre, 
+          nombre,
           ubicacionTexto,
           usuarioCreadorId: user?.id ?? "00000000-0000-0000-0000-000000000000",
           categoria,
           datosDesarrollador: datosDesarrollador || undefined,
+          rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
           ubicacionGps: ubicacionGps || undefined,
         };
@@ -188,6 +295,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
   const isSaveDisabled = !nombre.trim() || !ubicacionTexto.trim() || isSubmitting;
 
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-6" noValidate>
       {error && (
@@ -197,7 +305,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Form Cards */}
+
+        {/* ── Left: Form Fields ── */}
         <div className="lg:col-span-6 space-y-6">
           <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
             <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
@@ -215,10 +324,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 required
                 placeholder="Ej: Residencial Las Palmeras"
                 value={nombre}
-                onChange={(e) => {
-                  setNombre(e.target.value);
-                  setNombreTouched(true);
-                }}
+                onChange={(e) => { setNombre(e.target.value); setNombreTouched(true); }}
                 onBlur={() => setNombreTouched(true)}
                 className={`vf-input ${nombreTouched && !nombre.trim() ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
               />
@@ -229,7 +335,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               )}
             </div>
 
-            {/* Provincia (Ubicación Dropdown) */}
+            {/* Provincia Dropdown */}
             <div>
               <label htmlFor="provincia" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
                 Provincia (Ubicación) *
@@ -239,11 +345,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 required
                 value={ubicacionTexto}
                 onChange={(e) => {
-                  setUbicacionTexto(e.target.value);
+                  const val = e.target.value;
+                  setUbicacionTexto(val);
                   setUbicacionTouched(true);
-
-                  // Update coordinates if mapped
-                  const matched = PROVINCIAS.find(p => p.nombre === e.target.value);
+                  const matched = PROVINCIAS.find(p => p.nombre === val);
                   if (matched) {
                     setUbicacionGps(`${matched.lat.toFixed(6)},${matched.lng.toFixed(6)}`);
                     setDesignacionCatastral(`Parc. ${Math.floor(Math.random() * 500) + 1}, ${matched.dcPrefix}`);
@@ -254,9 +359,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               >
                 <option value="">-- Seleccione una provincia --</option>
                 {PROVINCIAS.map((prov) => (
-                  <option key={prov.nombre} value={prov.nombre}>
-                    {prov.nombre}
-                  </option>
+                  <option key={prov.nombre} value={prov.nombre}>{prov.nombre}</option>
                 ))}
               </select>
               {ubicacionTouched && !ubicacionTexto.trim() && (
@@ -285,6 +388,37 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               </select>
             </div>
 
+            {/* RNC del Desarrollador */}
+            <div>
+              <label htmlFor="rncDesarrollador" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+                RNC / Cédula del Desarrollador
+              </label>
+              <div className="relative">
+                <input
+                  id="rncDesarrollador"
+                  type="text"
+                  value={rncDesarrollador}
+                  onChange={(e) => {
+                    setRncDesarrollador(e.target.value);
+                    if (rncError) setRncError(null);
+                  }}
+                  onBlur={() => handleRncSearch(rncDesarrollador)}
+                  className={`vf-input ${rncError ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
+                  placeholder="Ingrese RNC o Cédula (ej: 02601322098) y presione Tab"
+                />
+                {isSearchingRnc && (
+                  <div className="absolute right-3 top-3.5 flex items-center">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
+              {rncError && (
+                <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
+                  {rncError}
+                </p>
+              )}
+            </div>
+
             {/* Desarrollador */}
             <div>
               <label htmlFor="desarrollador" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
@@ -301,6 +435,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             </div>
           </div>
 
+          {/* Geolocalización y Catastro */}
           <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
             <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
               Geolocalización y Catastro
@@ -315,10 +450,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 <input
                   id="gps"
                   type="text"
+                  disabled={true}
                   value={ubicacionGps}
-                  onChange={(e) => setUbicacionGps(e.target.value)}
-                  className="vf-input font-mono pl-10"
-                  placeholder="Haga clic en el mapa para marcar o ingrese coordenadas"
+                  className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
+                  placeholder="Haga clic en el mapa para marcar"
                 />
                 <MapPin className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
               </div>
@@ -333,10 +468,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 <input
                   id="catastral"
                   type="text"
+                  disabled={true}
                   value={designacionCatastral}
-                  onChange={(e) => setDesignacionCatastral(e.target.value)}
-                  className="vf-input font-mono pl-10"
-                  placeholder="Ej: Parc. 120, DC-01"
+                  className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
+                  placeholder="Se genera al marcar la ubicación"
                 />
                 <Compass className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
               </div>
@@ -359,9 +494,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           </div>
         </div>
 
-        {/* Right Map Workspace */}
+        {/* ── Right: Map Workspace ── */}
         <div className="lg:col-span-6 space-y-4">
           <div className="vf-card p-6 flex flex-col space-y-4 bg-white/90 backdrop-blur-md min-h-[570px]">
+
             {/* Tab Selectors */}
             <div className="flex bg-[var(--color-surface-raised)] p-1 rounded-xl border border-[var(--color-border)]/20 shadow-inner">
               <button
@@ -393,37 +529,55 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             {/* Instructions */}
             <p className="text-xs text-[var(--color-text-secondary)] italic">
               {activeMapTab === "leaflet"
-                ? "Seleccione una provincia o haga clic directamente en el mapa para posicionar el marcador, extraer coordenadas GPS y obtener la Designación Catastral asociada."
-                : "Portal de Consulta Geográfica Oficial del Registro Inmobiliario de la República Dominicana. Utilícelo como consulta espacial paralela."}
+                ? "Seleccione una provincia o haga clic en el mapa para posicionar el marcador, extraer coordenadas GPS y obtener la Designación Catastral."
+                : ubicacionTexto
+                  ? `Portal Catastral RI — mostrando: ${ubicacionTexto}. El mapa se centra automáticamente en la provincia seleccionada.`
+                  : "Portal de Consulta Geográfica Oficial del Registro Inmobiliario. Seleccione una provincia para centrar el mapa automáticamente."}
             </p>
 
-            {/* Leaflet Map Container */}
-            <div className={activeMapTab === "leaflet" ? "block" : "hidden"}>
+            {/* ── Leaflet Interactive Map ── */}
+            <div
+              className={activeMapTab === "leaflet" ? "block flex-1" : "hidden"}
+              style={{ minHeight: 410 }}
+            >
               <div
-                id="leaflet-map-container"
-                className="w-full h-[410px] rounded-2xl border border-[var(--color-border)]/30 shadow-inner overflow-hidden"
-                style={{ zIndex: 1 }}
-              ></div>
+                ref={mapContainerRef}
+                className="w-full rounded-2xl border border-[var(--color-border)]/30 shadow-inner overflow-hidden"
+                style={{ height: 410, zIndex: 1 }}
+              />
             </div>
 
-            {/* Official IFrame Container */}
-            <div className={activeMapTab === "official" ? "block" : "hidden"}>
-              <div 
-                className="w-full h-[410px] rounded-2xl border border-[var(--color-border)]/30 shadow-inner overflow-hidden relative"
-                style={{ zIndex: 1 }}
-              >
-                <iframe
-                  src="https://servicios.ri.gob.do/ConsultaGeografica"
-                  className="w-full h-full border-none"
-                  title="Consulta Geográfica Registro Inmobiliario"
-                ></iframe>
-              </div>
+            {/* ── Official RI Cadastral Iframe ── */}
+            <div
+              className={activeMapTab === "official" ? "block flex-1 relative overflow-hidden rounded-2xl border border-[var(--color-border)]/30 shadow-inner" : "hidden"}
+              style={{ height: 410 }}
+            >
+              {/* 
+                sandbox: silences geolocation popup (allow-geolocation is intentionally absent).
+                The RI page fires postMessage({ event: 'geoPermission' }) to window.parent.
+                Our useEffect listener above responds with province centroid coordinates,
+                which their showPosition() uses to pan the Google Maps instance.
+              */}
+              <iframe
+                ref={iframeRef}
+                src="https://servicios.ri.gob.do/ConsultaGeografica"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                className="border-none absolute left-0"
+                title="Consulta Geográfica Registro Inmobiliario"
+                style={{
+                  // The RI page has ~130px of header + nav above the map canvas.
+                  // We shift the iframe up to clip those away and show only the map.
+                  top: "-132px",
+                  width: "100%",
+                  height: "calc(100% + 132px)",
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* ── Action Buttons ── */}
       <div className="flex justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
         <button type="button" onClick={onCancel} className="vf-btn-secondary">
           Cancelar

@@ -1,32 +1,75 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ProjectForm } from "./ProjectForm";
+import { AuthProvider } from "../../../shared/context/AuthContext";
+
+// Mock AuthService so AuthProvider doesn't make real HTTP calls in tests.
+vi.mock("../../../features/auth/services/AuthService", () => ({
+  AuthService: {
+    getCurrentUser: vi.fn().mockResolvedValue({ _tag: "None" }),
+    login: vi.fn(),
+    logout: vi.fn(),
+  },
+}));
+
+// Also mock Leaflet since jsdom doesn't have a real canvas/DOM layout engine.
+vi.mock("leaflet", () => ({
+  default: {
+    Icon: { Default: { prototype: {}, mergeOptions: vi.fn() } },
+    map: vi.fn(() => ({
+      setView: vi.fn().mockReturnThis(),
+      on: vi.fn().mockReturnThis(),
+      addLayer: vi.fn(),
+      remove: vi.fn(),
+      flyTo: vi.fn(),
+      invalidateSize: vi.fn(),
+    })),
+    tileLayer: vi.fn(() => ({ addTo: vi.fn() })),
+    marker: vi.fn(() => ({ addTo: vi.fn(), setLatLng: vi.fn() })),
+  },
+}));
+
+// Suppress leaflet.css import in jsdom
+vi.mock("leaflet/dist/leaflet.css", () => ({}));
+vi.mock("leaflet/dist/images/marker-icon-2x.png", () => ({ default: "" }));
+vi.mock("leaflet/dist/images/marker-icon.png", () => ({ default: "" }));
+vi.mock("leaflet/dist/images/marker-shadow.png", () => ({ default: "" }));
+
+const renderWithAuth = (ui: React.ReactElement) =>
+  render(<AuthProvider>{ui}</AuthProvider>);
 
 describe("ProjectForm", () => {
-  it("renders form fields", () => {
-    render(<ProjectForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+  beforeEach(() => { vi.clearAllMocks(); });
 
+  it("renders form fields", () => {
+    renderWithAuth(<ProjectForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
     expect(screen.getByLabelText(/Nombre del Proyecto/i)).toBeDefined();
-    expect(screen.getByLabelText(/Ubicación/i)).toBeDefined();
+    expect(screen.getByLabelText(/Provincia/i)).toBeDefined();
     expect(screen.getByRole("button", { name: /Guardar/i })).toBeDefined();
   });
 
-  it("calls onSubmit with correct data", async () => {
-    const handleSubmit = vi.fn();
-    render(<ProjectForm onSubmit={handleSubmit} onCancel={vi.fn()} />);
+  it("disables save button when required fields are empty", () => {
+    renderWithAuth(<ProjectForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+    const submitButton = screen.getByRole("button", { name: /Guardar/i }) as HTMLButtonElement;
+    expect(submitButton.disabled).toBe(true);
+  });
+
+  it("calls onSubmit with correct data when form is filled", async () => {
+    const handleSubmit = vi.fn().mockResolvedValue(undefined);
+    renderWithAuth(<ProjectForm onSubmit={handleSubmit} onCancel={vi.fn()} />);
 
     const nameInput = screen.getByLabelText(/Nombre del Proyecto/i);
-    const locationInput = screen.getByLabelText(/Ubicación/i);
+    const provinciaSelect = screen.getByLabelText(/Provincia/i);
     const submitButton = screen.getByRole("button", { name: /Guardar/i });
 
-    fireEvent.change(nameInput, { target: { value: "Nuevo Proyecto" } });
-    fireEvent.change(locationInput, { target: { value: "Distrito Nacional" } });
+    fireEvent.change(nameInput, { target: { value: "Residencial Las Palmas" } });
+    fireEvent.change(provinciaSelect, { target: { value: "Santiago" } });
     fireEvent.click(submitButton);
 
     expect(handleSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
-        nombre: "Nuevo Proyecto",
-        ubicacionTexto: "Distrito Nacional",
+        nombre: "Residencial Las Palmas",
+        ubicacionTexto: "Santiago",
       }),
     );
   });

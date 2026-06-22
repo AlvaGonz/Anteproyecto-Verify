@@ -9,6 +9,7 @@ export interface ProyectoDto {
   valorEstimado?: number;
   categoria: ProjectCategory;
   datosDesarrollador?: string;
+  rncDesarrollador?: string;
   designacionCatastral?: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;

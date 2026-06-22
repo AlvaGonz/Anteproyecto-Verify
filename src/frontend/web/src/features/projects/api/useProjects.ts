@@ -18,6 +18,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   valorEstimado: apiProj.valorEstimado,
   categoria: apiProj.categoria,
   datosDesarrollador: apiProj.datosDesarrollador,
+  rncDesarrollador: apiProj.rncDesarrollador,
   designacionCatastral: apiProj.designacionCatastral,
   estadoProyecto: apiProj.estadoProyecto,
   estadoIntegridad: apiProj.estadoIntegridad,
@@ -49,6 +50,7 @@ export const useCreateProject = () => {
         categoria: data.categoria ?? ProjectCategory.Residencial,
         usuarioCreadorId: data.usuarioCreadorId,
         datosDesarrollador: data.datosDesarrollador,
+        rncDesarrollador: data.rncDesarrollador,
         designacionCatastral: data.designacionCatastral,
         ubicacionGps: data.ubicacionGps
       }).then(res => mapApiProject(res.data)),

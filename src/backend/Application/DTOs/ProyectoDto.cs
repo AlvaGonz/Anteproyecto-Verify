@@ -12,6 +12,7 @@ public record ProyectoDto(
     decimal? ValorEstimado,
     ProjectCategory Categoria,
     string? DatosDesarrollador,
+    string? RncDesarrollador,
     string? DesignacionCatastral,
     ProjectStatus EstadoProyecto,
     IntegrityStatus EstadoIntegridad,
@@ -26,6 +27,7 @@ public record CreateProyectoDto(
     Guid UsuarioCreadorId,
     ProjectCategory Categoria = ProjectCategory.Residencial,
     string? DatosDesarrollador = null,
+    string? RncDesarrollador = null,
     string? DesignacionCatastral = null,
     string? UbicacionGps = null
 );

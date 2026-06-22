@@ -10,5 +10,6 @@ public record UpdateProyectoDto(
     decimal? ValorEstimado,
     ProjectCategory Categoria,
     string? DatosDesarrollador,
+    string? RncDesarrollador,
     string? DesignacionCatastral
 );

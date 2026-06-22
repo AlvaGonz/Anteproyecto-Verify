@@ -66,19 +66,23 @@ export const ProjectManagePage: React.FC = () => {
         }
         await updateMutation.mutateAsync({ id: id as string, payload: data });
         addToast("Proyecto actualizado exitosamente", "success");
-        navigate(`/projects/${id}`);
+        navigate("/admin/projects");
       } else {
         if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
           throw new Error("Missing required field: usuarioCreadorId");
         }
-        const created = await createMutation.mutateAsync({
+        await createMutation.mutateAsync({
           nombre: data.nombre,
           ubicacionTexto: data.ubicacionTexto || "",
           categoria: data.categoria,
-          usuarioCreadorId: data.usuarioCreadorId
+          usuarioCreadorId: data.usuarioCreadorId,
+          datosDesarrollador: data.datosDesarrollador,
+          rncDesarrollador: data.rncDesarrollador,
+          designacionCatastral: data.designacionCatastral,
+          ubicacionGps: data.ubicacionGps
         });
         addToast("Proyecto creado exitosamente", "success");
-        navigate(`/projects/${created.id}`);
+        navigate("/admin/projects");
       }
     } catch (error) {
       addToast("Error al guardar el proyecto", "error");
@@ -137,7 +141,7 @@ export const ProjectManagePage: React.FC = () => {
         key={project?.id || 'new'}
         initialData={project}
         onSubmit={handleSubmit}
-        onCancel={() => navigate(isEditing ? `/projects/${id}` : "/admin/projects")}
+        onCancel={() => navigate("/admin/projects")}
       />
 
       {isEditing && project && (

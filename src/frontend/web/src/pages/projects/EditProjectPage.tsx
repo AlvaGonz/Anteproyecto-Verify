@@ -14,7 +14,7 @@ export const EditProjectPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-premium mt-6">
-        {project && <EditProjectForm project={project} onSuccess={() => navigate(`/projects/${id}`)} />}
+        {project && <EditProjectForm project={project} onSuccess={() => navigate(`/p/${id}`)} />}
       </div>
     </AdminLayout>
   );

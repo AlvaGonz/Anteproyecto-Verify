@@ -25,7 +25,10 @@ public class ProjectsController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(CancellationToken cancellationToken)
     {
-        var projects = await _projectService.GetVisibleProjectsAsync(cancellationToken);
+        var showAll = User.Identity?.IsAuthenticated == true || Request.Headers.ContainsKey("Authorization");
+        var projects = showAll 
+            ? await _projectService.GetAllProjectsAsync(cancellationToken)
+            : await _projectService.GetVisibleProjectsAsync(cancellationToken);
         return Ok(projects);
     }
 

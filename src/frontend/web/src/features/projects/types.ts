@@ -7,6 +7,7 @@ export interface ProyectoDto {
   valorEstimado?: number;
   categoria: ProjectCategory;
   datosDesarrollador?: string;
+  rncDesarrollador?: string;
   designacionCatastral?: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
@@ -25,6 +26,7 @@ export interface CreateProyectoDto {
   usuarioCreadorId: string;
   categoria?: ProjectCategory;
   datosDesarrollador?: string;
+  rncDesarrollador?: string;
   designacionCatastral?: string;
   ubicacionGps?: string;
 }
@@ -36,6 +38,7 @@ export interface UpdateProyectoDto {
   valorEstimado?: number;
   categoria: ProjectCategory;
   datosDesarrollador?: string;
+  rncDesarrollador?: string;
   designacionCatastral?: string;
 }
 

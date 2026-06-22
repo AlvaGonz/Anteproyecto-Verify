@@ -28,7 +28,7 @@ export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
   const onSubmit = (data: CreateProjectFormValues) =>
     createProject(
       { ...data, usuarioCreadorId: "00000000-0000-0000-0000-000000000000" }, // replaced by auth context in production
-      { onSuccess: (proj) => onSuccess ? onSuccess(proj.id) : navigate(`/projects/${proj.id}`) }
+      { onSuccess: (proj) => onSuccess ? onSuccess(proj.id) : navigate(`/p/${proj.id}`) }
     );
 
   return (

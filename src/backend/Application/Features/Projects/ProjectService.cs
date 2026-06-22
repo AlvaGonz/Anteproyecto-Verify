@@ -38,6 +38,12 @@ public class ProjectService : IProjectService
         return proyectos.Select(MapToDto);
     }
 
+    public async Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(CancellationToken cancellationToken = default)
+    {
+        var proyectos = await _proyectoRepository.GetAllAsync(cancellationToken);
+        return proyectos.Select(MapToDto);
+    }
+
     public async Task<ProyectoDto?> GetProjectByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var proyecto = await _proyectoRepository.GetByIdAsync(id, cancellationToken);
@@ -50,6 +56,10 @@ public class ProjectService : IProjectService
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {
             proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
+        }
+        if (!string.IsNullOrEmpty(dto.RncDesarrollador))
+        {
+            proyecto.UpdateRncYMatricula(dto.RncDesarrollador, null);
         }
         
         await _proyectoRepository.AddAsync(proyecto, cancellationToken);
@@ -67,6 +77,7 @@ public class ProjectService : IProjectService
         }
 
         proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
+        proyecto.UpdateRncYMatricula(dto.RncDesarrollador, proyecto.Matricula);
         
         _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -112,6 +123,7 @@ public class ProjectService : IProjectService
             proyecto.ValorEstimado,
             proyecto.Categoria,
             proyecto.DatosDesarrollador,
+            proyecto.RncDesarrollador,
             proyecto.DesignacionCatastral,
             proyecto.EstadoProyecto,
             proyecto.EstadoIntegridad,
