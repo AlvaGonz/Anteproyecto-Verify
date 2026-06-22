@@ -14,6 +14,7 @@ public record ProyectoDto(
     string? DatosDesarrollador,
     string? RncDesarrollador,
     string? DesignacionCatastral,
+    string? Matricula,
     ProjectStatus EstadoProyecto,
     IntegrityStatus EstadoIntegridad,
     Guid UsuarioCreadorId,
@@ -29,5 +30,6 @@ public record CreateProyectoDto(
     string? DatosDesarrollador = null,
     string? RncDesarrollador = null,
     string? DesignacionCatastral = null,
-    string? UbicacionGps = null
+    string? UbicacionGps = null,
+    string? Matricula = null
 );

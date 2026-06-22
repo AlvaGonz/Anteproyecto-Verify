@@ -14,9 +14,8 @@ USER appuser
 # Copy lockfile and manifest first (cache layer)
 COPY --chown=appuser:appgroup package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=appuser:appgroup src/frontend/web/package.json ./src/frontend/web/
-
-# Install with frozen lockfile — reproducible and pnpm-only, filter by web-frontend
-RUN pnpm install --filter web-frontend --frozen-lockfile
+# Install dependencies, filter by web-frontend, allow updating lockfile if needed
+RUN pnpm install --filter web-frontend --no-frozen-lockfile
 
 # Copy the rest of the workspace source code
 COPY --chown=appuser:appgroup src/frontend/web ./src/frontend/web

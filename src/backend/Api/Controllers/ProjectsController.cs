@@ -92,4 +92,19 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
     }
+
+    [HttpDelete("{id:guid}")]
+    // [Authorize] // TODO: Enable when auth is fully implemented
+    public async Task<IActionResult> DeleteProject(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _projectService.DeleteProjectAsync(id, cancellationToken);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
 }

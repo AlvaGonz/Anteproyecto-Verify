@@ -11,5 +11,6 @@ public record UpdateProyectoDto(
     ProjectCategory Categoria,
     string? DatosDesarrollador,
     string? RncDesarrollador,
-    string? DesignacionCatastral
+    string? DesignacionCatastral,
+    string? Matricula
 );

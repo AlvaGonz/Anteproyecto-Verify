@@ -169,7 +169,7 @@ CREATE TABLE ProyectosInmobiliarios (
     Matricula VARCHAR(100) NULL,
     Categoria INT NOT NULL,
     DesignacionCatastral VARCHAR(200) NULL,
-    EstadoProyecto INT NOT NULL,
+    Status INT NOT NULL,
     EstadoIntegridad INT NOT NULL,
     EstadoJuridico INT NOT NULL DEFAULT 0,
     SelladoBloqueado BIT NOT NULL DEFAULT 0,

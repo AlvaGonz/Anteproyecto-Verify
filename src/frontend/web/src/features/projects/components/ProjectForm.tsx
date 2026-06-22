@@ -22,6 +22,7 @@ interface ProjectFormProps {
   initialData?: ProyectoDto;
   onSubmit: (data: any) => Promise<void>;
   onCancel: () => void;
+  onDelete?: () => void;
 }
 
 interface ProvinciaInfo {
@@ -70,6 +71,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
+  onDelete,
 }) => {
   // useAuth must be called unconditionally at the top level (React rules).
   // In unit tests the component is wrapped in a test AuthProvider, so this is safe.
@@ -84,6 +86,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador ?? "");
   const [rncDesarrollador, setRncDesarrollador] = useState(initialData?.rncDesarrollador ?? "");
   const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");
+  const [matricula, setMatricula] = useState(initialData?.matricula ?? "");
 
   // RNC Lookup States
   const [isSearchingRnc, setIsSearchingRnc] = useState(false);
@@ -271,6 +274,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           datosDesarrollador: datosDesarrollador || undefined,
           rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
+          matricula: matricula || undefined,
         };
         await onSubmit(updateData);
       } else {
@@ -283,6 +287,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
           ubicacionGps: ubicacionGps || undefined,
+          matricula: matricula || undefined,
         };
         await onSubmit(createData);
       }
@@ -477,6 +482,21 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
             </div>
 
+            {/* Matrícula */}
+            <div>
+              <label htmlFor="matricula" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+                Matrícula del Inmueble
+              </label>
+              <input
+                id="matricula"
+                type="text"
+                value={matricula}
+                onChange={(e) => setMatricula(e.target.value)}
+                className="vf-input font-mono"
+                placeholder="Ej: 0100234567"
+              />
+            </div>
+
             {/* Valor Estimado */}
             <div>
               <label htmlFor="valorEstimado" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
@@ -579,6 +599,15 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
       {/* ── Action Buttons ── */}
       <div className="flex justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
+        {initialData && onDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="vf-btn-danger mr-auto"
+          >
+            Eliminar Expediente
+          </button>
+        )}
         <button type="button" onClick={onCancel} className="vf-btn-secondary">
           Cancelar
         </button>

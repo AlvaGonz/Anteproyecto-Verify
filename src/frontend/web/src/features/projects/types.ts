@@ -9,6 +9,7 @@ export interface ProyectoDto {
   datosDesarrollador?: string;
   rncDesarrollador?: string;
   designacionCatastral?: string;
+  matricula?: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
   integrityScore?: number;
@@ -29,6 +30,7 @@ export interface CreateProyectoDto {
   rncDesarrollador?: string;
   designacionCatastral?: string;
   ubicacionGps?: string;
+  matricula?: string;
 }
 
 export interface UpdateProyectoDto {
@@ -40,6 +42,7 @@ export interface UpdateProyectoDto {
   datosDesarrollador?: string;
   rncDesarrollador?: string;
   designacionCatastral?: string;
+  matricula?: string;
 }
 
 export enum ProjectCategory {

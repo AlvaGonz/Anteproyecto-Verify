@@ -57,9 +57,9 @@ public class ProjectService : IProjectService
         {
             proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
         }
-        if (!string.IsNullOrEmpty(dto.RncDesarrollador))
+        if (!string.IsNullOrEmpty(dto.RncDesarrollador) || !string.IsNullOrEmpty(dto.Matricula))
         {
-            proyecto.UpdateRncYMatricula(dto.RncDesarrollador, null);
+            proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
         }
         
         await _proyectoRepository.AddAsync(proyecto, cancellationToken);
@@ -77,7 +77,7 @@ public class ProjectService : IProjectService
         }
 
         proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
-        proyecto.UpdateRncYMatricula(dto.RncDesarrollador, proyecto.Matricula);
+        proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
         
         _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -112,6 +112,18 @@ public class ProjectService : IProjectService
         return MapToDto(proyecto);
     }
 
+    public async Task DeleteProjectAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var proyecto = await _proyectoRepository.GetByIdAsync(id, cancellationToken);
+        if (proyecto == null)
+        {
+            throw new KeyNotFoundException($"Project with id {id} not found.");
+        }
+
+        _proyectoRepository.Delete(proyecto);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     private static ProyectoDto MapToDto(Proyecto proyecto)
     {
         return new ProyectoDto(
@@ -125,6 +137,7 @@ public class ProjectService : IProjectService
             proyecto.DatosDesarrollador,
             proyecto.RncDesarrollador,
             proyecto.DesignacionCatastral,
+            proyecto.Matricula,
             proyecto.EstadoProyecto,
             proyecto.EstadoIntegridad,
             proyecto.UsuarioCreadorId,

@@ -8,7 +8,7 @@ import {
   UpdateProyectoDto
 } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
-import { useProject, useCreateProject } from "../../features/projects/api/useProjects";
+import { useProject, useCreateProject, useDeleteProject } from "../../features/projects/api/useProjects";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
@@ -39,6 +39,7 @@ export const ProjectManagePage: React.FC = () => {
   const project = rawProject;
   
   const createMutation = useCreateProject();
+  const deleteMutation = useDeleteProject();
   
   const qc = useQueryClient();
   const updateMutation = useMutation({
@@ -56,6 +57,19 @@ export const ProjectManagePage: React.FC = () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
     }
   });
+
+  const handleDelete = async () => {
+    if (!id) return;
+    if (window.confirm("¿Está seguro de que desea eliminar este proyecto? Esta acción no se puede deshacer.")) {
+      try {
+        await deleteMutation.mutateAsync(id);
+        addToast("Proyecto eliminado exitosamente", "success");
+        navigate("/admin/projects");
+      } catch (error) {
+        addToast("Error al eliminar el proyecto", "error");
+      }
+    }
+  };
 
   const handleSubmit = async (data: CreateProyectoDto | UpdateProyectoDto) => {
     try {
@@ -142,6 +156,7 @@ export const ProjectManagePage: React.FC = () => {
         initialData={project}
         onSubmit={handleSubmit}
         onCancel={() => navigate("/admin/projects")}
+        onDelete={handleDelete}
       />
 
       {isEditing && project && (

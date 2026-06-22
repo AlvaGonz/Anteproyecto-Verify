@@ -615,6 +615,7 @@ public static class AppDbContextSeeder
 
         foreach (var line in lines)
         {
+            if (rowCount >= 1000) break;
             if (string.IsNullOrWhiteSpace(line)) continue;
 
             var parts = line.Split('|');
@@ -671,6 +672,7 @@ public static class AppDbContextSeeder
 
         foreach (var line in lines)
         {
+            if (count >= 1000) break;
             if (string.IsNullOrWhiteSpace(line)) continue;
 
             var parts = line.Split('|');
