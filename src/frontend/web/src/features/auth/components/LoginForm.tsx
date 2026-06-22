@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { loginSchema, type LoginFormValues } from "../schemas";
-import { useLogin } from "../api/useAuth";
+import { useAuth } from "../../../shared/context/AuthContext";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export const LoginForm = () => {
@@ -12,7 +12,9 @@ export const LoginForm = () => {
   const verified = searchParams.get("verified") === "true";
   const verificationError = searchParams.get("error");
   
-  const { mutate: login, isPending, error } = useLogin();
+  const { login } = useAuth();
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -21,8 +23,18 @@ export const LoginForm = () => {
     formState: { errors: formErrors },
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
-  const onSubmit = (data: LoginFormValues) =>
-    login(data, { onSuccess: () => navigate("/admin/dashboard") });
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      setIsPending(true);
+      setError(null);
+      await login(data.email, data.password);
+      navigate("/admin/dashboard");
+    } catch (err: any) {
+      setError(new Error(err?.message || "Error de autenticación. Verifique sus credenciales."));
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <div className="w-full">

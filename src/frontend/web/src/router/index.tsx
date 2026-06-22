@@ -17,6 +17,7 @@ import { SettingsPage } from "../pages/admin/SettingsPage";
 import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
+import { EmailVerifiedPage } from "../pages/auth/EmailVerifiedPage";
 import { ProjectDocumentUploadPage } from "../pages/projects/ProjectDocumentUploadPage";
 import { AuditLogPage } from "../features/audit/pages/AuditLogPage";
 import { ValidationExecutionPage } from "../features/validations/pages/ValidationExecutionPage";
@@ -87,6 +88,10 @@ export const router = createHashRouter([
       {
         path: "/register",
         element: <RegisterPage />,
+      },
+      {
+        path: "/verify-email",
+        element: <EmailVerifiedPage />,
       },
       {
         path: "/verify",

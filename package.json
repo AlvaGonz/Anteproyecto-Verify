@@ -16,7 +16,6 @@
   "dependencies": {
     "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
-    "@vitejs/plugin-react": "^6.0.2",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
@@ -29,7 +28,6 @@
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^7.13.2",
     "tailwind-merge": "^2.5.2",
-    "vite": "^6.4.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -39,12 +37,13 @@
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.4.21",
     "jsdom": "^29.0.2",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
-    "vite": "^6.2.0",
-    "vitest": "^4.1.8"
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9"
   }
 }

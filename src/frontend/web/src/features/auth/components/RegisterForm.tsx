@@ -22,6 +22,7 @@ export const RegisterForm = () => {
   const navigate = useNavigate();
   const { mutate: register_, isPending, error } = useRegister();
   const [modalType, setModalType] = useState<"terms" | "privacy" | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const {
     register,
@@ -37,7 +38,7 @@ export const RegisterForm = () => {
   const onSubmit = (data: RegisterFormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { acceptedTerms: _, ...submitData } = data;
-    register_(submitData, { onSuccess: () => navigate("/admin/dashboard") });
+    register_(submitData, { onSuccess: () => setIsSuccess(true) });
   };
 
   const password = watch("password") || "";
@@ -66,6 +67,32 @@ export const RegisterForm = () => {
     setValue("acceptedTerms", true, { shouldValidate: true, shouldDirty: true });
     setModalType(null);
   };
+
+  if (isSuccess) {
+    return (
+      <div className="w-full text-center py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-emerald-200">
+          <Mail className="w-10 h-10 text-emerald-600" />
+        </div>
+        <h3 className="text-2xl font-display font-extrabold text-[#223382] mb-3 tracking-tight">Revisa tu correo</h3>
+        <p className="text-text-secondary mb-8 leading-relaxed max-w-sm mx-auto">
+          Hemos enviado un enlace de verificación a <span className="font-semibold text-text-primary block mt-1 text-lg">{watch("email")}</span>
+          Por favor, haz clic en el enlace para activar tu cuenta.
+        </p>
+        <div className="pt-6 border-t border-border/50">
+          <p className="text-sm text-text-secondary">
+            ¿No lo recibiste? Revisa tu carpeta de spam o{" "}
+            <button 
+              onClick={() => setIsSuccess(false)} 
+              className="text-primary hover:text-[#1a2663] hover:underline font-semibold transition-colors"
+            >
+              intenta registrarte nuevamente
+            </button>.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
