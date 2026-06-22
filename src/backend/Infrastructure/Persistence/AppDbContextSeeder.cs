@@ -638,7 +638,7 @@ public static class AppDbContextSeeder
                     modDate = d;
                 }
             }
-            row["FechaModificacion"] = (object)modDate ?? DBNull.Value;
+            row["FechaModificacion"] = (object?)modDate ?? DBNull.Value;
 
             row["Estado"] = parts.Length > 9 ? parts[9].Trim() : null;
             row["LicenciasVhm"] = parts.Length > 10 ? parts[10].Trim() : null;

@@ -23,7 +23,9 @@ public class ProyectoConfiguration : IEntityTypeConfiguration<Proyecto>
         builder.HasOne(p => p.UsuarioCreador)
             .WithMany(u => u.Proyectos)
             .HasForeignKey(p => p.UsuarioCreadorId)
-            .HasColumnName("IdUsuario")
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(p => p.UsuarioCreadorId)
+            .HasColumnName("IdUsuario");
     }
 }

@@ -71,6 +71,34 @@ docker compose up --build -d
 
 ---
 
+## ⏱️ Ciclo de Vida del Arranque, Tiempos Estimados y Siembra Automática
+
+Para garantizar que el sistema inicie al 100% de manera consistente en cualquier reinicio, reinstalación de Docker o máquina limpia, hemos configurado **políticas de reinicio automático (`restart: unless-stopped`)**, **verificaciones de salud (Healthchecks)** y un **bucle de reintento de conexión con siembra automática**.
+
+A continuación se detalla el paso a paso del flujo del sistema al ejecutar `docker compose up -d`:
+
+| Paso | Descripción | Acción Requerida | Tiempo Estimado | Estado del Sistema / Validación |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Variables de Entorno** | Cargar configuraciones del backend, base de datos y llaves de desarrollo. | Asegúrate de tener el archivo `.env` en la raíz del proyecto (puedes copiar de `.env.example`). | 1 minuto | El sistema leerá las variables de base de datos y configuración JWT. |
+| **2. docker compose up -d** | Orquestación en segundo plano de los contenedores (`api`, `web`, `sqlserver`, `azurite`). | Ejecutar `docker compose up -d` en tu terminal. | 15 segundos | Todos los contenedores quedan en estado `Up` o `Starting`. |
+| **3. Healthcheck de BD** | SQL Server se inicia, compila la base de datos, traduce el script MySQL a T-SQL y crea el esquema. | Ninguna (Automático). El contenedor de la API esperará hasta que SQL Server esté saludable (`service_healthy`). | 30 - 45 segundos | Puedes verificar con `docker compose ps` que `sqlserver-1` tenga status `healthy`. |
+| **4. Compilación y Seeding** | El backend se compila en el contenedor con `dotnet watch` y siembra la base de datos. | Ninguna (Automático). La API verifica la conexión con SQL Server (reintenta hasta 30 veces), crea las tablas y **siembra automáticamente los usuarios y planes por defecto**. | 1 - 2 minutos | Verás `dotnet watch 🚀 Started` en los logs de `api` y el puerto `5000` estará activo. |
+| **5. Acceso al Frontend** | El frontend web compilado en Vite expone el portal en el puerto `3000`. | Abrir `http://localhost:3000` en tu navegador. | Inmediato | La pantalla de Login estará disponible y podrás entrar inmediatamente. |
+
+### 🔐 Credenciales Sembradas por Defecto (Listas para Usar)
+Una vez finalizado el Paso 4, puedes iniciar sesión inmediatamente con:
+* **Desarrollador Inmobiliario (Professional)**:
+  * **Usuario:** `dev@constructora.do`
+  * **Contraseña:** `Dev123!`
+* **Administrador (Administrator)**:
+  * **Usuario:** `admin@verifinca.do`
+  * **Contraseña:** `Admin123!`
+
+> [!NOTE]
+> Gracias a las políticas de reinicio y al bucle de resiliencia del backend, si reinicias tu PC o tu Docker Desktop, el sistema reordenará el inicio por sí mismo y levantará los servicios listos para iniciar sesión sin requerir ningún comando manual adicional.
+
+---
+
 ## 📊 Información Técnica y Conexiones
 
 ### 💾 Base de Datos (SQL Server)
