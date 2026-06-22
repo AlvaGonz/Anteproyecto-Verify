@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2, ArrowRight, XCircle } from "lucide-react";
 import { apiClient } from "@/infrastructure/api/client";
@@ -9,12 +9,16 @@ export const EmailVerifiedPage = () => {
   const token = searchParams.get("token");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [countdown, setCountdown] = useState(7);
+  const hasAttempted = useRef(false);
 
   useEffect(() => {
     if (!token) {
       setStatus("error");
       return;
     }
+
+    if (hasAttempted.current) return;
+    hasAttempted.current = true;
 
     // Call API to verify token
     apiClient.get(`/auth/verify?token=${token}`)

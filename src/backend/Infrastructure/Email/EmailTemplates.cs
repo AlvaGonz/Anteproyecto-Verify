@@ -17,7 +17,7 @@ public static class EmailTemplates
     // ── Logo Image (ISOTIPO.png) ────────────────────────────────────────────────
     // Nota: Cambiar http://localhost:3000 por el dominio de producción cuando se despliegue.
     private const string LogoImg = @"
-        <img src=""http://localhost:3000/brand/isotipo/ISOTIPO.png"" width=""36"" height=""36"" alt=""VeriFinca Logo"" style=""display:inline-block;vertical-align:middle;border-radius:8px;"" />";
+        <img src=""http://localhost:3000/brand/isotipo/ISOTIPO.png"" width=""36"" height=""36"" alt=""VeriFinca Logo"" style=""display:inline-block;vertical-align:middle;border-radius:8px;background-color:#FFFFFF;padding:4px;box-sizing:border-box;"" />";
 
     // ── Wrapper ──────────────────────────────────────────────────────────────
     private static string BuildEmailWrapper(string title, string preHeader, string contentHtml)
@@ -31,7 +31,7 @@ public static class EmailTemplates
   <meta name=""x-apple-disable-message-reformatting"">
   <title>{title}</title>
   <!--[if !mso]><!-->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href=""https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"" rel=""stylesheet"">
   <!--<![endif]-->
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>

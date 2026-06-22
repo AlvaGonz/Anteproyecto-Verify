@@ -28,10 +28,11 @@ export const LoginForm = () => {
       setIsPending(true);
       setError(null);
       await login(data.email, data.password);
-      navigate("/admin/dashboard");
+      // Force a reload to ensure clean state and synchronized cookies
+      window.location.hash = "#/admin/dashboard";
+      window.location.reload();
     } catch (err: any) {
       setError(new Error(err?.message || "Error de autenticación. Verifique sus credenciales."));
-    } finally {
       setIsPending(false);
     }
   };
