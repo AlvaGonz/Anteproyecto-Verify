@@ -17,7 +17,7 @@ export const EmailVerifiedPage = () => {
     }
 
     // Call API to verify token
-    apiClient.get(`/auth/verify-email?token=${token}`)
+    apiClient.get(`/auth/verify?token=${token}`)
       .then(() => {
         setStatus("success");
       })
