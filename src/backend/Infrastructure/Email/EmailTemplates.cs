@@ -14,13 +14,10 @@ public static class EmailTemplates
     private const string TextMuted  = "#64748B";
     private const string BorderLine = "#E2E8F0";
 
-    // ── SVG logo mark (inline, email-safe) ──────────────────────────────────
-    private const string LogoSvg = @"
-        <svg width=""36"" height=""36"" viewBox=""0 0 36 36"" fill=""none"" xmlns=""http://www.w3.org/2000/svg"" style=""display:inline-block;vertical-align:middle;"">
-          <rect width=""36"" height=""36"" rx=""8"" fill=""#E87B2B""/>
-          <path d=""M10 26 L18 10 L26 26"" stroke=""#FFFFFF"" stroke-width=""2.5"" stroke-linecap=""round"" stroke-linejoin=""round"" fill=""none""/>
-          <path d=""M13 21 L23 21"" stroke=""#FFFFFF"" stroke-width=""2"" stroke-linecap=""round""/>
-        </svg>";
+    // ── Logo Image (ISOTIPO.png) ────────────────────────────────────────────────
+    // Nota: Cambiar http://localhost:5173 por el dominio de producción cuando se despliegue.
+    private const string LogoImg = @"
+        <img src=""http://localhost:5173/brand/isotipo/ISOTIPO.png"" width=""36"" height=""36"" alt=""VeriFinca Logo"" style=""display:inline-block;vertical-align:middle;border-radius:8px;"" />";
 
     // ── Wrapper ──────────────────────────────────────────────────────────────
     private static string BuildEmailWrapper(string title, string preHeader, string contentHtml)
@@ -33,6 +30,9 @@ public static class EmailTemplates
   <meta http-equiv=""X-UA-Compatible"" content=""IE=edge"">
   <meta name=""x-apple-disable-message-reformatting"">
   <title>{title}</title>
+  <!--[if !mso]><!-->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <!--<![endif]-->
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
   <![endif]-->
@@ -80,11 +80,11 @@ public static class EmailTemplates
               <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"">
                 <tr>
                   <td style=""padding-right:12px;vertical-align:middle;"">
-                    {LogoSvg}
+                    {LogoImg}
                   </td>
                   <td style=""vertical-align:middle;"">
-                    <span style=""font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:700;color:#FFFFFF;letter-spacing:1px;line-height:1;"">Veri<span style=""color:{Orange};"">Finca</span></span>
-                    <div style=""font-family:Arial,Helvetica,sans-serif;font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:3px;"">Plataforma de Certificación</div>
+                    <span style=""font-family:'Manrope',Arial,sans-serif;font-size:26px;font-weight:700;color:#FFFFFF;letter-spacing:1px;line-height:1;"">Veri<span style=""color:{Orange};"">Finca</span></span>
+                    <div style=""font-family:'Inter',Arial,sans-serif;font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:3px;"">Plataforma de Certificación</div>
                   </td>
                 </tr>
               </table>
@@ -96,7 +96,7 @@ public static class EmailTemplates
 
     <!-- Content area -->
     <tr>
-      <td class=""pd-mobile"" style=""padding:40px 40px 32px 40px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:{TextBody};"">
+      <td class=""pd-mobile"" style=""padding:40px 40px 32px 40px;font-family:'Inter',Arial,sans-serif;font-size:15px;line-height:1.7;color:{TextBody};"">
         {contentHtml}
       </td>
     </tr>
@@ -115,7 +115,7 @@ public static class EmailTemplates
       <td style=""padding:24px 40px 28px 40px;background-color:{BgMuted};border-radius:0 0 12px 12px;"">
         <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
           <tr>
-            <td style=""font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{TextMuted};text-align:center;line-height:1.6;"">
+            <td style=""font-family:'Inter',Arial,sans-serif;font-size:12px;color:{TextMuted};text-align:center;line-height:1.6;"">
               <p style=""margin:0 0 6px 0;"">Este es un correo automático de <strong>VeriFinca</strong>. Por favor no respondas a este mensaje.</p>
               <p style=""margin:0;"">
                 <span style=""color:{BorderLine};"">|</span>
@@ -145,7 +145,7 @@ public static class EmailTemplates
         return $@"
         <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"" style=""margin:24px 0;"">
           <tr>
-            <td style=""background-color:{BgMuted};border:1px solid {BorderLine};border-radius:8px;padding:20px 24px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.7;color:{TextBody};"">
+            <td style=""background-color:{BgMuted};border:1px solid {BorderLine};border-radius:8px;padding:20px 24px;font-family:'Inter',Arial,sans-serif;font-size:14px;line-height:1.7;color:{TextBody};"">
               <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
                 <tr>
                   <td width=""4"" style=""background-color:{accent};border-radius:4px;font-size:0;"">&nbsp;</td>
@@ -165,7 +165,7 @@ public static class EmailTemplates
           <tr>
             <td style=""border-radius:6px;background-color:{Orange};"">
               <!--[if mso]><i style=""mso-font-width:40px;mso-text-raise:12px;"" hidden>&nbsp; </i><![endif]-->
-              <a href=""{href}"" target=""_blank"" style=""display:inline-block;padding:14px 36px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:6px;letter-spacing:0.3px;"">{label}</a>
+              <a href=""{href}"" target=""_blank"" style=""display:inline-block;padding:14px 36px;font-family:'Inter',Arial,sans-serif;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:6px;letter-spacing:0.3px;"">{label}</a>
               <!--[if mso]><i style=""mso-font-width:40px;"" hidden>&nbsp; </i><![endif]-->
             </td>
           </tr>
@@ -178,7 +178,7 @@ public static class EmailTemplates
         string bg    = isPositive ? "#DCFCE7" : "#FEE2E2";
         string color = isPositive ? "#15803D" : "#B91C1C";
         string dot   = isPositive ? "●" : "●";
-        return $@"<span style=""display:inline-block;background-color:{bg};color:{color};padding:4px 12px;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2px;"">{dot}&nbsp; {label}</span>";
+        return $@"<span style=""display:inline-block;background-color:{bg};color:{color};padding:4px 12px;border-radius:20px;font-family:'Inter',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2px;"">{dot}&nbsp; {label}</span>";
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -189,7 +189,7 @@ public static class EmailTemplates
         string verificationUrl = $"http://localhost:5173/#/verify-email?token={verificationToken}";
 
         string content = $@"
-            <h2 style=""margin:0 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>
+            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>
             <p style=""margin:0 0 16px 0;font-size:15px;color:{TextMuted};"">Un paso más para activar tu cuenta</p>
 
             <p style=""margin:0 0 16px 0;"">Gracias por registrarte en <strong>VeriFinca</strong>, la plataforma de verificación de expedientes e inmuebles de la República Dominicana. Para activar tu cuenta confirma tu correo electrónico:</p>
@@ -223,7 +223,7 @@ public static class EmailTemplates
             <span style=""color:{TextMuted};""> {System.DateTime.Now:dd/MM/yyyy HH:mm}</span>";
 
         string content = $@"
-            <h2 style=""margin:0 0 4px 0;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:{Navy};"">Documento Recibido</h2>
+            <h2 style=""margin:0 0 4px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">Documento Recibido</h2>
             <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Confirmación de recepción</p>
 
             <p style=""margin:0 0 16px 0;"">Estimado/a <strong>{userName}</strong>,</p>
@@ -266,7 +266,7 @@ public static class EmailTemplates
                  <p style=""margin:0;"">Por favor acceda a la plataforma y cargue una versión corregida para continuar con la validación.</p>";
 
         string content = $@"
-            <h2 style=""margin:0 0 4px 0;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:{Navy};"">Actualización de Estatus</h2>
+            <h2 style=""margin:0 0 4px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">Actualización de Estatus</h2>
             <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Resultado del análisis de documento</p>
 
             <p style=""margin:0 0 16px 0;"">Estimado/a <strong>{userName}</strong>,</p>
@@ -304,7 +304,7 @@ public static class EmailTemplates
             <span style=""color:{TextMuted};""> {System.DateTime.Now:dd/MM/yyyy}</span>";
 
         string content = $@"
-            <h2 style=""margin:0 0 4px 0;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:{Navy};"">¡Proyecto Creado!</h2>
+            <h2 style=""margin:0 0 4px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Proyecto Creado!</h2>
             <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Todo listo para comenzar la certificación</p>
 
             <p style=""margin:0 0 16px 0;"">Estimado/a <strong>{ownerName}</strong>,</p>
@@ -324,3 +324,4 @@ public static class EmailTemplates
             content);
     }
 }
+
