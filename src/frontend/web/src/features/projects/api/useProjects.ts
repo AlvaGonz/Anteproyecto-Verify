@@ -14,7 +14,13 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   codigoInterno: apiProj.codigoInterno || `PRJ-${apiProj.id}`,
   nombre: apiProj.nombre,
   ubicacionTexto: apiProj.ubicacionTexto || "",
+  ubicacionGps: apiProj.ubicacionGps,
+  valorEstimado: apiProj.valorEstimado,
   categoria: apiProj.categoria,
+  datosDesarrollador: apiProj.datosDesarrollador,
+  rncDesarrollador: apiProj.rncDesarrollador,
+  designacionCatastral: apiProj.designacionCatastral,
+  matricula: apiProj.matricula,
   estadoProyecto: apiProj.estadoProyecto,
   estadoIntegridad: apiProj.estadoIntegridad,
   usuarioCreadorId: String(apiProj.usuarioCreadorId),
@@ -45,7 +51,10 @@ export const useCreateProject = () => {
         categoria: data.categoria ?? ProjectCategory.Residencial,
         usuarioCreadorId: data.usuarioCreadorId,
         datosDesarrollador: data.datosDesarrollador,
-        designacionCatastral: data.designacionCatastral
+        rncDesarrollador: data.rncDesarrollador,
+        designacionCatastral: data.designacionCatastral,
+        ubicacionGps: data.ubicacionGps,
+        matricula: data.matricula
       }).then(res => mapApiProject(res.data)),
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
   });
@@ -59,5 +68,14 @@ export const useProjectDiagnosis = () => {
       const response = await apiClient.get(`/projects/${id}/documents/diagnosis`);
       return response.data;
     }
+  });
+};
+
+export const useDeleteProject = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['deleteProject'],
+    mutationFn: (id: string) => apiClient.delete(`/projects/${id}`).then(res => res.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
   });
 };

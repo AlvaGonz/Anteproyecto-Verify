@@ -20,9 +20,12 @@ services:
       - UseMockData=false
     env_file:
       - .env
+    restart: unless-stopped
     depends_on:
-      - sqlserver
-      - azurite
+      sqlserver:
+        condition: service_healthy
+      azurite:
+        condition: service_started
     deploy:
       resources:
         limits:
@@ -37,6 +40,7 @@ services:
       dockerfile: docker/web.dev.Dockerfile
     ports:
       - "3000:3000"
+    restart: unless-stopped
     volumes:
       - ./src/frontend/web:/app/src/frontend/web
       - /app/src/frontend/web/node_modules
@@ -66,6 +70,13 @@ services:
     volumes:
       - mssql-data:/var/opt/mssql/data
       - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/db_ready && /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Your_password123' -Q 'SELECT 1' -C"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
     deploy:
       resources:
         limits:
@@ -82,6 +93,7 @@ services:
       - "10000:10000"
     security_opt:
       - no-new-privileges:true
+    restart: unless-stopped
     deploy:
       resources:
         limits:

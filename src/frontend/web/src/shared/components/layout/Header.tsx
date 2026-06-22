@@ -35,14 +35,13 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
     }
   };
 
-  const getInitials = (name: string) => {
-    if (!name) return "U";
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return parts[0].substring(0, 2).toUpperCase();
-  };
+  const displayName = user?.name || "Admin_Verifinca";
+  const roleLabel = {
+    admin: "Administrador",
+    dev: "Desarrollador",
+    validator: "Validador",
+    user: "Usuario",
+  }[user?.role || "user"] || "Usuario";
 
   return (
     <header className="sticky top-0 z-20 w-full h-20 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-8">
@@ -90,8 +89,8 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
 
         <button className="flex items-center gap-3 pl-2 pr-1 py-1 hover:bg-gray-50 rounded-2xl transition-colors group">
            <div className="flex flex-col items-end hidden sm:flex">
-              <span className="text-xs font-bold text-gray-900">{user?.name || "Usuario"}</span>
-              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{user?.role || "Invitado"}</span>
+              <span className="text-xs font-bold text-gray-900">{displayName}</span>
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{roleLabel}</span>
            </div>
            <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200 group-hover:border-primary/30 transition-colors">
               {user ? (

@@ -119,6 +119,18 @@ h1, h2, h3, h4 {
     @apply bg-surface border border-outline-variant/10 rounded-[32px] p-8 shadow-raised hover:shadow-premium transition-all duration-500;
   }
 
+  .vf-input {
+    @apply w-full h-[52px] px-4 rounded-xl border border-border bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all duration-300 text-sm placeholder:text-text-secondary/50 font-sans disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .vf-btn-secondary {
+    @apply h-[56px] px-8 flex items-center justify-center gap-2 rounded-2xl font-sans font-black text-[16px] bg-surface-raised border border-border text-text-primary shadow-raised hover:bg-border/20 transition-all duration-300 active:scale-[0.98];
+  }
+
+  .vf-btn-danger {
+    @apply h-[56px] px-8 flex items-center justify-center gap-2 rounded-2xl font-sans font-black text-[16px] bg-red-600 text-white shadow-raised hover:bg-red-700 hover:shadow-floating transition-all duration-300 active:scale-[0.98];
+  }
+
   /* Typography shortcuts */
   .display-xl { @apply font-display font-black text-[64px] leading-[1.05] tracking-tight; }
   .display-lg { @apply font-display font-black text-[48px] leading-[1.1] tracking-tight; }

@@ -77,15 +77,47 @@ export const AdminProjectsPage: React.FC = () => {
   const { data: rawProjects = [], isLoading } = useProjects();
   const projects = rawProjects;
 
+  const [selectedStatuses, setSelectedStatuses] = useState<ProjectStatus[]>([]);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+
+  const ALL_STATUSES = [
+    { value: ProjectStatus.Draft, label: "Borrador" },
+    { value: ProjectStatus.Published, label: "Publicado" },
+    { value: ProjectStatus.InReview, label: "En Revisión" },
+    { value: ProjectStatus.Observed, label: "Observado" },
+    { value: ProjectStatus.Validated, label: "Validado" },
+    { value: ProjectStatus.Rejected, label: "Rechazado" },
+  ];
+
   const stats = {
     total: projects.length,
     validated: projects.filter(p => p.estadoProyecto === ProjectStatus.Validated).length,
     pending: projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length
   };
 
+  const totalValue = stats.total || 1;
+  const metrics = [
+    { label: "Total Proyectos", value: stats.total, icon: Building, color: "text-blue-600", bg: "bg-blue-50", barColor: "bg-blue-500", pct: 100 },
+    { label: "Validados (RD)", value: stats.validated, icon: FileCheck, color: "text-emerald-600", bg: "bg-emerald-50", barColor: "bg-emerald-500", pct: stats.total ? Math.round((stats.validated / totalValue) * 100) : 0 },
+    { label: "En Revisión", value: stats.pending, icon: Activity, color: "text-indigo-600", bg: "bg-indigo-50", barColor: "bg-indigo-500", pct: stats.total ? Math.round((stats.pending / totalValue) * 100) : 0 },
+  ];
+
   const filtered = projects.filter((p) => {
-    const matchesSearch = p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         p.codigoInterno?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+      p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (p.codigoInterno && p.codigoInterno.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.designacionCatastral && p.designacionCatastral.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.matricula && p.matricula.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.ubicacionTexto && p.ubicacionTexto.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.ubicacionGps && p.ubicacionGps.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.datosDesarrollador && p.datosDesarrollador.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.rncDesarrollador && p.rncDesarrollador.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.createdAtUtc && new Date(p.createdAtUtc).toLocaleDateString().includes(searchTerm)) ||
+      (p.valorEstimado && String(p.valorEstimado).includes(searchTerm));
+    
+    if (selectedStatuses.length > 0) {
+      return matchesSearch && selectedStatuses.includes(p.estadoProyecto);
+    }
     
     if (activeFilter === "all") return matchesSearch;
     if (activeFilter === "validated") return matchesSearch && p.estadoProyecto === ProjectStatus.Validated;
@@ -115,18 +147,22 @@ export const AdminProjectsPage: React.FC = () => {
 
       {/* Metrics Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {[
-          { label: "Total Proyectos", value: stats.total, icon: Building, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "Validados (RD)", value: stats.validated, icon: FileCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "En Revisión", value: stats.pending, icon: Activity, color: "text-indigo-600", bg: "bg-indigo-50" },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center`}>
-              <stat.icon className="w-6 h-6" />
+        {metrics.map((stat, i) => (
+          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center gap-5 mb-4">
+              <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center`}>
+                <stat.icon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
+                <p className="text-2xl font-display font-black text-gray-900">{stat.value}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
-              <p className="text-2xl font-display font-black text-gray-900">{stat.value}</p>
+            <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-1000 ${stat.barColor}`} 
+                style={{ width: `${stat.pct}%` }}
+              />
             </div>
           </div>
         ))}
@@ -153,9 +189,21 @@ export const AdminProjectsPage: React.FC = () => {
           ].map((f) => (
             <button
               key={f.id}
-              onClick={() => setActiveFilter(f.id)}
+              onClick={() => {
+                setActiveFilter(f.id);
+                if (f.id === "all") {
+                  setSelectedStatuses([]);
+                } else if (f.id === "validated") {
+                  setSelectedStatuses([ProjectStatus.Validated]);
+                } else if (f.id === "review") {
+                  setSelectedStatuses([ProjectStatus.InReview]);
+                }
+              }}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeFilter === f.id 
+                (activeFilter === f.id || 
+                 (f.id === "all" && selectedStatuses.length === 0) ||
+                 (f.id === "validated" && selectedStatuses.length === 1 && selectedStatuses[0] === ProjectStatus.Validated) ||
+                 (f.id === "review" && selectedStatuses.length === 1 && selectedStatuses[0] === ProjectStatus.InReview))
                   ? "bg-white text-primary shadow-sm border border-gray-100" 
                   : "text-gray-500 hover:text-gray-900"
               }`}
@@ -165,9 +213,75 @@ export const AdminProjectsPage: React.FC = () => {
           ))}
         </div>
 
-        <button className="p-3 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all">
-          <Filter className="w-5 h-5" />
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+            className={`p-3 rounded-2xl transition-all ${
+              selectedStatuses.length > 0 
+                ? "text-primary bg-primary/10 hover:bg-primary/20" 
+                : "text-gray-400 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+            title="Filtrar por estados"
+          >
+            <Filter className="w-5 h-5" />
+          </button>
+          
+          {isFilterDropdownOpen && (
+            <>
+              <div 
+                className="fixed inset-0 z-10" 
+                onClick={() => setIsFilterDropdownOpen(false)} 
+              />
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-lg border border-gray-100 z-20 p-4 space-y-2.5">
+                <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Filtrar por estado</p>
+                {ALL_STATUSES.map((status) => {
+                  const isChecked = selectedStatuses.includes(status.value);
+                  return (
+                    <label key={status.value} className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-1.5 rounded-lg transition-colors w-full">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {
+                          let next;
+                          if (isChecked) {
+                            next = selectedStatuses.filter(s => s !== status.value);
+                          } else {
+                            next = [...selectedStatuses, status.value];
+                          }
+                          setSelectedStatuses(next);
+                          
+                          if (next.length === 0) {
+                            setActiveFilter("all");
+                          } else if (next.length === 1 && next[0] === ProjectStatus.Validated) {
+                            setActiveFilter("validated");
+                          } else if (next.length === 1 && next[0] === ProjectStatus.InReview) {
+                            setActiveFilter("review");
+                          } else {
+                            setActiveFilter("custom");
+                          }
+                        }}
+                        className="rounded text-primary focus:ring-primary w-4 h-4 border-gray-300"
+                      />
+                      <span className="text-xs font-bold text-gray-700">{status.label}</span>
+                    </label>
+                  );
+                })}
+                {selectedStatuses.length > 0 && (
+                  <button 
+                    onClick={() => {
+                      setSelectedStatuses([]);
+                      setActiveFilter("all");
+                      setIsFilterDropdownOpen(false);
+                    }}
+                    className="w-full text-center text-xs font-black text-red-500 hover:text-red-700 pt-2 border-t border-gray-100 block"
+                  >
+                    Limpiar Filtros
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Project Grid */}
@@ -235,6 +349,11 @@ export const AdminProjectsPage: React.FC = () => {
                           <span className="flex items-center gap-1.5 font-mono bg-gray-50 px-2 py-0.5 rounded-md">
                             ID: {project.codigoInterno}
                           </span>
+                          {project.matricula && (
+                            <span className="flex items-center gap-1.5 font-mono bg-blue-50/50 text-blue-600 px-2 py-0.5 rounded-md">
+                              Matrícula: {project.matricula}
+                            </span>
+                          )}
                           <span className="flex items-center gap-1.5">
                             <Timer className="w-3.5 h-3.5" />
                             Act: {new Date(project.updatedAtUtc || project.createdAtUtc).toLocaleDateString()}

@@ -27,7 +27,14 @@ var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLo
 try
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.EnsureCreatedAsync();
+    try
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "EnsureCreatedAsync reported database already exists or file conflicts. Proceeding with schema validation.");
+    }
 
     // Create missing tables in batches (ignoring duplicate table errors)
     try

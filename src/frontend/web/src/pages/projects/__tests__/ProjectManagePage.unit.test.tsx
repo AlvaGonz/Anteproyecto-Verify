@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProjectManagePage } from "../ProjectManagePage";
 import { projectsApi } from "../../../features/projects/api/projectsApi";
-import { useProject, useCreateProject } from "../../../features/projects/api/useProjects";
+import { useProject, useCreateProject, useDeleteProject } from "../../../features/projects/api/useProjects";
 import { apiClient } from "@/infrastructure/api/client";
 import { ProjectStatus, IntegrityStatus, ProyectoDto } from "../../../features/projects/types";
 import { success, failure } from "../../../shared/utils/functional";
@@ -53,6 +53,7 @@ vi.mock("../../../features/projects/api/projectsApi", () => ({
 vi.mock("../../../features/projects/api/useProjects", () => ({
   useProject: vi.fn(),
   useCreateProject: vi.fn(),
+  useDeleteProject: vi.fn(),
 }));
 
 // Mock apiClient
@@ -142,6 +143,9 @@ describe("ProjectManagePage", () => {
         mutations: { retry: false },
       },
     });
+    vi.mocked(useDeleteProject).mockReturnValue({
+      mutateAsync: vi.fn().mockResolvedValue({}),
+    } as any);
   });
 
   const renderPage = () =>

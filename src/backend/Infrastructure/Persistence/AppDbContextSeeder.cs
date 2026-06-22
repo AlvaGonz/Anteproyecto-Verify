@@ -3,6 +3,8 @@ namespace Infrastructure.Persistence;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities;
@@ -39,7 +41,7 @@ public static class AppDbContextSeeder
                 nombre: "Desarrollador",
                 apellido: "Inmobiliario",
                 correoElectronico: "dev@constructora.do",
-                contrasenaHash: passwordHasher.HashPassword("Dev123!"),
+                contrasenaHash: passwordHasher.HashPassword("Dev1234!"),
                 rol: UserRole.Professional,
                 telefono: "809-555-0200",
                 cedula: "001-0000000-2");
@@ -313,6 +315,7 @@ public static class AppDbContextSeeder
             await context.SaveChangesAsync();
 
             logger.LogInformation("Prototype demo data seeding completed successfully.");
+            await SeedDgiiRncAsync(context, logger);
         }
         catch (Exception ex)
         {
@@ -496,5 +499,227 @@ public static class AppDbContextSeeder
         context.Notificaciones.Add(notif);
         await context.SaveChangesAsync();
         return notif;
+    }
+
+    private static async Task SeedDgiiRncAsync(AppDbContext context, ILogger logger)
+    {
+        if (await context.DgiiRnc.AnyAsync())
+        {
+            logger.LogInformation("DGII RNC table already has data. Skipping seed.");
+            return;
+        }
+
+        var possiblePaths = new[]
+        {
+            "/src/Bots/DGII/src/DGII_RNC.TXT",
+            "../Bots/DGII/src/DGII_RNC.TXT",
+            "Bots/DGII/src/DGII_RNC.TXT",
+            Path.Combine(AppContext.BaseDirectory, "Bots", "DGII", "src", "DGII_RNC.TXT"),
+            Path.Combine(AppContext.BaseDirectory, "..", "Bots", "DGII", "src", "DGII_RNC.TXT"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "Bots", "DGII", "src", "DGII_RNC.TXT"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Bots", "DGII", "src", "DGII_RNC.TXT")
+        };
+
+        string? filePath = null;
+        foreach (var path in possiblePaths)
+        {
+            if (File.Exists(path))
+            {
+                filePath = path;
+                break;
+            }
+        }
+
+        if (filePath == null)
+        {
+            logger.LogWarning("DGII_RNC.TXT source file not found. Skipping DGII RNC database seed.");
+            return;
+        }
+
+        logger.LogInformation($"Found DGII RNC file at {filePath}. Starting bulk seeding...");
+
+        var connection = context.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+        {
+            await connection.OpenAsync();
+        }
+
+        if (connection.GetType().Name.Contains("SqlConnection"))
+        {
+            try
+            {
+                await SeedDgiiRncViaBulkCopyAsync(connection, filePath, logger);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "SqlBulkCopy failed. Retrying with EF batch seeding...");
+                await SeedDgiiRncViaEFAsync(context, filePath, logger);
+            }
+        }
+        else
+        {
+            await SeedDgiiRncViaEFAsync(context, filePath, logger);
+        }
+    }
+
+    private static async Task SeedDgiiRncViaBulkCopyAsync(System.Data.Common.DbConnection connection, string filePath, ILogger logger)
+    {
+        var bulkCopyType = Type.GetType("Microsoft.Data.SqlClient.SqlBulkCopy, Microsoft.Data.SqlClient");
+        if (bulkCopyType == null)
+        {
+            throw new InvalidOperationException("SqlBulkCopy type not found in assembly.");
+        }
+
+        using var bulkCopy = (IDisposable)Activator.CreateInstance(bulkCopyType, connection)!;
+
+        bulkCopyType.GetProperty("DestinationTableName")!.SetValue(bulkCopy, "DgiiRnc");
+        bulkCopyType.GetProperty("BatchSize")!.SetValue(bulkCopy, 50000);
+        bulkCopyType.GetProperty("BulkCopyTimeout")!.SetValue(bulkCopy, 600);
+
+        var mappings = (System.Collections.IList)bulkCopyType.GetProperty("ColumnMappings")!.GetValue(bulkCopy)!;
+        var mappingType = Type.GetType("Microsoft.Data.SqlClient.SqlBulkCopyColumnMapping, Microsoft.Data.SqlClient")!;
+
+        void AddMapping(string source, string dest)
+        {
+            var mapping = Activator.CreateInstance(mappingType, source, dest);
+            mappings.Add(mapping);
+        }
+
+        AddMapping("Rnc", "Rnc");
+        AddMapping("NombreRazonSocial", "NombreRazonSocial");
+        AddMapping("NombreComercial", "NombreComercial");
+        AddMapping("Categoria", "Categoria");
+        AddMapping("RegimenPagos", "RegimenPagos");
+        AddMapping("Estado", "Estado");
+        AddMapping("ActividadEconomica", "ActividadEconomica");
+        AddMapping("AdministracionLocal", "AdministracionLocal");
+        AddMapping("FacturadorElectronico", "FacturadorElectronico");
+        AddMapping("LicenciasVhm", "LicenciasVhm");
+        AddMapping("FechaModificacion", "FechaModificacion");
+
+        using var dataTable = new System.Data.DataTable();
+        dataTable.Columns.Add("Rnc", typeof(string));
+        dataTable.Columns.Add("NombreRazonSocial", typeof(string));
+        dataTable.Columns.Add("NombreComercial", typeof(string));
+        dataTable.Columns.Add("Categoria", typeof(string));
+        dataTable.Columns.Add("RegimenPagos", typeof(string));
+        dataTable.Columns.Add("Estado", typeof(string));
+        dataTable.Columns.Add("ActividadEconomica", typeof(string));
+        dataTable.Columns.Add("AdministracionLocal", typeof(string));
+        dataTable.Columns.Add("FacturadorElectronico", typeof(string));
+        dataTable.Columns.Add("LicenciasVhm", typeof(string));
+        dataTable.Columns.Add("FechaModificacion", typeof(DateTime));
+
+        int rowCount = 0;
+        var lines = File.ReadLines(filePath, System.Text.Encoding.UTF8);
+        var writeMethod = bulkCopyType.GetMethod("WriteToServerAsync", new[] { typeof(System.Data.DataTable) })!;
+
+        foreach (var line in lines)
+        {
+            if (rowCount >= 1000) break;
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            var parts = line.Split('|');
+            if (parts.Length < 2) continue;
+
+            var row = dataTable.NewRow();
+            row["Rnc"] = parts[0].Trim();
+            row["NombreRazonSocial"] = parts[1].Trim();
+            row["NombreComercial"] = parts.Length > 2 ? parts[2].Trim() : null;
+            row["ActividadEconomica"] = parts.Length > 3 ? parts[3].Trim() : null;
+            row["Categoria"] = parts.Length > 4 ? parts[4].Trim() : null;
+            row["RegimenPagos"] = parts.Length > 5 ? parts[5].Trim() : null;
+            row["AdministracionLocal"] = parts.Length > 6 ? parts[6].Trim() : null;
+            row["FacturadorElectronico"] = parts.Length > 7 ? parts[7].Trim() : null;
+
+            DateTime? modDate = null;
+            if (parts.Length > 8 && !string.IsNullOrWhiteSpace(parts[8]))
+            {
+                if (DateTime.TryParseExact(parts[8].Trim(), "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d))
+                {
+                    modDate = d;
+                }
+            }
+            row["FechaModificacion"] = (object?)modDate ?? DBNull.Value;
+
+            row["Estado"] = parts.Length > 9 ? parts[9].Trim() : null;
+            row["LicenciasVhm"] = parts.Length > 10 ? parts[10].Trim() : null;
+
+            dataTable.Rows.Add(row);
+            rowCount++;
+
+            if (rowCount % 50000 == 0)
+            {
+                var task = (Task)writeMethod.Invoke(bulkCopy, new object[] { dataTable })!;
+                await task;
+                dataTable.Clear();
+                logger.LogInformation($"Bulk copy progress: {rowCount} rows written.");
+            }
+        }
+
+        if (dataTable.Rows.Count > 0)
+        {
+            var task = (Task)writeMethod.Invoke(bulkCopy, new object[] { dataTable })!;
+            await task;
+            logger.LogInformation($"Bulk copy complete! Total rows: {rowCount}.");
+        }
+    }
+
+    private static async Task SeedDgiiRncViaEFAsync(AppDbContext context, string filePath, ILogger logger)
+    {
+        var list = new List<Domain.Entities.DgiiRnc>();
+        int count = 0;
+        var lines = File.ReadLines(filePath, System.Text.Encoding.UTF8);
+
+        foreach (var line in lines)
+        {
+            if (count >= 1000) break;
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            var parts = line.Split('|');
+            if (parts.Length < 2) continue;
+
+            DateTime? modDate = null;
+            if (parts.Length > 8 && !string.IsNullOrWhiteSpace(parts[8]))
+            {
+                if (DateTime.TryParseExact(parts[8].Trim(), "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d))
+                {
+                    modDate = d;
+                }
+            }
+
+            var record = new Domain.Entities.DgiiRnc
+            {
+                Rnc = parts[0].Trim(),
+                NombreRazonSocial = parts[1].Trim(),
+                NombreComercial = parts.Length > 2 ? parts[2].Trim() : null,
+                ActividadEconomica = parts.Length > 3 ? parts[3].Trim() : null,
+                Categoria = parts.Length > 4 ? parts[4].Trim() : null,
+                RegimenPagos = parts.Length > 5 ? parts[5].Trim() : null,
+                AdministracionLocal = parts.Length > 6 ? parts[6].Trim() : null,
+                FacturadorElectronico = parts.Length > 7 ? parts[7].Trim() : null,
+                FechaModificacion = modDate,
+                Estado = parts.Length > 9 ? parts[9].Trim() : null,
+                LicenciasVhm = parts.Length > 10 ? parts[10].Trim() : null
+            };
+
+            list.Add(record);
+            count++;
+
+            if (count % 10000 == 0)
+            {
+                await context.DgiiRnc.AddRangeAsync(list);
+                await context.SaveChangesAsync();
+                list.Clear();
+                logger.LogInformation($"EF seed progress: {count} rows saved.");
+            }
+        }
+
+        if (list.Count > 0)
+        {
+            await context.DgiiRnc.AddRangeAsync(list);
+            await context.SaveChangesAsync();
+            logger.LogInformation($"EF seed complete! Total rows: {count}.");
+        }
     }
 }

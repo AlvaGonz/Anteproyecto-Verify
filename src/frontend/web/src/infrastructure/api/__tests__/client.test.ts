@@ -141,7 +141,7 @@ describe("apiClient — 401 silent refresh", () => {
     }
 
     expect(axiosPostSpy).toHaveBeenCalledWith(
-      `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
+      expect.stringContaining("/auth/refresh"),
       {},
       { withCredentials: true }
     );

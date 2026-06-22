@@ -84,5 +84,8 @@ echo "================================================"
 echo "   SQL Server Container is Ready and Running   "
 echo "================================================"
 
+# Signal that the database is fully initialized
+touch /tmp/db_ready
+
 # 5. Keep the container alive by waiting for the SQL Server process
 wait $SQL_PID

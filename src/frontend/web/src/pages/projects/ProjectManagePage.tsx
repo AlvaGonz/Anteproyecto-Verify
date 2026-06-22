@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
@@ -8,7 +8,7 @@ import {
   UpdateProyectoDto
 } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
-import { useProject, useCreateProject } from "../../features/projects/api/useProjects";
+import { useProject, useCreateProject, useDeleteProject } from "../../features/projects/api/useProjects";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
@@ -39,6 +39,7 @@ export const ProjectManagePage: React.FC = () => {
   const project = rawProject;
   
   const createMutation = useCreateProject();
+  const deleteMutation = useDeleteProject();
   
   const qc = useQueryClient();
   const updateMutation = useMutation({
@@ -57,6 +58,24 @@ export const ProjectManagePage: React.FC = () => {
     }
   });
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = () => {
+    if (!id) return;
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setShowDeleteConfirm(false);
+    try {
+      await deleteMutation.mutateAsync(id as string);
+      addToast("Proyecto eliminado exitosamente", "success");
+      navigate("/admin/projects");
+    } catch (error) {
+      addToast("Error al eliminar el proyecto", "error");
+    }
+  };
+
   const handleSubmit = async (data: CreateProyectoDto | UpdateProyectoDto) => {
     try {
       validateProjectData(data);
@@ -66,19 +85,23 @@ export const ProjectManagePage: React.FC = () => {
         }
         await updateMutation.mutateAsync({ id: id as string, payload: data });
         addToast("Proyecto actualizado exitosamente", "success");
-        navigate(`/projects/${id}`);
+        navigate("/admin/projects");
       } else {
         if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
           throw new Error("Missing required field: usuarioCreadorId");
         }
-        const created = await createMutation.mutateAsync({
+        const newProj = await createMutation.mutateAsync({
           nombre: data.nombre,
           ubicacionTexto: data.ubicacionTexto || "",
           categoria: data.categoria,
-          usuarioCreadorId: data.usuarioCreadorId
+          usuarioCreadorId: data.usuarioCreadorId,
+          datosDesarrollador: data.datosDesarrollador,
+          rncDesarrollador: data.rncDesarrollador,
+          designacionCatastral: data.designacionCatastral,
+          ubicacionGps: data.ubicacionGps
         });
         addToast("Proyecto creado exitosamente", "success");
-        navigate(`/projects/${created.id}`);
+        navigate(`/projects/${newProj.id}`);
       }
     } catch (error) {
       addToast("Error al guardar el proyecto", "error");
@@ -123,13 +146,57 @@ export const ProjectManagePage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[var(--color-text-strong)]">
+    <div className="max-w-6xl mx-auto p-4">
+
+      {/* ── Inline Delete Confirmation Modal ── */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-red-600 text-2xl">⚠</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-gray-900">Eliminar Proyecto</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer.</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-700">
+              ¿Está seguro de que desea eliminar este proyecto permanentemente? Todos los datos asociados serán borrados.
+            </p>
+            <div className="flex gap-3 justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-6 py-3 rounded-xl font-bold text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="px-6 py-3 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-8 text-center animate-fade-in">
+        <h1 className="text-4xl font-extrabold text-[var(--color-text-strong)] tracking-tight">
           {isEditing ? "Editar Proyecto" : "Crear Nuevo Proyecto"}
         </h1>
-        <p className="text-sm mt-1 text-[var(--color-text-strong)] opacity-60">
-          {isEditing ? "Modifica los datos del proyecto existente." : "Ingresa los datos basicos para registrar un nuevo proyecto."}
+        <p className="text-base mt-2 text-[var(--color-text-strong)] opacity-70">
+          {isEditing ? "Modifica los datos del proyecto existente." : "Ingresa los datos básicos para registrar un nuevo proyecto."}
         </p>
       </div>
 
@@ -137,7 +204,8 @@ export const ProjectManagePage: React.FC = () => {
         key={project?.id || 'new'}
         initialData={project}
         onSubmit={handleSubmit}
-        onCancel={() => navigate(isEditing ? `/projects/${id}` : "/admin/projects")}
+        onCancel={() => navigate("/admin/projects")}
+        onDelete={handleDelete}
       />
 
       {isEditing && project && (
