@@ -298,7 +298,7 @@ public class SettingsController : ControllerBase
 
         if (lu != null)
         {
-            var perf = await _context.Perfiles.FirstOrDefaultAsync(p => string.Equals(p.NombrePerfil, targetProfileName, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            var perf = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == targetProfileName, cancellationToken);
             if (perf != null)
             {
                 var acceso = await _context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == lu.IdUsuario, cancellationToken);
