@@ -53,7 +53,7 @@ if (app.Environment.IsDevelopment())
             try
             {
                 using var cmd = db.Database.GetDbConnection().CreateCommand();
-                cmd.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Usuarios'";
+                cmd.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Usuario'";
                 var result = await cmd.ExecuteScalarAsync();
                 tableExists = result != null && Convert.ToInt32(result) > 0;
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -99,7 +99,7 @@ namespace Infrastructure.Migrations
                     Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Apellido = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     NombreCompleto = table.Column<string>(type: "nvarchar(max)", nullable: false, computedColumnSql: "[Nombre] + ' ' + [Apellido]", stored: true),
-                    CorreoElectronico = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     ContrasenaHash = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Telefono = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Cedula = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
@@ -860,9 +860,9 @@ namespace Infrastructure.Migrations
                 column: "ProyectoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Usuario_CorreoElectronico",
+                name: "UQ_Usuario_Email",
                 table: "Usuario",
-                column: "CorreoElectronico",
+                column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(

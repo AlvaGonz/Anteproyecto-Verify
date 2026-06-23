@@ -3,10 +3,27 @@
 **/bin
 **/obj
 **/dist
+**/dist-ssr
 **/.vscode
 **/.antigravity
+**/.gemini
 .env
 README.md
 docker/*
 !docker/SQL_Server/
 scripts/
+
+# Frontend — not needed for backend API image
+src/frontend/
+
+# Test and scratch files
+*.test.js
+*.ps1
+test_*.js
+scratch_*.ps1
+scratch_*.js
+
+# IDE and OS
+**/.idea
+**/.DS_Store
+**/Thumbs.db

@@ -14,13 +14,20 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Apellido).IsRequired().HasMaxLength(100);
         builder.Property(u => u.NombreCompleto).HasComputedColumnSql("[Nombre] + ' ' + [Apellido]", stored: true);
-        
-        builder.Property(u => u.CorreoElectronico).HasColumnName("CorreoElectronico").IsRequired().HasMaxLength(200);
-        builder.HasIndex(u => u.CorreoElectronico).IsUnique();
+
+        // CorreoElectronico (C# property) maps to "Email" column in the DB
+        builder.Property(u => u.CorreoElectronico).HasColumnName("Email").IsRequired().HasMaxLength(200);
+        builder.HasIndex(u => u.CorreoElectronico).IsUnique().HasDatabaseName("UQ_Usuario_Email");
         
         builder.Property(u => u.ContrasenaHash).IsRequired().HasMaxLength(500);
         builder.Property(u => u.Telefono).IsRequired().HasMaxLength(15);
         builder.Property(u => u.Cedula).IsRequired().HasMaxLength(15);
         builder.Property(u => u.Rol).IsRequired();
+        builder.Property(u => u.Activo).IsRequired().HasDefaultValue(true);
+
+        // Email verification fields (added to DB schema)
+        builder.Property(u => u.EmailVerificado).IsRequired().HasDefaultValue(false);
+        builder.Property(u => u.TokenVerificacion).HasMaxLength(4000).IsRequired(false);
+        builder.Property(u => u.TokenVerificacionExpiraUtc).IsRequired(false);
     }
 }
