@@ -287,8 +287,8 @@ config:
   max_attempts: 2
   timeout_seconds: 300
   parallel: false
-  executor: mock
-  model: claude-sonnet-4.6
+  executor: copilot-sdk
+  model: claude-haiku-4.5
 
 # Outcome checks (deterministic — did the task complete?)
 graders:
@@ -301,7 +301,7 @@ graders:
   - type: action_sequence
     name: process_check
     config:
-      matching_mode: all_anywhere
+      matching_mode: any_order_match
       expected_actions: ["bash", "read", "write", "edit"]
 
   # Style checks (does output match conventions? LLM-as-judge)
@@ -367,7 +367,6 @@ inputs:
 expected:
   outcomes:
     - type: task_completed
-should_trigger: true
 `;
     upgradeTaskYaml(skillDir, 'basic-usage.yaml', posContent1);
 
@@ -384,7 +383,6 @@ inputs:
 expected:
   outcomes:
     - type: task_completed
-should_trigger: true
 `;
     upgradeTaskYaml(skillDir, 'edge-case.yaml', posContent2);
 
@@ -403,7 +401,6 @@ inputs:
 expected:
   outcomes:
     - type: skill_not_invoked
-should_trigger: false
 `;
     upgradeTaskYaml(skillDir, 'should-not-trigger.yaml', negContent);
 
