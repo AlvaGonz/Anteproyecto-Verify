@@ -7,7 +7,7 @@ tags:
   - happy-path
   - positive-trigger
 inputs:
-  prompt: "Use the $ui-ux-pro-max skill to help me with this task."
+  prompt: "Help me apply the ui-ux-pro-max skill: UI/UX design intelligence with searchable database"
 expected:
   outcomes:
     - type: task_completed

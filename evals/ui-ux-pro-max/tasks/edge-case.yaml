@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "ui ux pro max: review this implementation for quality issues"
+  prompt: "UI/UX design intelligence with searchable database"
 expected:
   outcomes:
     - type: task_completed

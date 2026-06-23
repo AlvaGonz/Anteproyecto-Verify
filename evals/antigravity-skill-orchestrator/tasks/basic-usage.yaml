@@ -7,7 +7,7 @@ tags:
   - happy-path
   - positive-trigger
 inputs:
-  prompt: "Use the $antigravity-skill-orchestrator skill to help me with this task."
+  prompt: "Help me apply the antigravity-skill-orchestrator skill: A meta-skill that dynamically discovers available skills from local and global directories, evaluates task complexity, selects the optimal skill combination via structured Tool Calling, and tracks dec"
 expected:
   outcomes:
     - type: task_completed

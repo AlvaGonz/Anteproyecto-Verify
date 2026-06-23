@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "typescript expert: review this implementation for quality issues"
+  prompt: "TypeScript and JavaScript expert with deep knowledge of type-level programming, performance optimization, monorepo manag..."
 expected:
   outcomes:
     - type: task_completed

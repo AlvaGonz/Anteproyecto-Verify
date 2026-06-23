@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "playwright generate test: review this implementation for quality issues"
+  prompt: "Generate a Playwright test based on a scenario using Playwright MCP"
 expected:
   outcomes:
     - type: task_completed

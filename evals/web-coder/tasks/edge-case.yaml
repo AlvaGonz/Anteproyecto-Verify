@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "web coder: review this implementation for quality issues"
+  prompt: "Expert 10x engineer with comprehensive knowledge of web development, internet protocols, and web standards. Use when wor..."
 expected:
   outcomes:
     - type: task_completed

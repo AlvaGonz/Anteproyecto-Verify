@@ -7,7 +7,7 @@ tags:
   - happy-path
   - positive-trigger
 inputs:
-  prompt: "Use the $playwright-skill skill to help me with this task."
+  prompt: "Help me apply the playwright-skill skill: IMPORTANT - Path Resolution: This skill can be installed in different locations (plugin system, manual installation, global, or project-specific). Before executing any commands, determine the skill di"
 expected:
   outcomes:
     - type: task_completed

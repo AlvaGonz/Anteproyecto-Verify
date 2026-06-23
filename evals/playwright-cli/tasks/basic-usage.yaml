@@ -7,7 +7,7 @@ tags:
   - happy-path
   - positive-trigger
 inputs:
-  prompt: "Use the $playwright-cli skill to help me with this task."
+  prompt: "Help me apply the playwright-cli skill: Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, tes"
 expected:
   outcomes:
     - type: task_completed

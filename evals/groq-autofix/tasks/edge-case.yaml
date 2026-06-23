@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "groq autofix: review this implementation for quality issues"
+  prompt: "Specialized skill for groq autofix."
 expected:
   outcomes:
     - type: task_completed

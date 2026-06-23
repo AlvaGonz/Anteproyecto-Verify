@@ -7,7 +7,7 @@ tags:
   - happy-path
   - positive-trigger
 inputs:
-  prompt: "Use the $antigravity-workflows skill to help me with this task."
+  prompt: "Help me apply the antigravity-workflows skill: Orchestrate multiple Antigravity skills through guided workflows for SaaS MVP delivery, security audits, AI agent builds, and browser QA."
 expected:
   outcomes:
     - type: task_completed

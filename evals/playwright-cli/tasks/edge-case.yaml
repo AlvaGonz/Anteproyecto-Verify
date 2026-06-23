@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "playwright cli: review this implementation for quality issues"
+  prompt: "Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs ..."
 expected:
   outcomes:
     - type: task_completed

@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "typescript pro: review this implementation for quality issues"
+  prompt: "Master TypeScript with advanced types, generics, and strict type safety. Handles complex type systems, decorators, and e..."
 expected:
   outcomes:
     - type: task_completed

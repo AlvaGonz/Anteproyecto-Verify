@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "playwright skill: review this implementation for quality issues"
+  prompt: "IMPORTANT - Path Resolution: This skill can be installed in different locations (plugin system, manual installation, glo..."
 expected:
   outcomes:
     - type: task_completed

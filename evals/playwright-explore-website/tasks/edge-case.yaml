@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "playwright explore website: review this implementation for quality issues"
+  prompt: "Website exploration for testing using Playwright MCP"
 expected:
   outcomes:
     - type: task_completed

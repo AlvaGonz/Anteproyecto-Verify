@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "vercel composition patterns: review this implementation for quality issues"
+  prompt: "React composition patterns that scale. Use when refactoring components with boolean prop proliferation, building flexibl..."
 expected:
   outcomes:
     - type: task_completed

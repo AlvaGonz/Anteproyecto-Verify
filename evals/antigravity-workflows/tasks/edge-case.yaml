@@ -6,7 +6,7 @@ tags:
   - edge-case
   - positive-trigger
 inputs:
-  prompt: "antigravity workflows: review this implementation for quality issues"
+  prompt: "Orchestrate multiple Antigravity skills through guided workflows for SaaS MVP delivery, security audits, AI agent builds..."
 expected:
   outcomes:
     - type: task_completed
