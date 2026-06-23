@@ -14,7 +14,7 @@ docker/*
 scripts/
 
 # Frontend — not needed for backend API image
-src/frontend/
+
 
 # Test and scratch files
 *.test.js
