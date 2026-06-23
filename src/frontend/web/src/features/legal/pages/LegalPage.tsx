@@ -114,12 +114,14 @@ export const LegalPage: React.FC = () => {
 
   return (
     <div className="font-body text-on-surface antialiased min-h-screen bg-neutral">
-      <LandingNav />
+      <div className="print:hidden">
+        <LandingNav />
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 print:pt-4 print:pb-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Sidebar */}
-          <div className={`w-full lg:col-span-3 fade-up stagger-1 ${isRevealed ? "is-visible" : ""}`}>
+          <div className={`w-full lg:col-span-3 fade-up stagger-1 ${isRevealed ? "is-visible" : ""} print:hidden`}>
             <nav className="sidebar-bg rounded-xl p-4 sticky top-[88px] z-40 flex flex-row overflow-x-auto gap-3 border border-outline-variant/30 no-scrollbar lg:flex-col lg:p-6 lg:top-[100px] bg-surface-raised shadow-raised">
               <div className="mb-6 border-b border-outline-variant/30 pb-4 hidden lg:block">
                 <h3 className="font-headline font-bold text-lg text-on-surface">Centro de Cumplimiento</h3>
@@ -176,7 +178,10 @@ export const LegalPage: React.FC = () => {
                 Marco Normativo
               </a>
               <div className="mt-8 pt-6 border-t border-outline-variant/30 flex-shrink-0 ml-auto lg:mt-8 lg:pt-6 lg:border-t lg:ml-0">
-                <button className="w-full bg-surface border border-outline-variant text-on-surface hover:bg-surface-container hover:text-primary font-label text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-sm">
+                <button 
+                  onClick={() => window.print()}
+                  className="w-full bg-surface border border-outline-variant text-on-surface hover:bg-surface-container hover:text-primary font-label text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+                >
                   <span className="material-symbols-outlined text-sm">{ICONS.download}</span>
                   Descargar PDF
                 </button>
@@ -185,7 +190,7 @@ export const LegalPage: React.FC = () => {
           </div>
 
           {/* Main Content */}
-          <main className="lg:col-span-9 max-w-[760px] px-2">
+          <main className="lg:col-span-9 max-w-[760px] px-2 print:col-span-12 print:max-w-none print:w-full print:px-0">
             {/* Header */}
             <div className={`mb-12 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
               <span className="font-sans font-semibold text-[11px] tracking-widest uppercase text-secondary mb-2 block">
@@ -843,7 +848,7 @@ export const LegalPage: React.FC = () => {
       </div>
 
       {/* Contact Strip */}
-      <section className="bg-secondary w-full py-12 px-4 sm:px-6 lg:px-8 mt-8">
+      <section className="bg-secondary w-full py-12 px-4 sm:px-6 lg:px-8 mt-8 print:hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-white text-center md:text-left">
             <h3 className="font-headline text-2xl font-bold mb-2">¿Necesita asistencia legal?</h3>
@@ -863,7 +868,9 @@ export const LegalPage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <LandingFooter />
+      <div className="print:hidden">
+        <LandingFooter />
+      </div>
     </div>
   );
 };
