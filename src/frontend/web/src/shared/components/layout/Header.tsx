@@ -36,6 +36,15 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   };
 
   const displayName = user?.name || "Admin_Verifinca";
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .filter(Boolean)
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "US";
   const roleLabel = {
     admin: "Administrador",
     dev: "Desarrollador",
@@ -94,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
            </div>
            <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200 group-hover:border-primary/30 transition-colors">
               {user ? (
-                <span className="text-sm font-black text-gray-600">{getInitials(user.name)}</span>
+                <span className="text-sm font-black text-gray-600">{initials}</span>
               ) : (
                 <User className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
               )}
