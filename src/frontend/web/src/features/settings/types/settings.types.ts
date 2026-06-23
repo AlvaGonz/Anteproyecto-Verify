@@ -30,6 +30,7 @@ export interface CreateUserDto {
   role: "admin" | "dev" | "validator" | "user";
   telefono?: string;
   cedula?: string;
+  password?: string;
 }
 
 export interface UpdateUserDto {

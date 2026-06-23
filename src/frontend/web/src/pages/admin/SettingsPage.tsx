@@ -21,6 +21,7 @@ import {
   Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import InputMask from "react-input-mask";
 
 type TabId = "users" | "permissions";
 
@@ -113,7 +114,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleAddNewClick = () => {
     setEditingUser(null);
-    setFormData({ name: "", email: "", role: "user", telefono: "", cedula: "" });
+    setFormData({ name: "", email: "", role: "user", telefono: "", cedula: "", password: "" });
     setIsModalOpen(true);
   };
 
@@ -413,8 +414,8 @@ export const SettingsPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Teléfono</label>
-                  <input 
-                    type="text" 
+                  <InputMask 
+                    mask="999-999-9999"
                     value={formData.telefono || ""}
                     onChange={e => setFormData({...formData, telefono: e.target.value})}
                     className="vf-input w-full"
@@ -423,8 +424,8 @@ export const SettingsPage: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
-                  <input 
-                    type="text" 
+                  <InputMask 
+                    mask="999-9999999-9"
                     value={formData.cedula || ""}
                     onChange={e => setFormData({...formData, cedula: e.target.value})}
                     className="vf-input w-full"
@@ -432,6 +433,20 @@ export const SettingsPage: React.FC = () => {
                   />
                 </div>
               </div>
+
+              {!editingUser && (
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Contraseña Temporal (Opcional)</label>
+                  <input 
+                    type="text" 
+                    value={formData.password || ""}
+                    onChange={e => setFormData({...formData, password: e.target.value})}
+                    className="vf-input w-full"
+                    placeholder="Dejar en blanco para usar clave por defecto"
+                  />
+                  <p className="text-[10px] text-text-secondary mt-1">El usuario recibirá una alerta para cambiar esta contraseña al iniciar sesión.</p>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Rol de Acceso</label>

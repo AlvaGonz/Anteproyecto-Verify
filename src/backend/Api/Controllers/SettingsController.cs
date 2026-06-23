@@ -19,10 +19,12 @@ using Microsoft.EntityFrameworkCore;
 public class SettingsController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly Application.Abstractions.Security.IPasswordHasher _passwordHasher;
 
-    public SettingsController(AppDbContext context)
+    public SettingsController(AppDbContext context, Application.Abstractions.Security.IPasswordHasher passwordHasher)
     {
         _context = context;
+        _passwordHasher = passwordHasher;
     }
 
     [HttpGet("users")]
@@ -144,17 +146,32 @@ public class SettingsController : ControllerBase
         string nombre = nameParts[0];
         string apellido = nameParts.Length > 1 ? nameParts[1] : string.Empty;
 
+        string finalPassword = string.IsNullOrWhiteSpace(request.Password) ? "Temporal123!" : request.Password;
+        string hashedPassword = _passwordHasher.HashPassword(finalPassword);
+
         var user = new Usuario(
             nombre: string.IsNullOrWhiteSpace(nombre) ? "Usuario" : nombre,
             apellido: string.IsNullOrWhiteSpace(apellido) ? "Nuevo" : apellido,
             correoElectronico: request.Email,
-            contrasenaHash: "Temporal123!", // Dummy password hash
+            contrasenaHash: hashedPassword,
             rol: role,
             telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
             cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
         );
 
         _context.Usuarios.Add(user);
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            var notification = new Notificacion(
+                usuarioId: user.Id,
+                mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
+                tipo: "Warning",
+                enlaceRelacionado: "/profile"
+            );
+            _context.Notificaciones.Add(notification);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         await SyncUserLegacyAsync(user);
@@ -201,6 +218,12 @@ public class SettingsController : ControllerBase
 
         var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
         if (user == null) return NotFound(new { Message = "Usuario no encontrado." });
+
+        var auditorias = await _context.Auditorias.Where(a => a.UsuarioId == id).ToListAsync(cancellationToken);
+        if (auditorias.Any()) _context.Auditorias.RemoveRange(auditorias);
+
+        var notificaciones = await _context.Notificaciones.Where(n => n.UsuarioId == id).ToListAsync(cancellationToken);
+        if (notificaciones.Any()) _context.Notificaciones.RemoveRange(notificaciones);
 
         _context.Usuarios.Remove(user);
         
@@ -266,11 +289,11 @@ public class SettingsController : ControllerBase
         u.UpdateRol(targetRole);
 
         // Update or sync legacy record
-        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => string.Equals(l.Email, u.Email, StringComparison.OrdinalIgnoreCase), cancellationToken);
+        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         if (lu == null)
         {
             await SyncUserLegacyAsync(u);
-            lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => string.Equals(l.Email, u.Email, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         }
 
         if (lu != null)
@@ -322,11 +345,11 @@ public class SettingsController : ControllerBase
         }
 
         // Sync legacy user if missing
-        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => string.Equals(l.Email, u.Email, StringComparison.OrdinalIgnoreCase), cancellationToken);
+        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         if (lu == null)
         {
             await SyncUserLegacyAsync(u);
-            lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => string.Equals(l.Email, u.Email, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         }
 
         if (lu != null)
@@ -480,6 +503,7 @@ public class CreateUserDto
     public string Role { get; set; } = "user";
     public string Telefono { get; set; } = "0000000000";
     public string Cedula { get; set; } = "00000000000";
+    public string? Password { get; set; }
 }
 
 public class UpdateUserDto
