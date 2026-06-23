@@ -36,3 +36,8 @@ Thumbs.db
 playwright-report/
 test-results/
 
+
+# Waza eval artifacts (cache only, not the evals themselves)
+.waza-cache/
+results/
+

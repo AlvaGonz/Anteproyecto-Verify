@@ -2,23 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { useUsers, useProfiles, usePlans, useUpdateUserRole, useUpdateUserPlan, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
+import { useUsers, useProfiles, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
 import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
-import { 
-  Users, 
-  Shield, 
-  Settings, 
-  Loader2, 
-  UserCheck, 
-  Check, 
+import { UsersTable, UserFormModal, DeleteModal } from "../../features/settings/components";
+import {
+  Settings,
   RefreshCw,
-  Mail,
-  Phone,
-  Layers,
-  Plus,
-  X,
-  Pencil,
-  Trash2
+  Users,
+  Shield,
+  Loader2,
+  UserCheck,
+  Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
@@ -43,19 +37,17 @@ export const SettingsPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserDto>({ name: "", email: "", role: "user", telefono: "", cedula: "" });
-  
+
   const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers();
   const { data: profiles = [], isLoading: isLoadingProfiles, refetch: refetchProfiles } = useProfiles();
   const { data: plans = [], isLoading: isLoadingPlans, refetch: refetchPlans } = usePlans();
 
-  const updateUserRoleMutation = useUpdateUserRole();
-  const updateUserPlanMutation = useUpdateUserPlan();
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
 
   const loading = isLoadingUsers || isLoadingProfiles || isLoadingPlans;
-  const updatingUserId = updateUserRoleMutation.isPending || updateUserPlanMutation.isPending || deleteUserMutation.isPending ? "updating" : null;
+  const isProcessing = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
 
   // Security Check: Only admin allowed
   useEffect(() => {
@@ -69,24 +61,6 @@ export const SettingsPage: React.FC = () => {
     refetchUsers();
     refetchProfiles();
     refetchPlans();
-  };
-
-  const handleRoleChange = async (userId: string, newRole: "admin" | "dev" | "validator" | "user") => {
-    try {
-      await updateUserRoleMutation.mutateAsync({ userId, role: newRole });
-      addToast("Rol y perfil actualizados exitosamente", "success");
-    } catch {
-      addToast("Error de red al actualizar rol", "error");
-    }
-  };
-
-  const handlePlanChange = async (userId: string, newPlanId: string) => {
-    try {
-      await updateUserPlanMutation.mutateAsync({ userId, planId: newPlanId });
-      addToast("Plan de suscripción asignado exitosamente", "success");
-    } catch {
-      addToast("Error de red al actualizar suscripción", "error");
-    }
   };
 
   const handleSaveUser = async (e: React.FormEvent) => {
@@ -228,129 +202,14 @@ export const SettingsPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden"
             >
-              <div className="p-6 border-b border-border bg-surface-raised/40 flex justify-between items-center">
-                <div>
-                  <h3 className="font-display font-bold text-[#223382] text-lg">Listado de Usuarios Registrados</h3>
-                  <p className="text-xs text-text-secondary mt-1">
-                    Gestione la información, roles y suscripciones de los usuarios en el sistema.
-                  </p>
-                </div>
-                <button onClick={handleAddNewClick} className="vf-btn-primary flex items-center gap-2 text-sm px-4 py-2">
-                  <Plus className="w-4 h-4" /> Nuevo Usuario
-                </button>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-surface-raised/20 border-b border-border text-[11px] font-black uppercase tracking-wider text-text-secondary">
-                      <th className="px-6 py-4">Usuario</th>
-                      <th className="px-6 py-4">Contacto</th>
-                      <th className="px-6 py-4">Identificación</th>
-                      <th className="px-6 py-4">Rol en Sistema</th>
-                      <th className="px-6 py-4">Suscripción</th>
-                      <th className="px-6 py-4 text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border text-sm">
-                    {users.map(u => (
-                      <tr key={u.id} className="hover:bg-surface-raised/10 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="font-bold text-text-primary">{u.name}</span>
-                            <span className="text-xs text-text-secondary flex items-center gap-1 mt-0.5">
-                              <Mail className="w-3.5 h-3.5 shrink-0" />
-                              {u.email}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-xs text-text-secondary flex items-center gap-1 font-mono">
-                            <Phone className="w-3.5 h-3.5 shrink-0" />
-                            {u.telefono || "N/A"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 font-mono text-xs">
-                          {u.cedula || "N/A"}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                            u.role === "admin"
-                              ? "bg-red-50 text-red-700 border border-red-200"
-                              : u.role === "dev"
-                              ? "bg-blue-50 text-blue-700 border border-blue-200"
-                              : "bg-green-50 text-green-700 border border-green-200"
-                          }`}>
-                            {u.profileName || u.role.toUpperCase()}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="font-medium text-text-primary flex items-center gap-1">
-                              <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
-                              {u.planName || "Ninguno"}
-                            </span>
-                            {u.planPrice !== null && (
-                              <span className="text-[11px] text-text-secondary mt-0.5">
-                                RD$ {u.planPrice.toLocaleString("es-DO", { minimumFractionDigits: 2 })} / mes
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-3">
-                            {/* Role selection dropdown */}
-                            <div className="flex flex-col items-start gap-1">
-                              <label className="text-[10px] font-bold text-text-secondary uppercase">Cambiar Rol</label>
-                              <select
-                                value={u.role}
-                                onChange={(e) => handleRoleChange(u.id, e.target.value as any)}
-                                disabled={updatingUserId !== null}
-                                className="vf-input py-1 px-2 text-xs h-8 min-w-[120px]"
-                              >
-                                <option value="admin">Administrador</option>
-                                <option value="dev">Desarrollador</option>
-                                <option value="validator">Validador</option>
-                              </select>
-                            </div>
-
-                            {/* Plan selection dropdown */}
-                            <div className="flex flex-col items-start gap-1">
-                              <label className="text-[10px] font-bold text-text-secondary uppercase">Cambiar Plan</label>
-                              <select
-                                value={u.planId || ""}
-                                onChange={(e) => handlePlanChange(u.id, e.target.value)}
-                                disabled={updatingUserId !== null}
-                                className="vf-input py-1 px-2 text-xs h-8 min-w-[130px]"
-                              >
-                                <option value="" disabled>Seleccionar...</option>
-                                {plans.map(p => (
-                                  <option key={p.planId} value={p.planId}>
-                                    {p.name}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="flex flex-col items-center gap-1 justify-center ml-2 border-l border-border pl-3">
-                              <div className="flex gap-1">
-                                <button onClick={() => handleEditClick(u)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
-                                  <Pencil className="w-4 h-4" />
-                                </button>
-                                <button onClick={() => setDeleteId(u.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <UsersTable
+                users={users}
+                plans={plans}
+                onEdit={handleEditClick}
+                onDelete={(id) => setDeleteId(id)}
+                onAddNew={handleAddNewClick}
+              />
             </motion.div>
           )}
 
@@ -372,7 +231,7 @@ export const SettingsPage: React.FC = () => {
                         p.name === "ADMIN" ? "text-red-500" : p.name === "DEVELOPER" ? "text-blue-500" : "text-green-500"
                       }`} />
                     </div>
-                    
+
                     <p className="text-xs text-text-secondary mb-4 font-medium">
                       Permisos funcionales asignados en la capa legacy:
                     </p>
@@ -402,181 +261,23 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* User Form Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
-          >
-            <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-surface-raised/30">
-              <h2 className="text-lg font-bold text-[#223382]">
-                {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-surface rounded-full transition-colors">
-                <X className="w-5 h-5 text-text-secondary" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleSaveUser} className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre Completo</label>
-                <input 
-                  type="text" 
-                  required
-                  value={formData.name}
-                  onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="vf-input w-full"
-                  placeholder="Ej. Juan Pérez"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Correo Electrónico</label>
-                <input 
-                  type="email" 
-                  required
-                  value={formData.email}
-                  onChange={e => setFormData({...formData, email: e.target.value})}
-                  className="vf-input w-full"
-                  placeholder="ejemplo@empresa.com"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Teléfono</label>
-                  <input 
-                    type="text"
-                    maxLength={14}
-                    inputMode="numeric"
-                    value={formData.telefono || ""}
-                    onChange={e => {
-                      let val = e.target.value.replace(/\D/g, "");
-                      if (val.length > 0) {
-                        if (val.length <= 3) val = `(${val}`;
-                        else if (val.length <= 6) val = `(${val.slice(0, 3)}) ${val.slice(3)}`;
-                        else val = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6, 10)}`;
-                      }
-                      setFormData({...formData, telefono: val});
-                    }}
-                    onKeyDown={(e) => {
-                      const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
-                      if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
-                        e.preventDefault();
-                      }
-                    }}
-                    className="vf-input w-full"
-                    placeholder="(809) 000-0000"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
-                  <input 
-                    type="text"
-                    maxLength={13}
-                    inputMode="numeric"
-                    value={formData.cedula || ""}
-                    onChange={e => {
-                      let val = e.target.value.replace(/\D/g, "");
-                      if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
-                      else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
-                      setFormData({...formData, cedula: val});
-                    }}
-                    onKeyDown={(e) => {
-                      const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
-                      if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
-                        e.preventDefault();
-                      }
-                    }}
-                    className="vf-input w-full"
-                    placeholder="000-0000000-0"
-                  />
-                </div>
-              </div>
-
-              {!editingUser && (
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Contraseña Temporal (Opcional)</label>
-                  <input 
-                    type="text" 
-                    value={formData.password || ""}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                    className="vf-input w-full"
-                    placeholder="Dejar en blanco para usar clave por defecto"
-                  />
-                  <p className="text-[10px] text-text-secondary mt-1">El usuario recibirá una alerta para cambiar esta contraseña al iniciar sesión.</p>
-                </div>
-              )}
-
-              <div>
-                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Rol de Acceso</label>
-                <select 
-                  value={formData.role}
-                  onChange={e => setFormData({...formData, role: e.target.value as any})}
-                  className="vf-input w-full"
-                >
-                  <option value="user">Usuario Regular</option>
-                  <option value="validator">Validador</option>
-                  <option value="dev">Desarrollador</option>
-                  <option value="admin">Administrador</option>
-                </select>
-              </div>
-
-              <div className="pt-4 flex gap-3 justify-end border-t border-border mt-6">
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="vf-btn-secondary"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={updatingUserId === "updating"}
-                  className="vf-btn-primary"
-                >
-                  {updatingUserId === "updating" ? "Guardando..." : "Guardar Usuario"}
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+      <UserFormModal
+        isOpen={isModalOpen}
+        editingUser={editingUser}
+        formData={formData}
+        isProcessing={isProcessing}
+        onChange={setFormData}
+        onSubmit={handleSaveUser}
+        onClose={() => { setIsModalOpen(false); setEditingUser(null); }}
+      />
 
       {/* Delete Confirmation Modal */}
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center"
-          >
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trash2 className="w-8 h-8 text-red-600" />
-            </div>
-            <h3 className="text-lg font-bold text-text-primary mb-2">¿Eliminar Usuario?</h3>
-            <p className="text-sm text-text-secondary mb-6">
-              Esta acción no se puede deshacer. El usuario perderá acceso al sistema inmediatamente.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <button 
-                onClick={() => setDeleteId(null)}
-                className="vf-btn-secondary w-full"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={confirmDelete}
-                disabled={updatingUserId === "updating"}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-              >
-                Sí, Eliminar
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      <DeleteModal
+        deleteId={deleteId}
+        isProcessing={isProcessing}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   );
 };

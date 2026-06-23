@@ -2,6 +2,7 @@ namespace Domain.Entities;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Domain.Common;
 using Domain.Enums;
 
@@ -21,6 +22,10 @@ public class Usuario : EntityBase
     public bool EmailVerificado { get; private set; }
     public string? TokenVerificacion { get; private set; }
     public DateTime? TokenVerificacionExpiraUtc { get; private set; }
+
+    // Optimistic concurrency token
+    [Timestamp]
+    public byte[]? RowVersion { get; private set; }
 
     // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();

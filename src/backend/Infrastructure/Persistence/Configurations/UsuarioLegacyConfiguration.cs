@@ -19,5 +19,8 @@ public class UsuarioLegacyConfiguration : IEntityTypeConfiguration<UsuarioLegacy
         builder.Property(u => u.ContrasenaHash).IsRequired().HasMaxLength(255);
         builder.Property(u => u.Telefono).IsRequired().HasMaxLength(15);
         builder.Property(u => u.Cedula).IsRequired().HasMaxLength(15);
+
+        // Unique index on Email for fast lookups (used in legacy sync and user queries)
+        builder.HasIndex(u => u.Email).IsUnique().HasDatabaseName("IX_UsuarioLegacy_Email");
     }
 }

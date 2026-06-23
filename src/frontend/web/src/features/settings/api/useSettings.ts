@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
-import { UserSettings, ProfilePermissions, SubscriptionPlan, CreateUserDto, UpdateUserDto } from "../types/settings.types";
+import { PaginatedResponse, UserSettings, ProfilePermissions, SubscriptionPlan, CreateUserDto, UpdateUserDto } from "../types/settings.types";
 
-export const useUsers = () =>
+export const useUsers = (page = 1, pageSize = 50) =>
   useQuery({
-    queryKey: ["settings", "users"],
-    queryFn: () => apiClient.get<UserSettings[]>("/admin/users").then(res => res.data),
+    queryKey: ["settings", "users", page, pageSize],
+    queryFn: () =>
+      apiClient
+        .get<PaginatedResponse<UserSettings>>("/admin/users", { params: { page, pageSize } })
+        .then(res => res.data.items),
   });
 
 export const useProfiles = () =>

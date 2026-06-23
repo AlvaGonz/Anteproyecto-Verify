@@ -1,6 +1,0 @@
-interface:
-  display_name: "Anteproyecto Verify"
-  short_description: "Repo-specific patterns and workflows for Anteproyecto-Verify"
-  default_prompt: "Use the Anteproyecto-Verify repo skill to follow existing architecture, testing, and workflow conventions."
-policy:
-  allow_implicit_invocation: true

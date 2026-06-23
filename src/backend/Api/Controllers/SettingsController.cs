@@ -1,4 +1,4 @@
-namespace Api.Controllers;
+﻿namespace Api.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,33 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+/// <summary>
+/// Response DTO for admin user settings with profile and plan information
+/// </summary>
+public record AdminUserSettingsDto(
+    Guid Id,
+    string Name,
+    string Email,
+    string Role,
+    string Telefono,
+    string Cedula,
+    Guid? ProfileId,
+    string ProfileName,
+    Guid? PlanId,
+    string PlanName,
+    decimal? PlanPrice
+);
+
+/// <summary>
+/// Paginated response wrapper
+/// </summary>
+public record PaginatedResponse<T>(
+    IReadOnlyList<T> Items,
+    int TotalCount,
+    int Page,
+    int PageSize
+);
 
 [Microsoft.AspNetCore.Authorization.Authorize]
 [ApiController]
@@ -28,102 +55,55 @@ public class SettingsController : ControllerBase
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUsers(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        CancellationToken cancellationToken = default)
     {
         if (!await IsAdminAsync())
         {
             return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado. Se requieren permisos de administrador." });
         }
 
-        var efUsers = await _context.Usuarios.ToListAsync(cancellationToken);
+        // Validate pagination parameters
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 200);
 
-        // Auto sync if any user doesn't have a legacy record
-        foreach (var u in efUsers)
-        {
-            var legacyUser = await _context.UsuariosLegacy.FirstOrDefaultAsync(ul => ul.Email == u.Email, cancellationToken);
-            var hasAcceso = legacyUser != null && await _context.Accesos.AnyAsync(a => a.IdUsuario == legacyUser.IdUsuario, cancellationToken);
-            var hasPago = legacyUser != null && await _context.PagosLegacy.AnyAsync(p => p.IdUsuario == legacyUser.IdUsuario, cancellationToken);
+        // Single optimized query with server-side joins and projection
+        var query = from u in _context.Usuarios
+                    join l in _context.UsuariosLegacy on u.CorreoElectronico equals l.Email into lj
+                    from l in lj.DefaultIfEmpty()
+                    join a in _context.Accesos on l!.IdUsuario equals a.IdUsuario into aj
+                    from a in aj.DefaultIfEmpty()
+                    join pf in _context.Perfiles on a!.IdPerfil equals pf.IdPerfil into pfj
+                    from pf in pfj.DefaultIfEmpty()
+                    join p in _context.PagosLegacy.OrderByDescending(x => x.FechaPago) on l!.IdUsuario equals p.IdUsuario into pj
+                    from p in pj.DefaultIfEmpty()
+                    join pl in _context.PlanesSuscripcion on p!.Idsuscripcion equals pl.Idsuscripcion into plj
+                    from pl in plj.DefaultIfEmpty()
+                    where u.Activo
+                    select new AdminUserSettingsDto(
+                        u.Id,
+                        u.NombreCompleto,
+                        u.CorreoElectronico,
+                        u.Rol == UserRole.Administrator ? "admin" : u.Rol == UserRole.Professional ? "dev" : "validator",
+                        u.Telefono,
+                        u.Cedula,
+                        pf!.IdPerfil,
+                        pf!.NombrePerfil,
+                        pl!.Idsuscripcion,
+                        pl!.NombrePlan,
+                        pl!.Precio
+                    );
 
-            if (legacyUser == null || !hasAcceso || !hasPago)
-            {
-                await SyncUserLegacyAsync(u);
-            }
-        }
-
-        // Fetch everything again
-        var legacyUsers = await _context.UsuariosLegacy.ToListAsync(cancellationToken);
-        var accesos = await _context.Accesos.ToListAsync(cancellationToken);
-        var perfiles = await _context.Perfiles.ToListAsync(cancellationToken);
-        
-        // Order by descending date to get the latest plan
-        var pagos = await _context.PagosLegacy
-            .OrderByDescending(p => p.FechaPago)
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
-        var planes = await _context.PlanesSuscripcion.ToListAsync(cancellationToken);
 
-        var resultList = new List<object>();
-
-        foreach (var u in efUsers)
-        {
-            var lu = legacyUsers.FirstOrDefault(l => string.Equals(l.Email, u.Email, StringComparison.OrdinalIgnoreCase));
-            
-            Guid? profileId = null;
-            string profileName = string.Empty;
-            Guid? planId = null;
-            string planName = string.Empty;
-            decimal? planPrice = null;
-
-            if (lu != null)
-            {
-                var acceso = accesos.FirstOrDefault(a => a.IdUsuario == lu.IdUsuario);
-                if (acceso != null)
-                {
-                    var perf = perfiles.FirstOrDefault(p => p.IdPerfil == acceso.IdPerfil);
-                    if (perf != null)
-                    {
-                        profileId = perf.IdPerfil;
-                        profileName = perf.NombrePerfil;
-                    }
-                }
-
-                var pago = pagos.FirstOrDefault(p => p.IdUsuario == lu.IdUsuario);
-                if (pago != null)
-                {
-                    var plan = planes.FirstOrDefault(p => p.Idsuscripcion == pago.Idsuscripcion);
-                    if (plan != null)
-                    {
-                        planId = plan.Idsuscripcion;
-                        planName = plan.NombrePlan;
-                        planPrice = plan.Precio;
-                    }
-                }
-            }
-
-            string roleStr = u.Rol switch
-            {
-                UserRole.Administrator => "admin",
-                UserRole.Professional => "dev",
-                UserRole.Consultation => "validator",
-                _ => "user"
-            };
-
-            resultList.Add(new
-            {
-                Id = u.Id,
-                Name = u.NombreCompleto,
-                Email = u.CorreoElectronico,
-                Role = roleStr,
-                Telefono = u.Telefono,
-                Cedula = u.Cedula,
-                ProfileId = profileId,
-                ProfileName = profileName,
-                PlanId = planId,
-                PlanName = planName,
-                PlanPrice = planPrice
-            });
-        }
-
-        return Ok(resultList);
+        var response = new PaginatedResponse<AdminUserSettingsDto>(items, totalCount, page, pageSize);
+        return Ok(response);
     }
 
     [HttpPost("users")]
@@ -132,7 +112,7 @@ public class SettingsController : ControllerBase
         if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
 
         if (await _context.Usuarios.AnyAsync(u => u.CorreoElectronico == request.Email, cancellationToken))
-            return BadRequest(new { Message = "El correo electrónico ya está en uso." });
+            return BadRequest(new { Message = "El correo electrÃ³nico ya estÃ¡ en uso." });
 
         UserRole role = request.Role.ToLower() switch
         {
@@ -165,16 +145,18 @@ public class SettingsController : ControllerBase
         {
             var notification = new Notificacion(
                 usuarioId: user.Id,
-                mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
+                mensaje: "Tu cuenta fue creada con una contraseÃ±a temporal. Por favor, cÃ¡mbiala en tu perfil.",
                 tipo: "Warning",
                 enlaceRelacionado: "/profile"
             );
             _context.Notificaciones.Add(notification);
         }
 
-        await _context.SaveChangesAsync(cancellationToken);
+        // Sync legacy in same transaction
+        await SyncUserLegacyAsync(user, cancellationToken);
 
-        await SyncUserLegacyAsync(user);
+        // Single SaveChangesAsync for entire operation
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Ok(new { Message = "Usuario creado exitosamente.", Id = user.Id });
     }
@@ -187,26 +169,45 @@ public class SettingsController : ControllerBase
         var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
         if (user == null) return NotFound(new { Message = "Usuario no encontrado." });
 
-        UserRole role = request.Role.ToLower() switch
+        // Use centralized role/profile mapping
+        var (targetRole, targetProfileName) = RoleProfileMapper.MapRole(request.Role);
+        if (targetRole == null)
         {
-            "admin" => UserRole.Administrator,
-            "dev" => UserRole.Professional,
-            "validator" => UserRole.Consultation,
-            _ => UserRole.Consultation
-        };
+            return BadRequest(new { Message = "Rol no vÃ¡lido. Debe ser admin, dev, o validator." });
+        }
 
-        user.UpdateRol(role);
-        
+        user.UpdateRol(targetRole.Value);
+
         if (!string.IsNullOrWhiteSpace(request.Telefono) && !string.IsNullOrWhiteSpace(request.Cedula))
         {
             user.UpdateContactInfo(request.Telefono, request.Cedula);
         }
 
+        // Sync legacy record (creates if missing) in same transaction
+        await SyncUserLegacyAsync(user, cancellationToken);
+
+        // Update legacy profile to match new role
+        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == user.Email, cancellationToken);
+        if (lu != null)
+        {
+            var perf = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == targetProfileName, cancellationToken);
+            if (perf != null)
+            {
+                var acceso = await _context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == lu.IdUsuario, cancellationToken);
+                if (acceso == null)
+                {
+                    acceso = new Acceso { IdUsuario = lu.IdUsuario, IdPerfil = perf.IdPerfil };
+                    _context.Accesos.Add(acceso);
+                }
+                else
+                {
+                    acceso.IdPerfil = perf.IdPerfil;
+                }
+            }
+        }
+
+        // Single SaveChangesAsync for entire operation
         await _context.SaveChangesAsync(cancellationToken);
-        
-        // Also update role in legacy
-        var roleReq = new UpdateRoleRequest { Role = request.Role };
-        await UpdateUserRole(id, roleReq, cancellationToken);
 
         return Ok(new { Message = "Usuario actualizado exitosamente." });
     }
@@ -264,35 +265,21 @@ public class SettingsController : ControllerBase
             return NotFound(new { Message = "Usuario no encontrado." });
         }
 
-        UserRole targetRole;
-        string targetProfileName;
-
-        switch (request.Role.ToLower())
+        // Use centralized role/profile mapping
+        var (targetRole, targetProfileName) = RoleProfileMapper.MapRole(request.Role);
+        if (targetRole == null)
         {
-            case "admin":
-                targetRole = UserRole.Administrator;
-                targetProfileName = "ADMIN";
-                break;
-            case "dev":
-                targetRole = UserRole.Professional;
-                targetProfileName = "DEVELOPER";
-                break;
-            case "validator":
-                targetRole = UserRole.Consultation;
-                targetProfileName = "VALIDATOR";
-                break;
-            default:
-                return BadRequest(new { Message = "Rol no válido. Debe ser admin, dev, o validator." });
+            return BadRequest(new { Message = "Rol no vÃ¡lido. Debe ser admin, dev, o validator." });
         }
 
         // Update EF user role
-        u.UpdateRol(targetRole);
+        u.UpdateRol(targetRole.Value);
 
         // Update or sync legacy record
         var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         if (lu == null)
         {
-            await SyncUserLegacyAsync(u);
+            await SyncUserLegacyAsync(u, cancellationToken);
             lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         }
 
@@ -329,7 +316,7 @@ public class SettingsController : ControllerBase
 
         if (request == null || request.PlanId == Guid.Empty)
         {
-            return BadRequest(new { Message = "ID de plan inválido." });
+            return BadRequest(new { Message = "ID de plan invÃ¡lido." });
         }
 
         var u = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
@@ -341,14 +328,14 @@ public class SettingsController : ControllerBase
         var plan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.Idsuscripcion == request.PlanId, cancellationToken);
         if (plan == null)
         {
-            return BadRequest(new { Message = "El plan de suscripción seleccionado no existe." });
+            return BadRequest(new { Message = "El plan de suscripciÃ³n seleccionado no existe." });
         }
 
         // Sync legacy user if missing
         var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         if (lu == null)
         {
-            await SyncUserLegacyAsync(u);
+            await SyncUserLegacyAsync(u, cancellationToken);
             lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
         }
 
@@ -363,10 +350,12 @@ public class SettingsController : ControllerBase
                 FechaPago = DateTime.UtcNow
             };
             _context.PagosLegacy.Add(nuevoPago);
-            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        return Ok(new { Message = "Suscripción asignada y pago registrado exitosamente." });
+        // Single SaveChangesAsync for entire operation
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { Message = "SuscripciÃ³n asignada y pago registrado exitosamente." });
     }
 
     [HttpGet("profiles")]
@@ -423,9 +412,9 @@ public class SettingsController : ControllerBase
         return Task.FromResult(roleClaim == "admin");
     }
 
-    private async Task SyncUserLegacyAsync(Usuario u)
+    private async Task SyncUserLegacyAsync(Usuario u, CancellationToken cancellationToken = default)
     {
-        var existingLegacy = await _context.UsuariosLegacy.FirstOrDefaultAsync(ul => ul.Email == u.Email);
+        var existingLegacy = await _context.UsuariosLegacy.FirstOrDefaultAsync(ul => ul.Email == u.Email, cancellationToken);
         if (existingLegacy == null)
         {
             existingLegacy = new UsuarioLegacy
@@ -439,16 +428,17 @@ public class SettingsController : ControllerBase
                 Cedula = u.Cedula
             };
             _context.UsuariosLegacy.Add(existingLegacy);
-            await _context.SaveChangesAsync();
+            // Don't save here - let the caller save once
         }
 
-        var hasAcceso = await _context.Accesos.AnyAsync(a => a.IdUsuario == existingLegacy.IdUsuario);
+        // Ensure profiles are loaded (cached for performance)
+        var adminLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "ADMIN", cancellationToken);
+        var devLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "DEVELOPER", cancellationToken);
+        var valLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "VALIDATOR", cancellationToken);
+
+        var hasAcceso = await _context.Accesos.AnyAsync(a => a.IdUsuario == existingLegacy.IdUsuario, cancellationToken);
         if (!hasAcceso)
         {
-            var adminLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "ADMIN");
-            var devLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "DEVELOPER");
-            var valLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "VALIDATOR");
-
             var targetPerfil = u.Rol switch
             {
                 UserRole.Administrator => adminLegacyProfile,
@@ -463,11 +453,11 @@ public class SettingsController : ControllerBase
             }
         }
 
-        var hasPagos = await _context.PagosLegacy.AnyAsync(p => p.IdUsuario == existingLegacy.IdUsuario);
+        var hasPagos = await _context.PagosLegacy.AnyAsync(p => p.IdUsuario == existingLegacy.IdUsuario, cancellationToken);
         if (!hasPagos)
         {
-            var freePlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Gratuito");
-            var proPlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Profesional");
+            var freePlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Gratuito", cancellationToken);
+            var proPlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Profesional", cancellationToken);
             
             var targetPlan = u.Rol == UserRole.Administrator ? proPlan : freePlan;
             if (targetPlan != null)
@@ -481,8 +471,8 @@ public class SettingsController : ControllerBase
                 });
             }
         }
-
-        await _context.SaveChangesAsync();
+        
+        // Single SaveChangesAsync at the end - caller is responsible for calling it
     }
 }
 
@@ -514,3 +504,53 @@ public class UpdateUserDto
     public string? Telefono { get; set; }
     public string? Cedula { get; set; }
 }
+
+/// <summary>
+/// Centralized mapping between API role strings and domain enums/profile names
+/// </summary>
+public static class RoleProfileMapper
+{
+    private static readonly Dictionary<string, (UserRole Role, string ProfileName)> RoleMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["admin"] = (UserRole.Administrator, "ADMIN"),
+        ["dev"] = (UserRole.Professional, "DEVELOPER"),
+        ["validator"] = (UserRole.Consultation, "VALIDATOR"),
+        ["user"] = (UserRole.Consultation, "VALIDATOR") // Default fallback
+    };
+
+    public static (UserRole? Role, string ProfileName) MapRole(string roleString)
+    {
+        if (string.IsNullOrWhiteSpace(roleString))
+            return (null, string.Empty);
+
+        if (RoleMap.TryGetValue(roleString.Trim().ToLower(), out var mapping))
+        {
+            return (mapping.Role, mapping.ProfileName);
+        }
+
+        return (null, string.Empty);
+    }
+
+    public static string MapRoleToProfileName(UserRole role)
+    {
+        return role switch
+        {
+            UserRole.Administrator => "ADMIN",
+            UserRole.Professional => "DEVELOPER",
+            UserRole.Consultation => "VALIDATOR",
+            _ => "VALIDATOR"
+        };
+    }
+
+    public static UserRole MapProfileNameToRole(string profileName)
+    {
+        return profileName.ToUpperInvariant() switch
+        {
+            "ADMIN" => UserRole.Administrator,
+            "DEVELOPER" => UserRole.Professional,
+            "VALIDATOR" => UserRole.Consultation,
+            _ => UserRole.Consultation
+        };
+    }
+}
+
