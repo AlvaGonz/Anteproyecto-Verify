@@ -21,7 +21,6 @@ import {
   Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import InputMask from "react-input-mask";
 
 type TabId = "users" | "permissions";
 
@@ -414,20 +413,49 @@ export const SettingsPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Teléfono</label>
-                  <InputMask 
-                    mask="999-999-9999"
+                  <input 
+                    type="text"
+                    maxLength={14}
+                    inputMode="numeric"
                     value={formData.telefono || ""}
-                    onChange={e => setFormData({...formData, telefono: e.target.value})}
+                    onChange={e => {
+                      let val = e.target.value.replace(/\D/g, "");
+                      if (val.length > 0) {
+                        if (val.length <= 3) val = `(${val}`;
+                        else if (val.length <= 6) val = `(${val.slice(0, 3)}) ${val.slice(3)}`;
+                        else val = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6, 10)}`;
+                      }
+                      setFormData({...formData, telefono: val});
+                    }}
+                    onKeyDown={(e) => {
+                      const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
+                      if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                     className="vf-input w-full"
-                    placeholder="809-000-0000"
+                    placeholder="(809) 000-0000"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
-                  <InputMask 
-                    mask="999-9999999-9"
+                  <input 
+                    type="text"
+                    maxLength={13}
+                    inputMode="numeric"
                     value={formData.cedula || ""}
-                    onChange={e => setFormData({...formData, cedula: e.target.value})}
+                    onChange={e => {
+                      let val = e.target.value.replace(/\D/g, "");
+                      if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
+                      else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
+                      setFormData({...formData, cedula: val});
+                    }}
+                    onKeyDown={(e) => {
+                      const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
+                      if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                     className="vf-input w-full"
                     placeholder="000-0000000-0"
                   />
