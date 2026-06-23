@@ -3,6 +3,7 @@ namespace Api.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+[Microsoft.AspNetCore.Authorization.Authorize]
 [ApiController]
 [Route("api/admin")]
 public class SettingsController : ControllerBase
@@ -120,6 +122,104 @@ public class SettingsController : ControllerBase
         }
 
         return Ok(resultList);
+    }
+
+    [HttpPost("users")]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto request, CancellationToken cancellationToken)
+    {
+        if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
+
+        if (await _context.Usuarios.AnyAsync(u => u.CorreoElectronico == request.Email, cancellationToken))
+            return BadRequest(new { Message = "El correo electrónico ya está en uso." });
+
+        UserRole role = request.Role.ToLower() switch
+        {
+            "admin" => UserRole.Administrator,
+            "dev" => UserRole.Professional,
+            "validator" => UserRole.Consultation,
+            _ => UserRole.Consultation
+        };
+
+        var nameParts = request.Name.Split(' ', 2);
+        string nombre = nameParts[0];
+        string apellido = nameParts.Length > 1 ? nameParts[1] : string.Empty;
+
+        var user = new Usuario(
+            nombre: string.IsNullOrWhiteSpace(nombre) ? "Usuario" : nombre,
+            apellido: string.IsNullOrWhiteSpace(apellido) ? "Nuevo" : apellido,
+            correoElectronico: request.Email,
+            contrasenaHash: "Temporal123!", // Dummy password hash
+            rol: role,
+            telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
+            cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
+        );
+
+        _context.Usuarios.Add(user);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        await SyncUserLegacyAsync(user);
+
+        return Ok(new { Message = "Usuario creado exitosamente.", Id = user.Id });
+    }
+
+    [HttpPut("users/{id}")]
+    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto request, CancellationToken cancellationToken)
+    {
+        if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
+
+        var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+        if (user == null) return NotFound(new { Message = "Usuario no encontrado." });
+
+        UserRole role = request.Role.ToLower() switch
+        {
+            "admin" => UserRole.Administrator,
+            "dev" => UserRole.Professional,
+            "validator" => UserRole.Consultation,
+            _ => UserRole.Consultation
+        };
+
+        user.UpdateRol(role);
+        
+        if (!string.IsNullOrWhiteSpace(request.Telefono) && !string.IsNullOrWhiteSpace(request.Cedula))
+        {
+            user.UpdateContactInfo(request.Telefono, request.Cedula);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        // Also update role in legacy
+        var roleReq = new UpdateRoleRequest { Role = request.Role };
+        await UpdateUserRole(id, roleReq, cancellationToken);
+
+        return Ok(new { Message = "Usuario actualizado exitosamente." });
+    }
+
+    [HttpDelete("users/{id}")]
+    public async Task<IActionResult> DeleteUser(Guid id, CancellationToken cancellationToken)
+    {
+        if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
+
+        var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+        if (user == null) return NotFound(new { Message = "Usuario no encontrado." });
+
+        _context.Usuarios.Remove(user);
+        
+        // Remove legacy
+        var legacyUser = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == user.CorreoElectronico, cancellationToken);
+        if (legacyUser != null)
+        {
+            var access = await _context.Accesos.Where(a => a.IdUsuario == legacyUser.IdUsuario).ToListAsync(cancellationToken);
+            _context.Accesos.RemoveRange(access);
+            
+            var pagos = await _context.PagosLegacy.Where(p => p.IdUsuario == legacyUser.IdUsuario).ToListAsync(cancellationToken);
+            _context.PagosLegacy.RemoveRange(pagos);
+            
+            _context.UsuariosLegacy.Remove(legacyUser);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { Message = "Usuario eliminado exitosamente." });
     }
 
     [HttpPatch("users/{id}/role")]
@@ -289,21 +389,15 @@ public class SettingsController : ControllerBase
         return Ok(result);
     }
 
-    private async Task<bool> IsAdminAsync()
+    private Task<bool> IsAdminAsync()
     {
-        var token = Request.Cookies["jwt"];
-        if (string.IsNullOrEmpty(token)) return false;
+        if (User?.Identity?.IsAuthenticated != true)
+        {
+            return Task.FromResult(false);
+        }
 
-        try
-        {
-            var userEmail = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
-            var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == userEmail);
-            return user != null && user.Rol == UserRole.Administrator;
-        }
-        catch
-        {
-            return false;
-        }
+        var roleClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role) ?? User.FindFirstValue("role");
+        return Task.FromResult(roleClaim == "admin");
     }
 
     private async Task SyncUserLegacyAsync(Usuario u)
@@ -377,4 +471,22 @@ public class UpdateRoleRequest
 public class UpdatePlanRequest
 {
     public Guid PlanId { get; set; }
+}
+
+public class CreateUserDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Role { get; set; } = "user";
+    public string Telefono { get; set; } = "0000000000";
+    public string Cedula { get; set; } = "00000000000";
+}
+
+public class UpdateUserDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Role { get; set; } = "user";
+    public string? Telefono { get; set; }
+    public string? Cedula { get; set; }
 }

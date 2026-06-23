@@ -23,3 +23,19 @@ export interface SubscriptionPlan {
   name: string;
   price: number;
 }
+
+export interface CreateUserDto {
+  name: string;
+  email: string;
+  role: "admin" | "dev" | "validator" | "user";
+  telefono?: string;
+  cedula?: string;
+}
+
+export interface UpdateUserDto {
+  name?: string;
+  email?: string;
+  role?: "admin" | "dev" | "validator" | "user";
+  telefono?: string;
+  cedula?: string;
+}

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
-import { UserSettings, ProfilePermissions, SubscriptionPlan } from "../types/settings.types";
+import { UserSettings, ProfilePermissions, SubscriptionPlan, CreateUserDto, UpdateUserDto } from "../types/settings.types";
 
 export const useUsers = () =>
   useQuery({
@@ -44,3 +44,38 @@ export const useUpdateUserPlan = () => {
   });
 };
 
+export const useCreateUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useCreateUser'],
+    mutationFn: (data: CreateUserDto) =>
+      apiClient.post<UserSettings>(`/admin/users`, data).then(res => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["settings", "users"] });
+    },
+  });
+};
+
+export const useUpdateUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useUpdateUser'],
+    mutationFn: ({ userId, data }: { userId: string; data: UpdateUserDto }) =>
+      apiClient.put<UserSettings>(`/admin/users/${userId}`, data).then(res => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["settings", "users"] });
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useDeleteUser'],
+    mutationFn: (userId: string) =>
+      apiClient.delete<void>(`/admin/users/${userId}`).then(res => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["settings", "users"] });
+    },
+  });
+};

@@ -122,10 +122,10 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public IActionResult GetCurrentUser()
     {
-        var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub);
-        var emailClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Email) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email);
-        var nameClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Name) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Name);
-        var roleClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role);
+        var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        var emailClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Email) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email) ?? User.FindFirstValue("email");
+        var nameClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Name) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Name) ?? User.FindFirstValue("name");
+        var roleClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role) ?? User.FindFirstValue("role");
 
         if (string.IsNullOrEmpty(idClaim) || string.IsNullOrEmpty(emailClaim))
         {

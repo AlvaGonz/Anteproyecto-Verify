@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-// removed
-import { useUsers, useProfiles, usePlans, useUpdateUserRole, useUpdateUserPlan } from "../../features/settings/api/useSettings";
+import { useUsers, useProfiles, usePlans, useUpdateUserRole, useUpdateUserPlan, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
+import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
 import { 
   Users, 
   Shield, 
-  CreditCard, 
   Settings, 
   Loader2, 
   UserCheck, 
@@ -15,11 +14,15 @@ import {
   RefreshCw,
   Mail,
   Phone,
-  Layers
+  Layers,
+  Plus,
+  X,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type TabId = "users" | "permissions" | "plans";
+type TabId = "users" | "permissions";
 
 const permissionLabels: Record<string, string> = {
   "GestionarUsuarios": "Gestión de Usuarios",
@@ -35,6 +38,10 @@ export const SettingsPage: React.FC = () => {
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<TabId>("users");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<CreateUserDto>({ name: "", email: "", role: "user", telefono: "", cedula: "" });
   
   const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers();
   const { data: profiles = [], isLoading: isLoadingProfiles, refetch: refetchProfiles } = useProfiles();
@@ -42,9 +49,12 @@ export const SettingsPage: React.FC = () => {
 
   const updateUserRoleMutation = useUpdateUserRole();
   const updateUserPlanMutation = useUpdateUserPlan();
+  const createUserMutation = useCreateUser();
+  const updateUserMutation = useUpdateUser();
+  const deleteUserMutation = useDeleteUser();
 
   const loading = isLoadingUsers || isLoadingProfiles || isLoadingPlans;
-  const updatingUserId = updateUserRoleMutation.isPending || updateUserPlanMutation.isPending ? "updating" : null;
+  const updatingUserId = updateUserRoleMutation.isPending || updateUserPlanMutation.isPending || deleteUserMutation.isPending ? "updating" : null;
 
   // Security Check: Only admin allowed
   useEffect(() => {
@@ -75,6 +85,46 @@ export const SettingsPage: React.FC = () => {
       addToast("Plan de suscripción asignado exitosamente", "success");
     } catch {
       addToast("Error de red al actualizar suscripción", "error");
+    }
+  };
+
+  const handleSaveUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingUser) {
+        await updateUserMutation.mutateAsync({ userId: editingUser.id, data: formData });
+        addToast("Usuario actualizado exitosamente", "success");
+      } else {
+        await createUserMutation.mutateAsync(formData);
+        addToast("Usuario creado exitosamente", "success");
+      }
+      setIsModalOpen(false);
+      setEditingUser(null);
+    } catch {
+      addToast("Error al guardar el usuario", "error");
+    }
+  };
+
+  const handleEditClick = (u: UserSettings) => {
+    setEditingUser(u);
+    setFormData({ name: u.name, email: u.email, role: u.role, telefono: u.telefono || "", cedula: u.cedula || "" });
+    setIsModalOpen(true);
+  };
+
+  const handleAddNewClick = () => {
+    setEditingUser(null);
+    setFormData({ name: "", email: "", role: "user", telefono: "", cedula: "" });
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await deleteUserMutation.mutateAsync(deleteId);
+      addToast("Usuario eliminado exitosamente", "success");
+      setDeleteId(null);
+    } catch {
+      addToast("Error al eliminar", "error");
     }
   };
 
@@ -133,17 +183,6 @@ export const SettingsPage: React.FC = () => {
           <Shield className="w-4 h-4" />
           Perfiles y Permisos
         </button>
-        <button
-          onClick={() => setActiveTab("plans")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-            activeTab === "plans"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-text-secondary hover:text-text-primary"
-          }`}
-        >
-          <CreditCard className="w-4 h-4" />
-          Planes Disponibles
-        </button>
       </div>
 
       {/* Tab Contents */}
@@ -158,11 +197,16 @@ export const SettingsPage: React.FC = () => {
               transition={{ duration: 0.2 }}
               className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden"
             >
-              <div className="p-6 border-b border-border bg-surface-raised/40">
-                <h3 className="font-display font-bold text-[#223382] text-lg">Listado de Usuarios Registrados</h3>
-                <p className="text-xs text-text-secondary mt-1">
-                  Modifique la jerarquía organizativa y asigne planes de facturación a los usuarios sincronizados de la base de datos real.
-                </p>
+              <div className="p-6 border-b border-border bg-surface-raised/40 flex justify-between items-center">
+                <div>
+                  <h3 className="font-display font-bold text-[#223382] text-lg">Listado de Usuarios Registrados</h3>
+                  <p className="text-xs text-text-secondary mt-1">
+                    Gestione la información, roles y suscripciones de los usuarios en el sistema.
+                  </p>
+                </div>
+                <button onClick={handleAddNewClick} className="vf-btn-primary flex items-center gap-2 text-sm px-4 py-2">
+                  <Plus className="w-4 h-4" /> Nuevo Usuario
+                </button>
               </div>
 
               <div className="overflow-x-auto">
@@ -256,6 +300,17 @@ export const SettingsPage: React.FC = () => {
                                 ))}
                               </select>
                             </div>
+
+                            <div className="flex flex-col items-center gap-1 justify-center ml-2 border-l border-border pl-3">
+                              <div className="flex gap-1">
+                                <button onClick={() => handleEditClick(u)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => setDeleteId(u.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -310,49 +365,142 @@ export const SettingsPage: React.FC = () => {
               ))}
             </motion.div>
           )}
-
-          {activeTab === "plans" && (
-            <motion.div
-              key="plans"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="grid gap-6 md:grid-cols-4"
-            >
-              {plans.map(p => (
-                <div key={p.planId} className="bg-white border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-primary/30 transition-all relative overflow-hidden group">
-                  {p.price > 0 && (
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full pointer-events-none group-hover:bg-primary/10 transition-colors" />
-                  )}
-                  <div>
-                    <h4 className="font-display font-black text-xl text-text-primary mb-1">{p.name}</h4>
-                    <div className="mt-4 mb-6">
-                      <span className="text-3xl font-display font-black text-[#223382]">
-                        RD$ {p.price.toLocaleString("es-DO", { minimumFractionDigits: 2 })}
-                      </span>
-                      <span className="text-xs text-text-secondary font-medium ml-1">/ mes</span>
-                    </div>
-
-                    <p className="text-xs text-text-secondary leading-relaxed">
-                      Plan aplicable a usuarios operativos. Incluye configuración automática en la base de datos de auditoría legacy.
-                    </p>
-                  </div>
-
-                  <div className="mt-8 pt-4 border-t border-border flex items-center justify-between text-[11px] font-bold text-text-secondary">
-                    <span>ID PLAN: {p.planId}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black ${
-                      p.price === 0 ? "bg-surface-raised text-text-secondary" : "bg-primary/10 text-primary"
-                    }`}>
-                      {p.price === 0 ? "Gratuito" : "Comercial"}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
+
+      {/* User Form Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-surface-raised/30">
+              <h2 className="text-lg font-bold text-[#223382]">
+                {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
+              </h2>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-surface rounded-full transition-colors">
+                <X className="w-5 h-5 text-text-secondary" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveUser} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre Completo</label>
+                <input 
+                  type="text" 
+                  required
+                  value={formData.name}
+                  onChange={e => setFormData({...formData, name: e.target.value})}
+                  className="vf-input w-full"
+                  placeholder="Ej. Juan Pérez"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Correo Electrónico</label>
+                <input 
+                  type="email" 
+                  required
+                  value={formData.email}
+                  onChange={e => setFormData({...formData, email: e.target.value})}
+                  className="vf-input w-full"
+                  placeholder="ejemplo@empresa.com"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Teléfono</label>
+                  <input 
+                    type="text" 
+                    value={formData.telefono || ""}
+                    onChange={e => setFormData({...formData, telefono: e.target.value})}
+                    className="vf-input w-full"
+                    placeholder="809-000-0000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
+                  <input 
+                    type="text" 
+                    value={formData.cedula || ""}
+                    onChange={e => setFormData({...formData, cedula: e.target.value})}
+                    className="vf-input w-full"
+                    placeholder="000-0000000-0"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Rol de Acceso</label>
+                <select 
+                  value={formData.role}
+                  onChange={e => setFormData({...formData, role: e.target.value as any})}
+                  className="vf-input w-full"
+                >
+                  <option value="user">Usuario Regular</option>
+                  <option value="validator">Validador</option>
+                  <option value="dev">Desarrollador</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex gap-3 justify-end border-t border-border mt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)}
+                  className="vf-btn-secondary"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={updatingUserId === "updating"}
+                  className="vf-btn-primary"
+                >
+                  {updatingUserId === "updating" ? "Guardando..." : "Guardar Usuario"}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center"
+          >
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-8 h-8 text-red-600" />
+            </div>
+            <h3 className="text-lg font-bold text-text-primary mb-2">¿Eliminar Usuario?</h3>
+            <p className="text-sm text-text-secondary mb-6">
+              Esta acción no se puede deshacer. El usuario perderá acceso al sistema inmediatamente.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={() => setDeleteId(null)}
+                className="vf-btn-secondary w-full"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={confirmDelete}
+                disabled={updatingUserId === "updating"}
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              >
+                Sí, Eliminar
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
