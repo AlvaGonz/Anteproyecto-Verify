@@ -21,6 +21,7 @@ import {
   Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
 type TabId = "users" | "permissions";
 
@@ -90,6 +91,37 @@ export const SettingsPage: React.FC = () => {
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const nameRegex = /^[a-zA-ZÀ-ÿ\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      addToast("El nombre solo puede contener letras", "error");
+      return;
+    }
+
+    if (formData.telefono) {
+      const telDigits = formData.telefono.replace(/\D/g, "");
+      if (telDigits.length > 0 && !/^(809|829|849)\d{7}$/.test(telDigits)) {
+        addToast("Teléfono inválido. Solo códigos 809, 829 o 849", "error");
+        return;
+      }
+    }
+
+    if (formData.cedula) {
+      const cedDigits = formData.cedula.replace(/\D/g, "");
+      if (cedDigits.length > 0 && !validateCedulaCheckDigit(cedDigits)) {
+        addToast("Cédula inválida o dígito verificador incorrecto", "error");
+        return;
+      }
+    }
+
+    if (!editingUser && formData.password) {
+      const p = formData.password;
+      if (p.length < 8 || !/[A-Z]/.test(p) || !/[a-z]/.test(p) || !/[0-9]/.test(p) || !/[!@#$%^&*\-]/.test(p)) {
+        addToast("La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial", "error");
+        return;
+      }
+    }
+
     try {
       if (editingUser) {
         await updateUserMutation.mutateAsync({ userId: editingUser.id, data: formData });
@@ -100,8 +132,9 @@ export const SettingsPage: React.FC = () => {
       }
       setIsModalOpen(false);
       setEditingUser(null);
-    } catch {
-      addToast("Error al guardar el usuario", "error");
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.response?.data?.Message || "Error al guardar el usuario";
+      addToast(errorMsg, "error");
     }
   };
 

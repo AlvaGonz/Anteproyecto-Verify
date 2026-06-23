@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Dominican Cédula check-digit validation algorithm (Luhn mod-10 variant)
-const validateCedulaCheckDigit = (cedula: string): boolean => {
+export const validateCedulaCheckDigit = (cedula: string): boolean => {
   const digits = cedula.replace(/\D/g, "");
   if (digits.length !== 11) return false;
   
