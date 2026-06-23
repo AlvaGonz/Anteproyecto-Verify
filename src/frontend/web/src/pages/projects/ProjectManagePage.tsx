@@ -101,7 +101,7 @@ export const ProjectManagePage: React.FC = () => {
           ubicacionGps: data.ubicacionGps
         });
         addToast("Proyecto creado exitosamente", "success");
-        navigate(`/projects/${newProj.id}`);
+        navigate("/admin/projects");
       }
     } catch (error) {
       addToast("Error al guardar el proyecto", "error");
