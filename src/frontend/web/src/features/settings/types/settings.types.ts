@@ -42,7 +42,7 @@ export interface CreateUserDto {
 
 export interface UpdateUserDto {
   name?: string;
-  role?: "admin" | "dev" | "validator" | "user";
   telefono?: string;
-  // email and cedula intentionally excluded — immutable post-registration
+  // email and cedula are intentionally excluded — immutable post-registration
+  // role is managed via PATCH /admin/users/:id/role (separate endpoint)
 }

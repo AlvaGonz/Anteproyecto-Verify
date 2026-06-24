@@ -35,8 +35,6 @@ import { EditProjectPage } from "../pages/projects/EditProjectPage";
 import { UploadDocumentPage } from "../pages/projects/UploadDocumentPage";
 import { CreateValidationPage } from "../pages/projects/CreateValidationPage";
 import { AdminErrorFallback } from "../components/ui/AdminErrorFallback";
-import { ProfilePage } from "../pages/admin/ProfilePage";
-
 const NavigateToVerifyResult: React.FC = () => {
   const { code } = useParams<{ code: string }>();
   return <Navigate to={`/projects/verify/${code}`} replace />;
@@ -310,17 +308,7 @@ export const router = createHashRouter([
           </AuthGuard>
         ),
       },
-      {
-        path: "/admin/profile",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ProfilePage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
+
       {
         path: "/admin/audit-log",
         errorElement: <AdminErrorFallback />,

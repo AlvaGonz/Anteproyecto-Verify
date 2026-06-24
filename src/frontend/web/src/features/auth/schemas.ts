@@ -77,25 +77,33 @@ export const registerSchema = z.object({
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export const UpdateProfileSchema = z.object({
-  name: z.string().regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Solo letras permitidas"),
-  telefono: z.string()
-    .regex(/^(809|829|849)\d{7}$/, "Solo 809, 829 o 849")
+  name: z
+    .string()
+    .min(2, "Mínimo 2 caracteres")
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Solo letras y espacios"),
+  telefono: z
+    .string()
+    .regex(/^(\(8(09|29|49)\)\s\d{3}-\d{4})?$/, "Formato: (809) 000-0000")
     .optional()
     .or(z.literal("")),
+  changePassword: z.boolean().default(false),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
   confirmPassword: z.string().optional(),
-}).refine((data) => {
-  if (data.newPassword) {
-    return data.currentPassword && data.currentPassword.length > 0;
+})
+.superRefine((data, ctx) => {
+  if (!data.changePassword) return;
+  if (!data.currentPassword || data.currentPassword.length === 0) {
+    ctx.addIssue({ code: "custom", path: ["currentPassword"], message: "Requerida para cambiar contraseña" });
   }
-  return true;
-}, { message: "Debes ingresar tu contraseña actual", path: ["currentPassword"] })
-.refine((data) => {
-  if (data.newPassword) {
-    return data.newPassword === data.confirmPassword;
+  if (!data.newPassword || data.newPassword.length < 8) {
+    ctx.addIssue({ code: "custom", path: ["newPassword"], message: "Mínimo 8 caracteres" });
+  } else if (!/[A-Z]/.test(data.newPassword) || !/[a-z]/.test(data.newPassword) || !/[0-9]/.test(data.newPassword) || !/[!@#$%^&*\-]/.test(data.newPassword)) {
+    ctx.addIssue({ code: "custom", path: ["newPassword"], message: "Requiere mayúscula, minúscula, número y carácter especial (!@#$%^&*-)" });
   }
-  return true;
-}, { message: "Las contraseñas no coinciden", path: ["confirmPassword"] });
+  if (data.newPassword !== data.confirmPassword) {
+    ctx.addIssue({ code: "custom", path: ["confirmPassword"], message: "Las contraseñas no coinciden" });
+  }
+});
 
 export type UpdateProfileDto = z.infer<typeof UpdateProfileSchema>;

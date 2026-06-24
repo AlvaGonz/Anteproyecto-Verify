@@ -62,13 +62,15 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               required={!editingUser}
               value={formData.email}
               readOnly={!!editingUser}
-              onChange={editingUser ? undefined : e => update({ email: e.target.value })}
-              className={`vf-input w-full ${editingUser ? "bg-surface opacity-60 cursor-not-allowed" : ""}`}
+              onChange={editingUser ? undefined : (e) => update({ email: e.target.value })}
+              className={`vf-input w-full ${
+                editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
+              }`}
               placeholder="ejemplo@empresa.com"
             />
             {editingUser && (
-              <p className="text-[10px] text-text-secondary mt-1">
-                El correo no puede editarse directamente. Use el flujo de cambio de email.
+              <p className="text-[10px] text-amber-600 mt-1 flex items-center gap-1">
+                <span>⚠</span> El correo es inmutable post-registro. Use el flujo de cambio de email.
               </p>
             )}
           </div>
@@ -104,8 +106,6 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
               <input
                 type="text"
-                maxLength={13}
-                inputMode="numeric"
                 readOnly={!!editingUser}
                 value={formData.cedula || ""}
                 onChange={editingUser ? undefined : e => {
@@ -114,18 +114,20 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                   else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
                   update({ cedula: val });
                 }}
-                onKeyDown={(e) => {
+                onKeyDown={editingUser ? undefined : (e) => {
                   const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
                   if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
                     e.preventDefault();
                   }
                 }}
-                className={`vf-input w-full ${editingUser ? "bg-surface opacity-60 cursor-not-allowed" : ""}`}
+                className={`vf-input w-full ${
+                  editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
+                }`}
                 placeholder="000-0000000-0"
               />
               {editingUser && (
-                <p className="text-[10px] text-text-secondary mt-1">
-                  La cédula es un dato de identidad legal y no puede modificarse.
+                <p className="text-[10px] text-amber-600 mt-1 flex items-center gap-1">
+                  <span>⚠</span> La cédula es un dato de identidad legal y no puede modificarse.
                 </p>
               )}
             </div>

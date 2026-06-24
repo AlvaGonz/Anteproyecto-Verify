@@ -4,7 +4,7 @@ import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, useProfiles, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
 import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
-import { UsersTable, UserFormModal, DeleteModal } from "../../features/settings/components";
+import { UsersTable, UserFormModal, DeleteModal, MyProfileForm } from "../../features/settings/components";
 import {
   Settings,
   RefreshCw,
@@ -12,12 +12,13 @@ import {
   Shield,
   Loader2,
   UserCheck,
-  Check
+  Check,
+  User
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
-type TabId = "users" | "permissions";
+type TabId = "profile" | "users" | "permissions";
 
 const permissionLabels: Record<string, string> = {
   "GestionarUsuarios": "Gestión de Usuarios",
@@ -32,7 +33,7 @@ export const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<TabId>("users");
+  const [activeTab, setActiveTab] = useState<TabId>("profile");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -49,13 +50,12 @@ export const SettingsPage: React.FC = () => {
   const loading = isLoadingUsers || isLoadingProfiles || isLoadingPlans;
   const isProcessing = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
 
-  // Security Check: Only admin allowed
+  // Security Check: Redirect non-admins away from users/permissions tabs
   useEffect(() => {
-    if (user && user.role !== "admin") {
-      addToast("Acceso denegado. Se requieren permisos de administrador.", "error");
-      navigate("/admin/dashboard");
+    if (user && user.role !== "admin" && (activeTab === "users" || activeTab === "permissions")) {
+      setActiveTab("profile");
     }
-  }, [user, navigate]);
+  }, [user, activeTab]);
 
   const loadData = () => {
     refetchUsers();
@@ -169,32 +169,57 @@ export const SettingsPage: React.FC = () => {
       {/* Navigation tabs */}
       <div className="flex border-b border-border">
         <button
-          onClick={() => setActiveTab("users")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-            activeTab === "users"
+          onClick={() => setActiveTab("profile")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "profile"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-text-secondary hover:text-text-primary"
-          }`}
+            }`}
         >
-          <Users className="w-4 h-4" />
-          Usuarios y Accesos
+          <User className="w-4 h-4" />
+          Mi Perfil
         </button>
-        <button
-          onClick={() => setActiveTab("permissions")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-            activeTab === "permissions"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-text-secondary hover:text-text-primary"
-          }`}
-        >
-          <Shield className="w-4 h-4" />
-          Perfiles y Permisos
-        </button>
+
+        {user?.role === "admin" && (
+          <>
+            <button
+              onClick={() => setActiveTab("users")}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "users"
+                  ? "border-[#223382] text-[#223382]"
+                  : "border-transparent text-text-secondary hover:text-text-primary"
+                }`}
+            >
+              <Users className="w-4 h-4" />
+              Usuarios y Accesos
+            </button>
+            <button
+              onClick={() => setActiveTab("permissions")}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "permissions"
+                  ? "border-[#223382] text-[#223382]"
+                  : "border-transparent text-text-secondary hover:text-text-primary"
+                }`}
+            >
+              <Shield className="w-4 h-4" />
+              Perfiles y Permisos
+            </button>
+          </>
+        )}
       </div>
 
       {/* Tab Contents */}
       <div className="mt-6">
         <AnimatePresence mode="wait">
+          {activeTab === "profile" && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <MyProfileForm />
+            </motion.div>
+          )}
+
           {activeTab === "users" && (
             <motion.div
               key="users"
@@ -227,9 +252,8 @@ export const SettingsPage: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
                       <h3 className="font-display font-black text-lg text-[#223382] uppercase">{p.name}</h3>
-                      <Shield className={`w-6 h-6 ${
-                        p.name === "ADMIN" ? "text-red-500" : p.name === "DEVELOPER" ? "text-blue-500" : "text-green-500"
-                      }`} />
+                      <Shield className={`w-6 h-6 ${p.name === "ADMIN" ? "text-red-500" : p.name === "DEVELOPER" ? "text-blue-500" : "text-green-500"
+                        }`} />
                     </div>
 
                     <p className="text-xs text-text-secondary mb-4 font-medium">

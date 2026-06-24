@@ -82,3 +82,16 @@ export const useDeleteUser = () => {
     },
   });
 };
+
+export const useUpdateMyProfile = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["useUpdateMyProfile"],
+    mutationFn: (data: { name: string; telefono?: string; currentPassword?: string; newPassword?: string }) =>
+      apiClient.patch("/auth/profile", data).then((res) => res.data),
+    onSuccess: () => {
+      // Invalidate auth/me so AuthContext reflects the new name
+      qc.invalidateQueries({ queryKey: ["auth", "me"] });
+    },
+  });
+};
