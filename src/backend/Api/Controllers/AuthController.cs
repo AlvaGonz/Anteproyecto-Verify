@@ -156,6 +156,8 @@ public class AuthController : ControllerBase
         var emailClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Email) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email) ?? User.FindFirstValue("email");
         var nameClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Name) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Name) ?? User.FindFirstValue("name");
         var roleClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role) ?? User.FindFirstValue("role");
+        var cedulaClaim = User.FindFirstValue("cedula");
+        var telefonoClaim = User.FindFirstValue("telefono");
 
         if (string.IsNullOrEmpty(idClaim) || string.IsNullOrEmpty(emailClaim))
         {
@@ -167,7 +169,10 @@ public class AuthController : ControllerBase
             Id = idClaim,
             Email = emailClaim,
             Name = nameClaim ?? string.Empty,
-            Role = roleClaim ?? "user"
+            Role = roleClaim ?? "user",
+            Cedula = cedulaClaim ?? string.Empty,
+            Telefono = telefonoClaim ?? string.Empty
+
         });
     }
 

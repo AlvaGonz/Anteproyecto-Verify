@@ -71,16 +71,11 @@ public class SettingsController : ControllerBase
 
         // Single optimized query with server-side joins and projection
         var query = from u in _context.Usuarios
-                    join l in _context.UsuariosLegacy on u.CorreoElectronico equals l.Email into lj
-                    from l in lj.DefaultIfEmpty()
-                    join a in _context.Accesos on l!.IdUsuario equals a.IdUsuario into aj
-                    from a in aj.DefaultIfEmpty()
-                    join pf in _context.Perfiles on a!.IdPerfil equals pf.IdPerfil into pfj
-                    from pf in pfj.DefaultIfEmpty()
-                    join p in _context.PagosLegacy.OrderByDescending(x => x.FechaPago) on l!.IdUsuario equals p.IdUsuario into pj
-                    from p in pj.DefaultIfEmpty()
-                    join pl in _context.PlanesSuscripcion on p!.Idsuscripcion equals pl.Idsuscripcion into plj
-                    from pl in plj.DefaultIfEmpty()
+                    let l = _context.UsuariosLegacy.FirstOrDefault(x => x.Email == u.CorreoElectronico)
+                    let a = _context.Accesos.FirstOrDefault(x => x.IdUsuario == l.IdUsuario)
+                    let pf = _context.Perfiles.FirstOrDefault(x => x.IdPerfil == a.IdPerfil)
+                    let p = _context.PagosLegacy.OrderByDescending(x => x.FechaPago).FirstOrDefault(x => x.IdUsuario == l.IdUsuario)
+                    let pl = _context.PlanesSuscripcion.FirstOrDefault(x => x.Idsuscripcion == p.Idsuscripcion)
                     where u.Activo
                     select new AdminUserSettingsDto(
                         u.Id,
@@ -89,11 +84,11 @@ public class SettingsController : ControllerBase
                         u.Rol == UserRole.Administrator ? "admin" : u.Rol == UserRole.Professional ? "dev" : "validator",
                         u.Telefono,
                         u.Cedula,
-                        pf!.IdPerfil,
-                        pf!.NombrePerfil,
-                        pl!.Idsuscripcion,
-                        pl!.NombrePlan,
-                        pl!.Precio
+                        pf != null ? pf.IdPerfil : null,
+                        pf != null ? pf.NombrePerfil : null,
+                        pl != null ? pl.Idsuscripcion : null,
+                        pl != null ? pl.NombrePlan : null,
+                        pl != null ? pl.Precio : null
                     );
 
         var totalCount = await query.CountAsync(cancellationToken);

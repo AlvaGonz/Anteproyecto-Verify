@@ -13,6 +13,8 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  cedula?: string;
+  telefono?: string;
 }
 
 export interface AuthResponse {

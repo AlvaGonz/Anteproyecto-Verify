@@ -151,11 +151,8 @@ export const SettingsPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-[#223382] flex items-center gap-3">
             <Settings className="w-7 h-7" />
-            Configuración del Sistema
+            Configuración
           </h1>
-          <p className="mt-1 text-sm text-text-secondary">
-            Administre roles, accesos, asignación de planes y permisos de la plataforma.
-          </p>
         </div>
         <button
           onClick={loadData}
@@ -171,8 +168,8 @@ export const SettingsPage: React.FC = () => {
         <button
           onClick={() => setActiveTab("profile")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "profile"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-text-secondary hover:text-text-primary"
+            ? "border-[#223382] text-[#223382]"
+            : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
           <User className="w-4 h-4" />
@@ -184,8 +181,8 @@ export const SettingsPage: React.FC = () => {
             <button
               onClick={() => setActiveTab("users")}
               className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "users"
-                  ? "border-[#223382] text-[#223382]"
-                  : "border-transparent text-text-secondary hover:text-text-primary"
+                ? "border-[#223382] text-[#223382]"
+                : "border-transparent text-text-secondary hover:text-text-primary"
                 }`}
             >
               <Users className="w-4 h-4" />
@@ -194,8 +191,8 @@ export const SettingsPage: React.FC = () => {
             <button
               onClick={() => setActiveTab("permissions")}
               className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "permissions"
-                  ? "border-[#223382] text-[#223382]"
-                  : "border-transparent text-text-secondary hover:text-text-primary"
+                ? "border-[#223382] text-[#223382]"
+                : "border-transparent text-text-secondary hover:text-text-primary"
                 }`}
             >
               <Shield className="w-4 h-4" />

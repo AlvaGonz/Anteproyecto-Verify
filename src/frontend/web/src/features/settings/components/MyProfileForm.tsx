@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateProfileSchema, UpdateProfileDto } from "../../auth/schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown } from "lucide-react";
+import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard } from "lucide-react";
 
 export const MyProfileForm: React.FC = () => {
   const { user } = useAuth();
@@ -20,15 +20,26 @@ export const MyProfileForm: React.FC = () => {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors, isDirty },
   } = useForm<UpdateProfileDto>({
     resolver: zodResolver(UpdateProfileSchema),
     defaultValues: {
       name: user?.name ?? "",
-      telefono: "",
+      telefono: user?.telefono ?? "",
       changePassword: false,
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        name: user.name ?? "",
+        telefono: user.telefono ?? "",
+        changePassword: false,
+      });
+    }
+  }, [user, reset]);
 
   const changePassword = watch("changePassword");
 
@@ -81,6 +92,13 @@ export const MyProfileForm: React.FC = () => {
           <div>
             <p className="text-[10px] text-text-secondary uppercase font-bold">Correo Electrónico</p>
             <p className="text-sm font-mono text-text-primary">{user?.email}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <CreditCard className="w-4 h-4 text-text-secondary shrink-0" />
+          <div>
+            <p className="text-[10px] text-text-secondary uppercase font-bold">Cédula</p>
+            <p className="text-sm font-mono text-text-primary">{user?.cedula || "N/A"}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
