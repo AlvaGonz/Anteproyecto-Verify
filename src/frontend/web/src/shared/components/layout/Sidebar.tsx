@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -8,7 +8,8 @@ import {
   X,
   Plus,
   Compass,
-  History
+  History,
+  LogOut
 } from "lucide-react";
 import { useProjects } from "../../../features/projects/api/useProjects";
 import { useAuth } from "../../context/AuthContext";
@@ -19,9 +20,15 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: projects } = useProjects();
   const projectCount = projects?.length || 0;
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const firstName = user?.name ? user.name.split(" ")[0] : "Usuario";
   const initials = user?.name
@@ -152,6 +159,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             <p className="text-[9px] text-white/30 font-black uppercase tracking-widest mt-0.5">{roleLabel}</p>
           </div>
         </div>
+        <button
+          onClick={handleLogout}
+          className="mt-3 flex items-center gap-2 w-full px-2 py-2 text-[10px] font-black text-white/30 hover:text-red-400 transition-colors uppercase tracking-widest rounded-xl hover:bg-white/5"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          Cerrar Sesión
+        </button>
       </div>
     </div>
   );

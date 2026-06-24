@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ public class AuthController : ControllerBase
     private readonly Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler _verifyHandler;
     private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
     private readonly IConfiguration _configuration;
+    private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
 
     public AuthController(
         Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler registerHandler,
@@ -73,9 +75,22 @@ public class AuthController : ControllerBase
             Path = "/"
         });
 
+        var refreshToken = Guid.NewGuid().ToString("N");
+        _refreshTokens[refreshToken] = responseData.User.Id;
+
+        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Strict,
+            Path = "/api/auth/refresh",
+            MaxAge = TimeSpan.FromDays(30)
+        });
+
         return Ok(new
         {
             succeeded = true,
+            accessToken = responseData.Token,
             user = new
             {
                 id = responseData.User.Id,
@@ -106,12 +121,27 @@ public class AuthController : ControllerBase
     [HttpPost("logout")]
     public IActionResult Logout()
     {
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (!string.IsNullOrEmpty(refreshToken))
+        {
+            _refreshTokens.TryRemove(refreshToken, out _);
+        }
+
         Response.Cookies.Append("jwt", "", new CookieOptions
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
             SameSite = SameSiteMode.Strict,
             Path = "/",
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
+        });
+
+        Response.Cookies.Append("refreshToken", "", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Strict,
+            Path = "/api/auth/refresh",
             Expires = DateTimeOffset.UtcNow.AddDays(-1)
         });
 
@@ -144,18 +174,34 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public IActionResult Refresh()
     {
-        var token = Request.Cookies["jwt"];
-        if (string.IsNullOrEmpty(token))
+        var token = Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(token) || !_refreshTokens.TryGetValue(token, out var userId))
         {
             return Unauthorized(new { Message = "Token de refresco inválido o expirado." });
         }
 
-        // Generate new access token
-        var newAccessToken = "mock-new-jwt-token";
+        // Rotate token (single-use)
+        _refreshTokens.TryRemove(token, out _);
+
+        // Generate new access token (mock for now as per existing setup)
+        var newAccessToken = "mock-new-jwt-token-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        
+        var newRefreshToken = Guid.NewGuid().ToString("N");
+        _refreshTokens[newRefreshToken] = userId;
+
+        Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Strict,
+            Path = "/api/auth/refresh",
+            MaxAge = TimeSpan.FromDays(30)
+        });
+
         return Ok(new
         {
-            AccessToken = newAccessToken,
-            ExpiresIn = 7200
+            accessToken = newAccessToken,
+            expiresIn = 7200
         });
     }
 }

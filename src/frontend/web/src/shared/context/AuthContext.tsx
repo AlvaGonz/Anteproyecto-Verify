@@ -32,6 +32,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
+  useEffect(() => {
+    const handler = () => {
+      setUser(null);
+      AuthService.logout();
+      window.location.hash = '#/login';
+    };
+    window.addEventListener('auth:force-logout', handler);
+    return () => window.removeEventListener('auth:force-logout', handler);
+  }, []);
+
   const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
