@@ -1,0 +1,15 @@
+{
+  "name": "verifinca-evals",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VeriFinca evaluation framework — waza-powered smoke tests for agent skills",
+  "scripts": {
+    "eval:sdk": "node runner.mjs",
+    "eval:all": "node runner.mjs --all",
+    "eval:coverage": "node runner.mjs --coverage",
+    "eval:list": "node runner.mjs --list"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
