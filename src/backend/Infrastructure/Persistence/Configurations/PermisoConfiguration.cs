@@ -8,7 +8,7 @@ public class PermisoConfiguration : IEntityTypeConfiguration<Permiso>
 {
     public void Configure(EntityTypeBuilder<Permiso> builder)
     {
-        builder.ToTable("Permisos");
+        builder.ToTable("Permisos", t => t.ExcludeFromMigrations());
         builder.HasKey(p => p.IdPermiso);
         
         builder.Property(p => p.IdPermiso).HasColumnName("IdPermiso").ValueGeneratedOnAdd();

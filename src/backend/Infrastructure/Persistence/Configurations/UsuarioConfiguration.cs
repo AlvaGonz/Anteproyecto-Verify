@@ -8,7 +8,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        builder.ToTable("Usuario");
+        builder.ToTable("Usuario", t => t.ExcludeFromMigrations());
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnName("IdUsuario");
         builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);

@@ -26,7 +26,8 @@ CREATE TABLE Usuario (
     TokenVerificacion VARCHAR(MAX) NULL,
     TokenVerificacionExpiraUtc DATETIME2 NULL,
     CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-    UpdatedAtUtc DATETIME2 NULL
+    UpdatedAtUtc DATETIME2 NULL,
+    RowVersion TIMESTAMP
 );
 GO
 
@@ -178,6 +179,7 @@ CREATE TABLE ProyectosInmobiliarios (
     SelladoBloqueado BIT NOT NULL DEFAULT 0,
     CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
     UpdatedAtUtc DATETIME2 NULL,
+    RowVersion TIMESTAMP,
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario),
     FOREIGN KEY (IdMunicipio) REFERENCES Municipio(IdMunicipio)
 );

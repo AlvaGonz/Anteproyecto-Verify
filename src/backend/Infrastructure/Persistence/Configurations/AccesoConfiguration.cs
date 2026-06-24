@@ -8,7 +8,7 @@ public class AccesoConfiguration : IEntityTypeConfiguration<Acceso>
 {
     public void Configure(EntityTypeBuilder<Acceso> builder)
     {
-        builder.ToTable("Acceso");
+        builder.ToTable("Acceso", t => t.ExcludeFromMigrations());
         builder.HasKey(a => a.IdAcceso);
         
         builder.Property(a => a.IdAcceso).HasColumnName("IdAcceso").ValueGeneratedOnAdd();

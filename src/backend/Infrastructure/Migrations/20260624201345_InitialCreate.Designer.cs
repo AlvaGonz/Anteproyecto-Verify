@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260623125635_AddRowVersionAndEmailIndex")]
-    partial class AddRowVersionAndEmailIndex
+    [Migration("20260624201345_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,7 +46,10 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("IdUsuario");
 
-                    b.ToTable("Acceso", (string)null);
+                    b.ToTable("Acceso", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.AlertaValidacion", b =>
@@ -365,7 +368,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Rnc");
 
-                    b.ToTable("DgiiRnc", (string)null);
+                    b.ToTable("DgiiRnc", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Documento", b =>
@@ -585,7 +591,10 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("Idsuscripcion");
 
-                    b.ToTable("Pagos", (string)null);
+                    b.ToTable("Pagos", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Perfil", b =>
@@ -602,7 +611,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("IdPerfil");
 
-                    b.ToTable("Perfiles", (string)null);
+                    b.ToTable("Perfiles", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.PerfilPermiso", b =>
@@ -619,7 +631,10 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("IdPermiso");
 
-                    b.ToTable("PerfilPermiso", (string)null);
+                    b.ToTable("PerfilPermiso", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Permiso", b =>
@@ -636,7 +651,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("IdPermiso");
 
-                    b.ToTable("Permisos", (string)null);
+                    b.ToTable("Permisos", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.PlanSuscripcion", b =>
@@ -656,7 +674,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Idsuscripcion");
 
-                    b.ToTable("PlanSuscripcion", (string)null);
+                    b.ToTable("PlanSuscripcion", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Proyecto", b =>
@@ -734,7 +755,10 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UsuarioCreadorId");
 
-                    b.ToTable("ProyectosInmobiliarios", (string)null);
+                    b.ToTable("ProyectosInmobiliarios", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.ReglaValidacion", b =>
@@ -1055,7 +1079,10 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UQ_Usuario_Email");
 
-                    b.ToTable("Usuario", (string)null);
+                    b.ToTable("Usuario", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.UsuarioLegacy", b =>
@@ -1107,7 +1134,10 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_UsuarioLegacy_Email");
 
-                    b.ToTable("UsuarioLegacy", (string)null);
+                    b.ToTable("UsuarioLegacy", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Validacion", b =>

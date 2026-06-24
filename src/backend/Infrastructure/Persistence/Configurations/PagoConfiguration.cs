@@ -8,7 +8,7 @@ public class PagoConfiguration : IEntityTypeConfiguration<Pago>
 {
     public void Configure(EntityTypeBuilder<Pago> builder)
     {
-        builder.ToTable("Pagos");
+        builder.ToTable("Pagos", t => t.ExcludeFromMigrations());
         builder.HasKey(p => p.IdPago);
         
         builder.Property(p => p.IdPago).HasColumnName("IdPago").ValueGeneratedOnAdd();

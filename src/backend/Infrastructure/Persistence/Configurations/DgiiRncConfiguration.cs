@@ -8,7 +8,7 @@ public class DgiiRncConfiguration : IEntityTypeConfiguration<DgiiRnc>
 {
     public void Configure(EntityTypeBuilder<DgiiRnc> builder)
     {
-        builder.ToTable("DgiiRnc");
+        builder.ToTable("DgiiRnc", t => t.ExcludeFromMigrations());
         builder.HasKey(d => d.Rnc);
         builder.Property(d => d.Rnc).HasMaxLength(20);
         builder.Property(d => d.NombreRazonSocial).IsRequired().HasMaxLength(250);

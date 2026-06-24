@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -12,150 +12,41 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Notificaciones",
+                name: "Auditorias",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Mensaje = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Tipo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Leida = table.Column<bool>(type: "bit", nullable: false),
-                    FechaUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EnlaceRelacionado = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TipoEvento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Accion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Entidad = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EntidadId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Detalle = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    IpOrigen = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FechaEventoUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TipoOperacion = table.Column<int>(type: "int", nullable: false),
+                    Resultado = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    ReferenciaExpedienteId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Notificaciones", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Perfiles",
-                columns: table => new
-                {
-                    IdPerfil = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NombrePerfil = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Perfiles", x => x.IdPerfil);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Permisos",
-                columns: table => new
-                {
-                    IdPermiso = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Permisos", x => x.IdPermiso);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PlanSuscripcion",
-                columns: table => new
-                {
-                    Idsuscripcion = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NombrePlan = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Precio = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PlanSuscripcion", x => x.Idsuscripcion);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReglasValidacion",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Nombre = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    CondicionLogica = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    TipoDocumentoAplicable = table.Column<int>(type: "int", nullable: false),
-                    NivelAlerta = table.Column<int>(type: "int", nullable: false),
-                    TipoProyecto = table.Column<int>(type: "int", nullable: false),
-                    Activa = table.Column<bool>(type: "bit", nullable: false),
-                    Version = table.Column<int>(type: "int", nullable: false),
-                    FechaCreacionUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreadaPor = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReglaAnteriorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReglasValidacion", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Usuario",
-                columns: table => new
-                {
-                    IdUsuario = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Apellido = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    NombreCompleto = table.Column<string>(type: "nvarchar(max)", nullable: false, computedColumnSql: "[Nombre] + ' ' + [Apellido]", stored: true),
-                    Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ContrasenaHash = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Telefono = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
-                    Cedula = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
-                    Rol = table.Column<int>(type: "int", nullable: false),
-                    Activo = table.Column<bool>(type: "bit", nullable: false),
-                    EmailVerificado = table.Column<bool>(type: "bit", nullable: false),
-                    TokenVerificacion = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TokenVerificacionExpiraUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Usuario", x => x.IdUsuario);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UsuarioLegacy",
-                columns: table => new
-                {
-                    IdUsuario = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Apellido = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    NombreCompleto = table.Column<string>(type: "nvarchar(max)", nullable: false, computedColumnSql: "[Nombre] + ' ' + [Apellido]", stored: true),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ContrasenaHash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Telefono = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
-                    Cedula = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UsuarioLegacy", x => x.IdUsuario);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PerfilPermiso",
-                columns: table => new
-                {
-                    IdPerfil = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IdPermiso = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PerfilPermiso", x => new { x.IdPerfil, x.IdPermiso });
+                    table.PrimaryKey("PK_Auditorias", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PerfilPermiso_Perfiles_IdPerfil",
-                        column: x => x.IdPerfil,
-                        principalTable: "Perfiles",
-                        principalColumn: "IdPerfil",
+                        name: "FK_Auditorias_ProyectosInmobiliarios_ProyectoId",
+                        column: x => x.ProyectoId,
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PerfilPermiso_Permisos_IdPermiso",
-                        column: x => x.IdPermiso,
-                        principalTable: "Permisos",
-                        principalColumn: "IdPermiso",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Auditorias_Usuario_UsuarioId",
+                        column: x => x.UsuarioId,
+                        principalTable: "Usuario",
+                        principalColumn: "IdUsuario",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,131 +75,6 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Proyectos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CodigoInterno = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Nombre = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    UbicacionTexto = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    UbicacionGps = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    ValorEstimado = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    DatosDesarrollador = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RncDesarrollador = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Matricula = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Categoria = table.Column<int>(type: "int", nullable: false),
-                    DesignacionCatastral = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EstadoJuridico = table.Column<int>(type: "int", nullable: false),
-                    EstadoProyecto = table.Column<int>(type: "int", nullable: false),
-                    EstadoIntegridad = table.Column<int>(type: "int", nullable: false),
-                    SelladoBloqueado = table.Column<bool>(type: "bit", nullable: false),
-                    UsuarioCreadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Proyectos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Proyectos_Usuario_UsuarioCreadorId",
-                        column: x => x.UsuarioCreadorId,
-                        principalTable: "Usuario",
-                        principalColumn: "IdUsuario",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Acceso",
-                columns: table => new
-                {
-                    IdAcceso = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IdPerfil = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IdUsuario = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Acceso", x => x.IdAcceso);
-                    table.ForeignKey(
-                        name: "FK_Acceso_Perfiles_IdPerfil",
-                        column: x => x.IdPerfil,
-                        principalTable: "Perfiles",
-                        principalColumn: "IdPerfil",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Acceso_UsuarioLegacy_IdUsuario",
-                        column: x => x.IdUsuario,
-                        principalTable: "UsuarioLegacy",
-                        principalColumn: "IdUsuario",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pagos",
-                columns: table => new
-                {
-                    IdPago = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IdUsuario = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IdApiGobernanza = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Idsuscripcion = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Monto = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FechaPago = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pagos", x => x.IdPago);
-                    table.ForeignKey(
-                        name: "FK_Pagos_PlanSuscripcion_Idsuscripcion",
-                        column: x => x.Idsuscripcion,
-                        principalTable: "PlanSuscripcion",
-                        principalColumn: "Idsuscripcion",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Pagos_UsuarioLegacy_IdUsuario",
-                        column: x => x.IdUsuario,
-                        principalTable: "UsuarioLegacy",
-                        principalColumn: "IdUsuario",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Auditorias",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TipoEvento = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Accion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Entidad = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EntidadId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Detalle = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    IpOrigen = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FechaEventoUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TipoOperacion = table.Column<int>(type: "int", nullable: false),
-                    Resultado = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    ReferenciaExpedienteId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Auditorias", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Auditorias_Proyectos_ProyectoId",
-                        column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Auditorias_Usuario_UsuarioId",
-                        column: x => x.UsuarioId,
-                        principalTable: "Usuario",
-                        principalColumn: "IdUsuario",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DeteccionesDuplicidad",
                 columns: table => new
                 {
@@ -326,15 +92,15 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_DeteccionesDuplicidad", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DeteccionesDuplicidad_Proyectos_ProyectoDuplicadoId",
+                        name: "FK_DeteccionesDuplicidad_ProyectosInmobiliarios_ProyectoDuplicadoId",
                         column: x => x.ProyectoDuplicadoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id");
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto");
                     table.ForeignKey(
-                        name: "FK_DeteccionesDuplicidad_Proyectos_ProyectoId",
+                        name: "FK_DeteccionesDuplicidad_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -369,11 +135,54 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Documentos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Documentos_Proyectos_ProyectoId",
+                        name: "FK_Documentos_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notificaciones",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Mensaje = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tipo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Leida = table.Column<bool>(type: "bit", nullable: false),
+                    FechaUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EnlaceRelacionado = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notificaciones", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReglasValidacion",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    CondicionLogica = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    TipoDocumentoAplicable = table.Column<int>(type: "int", nullable: false),
+                    NivelAlerta = table.Column<int>(type: "int", nullable: false),
+                    TipoProyecto = table.Column<int>(type: "int", nullable: false),
+                    Activa = table.Column<bool>(type: "bit", nullable: false),
+                    Version = table.Column<int>(type: "int", nullable: false),
+                    FechaCreacionUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreadaPor = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReglaAnteriorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReglasValidacion", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -393,10 +202,10 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Reportes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reportes_Proyectos_ProyectoId",
+                        name: "FK_Reportes_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reportes_Usuario_GeneradoPorUsuarioId",
@@ -404,6 +213,85 @@ namespace Infrastructure.Migrations
                         principalTable: "Usuario",
                         principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SellosIntegridad",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CodigoSello = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Nivel = table.Column<int>(type: "int", nullable: false),
+                    UrlQr = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    FirmaDigital = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    FechaEmisionUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaExpiracionUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Estado = table.Column<int>(type: "int", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SellosIntegridad", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SellosIntegridad_ProyectosInmobiliarios_ProyectoId",
+                        column: x => x.ProyectoId,
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ValidacionesAyuntamiento",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Municipio = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Result = table.Column<int>(type: "int", nullable: false),
+                    Detalle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FechaConsulta = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DisponibilidadServicio = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ValidacionesAyuntamiento", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ValidacionesAyuntamiento_ProyectosInmobiliarios_ProyectoId",
+                        column: x => x.ProyectoId,
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ValidacionesDgii",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Rnc = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    TieneDeudas = table.Column<bool>(type: "bit", nullable: false),
+                    FechaConsulta = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrigenDatos = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ValidacionesDgii", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ValidacionesDgii_ProyectosInmobiliarios_ProyectoId",
+                        column: x => x.ProyectoId,
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -431,90 +319,11 @@ namespace Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ResultadosCrediticios_Proyectos_ProyectoId",
+                        name: "FK_ResultadosCrediticios_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SellosIntegridad",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CodigoSello = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Nivel = table.Column<int>(type: "int", nullable: false),
-                    UrlQr = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    FirmaDigital = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    FechaEmisionUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FechaExpiracionUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Estado = table.Column<int>(type: "int", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SellosIntegridad", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SellosIntegridad_Proyectos_ProyectoId",
-                        column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ValidacionesAyuntamiento",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Municipio = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Result = table.Column<int>(type: "int", nullable: false),
-                    Detalle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FechaConsulta = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DisponibilidadServicio = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ValidacionesAyuntamiento", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ValidacionesAyuntamiento_Proyectos_ProyectoId",
-                        column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ValidacionesDgii",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProyectoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Rnc = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    TieneDeudas = table.Column<bool>(type: "bit", nullable: false),
-                    FechaConsulta = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrigenDatos = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ValidacionesDgii", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ValidacionesDgii_Proyectos_ProyectoId",
-                        column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -544,10 +353,10 @@ namespace Infrastructure.Migrations
                         principalTable: "Documentos",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_AlertasValidacion_Proyectos_ProyectoId",
+                        name: "FK_AlertasValidacion_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -576,10 +385,10 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Certificaciones", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Certificaciones_Proyectos_ProyectoId",
+                        name: "FK_Certificaciones_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Certificaciones_Reportes_ReporteId",
@@ -615,10 +424,10 @@ namespace Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Validaciones_Proyectos_ProyectoId",
+                        name: "FK_Validaciones_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Validaciones_SellosIntegridad_SelloId",
@@ -673,10 +482,10 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Hallazgos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Hallazgos_Proyectos_ProyectoId",
+                        name: "FK_Hallazgos_ProyectosInmobiliarios_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Hallazgos_Validaciones_ValidacionId",
@@ -711,16 +520,6 @@ namespace Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Acceso_IdPerfil",
-                table: "Acceso",
-                column: "IdPerfil");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Acceso_IdUsuario",
-                table: "Acceso",
-                column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AlertasValidacion_DocumentoId",
@@ -798,32 +597,6 @@ namespace Infrastructure.Migrations
                 column: "ValidacionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pagos_Idsuscripcion",
-                table: "Pagos",
-                column: "Idsuscripcion");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pagos_IdUsuario",
-                table: "Pagos",
-                column: "IdUsuario");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PerfilPermiso_IdPermiso",
-                table: "PerfilPermiso",
-                column: "IdPermiso");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Proyectos_CodigoInterno",
-                table: "Proyectos",
-                column: "CodigoInterno",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Proyectos_UsuarioCreadorId",
-                table: "Proyectos",
-                column: "UsuarioCreadorId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Reportes_GeneradoPorUsuarioId",
                 table: "Reportes",
                 column: "GeneradoPorUsuarioId");
@@ -860,12 +633,6 @@ namespace Infrastructure.Migrations
                 column: "ProyectoId");
 
             migrationBuilder.CreateIndex(
-                name: "UQ_Usuario_Email",
-                table: "Usuario",
-                column: "Email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Validaciones_DocumentoId",
                 table: "Validaciones",
                 column: "DocumentoId");
@@ -895,9 +662,6 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Acceso");
-
-            migrationBuilder.DropTable(
                 name: "AlertasValidacion");
 
             migrationBuilder.DropTable(
@@ -919,12 +683,6 @@ namespace Infrastructure.Migrations
                 name: "Notificaciones");
 
             migrationBuilder.DropTable(
-                name: "Pagos");
-
-            migrationBuilder.DropTable(
-                name: "PerfilPermiso");
-
-            migrationBuilder.DropTable(
                 name: "ReglasValidacion");
 
             migrationBuilder.DropTable(
@@ -943,18 +701,6 @@ namespace Infrastructure.Migrations
                 name: "Reportes");
 
             migrationBuilder.DropTable(
-                name: "PlanSuscripcion");
-
-            migrationBuilder.DropTable(
-                name: "UsuarioLegacy");
-
-            migrationBuilder.DropTable(
-                name: "Perfiles");
-
-            migrationBuilder.DropTable(
-                name: "Permisos");
-
-            migrationBuilder.DropTable(
                 name: "ConsentimientosFinancieros");
 
             migrationBuilder.DropTable(
@@ -965,12 +711,6 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "SellosIntegridad");
-
-            migrationBuilder.DropTable(
-                name: "Proyectos");
-
-            migrationBuilder.DropTable(
-                name: "Usuario");
         }
     }
 }

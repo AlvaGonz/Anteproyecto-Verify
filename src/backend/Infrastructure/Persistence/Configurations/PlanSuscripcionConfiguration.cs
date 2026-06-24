@@ -8,7 +8,7 @@ public class PlanSuscripcionConfiguration : IEntityTypeConfiguration<PlanSuscrip
 {
     public void Configure(EntityTypeBuilder<PlanSuscripcion> builder)
     {
-        builder.ToTable("PlanSuscripcion");
+        builder.ToTable("PlanSuscripcion", t => t.ExcludeFromMigrations());
         builder.HasKey(p => p.Idsuscripcion);
         
         builder.Property(p => p.Idsuscripcion).HasColumnName("Idsuscripcion").ValueGeneratedOnAdd();
