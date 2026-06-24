@@ -42,8 +42,7 @@ export interface CreateUserDto {
 
 export interface UpdateUserDto {
   name?: string;
-  email?: string;
   role?: "admin" | "dev" | "validator" | "user";
   telefono?: string;
-  cedula?: string;
+  // email and cedula intentionally excluded — immutable post-registration
 }

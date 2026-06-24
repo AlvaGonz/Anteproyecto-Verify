@@ -104,16 +104,7 @@ export const LoginForm = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-1">
-          <label className="flex items-center gap-2 cursor-pointer group">
-            <input
-              type="checkbox"
-              className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
-            />
-            <span className="text-[13px] text-text-secondary group-hover:text-text-primary transition-colors font-medium">
-              Recordar sesión
-            </span>
-          </label>
+        <div className="flex items-center justify-end pt-1">
           <a
             href="#"
             className="text-[13px] text-primary font-bold hover:underline"

@@ -76,7 +76,7 @@ public class AuthController : ControllerBase
         });
 
         var refreshToken = Guid.NewGuid().ToString("N");
-        _refreshTokens[refreshToken] = responseData.User.Id;
+        _refreshTokens[refreshToken] = responseData.User.Id.ToString();
 
         Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
         {

@@ -1,4 +1,4 @@
-﻿namespace Api.Controllers;
+namespace Api.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -187,22 +187,18 @@ public class SettingsController : ControllerBase
         await SyncUserLegacyAsync(user, cancellationToken);
 
         // Update legacy profile to match new role
-        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == user.Email, cancellationToken);
-        if (lu != null)
+        var perf = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == targetProfileName, cancellationToken);
+        if (perf != null)
         {
-            var perf = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == targetProfileName, cancellationToken);
-            if (perf != null)
+            var acceso = await _context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == user.Id, cancellationToken);
+            if (acceso == null)
             {
-                var acceso = await _context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == lu.IdUsuario, cancellationToken);
-                if (acceso == null)
-                {
-                    acceso = new Acceso { IdUsuario = lu.IdUsuario, IdPerfil = perf.IdPerfil };
-                    _context.Accesos.Add(acceso);
-                }
-                else
-                {
-                    acceso.IdPerfil = perf.IdPerfil;
-                }
+                acceso = new Acceso { IdUsuario = user.Id, IdPerfil = perf.IdPerfil };
+                _context.Accesos.Add(acceso);
+            }
+            else
+            {
+                acceso.IdPerfil = perf.IdPerfil;
             }
         }
 
@@ -228,18 +224,14 @@ public class SettingsController : ControllerBase
 
         _context.Usuarios.Remove(user);
         
-        // Remove legacy
-        var legacyUser = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == user.CorreoElectronico, cancellationToken);
-        if (legacyUser != null)
-        {
-            var access = await _context.Accesos.Where(a => a.IdUsuario == legacyUser.IdUsuario).ToListAsync(cancellationToken);
-            _context.Accesos.RemoveRange(access);
-            
-            var pagos = await _context.PagosLegacy.Where(p => p.IdUsuario == legacyUser.IdUsuario).ToListAsync(cancellationToken);
-            _context.PagosLegacy.RemoveRange(pagos);
-            
-            _context.UsuariosLegacy.Remove(legacyUser);
-        }
+        // Remove legacy dependencies
+        var access = await _context.Accesos.Where(a => a.IdUsuario == user.Id).ToListAsync(cancellationToken);
+        _context.Accesos.RemoveRange(access);
+        
+        var pagos = await _context.PagosLegacy.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
+        _context.PagosLegacy.RemoveRange(pagos);
+        
+        // Do not remove from UsuariosLegacy since it is a view over Usuarios
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -332,25 +324,17 @@ public class SettingsController : ControllerBase
         }
 
         // Sync legacy user if missing
-        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
-        if (lu == null)
-        {
-            await SyncUserLegacyAsync(u, cancellationToken);
-            lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
-        }
+        await SyncUserLegacyAsync(u, cancellationToken);
 
-        if (lu != null)
+        // Insert a new payment/allocation record in Pagos table
+        var nuevoPago = new Pago
         {
-            // Insert a new payment/allocation record in Pagos table
-            var nuevoPago = new Pago
-            {
-                IdUsuario = lu.IdUsuario,
-                Idsuscripcion = plan.Idsuscripcion,
-                Monto = plan.Precio,
-                FechaPago = DateTime.UtcNow
-            };
-            _context.PagosLegacy.Add(nuevoPago);
-        }
+            IdUsuario = u.Id,
+            Idsuscripcion = plan.Idsuscripcion,
+            Monto = plan.Precio,
+            FechaPago = DateTime.UtcNow
+        };
+        _context.PagosLegacy.Add(nuevoPago);
 
         // Single SaveChangesAsync for entire operation
         await _context.SaveChangesAsync(cancellationToken);
@@ -414,29 +398,15 @@ public class SettingsController : ControllerBase
 
     private async Task SyncUserLegacyAsync(Usuario u, CancellationToken cancellationToken = default)
     {
-        var existingLegacy = await _context.UsuariosLegacy.FirstOrDefaultAsync(ul => ul.Email == u.Email, cancellationToken);
-        if (existingLegacy == null)
-        {
-            existingLegacy = new UsuarioLegacy
-            {
-                Nombre = u.Nombre,
-                Apellido = u.Apellido,
-                NombreCompleto = u.NombreCompleto,
-                Email = u.Email,
-                ContrasenaHash = u.ContrasenaHash,
-                Telefono = u.Telefono,
-                Cedula = u.Cedula
-            };
-            _context.UsuariosLegacy.Add(existingLegacy);
-            // Don't save here - let the caller save once
-        }
+        // Don't add to UsuariosLegacy explicitly because it is a VIEW over Usuarios
+        // The record will appear in the view automatically once SaveChanges is called.
 
         // Ensure profiles are loaded (cached for performance)
         var adminLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "ADMIN", cancellationToken);
         var devLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "DEVELOPER", cancellationToken);
         var valLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "VALIDATOR", cancellationToken);
 
-        var hasAcceso = await _context.Accesos.AnyAsync(a => a.IdUsuario == existingLegacy.IdUsuario, cancellationToken);
+        var hasAcceso = await _context.Accesos.AnyAsync(a => a.IdUsuario == u.Id, cancellationToken);
         if (!hasAcceso)
         {
             var targetPerfil = u.Rol switch
@@ -449,11 +419,11 @@ public class SettingsController : ControllerBase
 
             if (targetPerfil != null)
             {
-                _context.Accesos.Add(new Acceso { IdUsuario = existingLegacy.IdUsuario, IdPerfil = targetPerfil.IdPerfil });
+                _context.Accesos.Add(new Acceso { IdUsuario = u.Id, IdPerfil = targetPerfil.IdPerfil });
             }
         }
 
-        var hasPagos = await _context.PagosLegacy.AnyAsync(p => p.IdUsuario == existingLegacy.IdUsuario, cancellationToken);
+        var hasPagos = await _context.PagosLegacy.AnyAsync(p => p.IdUsuario == u.Id, cancellationToken);
         if (!hasPagos)
         {
             var freePlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Gratuito", cancellationToken);
@@ -464,7 +434,7 @@ public class SettingsController : ControllerBase
             {
                 _context.PagosLegacy.Add(new Pago
                 {
-                    IdUsuario = existingLegacy.IdUsuario,
+                    IdUsuario = u.Id,
                     Idsuscripcion = targetPlan.Idsuscripcion,
                     Monto = targetPlan.Precio,
                     FechaPago = DateTime.UtcNow

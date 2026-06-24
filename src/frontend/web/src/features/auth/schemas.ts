@@ -75,3 +75,27 @@ export const registerSchema = z.object({
     .refine((val) => val === true, "Debe aceptar los términos de uso y políticas de privacidad"),
 });
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+
+export const UpdateProfileSchema = z.object({
+  name: z.string().regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Solo letras permitidas"),
+  telefono: z.string()
+    .regex(/^(809|829|849)\d{7}$/, "Solo 809, 829 o 849")
+    .optional()
+    .or(z.literal("")),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().optional(),
+  confirmPassword: z.string().optional(),
+}).refine((data) => {
+  if (data.newPassword) {
+    return data.currentPassword && data.currentPassword.length > 0;
+  }
+  return true;
+}, { message: "Debes ingresar tu contraseña actual", path: ["currentPassword"] })
+.refine((data) => {
+  if (data.newPassword) {
+    return data.newPassword === data.confirmPassword;
+  }
+  return true;
+}, { message: "Las contraseñas no coinciden", path: ["confirmPassword"] });
+
+export type UpdateProfileDto = z.infer<typeof UpdateProfileSchema>;

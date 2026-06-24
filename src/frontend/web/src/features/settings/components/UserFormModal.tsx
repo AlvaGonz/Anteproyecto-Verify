@@ -59,12 +59,18 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
             <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Correo Electrónico</label>
             <input
               type="email"
-              required
+              required={!editingUser}
               value={formData.email}
-              onChange={e => update({ email: e.target.value })}
-              className="vf-input w-full"
+              readOnly={!!editingUser}
+              onChange={editingUser ? undefined : e => update({ email: e.target.value })}
+              className={`vf-input w-full ${editingUser ? "bg-surface opacity-60 cursor-not-allowed" : ""}`}
               placeholder="ejemplo@empresa.com"
             />
+            {editingUser && (
+              <p className="text-[10px] text-text-secondary mt-1">
+                El correo no puede editarse directamente. Use el flujo de cambio de email.
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -100,8 +106,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                 type="text"
                 maxLength={13}
                 inputMode="numeric"
+                readOnly={!!editingUser}
                 value={formData.cedula || ""}
-                onChange={e => {
+                onChange={editingUser ? undefined : e => {
                   let val = e.target.value.replace(/\D/g, "");
                   if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
                   else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
@@ -113,9 +120,14 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                     e.preventDefault();
                   }
                 }}
-                className="vf-input w-full"
+                className={`vf-input w-full ${editingUser ? "bg-surface opacity-60 cursor-not-allowed" : ""}`}
                 placeholder="000-0000000-0"
               />
+              {editingUser && (
+                <p className="text-[10px] text-text-secondary mt-1">
+                  La cédula es un dato de identidad legal y no puede modificarse.
+                </p>
+              )}
             </div>
           </div>
 
