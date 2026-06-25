@@ -1,0 +1,436 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ecb52931-e9fa-4144-af84-adf2beb3dd21" name="Admin@ALVAGONZ 2026-06-25 09:10:06" runUser="ALVAGONZ\Admin" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-25T09:10:06.1468378-04:00" queuing="2026-06-25T09:10:06.1468385-04:00" start="2026-06-25T09:10:03.8483225-04:00" finish="2026-06-25T09:10:09.0073549-04:00" />
+  <TestSettings name="default" id="f2c61d50-81d6-4c2d-aa17-bf5b94f2a4b1">
+    <Deployment runDeploymentRoot="Admin_ALVAGONZ_2026-06-25_09_10_06" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="0690998e-72ef-4a88-ba05-2ab55b3d778f" testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" computerName="ALVAGONZ" duration="00:00:00.0015267" startTime="2026-06-25T09:10:06.1574213-04:00" endTime="2026-06-25T09:10:06.1574218-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0690998e-72ef-4a88-ba05-2ab55b3d778f" />
+    <UnitTestResult executionId="ba188042-9bb2-4332-b219-6c37e30783b2" testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" testName="Api.Tests.UnitTest1.Test1" computerName="ALVAGONZ" duration="00:00:00.0027074" startTime="2026-06-25T09:10:05.6570502-04:00" endTime="2026-06-25T09:10:05.6570745-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ba188042-9bb2-4332-b219-6c37e30783b2" />
+    <UnitTestResult executionId="bc5fbe6e-940b-4df1-bc2b-c4d99a73ef4a" testId="39116a4a-dcfa-62b0-77c9-919eab681596" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0058028" startTime="2026-06-25T09:10:06.1687442-04:00" endTime="2026-06-25T09:10:06.1687451-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bc5fbe6e-940b-4df1-bc2b-c4d99a73ef4a">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+Not found: "badge-rejected"</Message>
+          <StackTrace>   at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs:line 172&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b80b37a2-2fc1-4acc-b7ba-0f5551d41300" testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" testName="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:00:03.2230416" startTime="2026-06-25T09:10:08.8818292-04:00" endTime="2026-06-25T09:10:08.8818299-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b80b37a2-2fc1-4acc-b7ba-0f5551d41300">
+      <Output>
+        <ErrorInfo>
+          <Message>Microsoft.Data.SqlClient.SqlException : There is already an object named 'Notificaciones' in the database.</Message>
+          <StackTrace>   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 54&#xD;
+   at Program.&lt;Main&gt;(String[] args)&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+   at Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\SwaggerTests.cs:line 20&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="abbb17c6-f00d-4d05-8dc8-dfae156d44f3" testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" testName="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:00:03.2230610" startTime="2026-06-25T09:10:08.8790307-04:00" endTime="2026-06-25T09:10:08.8790312-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="abbb17c6-f00d-4d05-8dc8-dfae156d44f3">
+      <Output>
+        <ErrorInfo>
+          <Message>Microsoft.Data.SqlClient.SqlException : There is already an object named 'Notificaciones' in the database.</Message>
+          <StackTrace>   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 54&#xD;
+   at Program.&lt;Main&gt;(String[] args)&#xD;
+   at InvokeStub_Program.&lt;Main&gt;(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+   at Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ApiStatusTests.cs:line 20&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="162ca636-1246-40f4-8ecf-2dd2a07dad7c" testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" testName="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0025167" startTime="2026-06-25T09:10:06.1691338-04:00" endTime="2026-06-25T09:10:06.1691343-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="162ca636-1246-40f4-8ecf-2dd2a07dad7c" />
+    <UnitTestResult executionId="d1457286-dde5-4c19-ae6e-041fa02c3f6a" testId="c0500782-0e63-83fc-9487-18b8746c1627" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" computerName="ALVAGONZ" duration="00:00:00.0033837" startTime="2026-06-25T09:10:06.1556203-04:00" endTime="2026-06-25T09:10:06.1556209-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1457286-dde5-4c19-ae6e-041fa02c3f6a" />
+    <UnitTestResult executionId="35214e4d-74bc-4751-9774-fec7eb59bd44" testId="62532f84-b3c3-01cc-4382-d22055358b75" testName="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.4873384" startTime="2026-06-25T09:10:06.1343350-04:00" endTime="2026-06-25T09:10:06.1343351-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="35214e4d-74bc-4751-9774-fec7eb59bd44" />
+    <UnitTestResult executionId="915c86a1-3e55-4d26-a877-56ab23994d4a" testId="3f4a7373-ae45-356c-273c-1587d600f8fe" testName="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" computerName="ALVAGONZ" duration="00:00:00.0042956" startTime="2026-06-25T09:10:06.1382526-04:00" endTime="2026-06-25T09:10:06.1382530-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="915c86a1-3e55-4d26-a877-56ab23994d4a" />
+    <UnitTestResult executionId="79fa37b5-817f-4a49-bb83-39e34ed66e61" testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" computerName="ALVAGONZ" duration="00:00:00.0099929" startTime="2026-06-25T09:10:06.1437289-04:00" endTime="2026-06-25T09:10:06.1437297-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="79fa37b5-817f-4a49-bb83-39e34ed66e61" />
+    <UnitTestResult executionId="c6621c7e-75a5-4243-ab74-11ac882cac9d" testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" computerName="ALVAGONZ" duration="00:00:00.4869529" startTime="2026-06-25T09:10:06.1335099-04:00" endTime="2026-06-25T09:10:06.1335104-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c6621c7e-75a5-4243-ab74-11ac882cac9d" />
+    <UnitTestResult executionId="26e2d6dd-7984-4f97-896e-38844b19b573" testId="eff72f46-a3f9-d3a7-ff15-275794af9931" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" computerName="ALVAGONZ" duration="00:00:00.0050904" startTime="2026-06-25T09:10:06.1519966-04:00" endTime="2026-06-25T09:10:06.1519971-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="26e2d6dd-7984-4f97-896e-38844b19b573" />
+    <UnitTestResult executionId="a9d7d381-78f7-466d-a1c8-379525d3da0e" testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" computerName="ALVAGONZ" duration="00:00:00.0026342" startTime="2026-06-25T09:10:06.1466003-04:00" endTime="2026-06-25T09:10:06.1466007-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a9d7d381-78f7-466d-a1c8-379525d3da0e" />
+    <UnitTestResult executionId="29d925a8-9618-4da9-8056-096d4b3ec518" testId="7b8a1692-efa4-d511-32d7-4966224f8985" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0017787" startTime="2026-06-25T09:10:06.1702394-04:00" endTime="2026-06-25T09:10:06.1702400-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="29d925a8-9618-4da9-8056-096d4b3ec518">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+Not found: "badge-verified"</Message>
+          <StackTrace>   at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs:line 145&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="7f908116-0f78-4a2c-b8fa-c3e17f8ac54a" testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" testName="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0042676" startTime="2026-06-25T09:10:06.1427559-04:00" endTime="2026-06-25T09:10:06.1427565-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7f908116-0f78-4a2c-b8fa-c3e17f8ac54a" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f94b12e1-cee5-36f3-81e3-df0658a53dcc">
+      <Execution id="b80b37a2-2fc1-4acc-b7ba-0f5551d41300" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.SwaggerTests" name="Get_SwaggerIndex_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="c0500782-0e63-83fc-9487-18b8746c1627">
+      <Execution id="d1457286-dde5-4c19-ae6e-041fa02c3f6a" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ValidationError_ThrowsValidationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="62532f84-b3c3-01cc-4382-d22055358b75">
+      <Execution id="35214e4d-74bc-4751-9774-fec7eb59bd44" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendAccountVerificationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3dbf0911-bb1c-684c-f297-8a1080bd1b71">
+      <Execution id="a9d7d381-78f7-466d-a1c8-379525d3da0e" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8">
+      <Execution id="162ca636-1246-40f4-8ecf-2dd2a07dad7c" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendProjectCreatedAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="eff72f46-a3f9-d3a7-ff15-275794af9931">
+      <Execution id="26e2d6dd-7984-4f97-896e-38844b19b573" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_HappyPath_ReturnsExpectedDto" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="d613d3e3-a00c-805d-8fe8-9f741d534ffe">
+      <Execution id="c6621c7e-75a5-4243-ab74-11ac882cac9d" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="39116a4a-dcfa-62b0-77c9-919eab681596">
+      <Execution id="bc5fbe6e-940b-4df1-bc2b-c4d99a73ef4a" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3f4a7373-ae45-356c-273c-1587d600f8fe">
+      <Execution id="915c86a1-3e55-4d26-a877-56ab23994d4a" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendEmailAsync_SendsMessageWithCorrectValues" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="7b8a1692-efa4-d511-32d7-4966224f8985">
+      <Execution id="29d925a8-9618-4da9-8056-096d4b3ec518" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="5380e8c3-5f3f-436c-34df-3b3a96511a9b">
+      <Execution id="7f908116-0f78-4a2c-b8fa-c3e17f8ac54a" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="2bae8dcb-84de-ee76-203f-153ae7f3e8b4">
+      <Execution id="abbb17c6-f00d-4d05-8dc8-dfae156d44f3" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ApiStatusTests" name="Get_ApiStatus_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f0e1e511-e13f-e8d9-e04b-28c87c7fd256">
+      <Execution id="0690998e-72ef-4a88-ba05-2ab55b3d778f" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="afdb3f1a-4623-7490-795d-e6837e60c3b8">
+      <Execution id="79fa37b5-817f-4a49-bb83-39e34ed66e61" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_AiServiceThrows_ReturnsFallbackResult" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.UnitTest1.Test1" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="9983a587-9771-0fbd-a017-1bbb600dfa5c">
+      <Execution id="ba188042-9bb2-4332-b219-6c37e30783b2" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.UnitTest1" name="Test1" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" executionId="0690998e-72ef-4a88-ba05-2ab55b3d778f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" executionId="ba188042-9bb2-4332-b219-6c37e30783b2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="39116a4a-dcfa-62b0-77c9-919eab681596" executionId="bc5fbe6e-940b-4df1-bc2b-c4d99a73ef4a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" executionId="b80b37a2-2fc1-4acc-b7ba-0f5551d41300" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" executionId="abbb17c6-f00d-4d05-8dc8-dfae156d44f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" executionId="162ca636-1246-40f4-8ecf-2dd2a07dad7c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c0500782-0e63-83fc-9487-18b8746c1627" executionId="d1457286-dde5-4c19-ae6e-041fa02c3f6a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="62532f84-b3c3-01cc-4382-d22055358b75" executionId="35214e4d-74bc-4751-9774-fec7eb59bd44" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3f4a7373-ae45-356c-273c-1587d600f8fe" executionId="915c86a1-3e55-4d26-a877-56ab23994d4a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" executionId="79fa37b5-817f-4a49-bb83-39e34ed66e61" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" executionId="c6621c7e-75a5-4243-ab74-11ac882cac9d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="eff72f46-a3f9-d3a7-ff15-275794af9931" executionId="26e2d6dd-7984-4f97-896e-38844b19b573" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" executionId="a9d7d381-78f7-466d-a1c8-379525d3da0e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7b8a1692-efa4-d511-32d7-4966224f8985" executionId="29d925a8-9618-4da9-8056-096d4b3ec518" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" executionId="7f908116-0f78-4a2c-b8fa-c3e17f8ac54a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="15" executed="15" passed="11" failed="4" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.25)&#xD;
+[xUnit.net 00:00:00.61]   Discovering: Api.Tests&#xD;
+[xUnit.net 00:00:00.66]   Discovered:  Api.Tests&#xD;
+[xUnit.net 00:00:00.66]   Starting:    Api.Tests&#xD;
+[xUnit.net 00:00:01.23]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:01.23]       String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+[xUnit.net 00:00:01.23]       Not found: "badge-rejected"&#xD;
+[xUnit.net 00:00:01.23]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.23]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs(172,0): at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate()&#xD;
+[xUnit.net 00:00:01.23]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:01.23]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:01.23]       String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+[xUnit.net 00:00:01.23]       Not found: "badge-verified"&#xD;
+[xUnit.net 00:00:01.23]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.23]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs(145,0): at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate()&#xD;
+[xUnit.net 00:00:01.23]         --- End of stack trace from previous location ---&#xD;
+info: Program[0]&#xD;
+      Database connection verified successfully.&#xD;
+info: Program[0]&#xD;
+      Database connection verified successfully.&#xD;
+info: Program[0]&#xD;
+      Applying database migrations...&#xD;
+info: Program[0]&#xD;
+      Applying database migrations...&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (28ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (28ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT [MigrationId], [ProductVersion]&#xD;
+      FROM [__EFMigrationsHistory]&#xD;
+      ORDER BY [MigrationId];&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT [MigrationId], [ProductVersion]&#xD;
+      FROM [__EFMigrationsHistory]&#xD;
+      ORDER BY [MigrationId];&#xD;
+info: Microsoft.EntityFrameworkCore.Migrations[20402]&#xD;
+      Applying migration '20260625043417_InitialCreate'.&#xD;
+info: Microsoft.EntityFrameworkCore.Migrations[20402]&#xD;
+      Applying migration '20260625043417_InitialCreate'.&#xD;
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]&#xD;
+      Failed executing DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Notificaciones] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [UsuarioId] uniqueidentifier NOT NULL,&#xD;
+          [Mensaje] nvarchar(max) NOT NULL,&#xD;
+          [Tipo] nvarchar(max) NOT NULL,&#xD;
+          [Leida] bit NOT NULL,&#xD;
+          [FechaUtc] datetime2 NOT NULL,&#xD;
+          [EnlaceRelacionado] nvarchar(max) NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Notificaciones] PRIMARY KEY ([Id])&#xD;
+      );&#xD;
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]&#xD;
+      Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Notificaciones] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [UsuarioId] uniqueidentifier NOT NULL,&#xD;
+          [Mensaje] nvarchar(max) NOT NULL,&#xD;
+          [Tipo] nvarchar(max) NOT NULL,&#xD;
+          [Leida] bit NOT NULL,&#xD;
+          [FechaUtc] datetime2 NOT NULL,&#xD;
+          [EnlaceRelacionado] nvarchar(max) NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Notificaciones] PRIMARY KEY ([Id])&#xD;
+      );&#xD;
+=== FATAL STARTUP CRASH ===&#xD;
+=== FATAL STARTUP CRASH ===&#xD;
+Microsoft.Data.SqlClient.SqlException (0x80131904): There is already an object named 'Notificaciones' in the database.&#xD;
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 54&#xD;
+ClientConnectionId:fe993821-9344-47b2-94bd-c00ab0f5a13f&#xD;
+Error Number:2714,State:6,Class:16&#xD;
+Microsoft.Data.SqlClient.SqlException (0x80131904): There is already an object named 'Notificaciones' in the database.&#xD;
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 54&#xD;
+ClientConnectionId:385ec157-cada-416c-a905-e2ad04db562c&#xD;
+Error Number:2714,State:6,Class:16&#xD;
+[xUnit.net 00:00:03.94]       Microsoft.Data.SqlClient.SqlException : There is already an object named 'Notificaciones' in the database.&#xD;
+[xUnit.net 00:00:03.94]       Stack Trace:&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+[xUnit.net 00:00:03.94]            at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+[xUnit.net 00:00:03.94]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs(54,0): at Program.&lt;Main&gt;$(String[] args)&#xD;
+[xUnit.net 00:00:03.94]            at Program.&lt;Main&gt;(String[] args)&#xD;
+[xUnit.net 00:00:03.94]            at InvokeStub_Program.&lt;Main&gt;(Object, Span`1)&#xD;
+[xUnit.net 00:00:03.94]            at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:03.94]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+[xUnit.net 00:00:03.94]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ApiStatusTests.cs(20,0): at Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode()&#xD;
+[xUnit.net 00:00:03.94]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.94]       Microsoft.Data.SqlClient.SqlException : There is already an object named 'Notificaciones' in the database.&#xD;
+[xUnit.net 00:00:03.94]       Stack Trace:&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+[xUnit.net 00:00:03.94]            at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+[xUnit.net 00:00:03.94]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs(54,0): at Program.&lt;Main&gt;$(String[] args)&#xD;
+[xUnit.net 00:00:03.94]            at Program.&lt;Main&gt;(String[] args)&#xD;
+[xUnit.net 00:00:03.94]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:03.94]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:03.94]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+[xUnit.net 00:00:03.94]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+[xUnit.net 00:00:03.94]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\SwaggerTests.cs(20,0): at Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode()&#xD;
+[xUnit.net 00:00:03.94]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.95]   Finished:    Api.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T09:10:06.1659501-04:00">
+        <Text>[xUnit.net 00:00:01.23]     Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T09:10:06.1700619-04:00">
+        <Text>[xUnit.net 00:00:01.23]     Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T09:10:08.8762300-04:00">
+        <Text>[xUnit.net 00:00:03.94]     Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T09:10:08.8798346-04:00">
+        <Text>[xUnit.net 00:00:03.94]     Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

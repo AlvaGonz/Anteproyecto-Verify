@@ -2,8 +2,8 @@ namespace Tests.Integration.Infrastructure;
 
 using Application.Abstractions.Persistence;
 using global::Infrastructure.Persistence;
-using global::Infrastructure.Persistence.Seeders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,7 +64,7 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        await db.Database.MigrateAsync();
-        await PlanSuscripcionSeeder.SeedAsync(db);
+        await db.Database.EnsureCreatedAsync();
+        await AppDbContextSeeder.SeedAsync(Services);
     }
 }

@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="330c5caf-e3fc-45cd-b4e3-9e087f32898d" name="Admin@ALVAGONZ 2026-06-25 10:39:15" runUser="ALVAGONZ\Admin" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-25T10:39:15.9702598-04:00" queuing="2026-06-25T10:39:15.9702605-04:00" start="2026-06-25T10:39:14.3276694-04:00" finish="2026-06-25T10:39:16.7106578-04:00" />
+  <TestSettings name="default" id="1330ff6e-7c5b-49c1-b276-60c7388e6f1a">
+    <Deployment runDeploymentRoot="Admin_ALVAGONZ_2026-06-25_10_39_15" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="f2575a1f-181d-4c0b-a654-b9d81b60ddd3" testId="eff72f46-a3f9-d3a7-ff15-275794af9931" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" computerName="ALVAGONZ" duration="00:00:00.0059465" startTime="2026-06-25T10:39:15.9307434-04:00" endTime="2026-06-25T10:39:15.9307435-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f2575a1f-181d-4c0b-a654-b9d81b60ddd3" />
+    <UnitTestResult executionId="309c8eee-78bb-4fb5-a626-28dbdb53c1da" testId="39116a4a-dcfa-62b0-77c9-919eab681596" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0026891" startTime="2026-06-25T10:39:15.9305937-04:00" endTime="2026-06-25T10:39:15.9305941-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="309c8eee-78bb-4fb5-a626-28dbdb53c1da" />
+    <UnitTestResult executionId="ab0fdf4d-7a30-4480-b427-c93f6e8e5665" testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" testName="Api.Tests.UnitTest1.Test1" computerName="ALVAGONZ" duration="00:00:00.0039267" startTime="2026-06-25T10:39:15.6899014-04:00" endTime="2026-06-25T10:39:15.6899346-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ab0fdf4d-7a30-4480-b427-c93f6e8e5665" />
+    <UnitTestResult executionId="64a7776e-53cf-4bb3-936d-c4779abe4fee" testId="7b8a1692-efa4-d511-32d7-4966224f8985" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0017701" startTime="2026-06-25T10:39:15.9307159-04:00" endTime="2026-06-25T10:39:15.9307159-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="64a7776e-53cf-4bb3-936d-c4779abe4fee" />
+    <UnitTestResult executionId="88a9dd56-9931-48ea-b792-c418dd79680f" testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" testName="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0048198" startTime="2026-06-25T10:39:15.8940031-04:00" endTime="2026-06-25T10:39:15.8940034-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="88a9dd56-9931-48ea-b792-c418dd79680f" />
+    <UnitTestResult executionId="5a87b3c7-2700-438f-b7dd-8082aff59666" testId="62532f84-b3c3-01cc-4382-d22055358b75" testName="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.2090994" startTime="2026-06-25T10:39:15.8863616-04:00" endTime="2026-06-25T10:39:15.8863618-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a87b3c7-2700-438f-b7dd-8082aff59666" />
+    <UnitTestResult executionId="954da64d-f24b-4f9f-90e3-0566a30e510c" testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" testName="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:00:00.8934381" startTime="2026-06-25T10:39:16.5777734-04:00" endTime="2026-06-25T10:39:16.5777734-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="954da64d-f24b-4f9f-90e3-0566a30e510c" />
+    <UnitTestResult executionId="178a9976-98b6-457a-8541-759f7ebef7db" testId="c0500782-0e63-83fc-9487-18b8746c1627" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" computerName="ALVAGONZ" duration="00:00:00.0033591" startTime="2026-06-25T10:39:15.9308480-04:00" endTime="2026-06-25T10:39:15.9308482-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="178a9976-98b6-457a-8541-759f7ebef7db" />
+    <UnitTestResult executionId="9b44a8fd-366a-4adf-8f21-eceb84d904b6" testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" computerName="ALVAGONZ" duration="00:00:00.0080830" startTime="2026-06-25T10:39:15.8940770-04:00" endTime="2026-06-25T10:39:15.8940771-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9b44a8fd-366a-4adf-8f21-eceb84d904b6" />
+    <UnitTestResult executionId="75381813-ec38-41c7-bab2-d246d40288bb" testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" testName="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:00:00.8933980" startTime="2026-06-25T10:39:16.5777056-04:00" endTime="2026-06-25T10:39:16.5777062-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75381813-ec38-41c7-bab2-d246d40288bb" />
+    <UnitTestResult executionId="38a61dfc-c44b-4554-994c-d0b8f3ec0b5b" testId="3f4a7373-ae45-356c-273c-1587d600f8fe" testName="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" computerName="ALVAGONZ" duration="00:00:00.0029248" startTime="2026-06-25T10:39:15.8890463-04:00" endTime="2026-06-25T10:39:15.8890469-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="38a61dfc-c44b-4554-994c-d0b8f3ec0b5b" />
+    <UnitTestResult executionId="62a99b89-01f8-41a0-a199-1727109e8d41" testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" testName="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0022150" startTime="2026-06-25T10:39:15.9306608-04:00" endTime="2026-06-25T10:39:15.9306608-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="62a99b89-01f8-41a0-a199-1727109e8d41" />
+    <UnitTestResult executionId="8b2b5d08-424b-4c7e-ac3f-e8d133a38b24" testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" computerName="ALVAGONZ" duration="00:00:00.0012819" startTime="2026-06-25T10:39:15.9308901-04:00" endTime="2026-06-25T10:39:15.9308901-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8b2b5d08-424b-4c7e-ac3f-e8d133a38b24" />
+    <UnitTestResult executionId="627f6b86-9eb9-4e60-a5ef-9ddc13eeff29" testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" computerName="ALVAGONZ" duration="00:00:00.0026081" startTime="2026-06-25T10:39:15.9303070-04:00" endTime="2026-06-25T10:39:15.9303074-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="627f6b86-9eb9-4e60-a5ef-9ddc13eeff29" />
+    <UnitTestResult executionId="898af24b-b6e7-456e-ba4d-f73fa8c76026" testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" computerName="ALVAGONZ" duration="00:00:00.1990776" startTime="2026-06-25T10:39:15.8857814-04:00" endTime="2026-06-25T10:39:15.8857819-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="898af24b-b6e7-456e-ba4d-f73fa8c76026" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f94b12e1-cee5-36f3-81e3-df0658a53dcc">
+      <Execution id="954da64d-f24b-4f9f-90e3-0566a30e510c" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.SwaggerTests" name="Get_SwaggerIndex_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="c0500782-0e63-83fc-9487-18b8746c1627">
+      <Execution id="178a9976-98b6-457a-8541-759f7ebef7db" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ValidationError_ThrowsValidationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="62532f84-b3c3-01cc-4382-d22055358b75">
+      <Execution id="5a87b3c7-2700-438f-b7dd-8082aff59666" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendAccountVerificationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3dbf0911-bb1c-684c-f297-8a1080bd1b71">
+      <Execution id="627f6b86-9eb9-4e60-a5ef-9ddc13eeff29" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8">
+      <Execution id="62a99b89-01f8-41a0-a199-1727109e8d41" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendProjectCreatedAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="eff72f46-a3f9-d3a7-ff15-275794af9931">
+      <Execution id="f2575a1f-181d-4c0b-a654-b9d81b60ddd3" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_HappyPath_ReturnsExpectedDto" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="d613d3e3-a00c-805d-8fe8-9f741d534ffe">
+      <Execution id="898af24b-b6e7-456e-ba4d-f73fa8c76026" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="39116a4a-dcfa-62b0-77c9-919eab681596">
+      <Execution id="309c8eee-78bb-4fb5-a626-28dbdb53c1da" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3f4a7373-ae45-356c-273c-1587d600f8fe">
+      <Execution id="38a61dfc-c44b-4554-994c-d0b8f3ec0b5b" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendEmailAsync_SendsMessageWithCorrectValues" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="7b8a1692-efa4-d511-32d7-4966224f8985">
+      <Execution id="64a7776e-53cf-4bb3-936d-c4779abe4fee" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="5380e8c3-5f3f-436c-34df-3b3a96511a9b">
+      <Execution id="88a9dd56-9931-48ea-b792-c418dd79680f" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="2bae8dcb-84de-ee76-203f-153ae7f3e8b4">
+      <Execution id="75381813-ec38-41c7-bab2-d246d40288bb" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ApiStatusTests" name="Get_ApiStatus_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f0e1e511-e13f-e8d9-e04b-28c87c7fd256">
+      <Execution id="8b2b5d08-424b-4c7e-ac3f-e8d133a38b24" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="afdb3f1a-4623-7490-795d-e6837e60c3b8">
+      <Execution id="9b44a8fd-366a-4adf-8f21-eceb84d904b6" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_AiServiceThrows_ReturnsFallbackResult" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.UnitTest1.Test1" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="9983a587-9771-0fbd-a017-1bbb600dfa5c">
+      <Execution id="ab0fdf4d-7a30-4480-b427-c93f6e8e5665" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.UnitTest1" name="Test1" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="eff72f46-a3f9-d3a7-ff15-275794af9931" executionId="f2575a1f-181d-4c0b-a654-b9d81b60ddd3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="39116a4a-dcfa-62b0-77c9-919eab681596" executionId="309c8eee-78bb-4fb5-a626-28dbdb53c1da" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" executionId="ab0fdf4d-7a30-4480-b427-c93f6e8e5665" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7b8a1692-efa4-d511-32d7-4966224f8985" executionId="64a7776e-53cf-4bb3-936d-c4779abe4fee" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" executionId="88a9dd56-9931-48ea-b792-c418dd79680f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="62532f84-b3c3-01cc-4382-d22055358b75" executionId="5a87b3c7-2700-438f-b7dd-8082aff59666" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" executionId="954da64d-f24b-4f9f-90e3-0566a30e510c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c0500782-0e63-83fc-9487-18b8746c1627" executionId="178a9976-98b6-457a-8541-759f7ebef7db" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" executionId="9b44a8fd-366a-4adf-8f21-eceb84d904b6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" executionId="75381813-ec38-41c7-bab2-d246d40288bb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3f4a7373-ae45-356c-273c-1587d600f8fe" executionId="38a61dfc-c44b-4554-994c-d0b8f3ec0b5b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" executionId="62a99b89-01f8-41a0-a199-1727109e8d41" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" executionId="8b2b5d08-424b-4c7e-ac3f-e8d133a38b24" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" executionId="627f6b86-9eb9-4e60-a5ef-9ddc13eeff29" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" executionId="898af24b-b6e7-456e-ba4d-f73fa8c76026" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="15" executed="15" passed="15" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.02] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.25)&#xD;
+[xUnit.net 00:00:00.27]   Discovering: Api.Tests&#xD;
+[xUnit.net 00:00:00.36]   Discovered:  Api.Tests&#xD;
+[xUnit.net 00:00:00.36]   Starting:    Api.Tests&#xD;
+[xUnit.net 00:00:01.36]   Finished:    Api.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

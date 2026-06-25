@@ -10,8 +10,8 @@ public class AnonymousAccessTests : IntegrationTestBase
     public AnonymousAccessTests(SqlServerFixture fixture) : base(fixture) { }
 
     [Theory]
-    [InlineData("GET", "/api/proyectos")]
-    [InlineData("POST", "/api/consultas")]
+    [InlineData("POST", "/api/projects")]
+    [InlineData("PUT", "/api/projects/00000000-0000-0000-0000-000000000000")]
     public async Task ConsultaEndpoints_WithoutJWT_Return401(
         string method, string path)
     {

@@ -37,9 +37,24 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     // ── Auth helpers ──────────────────────────────────────────────
 
     protected async Task<string> RegisterAndGetTokenAsync(
-        string email = "test@test.com",
+        string? email = null,
         string password = "Test123!")
     {
+        email ??= $"test_{Guid.NewGuid()}@test.com";
+
+        // Generate a valid Dominican Republic Cedula
+        var baseDigits = $"001{new Random().Next(1000000, 9999999):D7}";
+        int[] multipliers = { 1, 2, 1, 2, 1, 2, 1, 2, 1, 2 };
+        int sum = 0;
+        for (int i = 0; i < 10; i++)
+        {
+            int product = int.Parse(baseDigits[i].ToString()) * multipliers[i];
+            if (product >= 10) product -= 9;
+            sum += product;
+        }
+        int checkDigit = (10 - (sum % 10)) % 10;
+        var cedula = $"{baseDigits.Substring(0, 3)}-{baseDigits.Substring(3, 7)}-{checkDigit}";
+
         var registerResponse = await Client.PostAsJsonAsync(
             "/api/auth/register", new
             {
@@ -49,15 +64,35 @@ public abstract class IntegrationTestBase : IAsyncLifetime
                 password,
                 confirmPassword = password,
                 telefono = "8091234567",
-                cedula = "001-0000001-1"
+                cedula
             });
 
-        registerResponse.EnsureSuccessStatusCode();
+        if (!registerResponse.IsSuccessStatusCode)
+        {
+            var errorBody = await registerResponse.Content.ReadAsStringAsync();
+            throw new Exception($"Registration failed with {registerResponse.StatusCode}: {errorBody}");
+        }
+
+        // Force email verification via DB since we can't click the email link in a test
+        using (var scope = Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var user = await db.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == email);
+            if (user != null)
+            {
+                user.VerificarEmail(user.TokenVerificacion!);
+                await db.SaveChangesAsync();
+            }
+        }
 
         var loginResponse = await Client.PostAsJsonAsync(
             "/api/auth/login", new { email, password });
 
-        loginResponse.EnsureSuccessStatusCode();
+        if (!loginResponse.IsSuccessStatusCode)
+        {
+            var errorBody = await loginResponse.Content.ReadAsStringAsync();
+            throw new Exception($"Login failed with {loginResponse.StatusCode}: {errorBody}");
+        }
 
         var loginBody = await loginResponse.Content
             .ReadFromJsonAsync<LoginResponseDto>();
@@ -88,7 +123,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         var db = scope.ServiceProvider
             .GetRequiredService<AppDbContext>();
 
-        var plan = await db.PlanSuscripciones
+        var plan = await db.PlanesSuscripcion
             .FirstAsync(p => p.NombrePlan == planName);
         var user = await db.Usuarios
             .FirstAsync(u => u.Id == userId);

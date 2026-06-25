@@ -4,6 +4,8 @@ using Tests.Integration.Infrastructure;
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 [Collection("Database")]
 public class RegisterUserTests : IntegrationTestBase
@@ -21,22 +23,35 @@ public class RegisterUserTests : IntegrationTestBase
             password = "Test123!",
             confirmPassword = "Test123!",
             telefono = "8091234567",
-            cedula = "001-1234567-8"
+            cedula = "001-1234567-3"
         });
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var body = await response.Content
-            .ReadFromJsonAsync<RegisterUserResultDto>();
+            .ReadFromJsonAsync<Application.Features.Auth.Commands.RegisterUser.RegisterUserResultDto>();
 
-        body!.Role.Should().Be("user");
-        body.Role.Should().NotBe("developer");
-        body.Role.Should().NotBe("professional");
-        body.PlanNombre.Should().Be("Consultor");
+        body.Should().NotBeNull();
+        body!.IsSuccess.Should().BeTrue();
+        body.UsuarioId.Should().NotBeNull();
+
+        var userId = body.UsuarioId!.Value;
+        
+        using var scope = Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<global::Infrastructure.Persistence.AppDbContext>();
+
+        var userInDb = await db.Usuarios
+            .Include(u => u.Plan)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        userInDb.Should().NotBeNull();
+        userInDb!.Rol.Should().Be(Domain.Enums.UserRole.User);
+        userInDb.Plan.Should().NotBeNull();
+        userInDb.Plan!.NombrePlan.Should().Be("Consultor");
     }
 
     [Fact]
-    public async Task POST_Register_DuplicateEmail_Returns409()
+    public async Task POST_Register_DuplicateEmail_Returns400()
     {
         var payload = new
         {
@@ -46,16 +61,14 @@ public class RegisterUserTests : IntegrationTestBase
             password = "Test123!",
             confirmPassword = "Test123!",
             telefono = "8091234567",
-            cedula = "001-0000002-2"
+            cedula = "001-0000002-5"
         };
 
         await Client.PostAsJsonAsync("/api/auth/register", payload);
         var duplicate = await Client.PostAsJsonAsync(
             "/api/auth/register", payload);
 
-        duplicate.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        duplicate.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }
 
-public record RegisterUserResultDto(
-    string Id, string Role, string PlanNombre);

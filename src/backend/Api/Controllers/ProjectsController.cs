@@ -15,6 +15,7 @@ using Application.Common.Exceptions;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _projectService;
