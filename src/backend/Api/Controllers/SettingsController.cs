@@ -523,15 +523,6 @@ public static class RoleProfileMapper
         };
     }
 
-    public static UserRole MapProfileNameToRole(string profileName)
-    {
-        return profileName.ToUpperInvariant() switch
-        {
-            "ADMIN" => UserRole.Administrator,
-            "DEVELOPER" => UserRole.User,
-            "VALIDATOR" => UserRole.User,
-            _ => UserRole.User
-        };
-    }
+
 }
 

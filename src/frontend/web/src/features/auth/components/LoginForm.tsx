@@ -28,9 +28,8 @@ export const LoginForm = () => {
       setIsPending(true);
       setError(null);
       await login(data.email, data.password);
-      // Force a reload to ensure clean state and synchronized cookies
-      window.location.hash = "#/admin/dashboard";
-      window.location.reload();
+      // Soft update for browser state (React Router navigation)
+      navigate("/admin/dashboard");
     } catch (err: any) {
       setError(new Error(err?.message || "Error de autenticación. Verifique sus credenciales."));
       setIsPending(false);

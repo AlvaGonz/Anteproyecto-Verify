@@ -58,7 +58,7 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage });
         }
 
-        return Ok(new { Message = "Registro exitoso. Por favor, verifique su correo electrónico." });
+        return Ok(result);
     }
 
     [HttpPost("login")]
