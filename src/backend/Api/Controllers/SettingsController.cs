@@ -83,7 +83,7 @@ public class SettingsController : ControllerBase
                         u.Nombre,
                         u.Apellido,
                         u.CorreoElectronico,
-                        u.Rol == UserRole.Administrator ? "admin" : u.Rol == UserRole.Professional ? "dev" : "validator",
+                        u.Rol == UserRole.Administrator ? "admin" : "user",
                         u.Telefono,
                         u.Cedula,
                         pf != null ? pf.IdPerfil : null,
@@ -114,9 +114,8 @@ public class SettingsController : ControllerBase
         UserRole role = request.Role.ToLower() switch
         {
             "admin" => UserRole.Administrator,
-            "dev" => UserRole.Professional,
-            "validator" => UserRole.Consultation,
-            _ => UserRole.Consultation
+            "user" => UserRole.User,
+            _ => UserRole.User
         };
 
         string nombre = string.IsNullOrWhiteSpace(request.Nombre) ? "Usuario" : request.Nombre;
@@ -170,11 +169,10 @@ public class SettingsController : ControllerBase
         var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
         if (user == null) return NotFound(new { Message = "Usuario no encontrado." });
 
-        // Use centralized role/profile mapping
         var (targetRole, targetProfileName) = RoleProfileMapper.MapRole(request.Role);
         if (targetRole == null)
         {
-            return BadRequest(new { Message = "Rol no vÃ¡lido. Debe ser admin, dev, o validator." });
+            return BadRequest(new { Message = "Rol no vÃ¡lido. Debe ser admin o user." });
         }
 
         user.UpdateRol(targetRole.Value);
@@ -273,11 +271,10 @@ public class SettingsController : ControllerBase
             return NotFound(new { Message = "Usuario no encontrado." });
         }
 
-        // Use centralized role/profile mapping
         var (targetRole, targetProfileName) = RoleProfileMapper.MapRole(request.Role);
         if (targetRole == null)
         {
-            return BadRequest(new { Message = "Rol no vÃ¡lido. Debe ser admin, dev, o validator." });
+            return BadRequest(new { Message = "Rol no vÃ¡lido. Debe ser admin o user." });
         }
 
         // Update EF user role
@@ -428,8 +425,7 @@ public class SettingsController : ControllerBase
             var targetPerfil = u.Rol switch
             {
                 UserRole.Administrator => adminLegacyProfile,
-                UserRole.Professional => devLegacyProfile,
-                UserRole.Consultation => valLegacyProfile,
+                UserRole.User => devLegacyProfile,
                 _ => devLegacyProfile
             };
 
@@ -501,9 +497,7 @@ public static class RoleProfileMapper
     private static readonly Dictionary<string, (UserRole Role, string ProfileName)> RoleMap = new(StringComparer.OrdinalIgnoreCase)
     {
         ["admin"] = (UserRole.Administrator, "ADMIN"),
-        ["dev"] = (UserRole.Professional, "DEVELOPER"),
-        ["validator"] = (UserRole.Consultation, "VALIDATOR"),
-        ["user"] = (UserRole.Consultation, "VALIDATOR") // Default fallback
+        ["user"] = (UserRole.User, "DEVELOPER") // Default legacy profile for users
     };
 
     public static (UserRole? Role, string ProfileName) MapRole(string roleString)
@@ -524,9 +518,8 @@ public static class RoleProfileMapper
         return role switch
         {
             UserRole.Administrator => "ADMIN",
-            UserRole.Professional => "DEVELOPER",
-            UserRole.Consultation => "VALIDATOR",
-            _ => "VALIDATOR"
+            UserRole.User => "DEVELOPER",
+            _ => "DEVELOPER"
         };
     }
 
@@ -535,9 +528,9 @@ public static class RoleProfileMapper
         return profileName.ToUpperInvariant() switch
         {
             "ADMIN" => UserRole.Administrator,
-            "DEVELOPER" => UserRole.Professional,
-            "VALIDATOR" => UserRole.Consultation,
-            _ => UserRole.Consultation
+            "DEVELOPER" => UserRole.User,
+            "VALIDATOR" => UserRole.User,
+            _ => UserRole.User
         };
     }
 }

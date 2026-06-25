@@ -26,8 +26,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         var roleStr = user.Rol switch
         {
             UserRole.Administrator => "admin",
-            UserRole.Professional => "dev",
-            UserRole.Consultation => "validator",
+            UserRole.User => "user",
             _ => "user"
         };
 

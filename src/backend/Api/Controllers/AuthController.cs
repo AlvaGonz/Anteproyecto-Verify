@@ -19,6 +19,7 @@ public class AuthController : ControllerBase
     private readonly Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler _updateProfileHandler;
     private readonly Application.Abstractions.Persistence.IUsuarioRepository _usuarioRepository;
     private readonly IConfiguration _configuration;
+    private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
 
     public AuthController(
@@ -27,7 +28,8 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
         Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
         Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator)
     {
         _registerHandler = registerHandler;
         _verifyHandler = verifyHandler;
@@ -35,6 +37,7 @@ public class AuthController : ControllerBase
         _updateProfileHandler = updateProfileHandler;
         _usuarioRepository = usuarioRepository;
         _configuration = configuration;
+        _jwtTokenGenerator = jwtTokenGenerator;
     }
 
     [HttpPost("register")]
@@ -77,7 +80,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.Lax,
             Path = "/"
         });
 
@@ -88,7 +91,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.Lax,
             Path = "/api/auth/refresh",
             MaxAge = TimeSpan.FromDays(30)
         });
@@ -137,7 +140,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.Lax,
             Path = "/",
             Expires = DateTimeOffset.UtcNow.AddDays(-1)
         });
@@ -146,7 +149,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.Lax,
             Path = "/api/auth/refresh",
             Expires = DateTimeOffset.UtcNow.AddDays(-1)
         });
@@ -174,8 +177,7 @@ public class AuthController : ControllerBase
         var roleStr = user.Rol switch
         {
             Domain.Enums.UserRole.Administrator => "admin",
-            Domain.Enums.UserRole.Professional => "dev",
-            Domain.Enums.UserRole.Consultation => "validator",
+            Domain.Enums.UserRole.User => "user",
             _ => "user"
         };
 
@@ -192,28 +194,48 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public IActionResult Refresh()
+    public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
     {
         var token = Request.Cookies["refreshToken"];
-        if (string.IsNullOrEmpty(token) || !_refreshTokens.TryGetValue(token, out var userId))
+        if (string.IsNullOrEmpty(token) || !_refreshTokens.TryGetValue(token, out var userIdStr))
         {
             return Unauthorized(new { Message = "Token de refresco inválido o expirado." });
+        }
+
+        if (!Guid.TryParse(userIdStr, out var userId))
+        {
+            return Unauthorized(new { Message = "Token de refresco inválido." });
+        }
+
+        var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
+        if (user == null || !user.Activo)
+        {
+            return Unauthorized(new { Message = "Usuario no encontrado o inactivo." });
         }
 
         // Rotate token (single-use)
         _refreshTokens.TryRemove(token, out _);
 
-        // Generate new access token (mock for now as per existing setup)
-        var newAccessToken = "mock-new-jwt-token-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        // Generate real access token
+        var newAccessToken = _jwtTokenGenerator.GenerateToken(user);
         
         var newRefreshToken = Guid.NewGuid().ToString("N");
-        _refreshTokens[newRefreshToken] = userId;
+        _refreshTokens[newRefreshToken] = userId.ToString();
+
+        // Overwrite the jwt cookie with the new valid token
+        Response.Cookies.Append("jwt", newAccessToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
+        });
 
         Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.Lax,
             Path = "/api/auth/refresh",
             MaxAge = TimeSpan.FromDays(30)
         });
@@ -221,7 +243,7 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             accessToken = newAccessToken,
-            expiresIn = 7200
+            expiresIn = 3600 // 1 hour per appsettings
         });
     }
     [Microsoft.AspNetCore.Authorization.Authorize]

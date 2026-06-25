@@ -52,7 +52,7 @@ public class ConsultarCreditoCommandHandlerTests
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         
-        var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.Professional, "8095551212", "40200000000");
+        var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.User, "8095551212", "40200000000");
         var promotorId = promotor.Id;
         var project = new Proyecto("Test", "Loc", promotorId);
         
@@ -81,7 +81,7 @@ public class ConsultarCreditoCommandHandlerTests
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         
-        var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.Professional, "8095551212", "40200000000");
+        var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.User, "8095551212", "40200000000");
         var promotorId = promotor.Id;
         var project = new Proyecto("Test", "Loc", promotorId);
         var consentimiento = new ConsentimientoFinanciero(promotorId, "1.1.1.1", "v1.0");

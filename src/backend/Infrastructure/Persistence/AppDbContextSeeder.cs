@@ -42,7 +42,7 @@ public static class AppDbContextSeeder
                 apellido: "Inmobiliario",
                 correoElectronico: "dev@constructora.do",
                 contrasenaHash: passwordHasher.HashPassword("Dev1234!"),
-                rol: UserRole.Professional,
+                rol: UserRole.User,
                 telefono: "809-555-0200",
                 cedula: "001-0000000-2");
 
@@ -52,7 +52,7 @@ public static class AppDbContextSeeder
                 apellido: "Consulta",
                 correoElectronico: "consulta@publico.do",
                 contrasenaHash: passwordHasher.HashPassword("Consulta123!"),
-                rol: UserRole.Consultation,
+                rol: UserRole.User,
                 telefono: "809-555-0300",
                 cedula: "001-0000000-3");
 
@@ -239,10 +239,11 @@ public static class AppDbContextSeeder
             {
                 logger.LogInformation("Seeding legacy subscription plans...");
                 context.PlanesSuscripcion.AddRange(
-                    new PlanSuscripcion { NombrePlan = "Gratuito", Precio = 0.00m },
-                    new PlanSuscripcion { NombrePlan = "Profesional", Precio = 3500.00m },
-                    new PlanSuscripcion { NombrePlan = "Empresa", Precio = 10000.00m },
-                    new PlanSuscripcion { NombrePlan = "Enterprise", Precio = 30000.00m }
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Gratuito", 0.00m, 5, 1, true, false, false, false),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Consultor", 1000.00m, 50, 5, true, true, false, false),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Profesional", 3500.00m, -1, 10, true, true, true, false),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Empresa", 10000.00m, -1, 50, true, true, true, true),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Enterprise", 30000.00m, -1, -1, true, true, true, true)
                 );
                 await context.SaveChangesAsync();
             }
@@ -285,8 +286,7 @@ public static class AppDbContextSeeder
                     var targetPerfil = u.Rol switch
                     {
                         UserRole.Administrator => adminLegacyProfile,
-                        UserRole.Professional => devLegacyProfile,
-                        UserRole.Consultation => valLegacyProfile,
+                        UserRole.User => devLegacyProfile,
                         _ => devLegacyProfile
                     };
 
