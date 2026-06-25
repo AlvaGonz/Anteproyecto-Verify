@@ -67,7 +67,7 @@ export const SettingsPage: React.FC = () => {
     e.preventDefault();
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s]+$/;
-    if (!nameRegex.test(formData.name)) {
+    if (!nameRegex.test(formData.nombre)) {
       addToast("El nombre solo puede contener letras", "error");
       return;
     }

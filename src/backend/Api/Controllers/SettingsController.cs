@@ -229,6 +229,15 @@ public class SettingsController : ControllerBase
         var notificaciones = await _context.Notificaciones.Where(n => n.UsuarioId == id).ToListAsync(cancellationToken);
         if (notificaciones.Any()) _context.Notificaciones.RemoveRange(notificaciones);
 
+        var proyectos = await _context.Proyectos.Where(p => p.UsuarioCreadorId == id).ToListAsync(cancellationToken);
+        if (proyectos.Any()) return BadRequest(new { Message = "El usuario tiene proyectos asociados y no puede ser eliminado." });
+
+        var reportes = await _context.Reportes.Where(r => r.GeneradoPorUsuarioId == id).ToListAsync(cancellationToken);
+        if (reportes.Any()) return BadRequest(new { Message = "El usuario tiene reportes asociados y no puede ser eliminado." });
+
+        var consentimientos = await _context.ConsentimientosFinancieros.Where(c => c.UsuarioId == id).ToListAsync(cancellationToken);
+        if (consentimientos.Any()) _context.ConsentimientosFinancieros.RemoveRange(consentimientos);
+
         _context.Usuarios.Remove(user);
         
         // Remove legacy dependencies
