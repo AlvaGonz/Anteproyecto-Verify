@@ -178,7 +178,8 @@ public static class EmailTemplates
         string bg    = isPositive ? "#DCFCE7" : "#FEE2E2";
         string color = isPositive ? "#15803D" : "#B91C1C";
         string dot   = isPositive ? "●" : "●";
-        return $@"<span style=""display:inline-block;background-color:{bg};color:{color};padding:4px 12px;border-radius:20px;font-family:'Inter',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2px;"">{dot}&nbsp; {label}</span>";
+        string className = isPositive ? "badge-verified" : "badge-rejected";
+        return $@"<span class=""{className}"" style=""display:inline-block;background-color:{bg};color:{color};padding:4px 12px;border-radius:20px;font-family:'Inter',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2px;"">{dot}&nbsp; {label}</span>";
     }
 
     // ════════════════════════════════════════════════════════════════════════
