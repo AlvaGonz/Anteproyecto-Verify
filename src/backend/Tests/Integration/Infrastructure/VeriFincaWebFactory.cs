@@ -39,6 +39,12 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
                 options.UseSqlServer(_connectionString,
                     sql => sql.MigrationsAssembly(
                         typeof(AppDbContext).Assembly.FullName)));
+
+            // Disable real email sending in tests
+            var emailServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(Application.Abstractions.Notifications.IEmailService));
+            if (emailServiceDescriptor != null)
+                services.Remove(emailServiceDescriptor);
+            services.AddScoped<Application.Abstractions.Notifications.IEmailService, NullEmailService>();
         });
 
         builder.ConfigureAppConfiguration((context, config) =>
@@ -50,7 +56,8 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
                     "test-secret-key-min-32-chars-long!!",
                 ["JwtSettings:Issuer"] = "verifinca-test",
                 ["JwtSettings:Audience"] = "verifinca-test-client",
-                ["JwtSettings:ExpirationMinutes"] = "60"
+                ["JwtSettings:ExpirationMinutes"] = "60",
+                ["IsTestingEnvironment"] = "true"
             });
         });
     }
@@ -67,4 +74,25 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
         await db.Database.EnsureCreatedAsync();
         await AppDbContextSeeder.SeedAsync(Services);
     }
+}
+
+/// <summary>
+/// Prevents real emails from being sent during integration tests.
+/// </summary>
+internal sealed class NullEmailService : Application.Abstractions.Notifications.IEmailService
+{
+    public Task SendEmailAsync(string to, string subject, string body, System.Threading.CancellationToken ct = default)
+        => Task.CompletedTask;
+
+    public Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, System.Threading.CancellationToken ct = default)
+        => Task.CompletedTask;
+
+    public Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, System.Threading.CancellationToken ct = default)
+        => Task.CompletedTask;
+
+    public Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, System.Threading.CancellationToken ct = default)
+        => Task.CompletedTask;
+
+    public Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, System.Threading.CancellationToken ct = default)
+        => Task.CompletedTask;
 }

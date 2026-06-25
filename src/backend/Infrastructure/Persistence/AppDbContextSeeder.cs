@@ -315,7 +315,16 @@ public static class AppDbContextSeeder
             await context.SaveChangesAsync();
 
             logger.LogInformation("Prototype demo data seeding completed successfully.");
-            await SeedDgiiRncAsync(context, logger);
+
+            var config = scope.ServiceProvider.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
+            if (config == null || config["IsTestingEnvironment"] != "true")
+            {
+                await SeedDgiiRncAsync(context, logger);
+            }
+            else
+            {
+                logger.LogInformation("Skipping DGII RNC seeding in Testing environment.");
+            }
         }
         catch (Exception ex)
         {
