@@ -70,7 +70,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
               <tr key={u.id} className="hover:bg-surface-raised/10 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="font-bold text-text-primary">{u.name}</span>
+                    <span className="font-bold text-text-primary">{u.nombre} {u.apellido}</span>
                     <span className="text-xs text-text-secondary flex items-center gap-1 mt-0.5">
                       <Mail className="w-3.5 h-3.5 shrink-0" />
                       {u.email}

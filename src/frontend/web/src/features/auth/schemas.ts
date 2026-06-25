@@ -77,7 +77,11 @@ export const registerSchema = z.object({
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export const UpdateProfileSchema = z.object({
-  name: z
+  nombre: z
+    .string()
+    .min(2, "Mínimo 2 caracteres")
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Solo letras y espacios"),
+  apellido: z
     .string()
     .min(2, "Mínimo 2 caracteres")
     .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Solo letras y espacios"),

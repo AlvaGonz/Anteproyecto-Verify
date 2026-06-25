@@ -7,7 +7,8 @@ export interface PaginatedResponse<T> {
 
 export interface UserSettings {
   id: string;
-  name: string;
+  nombre: string;
+  apellido: string;
   email: string;
   role: "admin" | "dev" | "validator" | "user";
   telefono: string;
@@ -32,7 +33,8 @@ export interface SubscriptionPlan {
 }
 
 export interface CreateUserDto {
-  name: string;
+  nombre: string;
+  apellido: string;
   email: string;
   role: "admin" | "dev" | "validator" | "user";
   telefono?: string;
@@ -41,7 +43,8 @@ export interface CreateUserDto {
 }
 
 export interface UpdateUserDto {
-  name?: string;
+  nombre?: string;
+  apellido?: string;
   telefono?: string;
   // email and cedula are intentionally excluded — immutable post-registration
   // role is managed via PATCH /admin/users/:id/role (separate endpoint)

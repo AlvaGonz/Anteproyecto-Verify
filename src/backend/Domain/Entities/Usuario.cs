@@ -62,6 +62,26 @@ public class Usuario : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void UpdateProfile(string nombre, string apellido, string telefono)
+    {
+        if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
+        if (string.IsNullOrWhiteSpace(apellido)) throw new ArgumentException("Apellido requerido", nameof(apellido));
+        if (string.IsNullOrWhiteSpace(telefono)) throw new ArgumentException("Teléfono requerido", nameof(telefono));
+        
+        Nombre = nombre;
+        Apellido = apellido;
+        NombreCompleto = $"{nombre} {apellido}";
+        Telefono = telefono;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdatePassword(string contrasenaHash)
+    {
+        if (string.IsNullOrWhiteSpace(contrasenaHash)) throw new ArgumentException("Contraseña requerida", nameof(contrasenaHash));
+        ContrasenaHash = contrasenaHash;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void UpdateRol(UserRole rol)
     {
         Rol = rol;

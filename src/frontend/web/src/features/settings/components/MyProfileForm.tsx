@@ -8,7 +8,7 @@ import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard } from "lucide-react";
 
 export const MyProfileForm: React.FC = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { addToast } = useToast();
   const updateProfile = useUpdateMyProfile();
   const [showPasswordSection, setShowPasswordSection] = useState(false);
@@ -25,7 +25,8 @@ export const MyProfileForm: React.FC = () => {
   } = useForm<UpdateProfileDto>({
     resolver: zodResolver(UpdateProfileSchema),
     defaultValues: {
-      name: user?.name ?? "",
+      nombre: user?.nombre ?? "",
+      apellido: user?.apellido ?? "",
       telefono: user?.telefono ?? "",
       changePassword: false,
     },
@@ -34,7 +35,8 @@ export const MyProfileForm: React.FC = () => {
   useEffect(() => {
     if (user) {
       reset({
-        name: user.name ?? "",
+        nombre: user.nombre ?? "",
+        apellido: user.apellido ?? "",
         telefono: user.telefono ?? "",
         changePassword: false,
       });
@@ -57,13 +59,15 @@ export const MyProfileForm: React.FC = () => {
   const onSubmit = async (data: UpdateProfileDto) => {
     try {
       await updateProfile.mutateAsync({
-        name: data.name,
+        nombre: data.nombre,
+        apellido: data.apellido,
         telefono: data.telefono || undefined,
         ...(data.changePassword && {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword,
         }),
       });
+      await refreshUser();
       addToast("Perfil actualizado correctamente", "success");
       setShowPasswordSection(false);
       setValue("changePassword", false);
@@ -114,22 +118,41 @@ export const MyProfileForm: React.FC = () => {
 
       {/* EDITABLE fields */}
       <div className="space-y-4">
-        <div>
-          <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
-            Nombre Completo
-          </label>
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-            <input
-              {...register("name")}
-              type="text"
-              className="vf-input w-full pl-9"
-              placeholder="Tu nombre completo"
-            />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+              Nombre
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+              <input
+                {...register("nombre")}
+                type="text"
+                className="vf-input w-full pl-9"
+                placeholder="Tu nombre"
+              />
+            </div>
+            {errors.nombre && (
+              <p className="text-[10px] text-red-500 mt-1">{errors.nombre.message}</p>
+            )}
           </div>
-          {errors.name && (
-            <p className="text-[10px] text-red-500 mt-1">{errors.name.message}</p>
-          )}
+          <div>
+            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+              Apellido
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+              <input
+                {...register("apellido")}
+                type="text"
+                className="vf-input w-full pl-9"
+                placeholder="Tu apellido"
+              />
+            </div>
+            {errors.apellido && (
+              <p className="text-[10px] text-red-500 mt-1">{errors.apellido.message}</p>
+            )}
+          </div>
         </div>
 
         <div>

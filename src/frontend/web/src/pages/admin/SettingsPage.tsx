@@ -37,7 +37,7 @@ export const SettingsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<CreateUserDto>({ name: "", email: "", role: "user", telefono: "", cedula: "" });
+  const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers();
   const { data: profiles = [], isLoading: isLoadingProfiles, refetch: refetchProfiles } = useProfiles();
@@ -114,13 +114,13 @@ export const SettingsPage: React.FC = () => {
 
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
-    setFormData({ name: u.name, email: u.email, role: u.role, telefono: u.telefono || "", cedula: u.cedula || "" });
+    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: u.role, telefono: u.telefono || "", cedula: u.cedula || "" });
     setIsModalOpen(true);
   };
 
   const handleAddNewClick = () => {
     setEditingUser(null);
-    setFormData({ name: "", email: "", role: "user", telefono: "", cedula: "", password: "" });
+    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "" });
     setIsModalOpen(true);
   };
 
@@ -154,13 +154,6 @@ export const SettingsPage: React.FC = () => {
             Configuración
           </h1>
         </div>
-        <button
-          onClick={loadData}
-          className="vf-btn-secondary flex items-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Actualizar Datos
-        </button>
       </div>
 
       {/* Navigation tabs */}

@@ -11,7 +11,8 @@ import { apiClient, setAccessToken } from "../../../infrastructure/api/client";
 export interface User {
   id: string;
   email: string;
-  name: string;
+  nombre: string;
+  apellido: string;
   role: string;
   cedula?: string;
   telefono?: string;

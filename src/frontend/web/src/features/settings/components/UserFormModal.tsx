@@ -43,16 +43,29 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
         </div>
 
         <form onSubmit={onSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre Completo</label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={e => update({ name: e.target.value })}
-              className="vf-input w-full"
-              placeholder="Ej. Juan Pérez"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre</label>
+              <input
+                type="text"
+                required
+                value={formData.nombre}
+                onChange={e => update({ nombre: e.target.value })}
+                className="vf-input w-full"
+                placeholder="Ej. Juan"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Apellido</label>
+              <input
+                type="text"
+                required
+                value={formData.apellido}
+                onChange={e => update({ apellido: e.target.value })}
+                className="vf-input w-full"
+                placeholder="Ej. Pérez"
+              />
+            </div>
           </div>
 
           <div>

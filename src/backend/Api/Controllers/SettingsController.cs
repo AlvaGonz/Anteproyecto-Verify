@@ -18,7 +18,8 @@ using Microsoft.EntityFrameworkCore;
 /// </summary>
 public record AdminUserSettingsDto(
     Guid Id,
-    string Name,
+    string Nombre,
+    string Apellido,
     string Email,
     string Role,
     string Telefono,
@@ -79,15 +80,16 @@ public class SettingsController : ControllerBase
                     where u.Activo
                     select new AdminUserSettingsDto(
                         u.Id,
-                        u.NombreCompleto,
+                        u.Nombre,
+                        u.Apellido,
                         u.CorreoElectronico,
                         u.Rol == UserRole.Administrator ? "admin" : u.Rol == UserRole.Professional ? "dev" : "validator",
                         u.Telefono,
                         u.Cedula,
                         pf != null ? pf.IdPerfil : null,
-                        pf != null ? pf.NombrePerfil : null,
+                        pf != null ? pf.NombrePerfil : string.Empty,
                         pl != null ? pl.Idsuscripcion : null,
-                        pl != null ? pl.NombrePlan : null,
+                        pl != null ? pl.NombrePlan : string.Empty,
                         pl != null ? pl.Precio : null
                     );
 
@@ -117,16 +119,15 @@ public class SettingsController : ControllerBase
             _ => UserRole.Consultation
         };
 
-        var nameParts = request.Name.Split(' ', 2);
-        string nombre = nameParts[0];
-        string apellido = nameParts.Length > 1 ? nameParts[1] : string.Empty;
+        string nombre = string.IsNullOrWhiteSpace(request.Nombre) ? "Usuario" : request.Nombre;
+        string apellido = string.IsNullOrWhiteSpace(request.Apellido) ? "Nuevo" : request.Apellido;
 
         string finalPassword = string.IsNullOrWhiteSpace(request.Password) ? "Temporal123!" : request.Password;
         string hashedPassword = _passwordHasher.HashPassword(finalPassword);
 
         var user = new Usuario(
-            nombre: string.IsNullOrWhiteSpace(nombre) ? "Usuario" : nombre,
-            apellido: string.IsNullOrWhiteSpace(apellido) ? "Nuevo" : apellido,
+            nombre: nombre,
+            apellido: apellido,
             correoElectronico: request.Email,
             contrasenaHash: hashedPassword,
             rol: role,
@@ -136,21 +137,26 @@ public class SettingsController : ControllerBase
 
         _context.Usuarios.Add(user);
 
+        // Save the new user first so that its ID exists in the database.
+        // This prevents foreign key conflicts when inserting Acceso and Pagos
+        // which depend on the user's ID.
+        await _context.SaveChangesAsync(cancellationToken);
+
         if (!string.IsNullOrWhiteSpace(request.Password))
         {
             var notification = new Notificacion(
                 usuarioId: user.Id,
-                mensaje: "Tu cuenta fue creada con una contraseÃ±a temporal. Por favor, cÃ¡mbiala en tu perfil.",
+                mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
                 tipo: "Warning",
                 enlaceRelacionado: "/profile"
             );
             _context.Notificaciones.Add(notification);
         }
 
-        // Sync legacy in same transaction
+        // Sync legacy (inserts Acceso and Pagos)
         await SyncUserLegacyAsync(user, cancellationToken);
 
-        // Single SaveChangesAsync for entire operation
+        // Second SaveChangesAsync for notifications and legacy tables
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok(new { Message = "Usuario creado exitosamente.", Id = user.Id });
@@ -173,7 +179,13 @@ public class SettingsController : ControllerBase
 
         user.UpdateRol(targetRole.Value);
 
-        if (!string.IsNullOrWhiteSpace(request.Telefono) && !string.IsNullOrWhiteSpace(request.Cedula))
+        if (!string.IsNullOrWhiteSpace(request.Nombre) || !string.IsNullOrWhiteSpace(request.Apellido))
+        {
+            var nombre = string.IsNullOrWhiteSpace(request.Nombre) ? user.Nombre : request.Nombre;
+            var apellido = string.IsNullOrWhiteSpace(request.Apellido) ? user.Apellido : request.Apellido;
+            user.UpdateProfile(nombre, apellido, request.Telefono ?? user.Telefono ?? "0000000000");
+        }
+        else if (!string.IsNullOrWhiteSpace(request.Telefono) && !string.IsNullOrWhiteSpace(request.Cedula))
         {
             user.UpdateContactInfo(request.Telefono, request.Cedula);
         }
@@ -453,7 +465,8 @@ public class UpdatePlanRequest
 
 public class CreateUserDto
 {
-    public string Name { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellido { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = "user";
     public string Telefono { get; set; } = "0000000000";
@@ -463,7 +476,8 @@ public class CreateUserDto
 
 public class UpdateUserDto
 {
-    public string Name { get; set; } = string.Empty;
+    public string? Nombre { get; set; }
+    public string? Apellido { get; set; }
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = "user";
     public string? Telefono { get; set; }

@@ -16,6 +16,8 @@ public class AuthController : ControllerBase
     private readonly Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler _registerHandler;
     private readonly Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler _verifyHandler;
     private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
+    private readonly Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler _updateProfileHandler;
+    private readonly Application.Abstractions.Persistence.IUsuarioRepository _usuarioRepository;
     private readonly IConfiguration _configuration;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
 
@@ -23,11 +25,15 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler registerHandler,
         Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler,
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
+        Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
+        Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
         IConfiguration configuration)
     {
         _registerHandler = registerHandler;
         _verifyHandler = verifyHandler;
         _loginHandler = loginHandler;
+        _updateProfileHandler = updateProfileHandler;
+        _usuarioRepository = usuarioRepository;
         _configuration = configuration;
     }
 
@@ -150,29 +156,38 @@ public class AuthController : ControllerBase
 
     [Microsoft.AspNetCore.Authorization.Authorize]
     [HttpGet("me")]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
         var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
-        var emailClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Email) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email) ?? User.FindFirstValue("email");
-        var nameClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Name) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Name) ?? User.FindFirstValue("name");
-        var roleClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role) ?? User.FindFirstValue("role");
-        var cedulaClaim = User.FindFirstValue("cedula");
-        var telefonoClaim = User.FindFirstValue("telefono");
 
-        if (string.IsNullOrEmpty(idClaim) || string.IsNullOrEmpty(emailClaim))
+        if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
         {
             return Unauthorized(new { Message = "Token inválido o incompleto." });
         }
 
+        var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
+        if (user == null)
+        {
+            return Unauthorized(new { Message = "Usuario no encontrado." });
+        }
+
+        var roleStr = user.Rol switch
+        {
+            Domain.Enums.UserRole.Administrator => "admin",
+            Domain.Enums.UserRole.Professional => "dev",
+            Domain.Enums.UserRole.Consultation => "validator",
+            _ => "user"
+        };
+
         return Ok(new
         {
-            Id = idClaim,
-            Email = emailClaim,
-            Name = nameClaim ?? string.Empty,
-            Role = roleClaim ?? "user",
-            Cedula = cedulaClaim ?? string.Empty,
-            Telefono = telefonoClaim ?? string.Empty
-
+            Id = user.Id.ToString(),
+            Email = user.CorreoElectronico,
+            Nombre = user.Nombre,
+            Apellido = user.Apellido,
+            Role = roleStr,
+            Cedula = user.Cedula ?? string.Empty,
+            Telefono = user.Telefono ?? string.Empty
         });
     }
 
@@ -209,6 +224,38 @@ public class AuthController : ControllerBase
             expiresIn = 7200
         });
     }
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    [HttpPatch("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequestDto request, CancellationToken cancellationToken)
+    {
+        var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
+            return Unauthorized(new { Message = "Token inválido o incompleto." });
+
+        var command = new Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommand(
+            userId,
+            request.Nombre,
+            request.Apellido,
+            request.Telefono,
+            request.CurrentPassword,
+            request.NewPassword
+        );
+
+        var result = await _updateProfileHandler.Handle(command, cancellationToken);
+        if (!result.IsSuccess)
+            return BadRequest(new { Message = result.ErrorMessage });
+
+        return Ok(new { Message = "Perfil actualizado exitosamente." });
+    }
+}
+
+public class UpdateProfileRequestDto
+{
+    public string? Nombre { get; set; }
+    public string? Apellido { get; set; }
+    public string? Telefono { get; set; }
+    public string? CurrentPassword { get; set; }
+    public string? NewPassword { get; set; }
 }
 
 public class RegisterRequestDto
