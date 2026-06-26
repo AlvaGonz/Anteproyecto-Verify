@@ -170,7 +170,7 @@ html {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 7px; }
 ::-webkit-scrollbar-track { background: #f4f1ec; }
 ::-webkit-scrollbar-thumb { background: #223382; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #111144; }
