@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -6,8 +7,9 @@ import { useUpdateProject } from "../api/useProjectMutations";
 import { ProjectCategory, type ProyectoDto } from "../types";
 import { FormField } from "@/components/ui/FormField";
 import { useCedulaInput } from "@/shared/hooks/useCedulaInput";
-import { useDocuments } from "../../documents/api/useDocuments";
+import { useDocuments, useUploadDocument } from "../../documents/api/useDocuments";
 import { isImageDocument } from "../utils/imageUtils";
+import { ImageIcon, CheckCircle, UploadCloud } from "lucide-react";
 
 const CATEGORY_LABELS: Record<ProjectCategory, string> = {
   [ProjectCategory.Residencial]: "Residencial",
@@ -28,6 +30,10 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
 
   const { data: documents = [] } = useDocuments(project.id);
   const imageDocuments = documents.filter(d => isImageDocument(d.nombreArchivoOriginal));
+  const [selectedCoverId, setSelectedCoverId] = useState<string | null>(
+    imageDocuments[0]?.id ?? null
+  );
+  const { mutate: uploadDocument } = useUploadDocument(project.id);
 
   const { register, handleSubmit, formState: { errors }, setValue } =
     useForm<UpdateProjectFormValues>({
@@ -147,23 +153,83 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
       </FormField>
 
       {imageDocuments.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-700">
-            Imágenes adjuntas ({imageDocuments.length})
-          </h3>
-          <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-3 rounded-xl border-2 border-dashed border-teal-300 bg-teal-50/40 p-4">
+          <div className="flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-teal-600" />
+            <h3 className="text-sm font-semibold text-teal-800">
+              Imagen de portada del proyecto
+            </h3>
+            <span className="ml-auto text-xs text-teal-600">
+              La 1ª imagen seleccionada se usa como thumbnail
+            </span>
+          </div>
+
+          {/* Preview de portada actual */}
+          {selectedCoverId && (() => {
+            const selected = imageDocuments.find(d => d.id === selectedCoverId);
+            return selected ? (
+              <div className="relative w-full h-44 rounded-lg overflow-hidden border border-teal-200">
+                <img
+                  src={selected.fileUrl}
+                  alt="Portada seleccionada"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-2 left-2 bg-teal-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
+                  Portada activa
+                </div>
+              </div>
+            ) : null;
+          })()}
+
+          {/* Grid de selección */}
+          <div className="grid grid-cols-4 gap-2">
             {imageDocuments.map((doc) => (
-              <div key={doc.id} className="relative group aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+              <button
+                key={doc.id}
+                type="button"
+                onClick={() => setSelectedCoverId(doc.id)}
+                aria-pressed={selectedCoverId === doc.id}
+                aria-label={`Seleccionar ${doc.nombreArchivoOriginal} como portada`}
+                className={`relative aspect-video rounded-md overflow-hidden border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+                  selectedCoverId === doc.id
+                    ? 'border-teal-500 ring-2 ring-teal-300'
+                    : 'border-gray-200 hover:border-teal-300'
+                }`}
+              >
                 <img
                   src={doc.fileUrl}
                   alt={doc.nombreArchivoOriginal}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-              </div>
+                {selectedCoverId === doc.id && (
+                  <div className="absolute inset-0 bg-teal-500/20 flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-teal-700" />
+                  </div>
+                )}
+              </button>
             ))}
           </div>
+
+          {/* Upload nueva imagen */}
+          <label className="flex items-center gap-2 cursor-pointer w-fit text-sm text-teal-700 font-medium hover:text-teal-900 transition-colors">
+            <UploadCloud className="w-4 h-4" />
+            Subir nueva imagen
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('tipo', 'Imagen');
+                uploadDocument(formData);
+                e.target.value = '';
+              }}
+            />
+          </label>
         </div>
       )}
 
