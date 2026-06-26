@@ -3,7 +3,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } from "../types";
 import { useAuth } from "../../../shared/context/AuthContext";
-import { MapPin, Globe, Compass, Navigation } from "lucide-react";
+import { MapPin, Globe, Compass, Navigation, ImagePlus, X } from "lucide-react";
 import { apiClient } from "@/infrastructure/api/client";
 
 // Fix Leaflet default marker icon paths broken by Vite's asset bundler
@@ -88,6 +88,22 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");
   const [matricula, setMatricula] = useState(initialData?.matricula ?? "");
 
+  // ── Constantes de fotos ────────────────────────────────────────────────────
+  const MAX_PHOTOS = 10;
+  const MAX_FILE_SIZE_MB = 5;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+  const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+  // ── Estado de fotos ────────────────────────────────────────────────────────
+  const [fotos, setFotos] = useState<File[]>([]);
+  const [fotosPreviews, setFotosPreviews] = useState<string[]>([]);
+  const [fotosError, setFotosError] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const existingFotoUrls: string[] = initialData?.fotoUrls ?? [];
+
+  // ── Estado de superficie ───────────────────────────────────────────────────
+  const [superficieM2, setSuperficieM2] = useState<number | "">(initialData?.superficieM2 ?? "");
+
   // RNC Lookup States
   const [isSearchingRnc, setIsSearchingRnc] = useState(false);
   const [rncError, setRncError] = useState<string | null>(null);
@@ -111,6 +127,50 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       setIsSearchingRnc(false);
     }
   };
+
+  // ── Photo Handlers ─────────────────────────────────────────────────────────
+  const handlePhotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFotosError(null);
+    const selected = Array.from(e.target.files ?? []);
+
+    const invalidType = selected.find((f) => !ALLOWED_PHOTO_TYPES.includes(f.type));
+    if (invalidType) {
+      setFotosError(`Tipo no permitido: ${invalidType.name}. Solo JPEG, PNG y WebP.`);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+      return;
+    }
+
+    const oversized = selected.find((f) => f.size > MAX_FILE_SIZE_BYTES);
+    if (oversized) {
+      setFotosError(`"${oversized.name}" supera el límite de ${MAX_FILE_SIZE_MB} MB.`);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+      return;
+    }
+
+    const totalAfterAdd = existingFotoUrls.length + fotos.length + selected.length;
+    if (totalAfterAdd > MAX_PHOTOS) {
+      setFotosError(`Máximo ${MAX_PHOTOS} fotos. Ya tienes ${existingFotoUrls.length + fotos.length}.`);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+      return;
+    }
+
+    const newFiles = [...fotos, ...selected];
+    setFotos(newFiles);
+    setFotosPreviews(newFiles.map((f) => URL.createObjectURL(f)));
+    if (photoInputRef.current) photoInputRef.current.value = "";
+  };
+
+  const removeNewPhoto = (index: number) => {
+    URL.revokeObjectURL(fotosPreviews[index]);
+    setFotos((prev) => prev.filter((_, i) => i !== index));
+    setFotosPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Limpiar object URLs al desmontar
+  useEffect(() => {
+    return () => { fotosPreviews.forEach((url) => URL.revokeObjectURL(url)); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Validation State ──────────────────────────────────────────────────────
   const [nombreTouched, setNombreTouched] = useState(false);
@@ -265,7 +325,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     setError(null);
     try {
       if (initialData) {
-        const updateData: UpdateProyectoDto = {
+        const updateData: UpdateProyectoDto & { fotosNuevas?: File[] } = {
           nombre,
           ubicacionTexto,
           ubicacionGps: ubicacionGps || undefined,
@@ -275,10 +335,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
           matricula: matricula || undefined,
+          superficieM2: superficieM2 === "" ? undefined : Number(superficieM2),
+          fotosNuevas: fotos.length > 0 ? fotos : undefined,
         };
         await onSubmit(updateData);
       } else {
-        const createData: CreateProyectoDto = {
+        const createData: CreateProyectoDto & { fotosNuevas?: File[] } = {
           nombre,
           ubicacionTexto,
           usuarioCreadorId: user?.id ?? "00000000-0000-0000-0000-000000000000",
@@ -288,6 +350,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           designacionCatastral: designacionCatastral || undefined,
           ubicacionGps: ubicacionGps || undefined,
           matricula: matricula || undefined,
+          superficieM2: superficieM2 === "" ? undefined : Number(superficieM2),
+          fotosNuevas: fotos.length > 0 ? fotos : undefined,
         };
         await onSubmit(createData);
       }
@@ -309,291 +373,348 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* ── TOP: Map Workspace Full-Width ── */}
+      <div className="w-full rounded-xl overflow-hidden">
+        <div className="vf-card p-6 flex flex-col space-y-4 bg-white/90 backdrop-blur-md w-full">
 
-        {/* ── Left: Form Fields ── */}
-        <div className="lg:col-span-6 space-y-6">
-          <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
-            <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
-              Detalles del Proyecto
-            </h3>
-
-            {/* Nombre del Proyecto */}
-            <div>
-              <label htmlFor="nombre" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Nombre del Proyecto *
-              </label>
-              <input
-                id="nombre"
-                type="text"
-                required
-                placeholder="Ej: Residencial Las Palmeras"
-                value={nombre}
-                onChange={(e) => { setNombre(e.target.value); setNombreTouched(true); }}
-                onBlur={() => setNombreTouched(true)}
-                className={`vf-input ${nombreTouched && !nombre.trim() ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
-              />
-              {nombreTouched && !nombre.trim() && (
-                <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
-                  Campo Nombre del Proyecto necesario
-                </p>
-              )}
-            </div>
-
-            {/* Provincia Dropdown */}
-            <div>
-              <label htmlFor="provincia" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Provincia (Ubicación) *
-              </label>
-              <select
-                id="provincia"
-                required
-                value={ubicacionTexto}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setUbicacionTexto(val);
-                  setUbicacionTouched(true);
-                  const matched = PROVINCIAS.find(p => p.nombre === val);
-                  if (matched) {
-                    setUbicacionGps(`${matched.lat.toFixed(6)},${matched.lng.toFixed(6)}`);
-                    setDesignacionCatastral(`Parc. ${Math.floor(Math.random() * 500) + 1}, ${matched.dcPrefix}`);
-                  }
-                }}
-                onBlur={() => setUbicacionTouched(true)}
-                className={`vf-input ${ubicacionTouched && !ubicacionTexto.trim() ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
-              >
-                <option value="">-- Seleccione una provincia --</option>
-                {PROVINCIAS.map((prov) => (
-                  <option key={prov.nombre} value={prov.nombre}>{prov.nombre}</option>
-                ))}
-              </select>
-              {ubicacionTouched && !ubicacionTexto.trim() && (
-                <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
-                  Campo Provincia necesario
-                </p>
-              )}
-            </div>
-
-            {/* Categoría */}
-            <div>
-              <label htmlFor="categoria" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Categoria del Proyecto
-              </label>
-              <select
-                id="categoria"
-                value={categoria}
-                onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)}
-                className="vf-input"
-              >
-                <option value={ProjectCategory.Residencial}>Residencial</option>
-                <option value={ProjectCategory.Comercial}>Comercial</option>
-                <option value={ProjectCategory.Turistico}>Turístico</option>
-                <option value={ProjectCategory.Mixto}>Mixto</option>
-                <option value={ProjectCategory.Otro}>Otro</option>
-              </select>
-            </div>
-
-            {/* RNC del Desarrollador */}
-            <div>
-              <label htmlFor="rncDesarrollador" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                RNC / Cédula del Desarrollador
-              </label>
-              <div className="relative">
-                <input
-                  id="rncDesarrollador"
-                  type="text"
-                  value={rncDesarrollador}
-                  onChange={(e) => {
-                    setRncDesarrollador(e.target.value);
-                    if (rncError) setRncError(null);
-                  }}
-                  onBlur={() => handleRncSearch(rncDesarrollador)}
-                  className={`vf-input ${rncError ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
-                  placeholder="Ingrese RNC o Cédula (ej: 02601322098) y presione Tab"
-                />
-                {isSearchingRnc && (
-                  <div className="absolute right-3 top-3.5 flex items-center">
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-              </div>
-              {rncError && (
-                <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
-                  {rncError}
-                </p>
-              )}
-            </div>
-
-            {/* Desarrollador */}
-            <div>
-              <label htmlFor="desarrollador" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Desarrollador / Constructora
-              </label>
-              <input
-                id="desarrollador"
-                type="text"
-                value={datosDesarrollador}
-                onChange={(e) => setDatosDesarrollador(e.target.value)}
-                className="vf-input"
-                placeholder="Nombre de la constructora encargada"
-              />
-            </div>
+          {/* Tab Selectors */}
+          <div className="flex bg-[var(--color-surface-raised)] p-1 rounded-xl border border-[var(--color-border)]/20 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setActiveMapTab("leaflet")}
+              className={`flex-1 py-2.5 text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
+                activeMapTab === "leaflet"
+                  ? "bg-primary text-white shadow-raised"
+                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              }`}
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              Mapa Interactivo
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveMapTab("official")}
+              className={`flex-1 py-2.5 text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
+                activeMapTab === "official"
+                  ? "bg-primary text-white shadow-raised"
+                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              Catastro Oficial RI
+            </button>
           </div>
 
-          {/* Geolocalización y Catastro */}
-          <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
-            <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
-              Geolocalización y Catastro
-            </h3>
+          {/* Instructions */}
+          <p className="text-xs text-[var(--color-text-secondary)] italic">
+            {activeMapTab === "leaflet"
+              ? "Seleccione una provincia o haga clic en el mapa para posicionar el marcador, extraer coordenadas GPS y obtener la Designación Catastral."
+              : ubicacionTexto
+                ? `Portal Catastral RI — mostrando: ${ubicacionTexto}. El mapa se centra automáticamente en la provincia seleccionada.`
+                : "Portal de Consulta Geográfica Oficial del Registro Inmobiliario. Seleccione una provincia para centrar el mapa automáticamente."}
+          </p>
 
-            {/* Coordenadas GPS */}
-            <div>
-              <label htmlFor="gps" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Coordenadas GPS (Lat, Lng)
-              </label>
-              <div className="relative">
-                <input
-                  id="gps"
-                  type="text"
-                  disabled={true}
-                  value={ubicacionGps}
-                  className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
-                  placeholder="Haga clic en el mapa para marcar"
-                />
-                <MapPin className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
-              </div>
-            </div>
+          {/* ── Leaflet Interactive Map ── */}
+          <div
+            className={activeMapTab === "leaflet" ? "block" : "hidden"}
+          >
+            <div
+              ref={mapContainerRef}
+              className="w-full h-[400px] md:h-[500px] rounded-2xl border border-[var(--color-border)]/30 shadow-inner overflow-hidden"
+              style={{ zIndex: 1 }}
+            />
+          </div>
 
-            {/* Designación Catastral */}
-            <div>
-              <label htmlFor="catastral" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Designación Catastral
-              </label>
-              <div className="relative">
-                <input
-                  id="catastral"
-                  type="text"
-                  disabled={true}
-                  value={designacionCatastral}
-                  className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
-                  placeholder="Se genera al marcar la ubicación"
-                />
-                <Compass className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
-              </div>
-            </div>
+          {/* ── Official RI Cadastral Iframe ── */}
+          <div
+            className={activeMapTab === "official" ? "block relative overflow-hidden rounded-2xl border border-[var(--color-border)]/30 shadow-inner" : "hidden"}
+            style={{ height: 410 }}
+          >
+            <iframe
+              ref={iframeRef}
+              src="https://servicios.ri.gob.do/ConsultaGeografica"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              className="border-none absolute left-0"
+              title="Consulta Geográfica Registro Inmobiliario"
+              style={{
+                top: "-132px",
+                width: "100%",
+                height: "calc(100% + 132px)",
+              }}
+            />
+          </div>
+        </div>
+      </div>
 
-            {/* Matrícula */}
-            <div>
-              <label htmlFor="matricula" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Matrícula del Inmueble
-              </label>
+      {/* ── BOTTOM: Form Fields in 2-col grid ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
+            Detalles del Proyecto
+          </h3>
+
+          {/* Nombre del Proyecto */}
+          <div>
+            <label htmlFor="nombre" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Nombre del Proyecto *
+            </label>
+            <input
+              id="nombre"
+              type="text"
+              required
+              placeholder="Ej: Residencial Las Palmeras"
+              value={nombre}
+              onChange={(e) => { setNombre(e.target.value); setNombreTouched(true); }}
+              onBlur={() => setNombreTouched(true)}
+              className={`vf-input ${nombreTouched && !nombre.trim() ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
+            />
+            {nombreTouched && !nombre.trim() && (
+              <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
+                Campo Nombre del Proyecto necesario
+              </p>
+            )}
+          </div>
+
+          {/* Provincia Dropdown */}
+          <div>
+            <label htmlFor="provincia" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Provincia (Ubicación) *
+            </label>
+            <select
+              id="provincia"
+              required
+              value={ubicacionTexto}
+              onChange={(e) => {
+                const val = e.target.value;
+                setUbicacionTexto(val);
+                setUbicacionTouched(true);
+                const matched = PROVINCIAS.find(p => p.nombre === val);
+                if (matched) {
+                  setUbicacionGps(`${matched.lat.toFixed(6)},${matched.lng.toFixed(6)}`);
+                  setDesignacionCatastral(`Parc. ${Math.floor(Math.random() * 500) + 1}, ${matched.dcPrefix}`);
+                }
+              }}
+              onBlur={() => setUbicacionTouched(true)}
+              className={`vf-input ${ubicacionTouched && !ubicacionTexto.trim() ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
+            >
+              <option value="">-- Seleccione una provincia --</option>
+              {PROVINCIAS.map((prov) => (
+                <option key={prov.nombre} value={prov.nombre}>{prov.nombre}</option>
+              ))}
+            </select>
+            {ubicacionTouched && !ubicacionTexto.trim() && (
+              <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
+                Campo Provincia necesario
+              </p>
+            )}
+          </div>
+
+          {/* Categoría */}
+          <div>
+            <label htmlFor="categoria" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Categoria del Proyecto
+            </label>
+            <select
+              id="categoria"
+              value={categoria}
+              onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)}
+              className="vf-input"
+            >
+              <option value={ProjectCategory.Residencial}>Residencial</option>
+              <option value={ProjectCategory.Comercial}>Comercial</option>
+              <option value={ProjectCategory.Turistico}>Turístico</option>
+              <option value={ProjectCategory.Mixto}>Mixto</option>
+              <option value={ProjectCategory.Otro}>Otro</option>
+            </select>
+          </div>
+
+          {/* RNC del Desarrollador */}
+          <div>
+            <label htmlFor="rncDesarrollador" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              RNC / Cédula del Desarrollador
+            </label>
+            <div className="relative">
               <input
-                id="matricula"
+                id="rncDesarrollador"
                 type="text"
-                value={matricula}
-                onChange={(e) => setMatricula(e.target.value)}
-                className="vf-input font-mono"
-                placeholder="Ej: 0100234567"
+                value={rncDesarrollador}
+                onChange={(e) => {
+                  setRncDesarrollador(e.target.value);
+                  if (rncError) setRncError(null);
+                }}
+                onBlur={() => handleRncSearch(rncDesarrollador)}
+                className={`vf-input ${rncError ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
+                placeholder="Ingrese RNC o Cédula (ej: 02601322098) y presione Tab"
               />
+              {isSearchingRnc && (
+                <div className="absolute right-3 top-3.5 flex items-center">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
             </div>
+            {rncError && (
+              <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
+                {rncError}
+              </p>
+            )}
+          </div>
 
-            {/* Valor Estimado */}
-            <div>
-              <label htmlFor="valorEstimado" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-                Valor Estimado (DOP)
-              </label>
-              <input
-                id="valorEstimado"
-                type="number"
-                value={valorEstimado}
-                onChange={(e) => setValorEstimado(e.target.value ? Number(e.target.value) : "")}
-                className="vf-input font-mono"
-                placeholder="Ej: 15000000"
-              />
-            </div>
+          {/* Desarrollador */}
+          <div>
+            <label htmlFor="desarrollador" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Desarrollador / Constructora
+            </label>
+            <input
+              id="desarrollador"
+              type="text"
+              value={datosDesarrollador}
+              onChange={(e) => setDatosDesarrollador(e.target.value)}
+              className="vf-input"
+              placeholder="Nombre de la constructora encargada"
+            />
           </div>
         </div>
 
-        {/* ── Right: Map Workspace ── */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="vf-card p-6 flex flex-col space-y-4 bg-white/90 backdrop-blur-md min-h-[570px]">
+        <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
+            Geolocalización y Catastro
+          </h3>
 
-            {/* Tab Selectors */}
-            <div className="flex bg-[var(--color-surface-raised)] p-1 rounded-xl border border-[var(--color-border)]/20 shadow-inner">
-              <button
-                type="button"
-                onClick={() => setActiveMapTab("leaflet")}
-                className={`flex-1 py-2.5 text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
-                  activeMapTab === "leaflet"
-                    ? "bg-primary text-white shadow-raised"
-                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                }`}
-              >
-                <Navigation className="w-3.5 h-3.5" />
-                Mapa Interactivo
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveMapTab("official")}
-                className={`flex-1 py-2.5 text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
-                  activeMapTab === "official"
-                    ? "bg-primary text-white shadow-raised"
-                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                }`}
-              >
-                <Globe className="w-3.5 h-3.5" />
-                Catastro Oficial RI
-              </button>
-            </div>
-
-            {/* Instructions */}
-            <p className="text-xs text-[var(--color-text-secondary)] italic">
-              {activeMapTab === "leaflet"
-                ? "Seleccione una provincia o haga clic en el mapa para posicionar el marcador, extraer coordenadas GPS y obtener la Designación Catastral."
-                : ubicacionTexto
-                  ? `Portal Catastral RI — mostrando: ${ubicacionTexto}. El mapa se centra automáticamente en la provincia seleccionada.`
-                  : "Portal de Consulta Geográfica Oficial del Registro Inmobiliario. Seleccione una provincia para centrar el mapa automáticamente."}
-            </p>
-
-            {/* ── Leaflet Interactive Map ── */}
-            <div
-              className={activeMapTab === "leaflet" ? "block flex-1" : "hidden"}
-              style={{ minHeight: 410 }}
-            >
-              <div
-                ref={mapContainerRef}
-                className="w-full rounded-2xl border border-[var(--color-border)]/30 shadow-inner overflow-hidden"
-                style={{ height: 410, zIndex: 1 }}
+          {/* Coordenadas GPS */}
+          <div>
+            <label htmlFor="gps" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Coordenadas GPS (Lat, Lng)
+            </label>
+            <div className="relative">
+              <input
+                id="gps"
+                type="text"
+                disabled={true}
+                value={ubicacionGps}
+                className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
+                placeholder="Haga clic en el mapa para marcar"
               />
-            </div>
-
-            {/* ── Official RI Cadastral Iframe ── */}
-            <div
-              className={activeMapTab === "official" ? "block flex-1 relative overflow-hidden rounded-2xl border border-[var(--color-border)]/30 shadow-inner" : "hidden"}
-              style={{ height: 410 }}
-            >
-              {/* 
-                sandbox: silences geolocation popup (allow-geolocation is intentionally absent).
-                The RI page fires postMessage({ event: 'geoPermission' }) to window.parent.
-                Our useEffect listener above responds with province centroid coordinates,
-                which their showPosition() uses to pan the Google Maps instance.
-              */}
-              <iframe
-                ref={iframeRef}
-                src="https://servicios.ri.gob.do/ConsultaGeografica"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                className="border-none absolute left-0"
-                title="Consulta Geográfica Registro Inmobiliario"
-                style={{
-                  // The RI page has ~130px of header + nav above the map canvas.
-                  // We shift the iframe up to clip those away and show only the map.
-                  top: "-132px",
-                  width: "100%",
-                  height: "calc(100% + 132px)",
-                }}
-              />
+              <MapPin className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
             </div>
           </div>
+
+          {/* Designación Catastral */}
+          <div>
+            <label htmlFor="catastral" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Designación Catastral
+            </label>
+            <div className="relative">
+              <input
+                id="catastral"
+                type="text"
+                disabled={true}
+                value={designacionCatastral}
+                className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
+                placeholder="Se genera al marcar la ubicación"
+              />
+              <Compass className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
+            </div>
+          </div>
+
+          {/* Matrícula */}
+          <div>
+            <label htmlFor="matricula" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Matrícula del Inmueble
+            </label>
+            <input
+              id="matricula"
+              type="text"
+              value={matricula}
+              onChange={(e) => setMatricula(e.target.value)}
+              className="vf-input font-mono"
+              placeholder="Ej: 0100234567"
+            />
+          </div>
+
+          {/* Valor Estimado */}
+          <div>
+            <label htmlFor="valorEstimado" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Valor Estimado (DOP)
+            </label>
+            <input
+              id="valorEstimado"
+              type="number"
+              value={valorEstimado}
+              onChange={(e) => setValorEstimado(e.target.value ? Number(e.target.value) : "")}
+              className="vf-input font-mono"
+              placeholder="Ej: 15000000"
+            />
+          </div>
+
+          {/* Superficie en M² */}
+          <div>
+            <label htmlFor="superficieM2" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+              Superficie (m²)
+            </label>
+            <input
+              id="superficieM2"
+              type="number"
+              min={0}
+              step={0.01}
+              value={superficieM2}
+              onChange={(e) => setSuperficieM2(e.target.value ? Number(e.target.value) : "")}
+              className="vf-input font-mono"
+              placeholder="Ej: 250.00"
+            />
+          </div>
+        </div>
+
+        <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md md:col-span-2">
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
+            Fotos del Proyecto
+          </h3>
+
+          {/* Fotos existentes (modo edición) */}
+          {existingFotoUrls.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {existingFotoUrls.map((url, idx) => (
+                <img key={idx} src={url} alt={`Foto existente ${idx + 1}`}
+                  className="w-20 h-20 object-cover rounded-xl border border-[var(--color-border)]/30" />
+              ))}
+            </div>
+          )}
+
+          {/* Botón de upload */}
+          <label htmlFor="fotos" className="flex items-center gap-2 vf-btn-secondary w-fit cursor-pointer">
+            <ImagePlus className="w-4 h-4" />
+            {initialData ? "Agregar más fotos" : "Subir fotos"}
+          </label>
+          <input
+            ref={photoInputRef}
+            id="fotos"
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handlePhotosChange}
+            className="sr-only"
+            disabled={existingFotoUrls.length + fotos.length >= MAX_PHOTOS}
+          />
+          <p className="text-xs text-[var(--color-text-secondary)]">
+            Máximo {MAX_PHOTOS} fotos · {MAX_FILE_SIZE_MB} MB por imagen · JPEG, PNG, WebP
+          </p>
+          {fotosError && <p className="text-xs text-red-600 font-semibold">{fotosError}</p>}
+
+          {/* Previsualizaciones de fotos nuevas */}
+          {fotosPreviews.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {fotosPreviews.map((preview, idx) => (
+                <div key={idx} className="relative group">
+                  <img src={preview} alt={`Preview ${idx + 1}`}
+                    className="w-20 h-20 object-cover rounded-xl border border-[var(--color-border)]/30" />
+                  <button type="button" onClick={() => removeNewPhoto(idx)}
+                    className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md hover:bg-red-600 transition-colors">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
