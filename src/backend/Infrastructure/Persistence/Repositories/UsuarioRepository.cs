@@ -21,6 +21,13 @@ public class UsuarioRepository : IUsuarioRepository
         return await _context.Usuarios.FindAsync(new object[] { id }, cancellationToken);
     }
 
+    public async Task<Usuario?> GetByIdWithPlanAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .Include(u => u.Plan)
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+    }
+
     public async Task<Usuario?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _context.Usuarios

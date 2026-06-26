@@ -147,21 +147,20 @@ describe("apiClient — 401 silent refresh", () => {
     );
   });
 
-  it("dispatches auth:logout event and nullifies token when refresh fails", async () => {
-    setAccessToken("expired-token");
-    mock.onGet("/fail").reply(401);
-
-    vi.spyOn(axios, "post").mockRejectedValue(new Error("Refresh failed"));
-
+  it("dispatches auth:force-logout event and nullifies token when refresh fails", async () => {
+    setAccessToken("test-token");
     const logoutSpy = vi.fn();
-    window.addEventListener("auth:logout", logoutSpy);
+    window.addEventListener("auth:force-logout", logoutSpy);
+
+    mock.onGet("/fail").reply(401);
+    mock.onPost(/.*\/auth\/refresh/).reply(403);
 
     await expect(apiClient.get("/fail")).rejects.toThrow();
 
     expect(logoutSpy).toHaveBeenCalledTimes(1);
     expect(getAccessToken()).toBeNull();
 
-    window.removeEventListener("auth:logout", logoutSpy);
+    window.removeEventListener("auth:force-logout", logoutSpy);
   });
 
   it("does NOT attempt refresh for non-401 errors (e.g. 500)", async () => {

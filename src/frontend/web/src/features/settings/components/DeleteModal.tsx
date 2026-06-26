@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 
@@ -10,6 +10,13 @@ interface DeleteModalProps {
 }
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing, onConfirm, onCancel }) => {
+  const [confirmText, setConfirmText] = useState("");
+
+  // Clear text when modal closes/opens
+  useEffect(() => {
+    if (!deleteId) setConfirmText("");
+  }, [deleteId]);
+
   if (!deleteId) return null;
 
   return (
@@ -23,9 +30,23 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
           <Trash2 className="w-8 h-8 text-red-600" />
         </div>
         <h3 className="text-lg font-bold text-text-primary mb-2">¿Eliminar Usuario?</h3>
-        <p className="text-sm text-text-secondary mb-6">
+        <p className="text-sm text-text-secondary mb-4">
           Esta acción no se puede deshacer. El usuario perderá acceso al sistema inmediatamente.
         </p>
+        
+        <div className="text-left mb-6">
+          <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+            Escriba ELIMINAR para confirmar
+          </label>
+          <input
+            type="text"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            className="vf-input w-full"
+            placeholder="ELIMINAR"
+          />
+        </div>
+
         <div className="flex gap-3 justify-center">
           <button
             onClick={onCancel}
@@ -35,8 +56,8 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
           </button>
           <button
             onClick={onConfirm}
-            disabled={isProcessing}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+            disabled={isProcessing || confirmText !== "ELIMINAR"}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Sí, Eliminar
           </button>

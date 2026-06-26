@@ -26,8 +26,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         var roleStr = user.Rol switch
         {
             UserRole.Administrator => "admin",
-            UserRole.Professional => "dev",
-            UserRole.Consultation => "validator",
+            UserRole.User => "user",
             _ => "user"
         };
 
@@ -36,7 +35,9 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.CorreoElectronico),
             new Claim(JwtRegisteredClaimNames.Name, user.NombreCompleto),
-            new Claim(ClaimTypes.Role, roleStr)
+            new Claim(ClaimTypes.Role, roleStr),
+            new Claim("cedula", user.Cedula ?? string.Empty),
+            new Claim("telefono", user.Telefono ?? string.Empty)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));

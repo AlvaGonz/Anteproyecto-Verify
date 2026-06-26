@@ -8,7 +8,7 @@ public class ProyectoConfiguration : IEntityTypeConfiguration<Proyecto>
 {
     public void Configure(EntityTypeBuilder<Proyecto> builder)
     {
-        builder.ToTable("ProyectosInmobiliarios", t => t.ExcludeFromMigrations());
+        builder.ToTable("ProyectosInmobiliarios");
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id).HasColumnName("IdProyecto");
         builder.Property(p => p.CodigoInterno).IsRequired().HasMaxLength(50);

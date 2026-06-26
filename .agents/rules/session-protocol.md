@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 ## Session Memory Protocol (Mandatory)
 
 **AL INICIAR cualquier objetivo nuevo:**

@@ -15,7 +15,7 @@ public class DomainTests
         var apellido = "Perez";
         var email = "juan@example.com";
         var hash = "hash";
-        var rol = UserRole.Professional;
+        var rol = UserRole.User;
         var telefono = "123456";
         var cedula = "40200000000";
 

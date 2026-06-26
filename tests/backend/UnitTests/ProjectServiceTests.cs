@@ -40,7 +40,15 @@ public class ProjectServiceTests
     public async Task CreateProject_ShouldReturnDto_WhenValid()
     {
         // Arrange
-        var dto = new CreateProyectoDto("Test", "Location", Guid.NewGuid(), ProjectCategory.Comercial, "DevData", "DC-123");
+        var userId = Guid.NewGuid();
+        var dto = new CreateProyectoDto("Test", "Location", userId, ProjectCategory.Comercial, "DevData", null, "DC-123");
+        
+        var plan = Domain.Entities.PlanSuscripcion.Create(Guid.NewGuid(), "Test Plan", 1000m, 100, 10, true, true, true, false);
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
+        user.GetType().GetProperty("Id")?.SetValue(user, userId);
+        user.GetType().GetProperty("Plan")?.SetValue(user, plan);
+        
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
@@ -63,7 +71,7 @@ public class ProjectServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", "NewDC");
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -86,7 +94,7 @@ public class ProjectServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", "NewDC");
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Proyecto?)null);
 
@@ -98,7 +106,7 @@ public class ProjectServiceTests
     public async Task GetVisibleProjects_ShouldReturnOnlyVisible()
     {
         // Arrange
-        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Professional, "123456", "40200000000");
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
         var p1 = new Proyecto("P1", "L1", user.Id);
         p1.UpdateStatus(ProjectStatus.Published);
         var p2 = new Proyecto("P2", "L2", user.Id);

@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
+import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 
 interface UserFormModalProps {
   isOpen: boolean;
@@ -25,6 +26,13 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   if (!isOpen) return null;
 
   const update = (partial: Partial<CreateUserDto>) => onChange({ ...formData, ...partial });
+  const phone = usePhoneInput(
+    formData.telefono ? formData.telefono.replace(/\D/g, '') : "",
+    (formattedValue) => {
+      const digits = formattedValue.replace(/\D/g, '');
+      update({ telefono: digits });
+    }
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -43,28 +51,48 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
         </div>
 
         <form onSubmit={onSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre Completo</label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={e => update({ name: e.target.value })}
-              className="vf-input w-full"
-              placeholder="Ej. Juan Pérez"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre</label>
+              <input
+                type="text"
+                required
+                value={formData.nombre}
+                onChange={e => update({ nombre: e.target.value })}
+                className="vf-input w-full"
+                placeholder="Ej. Juan"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Apellido</label>
+              <input
+                type="text"
+                required
+                value={formData.apellido}
+                onChange={e => update({ apellido: e.target.value })}
+                className="vf-input w-full"
+                placeholder="Ej. Pérez"
+              />
+            </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Correo Electrónico</label>
             <input
               type="email"
-              required
+              required={!editingUser}
               value={formData.email}
-              onChange={e => update({ email: e.target.value })}
-              className="vf-input w-full"
+              readOnly={!!editingUser}
+              onChange={editingUser ? undefined : (e) => update({ email: e.target.value })}
+              className={`vf-input w-full ${editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
+                }`}
               placeholder="ejemplo@empresa.com"
             />
+            {editingUser && (
+              <p className="text-[10px] text-amber-600 mt-1 flex items-center gap-1">
+                <span>⚠</span> El correo es inmutable post-registro. Use el flujo de cambio de email.
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -74,16 +102,8 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                 type="text"
                 maxLength={14}
                 inputMode="numeric"
-                value={formData.telefono || ""}
-                onChange={e => {
-                  let val = e.target.value.replace(/\D/g, "");
-                  if (val.length > 0) {
-                    if (val.length <= 3) val = `(${val}`;
-                    else if (val.length <= 6) val = `(${val.slice(0, 3)}) ${val.slice(3)}`;
-                    else val = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6, 10)}`;
-                  }
-                  update({ telefono: val });
-                }}
+                value={phone.value}
+                onChange={phone.handleChange}
                 onKeyDown={(e) => {
                   const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
                   if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
@@ -98,24 +118,29 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
               <input
                 type="text"
-                maxLength={13}
-                inputMode="numeric"
+                readOnly={!!editingUser}
                 value={formData.cedula || ""}
-                onChange={e => {
+                onChange={editingUser ? undefined : e => {
                   let val = e.target.value.replace(/\D/g, "");
                   if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
                   else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
                   update({ cedula: val });
                 }}
-                onKeyDown={(e) => {
+                onKeyDown={editingUser ? undefined : (e) => {
                   const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
                   if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
                     e.preventDefault();
                   }
                 }}
-                className="vf-input w-full"
+                className={`vf-input w-full ${editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
+                  }`}
                 placeholder="000-0000000-0"
               />
+              {editingUser && (
+                <p className="text-[10px] text-amber-600 mt-1 flex items-center gap-1">
+                  <span>⚠</span> La cédula es un dato de identidad legal y no puede modificarse.
+                </p>
+              )}
             </div>
           </div>
 
@@ -141,8 +166,6 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               className="vf-input w-full"
             >
               <option value="user">Usuario Regular</option>
-              <option value="validator">Validador</option>
-              <option value="dev">Desarrollador</option>
               <option value="admin">Administrador</option>
             </select>
           </div>

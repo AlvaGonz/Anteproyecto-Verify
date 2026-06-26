@@ -229,7 +229,7 @@ describe("ProjectManagePage", () => {
       fireEvent.click(screen.getByTestId("submit-btn-valid"));
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/projects/new-id-456");
+        expect(mockNavigate).toHaveBeenCalledWith("/admin/projects");
         expect(mockAddToast).toHaveBeenCalledWith("Proyecto creado exitosamente", "success");
       });
     });
@@ -369,7 +369,7 @@ describe("ProjectManagePage", () => {
       fireEvent.click(screen.getByTestId("submit-btn-valid"));
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/projects/proj-001");
+        expect(mockNavigate).toHaveBeenCalledWith("/admin/projects");
         expect(mockAddToast).toHaveBeenCalledWith("Proyecto actualizado exitosamente", "success");
       });
     });

@@ -6,13 +6,17 @@ import {
   success, 
   failure 
 } from "../../../shared/utils/functional";
-import { apiClient } from "../../../infrastructure/api/client";
+import { apiClient, setAccessToken } from "../../../infrastructure/api/client";
 
 export interface User {
   id: string;
   email: string;
-  name: string;
+  nombre: string;
+  apellido: string;
   role: string;
+  cedula?: string;
+  telefono?: string;
+  plan?: string;
 }
 
 export interface AuthResponse {
@@ -30,9 +34,13 @@ export const AuthService = {
   async login(email: string, password: string): Promise<Result<AuthResponse, AuthError>> {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
+      
+      const token = response.data.accessToken || "real-cookie-session";
+      setAccessToken(token);
+
       return success({
         user: response.data.user,
-        token: "real-cookie-session"
+        token: token
       });
     } catch (e: any) {
       if (e.response?.status === 401) {
@@ -76,6 +84,8 @@ export const AuthService = {
       await apiClient.post('/auth/logout');
     } catch {
       // Ignore errors on logout
+    } finally {
+      setAccessToken(null);
     }
   },
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -8,7 +8,8 @@ import {
   X,
   Plus,
   Compass,
-  History
+  History,
+  LogOut
 } from "lucide-react";
 import { useProjects } from "../../../features/projects/api/useProjects";
 import { useAuth } from "../../context/AuthContext";
@@ -19,9 +20,15 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: projects } = useProjects();
   const projectCount = projects?.length || 0;
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const firstName = user?.name ? user.name.split(" ")[0] : "Usuario";
   const initials = user?.name
@@ -140,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
       {/* User Section */}
       <div className="relative z-10 p-6 bg-white/[0.03] border-t border-white/5">
-        <div className="flex items-center gap-3">
+        <Link to="/admin/settings" className="flex items-center gap-3 hover:bg-white/5 p-2 -m-2 rounded-xl transition-colors cursor-pointer">
           <div className="relative">
              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-sm font-black text-white shadow-lg overflow-hidden border border-white/10">
                 {initials}
@@ -151,7 +158,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             <p className="text-sm font-bold text-white leading-tight truncate">{firstName}</p>
             <p className="text-[9px] text-white/30 font-black uppercase tracking-widest mt-0.5">{roleLabel}</p>
           </div>
-        </div>
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="mt-3 flex items-center gap-2 w-full px-2 py-2 text-[10px] font-black text-white/30 hover:text-red-400 transition-colors uppercase tracking-widest rounded-xl hover:bg-white/5"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          Cerrar Sesión
+        </button>
       </div>
     </div>
   );

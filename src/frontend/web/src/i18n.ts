@@ -151,11 +151,11 @@ const resources = {
           popular: "MÁS POPULAR",
           period: "/mes",
           free: {
-            title: "Consulta",
+            title: "Consultor",
             desc: "Para usuarios ocasionales que necesitan consultas básicas de inmuebles.",
             feature1: "1 consultas /mes",
             feature2: "Datos públicos básicos",
-            feature3: "Validación de identidad",
+            feature3: "Presentación pública de sus proyectos",
             button: "Comenzar gratis"
           },
           pro: {

@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { registerSchema, type RegisterFormValues } from "../schemas";
 import { useRegister } from "../api/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { 
   User, 
   Mail, 
@@ -35,25 +36,36 @@ export const RegisterForm = () => {
     mode: "onChange" 
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { acceptedTerms: _, ...submitData } = data;
-    register_(submitData, { onSuccess: () => setIsSuccess(true) });
-  };
+const onSubmit = (data: RegisterFormValues) => {
+     // Use raw digits from phone hook for submission
+     const telefonoDigits = phone.digits;
+     const { acceptedTerms: _, ...submitData } = {
+       ...data,
+       telefono: telefonoDigits,
+     };
+     register_(submitData, { onSuccess: () => setIsSuccess(true) });
+   };
 
-  const password = watch("password") || "";
-  const isMinLength = password.length >= 8;
-  const hasUpper = /[A-Z]/.test(password);
-  const hasLower = /[a-z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecial = /[!@#$%^&*\-]/.test(password);
+const password = watch("password") || "";
+   const isMinLength = password.length >= 8;
+   const hasUpper = /[A-Z]/.test(password);
+   const hasLower = /[a-z]/.test(password);
+   const hasNumber = /[0-9]/.test(password);
+   const hasSpecial = /[!@#$%^&*\-]/.test(password);
 
-  const blockNonDigits = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
-    if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
-      e.preventDefault();
-    }
-  };
+// Phone input hook
+   const phoneValueRaw = watch("telefono") ? watch("telefono").replace(/\D/g, '') : "";
+   const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
+     const digits = formattedValue.replace(/\D/g, '');
+     setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
+   });
+
+   const blockNonDigits = (e: React.KeyboardEvent<HTMLInputElement>) => {
+     const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
+     if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+       e.preventDefault();
+     }
+   };
 
   const openModal = (type: "terms" | "privacy") => {
     setModalType(type);
@@ -157,37 +169,29 @@ export const RegisterForm = () => {
           )}
         </div>
 
-        {/* Teléfono y Cédula Grid */}
-        <div className="grid grid-cols-2 gap-4 pt-1">
-          <div className="relative">
-            <label htmlFor="telefono" className="sr-only">Teléfono</label>
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
-            <input
-              id="telefono"
-              type="text"
-              placeholder="Teléfono"
-              maxLength={14}
-              inputMode="numeric"
-              className="vf-input w-full pl-12 h-[52px]"
-              {...register("telefono", {
-                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                  let val = e.target.value.replace(/\D/g, "");
-                  if (val.length > 0) {
-                    if (val.length <= 3) val = `(${val}`;
-                    else if (val.length <= 6) val = `(${val.slice(0, 3)}) ${val.slice(3)}`;
-                    else val = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6, 10)}`;
-                  }
-                  setValue("telefono", val, { shouldValidate: true, shouldDirty: true });
-                }
-              })}
-              onKeyDown={blockNonDigits}
-            />
-            {formErrors.telefono && (
-              <span className="text-rose-500 text-[10px] font-medium absolute -bottom-5 left-0">
-                {formErrors.telefono.message}
-              </span>
-            )}
-          </div>
+{/* Teléfono y Cédula Grid */}
+          <div className="grid grid-cols-2 gap-4 pt-1">
+            <div className="relative">
+              <label htmlFor="telefono" className="sr-only">Teléfono</label>
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
+              <input
+                id="telefono"
+                type="text"
+                placeholder="Teléfono"
+                maxLength={14}
+                inputMode="numeric"
+                value={phone.value}
+                onChange={phone.handleChange}
+                onKeyDown={blockNonDigits}
+                className="vf-input w-full pl-12 h-[52px]"
+                {...register("telefono")}
+              />
+              {formErrors.telefono && (
+                <span className="text-rose-500 text-[10px] font-medium absolute -bottom-5 left-0">
+                  {formErrors.telefono.message}
+                </span>
+              )}
+            </div>
           <div className="relative">
             <label htmlFor="cedula" className="sr-only">Cédula</label>
             <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />

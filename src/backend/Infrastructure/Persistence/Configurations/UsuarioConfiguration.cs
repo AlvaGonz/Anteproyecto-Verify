@@ -8,7 +8,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        builder.ToTable("Usuario", t => t.ExcludeFromMigrations());
+        builder.ToTable("Usuario"); // Removed ExcludeFromMigrations to allow additive migration
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnName("IdUsuario");
         builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
@@ -32,5 +32,14 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 
         // Optimistic concurrency token
         builder.Property(u => u.RowVersion).IsRowVersion().IsConcurrencyToken();
+
+        // Subscription properties
+        builder.Property(u => u.PlanSuscripcionId).IsRequired(false);
+        builder.Property(u => u.ConsultasUsadas).IsRequired().HasDefaultValue(0);
+
+        builder.HasOne(u => u.Plan)
+            .WithMany()
+            .HasForeignKey(u => u.PlanSuscripcionId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
