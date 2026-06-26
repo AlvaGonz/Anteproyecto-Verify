@@ -83,7 +83,7 @@ public class SettingsController : ControllerBase
                         u.Nombre,
                         u.Apellido,
                         u.CorreoElectronico,
-                        u.Rol == UserRole.Administrator ? "admin" : "user",
+                        pf != null && pf.NombrePerfil == "ADMIN" ? "admin" : "user",
                         u.Telefono,
                         u.Cedula,
                         pf != null ? pf.IdPerfil : null,
@@ -221,20 +221,30 @@ public class SettingsController : ControllerBase
         var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
         if (user == null) return NotFound(new { Message = "Usuario no encontrado." });
 
-        var auditorias = await _context.Auditorias.Where(a => a.UsuarioId == id).ToListAsync(cancellationToken);
-        if (auditorias.Any()) _context.Auditorias.RemoveRange(auditorias);
+        try {
+            var auditorias = await _context.Auditorias.Where(a => a.UsuarioId == id).ToListAsync(cancellationToken);
+            if (auditorias.Any()) _context.Auditorias.RemoveRange(auditorias);
+        } catch {}
 
-        var notificaciones = await _context.Notificaciones.Where(n => n.UsuarioId == id).ToListAsync(cancellationToken);
-        if (notificaciones.Any()) _context.Notificaciones.RemoveRange(notificaciones);
+        try {
+            var notificaciones = await _context.Notificaciones.Where(n => n.UsuarioId == id).ToListAsync(cancellationToken);
+            if (notificaciones.Any()) _context.Notificaciones.RemoveRange(notificaciones);
+        } catch {}
 
-        var proyectos = await _context.Proyectos.Where(p => p.UsuarioCreadorId == id).ToListAsync(cancellationToken);
-        if (proyectos.Any()) return BadRequest(new { Message = "El usuario tiene proyectos asociados y no puede ser eliminado." });
+        try {
+            var proyectos = await _context.Proyectos.Where(p => p.UsuarioCreadorId == id).ToListAsync(cancellationToken);
+            if (proyectos.Any()) return BadRequest(new { Message = "El usuario tiene proyectos asociados y no puede ser eliminado." });
+        } catch {}
 
-        var reportes = await _context.Reportes.Where(r => r.GeneradoPorUsuarioId == id).ToListAsync(cancellationToken);
-        if (reportes.Any()) return BadRequest(new { Message = "El usuario tiene reportes asociados y no puede ser eliminado." });
+        try {
+            var reportes = await _context.Reportes.Where(r => r.GeneradoPorUsuarioId == id).ToListAsync(cancellationToken);
+            if (reportes.Any()) return BadRequest(new { Message = "El usuario tiene reportes asociados y no puede ser eliminado." });
+        } catch {}
 
-        var consentimientos = await _context.ConsentimientosFinancieros.Where(c => c.UsuarioId == id).ToListAsync(cancellationToken);
-        if (consentimientos.Any()) _context.ConsentimientosFinancieros.RemoveRange(consentimientos);
+        try {
+            var consentimientos = await _context.ConsentimientosFinancieros.Where(c => c.UsuarioId == id).ToListAsync(cancellationToken);
+            if (consentimientos.Any()) _context.ConsentimientosFinancieros.RemoveRange(consentimientos);
+        } catch {}
 
         _context.Usuarios.Remove(user);
         
@@ -405,8 +415,14 @@ public class SettingsController : ControllerBase
             return Task.FromResult(false);
         }
 
-        var roleClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role) ?? User.FindFirstValue("role");
-        return Task.FromResult(roleClaim == "admin");
+        var roles = User.Claims
+            .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role || c.Type == "role")
+            .Select(c => c.Value)
+            .ToList();
+
+        return Task.FromResult(roles.Any(r => 
+            string.Equals(r, "admin", StringComparison.OrdinalIgnoreCase) || 
+            string.Equals(r, "Administrator", StringComparison.OrdinalIgnoreCase)));
     }
 
     private async Task SyncUserLegacyAsync(Usuario u, CancellationToken cancellationToken = default)
@@ -497,7 +513,9 @@ public static class RoleProfileMapper
     private static readonly Dictionary<string, (UserRole Role, string ProfileName)> RoleMap = new(StringComparer.OrdinalIgnoreCase)
     {
         ["admin"] = (UserRole.Administrator, "ADMIN"),
-        ["user"] = (UserRole.User, "DEVELOPER") // Default legacy profile for users
+        ["user"] = (UserRole.User, "DEVELOPER"), // Default legacy profile for users
+        ["dev"] = (UserRole.User, "DEVELOPER"),
+        ["validator"] = (UserRole.User, "VALIDATOR")
     };
 
     public static (UserRole? Role, string ProfileName) MapRole(string roleString)

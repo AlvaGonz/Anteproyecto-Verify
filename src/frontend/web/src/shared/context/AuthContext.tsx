@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
 import { isSome, isSuccess } from "../utils/functional";
 
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('auth:force-logout', handler);
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     
@@ -57,19 +57,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     setLoading(false);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     AuthService.logout();
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     const currentUserOption = await AuthService.getCurrentUser();
     if (isSome(currentUserOption)) {
       setUser(currentUserOption.value);
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider 

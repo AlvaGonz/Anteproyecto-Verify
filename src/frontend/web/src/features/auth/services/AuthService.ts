@@ -16,6 +16,7 @@ export interface User {
   role: string;
   cedula?: string;
   telefono?: string;
+  plan?: string;
 }
 
 export interface AuthResponse {

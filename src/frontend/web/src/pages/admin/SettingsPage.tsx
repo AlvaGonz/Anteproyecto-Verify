@@ -39,15 +39,17 @@ export const SettingsPage: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
-  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers();
-  const { data: profiles = [], isLoading: isLoadingProfiles, refetch: refetchProfiles } = useProfiles();
-  const { data: plans = [], isLoading: isLoadingPlans, refetch: refetchPlans } = usePlans();
+  const isAdmin = user?.role === "admin";
+
+  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin);
+  const { data: profiles = [], isLoading: isLoadingProfiles, refetch: refetchProfiles } = useProfiles(isAdmin);
+  const { data: plans = [], isLoading: isLoadingPlans, refetch: refetchPlans } = usePlans(isAdmin);
 
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
 
-  const loading = isLoadingUsers || isLoadingProfiles || isLoadingPlans;
+  const loading = isAdmin && (isLoadingUsers || isLoadingProfiles || isLoadingPlans);
   const isProcessing = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
 
   // Security Check: Redirect non-admins away from users/permissions tabs

@@ -168,8 +168,6 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               className="vf-input w-full"
             >
               <option value="user">Usuario Regular</option>
-              <option value="validator">Validador</option>
-              <option value="dev">Desarrollador</option>
               <option value="admin">Administrador</option>
             </select>
           </div>

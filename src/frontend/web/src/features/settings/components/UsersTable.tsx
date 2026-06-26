@@ -90,11 +90,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
                     u.role === "admin"
                       ? "bg-red-50 text-red-700 border border-red-200"
-                      : u.role === "dev"
-                      ? "bg-blue-50 text-blue-700 border border-blue-200"
                       : "bg-green-50 text-green-700 border border-green-200"
                   }`}>
-                    {u.profileName || u.role.toUpperCase()}
+                    {u.role === "admin" ? "ADMIN" : "USER"}
                   </span>
                 </td>
                 <td className="px-6 py-4">
@@ -121,9 +119,8 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
                         disabled={isUpdating}
                         className="vf-input py-1 px-2 text-xs h-8 min-w-[120px]"
                       >
+                        <option value="user">Usuario Regular</option>
                         <option value="admin">Administrador</option>
-                        <option value="dev">Desarrollador</option>
-                        <option value="validator">Validador</option>
                       </select>
                     </div>
 

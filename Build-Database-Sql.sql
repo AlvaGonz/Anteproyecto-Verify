@@ -25,6 +25,8 @@ CREATE TABLE Usuario (
     EmailVerificado BIT NOT NULL DEFAULT 0,
     TokenVerificacion VARCHAR(MAX) NULL,
     TokenVerificacionExpiraUtc DATETIME2 NULL,
+    PlanSuscripcionId UNIQUEIDENTIFIER NULL,
+    ConsultasUsadas INT NOT NULL DEFAULT 0,
     CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
     UpdatedAtUtc DATETIME2 NULL,
     RowVersion TIMESTAMP
@@ -41,7 +43,9 @@ SELECT
     Email,
     ContrasenaHash,
     Telefono,
-    Cedula
+    Cedula,
+    PlanSuscripcionId,
+    ConsultasUsadas
 FROM Usuario;
 GO
 
@@ -145,7 +149,13 @@ GO
 CREATE TABLE PlanSuscripcion (
     Idsuscripcion UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
     NombrePlan VARCHAR(100),
-    Precio DECIMAL(10,2)
+    Precio DECIMAL(10,2),
+    AccesoApi BIT NOT NULL DEFAULT 0,
+    MaxConsultas INT NOT NULL DEFAULT 0,
+    MaxProyectos INT NOT NULL DEFAULT 0,
+    MultiUsuario BIT NOT NULL DEFAULT 0,
+    PresentacionPublica BIT NOT NULL DEFAULT 0,
+    QrIncluido BIT NOT NULL DEFAULT 0
 );
 GO
 
@@ -451,4 +461,21 @@ GO
 ALTER TABLE ProyectosInmobiliarios ADD IdESuelo UNIQUEIDENTIFIER;
 GO
 ALTER TABLE ProyectosInmobiliarios ADD FOREIGN KEY (IdESuelo) REFERENCES EstudioSuelo(IdESuelo);
+GO
+-- Relacion Adicional: Usuario con PlanSuscripcion
+ALTER TABLE Usuario ADD FOREIGN KEY (PlanSuscripcionId) REFERENCES PlanSuscripcion(Idsuscripcion);
+GO
+
+-- Tabla Notificaciones (Requerida para el sistema de alertas de usuario)
+CREATE TABLE Notificaciones (
+    Id UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    UsuarioId UNIQUEIDENTIFIER NOT NULL,
+    Mensaje NVARCHAR(MAX) NOT NULL,
+    Tipo NVARCHAR(50) NOT NULL,
+    Leida BIT NOT NULL DEFAULT 0,
+    FechaUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    EnlaceRelacionado NVARCHAR(MAX) NULL,
+    CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAtUtc DATETIME2 NULL
+);
 GO

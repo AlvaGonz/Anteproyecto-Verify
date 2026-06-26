@@ -5,7 +5,7 @@ import { UpdateProfileSchema, UpdateProfileDto } from "../../auth/schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard } from "lucide-react";
+import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award } from "lucide-react";
 
 export const MyProfileForm: React.FC = () => {
   const { user, refreshUser } = useAuth();
@@ -31,6 +31,10 @@ export const MyProfileForm: React.FC = () => {
       changePassword: false,
     },
   });
+
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
 
   useEffect(() => {
     if (user) {
@@ -114,6 +118,17 @@ export const MyProfileForm: React.FC = () => {
             </p>
           </div>
         </div>
+        {user?.role !== "admin" && user?.plan && (
+          <div className="flex items-center gap-3">
+            <Award className="w-4 h-4 text-text-secondary shrink-0" />
+            <div>
+              <p className="text-[10px] text-text-secondary uppercase font-bold">Plan de Suscripción</p>
+              <p className="text-sm font-bold text-primary">
+                {user.plan}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* EDITABLE fields */}

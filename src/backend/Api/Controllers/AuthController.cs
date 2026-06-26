@@ -168,7 +168,7 @@ public class AuthController : ControllerBase
             return Unauthorized(new { Message = "Token inválido o incompleto." });
         }
 
-        var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
+        var user = await _usuarioRepository.GetByIdWithPlanAsync(userId, cancellationToken);
         if (user == null)
         {
             return Unauthorized(new { Message = "Usuario no encontrado." });
@@ -189,7 +189,8 @@ public class AuthController : ControllerBase
             Apellido = user.Apellido,
             Role = roleStr,
             Cedula = user.Cedula ?? string.Empty,
-            Telefono = user.Telefono ?? string.Empty
+            Telefono = user.Telefono ?? string.Empty,
+            Plan = user.Plan?.NombrePlan ?? "N/A"
         });
     }
 
