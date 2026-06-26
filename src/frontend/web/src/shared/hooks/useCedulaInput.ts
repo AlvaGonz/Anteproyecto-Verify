@@ -86,10 +86,3 @@ export function useCedulaInput(initialValue: string = '', onChange?: (value: str
     rawDigits: digits,
   };
 }
-
-// ponytail: minimal self-check — delete before shipping if needed
-if (import.meta.env.DEV) {
-  const { useCedulaInput } = await import('./useCedulaInput');
-  // Quick smoke: 40212345678 → "402-1234567-8", isValid true
-  // 123 → "(123" equivalent stub (partial), isValid false
-}
