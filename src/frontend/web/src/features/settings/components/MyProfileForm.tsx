@@ -184,22 +184,22 @@ export const MyProfileForm: React.FC = () => {
            </label>
            <div className="relative">
              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-             <input
-               ref={register("telefono")}
-               type="text"
-               maxLength={14}
-               inputMode="numeric"
-               value={phone.value}
-               onChange={phone.handleChange}
-               onKeyDown={(e) => {
-                 const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
-                 if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
-                   e.preventDefault();
-                 }
-               }}
-               className="vf-input w-full pl-9"
-               placeholder="(809) 000-0000"
-             />
+<input
+                {...register("telefono")}
+                type="text"
+                maxLength={14}
+                inputMode="numeric"
+                value={phone.value}
+                onChange={phone.handleChange}
+                onKeyDown={(e) => {
+                  const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
+                  if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                className="vf-input w-full pl-9"
+                placeholder="(809) 000-0000"
+              />
            </div>
            {errors.telefono && (
              <p className="text-[10px] text-red-500 mt-1">{errors.telefono.message}</p>
