@@ -14,6 +14,7 @@ export const createProjectSchema = z.object({
     errorMap: () => ({ message: "Seleccione una categoría válida" }),
   }),
   datosDesarrollador: z.string().max(1000).optional(),
+  rncDesarrollador: z.string().optional(),
   designacionCatastral: z
     .string()
     .regex(/^[A-Z0-9\-]{3,30}$/, "Formato catastral inválido (ej: ABC-123)")

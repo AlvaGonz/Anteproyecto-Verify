@@ -41,7 +41,7 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
     });
 
   // Initialize cedula hook with project's RNC (raw or formatted)
-  const { value: formattedRnc, onChange: handleCedulaChange, rawDigits: rncRawDigits } = useCedulaInput(project.rncDesarrollador ?? "");
+  const { value: formattedRnc, handleChange: handleCedulaChange, rawDigits: rncRawDigits } = useCedulaInput(project.rncDesarrollador ?? "");
 
   const onSubmit = (data: UpdateProjectFormValues) => {
     const { fotos, ...rest } = data;
@@ -106,11 +106,11 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
           value={formattedRnc}
           onChange={(e) => {
             handleCedulaChange(e);
-            setValue("rncDesarrollador", rncRawDigits);
+            setValue("rncDesarrollador", rncRawDigits, { shouldValidate: true });
           }}
+          name="rncDesarrollador"
           inputMode="numeric"
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-          {...register("rncDesarrollador")} />
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
       </FormField>
 
       <FormField label="Designación catastral" htmlFor="designacionCatastral" error={errors.designacionCatastral?.message}>
