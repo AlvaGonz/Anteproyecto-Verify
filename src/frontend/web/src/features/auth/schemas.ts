@@ -45,13 +45,13 @@ export const registerSchema = z.object({
     .string()
     .min(1, "El correo es requerido")
     .email("Formato de correo inválido"),
-  telefono: z
-    .string()
-    .min(1, "El teléfono es requerido")
-    .refine((val) => {
-      const digits = val.replace(/\D/g, "");
-      return /^(809|829|849)\d{7}$/.test(digits);
-    }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 809-555-0199)"),
+telefono: z
+     .string()
+     .min(1, "El teléfono es requerido")
+     .refine((val) => {
+       const digits = val.replace(/\D/g, "");
+       return /^(809|829|849)\d{7}$/.test(digits);
+     }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
   cedula: z
     .string()
     .min(1, "La cédula es requerida")
@@ -85,11 +85,13 @@ export const UpdateProfileSchema = z.object({
     .string()
     .min(2, "Mínimo 2 caracteres")
     .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Solo letras y espacios"),
-  telefono: z
-    .string()
-    .regex(/^(\(8(09|29|49)\)\s\d{3}-\d{4})?$/, "Formato: (809) 000-0000")
-    .optional()
-    .or(z.literal("")),
+telefono: z
+     .string()
+     .optional()
+     .refine((val) => {
+       if (val === undefined || val === "") return true;
+       return /^(809|829|849)\d{7}$/.test(val);
+     }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
   changePassword: z.boolean().default(false),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),

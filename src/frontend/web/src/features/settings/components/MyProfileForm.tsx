@@ -5,6 +5,7 @@ import { UpdateProfileSchema, UpdateProfileDto } from "../../auth/schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
+import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award } from "lucide-react";
 
 export const MyProfileForm: React.FC = () => {
@@ -30,11 +31,18 @@ export const MyProfileForm: React.FC = () => {
       telefono: user?.telefono ?? "",
       changePassword: false,
     },
-  });
+});
 
-  useEffect(() => {
-    refreshUser();
-  }, [refreshUser]);
+   // Phone input hook
+   const phoneValueRaw = watch("telefono") ? watch("telefono").replace(/\D/g, '') : "";
+   const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
+     const digits = formattedValue.replace(/\D/g, '');
+     setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
+   });
+
+   useEffect(() => {
+     refreshUser();
+   }, [refreshUser]);
 
   useEffect(() => {
     if (user) {
@@ -170,24 +178,33 @@ export const MyProfileForm: React.FC = () => {
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
-            Teléfono
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-            <input
-              {...register("telefono")}
-              type="text"
-              maxLength={14}
-              className="vf-input w-full pl-9"
-              placeholder="(809) 000-0000"
-            />
-          </div>
-          {errors.telefono && (
-            <p className="text-[10px] text-red-500 mt-1">{errors.telefono.message}</p>
-          )}
-        </div>
+<div>
+           <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+             Teléfono
+           </label>
+           <div className="relative">
+             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+             <input
+               ref={register("telefono")}
+               type="text"
+               maxLength={14}
+               inputMode="numeric"
+               value={phone.value}
+               onChange={phone.handleChange}
+               onKeyDown={(e) => {
+                 const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
+                 if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                   e.preventDefault();
+                 }
+               }}
+               className="vf-input w-full pl-9"
+               placeholder="(809) 000-0000"
+             />
+           </div>
+           {errors.telefono && (
+             <p className="text-[10px] text-red-500 mt-1">{errors.telefono.message}</p>
+           )}
+         </div>
       </div>
 
       {/* COLLAPSIBLE password change */}

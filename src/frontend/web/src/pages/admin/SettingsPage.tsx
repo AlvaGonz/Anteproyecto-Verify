@@ -74,13 +74,13 @@ export const SettingsPage: React.FC = () => {
       return;
     }
 
-    if (formData.telefono) {
-      const telDigits = formData.telefono.replace(/\D/g, "");
-      if (telDigits.length > 0 && !/^(809|829|849)\d{7}$/.test(telDigits)) {
-        addToast("Teléfono inválido. Solo códigos 809, 829 o 849", "error");
-        return;
-      }
-    }
+if (formData.telefono) {
+       const telDigits = formData.telefono.replace(/\D/g, "");
+       if (telDigits.length > 0 && !/^(809|829|849)\d{7}$/.test(telDigits)) {
+         addToast("Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)", "error");
+         return;
+       }
+     }
 
     if (formData.cedula) {
       const cedDigits = formData.cedula.replace(/\D/g, "");

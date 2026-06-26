@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
+import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 
 interface UserFormModalProps {
   isOpen: boolean;
@@ -25,6 +26,13 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   if (!isOpen) return null;
 
   const update = (partial: Partial<CreateUserDto>) => onChange({ ...formData, ...partial });
+  const phone = usePhoneInput(
+    formData.telefono ? formData.telefono.replace(/\D/g, '') : "",
+    (formattedValue) => {
+      const digits = formattedValue.replace(/\D/g, '');
+      update({ telefono: digits });
+    }
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -76,9 +84,8 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               value={formData.email}
               readOnly={!!editingUser}
               onChange={editingUser ? undefined : (e) => update({ email: e.target.value })}
-              className={`vf-input w-full ${
-                editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
-              }`}
+              className={`vf-input w-full ${editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
+                }`}
               placeholder="ejemplo@empresa.com"
             />
             {editingUser && (
@@ -95,16 +102,8 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                 type="text"
                 maxLength={14}
                 inputMode="numeric"
-                value={formData.telefono || ""}
-                onChange={e => {
-                  let val = e.target.value.replace(/\D/g, "");
-                  if (val.length > 0) {
-                    if (val.length <= 3) val = `(${val}`;
-                    else if (val.length <= 6) val = `(${val.slice(0, 3)}) ${val.slice(3)}`;
-                    else val = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6, 10)}`;
-                  }
-                  update({ telefono: val });
-                }}
+                value={phone.value}
+                onChange={phone.handleChange}
                 onKeyDown={(e) => {
                   const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
                   if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
@@ -133,9 +132,8 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                     e.preventDefault();
                   }
                 }}
-                className={`vf-input w-full ${
-                  editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
-                }`}
+                className={`vf-input w-full ${editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
+                  }`}
                 placeholder="000-0000000-0"
               />
               {editingUser && (
