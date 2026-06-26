@@ -6,6 +6,8 @@ import { useUpdateProject } from "../api/useProjectMutations";
 import { ProjectCategory, type ProyectoDto } from "../types";
 import { FormField } from "@/components/ui/FormField";
 import { useCedulaInput } from "@/shared/hooks/useCedulaInput";
+import { useDocuments } from "../../documents/api/useDocuments";
+import { isImageDocument } from "../utils/imageUtils";
 
 const CATEGORY_LABELS: Record<ProjectCategory, string> = {
   [ProjectCategory.Residencial]: "Residencial",
@@ -23,6 +25,9 @@ interface EditProjectFormProps {
 export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) => {
   const navigate = useNavigate();
   const { mutate: updateProject, isPending, error } = useUpdateProject(project.id);
+
+  const { data: documents = [] } = useDocuments(project.id);
+  const imageDocuments = documents.filter(d => isImageDocument(d.nombreArchivoOriginal));
 
   const { register, handleSubmit, formState: { errors }, setValue } =
     useForm<UpdateProjectFormValues>({
@@ -140,6 +145,27 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
           {...register("fotos")} />
         <p className="text-xs text-gray-400 mt-1">Las nuevas fotos reemplazarán las anteriores.</p>
       </FormField>
+
+      {imageDocuments.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-gray-700">
+            Imágenes adjuntas ({imageDocuments.length})
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            {imageDocuments.map((doc) => (
+              <div key={doc.id} className="relative group aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                <img
+                  src={doc.fileUrl}
+                  alt={doc.nombreArchivoOriginal}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-3 justify-end pt-2">
         <button type="button" onClick={() => navigate(-1)}
