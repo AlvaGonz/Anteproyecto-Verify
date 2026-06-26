@@ -5,6 +5,7 @@ import { updateProjectSchema, type UpdateProjectFormValues } from "../schemas";
 import { useUpdateProject } from "../api/useProjectMutations";
 import { ProjectCategory, type ProyectoDto } from "../types";
 import { FormField } from "@/components/ui/FormField";
+import { useCedulaInput } from "@/shared/hooks/useCedulaInput";
 
 const CATEGORY_LABELS: Record<ProjectCategory, string> = {
   [ProjectCategory.Residencial]: "Residencial",
@@ -23,7 +24,7 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
   const navigate = useNavigate();
   const { mutate: updateProject, isPending, error } = useUpdateProject(project.id);
 
-  const { register, handleSubmit, formState: { errors } } =
+  const { register, handleSubmit, formState: { errors }, setValue } =
     useForm<UpdateProjectFormValues>({
       resolver: zodResolver(updateProjectSchema),
       defaultValues: {
@@ -33,12 +34,20 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
         categoria: project.categoria,
         valorEstimado: project.valorEstimado,
         datosDesarrollador: project.datosDesarrollador ?? "",
+        rncDesarrollador: project.rncDesarrollador ?? "",
         designacionCatastral: project.designacionCatastral ?? "",
+        superficieM2: project.superficieM2,
       },
     });
 
-  const onSubmit = (data: UpdateProjectFormValues) =>
-    updateProject(data, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/p/${project.id}`) });
+  // Initialize cedula hook with project's RNC (raw or formatted)
+  const { value: formattedRnc, onChange: handleCedulaChange, rawDigits: rncRawDigits } = useCedulaInput(project.rncDesarrollador ?? "");
+
+  const onSubmit = (data: UpdateProjectFormValues) => {
+    const { fotos, ...rest } = data;
+    const fotosNuevas = fotos ? Array.from(fotos) : undefined;
+    updateProject({ ...rest, fotosNuevas }, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/p/${project.id}`) });
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
@@ -71,7 +80,7 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
       <FormField label="Categoría" htmlFor="categoria" error={errors.categoria?.message} required>
         <select id="categoria"
           className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-          {...register("categoria", { valueAsNumber: true })}>
+          {...register("categoria", { valueAsNumber: true })} >
           {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
             <option key={val} value={val}>{label}</option>
           ))}
@@ -82,6 +91,54 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
         <input id="valorEstimado" type="number" min={0}
           className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           {...register("valorEstimado", { valueAsNumber: true })} />
+      </FormField>
+
+      <FormField label="Datos del desarrollador" htmlFor="datosDesarrollador" error={errors.datosDesarrollador?.message}>
+        <input id="datosDesarrollador" type="text"
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          {...register("datosDesarrollador")} />
+      </FormField>
+
+      <FormField label="RNC del desarrollador" htmlFor="rncDesarrollador" error={errors.rncDesarrollador?.message}>
+        <input
+          id="rncDesarrollador"
+          type="text"
+          value={formattedRnc}
+          onChange={(e) => {
+            handleCedulaChange(e);
+            setValue("rncDesarrollador", rncRawDigits);
+          }}
+          inputMode="numeric"
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          {...register("rncDesarrollador")} />
+      </FormField>
+
+      <FormField label="Designación catastral" htmlFor="designacionCatastral" error={errors.designacionCatastral?.message}>
+        <input id="designacionCatastral" type="text"
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          {...register("designacionCatastral")} />
+      </FormField>
+
+      <FormField label="Superficie (m²)" htmlFor="superficieM2" error={errors.superficieM2?.message}>
+        <input id="superficieM2" type="number" min={1}
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          {...register("superficieM2", { valueAsNumber: true })} />
+      </FormField>
+
+      <FormField label="Fotos del proyecto (máx. 5)" htmlFor="fotos" error={errors.fotos?.message as string}>
+        {/* Show existing photos as small thumbnails if project.fotoUrls?.length */}
+        {project.fotoUrls?.length ? (
+          <div className="flex gap-2 flex-wrap mb-2">
+            {project.fotoUrls.map((url, i) => (
+              <img key={i} src={url} alt={`Foto ${i + 1}`}
+                className="h-16 w-16 rounded object-cover border border-gray-200" />
+            ))}
+          </div>
+        ) : null}
+        <input id="fotos" type="file" accept="image/*" multiple
+          className="text-sm"
+          {...register("fotos")} />
+        <p className="text-xs text-gray-400 mt-1">Las nuevas fotos reemplazarán las anteriores.</p>
       </FormField>
 
       <div className="flex gap-3 justify-end pt-2">

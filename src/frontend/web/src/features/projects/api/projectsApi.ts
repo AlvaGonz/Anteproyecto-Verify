@@ -69,14 +69,28 @@ export const projectsApi = {
     }
   },
 
-  async updateProject(id: string, data: UpdateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
-    try {
-      const response = await apiClient.put<ProyectoDto>(`/projects/${id}`, data);
-      return success(response.data);
-    } catch (error: any) {
-      return failure(mapError(error, id));
-    }
-  },
+async updateProject(id: string, data: UpdateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
+     try {
+       let response;
+       if (data.fotosNuevas?.length) {
+         const form = new FormData();
+         // append all scalar fields
+         Object.entries(data).forEach(([k, v]) => {
+           if (k !== 'fotosNuevas' && v !== undefined) form.append(k, String(v));
+         });
+         data.fotosNuevas.forEach(f => form.append('fotos', f));
+         response = await apiClient.put<ProyectoDto>(`/projects/${id}`, form, {
+           headers: { 'Content-Type': 'multipart/form-data' },
+         });
+       } else {
+         const { fotosNuevas: _, ...payload } = data;
+         response = await apiClient.put<ProyectoDto>(`/projects/${id}`, payload);
+       }
+       return success(response.data);
+     } catch (error: any) {
+       return failure(mapError(error, id));
+     }
+   },
 
   async updateProjectStatus(id: string, status: ProjectStatus): Promise<Result<ProyectoDto, ProjectError>> {
     if (!Object.values(ProjectStatus).includes(status) || typeof status !== "number") {
