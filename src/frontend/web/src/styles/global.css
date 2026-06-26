@@ -171,6 +171,11 @@ html {
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 7px; }
-::-webkit-scrollbar-track { background: #f4f1ec; }
+::-webkit-scrollbar-track { background: #dbd8d4; }
+
+/* Firefox scrollbar */
+* {
+  scrollbar-color: #223382 #dbd8d4;
+}
 ::-webkit-scrollbar-thumb { background: #223382; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #111144; }
