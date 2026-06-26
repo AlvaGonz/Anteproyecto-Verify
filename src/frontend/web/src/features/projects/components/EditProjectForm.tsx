@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { updateProjectSchema, type UpdateProjectFormValues } from "../schemas";
 import { useUpdateProject } from "../api/useProjectMutations";
-import { ProjectCategory, type ProyectoDto } from "../types";
+import { ProjectCategory, type ProyectoDto, type UpdateProyectoDto } from "../types";
 import { FormField } from "@/components/ui/FormField";
 import { useCedulaInput } from "@/shared/hooks/useCedulaInput";
 import { ProjectPhotosSection } from "./ProjectPhotosSection";
@@ -45,7 +45,7 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
   const { value: formattedRnc, handleChange: handleCedulaChange, rawDigits: rncRawDigits } = useCedulaInput(project.rncDesarrollador ?? "");
 
   const onSubmit = (data: UpdateProjectFormValues) => {
-    updateProject(data, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/p/${project.id}`) });
+    updateProject(data as unknown as UpdateProyectoDto, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/p/${project.id}`) });
   };
 
   return (

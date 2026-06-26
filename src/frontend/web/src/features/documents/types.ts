@@ -15,7 +15,7 @@ export interface DocumentDto {
   observaciones?: string;
   createdAtUtc: string;
   updatedAtUtc?: string;
-  fileUrl?: string;
+  fileUrl: string;
 }
 
 export enum DocumentType {

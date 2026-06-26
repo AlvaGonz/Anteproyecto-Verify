@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ImagePlus, Star, X, Upload, Images } from "lucide-react";
+import { Star, X, Upload, Images, Camera, ImagePlus } from "lucide-react";
 import { useDocuments } from "../../documents/api/useDocuments";
 import { useUploadDocument } from "../../documents/api/useDocumentMutations";
 
@@ -29,7 +29,6 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
   const portraitInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {
       pendingPhotos.forEach((p) => URL.revokeObjectURL(p.previewUrl));
@@ -59,11 +58,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
       }
       const err = validateFile(file);
       if (err) { setUploadError(err); return; }
-      newPending.push({
-        file,
-        previewUrl: URL.createObjectURL(file),
-        role,
-      });
+      newPending.push({ file, previewUrl: URL.createObjectURL(file), role });
     });
 
     if (newPending.length === 0) return;
@@ -81,7 +76,6 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
     if (pendingPhotos.length === 0) return;
     setUploadError(null);
 
-    // Portrait first, then gallery — order determines which is [0] in docs array
     const ordered = [
       ...pendingPhotos.filter((p) => p.role === "portrait"),
       ...pendingPhotos.filter((p) => p.role === "gallery"),
@@ -96,7 +90,6 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
       });
     });
 
-    // Clear previews after queuing
     pendingPhotos.forEach((p) => URL.revokeObjectURL(p.previewUrl));
     setPendingPhotos([]);
   };
@@ -105,186 +98,169 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
   const pendingGallery = pendingPhotos.filter((p) => p.role === "gallery");
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+
+      {/* ── Header ───────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-          <Images className="w-5 h-5 text-teal-600" />
+        <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+          <Images className="w-4 h-4 text-teal-600" />
           Fotos del Proyecto
         </h3>
         {totalCount > 0 && (
-          <span className="text-xs text-gray-400 font-medium">{totalCount}/{MAX_PHOTOS}</span>
+          <span className="text-xs text-gray-500 tabular-nums">
+            {totalCount} / {MAX_PHOTOS}
+          </span>
         )}
       </div>
 
       {uploadError && (
-        <div role="alert" className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+        <div role="alert" className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
           {uploadError}
         </div>
       )}
 
-      {/* === PORTADA === */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-          <span className="text-sm font-semibold text-gray-700">Foto de Portada</span>
-          <span className="text-xs text-gray-400">(1ra imagen — usada como thumbnail)</span>
+      {isLoading ? (
+        <div className="flex gap-2 animate-pulse">
+          <div className="w-28 h-20 rounded-md bg-gray-100" />
+          <div className="w-20 h-20 rounded-md bg-gray-100" />
+          <div className="w-20 h-20 rounded-md bg-gray-100" />
         </div>
+      ) : (
+        <div className="space-y-4">
 
-        <div className="flex gap-3">
-          {/* Slot portada existente */}
-          {portraitDoc ? (
-            <div className="relative w-32 h-24 rounded-xl overflow-hidden border-2 border-amber-400 shadow-sm flex-shrink-0">
-              <img
-                src={portraitDoc.fileUrl}
-                alt="Portada actual"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-              <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[9px] font-black uppercase tracking-wider text-center py-0.5">
-                Portada activa
-              </div>
-            </div>
-          ) : null}
+          {/* ── PORTADA + GALERÍA en una sola fila de acciones ── */}
+          <div className="flex flex-wrap items-start gap-4">
 
-          {/* Preview portada pendiente (pending) */}
-          {pendingPortrait.map((p, i) => (
-            <div key={`pending-portrait-${i}`} className="relative w-32 h-24 rounded-xl overflow-hidden border-2 border-amber-400 border-dashed flex-shrink-0">
-              <img src={p.previewUrl} alt="Portada pendiente" className="w-full h-full object-cover" />
-              <div className="absolute bottom-0 inset-x-0 bg-amber-400/80 text-white text-[9px] font-black uppercase tracking-wider text-center py-0.5">
-                Por subir
-              </div>
-              <button
-                type="button"
-                onClick={() => removePending(pendingPhotos.indexOf(p))}
-                className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
-                aria-label="Quitar foto de portada"
-              >
-                <X className="w-3 h-3 text-white" />
-              </button>
-            </div>
-          ))}
+            {/* — Portada — */}
+            <div className="flex flex-col gap-2 min-w-0">
+              <span className="text-xs font-medium text-gray-500 flex items-center gap-1">
+                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                Foto de portada
+              </span>
 
-          {/* Zona drop portada vacía (solo si no hay portada existente ni pendiente) */}
-          {!portraitDoc && pendingPortrait.length === 0 && (
-            <button
-              type="button"
-              onClick={() => portraitInputRef.current?.click()}
-              className="w-32 h-24 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center justify-center gap-1 transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-              aria-label="Subir foto de portada"
-            >
-              <ImagePlus className="w-6 h-6 text-amber-400" />
-              <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wide">Portada</span>
-            </button>
-          )}
-        </div>
+              <div className="flex items-center gap-2">
+                {/* Thumbnail existing portada */}
+                {portraitDoc && (
+                  <div className="relative w-14 h-14 rounded-md overflow-hidden border border-amber-300 flex-shrink-0">
+                    <img
+                      src={portraitDoc.fileUrl}
+                      alt="Portada actual"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                {/* Thumbnail pending portada */}
+                {pendingPortrait.map((p, i) => (
+                  <div
+                    key={`pending-portrait-${i}`}
+                    className="relative w-14 h-14 rounded-md overflow-hidden border border-dashed border-amber-400 flex-shrink-0"
+                  >
+                    <img src={p.previewUrl} alt="Portada pendiente" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removePending(pendingPhotos.indexOf(p))}
+                      className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors cursor-pointer"
+                      aria-label="Quitar foto de portada"
+                    >
+                      <X className="w-2.5 h-2.5 text-white" />
+                    </button>
+                  </div>
+                ))}
 
-        <input
-          ref={portraitInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="sr-only"
-          aria-label="Seleccionar foto de portada"
-          onChange={(e) => {
-            handleFileSelect(e.target.files, "portrait");
-            e.target.value = "";
-          }}
-        />
-      </div>
-
-      <div className="border-t border-gray-100" />
-
-      {/* === GALERÍA === */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Images className="w-4 h-4 text-teal-500" />
-          <span className="text-sm font-semibold text-gray-700">Fotos adicionales</span>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          {/* Fotos existentes (galería) */}
-          {galleryDocs.map((doc) => (
-            <div key={doc.id} className="relative w-24 h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-              <img
-                src={doc.fileUrl}
-                alt={doc.nombreArchivoOriginal}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          ))}
-
-          {/* Fotos pendientes galería */}
-          {pendingGallery.map((p) => {
-            const realIdx = pendingPhotos.indexOf(p);
-            return (
-              <div key={`pending-gallery-${realIdx}`} className="relative w-24 h-20 rounded-xl overflow-hidden border-2 border-dashed border-teal-300">
-                <img src={p.previewUrl} alt="Nueva foto" className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 inset-x-0 bg-teal-500/80 text-white text-[9px] font-black text-center py-0.5 uppercase tracking-wide">
-                  Por subir
-                </div>
+                {/* CTA portada */}
                 <button
+                  id="btn-agregar-portada"
                   type="button"
-                  onClick={() => removePending(realIdx)}
-                  className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
-                  aria-label="Quitar foto"
+                  onClick={() => portraitInputRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-amber-300 bg-white hover:bg-amber-50 active:scale-[0.98] text-amber-700 text-xs font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1"
+                  aria-label={portraitDoc ? "Cambiar foto de portada" : "Agregar foto de portada"}
                 >
-                  <X className="w-3 h-3 text-white" />
+                  <Camera className="w-3.5 h-3.5" />
+                  {portraitDoc ? "Cambiar portada" : "Agregar portada"}
                 </button>
               </div>
-            );
-          })}
+            </div>
 
-          {/* Botón agregar galería */}
-          {totalCount < MAX_PHOTOS && (
-            <button
-              type="button"
-              onClick={() => galleryInputRef.current?.click()}
-              className="w-24 h-20 rounded-xl border-2 border-dashed border-teal-200 bg-teal-50 hover:bg-teal-100 flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
-              aria-label="Agregar fotos adicionales"
-            >
-              <ImagePlus className="w-5 h-5 text-teal-400" />
-              <span className="text-[10px] font-bold text-teal-500 uppercase tracking-wide">Agregar</span>
-            </button>
+            {/* Divider vertical */}
+            <div className="hidden sm:block w-px self-stretch bg-gray-100 mt-5" />
+
+            {/* — Galería — */}
+            <div className="flex flex-col gap-2 min-w-0 flex-1">
+              <span className="text-xs font-medium text-gray-500">
+                Fotos adicionales
+              </span>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Thumbnails existentes galería */}
+                {galleryDocs.map((doc) => (
+                  <div
+                    key={doc.id}
+                    className="relative w-14 h-14 rounded-md overflow-hidden border border-gray-200 flex-shrink-0"
+                  >
+                    <img
+                      src={doc.fileUrl}
+                      alt={doc.nombreArchivoOriginal}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+
+                {/* Thumbnails pendientes galería */}
+                {pendingGallery.map((p) => {
+                  const realIdx = pendingPhotos.indexOf(p);
+                  return (
+                    <div
+                      key={`pending-gallery-${realIdx}`}
+                      className="relative w-14 h-14 rounded-md overflow-hidden border border-dashed border-teal-300 flex-shrink-0"
+                    >
+                      <img src={p.previewUrl} alt="Nueva foto" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removePending(realIdx)}
+                        className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors cursor-pointer"
+                        aria-label="Quitar foto"
+                      >
+                        <X className="w-2.5 h-2.5 text-white" />
+                      </button>
+                    </div>
+                  );
+                })}
+
+                {/* CTA galería */}
+                <button
+                  id="btn-agregar-fotos"
+                  type="button"
+                  disabled={totalCount >= MAX_PHOTOS}
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-teal-300 bg-white hover:bg-teal-50 active:scale-[0.98] text-teal-700 text-xs font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Agregar más fotos"
+                >
+                  <ImagePlus className="w-3.5 h-3.5" />
+                  Agregar más fotos
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── UPLOAD FOOTER ─────────────────────────────────── */}
+          {pendingPhotos.length > 0 && (
+            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+              <span className="text-xs text-gray-500">
+                {pendingPhotos.length} foto{pendingPhotos.length > 1 ? "s" : ""} por subir
+              </span>
+              <button
+                type="button"
+                onClick={handleUploadAll}
+                disabled={isUploading}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-700 text-white text-xs font-semibold rounded-md hover:bg-teal-800 active:scale-[0.98] disabled:opacity-50 transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                {isUploading ? "Subiendo..." : "Subir fotos"}
+              </button>
+            </div>
           )}
-        </div>
-
-        <input
-          ref={galleryInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          className="sr-only"
-          aria-label="Seleccionar fotos adicionales"
-          onChange={(e) => {
-            handleFileSelect(e.target.files, "gallery");
-            e.target.value = "";
-          }}
-        />
-      </div>
-
-      {/* === FOOTER UPLOAD === */}
-      {pendingPhotos.length > 0 && (
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <span className="text-sm text-gray-500">
-            {pendingPhotos.length} foto{pendingPhotos.length > 1 ? "s" : ""} lista{pendingPhotos.length > 1 ? "s" : ""} para subir
-          </span>
-          <button
-            type="button"
-            onClick={handleUploadAll}
-            disabled={isUploading}
-            className="flex items-center gap-2 px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded-lg hover:bg-teal-800 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-          >
-            <Upload className="w-4 h-4" />
-            {isUploading ? "Subiendo..." : "Subir fotos"}
-          </button>
-        </div>
-      )}
-
-      {isLoading && (
-        <div className="flex gap-3 animate-pulse">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="w-24 h-20 rounded-xl bg-gray-100" />
-          ))}
         </div>
       )}
 
