@@ -25,6 +25,24 @@ export const createProjectSchema = z.object({
     .positive("El valor debe ser positivo")
     .max(999_999_999, "Valor fuera de rango")
     .optional(),
+  superficieM2: z
+    .number({ invalid_type_error: "Debe ser un número" })
+    .positive("Debe ser mayor a 0")
+    .max(999_999, "Valor fuera de rango")
+    .optional(),
+  fotos: z
+    .custom<FileList>()
+    .optional()
+    .refine(
+      (files) => !files || files.length <= 5,
+      "Máximo 5 fotos permitidas"
+    )
+    .refine(
+      (files) =>
+        !files ||
+        Array.from(files).every((f) => f.type.startsWith("image/")),
+      "Solo se permiten archivos de imagen"
+    ),
 });
 export type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
 
@@ -37,21 +55,5 @@ export const updateProjectSchema = createProjectSchema.extend({
     )
     .optional()
     .or(z.literal("")),
-  superficieM2: z
-    .number({ invalid_type_error: "Debe ser un número" })
-    .positive("Debe ser mayor a 0")
-    .max(999_999, "Valor fuera de rango")
-    .optional(),
-  fotos: z
-    .custom<FileList>()
-    .optional()
-    .refine(
-      (files) => !files || files.length <= 5,
-      "Máximo 5 fotos"
-    )
-    .refine(
-      (files) => !files || Array.from(files).every(f => f.type.startsWith("image/")),
-      "Solo se permiten imágenes"
-    ),
 });
 export type UpdateProjectFormValues = z.infer<typeof updateProjectSchema>;

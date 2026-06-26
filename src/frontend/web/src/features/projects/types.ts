@@ -33,6 +33,7 @@ export interface CreateProyectoDto {
   designacionCatastral?: string;
   ubicacionGps?: string;
   matricula?: string;
+  superficieM2?: number;
 }
 
 export interface UpdateProyectoDto {
