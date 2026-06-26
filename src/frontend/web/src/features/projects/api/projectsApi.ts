@@ -6,7 +6,8 @@ import {
   ProjectStatus, 
   IntegrityStatus,
   ProjectError,
-  DocumentDiagnosisDto
+  DocumentDiagnosisDto,
+  getProjectErrorMessage,
 } from "../types";
 import { success, failure, Result } from "../../../shared/utils/functional";
 
@@ -51,20 +52,28 @@ export const projectsApi = {
     }
   },
 
-  async createProject(data: CreateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
+  async createProject(data: CreateProyectoDto & { fotosNuevas?: File[] }): Promise<Result<ProyectoDto, ProjectError>> {
     try {
-      const payload = {
-        ...data,
-        estadoProyecto: ProjectStatus.Draft,
-        estadoIntegridad: IntegrityStatus.Pending,
-      };
-      const response = await apiClient.post<ProyectoDto>("/projects", payload);
+      let response;
+      if (data.fotosNuevas?.length) {
+        const form = new FormData();
+        const { fotosNuevas, ...rest } = data;
+        Object.entries(rest).forEach(([k, v]) => {
+          if (v !== undefined) form.append(k, String(v));
+        });
+        fotosNuevas.forEach((f) => form.append("fotos", f));
+        response = await apiClient.post<ProyectoDto>("/projects", form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        const { fotosNuevas: _, ...payload } = data as any;
+        const enriched = { ...payload, estadoProyecto: ProjectStatus.Draft, estadoIntegridad: IntegrityStatus.Pending };
+        response = await apiClient.post<ProyectoDto>("/projects", enriched);
+      }
       return success(response.data);
     } catch (error: any) {
       const mapped = mapError(error);
-      if (mapped._tag === "ServerError") {
-        return failure(mapped);
-      }
+      if (mapped._tag === "ServerError") return failure(mapped);
       return failure({ _tag: "ServerError", message: error.message || "Server Error" });
     }
   },
