@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { ProyectoDto, ProjectStatus } from "../types";
 import { Link } from "react-router-dom";
 import { useDocuments } from "../../documents/api/useDocuments";
+import { getProjectCoverUrl } from "../utils/imageUtils";
 import { DocumentStatus } from "../../documents/types";
 import { 
   ShieldCheck, 
@@ -24,6 +25,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     return documents.length >= 20 && documents.every((d: any) => d.estadoDocumento === DocumentStatus.Valid);
   }, [documents]);
 
+  const coverUrl = getProjectCoverUrl(project.imagenUrl, documents);
+
   const isValidated = project.estadoProyecto === ProjectStatus.Validated && allVerified;
 
   return (
@@ -35,11 +38,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       className="vf-card group !p-0 overflow-hidden border border-surface-container-high/50 hover:border-primary/30 transition-all duration-500"
     >
       <div className="relative h-48 overflow-hidden bg-secondary">
+         {coverUrl ? (
+           <img
+             src={coverUrl}
+             alt={`Portada del proyecto ${project.nombre}`}
+             className="absolute inset-0 w-full h-full object-cover"
+             loading="lazy"
+           />
+         ) : (
+           <div className="absolute inset-0 flex items-center justify-center">
+             <ShieldCheck className={`w-16 h-16 ${isValidated ? "text-primary animate-pulse" : "text-white/10"}`} />
+           </div>
+         )}
          <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary to-primary/40 opacity-90"></div>
-         {/* Placeholder for real image if available */}
-         <div className="absolute inset-0 flex items-center justify-center">
-            <ShieldCheck className={`w-16 h-16 ${isValidated ? "text-primary animate-pulse" : "text-white/10"}`} />
-         </div>
          
          <div className="absolute top-4 left-4 z-10">
             <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border shadow-lg backdrop-blur-md ${
