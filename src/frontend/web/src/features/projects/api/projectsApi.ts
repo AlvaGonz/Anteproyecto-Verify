@@ -7,7 +7,6 @@ import {
   IntegrityStatus,
   ProjectError,
   DocumentDiagnosisDto,
-  getProjectErrorMessage,
 } from "../types";
 import { success, failure, Result } from "../../../shared/utils/functional";
 

@@ -10,8 +10,8 @@ export const useCreateProject = () => {
     mutationKey: ['useCreateProject'],
     mutationFn: async (data: CreateProyectoDto & { fotosNuevas?: File[] }) => {
       const result = await projectsApi.createProject(data);
-      if (result._tag === "failure") throw new Error(getProjectErrorMessage(result.error));
-      return result.value;
+      if (result._tag === "Failure") throw new Error(getProjectErrorMessage(result.error));
+      return result.data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
   });
@@ -23,8 +23,8 @@ export const useUpdateProject = (projectId: string) => {
     mutationKey: ['useUpdateProject'],
     mutationFn: async (data: UpdateProyectoDto) => {
       const result = await projectsApi.updateProject(projectId, data);
-      if (result._tag === "failure") throw new Error(getProjectErrorMessage(result.error));
-      return result.value;
+      if (result._tag === "Failure") throw new Error(getProjectErrorMessage(result.error));
+      return result.data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
