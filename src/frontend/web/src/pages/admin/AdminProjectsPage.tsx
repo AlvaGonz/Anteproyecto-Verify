@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
+import { ProjectCoverImage } from "../../features/projects/components/ProjectCoverImage";
 import { useProjects, useDeleteProject } from "../../features/projects/api/useProjects";
 import { 
   FolderKanban, 
@@ -334,10 +335,12 @@ export const AdminProjectsPage: React.FC = () => {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-start gap-5 min-w-0">
                       <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-inner">
-                        <img 
-                          src={project.imagenUrl || "https://images.unsplash.com/photo-1590019158224-399dc0f9fc31?q=80&w=200&auto=format&fit=crop"} 
-                          alt={project.nombre}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
+                        <ProjectCoverImage
+                          projectId={project.id}
+                          projectName={project.nombre}
+                          imagenUrl={project.imagenUrl}
+                          size="sm"
+                          className="grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
                         />
                       </div>
                       <div className="min-w-0 space-y-1">
