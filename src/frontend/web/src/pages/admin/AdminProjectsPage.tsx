@@ -336,9 +336,8 @@ export const AdminProjectsPage: React.FC = () => {
                     <div className="flex items-start gap-5 min-w-0">
                       <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-inner">
                         <ProjectCoverImage
-                          projectId={project.id}
+                          coverUrl={project.imagenUrl}
                           projectName={project.nombre}
-                          imagenUrl={project.imagenUrl}
                           size="sm"
                           className="grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
                         />

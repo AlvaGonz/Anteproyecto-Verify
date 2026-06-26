@@ -37,9 +37,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     >
       <div className="relative h-48 overflow-hidden bg-secondary">
          <ProjectCoverImage
-           projectId={project.id}
+           coverUrl={project.imagenUrl}
            projectName={project.nombre}
-           imagenUrl={project.imagenUrl}
            size="lg"
            className="absolute inset-0 w-full h-full object-cover"
          />
