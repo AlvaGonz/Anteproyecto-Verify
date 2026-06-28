@@ -315,7 +315,7 @@ public static class AppDbContextSeeder
             await context.SaveChangesAsync();
 
             logger.LogInformation("Prototype demo data seeding completed successfully.");
-            await SeedDgiiRncAsync(context, logger);
+            await SeedDgiiAsync(context, logger);
         }
         catch (Exception ex)
         {
@@ -501,11 +501,11 @@ public static class AppDbContextSeeder
         return notif;
     }
 
-    private static async Task SeedDgiiRncAsync(AppDbContext context, ILogger logger)
+    private static async Task SeedDgiiAsync(AppDbContext context, ILogger logger)
     {
-        if (await context.DgiiRnc.AnyAsync())
+        if (await context.DGII.AnyAsync())
         {
-            logger.LogInformation("DGII RNC table already has data. Skipping seed.");
+            logger.LogInformation("DGII table already has data. Skipping seed.");
             return;
         }
 
@@ -532,7 +532,7 @@ public static class AppDbContextSeeder
 
         if (filePath == null)
         {
-            logger.LogWarning("DGII_RNC.TXT source file not found. Skipping DGII RNC database seed.");
+            logger.LogWarning("DGII_RNC.TXT source file not found. Skipping DGII database seed.");
             return;
         }
 
@@ -548,21 +548,21 @@ public static class AppDbContextSeeder
         {
             try
             {
-                await SeedDgiiRncViaBulkCopyAsync(connection, filePath, logger);
+                await SeedDgiiViaBulkCopyAsync(connection, filePath, logger);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "SqlBulkCopy failed. Retrying with EF batch seeding...");
-                await SeedDgiiRncViaEFAsync(context, filePath, logger);
+                await SeedDgiiViaEFAsync(context, filePath, logger);
             }
         }
         else
         {
-            await SeedDgiiRncViaEFAsync(context, filePath, logger);
+            await SeedDgiiViaEFAsync(context, filePath, logger);
         }
     }
 
-    private static async Task SeedDgiiRncViaBulkCopyAsync(System.Data.Common.DbConnection connection, string filePath, ILogger logger)
+    private static async Task SeedDgiiViaBulkCopyAsync(System.Data.Common.DbConnection connection, string filePath, ILogger logger)
     {
         var bulkCopyType = Type.GetType("Microsoft.Data.SqlClient.SqlBulkCopy, Microsoft.Data.SqlClient");
         if (bulkCopyType == null)
@@ -572,7 +572,7 @@ public static class AppDbContextSeeder
 
         using var bulkCopy = (IDisposable)Activator.CreateInstance(bulkCopyType, connection)!;
 
-        bulkCopyType.GetProperty("DestinationTableName")!.SetValue(bulkCopy, "DgiiRnc");
+        bulkCopyType.GetProperty("DestinationTableName")!.SetValue(bulkCopy, "DGII");
         bulkCopyType.GetProperty("BatchSize")!.SetValue(bulkCopy, 50000);
         bulkCopyType.GetProperty("BulkCopyTimeout")!.SetValue(bulkCopy, 600);
 
@@ -616,7 +616,6 @@ public static class AppDbContextSeeder
 
         foreach (var line in lines)
         {
-            if (rowCount >= 1000) break;
             if (string.IsNullOrWhiteSpace(line)) continue;
 
             var parts = line.Split('|');
@@ -665,15 +664,14 @@ public static class AppDbContextSeeder
         }
     }
 
-    private static async Task SeedDgiiRncViaEFAsync(AppDbContext context, string filePath, ILogger logger)
+    private static async Task SeedDgiiViaEFAsync(AppDbContext context, string filePath, ILogger logger)
     {
-        var list = new List<Domain.Entities.DgiiRnc>();
+        var list = new List<Domain.Entities.DGII>();
         int count = 0;
         var lines = File.ReadLines(filePath, System.Text.Encoding.UTF8);
 
         foreach (var line in lines)
         {
-            if (count >= 1000) break;
             if (string.IsNullOrWhiteSpace(line)) continue;
 
             var parts = line.Split('|');
@@ -688,7 +686,7 @@ public static class AppDbContextSeeder
                 }
             }
 
-            var record = new Domain.Entities.DgiiRnc
+            var record = new Domain.Entities.DGII
             {
                 Rnc = parts[0].Trim(),
                 NombreRazonSocial = parts[1].Trim(),
@@ -708,7 +706,7 @@ public static class AppDbContextSeeder
 
             if (count % 10000 == 0)
             {
-                await context.DgiiRnc.AddRangeAsync(list);
+                await context.DGII.AddRangeAsync(list);
                 await context.SaveChangesAsync();
                 list.Clear();
                 logger.LogInformation($"EF seed progress: {count} rows saved.");
@@ -717,7 +715,7 @@ public static class AppDbContextSeeder
 
         if (list.Count > 0)
         {
-            await context.DgiiRnc.AddRangeAsync(list);
+            await context.DGII.AddRangeAsync(list);
             await context.SaveChangesAsync();
             logger.LogInformation($"EF seed complete! Total rows: {count}.");
         }

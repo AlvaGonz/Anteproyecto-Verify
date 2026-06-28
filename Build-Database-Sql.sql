@@ -185,8 +185,8 @@ CREATE TABLE ProyectosInmobiliarios (
 );
 GO
 
--- Tabla DgiiRnc
-CREATE TABLE DgiiRnc (
+-- Tabla DGII
+CREATE TABLE DGII (
     Rnc VARCHAR(20) PRIMARY KEY,
     NombreRazonSocial VARCHAR(250) NOT NULL,
     NombreComercial VARCHAR(250) NULL,

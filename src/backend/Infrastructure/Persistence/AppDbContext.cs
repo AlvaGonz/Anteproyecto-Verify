@@ -34,7 +34,7 @@ public class AppDbContext : DbContext
     public DbSet<ValidacionDgii> ValidacionesDgii => Set<ValidacionDgii>();
     public DbSet<ValidacionAyuntamiento> ValidacionesAyuntamiento => Set<ValidacionAyuntamiento>();
     public DbSet<DeteccionDuplicidad> DeteccionesDuplicidad => Set<DeteccionDuplicidad>();
-    public DbSet<DgiiRnc> DgiiRnc => Set<DgiiRnc>();
+    public DbSet<DGII> DGII => Set<DGII>();
     
     // RF-11 to RF-15 Entities
     public DbSet<ConsentimientoFinanciero> ConsentimientosFinancieros => Set<ConsentimientoFinanciero>();

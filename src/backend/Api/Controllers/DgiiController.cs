@@ -27,7 +27,7 @@ public class DgiiController : ControllerBase
 
         var cleanedRnc = rnc.Replace("-", "").Replace(" ", "").Trim();
 
-        var record = await _context.DgiiRnc
+        var record = await _context.DGII
             .FirstOrDefaultAsync(d => d.Rnc == cleanedRnc, cancellationToken);
 
         if (record == null)
