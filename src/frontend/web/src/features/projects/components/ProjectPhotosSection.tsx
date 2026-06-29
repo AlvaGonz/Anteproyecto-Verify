@@ -29,6 +29,16 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
   const portraitInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
+  const handlePortraitInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelect(e.target.files, "portrait");
+    if (portraitInputRef.current) portraitInputRef.current.value = "";
+  };
+
+  const handleGalleryInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelect(e.target.files, "gallery");
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
+  };
+
   useEffect(() => {
     return () => {
       pendingPhotos.forEach((p) => URL.revokeObjectURL(p.previewUrl));
@@ -86,7 +96,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
     for (const { file } of ordered) {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("tipo", "Imagen");
+      formData.append("tipoDocumento", "1"); // Use an existing enum value; backend handles images based on Content-Type
 
       try {
         await uploadDocumentAsync(formData);
@@ -273,6 +283,23 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
       <p className="text-xs text-gray-400">
         Máximo {MAX_PHOTOS} fotos · 5 MB por imagen · JPEG, PNG, WebP
       </p>
+
+      {/* Hidden file inputs */}
+      <input
+        type="file"
+        ref={portraitInputRef}
+        onChange={handlePortraitInput}
+        accept={IMAGE_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
+        className="hidden"
+      />
+      <input
+        type="file"
+        ref={galleryInputRef}
+        onChange={handleGalleryInput}
+        accept={IMAGE_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
+        multiple
+        className="hidden"
+      />
     </div>
   );
 };

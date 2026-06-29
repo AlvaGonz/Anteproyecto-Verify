@@ -17,4 +17,5 @@ export interface ProyectoDto {
   usuarioCreadorId: string;
   createdAtUtc: string;
   updatedAtUtc?: string;
+  imagenUrl?: string;
 }
