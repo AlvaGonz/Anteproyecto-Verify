@@ -28,33 +28,33 @@ public static class AppDbContextSeeder
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
-                nombre: "Admin",
-                apellido: "VeriFinca",
+                nombre: "Administrador",
+                apellido: "Principal",
                 correoElectronico: "admin@verifinca.do",
-                contrasenaHash: passwordHasher.HashPassword("Admin123!"),
+                contrasenaHash: passwordHasher.HashPassword("AdminVerifinca2026!"),
                 rol: UserRole.Administrator,
-                telefono: "809-555-0100",
-                cedula: "001-0000000-1");
+                telefono: "809-555-1000",
+                cedula: "001-1234567-8");
 
             var devUser = await GetOrCreateUsuarioAsync(
                 context,
                 nombre: "Desarrollador",
-                apellido: "Inmobiliario",
+                apellido: "Premium",
                 correoElectronico: "dev@constructora.do",
-                contrasenaHash: passwordHasher.HashPassword("Dev1234!"),
+                contrasenaHash: passwordHasher.HashPassword("DevVerifinca2026!"),
                 rol: UserRole.Professional,
-                telefono: "809-555-0200",
-                cedula: "001-0000000-2");
+                telefono: "809-555-2000",
+                cedula: "402-7654321-9");
 
             var publicUser = await GetOrCreateUsuarioAsync(
                 context,
                 nombre: "Usuario",
-                apellido: "Consulta",
-                correoElectronico: "consulta@publico.do",
-                contrasenaHash: passwordHasher.HashPassword("Consulta123!"),
+                apellido: "Validador",
+                correoElectronico: "validador@verifinca.do",
+                contrasenaHash: passwordHasher.HashPassword("Validador2026!"),
                 rol: UserRole.Consultation,
-                telefono: "809-555-0300",
-                cedula: "001-0000000-3");
+                telefono: "809-555-3000",
+                cedula: "001-9876543-2");
 
             var proyectos = new[]
             {
@@ -342,6 +342,8 @@ public static class AppDbContextSeeder
             context.Entry(existing).Property("Cedula").CurrentValue = cedula;
             context.Entry(existing).Property("Rol").CurrentValue = rol;
             context.Entry(existing).Property("ContrasenaHash").CurrentValue = contrasenaHash;
+            context.Entry(existing).Property("EmailVerificado").CurrentValue = true;
+            context.Entry(existing).Property("Activo").CurrentValue = true;
             
             await context.SaveChangesAsync();
             return existing;
@@ -349,6 +351,11 @@ public static class AppDbContextSeeder
 
         var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
         context.Usuarios.Add(user);
+        
+        // Ensure user is marked as verified and active for seeding purposes
+        context.Entry(user).Property("EmailVerificado").CurrentValue = true;
+        context.Entry(user).Property("Activo").CurrentValue = true;
+        
         await context.SaveChangesAsync();
         return user;
     }

@@ -87,12 +87,21 @@ A continuación se detalla el paso a paso del flujo del sistema al ejecutar `doc
 
 ### 🔐 Credenciales Sembradas por Defecto (Listas para Usar)
 Una vez finalizado el Paso 4, puedes iniciar sesión inmediatamente con:
-* **Desarrollador Inmobiliario (Professional)**:
-  * **Usuario:** `dev@constructora.do`
-  * **Contraseña:** `Dev1234!`
-* **Administrador (Administrator)**:
+
+* **Administrador Principal (Administrator)**:
   * **Usuario:** `admin@verifinca.do`
-  * **Contraseña:** `Admin123!`
+  * **Contraseña:** `AdminVerifinca2026!`
+  * *(Estado: Verificado y Activo)*
+
+* **Desarrollador Premium (Professional)**:
+  * **Usuario:** `dev@constructora.do`
+  * **Contraseña:** `DevVerifinca2026!`
+  * *(Estado: Verificado y Activo)*
+
+* **Usuario Validador (Consultation)**:
+  * **Usuario:** `validador@verifinca.do`
+  * **Contraseña:** `Validador2026!`
+  * *(Estado: Verificado y Activo)*
 
 > [!NOTE]
 > Gracias a las políticas de reinicio y al bucle de resiliencia del backend, si reinicias tu PC o tu Docker Desktop, el sistema reordenará el inicio por sí mismo y levantará los servicios listos para iniciar sesión sin requerir ningún comando manual adicional.
