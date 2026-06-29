@@ -43,7 +43,7 @@ task in this repository.
 
 ### Why This Exists
 
-Cursor/Windsurf agents lose full context after 15–20 turns. The codebase-memory-mcp
+agents lose full context after 15–20 turns. The codebase-memory-mcp
 provides a **live semantic graph** of every symbol, import, dependency, and
 architectural decision in this monorepo. It is the agent's persistent memory
 between sessions.
