@@ -165,3 +165,4 @@ public class ProjectService : IProjectService
         );
     }
 }
+// test codebase-memory-mcp
