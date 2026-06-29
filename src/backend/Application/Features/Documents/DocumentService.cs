@@ -117,6 +117,15 @@ public class DocumentService : IDocumentService
 
         await _documentoRepository.AddAsync(document, cancellationToken);
 
+        if (contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrEmpty(project.ImagenUrl))
+            {
+                project.SetImagenUrl(blobUrl);
+                _proyectoRepository.Update(project);
+            }
+        }
+
         // RS9: Registrar resultado de validación de integridad (exitoso)
         var validacion = new Validacion(projectId, "IntegridadDocumental", document.Id);
         validacion.CompleteValidation(

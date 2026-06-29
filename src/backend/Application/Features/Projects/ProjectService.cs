@@ -150,6 +150,7 @@ public class ProjectService : IProjectService
             proyecto.Nombre,
             proyecto.UbicacionTexto,
             proyecto.UbicacionGps,
+            proyecto.ImagenUrl,
             proyecto.ValorEstimado,
             proyecto.Categoria,
             proyecto.DatosDesarrollador,

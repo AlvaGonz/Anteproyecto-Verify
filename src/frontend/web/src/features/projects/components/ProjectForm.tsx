@@ -89,17 +89,24 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   const [matricula, setMatricula] = useState(initialData?.matricula ?? "");
 
   // ── Constantes de fotos ────────────────────────────────────────────────────
-  const MAX_PHOTOS = 10;
+  const MAX_PHOTOS = 6;
   const MAX_FILE_SIZE_MB = 5;
   const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
   const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   // ── Estado de fotos ────────────────────────────────────────────────────────
-  const [fotos, setFotos] = useState<File[]>([]);
-  const [fotosPreviews, setFotosPreviews] = useState<string[]>([]);
+  const [portrait, setPortrait] = useState<File | null>(null);
+  const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
+  const [gallery, setGallery] = useState<File[]>([]);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [fotosError, setFotosError] = useState<string | null>(null);
-  const photoInputRef = useRef<HTMLInputElement>(null);
+  
+  const portraitInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const existingFotoUrls: string[] = initialData?.fotoUrls ?? [];
+
+  // Derivado unificado para el submit — portada siempre primera
+  const fotos: File[] = portrait ? [portrait, ...gallery] : gallery;
 
   // ── Estado de superficie ───────────────────────────────────────────────────
   const [superficieM2, setSuperficieM2] = useState<number | "">(initialData?.superficieM2 ?? "");
@@ -129,46 +136,68 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   };
 
   // ── Photo Handlers ─────────────────────────────────────────────────────────
-  const handlePhotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePortraitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFotosError(null);
-    const selected = Array.from(e.target.files ?? []);
-
-    const invalidType = selected.find((f) => !ALLOWED_PHOTO_TYPES.includes(f.type));
-    if (invalidType) {
-      setFotosError(`Tipo no permitido: ${invalidType.name}. Solo JPEG, PNG y WebP.`);
-      if (photoInputRef.current) photoInputRef.current.value = "";
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
+      setFotosError("Solo se permiten JPEG, PNG y WebP.");
       return;
     }
-
-    const oversized = selected.find((f) => f.size > MAX_FILE_SIZE_BYTES);
-    if (oversized) {
-      setFotosError(`"${oversized.name}" supera el límite de ${MAX_FILE_SIZE_MB} MB.`);
-      if (photoInputRef.current) photoInputRef.current.value = "";
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setFotosError(`La imagen supera ${MAX_FILE_SIZE_MB} MB.`);
       return;
     }
-
-    const totalAfterAdd = existingFotoUrls.length + fotos.length + selected.length;
-    if (totalAfterAdd > MAX_PHOTOS) {
-      setFotosError(`Máximo ${MAX_PHOTOS} fotos. Ya tienes ${existingFotoUrls.length + fotos.length}.`);
-      if (photoInputRef.current) photoInputRef.current.value = "";
-      return;
-    }
-
-    const newFiles = [...fotos, ...selected];
-    setFotos(newFiles);
-    setFotosPreviews(newFiles.map((f) => URL.createObjectURL(f)));
-    if (photoInputRef.current) photoInputRef.current.value = "";
+    if (portraitPreview) URL.revokeObjectURL(portraitPreview);
+    setPortrait(file);
+    setPortraitPreview(URL.createObjectURL(file));
+    if (portraitInputRef.current) portraitInputRef.current.value = "";
   };
 
-  const removeNewPhoto = (index: number) => {
-    URL.revokeObjectURL(fotosPreviews[index]);
-    setFotos((prev) => prev.filter((_, i) => i !== index));
-    setFotosPreviews((prev) => prev.filter((_, i) => i !== index));
+  const removePortrait = () => {
+    if (portraitPreview) URL.revokeObjectURL(portraitPreview);
+    setPortrait(null);
+    setPortraitPreview(null);
+  };
+
+  const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFotosError(null);
+    const selected = Array.from(e.target.files ?? []);
+    const existingGalleryCount = existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0;
+    const remaining = 5 - gallery.length - existingGalleryCount;
+
+    if (selected.length > remaining) {
+      setFotosError(`Solo puedes agregar ${remaining} foto${remaining !== 1 ? "s" : ""} más.`);
+      return;
+    }
+    const invalidType = selected.find((f) => !ALLOWED_PHOTO_TYPES.includes(f.type));
+    if (invalidType) {
+      setFotosError(`Tipo no permitido: ${invalidType.name}.`);
+      return;
+    }
+    const oversized = selected.find((f) => f.size > MAX_FILE_SIZE_BYTES);
+    if (oversized) {
+      setFotosError(`"${oversized.name}" supera ${MAX_FILE_SIZE_MB} MB.`);
+      return;
+    }
+    const newGallery = [...gallery, ...selected];
+    setGallery(newGallery);
+    setGalleryPreviews([...galleryPreviews, ...selected.map((f) => URL.createObjectURL(f))]);
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
+  };
+
+  const removeGalleryPhoto = (idx: number) => {
+    URL.revokeObjectURL(galleryPreviews[idx]);
+    setGallery((prev) => prev.filter((_, i) => i !== idx));
+    setGalleryPreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
   // Limpiar object URLs al desmontar
   useEffect(() => {
-    return () => { fotosPreviews.forEach((url) => URL.revokeObjectURL(url)); };
+    return () => {
+      if (portraitPreview) URL.revokeObjectURL(portraitPreview);
+      galleryPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -665,56 +694,165 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           </div>
         </div>
 
-        <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md md:col-span-2">
-          <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
+        <div className="vf-card p-8 bg-white/90 backdrop-blur-md md:col-span-2">
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2 mb-6">
             Fotos del Proyecto
           </h3>
 
-          {/* Fotos existentes (modo edición) */}
-          {existingFotoUrls.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {existingFotoUrls.map((url, idx) => (
-                <img key={idx} src={url} alt={`Foto existente ${idx + 1}`}
-                  className="w-20 h-20 object-cover rounded-xl border border-[var(--color-border)]/30" />
-              ))}
+          {fotosError && (
+            <div role="alert" className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+              {fotosError}
             </div>
           )}
 
-          {/* Botón de upload */}
-          <label htmlFor="fotos" className="flex items-center gap-2 vf-btn-secondary w-fit cursor-pointer">
-            <ImagePlus className="w-4 h-4" />
-            {initialData ? "Agregar más fotos" : "Subir fotos"}
-          </label>
-          <input
-            ref={photoInputRef}
-            id="fotos"
-            type="file"
-            multiple
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handlePhotosChange}
-            className="sr-only"
-            disabled={existingFotoUrls.length + fotos.length >= MAX_PHOTOS}
-          />
-          <p className="text-xs text-[var(--color-text-secondary)]">
-            Máximo {MAX_PHOTOS} fotos · {MAX_FILE_SIZE_MB} MB por imagen · JPEG, PNG, WebP
-          </p>
-          {fotosError && <p className="text-xs text-red-600 font-semibold">{fotosError}</p>}
+          <div className="flex flex-col md:flex-row gap-6">
 
-          {/* Previsualizaciones de fotos nuevas */}
-          {fotosPreviews.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {fotosPreviews.map((preview, idx) => (
-                <div key={idx} className="relative group">
-                  <img src={preview} alt={`Preview ${idx + 1}`}
-                    className="w-20 h-20 object-cover rounded-xl border border-[var(--color-border)]/30" />
-                  <button type="button" onClick={() => removeNewPhoto(idx)}
-                    className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md hover:bg-red-600 transition-colors">
-                    <X className="w-3 h-3" />
+            {/* ── PORTADA ── */}
+            <div className="flex-shrink-0 space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-bold text-amber-600">★</span>
+                <span className="text-sm font-semibold text-[var(--color-text-primary)]">Foto de Portada</span>
+                <span className="text-xs text-[var(--color-text-secondary)]">· thumbnail principal</span>
+              </div>
+
+              {/* Slot portada */}
+              {portraitPreview ? (
+                <div className="relative w-[200px] h-[200px] rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+                  <img
+                    src={portraitPreview}
+                    alt="Vista previa de portada"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[10px] font-black uppercase tracking-wider text-center py-1">
+                    Portada
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removePortrait}
+                    aria-label="Quitar foto de portada"
+                    className="absolute top-2 right-2 w-7 h-7 bg-black/50 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5 text-white" />
                   </button>
                 </div>
-              ))}
+              ) : existingFotoUrls[0] ? (
+                <div className="relative w-[200px] h-[200px] rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+                  <img
+                    src={existingFotoUrls[0]}
+                    alt="Portada actual"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[10px] font-black uppercase tracking-wider text-center py-1">
+                    Portada activa
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => portraitInputRef.current?.click()}
+                    aria-label="Cambiar foto de portada"
+                    className="absolute top-2 left-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold rounded-lg hover:bg-black/80 transition-colors"
+                  >
+                    Cambiar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => portraitInputRef.current?.click()}
+                  aria-label="Subir foto de portada"
+                  className="w-[200px] h-[200px] rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center justify-center gap-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                >
+                  <ImagePlus className="w-8 h-8 text-amber-400" />
+                  <span className="text-xs font-bold text-amber-500 uppercase tracking-wide">
+                    Subir portada
+                  </span>
+                </button>
+              )}
+
+              <input
+                ref={portraitInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
+                aria-label="Seleccionar foto de portada"
+                onChange={handlePortraitChange}
+              />
             </div>
-          )}
+
+            {/* Divisor vertical */}
+            <div className="hidden md:block w-px bg-[var(--color-border)]/20 self-stretch" />
+            <div className="md:hidden h-px w-full bg-[var(--color-border)]/20" />
+
+            {/* ── GALERÍA ── */}
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-[var(--color-text-primary)]">Fotos adicionales</span>
+                  <span className="text-xs text-[var(--color-text-secondary)]">· hasta 5 fotos</span>
+                </div>
+                <span className="text-xs font-medium text-[var(--color-text-secondary)]">
+                  {gallery.length + (existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0)}/5
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                {/* Fotos de galería existentes (edit mode) */}
+                {existingFotoUrls.slice(1).map((url, idx) => (
+                  <div key={`existing-${idx}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
+                    <img src={url} alt={`Foto adicional ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                ))}
+
+                {/* Previews de galería nuevas */}
+                {galleryPreviews.map((preview, idx) => (
+                  <div key={`preview-${idx}`} className="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-dashed border-teal-300">
+                    <img src={preview} alt={`Nueva foto ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                    <div className="absolute bottom-0 inset-x-0 bg-teal-500/80 text-white text-[9px] font-black uppercase tracking-wider text-center py-0.5">
+                      Por subir
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeGalleryPhoto(idx)}
+                      aria-label={`Quitar foto ${idx + 1}`}
+                      className="absolute top-1 right-1 w-5 h-5 bg-black/50 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                ))}
+
+                {/* Botón agregar galería */}
+                {gallery.length + (existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0) < 5 && (
+                  <button
+                    type="button"
+                    onClick={() => galleryInputRef.current?.click()}
+                    aria-label="Agregar fotos adicionales"
+                    className="w-full aspect-square rounded-xl border-2 border-dashed border-[var(--color-border)]/40 bg-[var(--color-surface-raised)] hover:bg-[var(--color-surface-raised)]/80 flex flex-col items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  >
+                    <ImagePlus className="w-5 h-5 text-[var(--color-text-secondary)]" />
+                    <span className="text-[10px] font-bold text-[var(--color-text-secondary)] uppercase tracking-wide">
+                      Agregar
+                    </span>
+                  </button>
+                )}
+              </div>
+
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="sr-only"
+                aria-label="Seleccionar fotos adicionales"
+                onChange={handleGalleryChange}
+              />
+
+              <p className="text-xs text-[var(--color-text-secondary)]">
+                5 MB por imagen · JPEG, PNG, WebP
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
