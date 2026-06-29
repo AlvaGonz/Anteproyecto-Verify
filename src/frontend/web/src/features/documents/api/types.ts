@@ -1,10 +1,19 @@
 export interface DocumentoDto {
-  idDocumento: number;
-  idProyecto: number;
-  nombre: string;
-  tipo: string;
-  url: string;
-  fechaSubida: string;
-  estado: "Pendiente" | "Aprobado" | "Rechazado";
-  tamanio?: number;
+  id: string;
+  proyectoId: string;
+  tipoDocumento: number;
+  nombreArchivoOriginal: string;
+  contentType: string;
+  extension: string;
+  tamanoBytes: number;
+  estadoDocumento: number;
+  activo: boolean;
+  version: number;
+  fechaEmision?: string;
+  institucionEmisora?: string;
+  usuarioCargaId: string;
+  observaciones?: string;
+  fileUrl: string;
+  createdAtUtc: string;
+  updatedAtUtc?: string;
 }

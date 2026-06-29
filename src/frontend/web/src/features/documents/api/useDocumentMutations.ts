@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import { documentKeys } from "./useDocuments";
+import { projectKeys } from "../../projects/api/useProjects";
 import type { DocumentoDto } from "./types";
 
 export const useUploadDocument = (projectId: string) => {
@@ -13,7 +14,10 @@ export const useUploadDocument = (projectId: string) => {
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       ).then(res => res.data),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });
+      qc.invalidateQueries({ queryKey: projectKeys.all });
+      qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
   });
 };

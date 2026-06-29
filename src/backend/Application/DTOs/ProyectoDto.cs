@@ -9,6 +9,7 @@ public record ProyectoDto(
     string Nombre,
     string UbicacionTexto,
     string? UbicacionGps,
+    string? ImagenUrl,
     decimal? ValorEstimado,
     ProjectCategory Categoria,
     string? DatosDesarrollador,

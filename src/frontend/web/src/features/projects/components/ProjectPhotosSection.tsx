@@ -22,12 +22,22 @@ interface ProjectPhotosSectionProps {
 
 export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ projectId }) => {
   const { data: documents = [], isLoading } = useDocuments(projectId);
-  const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument(projectId);
+  const { mutateAsync: uploadDocumentAsync, isPending: isUploading } = useUploadDocument(projectId);
 
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const portraitInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePortraitInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelect(e.target.files, "portrait");
+    if (portraitInputRef.current) portraitInputRef.current.value = "";
+  };
+
+  const handleGalleryInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelect(e.target.files, "gallery");
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
+  };
 
   useEffect(() => {
     return () => {
@@ -72,7 +82,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
     });
   };
 
-  const handleUploadAll = () => {
+  const handleUploadAll = async () => {
     if (pendingPhotos.length === 0) return;
     setUploadError(null);
 
@@ -81,16 +91,22 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
       ...pendingPhotos.filter((p) => p.role === "gallery"),
     ];
 
-    ordered.forEach(({ file }) => {
+    const toRevoke = pendingPhotos.map((p) => p.previewUrl);
+
+    for (const { file } of ordered) {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("tipo", "Imagen");
-      uploadDocument(formData, {
-        onError: () => setUploadError("Error al subir una imagen. Intenta nuevamente."),
-      });
-    });
+      formData.append("tipoDocumento", "1"); // Use an existing enum value; backend handles images based on Content-Type
 
-    pendingPhotos.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+      try {
+        await uploadDocumentAsync(formData);
+      } catch {
+        setUploadError("Error al subir una imagen. Intenta nuevamente.");
+        return;
+      }
+    }
+
+    toRevoke.forEach((url) => URL.revokeObjectURL(url));
     setPendingPhotos([]);
   };
 
@@ -267,6 +283,23 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
       <p className="text-xs text-gray-400">
         Máximo {MAX_PHOTOS} fotos · 5 MB por imagen · JPEG, PNG, WebP
       </p>
+
+      {/* Hidden file inputs */}
+      <input
+        type="file"
+        ref={portraitInputRef}
+        onChange={handlePortraitInput}
+        accept={IMAGE_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
+        className="hidden"
+      />
+      <input
+        type="file"
+        ref={galleryInputRef}
+        onChange={handleGalleryInput}
+        accept={IMAGE_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
+        multiple
+        className="hidden"
+      />
     </div>
   );
 };

@@ -9,22 +9,22 @@ export const documentKeys = {
 };
 
 const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
-  id: String(apiDoc.idDocumento),
-  proyectoId: String(apiDoc.idProyecto),
-  tipoDocumento: apiDoc.tipo as any,
-  nombreArchivoOriginal: apiDoc.nombre,
-  contentType: "application/octet-stream",
-  extension: apiDoc.nombre.split(".").pop() || "",
-  tamanoBytes: apiDoc.tamanio || 0,
-  estadoDocumento: apiDoc.estado === "Aprobado" ? DocumentStatus.Valid : DocumentStatus.Uploaded,
-  activo: true,
-  version: 1,
-  fechaEmision: apiDoc.fechaSubida,
-  institucionEmisora: "N/A",
-  usuarioCargaId: "system",
-  observaciones: "",
-  createdAtUtc: apiDoc.fechaSubida,
-  fileUrl: apiDoc.url,
+  id: String(apiDoc.id),
+  proyectoId: String(apiDoc.proyectoId),
+  tipoDocumento: apiDoc.tipoDocumento as any,
+  nombreArchivoOriginal: apiDoc.nombreArchivoOriginal,
+  contentType: apiDoc.contentType || "application/octet-stream",
+  extension: apiDoc.extension || apiDoc.nombreArchivoOriginal?.split(".").pop() || "",
+  tamanoBytes: apiDoc.tamanoBytes || 0,
+  estadoDocumento: apiDoc.estadoDocumento as DocumentStatus,
+  activo: apiDoc.activo,
+  version: apiDoc.version || 1,
+  fechaEmision: apiDoc.fechaEmision,
+  institucionEmisora: apiDoc.institucionEmisora || "N/A",
+  usuarioCargaId: apiDoc.usuarioCargaId || "system",
+  observaciones: apiDoc.observaciones || "",
+  createdAtUtc: apiDoc.createdAtUtc,
+  fileUrl: apiDoc.fileUrl,
 });
 
 export const useDocuments = (projectId: string) =>
@@ -32,6 +32,8 @@ export const useDocuments = (projectId: string) =>
     queryKey: documentKeys.byProject(projectId),
     queryFn: () => apiClient.get<ApiDocumentoDto[]>(`/projects/${projectId}/documents`).then(res => res.data.map(mapApiDocument)),
     enabled: !!projectId,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
 export const useUploadDocument = (projectId: string) => {
