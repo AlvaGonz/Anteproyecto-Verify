@@ -11,9 +11,6 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "github-actions"
-
-  # Keep pnpm frontend deps up to date
   - package-ecosystem: "npm"
     directory: "/src/frontend/web"
     schedule:
