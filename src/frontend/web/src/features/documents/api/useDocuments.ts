@@ -32,6 +32,8 @@ export const useDocuments = (projectId: string) =>
     queryKey: documentKeys.byProject(projectId),
     queryFn: () => apiClient.get<ApiDocumentoDto[]>(`/projects/${projectId}/documents`).then(res => res.data.map(mapApiDocument)),
     enabled: !!projectId,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
 export const useUploadDocument = (projectId: string) => {
