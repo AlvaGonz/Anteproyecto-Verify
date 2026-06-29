@@ -1,0 +1,22 @@
+{
+  "entryPoints": [
+    "src/main.tsx",
+    "src/App.tsx"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.stories.tsx",
+    "**/e2e/**",
+    "**/playwright/**",
+    "dist-node/**"
+  ],
+  "keepPatterns": [
+    "^use[A-Z]",
+    "^on[A-Z]",
+    "^handle[A-Z]"
+  ],
+  "extensions": [".ts", ".tsx"]
+}
