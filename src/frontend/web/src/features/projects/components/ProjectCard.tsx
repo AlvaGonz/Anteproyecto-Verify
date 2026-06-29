@@ -42,7 +42,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
            size="lg"
            className="absolute inset-0 w-full h-full object-cover"
          />
-         <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary to-primary/40 opacity-90"></div>
+         <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/20 to-transparent"></div>
          
          <div className="absolute top-4 left-4 z-10">
             <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border shadow-lg backdrop-blur-md ${

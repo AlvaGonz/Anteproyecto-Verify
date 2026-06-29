@@ -15,6 +15,8 @@ public static class ApplicationBuilderExtensions
         app.UseSwaggerUI();
 
         app.UseCors("ViteDev");
+
+        app.UseStaticFiles();
         
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
