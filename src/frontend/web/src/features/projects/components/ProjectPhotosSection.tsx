@@ -22,7 +22,7 @@ interface ProjectPhotosSectionProps {
 
 export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ projectId }) => {
   const { data: documents = [], isLoading } = useDocuments(projectId);
-  const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument(projectId);
+  const { mutateAsync: uploadDocumentAsync, isPending: isUploading } = useUploadDocument(projectId);
 
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -72,7 +72,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
     });
   };
 
-  const handleUploadAll = () => {
+  const handleUploadAll = async () => {
     if (pendingPhotos.length === 0) return;
     setUploadError(null);
 
@@ -81,16 +81,22 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
       ...pendingPhotos.filter((p) => p.role === "gallery"),
     ];
 
-    ordered.forEach(({ file }) => {
+    const toRevoke = pendingPhotos.map((p) => p.previewUrl);
+
+    for (const { file } of ordered) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("tipo", "Imagen");
-      uploadDocument(formData, {
-        onError: () => setUploadError("Error al subir una imagen. Intenta nuevamente."),
-      });
-    });
 
-    pendingPhotos.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+      try {
+        await uploadDocumentAsync(formData);
+      } catch {
+        setUploadError("Error al subir una imagen. Intenta nuevamente.");
+        return;
+      }
+    }
+
+    toRevoke.forEach((url) => URL.revokeObjectURL(url));
     setPendingPhotos([]);
   };
 
