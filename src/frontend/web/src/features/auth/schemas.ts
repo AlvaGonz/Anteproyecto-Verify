@@ -92,7 +92,7 @@ telefono: z
        if (val === undefined || val === "") return true;
        return /^(809|829|849)\d{7}$/.test(val);
      }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
-  changePassword: z.boolean().default(false),
+  changePassword: z.boolean(),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
   confirmPassword: z.string().optional(),

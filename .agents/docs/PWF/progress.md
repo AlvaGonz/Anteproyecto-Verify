@@ -10,6 +10,7 @@
 | Fix Project Photo Persistence | N/A | feat-codebase-memory-mcp | b64c1f53 | 2026-06-29 |
 | AGENTS.md v5 — codebase-memory-mcp §0 mandatory | N/A | feat-codebase-memory-mcp | 6131fa9a | 2026-06-29 |
 | README.md full rewrite from codebase graph | N/A | feat-codebase-memory-mcp | efcbffa5 | 2026-06-29 |
+| E2E Test Success for Project Photos | N/A | feat-codebase-memory-mcp | 5661d1a6 | 2026-06-29 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

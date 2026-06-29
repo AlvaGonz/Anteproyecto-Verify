@@ -286,6 +286,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
 
       {/* Hidden file inputs */}
       <input
+        id="input-portada"
         type="file"
         ref={portraitInputRef}
         onChange={handlePortraitInput}

@@ -30,12 +30,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     navigate("/login");
   };
 
-  const firstName = user?.name ? user.name.split(" ")[0] : "Usuario";
-  const initials = user?.name
-    ? user.name
+  const fullName = user ? `${user.nombre || ""} ${user.apellido || ""}`.trim() : "";
+  const firstName = fullName ? fullName.split(" ")[0] : "Usuario";
+  const initials = fullName
+    ? fullName
         .split(" ")
         .filter(Boolean)
-        .map((n) => n[0])
+        .map((n: string) => n[0])
         .join("")
         .slice(0, 2)
         .toUpperCase()

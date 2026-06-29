@@ -35,12 +35,13 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
     }
   };
 
-  const displayName = user?.name || "Admin_Verifinca";
-  const initials = user?.name
-    ? user.name
+  const fullName = user ? `${user.nombre || ""} ${user.apellido || ""}`.trim() : "";
+  const displayName = fullName || "Admin_Verifinca";
+  const initials = fullName
+    ? fullName
         .split(" ")
         .filter(Boolean)
-        .map((n) => n[0])
+        .map((n: string) => n[0])
         .join("")
         .slice(0, 2)
         .toUpperCase()
