@@ -261,6 +261,7 @@ public class DocumentService : IDocumentService
         d.InstitucionEmisora,
         d.UsuarioCargaId,
         d.Observaciones,
+        d.RutaArchivo,
         d.CreatedAtUtc,
         d.UpdatedAtUtc
     );

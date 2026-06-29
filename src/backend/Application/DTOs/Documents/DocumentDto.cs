@@ -18,6 +18,7 @@ public record DocumentDto(
     string? InstitucionEmisora,
     Guid UsuarioCargaId,
     string? Observaciones,
+    string FileUrl,
     DateTime CreatedAtUtc,
     DateTime? UpdatedAtUtc
 );
