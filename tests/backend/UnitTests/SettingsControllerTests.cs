@@ -27,12 +27,18 @@ public class SettingsControllerTests
         return new AppDbContext(options);
     }
 
-    private void SetupControllerContext(SettingsController controller, string? tokenValue)
+    private void SetupControllerContext(global::Api.Controllers.SettingsController controller, string? email, string role = "user")
     {
         var httpContext = new DefaultHttpContext();
-        if (tokenValue != null)
+        if (email != null)
         {
-            httpContext.Request.Headers.Append("Cookie", $"vf_token={tokenValue}");
+            var claims = new List<System.Security.Claims.Claim>
+            {
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, email),
+                new System.Security.Claims.Claim("role", role)
+            };
+            var identity = new System.Security.Claims.ClaimsIdentity(claims, "TestAuthType");
+            httpContext.User = new System.Security.Claims.ClaimsPrincipal(identity);
         }
         
         controller.ControllerContext = new ControllerContext
@@ -46,11 +52,12 @@ public class SettingsControllerTests
     {
         // Arrange
         using var context = CreateDbContext("Settings_GetUsers_NoCookie");
-        var controller = new SettingsController(context);
+        var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
+        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
         SetupControllerContext(controller, null);
 
         // Act
-        var result = await controller.GetUsers(CancellationToken.None);
+        var result = await controller.GetUsers(1, 50, CancellationToken.None);
 
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
@@ -64,19 +71,19 @@ public class SettingsControllerTests
         var dbName = "Settings_GetUsers_NotAdmin";
         using (var context = CreateDbContext(dbName))
         {
-            var user = new Usuario("Juan", "Perez", "juan@verifinca.do", "hash", UserRole.Professional, "123", "123");
+            var user = new Usuario("Juan", "Perez", "juan@verifinca.do", "hash", UserRole.User, "123", "123");
             context.Usuarios.Add(user);
             await context.SaveChangesAsync();
         }
 
         using (var context = CreateDbContext(dbName))
         {
-            var controller = new SettingsController(context);
-            var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("juan@verifinca.do"));
-            SetupControllerContext(controller, token);
+            var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            SetupControllerContext(controller, "juan@verifinca.do", "user");
 
             // Act
-            var result = await controller.GetUsers(CancellationToken.None);
+            var result = await controller.GetUsers(1, 50, CancellationToken.None);
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);
@@ -97,7 +104,7 @@ public class SettingsControllerTests
         using (var context = CreateDbContext(dbName))
         {
             var admin = new Usuario("Admin", "User", "admin@verifinca.do", "hash", UserRole.Administrator, "123", "123");
-            var dev = new Usuario("Dev", "User", "dev@verifinca.do", "hash", UserRole.Professional, "456", "456");
+            var dev = new Usuario("Dev", "User", "dev@verifinca.do", "hash", UserRole.User, "456", "456");
             context.Usuarios.AddRange(admin, dev);
 
             context.Perfiles.AddRange(
@@ -105,8 +112,14 @@ public class SettingsControllerTests
                 new Perfil { IdPerfil = devProfileId, NombrePerfil = "DEVELOPER" }
             );
             context.PlanesSuscripcion.AddRange(
-                new PlanSuscripcion { Idsuscripcion = freePlanId, NombrePlan = "Gratuito", Precio = 0.00m },
-                new PlanSuscripcion { Idsuscripcion = proPlanId, NombrePlan = "Profesional", Precio = 3500.00m }
+                PlanSuscripcion.Create(freePlanId, "Gratuito", 0.00m, 5, 1, false, false, false, false),
+                PlanSuscripcion.Create(proPlanId, "Profesional", 3500.00m, -1, 5, true, true, false, false)
+            );
+            
+            // Add legacy view records manually for InMemory testing
+            context.UsuariosLegacy.AddRange(
+                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", NombreCompleto = "A A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
+                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", NombreCompleto = "D D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
             );
 
             await context.SaveChangesAsync();
@@ -114,17 +127,18 @@ public class SettingsControllerTests
 
         using (var context = CreateDbContext(dbName))
         {
-            var controller = new SettingsController(context);
-            var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("admin@verifinca.do"));
-            SetupControllerContext(controller, token);
+            var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             // Act
-            var result = await controller.GetUsers(CancellationToken.None);
+            var result = await controller.GetUsers(1, 50, CancellationToken.None);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var usersList = Assert.IsAssignableFrom<IEnumerable<object>>(okResult.Value);
-            Assert.Equal(2, usersList.Count());
+            var response = Assert.IsType<global::Api.Controllers.PaginatedResponse<global::Api.Controllers.AdminUserSettingsDto>>(okResult.Value);
+            Assert.Equal(2, response.TotalCount);
+            Assert.Equal(2, response.Items.Count);
 
             // Verify syncing occurred
             var legacyUsers = await context.UsuariosLegacy.ToListAsync();
@@ -147,7 +161,7 @@ public class SettingsControllerTests
         using (var context = CreateDbContext(dbName))
         {
             var admin = new Usuario("Admin", "User", "admin@verifinca.do", "hash", UserRole.Administrator, "123", "123");
-            var dev = new Usuario("Dev", "User", "dev@verifinca.do", "hash", UserRole.Professional, "456", "456");
+            var dev = new Usuario("Dev", "User", "dev@verifinca.do", "hash", UserRole.User, "456", "456");
             
             // Set explicit ID for testing
             typeof(EntityBase).GetProperty("Id")?.SetValue(dev, devUserGuid);
@@ -160,16 +174,21 @@ public class SettingsControllerTests
                 new Perfil { IdPerfil = validatorProfileId, NombrePerfil = "VALIDATOR" }
             );
 
+            context.UsuariosLegacy.AddRange(
+                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", NombreCompleto = "A A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
+                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", NombreCompleto = "D D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
+            );
+
             await context.SaveChangesAsync();
         }
 
         using (var context = CreateDbContext(dbName))
         {
-            var controller = new SettingsController(context);
-            var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("admin@verifinca.do"));
-            SetupControllerContext(controller, token);
+            var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
-            var request = new UpdateRoleRequest { Role = "validator" };
+            var request = new global::Api.Controllers.UpdateRoleRequest { Role = "user" };
 
             // Act
             var result = await controller.UpdateUserRole(devUserGuid, request, CancellationToken.None);
@@ -180,14 +199,14 @@ public class SettingsControllerTests
             // Verify DB update
             var updatedUser = await context.Usuarios.FindAsync(devUserGuid);
             Assert.NotNull(updatedUser);
-            Assert.Equal(UserRole.Consultation, updatedUser.Rol);
+            Assert.Equal(UserRole.User, updatedUser.Rol);
 
             var legacyUser = await context.UsuariosLegacy.FirstOrDefaultAsync(lu => lu.Email == "dev@verifinca.do");
             Assert.NotNull(legacyUser);
 
             var acceso = await context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == legacyUser.IdUsuario);
             Assert.NotNull(acceso);
-            Assert.Equal(validatorProfileId, acceso.IdPerfil); // VALIDATOR profile
+            Assert.Equal(devProfileId, acceso.IdPerfil);
         }
     }
 
@@ -202,23 +221,28 @@ public class SettingsControllerTests
         using (var context = CreateDbContext(dbName))
         {
             var admin = new Usuario("Admin", "User", "admin@verifinca.do", "hash", UserRole.Administrator, "123", "123");
-            var dev = new Usuario("Dev", "User", "dev@verifinca.do", "hash", UserRole.Professional, "456", "456");
+            var dev = new Usuario("Dev", "User", "dev@verifinca.do", "hash", UserRole.User, "456", "456");
             
             typeof(EntityBase).GetProperty("Id")?.SetValue(dev, devUserGuid);
 
             context.Usuarios.AddRange(admin, dev);
-            context.PlanesSuscripcion.Add(new PlanSuscripcion { Idsuscripcion = empresaPlanId, NombrePlan = "Empresa", Precio = 10000.00m });
+            context.PlanesSuscripcion.Add(PlanSuscripcion.Create(empresaPlanId, "Empresa", 10000.00m, -1, -1, true, true, true, true));
+
+            context.UsuariosLegacy.AddRange(
+                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", NombreCompleto = "A A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
+                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", NombreCompleto = "D D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
+            );
 
             await context.SaveChangesAsync();
         }
 
         using (var context = CreateDbContext(dbName))
         {
-            var controller = new SettingsController(context);
-            var token = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("admin@verifinca.do"));
-            SetupControllerContext(controller, token);
+            var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
-            var request = new UpdatePlanRequest { PlanId = empresaPlanId };
+            var request = new global::Api.Controllers.UpdatePlanRequest { PlanId = empresaPlanId };
 
             // Act
             var result = await controller.UpdateUserPlan(devUserGuid, request, CancellationToken.None);

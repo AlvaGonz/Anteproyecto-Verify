@@ -11,9 +11,11 @@ using Application.DTOs;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Application.Common.Exceptions;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _projectService;
@@ -88,6 +90,14 @@ public class ProjectsController : ControllerBase
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message, field = ex.ParamName });
+        }
+        catch (QuotaExceededException ex)
+        {
+            return StatusCode(402, new { 
+                error = "QUOTA_EXCEEDED", 
+                tier = ex.TierName, 
+                message = ex.Message 
+            });
         }
     }
 

@@ -10,8 +10,10 @@ using Application.Contracts.Projects;
 using Application.DTOs;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Policies;
 
 using Application.Abstractions.Notifications;
+using Application.Common.Exceptions;
 
 public class ProjectService : IProjectService
 {
@@ -52,6 +54,22 @@ public class ProjectService : IProjectService
 
     public async Task<ProyectoDto> CreateProjectAsync(CreateProyectoDto dto, CancellationToken cancellationToken = default)
     {
+        var usuario = await _usuarioRepository.GetByIdWithPlanAsync(dto.UsuarioCreadorId, cancellationToken);
+        if (usuario == null)
+        {
+            throw new KeyNotFoundException($"User with id {dto.UsuarioCreadorId} not found.");
+        }
+
+        var proyectosActuales = await _proyectoRepository.CountByUsuarioAsync(dto.UsuarioCreadorId, cancellationToken);
+        
+        if (!SubscriptionTierPolicy.CanCreateProject(usuario, proyectosActuales))
+        {
+            throw new QuotaExceededException(
+                SubscriptionTierPolicy.GetTierName(usuario), 
+                "MaxProyectos", 
+                "Límite de proyectos alcanzado para su plan actual. Considere mejorar su plan.");
+        }
+
         var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {

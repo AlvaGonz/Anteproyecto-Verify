@@ -78,104 +78,108 @@ public static class AppDbContextSeeder
                 proyectoEntities.Add(proyecto);
             }
 
-            var p1 = proyectoEntities[0];
-            var p2 = proyectoEntities[1];
-            var p3 = proyectoEntities[2];
+            try {
+                var p1 = proyectoEntities[0];
+                var p2 = proyectoEntities[1];
+                var p3 = proyectoEntities[2];
 
-            await GetOrCreateDocumentoAsync(
-                context,
-                proyectoId: p1.Id,
-                usuarioCargaId: devUser.Id,
-                tipo: DocumentType.CertificadoTitulo,
-                nombreOriginal: "Certificado_Titulo_BellaVista.pdf",
-                url: "https://mockstorage.blob.core.windows.net/docs/Certificado_Titulo_BellaVista.pdf",
-                status: DocumentStatus.Valid);
+                await GetOrCreateDocumentoAsync(
+                    context,
+                    proyectoId: p1.Id,
+                    usuarioCargaId: devUser.Id,
+                    tipo: DocumentType.CertificadoTitulo,
+                    nombreOriginal: "Certificado_Titulo_BellaVista.pdf",
+                    url: "https://mockstorage.blob.core.windows.net/docs/Certificado_Titulo_BellaVista.pdf",
+                    status: DocumentStatus.Valid);
 
-            await GetOrCreateDocumentoAsync(
-                context,
-                proyectoId: p1.Id,
-                usuarioCargaId: devUser.Id,
-                tipo: DocumentType.CertificadoEIA,
-                nombreOriginal: "Permiso_Ambiental_BellaVista.pdf",
-                url: "https://mockstorage.blob.core.windows.net/docs/Permiso_Ambiental_BellaVista.pdf",
-                status: DocumentStatus.Valid);
+                await GetOrCreateDocumentoAsync(
+                    context,
+                    proyectoId: p1.Id,
+                    usuarioCargaId: devUser.Id,
+                    tipo: DocumentType.CertificadoEIA,
+                    nombreOriginal: "Permiso_Ambiental_BellaVista.pdf",
+                    url: "https://mockstorage.blob.core.windows.net/docs/Permiso_Ambiental_BellaVista.pdf",
+                    status: DocumentStatus.Valid);
 
-            await GetOrCreateDocumentoAsync(
-                context,
-                proyectoId: p2.Id,
-                usuarioCargaId: devUser.Id,
-                tipo: DocumentType.PlanosArquitectonicos,
-                nombreOriginal: "Planos_LosCacicazgos.pdf",
-                url: "https://mockstorage.blob.core.windows.net/docs/Planos_LosCacicazgos.pdf",
-                status: DocumentStatus.Uploaded);
+                await GetOrCreateDocumentoAsync(
+                    context,
+                    proyectoId: p2.Id,
+                    usuarioCargaId: devUser.Id,
+                    tipo: DocumentType.PlanosArquitectonicos,
+                    nombreOriginal: "Planos_LosCacicazgos.pdf",
+                    url: "https://mockstorage.blob.core.windows.net/docs/Planos_LosCacicazgos.pdf",
+                    status: DocumentStatus.Uploaded);
 
-            await GetOrCreateValidacionAsync(context, proyectoId: p1.Id, status: ValidationStatus.Completed, esLegitimo: true);
-            await GetOrCreateValidacionAsync(context, proyectoId: p3.Id, status: ValidationStatus.Failed, esLegitimo: false);
+                await GetOrCreateValidacionAsync(context, proyectoId: p1.Id, status: ValidationStatus.Completed, esLegitimo: true);
+                await GetOrCreateValidacionAsync(context, proyectoId: p3.Id, status: ValidationStatus.Failed, esLegitimo: false);
 
-            await GetOrCreateHallazgoAsync(
-                context,
-                proyectoId: p3.Id,
-                titulo: "Permiso de construcción rechazado",
-                descripcion: "Falta firma del director de planeamiento urbano",
-                severidad: FindingSeverity.Critical,
-                fuente: "Ayuntamiento");
+                await GetOrCreateHallazgoAsync(
+                    context,
+                    proyectoId: p3.Id,
+                    titulo: "Permiso de construcción rechazado",
+                    descripcion: "Falta firma del director de planeamiento urbano",
+                    severidad: FindingSeverity.Critical,
+                    fuente: "Ayuntamiento");
 
-            await GetOrCreateAuditoriaAsync(
-                context,
-                usuarioId: devUser.Id,
-                accion: "ProjectCreated",
-                tipoEvento: "PROYECTO",
-                entidad: "Proyecto",
-                entidadId: p1.Id.ToString(),
-                proyectoId: p1.Id,
-                detalle: "Proyecto Torre Bella Vista Piantini creado");
+                await GetOrCreateAuditoriaAsync(
+                    context,
+                    usuarioId: devUser.Id,
+                    accion: "ProjectCreated",
+                    tipoEvento: "PROYECTO",
+                    entidad: "Proyecto",
+                    entidadId: p1.Id.ToString(),
+                    proyectoId: p1.Id,
+                    detalle: "Proyecto Torre Bella Vista Piantini creado");
 
-            await GetOrCreateAuditoriaAsync(
-                context,
-                usuarioId: adminUser.Id,
-                accion: "ValidationExecuted",
-                tipoEvento: "VALIDACION",
-                entidad: "Validacion",
-                entidadId: p1.Id.ToString(),
-                proyectoId: p1.Id,
-                detalle: "Validación interna ejecutada con resultado: Completado");
+                await GetOrCreateAuditoriaAsync(
+                    context,
+                    usuarioId: adminUser.Id,
+                    accion: "ValidationExecuted",
+                    tipoEvento: "VALIDACION",
+                    entidad: "Validacion",
+                    entidadId: p1.Id.ToString(),
+                    proyectoId: p1.Id,
+                    detalle: "Validación interna ejecutada con resultado: Completado");
 
-            var reporte = await GetOrCreateReporteAsync(context, proyectoId: p1.Id, generadoPorUsuarioId: adminUser.Id);
-            if (reporte.EstadoReporte != ReportStatus.Published)
-            {
-                reporte.UpdateStatus(
-                    ReportStatus.Published,
-                    resumen: "Reporte interno de validación completado. Sin hallazgos críticos.",
-                    detalle: "Proyecto validado para demo.",
-                    esApto: true);
-                await context.SaveChangesAsync();
+                var reporte = await GetOrCreateReporteAsync(context, proyectoId: p1.Id, generadoPorUsuarioId: adminUser.Id);
+                if (reporte.EstadoReporte != ReportStatus.Published)
+                {
+                    reporte.UpdateStatus(
+                        ReportStatus.Published,
+                        resumen: "Reporte interno de validación completado. Sin hallazgos críticos.",
+                        detalle: "Proyecto validado para demo.",
+                        esApto: true);
+                    await context.SaveChangesAsync();
+                }
+
+                await GetOrCreateCertificacionAsync(
+                    context,
+                    proyectoId: p1.Id,
+                    reporteId: reporte.Id,
+                    emisorId: adminUser.Id,
+                    codigoVerificacion: "VF-2026-ABC123XYZ",
+                    urlVerificacion: "https://verifinca.do/verify/VF-2026-ABC123XYZ",
+                    score: 95,
+                    estadoIntegridad: IntegrityStatus.Valid);
+
+                await GetOrCreateNotificacionAsync(
+                    context,
+                    usuarioId: devUser.Id,
+                    mensaje: "El proyecto Torre Bella Vista Piantini ha sido publicado.",
+                    tipo: "ProjectPublished",
+                    ruta: $"/admin/projects/{p1.Id}",
+                    markRead: false);
+
+                await GetOrCreateNotificacionAsync(
+                    context,
+                    usuarioId: devUser.Id,
+                    mensaje: "Validación fallida para Proyecto Costero La Romana.",
+                    tipo: "ValidationFailed",
+                    ruta: $"/admin/projects/{p3.Id}",
+                    markRead: true);
+            } catch (Exception ex) {
+                logger.LogWarning($"Skipping domain seeding due to missing tables: {ex.Message}");
             }
-
-            await GetOrCreateCertificacionAsync(
-                context,
-                proyectoId: p1.Id,
-                reporteId: reporte.Id,
-                emisorId: adminUser.Id,
-                codigoVerificacion: "VF-2026-ABC123XYZ",
-                urlVerificacion: "https://verifinca.do/verify/VF-2026-ABC123XYZ",
-                score: 95,
-                estadoIntegridad: IntegrityStatus.Valid);
-
-            await GetOrCreateNotificacionAsync(
-                context,
-                usuarioId: devUser.Id,
-                mensaje: "El proyecto Torre Bella Vista Piantini ha sido publicado.",
-                tipo: "ProjectPublished",
-                ruta: $"/admin/projects/{p1.Id}",
-                markRead: false);
-
-            await GetOrCreateNotificacionAsync(
-                context,
-                usuarioId: devUser.Id,
-                mensaje: "Validación fallida para Proyecto Costero La Romana.",
-                tipo: "ValidationFailed",
-                ruta: $"/admin/projects/{p3.Id}",
-                markRead: true);
 
             // Seeding Legacy Profiles, Permissions, and Plans
             if (!await context.Perfiles.AnyAsync())
@@ -239,10 +243,11 @@ public static class AppDbContextSeeder
             {
                 logger.LogInformation("Seeding legacy subscription plans...");
                 context.PlanesSuscripcion.AddRange(
-                    new PlanSuscripcion { NombrePlan = "Gratuito", Precio = 0.00m },
-                    new PlanSuscripcion { NombrePlan = "Profesional", Precio = 3500.00m },
-                    new PlanSuscripcion { NombrePlan = "Empresa", Precio = 10000.00m },
-                    new PlanSuscripcion { NombrePlan = "Enterprise", Precio = 30000.00m }
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Gratuito", 0.00m, 5, 1, true, false, false, false),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Consultor", 1000.00m, 50, 5, true, true, false, false),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Profesional", 3500.00m, -1, 10, true, true, true, false),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Empresa", 10000.00m, -1, 50, true, true, true, true),
+                    PlanSuscripcion.Create(Guid.NewGuid(), "Enterprise", 30000.00m, -1, -1, true, true, true, true)
                 );
                 await context.SaveChangesAsync();
             }
@@ -285,8 +290,7 @@ public static class AppDbContextSeeder
                     var targetPerfil = u.Rol switch
                     {
                         UserRole.Administrator => adminLegacyProfile,
-                        UserRole.Professional => devLegacyProfile,
-                        UserRole.Consultation => valLegacyProfile,
+                        UserRole.User => devLegacyProfile,
                         _ => devLegacyProfile
                     };
 
@@ -316,6 +320,16 @@ public static class AppDbContextSeeder
 
             logger.LogInformation("Prototype demo data seeding completed successfully.");
             await SeedDgiiAsync(context, logger);
+
+            var config = scope.ServiceProvider.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
+            if (config == null || config["IsTestingEnvironment"] != "true")
+            {
+                await SeedDgiiRncAsync(context, logger);
+            }
+            else
+            {
+                logger.LogInformation("Skipping DGII RNC seeding in Testing environment.");
+            }
         }
         catch (Exception ex)
         {

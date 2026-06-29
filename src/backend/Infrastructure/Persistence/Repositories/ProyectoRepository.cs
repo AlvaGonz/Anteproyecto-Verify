@@ -40,6 +40,12 @@ public class ProyectoRepository : IProyectoRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<int> CountByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Proyectos
+            .CountAsync(p => p.UsuarioCreadorId == usuarioId, cancellationToken);
+    }
+
     public async Task AddAsync(Proyecto proyecto, CancellationToken cancellationToken = default)
     {
         await _context.Proyectos.AddAsync(proyecto, cancellationToken);

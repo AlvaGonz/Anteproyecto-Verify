@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export const LandingNav: React.FC = () => {
   const [scrolled, setScrolled] = React.useState(false);
+  const { isAuthenticated } = useAuth();
 
   React.useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40);
@@ -48,18 +50,29 @@ export const LandingNav: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <Link
-          to="/login"
-          className="hidden sm:block text-sm font-bold text-secondary hover:text-primary px-4 py-2 transition-colors"
-        >
-          Acceso Clientes
-        </Link>
-        <Link
-          to="/register"
-          className="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all"
-        >
-          Crear cuenta
-        </Link>
+        {isAuthenticated ? (
+          <Link
+            to="/admin/dashboard"
+            className="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all"
+          >
+            Ir al Portal
+          </Link>
+        ) : (
+          <>
+            <Link
+              to="/login"
+              className="hidden sm:block text-sm font-bold text-secondary hover:text-primary px-4 py-2 transition-colors"
+            >
+              Acceso Clientes
+            </Link>
+            <Link
+              to="/register"
+              className="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all"
+            >
+              Crear cuenta
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

@@ -2,64 +2,58 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { useUsers, useProfiles, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
+import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
 import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
-import { UsersTable, UserFormModal, DeleteModal } from "../../features/settings/components";
+import { UsersTable, UserFormModal, DeleteModal, MyProfileForm } from "../../features/settings/components";
 import {
   Settings,
-  RefreshCw,
   Users,
   Shield,
   Loader2,
   UserCheck,
-  Check
+  User
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
-type TabId = "users" | "permissions";
+type TabId = "profile" | "users";
 
-const permissionLabels: Record<string, string> = {
-  "GestionarUsuarios": "Gestión de Usuarios",
-  "ConfigurarReglas": "Configuración de Reglas",
-  "VisualizarAuditoria": "Visualización de Auditoría",
-  "CrearProyectos": "Creación de Proyectos",
-  "ValidarProyectos": "Validación de Proyectos"
-};
+
 
 export const SettingsPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<TabId>("users");
+  const [activeTab, setActiveTab] = useState<TabId>("profile");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<CreateUserDto>({ name: "", email: "", role: "user", telefono: "", cedula: "" });
+  const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
-  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers();
-  const { data: profiles = [], isLoading: isLoadingProfiles, refetch: refetchProfiles } = useProfiles();
-  const { data: plans = [], isLoading: isLoadingPlans, refetch: refetchPlans } = usePlans();
+  const isAdmin = user?.role === "admin";
+
+  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin);
+
+  const { data: plans = [], isLoading: isLoadingPlans, refetch: refetchPlans } = usePlans(isAdmin);
 
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
 
-  const loading = isLoadingUsers || isLoadingProfiles || isLoadingPlans;
+  const loading = isAdmin && (isLoadingUsers || isLoadingPlans);
   const isProcessing = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
 
-  // Security Check: Only admin allowed
+  // Security Check: Redirect non-admins away from users/permissions tabs
   useEffect(() => {
-    if (user && user.role !== "admin") {
-      addToast("Acceso denegado. Se requieren permisos de administrador.", "error");
-      navigate("/admin/dashboard");
+    if (user && user.role !== "admin" && (activeTab === "users")) {
+      setActiveTab("profile");
     }
-  }, [user, navigate]);
+  }, [user, activeTab]);
 
   const loadData = () => {
     refetchUsers();
-    refetchProfiles();
+
     refetchPlans();
   };
 
@@ -67,18 +61,18 @@ export const SettingsPage: React.FC = () => {
     e.preventDefault();
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s]+$/;
-    if (!nameRegex.test(formData.name)) {
+    if (!nameRegex.test(formData.nombre)) {
       addToast("El nombre solo puede contener letras", "error");
       return;
     }
 
-    if (formData.telefono) {
-      const telDigits = formData.telefono.replace(/\D/g, "");
-      if (telDigits.length > 0 && !/^(809|829|849)\d{7}$/.test(telDigits)) {
-        addToast("Teléfono inválido. Solo códigos 809, 829 o 849", "error");
-        return;
-      }
-    }
+if (formData.telefono) {
+       const telDigits = formData.telefono.replace(/\D/g, "");
+       if (telDigits.length > 0 && !/^(809|829|849)\d{7}$/.test(telDigits)) {
+         addToast("Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)", "error");
+         return;
+       }
+     }
 
     if (formData.cedula) {
       const cedDigits = formData.cedula.replace(/\D/g, "");
@@ -114,13 +108,13 @@ export const SettingsPage: React.FC = () => {
 
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
-    setFormData({ name: u.name, email: u.email, role: u.role, telefono: u.telefono || "", cedula: u.cedula || "" });
+    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: u.role, telefono: u.telefono || "", cedula: u.cedula || "" });
     setIsModalOpen(true);
   };
 
   const handleAddNewClick = () => {
     setEditingUser(null);
-    setFormData({ name: "", email: "", role: "user", telefono: "", cedula: "", password: "" });
+    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "" });
     setIsModalOpen(true);
   };
 
@@ -151,50 +145,56 @@ export const SettingsPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-[#223382] flex items-center gap-3">
             <Settings className="w-7 h-7" />
-            Configuración del Sistema
+            Configuración
           </h1>
-          <p className="mt-1 text-sm text-text-secondary">
-            Administre roles, accesos, asignación de planes y permisos de la plataforma.
-          </p>
         </div>
-        <button
-          onClick={loadData}
-          className="vf-btn-secondary flex items-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Actualizar Datos
-        </button>
       </div>
 
       {/* Navigation tabs */}
       <div className="flex border-b border-border">
         <button
-          onClick={() => setActiveTab("users")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-            activeTab === "users"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-text-secondary hover:text-text-primary"
-          }`}
+          onClick={() => setActiveTab("profile")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "profile"
+            ? "border-[#223382] text-[#223382]"
+            : "border-transparent text-text-secondary hover:text-text-primary"
+            }`}
         >
-          <Users className="w-4 h-4" />
-          Usuarios y Accesos
+          <User className="w-4 h-4" />
+          Mi Perfil
         </button>
-        <button
-          onClick={() => setActiveTab("permissions")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-            activeTab === "permissions"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-text-secondary hover:text-text-primary"
-          }`}
-        >
-          <Shield className="w-4 h-4" />
-          Perfiles y Permisos
-        </button>
+
+        {user?.role === "admin" && (
+          <>
+            <button
+              onClick={() => setActiveTab("users")}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "users"
+                ? "border-[#223382] text-[#223382]"
+                : "border-transparent text-text-secondary hover:text-text-primary"
+                }`}
+            >
+              <Users className="w-4 h-4" />
+              Usuarios y Accesos
+            </button>
+
+          </>
+        )}
       </div>
 
       {/* Tab Contents */}
       <div className="mt-6">
         <AnimatePresence mode="wait">
+          {activeTab === "profile" && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <MyProfileForm />
+            </motion.div>
+          )}
+
           {activeTab === "users" && (
             <motion.div
               key="users"
@@ -213,50 +213,7 @@ export const SettingsPage: React.FC = () => {
             </motion.div>
           )}
 
-          {activeTab === "permissions" && (
-            <motion.div
-              key="permissions"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="grid gap-6 md:grid-cols-3"
-            >
-              {profiles.map(p => (
-                <div key={p.perfilId} className="bg-white border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
-                  <div>
-                    <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
-                      <h3 className="font-display font-black text-lg text-[#223382] uppercase">{p.name}</h3>
-                      <Shield className={`w-6 h-6 ${
-                        p.name === "ADMIN" ? "text-red-500" : p.name === "DEVELOPER" ? "text-blue-500" : "text-green-500"
-                      }`} />
-                    </div>
 
-                    <p className="text-xs text-text-secondary mb-4 font-medium">
-                      Permisos funcionales asignados en la capa legacy:
-                    </p>
-
-                    <ul className="space-y-2.5">
-                      {p.permissions.map((perm, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-text-primary">
-                          <Check className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                          <span className="font-medium font-mono">{permissionLabels[perm] || perm}</span>
-                        </li>
-                      ))}
-                      {p.permissions.length === 0 && (
-                        <li className="text-xs text-text-secondary italic">Sin permisos asignados</li>
-                      )}
-                    </ul>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-[10px] text-text-secondary font-bold uppercase tracking-wider">
-                    <UserCheck className="w-4 h-4 text-primary" />
-                    ID de Perfil: {p.perfilId}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
 

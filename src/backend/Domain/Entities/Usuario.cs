@@ -27,6 +27,10 @@ public class Usuario : EntityBase
     [Timestamp]
     public byte[]? RowVersion { get; private set; }
 
+    public Guid? PlanSuscripcionId { get; private set; }
+    public PlanSuscripcion? Plan { get; private set; }
+    public int ConsultasUsadas { get; private set; }
+
     // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
 
@@ -62,6 +66,26 @@ public class Usuario : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void UpdateProfile(string nombre, string apellido, string telefono)
+    {
+        if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
+        if (string.IsNullOrWhiteSpace(apellido)) throw new ArgumentException("Apellido requerido", nameof(apellido));
+        if (string.IsNullOrWhiteSpace(telefono)) throw new ArgumentException("Teléfono requerido", nameof(telefono));
+        
+        Nombre = nombre;
+        Apellido = apellido;
+        NombreCompleto = $"{nombre} {apellido}";
+        Telefono = telefono;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdatePassword(string contrasenaHash)
+    {
+        if (string.IsNullOrWhiteSpace(contrasenaHash)) throw new ArgumentException("Contraseña requerida", nameof(contrasenaHash));
+        ContrasenaHash = contrasenaHash;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void UpdateRol(UserRole rol)
     {
         Rol = rol;
@@ -90,5 +114,23 @@ public class Usuario : EntityBase
         TokenVerificacionExpiraUtc = null;
         UpdatedAtUtc = DateTime.UtcNow;
         return true;
+    }
+
+    public void AsignarPlan(Guid planId)
+    {
+        PlanSuscripcionId = planId;
+        ConsultasUsadas = 0; // Reset count when changing plans
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void IncrementarConsulta()
+    {
+        ConsultasUsadas++;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public bool EsAdministrador()
+    {
+        return Rol == UserRole.Administrator;
     }
 }

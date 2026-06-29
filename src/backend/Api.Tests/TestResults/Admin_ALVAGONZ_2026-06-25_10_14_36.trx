@@ -1,0 +1,396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="df48d24e-feef-446b-9b6b-67af4fcb3cde" name="Admin@ALVAGONZ 2026-06-25 10:14:36" runUser="ALVAGONZ\Admin" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-25T10:14:36.6557354-04:00" queuing="2026-06-25T10:14:36.6557359-04:00" start="2026-06-25T10:14:35.1962833-04:00" finish="2026-06-25T10:16:18.8717226-04:00" />
+  <TestSettings name="default" id="f1193c9a-7377-48d8-b4f9-d993c005a1eb">
+    <Deployment runDeploymentRoot="Admin_ALVAGONZ_2026-06-25_10_14_36" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="de2ec65d-665c-4ed6-8432-8a30ef0bd1fe" testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" testName="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:01:42.6370942" startTime="2026-06-25T10:16:18.7495843-04:00" endTime="2026-06-25T10:16:18.7495845-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="de2ec65d-665c-4ed6-8432-8a30ef0bd1fe">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Database connection failed after retries.</Message>
+          <StackTrace>   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 68&#xD;
+   at Program.&lt;Main&gt;(String[] args)&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+   at Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\SwaggerTests.cs:line 20&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2cf7176e-97f3-4131-843e-6f3081ff8879" testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" computerName="ALVAGONZ" duration="00:00:00.0176473" startTime="2026-06-25T10:14:36.5823267-04:00" endTime="2026-06-25T10:14:36.5823267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2cf7176e-97f3-4131-843e-6f3081ff8879" />
+    <UnitTestResult executionId="ccddc5ff-bd7d-424b-a120-1396e0d43537" testId="7b8a1692-efa4-d511-32d7-4966224f8985" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0014498" startTime="2026-06-25T10:14:36.6179862-04:00" endTime="2026-06-25T10:14:36.6179863-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ccddc5ff-bd7d-424b-a120-1396e0d43537" />
+    <UnitTestResult executionId="542e7f23-0f18-459c-bd92-12469f17c980" testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" testName="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:01:42.6370836" startTime="2026-06-25T10:16:18.7474109-04:00" endTime="2026-06-25T10:16:18.7474121-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="542e7f23-0f18-459c-bd92-12469f17c980">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Database connection failed after retries.</Message>
+          <StackTrace>   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 68&#xD;
+   at Program.&lt;Main&gt;(String[] args)&#xD;
+   at InvokeStub_Program.&lt;Main&gt;(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+   at Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ApiStatusTests.cs:line 20&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c296cdd2-3c43-4104-a837-1670d755e8f1" testId="3f4a7373-ae45-356c-273c-1587d600f8fe" testName="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" computerName="ALVAGONZ" duration="00:00:00.0119954" startTime="2026-06-25T10:14:36.5769361-04:00" endTime="2026-06-25T10:14:36.5769363-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c296cdd2-3c43-4104-a837-1670d755e8f1" />
+    <UnitTestResult executionId="181e5873-a0bc-431c-87e8-4d5d25920466" testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" testName="Api.Tests.UnitTest1.Test1" computerName="ALVAGONZ" duration="00:00:00.0026508" startTime="2026-06-25T10:14:36.0995274-04:00" endTime="2026-06-25T10:14:36.0995482-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="181e5873-a0bc-431c-87e8-4d5d25920466" />
+    <UnitTestResult executionId="779c056a-ac28-4956-b06f-eb5c7bb4910b" testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" computerName="ALVAGONZ" duration="00:00:00.0014438" startTime="2026-06-25T10:14:36.6181621-04:00" endTime="2026-06-25T10:14:36.6181622-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="779c056a-ac28-4956-b06f-eb5c7bb4910b" />
+    <UnitTestResult executionId="bfeb96ba-b807-413a-b221-f3af2bba792e" testId="39116a4a-dcfa-62b0-77c9-919eab681596" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0029375" startTime="2026-06-25T10:14:36.6178915-04:00" endTime="2026-06-25T10:14:36.6178917-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bfeb96ba-b807-413a-b221-f3af2bba792e" />
+    <UnitTestResult executionId="70102b6b-f926-4d87-8c6f-52f7e0188ee8" testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" computerName="ALVAGONZ" duration="00:00:00.4756873" startTime="2026-06-25T10:14:36.5645403-04:00" endTime="2026-06-25T10:14:36.5645409-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="70102b6b-f926-4d87-8c6f-52f7e0188ee8" />
+    <UnitTestResult executionId="e0312445-58fb-4678-82eb-0a624b31a9bf" testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" computerName="ALVAGONZ" duration="00:00:00.0027406" startTime="2026-06-25T10:14:36.6176000-04:00" endTime="2026-06-25T10:14:36.6176004-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0312445-58fb-4678-82eb-0a624b31a9bf" />
+    <UnitTestResult executionId="e4260b8e-3608-4530-830e-9bca357abff7" testId="62532f84-b3c3-01cc-4382-d22055358b75" testName="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.4761393" startTime="2026-06-25T10:14:36.5651931-04:00" endTime="2026-06-25T10:14:36.5651932-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e4260b8e-3608-4530-830e-9bca357abff7" />
+    <UnitTestResult executionId="468f7aab-d9d5-46f5-a6a9-47b47da44e71" testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" testName="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0019977" startTime="2026-06-25T10:14:36.6179399-04:00" endTime="2026-06-25T10:14:36.6179399-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="468f7aab-d9d5-46f5-a6a9-47b47da44e71" />
+    <UnitTestResult executionId="238d8fa9-baf1-4624-bf67-28ef5b2d5cb6" testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" testName="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0050780" startTime="2026-06-25T10:14:36.5822342-04:00" endTime="2026-06-25T10:14:36.5822345-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="238d8fa9-baf1-4624-bf67-28ef5b2d5cb6" />
+    <UnitTestResult executionId="e6871251-5cfd-496f-9cae-ba70adcf20f9" testId="eff72f46-a3f9-d3a7-ff15-275794af9931" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" computerName="ALVAGONZ" duration="00:00:00.0053660" startTime="2026-06-25T10:14:36.6180228-04:00" endTime="2026-06-25T10:14:36.6180229-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e6871251-5cfd-496f-9cae-ba70adcf20f9" />
+    <UnitTestResult executionId="3c135123-360c-4387-b4bf-7bf7bc80dce2" testId="c0500782-0e63-83fc-9487-18b8746c1627" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" computerName="ALVAGONZ" duration="00:00:00.0033301" startTime="2026-06-25T10:14:36.6181030-04:00" endTime="2026-06-25T10:14:36.6181031-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3c135123-360c-4387-b4bf-7bf7bc80dce2" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f94b12e1-cee5-36f3-81e3-df0658a53dcc">
+      <Execution id="de2ec65d-665c-4ed6-8432-8a30ef0bd1fe" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.SwaggerTests" name="Get_SwaggerIndex_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="c0500782-0e63-83fc-9487-18b8746c1627">
+      <Execution id="3c135123-360c-4387-b4bf-7bf7bc80dce2" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ValidationError_ThrowsValidationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="62532f84-b3c3-01cc-4382-d22055358b75">
+      <Execution id="e4260b8e-3608-4530-830e-9bca357abff7" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendAccountVerificationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3dbf0911-bb1c-684c-f297-8a1080bd1b71">
+      <Execution id="e0312445-58fb-4678-82eb-0a624b31a9bf" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8">
+      <Execution id="468f7aab-d9d5-46f5-a6a9-47b47da44e71" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendProjectCreatedAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="eff72f46-a3f9-d3a7-ff15-275794af9931">
+      <Execution id="e6871251-5cfd-496f-9cae-ba70adcf20f9" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_HappyPath_ReturnsExpectedDto" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="d613d3e3-a00c-805d-8fe8-9f741d534ffe">
+      <Execution id="70102b6b-f926-4d87-8c6f-52f7e0188ee8" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="39116a4a-dcfa-62b0-77c9-919eab681596">
+      <Execution id="bfeb96ba-b807-413a-b221-f3af2bba792e" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3f4a7373-ae45-356c-273c-1587d600f8fe">
+      <Execution id="c296cdd2-3c43-4104-a837-1670d755e8f1" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendEmailAsync_SendsMessageWithCorrectValues" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="7b8a1692-efa4-d511-32d7-4966224f8985">
+      <Execution id="ccddc5ff-bd7d-424b-a120-1396e0d43537" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="5380e8c3-5f3f-436c-34df-3b3a96511a9b">
+      <Execution id="238d8fa9-baf1-4624-bf67-28ef5b2d5cb6" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="2bae8dcb-84de-ee76-203f-153ae7f3e8b4">
+      <Execution id="542e7f23-0f18-459c-bd92-12469f17c980" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ApiStatusTests" name="Get_ApiStatus_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f0e1e511-e13f-e8d9-e04b-28c87c7fd256">
+      <Execution id="779c056a-ac28-4956-b06f-eb5c7bb4910b" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="afdb3f1a-4623-7490-795d-e6837e60c3b8">
+      <Execution id="2cf7176e-97f3-4131-843e-6f3081ff8879" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_AiServiceThrows_ReturnsFallbackResult" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.UnitTest1.Test1" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="9983a587-9771-0fbd-a017-1bbb600dfa5c">
+      <Execution id="181e5873-a0bc-431c-87e8-4d5d25920466" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.UnitTest1" name="Test1" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" executionId="de2ec65d-665c-4ed6-8432-8a30ef0bd1fe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" executionId="2cf7176e-97f3-4131-843e-6f3081ff8879" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7b8a1692-efa4-d511-32d7-4966224f8985" executionId="ccddc5ff-bd7d-424b-a120-1396e0d43537" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" executionId="542e7f23-0f18-459c-bd92-12469f17c980" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3f4a7373-ae45-356c-273c-1587d600f8fe" executionId="c296cdd2-3c43-4104-a837-1670d755e8f1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" executionId="181e5873-a0bc-431c-87e8-4d5d25920466" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" executionId="779c056a-ac28-4956-b06f-eb5c7bb4910b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="39116a4a-dcfa-62b0-77c9-919eab681596" executionId="bfeb96ba-b807-413a-b221-f3af2bba792e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" executionId="70102b6b-f926-4d87-8c6f-52f7e0188ee8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" executionId="e0312445-58fb-4678-82eb-0a624b31a9bf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="62532f84-b3c3-01cc-4382-d22055358b75" executionId="e4260b8e-3608-4530-830e-9bca357abff7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" executionId="468f7aab-d9d5-46f5-a6a9-47b47da44e71" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" executionId="238d8fa9-baf1-4624-bf67-28ef5b2d5cb6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="eff72f46-a3f9-d3a7-ff15-275794af9931" executionId="e6871251-5cfd-496f-9cae-ba70adcf20f9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c0500782-0e63-83fc-9487-18b8746c1627" executionId="3c135123-360c-4387-b4bf-7bf7bc80dce2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="15" executed="15" passed="13" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.25)&#xD;
+[xUnit.net 00:00:00.15]   Discovering: Api.Tests&#xD;
+[xUnit.net 00:00:00.20]   Discovered:  Api.Tests&#xD;
+[xUnit.net 00:00:00.21]   Starting:    Api.Tests&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (1/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (1/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (2/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (2/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (3/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (3/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (4/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (4/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (5/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (5/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (6/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (6/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (7/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (7/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (8/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (8/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (9/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (9/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (10/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (10/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (11/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (11/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (12/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (12/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (13/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (13/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (14/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (14/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (15/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (15/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (16/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (16/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (17/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (17/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (18/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (18/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (19/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (19/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (20/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (20/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (21/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (21/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (22/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (22/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (23/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (23/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (24/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (24/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (25/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (25/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (26/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (26/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (27/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (27/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (28/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (28/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (29/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (29/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (30/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+warn: Program[0]&#xD;
+      Database is not ready yet. Retrying in 2 seconds... (30/30). Error: Cannot open database "VeriFincaDb" requested by the login. The login failed.&#xD;
+      Login failed for user 'ALVAGONZ\Admin'.&#xD;
+fail: Program[0]&#xD;
+      Could not connect to database after 30 retries.&#xD;
+fail: Program[0]&#xD;
+      Could not connect to database after 30 retries.&#xD;
+=== FATAL STARTUP CRASH ===&#xD;
+=== FATAL STARTUP CRASH ===&#xD;
+System.InvalidOperationException: Database connection failed after retries.&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 68&#xD;
+System.InvalidOperationException: Database connection failed after retries.&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 68&#xD;
+[xUnit.net 00:01:42.92]       System.InvalidOperationException : Database connection failed after retries.&#xD;
+[xUnit.net 00:01:42.92]       Stack Trace:&#xD;
+[xUnit.net 00:01:42.92]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs(68,0): at Program.&lt;Main&gt;$(String[] args)&#xD;
+[xUnit.net 00:01:42.92]            at Program.&lt;Main&gt;(String[] args)&#xD;
+[xUnit.net 00:01:42.92]            at InvokeStub_Program.&lt;Main&gt;(Object, Span`1)&#xD;
+[xUnit.net 00:01:42.92]            at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:01:42.92]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+[xUnit.net 00:01:42.92]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ApiStatusTests.cs(20,0): at Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode()&#xD;
+[xUnit.net 00:01:42.92]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:01:42.92]       System.InvalidOperationException : Database connection failed after retries.&#xD;
+[xUnit.net 00:01:42.92]       Stack Trace:&#xD;
+[xUnit.net 00:01:42.92]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs(68,0): at Program.&lt;Main&gt;$(String[] args)&#xD;
+[xUnit.net 00:01:42.92]            at Program.&lt;Main&gt;(String[] args)&#xD;
+[xUnit.net 00:01:42.92]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:01:42.92]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:01:42.92]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+[xUnit.net 00:01:42.92]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+[xUnit.net 00:01:42.92]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\SwaggerTests.cs(20,0): at Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode()&#xD;
+[xUnit.net 00:01:42.92]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:01:42.93]   Finished:    Api.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T10:16:18.7442071-04:00">
+        <Text>[xUnit.net 00:01:42.92]     Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T10:16:18.7484153-04:00">
+        <Text>[xUnit.net 00:01:42.92]     Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

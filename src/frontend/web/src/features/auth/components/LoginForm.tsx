@@ -28,9 +28,8 @@ export const LoginForm = () => {
       setIsPending(true);
       setError(null);
       await login(data.email, data.password);
-      // Force a reload to ensure clean state and synchronized cookies
-      window.location.hash = "#/admin/dashboard";
-      window.location.reload();
+      // Soft update for browser state (React Router navigation)
+      navigate("/admin/dashboard");
     } catch (err: any) {
       setError(new Error(err?.message || "Error de autenticación. Verifique sus credenciales."));
       setIsPending(false);
@@ -104,16 +103,7 @@ export const LoginForm = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-1">
-          <label className="flex items-center gap-2 cursor-pointer group">
-            <input
-              type="checkbox"
-              className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
-            />
-            <span className="text-[13px] text-text-secondary group-hover:text-text-primary transition-colors font-medium">
-              Recordar sesión
-            </span>
-          </label>
+        <div className="flex items-center justify-end pt-1">
           <a
             href="#"
             className="text-[13px] text-primary font-bold hover:underline"

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
 import { isSome, isSuccess } from "../utils/functional";
 
@@ -8,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   error: AuthError | null;
 }
 
@@ -32,7 +33,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  useEffect(() => {
+    const handler = () => {
+      setUser(null);
+      AuthService.logout();
+      window.location.hash = '#/login';
+    };
+    window.addEventListener('auth:force-logout', handler);
+    return () => window.removeEventListener('auth:force-logout', handler);
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     
@@ -46,12 +57,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     setLoading(false);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     AuthService.logout();
-  };
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const currentUserOption = await AuthService.getCurrentUser();
+    if (isSome(currentUserOption)) {
+      setUser(currentUserOption.value);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider 
@@ -61,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading, 
         login, 
         logout,
+        refreshUser,
         error 
       }}
     >

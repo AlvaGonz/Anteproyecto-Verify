@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -22,14 +23,28 @@ export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
   const navigate = useNavigate();
   const { mutate: createProject, isPending, error } = useCreateProject();
 
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
   const { register, handleSubmit, formState: { errors } } =
     useForm<CreateProjectFormValues>({ resolver: zodResolver(createProjectSchema) });
 
-  const onSubmit = (data: CreateProjectFormValues) =>
+  const fotosRef = register("fotos");
+
+  const onSubmit = (data: CreateProjectFormValues) => {
+    const { fotos, ...rest } = data as any;
+    const fotosNuevas = fotos ? Array.from(fotos as FileList) : undefined;
     createProject(
-      { ...data, usuarioCreadorId: "00000000-0000-0000-0000-000000000000" }, // replaced by auth context in production
-      { onSuccess: (proj) => onSuccess ? onSuccess(proj.id) : navigate(`/p/${proj.id}`) }
+      {
+        ...rest,
+        fotosNuevas,
+        usuarioCreadorId: "00000000-0000-0000-0000-000000000000",
+      },
+      {
+        onSuccess: (proj) =>
+          onSuccess ? onSuccess(proj.id) : navigate(`/p/${proj.id}`),
+      }
     );
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
@@ -74,6 +89,46 @@ export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
         <input id="valorEstimado" type="number" min={0} placeholder="Ej: 500000"
           className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           {...register("valorEstimado", { valueAsNumber: true })} />
+      </FormField>
+
+      <FormField label="Superficie (m²)" htmlFor="superficieM2" error={errors.superficieM2?.message}>
+        <input
+          id="superficieM2"
+          type="number"
+          min={1}
+          placeholder="Ej: 250"
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 w-full"
+          {...register("superficieM2", { valueAsNumber: true })}
+        />
+      </FormField>
+
+      <FormField label="Fotos del proyecto (máx. 5)" htmlFor="fotos" error={errors.fotos?.message as string}>
+        <input
+          id="fotos"
+          type="file"
+          accept="image/*"
+          multiple
+          className="text-sm w-full"
+          {...fotosRef}
+          onChange={(e) => {
+            fotosRef.onChange(e);
+            const files = Array.from(e.target.files ?? []);
+            setPreviewUrls(files.slice(0, 5).map((f) => URL.createObjectURL(f)));
+          }}
+        />
+        {previewUrls.length > 0 && (
+          <div className="flex gap-2 flex-wrap mt-2">
+            {previewUrls.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt={`Preview ${i + 1}`}
+                className="h-16 w-16 rounded object-cover border border-gray-200"
+              />
+            ))}
+          </div>
+        )}
+        <p className="text-xs text-gray-400 mt-1">Formatos: JPG, PNG, WebP. Máximo 5 imágenes.</p>
       </FormField>
 
       <FormField label="Datos del desarrollador" htmlFor="datosDesarrollador" error={errors.datosDesarrollador?.message}>

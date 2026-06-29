@@ -19,19 +19,22 @@ public class RegisterUserCommandHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<RegisterUserCommand> _validator;
     private readonly IEmailService _emailService;
+    private readonly IPlanSuscripcionRepository _planSuscripcionRepository;
 
     public RegisterUserCommandHandler(
         IUsuarioRepository usuarioRepository,
         IPasswordHasher passwordHasher,
         IUnitOfWork unitOfWork,
         IValidator<RegisterUserCommand> validator,
-        IEmailService emailService)
+        IEmailService emailService,
+        IPlanSuscripcionRepository planSuscripcionRepository)
     {
         _usuarioRepository = usuarioRepository;
         _passwordHasher = passwordHasher;
         _unitOfWork = unitOfWork;
         _validator = validator;
         _emailService = emailService;
+        _planSuscripcionRepository = planSuscripcionRepository;
     }
 
     public async Task<RegisterUserResultDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -51,16 +54,23 @@ public class RegisterUserCommandHandler
         // 6. Hashear la contraseña con BCrypt
         var passwordHash = _passwordHasher.HashPassword(request.Password);
 
-        // 7. Crear el usuario (por defecto rol Professional / desarrollador)
+        // 7. Crear el usuario (por defecto rol User)
         var user = new Usuario(
             request.Nombre.Trim(),
             request.Apellido.Trim(),
             request.Email.Trim().ToLower(),
             passwordHash,
-            UserRole.Professional,
+            UserRole.User,
             request.Telefono!.Trim(),
             request.Cedula!.Trim()
         );
+
+        // Assign default Consultor plan
+        var consultorPlan = await _planSuscripcionRepository.GetByNameAsync("Consultor", cancellationToken);
+        if (consultorPlan != null)
+        {
+            user.AsignarPlan(consultorPlan.Idsuscripcion);
+        }
 
         // 8. Generar token de verificación
         user.GenerarTokenVerificacion();

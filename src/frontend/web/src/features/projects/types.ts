@@ -19,6 +19,8 @@ export interface ProyectoDto {
   updatedAtUtc?: string;
   imagenUrl?: string;
   completionRate?: number;
+  superficieM2?: number;
+  fotoUrls?: string[];
 }
 
 export interface CreateProyectoDto {
@@ -31,6 +33,7 @@ export interface CreateProyectoDto {
   designacionCatastral?: string;
   ubicacionGps?: string;
   matricula?: string;
+  superficieM2?: number;
 }
 
 export interface UpdateProyectoDto {
@@ -43,6 +46,8 @@ export interface UpdateProyectoDto {
   rncDesarrollador?: string;
   designacionCatastral?: string;
   matricula?: string;
+  superficieM2?: number;
+  fotosNuevas?: File[];
 }
 
 export enum ProjectCategory {

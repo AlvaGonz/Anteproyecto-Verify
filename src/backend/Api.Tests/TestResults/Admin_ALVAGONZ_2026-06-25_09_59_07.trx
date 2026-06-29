@@ -1,0 +1,1049 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="6075d9ee-3f71-448a-9a6e-b4f900276cb9" name="Admin@ALVAGONZ 2026-06-25 09:59:07" runUser="ALVAGONZ\Admin" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-25T09:59:07.7147523-04:00" queuing="2026-06-25T09:59:07.7147527-04:00" start="2026-06-25T09:59:03.9260187-04:00" finish="2026-06-25T09:59:13.2602105-04:00" />
+  <TestSettings name="default" id="f88c9e6a-6336-4688-b851-bb0fc8b438d3">
+    <Deployment runDeploymentRoot="Admin_ALVAGONZ_2026-06-25_09_59_07" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="ebda9ea9-98af-40ab-8681-0443fd19e654" testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" computerName="ALVAGONZ" duration="00:00:00.0023082" startTime="2026-06-25T09:59:07.6918611-04:00" endTime="2026-06-25T09:59:07.6918617-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ebda9ea9-98af-40ab-8681-0443fd19e654" />
+    <UnitTestResult executionId="1f21cba3-dd83-4efc-98db-011308595123" testId="eff72f46-a3f9-d3a7-ff15-275794af9931" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" computerName="ALVAGONZ" duration="00:00:00.0046585" startTime="2026-06-25T09:59:07.6921504-04:00" endTime="2026-06-25T09:59:07.6921505-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1f21cba3-dd83-4efc-98db-011308595123" />
+    <UnitTestResult executionId="132515d2-9a3e-45e0-96fb-158247a3f2a6" testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" testName="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0025809" startTime="2026-06-25T09:59:07.6989626-04:00" endTime="2026-06-25T09:59:07.6989627-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="132515d2-9a3e-45e0-96fb-158247a3f2a6" />
+    <UnitTestResult executionId="3d6ec3e9-3e76-4d82-ac02-929e4df3ff78" testId="c0500782-0e63-83fc-9487-18b8746c1627" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" computerName="ALVAGONZ" duration="00:00:00.0042873" startTime="2026-06-25T09:59:07.6988556-04:00" endTime="2026-06-25T09:59:07.6988556-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3d6ec3e9-3e76-4d82-ac02-929e4df3ff78" />
+    <UnitTestResult executionId="3c5ebaca-e26b-43bf-af77-5bd466d1f62f" testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" computerName="ALVAGONZ" duration="00:00:00.0096017" startTime="2026-06-25T09:59:07.6782209-04:00" endTime="2026-06-25T09:59:07.6782214-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3c5ebaca-e26b-43bf-af77-5bd466d1f62f" />
+    <UnitTestResult executionId="acbaefbf-4336-40cf-a7e7-7caa8a5db6df" testId="39116a4a-dcfa-62b0-77c9-919eab681596" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0052261" startTime="2026-06-25T09:59:07.6985843-04:00" endTime="2026-06-25T09:59:07.6985848-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="acbaefbf-4336-40cf-a7e7-7caa8a5db6df">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+Not found: "badge-rejected"</Message>
+          <StackTrace>   at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs:line 172&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="dbe7f8e4-98fe-489b-aeb6-1fe8d18ec28c" testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" computerName="ALVAGONZ" duration="00:00:00.0020827" startTime="2026-06-25T09:59:07.6989285-04:00" endTime="2026-06-25T09:59:07.6989286-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dbe7f8e4-98fe-489b-aeb6-1fe8d18ec28c" />
+    <UnitTestResult executionId="d96bc92a-353c-4145-9090-4afa8a3d9afd" testId="3f4a7373-ae45-356c-273c-1587d600f8fe" testName="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" computerName="ALVAGONZ" duration="00:00:00.0026175" startTime="2026-06-25T09:59:07.6657481-04:00" endTime="2026-06-25T09:59:07.6657487-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d96bc92a-353c-4145-9090-4afa8a3d9afd" />
+    <UnitTestResult executionId="48f41cb5-e56e-4fb2-be5b-70a4a5dc33a6" testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" testName="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:00:06.4228349" startTime="2026-06-25T09:59:13.1530379-04:00" endTime="2026-06-25T09:59:13.1530383-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="48f41cb5-e56e-4fb2-be5b-70a4a5dc33a6" />
+    <UnitTestResult executionId="9a39cae3-f62e-4ec4-b3a9-7ca52a10ad83" testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" testName="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" computerName="ALVAGONZ" duration="00:00:02.9435343" startTime="2026-06-25T09:59:09.6751169-04:00" endTime="2026-06-25T09:59:09.6751176-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9a39cae3-f62e-4ec4-b3a9-7ca52a10ad83">
+      <Output>
+        <ErrorInfo>
+          <Message>Microsoft.Data.SqlClient.SqlException : There is already an object named '__EFMigrationsHistory' in the database.</Message>
+          <StackTrace>   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 54&#xD;
+   at Program.&lt;Main&gt;(String[] args)&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+   at Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ApiStatusTests.cs:line 20&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5b8d7615-0f85-42c6-b356-005e88076079" testId="7b8a1692-efa4-d511-32d7-4966224f8985" testName="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0016191" startTime="2026-06-25T09:59:07.6997511-04:00" endTime="2026-06-25T09:59:07.6997513-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5b8d7615-0f85-42c6-b356-005e88076079">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+Not found: "badge-verified"</Message>
+          <StackTrace>   at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate() in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs:line 145&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d882d3f6-fb44-4987-bb5b-5429b66d99f3" testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" testName="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" computerName="ALVAGONZ" duration="00:00:00.9446884" startTime="2026-06-25T09:59:07.6684443-04:00" endTime="2026-06-25T09:59:07.6684450-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d882d3f6-fb44-4987-bb5b-5429b66d99f3" />
+    <UnitTestResult executionId="a288c2cc-1626-4cc5-b888-db2b0487e547" testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" testName="Api.Tests.UnitTest1.Test1" computerName="ALVAGONZ" duration="00:00:00.0025896" startTime="2026-06-25T09:59:06.7437084-04:00" endTime="2026-06-25T09:59:06.7437249-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a288c2cc-1626-4cc5-b888-db2b0487e547" />
+    <UnitTestResult executionId="d1c3e980-711a-4792-8718-83f07bb3842d" testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" testName="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.0044997" startTime="2026-06-25T09:59:07.6704147-04:00" endTime="2026-06-25T09:59:07.6704150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1c3e980-711a-4792-8718-83f07bb3842d" />
+    <UnitTestResult executionId="2d917121-4138-403d-a307-da36bf339d7a" testId="62532f84-b3c3-01cc-4382-d22055358b75" testName="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" computerName="ALVAGONZ" duration="00:00:00.9390231" startTime="2026-06-25T09:59:07.6629303-04:00" endTime="2026-06-25T09:59:07.6629311-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d917121-4138-403d-a307-da36bf339d7a" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Api.Tests.SwaggerTests.Get_SwaggerIndex_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f94b12e1-cee5-36f3-81e3-df0658a53dcc">
+      <Execution id="48f41cb5-e56e-4fb2-be5b-70a4a5dc33a6" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.SwaggerTests" name="Get_SwaggerIndex_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ValidationError_ThrowsValidationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="c0500782-0e63-83fc-9487-18b8746c1627">
+      <Execution id="3d6ec3e9-3e76-4d82-ac02-929e4df3ff78" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ValidationError_ThrowsValidationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendAccountVerificationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="62532f84-b3c3-01cc-4382-d22055358b75">
+      <Execution id="2d917121-4138-403d-a307-da36bf339d7a" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendAccountVerificationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3dbf0911-bb1c-684c-f297-8a1080bd1b71">
+      <Execution id="ebda9ea9-98af-40ab-8681-0443fd19e654" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_ProjectNotFound_ThrowsKeyNotFoundException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendProjectCreatedAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8">
+      <Execution id="132515d2-9a3e-45e0-96fb-158247a3f2a6" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendProjectCreatedAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_HappyPath_ReturnsExpectedDto" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="eff72f46-a3f9-d3a7-ff15-275794af9931">
+      <Execution id="1f21cba3-dd83-4efc-98db-011308595123" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_HappyPath_ReturnsExpectedDto" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="d613d3e3-a00c-805d-8fe8-9f741d534ffe">
+      <Execution id="d882d3f6-fb44-4987-bb5b-5429b66d99f3" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_CalledTwiceWithinOneMinute_ThrowsInvalidOperationException" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="39116a4a-dcfa-62b0-77c9-919eab681596">
+      <Execution id="acbaefbf-4336-40cf-a7e7-7caa8a5db6df" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendEmailAsync_SendsMessageWithCorrectValues" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="3f4a7373-ae45-356c-273c-1587d600f8fe">
+      <Execution id="d96bc92a-353c-4145-9090-4afa8a3d9afd" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendEmailAsync_SendsMessageWithCorrectValues" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="7b8a1692-efa4-d511-32d7-4966224f8985">
+      <Execution id="5b8d7615-0f85-42c6-b356-005e88076079" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ResendEmailServiceTests.SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="5380e8c3-5f3f-436c-34df-3b3a96511a9b">
+      <Execution id="d1c3e980-711a-4792-8718-83f07bb3842d" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ResendEmailServiceTests" name="SendDocumentUploadConfirmationAsync_UsesCorrectTemplate" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="2bae8dcb-84de-ee76-203f-153ae7f3e8b4">
+      <Execution id="9a39cae3-f62e-4ec4-b3a9-7ca52a10ad83" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.ApiStatusTests" name="Get_ApiStatus_ReturnsSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="f0e1e511-e13f-e8d9-e04b-28c87c7fd256">
+      <Execution id="dbe7f8e4-98fe-489b-aeb6-1fe8d18ec28c" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_NoDocuments_ReturnsScoreZeroAndDefaultSummary" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.GetDocumentDiagnosisQueryHandlerTests.HandleAsync_AiServiceThrows_ReturnsFallbackResult" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="afdb3f1a-4623-7490-795d-e6837e60c3b8">
+      <Execution id="3c5ebaca-e26b-43bf-af77-5bd466d1f62f" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.GetDocumentDiagnosisQueryHandlerTests" name="HandleAsync_AiServiceThrows_ReturnsFallbackResult" />
+    </UnitTest>
+    <UnitTest name="Api.Tests.UnitTest1.Test1" storage="c:\users\admin\desktop\anteproyecto-verify\src\backend\api.tests\bin\debug\net8.0\api.tests.dll" id="9983a587-9771-0fbd-a017-1bbb600dfa5c">
+      <Execution id="a288c2cc-1626-4cc5-b888-db2b0487e547" />
+      <TestMethod codeBase="C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Api.Tests.UnitTest1" name="Test1" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="3dbf0911-bb1c-684c-f297-8a1080bd1b71" executionId="ebda9ea9-98af-40ab-8681-0443fd19e654" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="eff72f46-a3f9-d3a7-ff15-275794af9931" executionId="1f21cba3-dd83-4efc-98db-011308595123" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a8a5ed93-5cab-7da6-6bf9-6122f5a5beb8" executionId="132515d2-9a3e-45e0-96fb-158247a3f2a6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c0500782-0e63-83fc-9487-18b8746c1627" executionId="3d6ec3e9-3e76-4d82-ac02-929e4df3ff78" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="afdb3f1a-4623-7490-795d-e6837e60c3b8" executionId="3c5ebaca-e26b-43bf-af77-5bd466d1f62f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="39116a4a-dcfa-62b0-77c9-919eab681596" executionId="acbaefbf-4336-40cf-a7e7-7caa8a5db6df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f0e1e511-e13f-e8d9-e04b-28c87c7fd256" executionId="dbe7f8e4-98fe-489b-aeb6-1fe8d18ec28c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3f4a7373-ae45-356c-273c-1587d600f8fe" executionId="d96bc92a-353c-4145-9090-4afa8a3d9afd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f94b12e1-cee5-36f3-81e3-df0658a53dcc" executionId="48f41cb5-e56e-4fb2-be5b-70a4a5dc33a6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2bae8dcb-84de-ee76-203f-153ae7f3e8b4" executionId="9a39cae3-f62e-4ec4-b3a9-7ca52a10ad83" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7b8a1692-efa4-d511-32d7-4966224f8985" executionId="5b8d7615-0f85-42c6-b356-005e88076079" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d613d3e3-a00c-805d-8fe8-9f741d534ffe" executionId="d882d3f6-fb44-4987-bb5b-5429b66d99f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9983a587-9771-0fbd-a017-1bbb600dfa5c" executionId="a288c2cc-1626-4cc5-b888-db2b0487e547" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5380e8c3-5f3f-436c-34df-3b3a96511a9b" executionId="d1c3e980-711a-4792-8718-83f07bb3842d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="62532f84-b3c3-01cc-4382-d22055358b75" executionId="2d917121-4138-403d-a307-da36bf339d7a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="15" executed="15" passed="12" failed="3" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.25)&#xD;
+[xUnit.net 00:00:01.30]   Discovering: Api.Tests&#xD;
+[xUnit.net 00:00:01.34]   Discovered:  Api.Tests&#xD;
+[xUnit.net 00:00:01.34]   Starting:    Api.Tests&#xD;
+[xUnit.net 00:00:02.37]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.37]       String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+[xUnit.net 00:00:02.37]       Not found: "badge-rejected"&#xD;
+[xUnit.net 00:00:02.37]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.37]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs(172,0): at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate()&#xD;
+[xUnit.net 00:00:02.37]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:02.37]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.37]       String:    "&lt;!DOCTYPE html&gt;\r\n&lt;html lang="es" xmlns="h"···&#xD;
+[xUnit.net 00:00:02.37]       Not found: "badge-verified"&#xD;
+[xUnit.net 00:00:02.37]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.37]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ResendEmailServiceTests.cs(145,0): at Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate()&#xD;
+[xUnit.net 00:00:02.37]         --- End of stack trace from previous location ---&#xD;
+info: Program[0]&#xD;
+      Database connection verified successfully.&#xD;
+info: Program[0]&#xD;
+      Database connection verified successfully.&#xD;
+info: Program[0]&#xD;
+      Applying database migrations...&#xD;
+info: Program[0]&#xD;
+      Applying database migrations...&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (31ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (31ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (21ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (21ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [__EFMigrationsHistory] (&#xD;
+          [MigrationId] nvarchar(150) NOT NULL,&#xD;
+          [ProductVersion] nvarchar(32) NOT NULL,&#xD;
+          CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT 1&#xD;
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]&#xD;
+      Failed executing DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [__EFMigrationsHistory] (&#xD;
+          [MigrationId] nvarchar(150) NOT NULL,&#xD;
+          [ProductVersion] nvarchar(32) NOT NULL,&#xD;
+          CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT [MigrationId], [ProductVersion]&#xD;
+      FROM [__EFMigrationsHistory]&#xD;
+      ORDER BY [MigrationId];&#xD;
+=== FATAL STARTUP CRASH ===&#xD;
+Microsoft.Data.SqlClient.SqlException (0x80131904): There is already an object named '__EFMigrationsHistory' in the database.&#xD;
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+   at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+   at Program.&lt;Main&gt;$(String[] args) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs:line 54&#xD;
+ClientConnectionId:5a32d80b-dfc3-44d2-a946-5692150aaab5&#xD;
+Error Number:2714,State:6,Class:16&#xD;
+info: Microsoft.EntityFrameworkCore.Migrations[20402]&#xD;
+      Applying migration '20260625043417_InitialCreate'.&#xD;
+[xUnit.net 00:00:04.34]       Microsoft.Data.SqlClient.SqlException : There is already an object named '__EFMigrationsHistory' in the database.&#xD;
+[xUnit.net 00:00:04.35]       Stack Trace:&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;InternalExecuteNonQueryAsync&gt;b__210_1(IAsyncResult result)&#xD;
+[xUnit.net 00:00:04.35]            at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)&#xD;
+[xUnit.net 00:00:04.35]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:04.35]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api\Program.cs(54,0): at Program.&lt;Main&gt;$(String[] args)&#xD;
+[xUnit.net 00:00:04.35]            at Program.&lt;Main&gt;(String[] args)&#xD;
+[xUnit.net 00:00:04.35]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:04.35]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:04.35]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.DeferredHost.StartAsync(CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Start(IHost host)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.EnsureServer()&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)&#xD;
+[xUnit.net 00:00:04.35]            at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient()&#xD;
+[xUnit.net 00:00:04.35]         C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\ApiStatusTests.cs(20,0): at Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode()&#xD;
+[xUnit.net 00:00:04.35]         --- End of stack trace from previous location ---&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Notificaciones] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [UsuarioId] uniqueidentifier NOT NULL,&#xD;
+          [Mensaje] nvarchar(max) NOT NULL,&#xD;
+          [Tipo] nvarchar(max) NOT NULL,&#xD;
+          [Leida] bit NOT NULL,&#xD;
+          [FechaUtc] datetime2 NOT NULL,&#xD;
+          [EnlaceRelacionado] nvarchar(max) NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Notificaciones] PRIMARY KEY ([Id])&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [PlanSuscripcion] (&#xD;
+          [Idsuscripcion] uniqueidentifier NOT NULL,&#xD;
+          [NombrePlan] nvarchar(100) NOT NULL,&#xD;
+          [Precio] decimal(10,2) NOT NULL,&#xD;
+          [MaxConsultas] int NOT NULL DEFAULT 0,&#xD;
+          [MaxProyectos] int NOT NULL DEFAULT 0,&#xD;
+          [PresentacionPublica] bit NOT NULL DEFAULT CAST(0 AS bit),&#xD;
+          [QrIncluido] bit NOT NULL DEFAULT CAST(0 AS bit),&#xD;
+          [MultiUsuario] bit NOT NULL DEFAULT CAST(0 AS bit),&#xD;
+          [AccesoApi] bit NOT NULL DEFAULT CAST(0 AS bit),&#xD;
+          CONSTRAINT [PK_PlanSuscripcion] PRIMARY KEY ([Idsuscripcion])&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [ReglasValidacion] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [Nombre] nvarchar(200) NOT NULL,&#xD;
+          [Descripcion] nvarchar(1000) NOT NULL,&#xD;
+          [CondicionLogica] nvarchar(2000) NOT NULL,&#xD;
+          [TipoDocumentoAplicable] int NOT NULL,&#xD;
+          [NivelAlerta] int NOT NULL,&#xD;
+          [TipoProyecto] int NOT NULL,&#xD;
+          [Activa] bit NOT NULL,&#xD;
+          [Version] int NOT NULL,&#xD;
+          [FechaCreacionUtc] datetime2 NOT NULL,&#xD;
+          [CreadaPor] uniqueidentifier NOT NULL,&#xD;
+          [ReglaAnteriorId] uniqueidentifier NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_ReglasValidacion] PRIMARY KEY ([Id])&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Usuario] (&#xD;
+          [IdUsuario] uniqueidentifier NOT NULL,&#xD;
+          [Nombre] nvarchar(100) NOT NULL,&#xD;
+          [Apellido] nvarchar(100) NOT NULL,&#xD;
+          [NombreCompleto] AS [Nombre] + ' ' + [Apellido] PERSISTED,&#xD;
+          [Email] nvarchar(200) NOT NULL,&#xD;
+          [ContrasenaHash] nvarchar(500) NOT NULL,&#xD;
+          [Telefono] nvarchar(15) NOT NULL,&#xD;
+          [Cedula] nvarchar(15) NOT NULL,&#xD;
+          [Rol] int NOT NULL,&#xD;
+          [Activo] bit NOT NULL DEFAULT CAST(1 AS bit),&#xD;
+          [EmailVerificado] bit NOT NULL DEFAULT CAST(0 AS bit),&#xD;
+          [TokenVerificacion] nvarchar(4000) NULL,&#xD;
+          [TokenVerificacionExpiraUtc] datetime2 NULL,&#xD;
+          [RowVersion] rowversion NULL,&#xD;
+          [PlanSuscripcionId] uniqueidentifier NULL,&#xD;
+          [ConsultasUsadas] int NOT NULL DEFAULT 0,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Usuario] PRIMARY KEY ([IdUsuario]),&#xD;
+          CONSTRAINT [FK_Usuario_PlanSuscripcion_PlanSuscripcionId] FOREIGN KEY ([PlanSuscripcionId]) REFERENCES [PlanSuscripcion] ([Idsuscripcion]) ON DELETE SET NULL&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [ConsentimientosFinancieros] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [UsuarioId] uniqueidentifier NOT NULL,&#xD;
+          [FechaHoraUtc] datetime2 NOT NULL,&#xD;
+          [IpOrigen] nvarchar(50) NOT NULL,&#xD;
+          [VersionPolitica] nvarchar(20) NOT NULL,&#xD;
+          [Estado] int NOT NULL,&#xD;
+          [FechaExpiracionUtc] datetime2 NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_ConsentimientosFinancieros] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_ConsentimientosFinancieros_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [ProyectosInmobiliarios] (&#xD;
+          [IdProyecto] uniqueidentifier NOT NULL,&#xD;
+          [CodigoInterno] nvarchar(50) NOT NULL,&#xD;
+          [NombreProyecto] nvarchar(200) NOT NULL,&#xD;
+          [UbicacionTexto] nvarchar(500) NOT NULL,&#xD;
+          [UbicacionGps] nvarchar(100) NULL,&#xD;
+          [ValorEstimado] decimal(18,2) NULL,&#xD;
+          [DatosDesarrollador] nvarchar(max) NULL,&#xD;
+          [RncDesarrollador] nvarchar(max) NULL,&#xD;
+          [Matricula] nvarchar(max) NULL,&#xD;
+          [Categoria] int NOT NULL,&#xD;
+          [DesignacionCatastral] nvarchar(max) NULL,&#xD;
+          [EstadoJuridico] int NOT NULL,&#xD;
+          [Status] int NOT NULL,&#xD;
+          [EstadoIntegridad] int NOT NULL,&#xD;
+          [SelladoBloqueado] bit NOT NULL,&#xD;
+          [IdUsuario] uniqueidentifier NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_ProyectosInmobiliarios] PRIMARY KEY ([IdProyecto]),&#xD;
+          CONSTRAINT [FK_ProyectosInmobiliarios_Usuario_IdUsuario] FOREIGN KEY ([IdUsuario]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Auditorias] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [UsuarioId] uniqueidentifier NULL,&#xD;
+          [ProyectoId] uniqueidentifier NULL,&#xD;
+          [TipoEvento] nvarchar(max) NOT NULL,&#xD;
+          [Accion] nvarchar(200) NOT NULL,&#xD;
+          [Entidad] nvarchar(max) NULL,&#xD;
+          [EntidadId] nvarchar(max) NULL,&#xD;
+          [Detalle] nvarchar(2000) NULL,&#xD;
+          [IpOrigen] nvarchar(50) NULL,&#xD;
+          [UserAgent] nvarchar(max) NULL,&#xD;
+          [FechaEventoUtc] datetime2 NOT NULL,&#xD;
+          [TipoOperacion] int NOT NULL,&#xD;
+          [Resultado] nvarchar(2000) NULL,&#xD;
+          [ReferenciaExpedienteId] uniqueidentifier NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Auditorias] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_Auditorias_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,&#xD;
+          CONSTRAINT [FK_Auditorias_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [DeteccionesDuplicidad] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoDuplicadoId] uniqueidentifier NULL,&#xD;
+          [NivelRiesgo] int NOT NULL,&#xD;
+          [DescripcionCoincidencia] nvarchar(max) NOT NULL,&#xD;
+          [FechaDeteccion] datetime2 NOT NULL,&#xD;
+          [Bloqueante] bit NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_DeteccionesDuplicidad] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_DeteccionesDuplicidad_ProyectosInmobiliarios_ProyectoDuplicadoId] FOREIGN KEY ([ProyectoDuplicadoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]),&#xD;
+          CONSTRAINT [FK_DeteccionesDuplicidad_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Documentos] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [TipoDocumento] int NOT NULL,&#xD;
+          [NombreArchivoOriginal] nvarchar(500) NOT NULL,&#xD;
+          [NombreArchivoAlmacenado] nvarchar(500) NOT NULL,&#xD;
+          [RutaArchivo] nvarchar(1000) NOT NULL,&#xD;
+          [ContentType] nvarchar(100) NOT NULL,&#xD;
+          [Extension] nvarchar(10) NOT NULL,&#xD;
+          [TamanoBytes] bigint NOT NULL,&#xD;
+          [EstadoDocumento] int NOT NULL,&#xD;
+          [Activo] bit NOT NULL,&#xD;
+          [Version] int NOT NULL,&#xD;
+          [FechaEmision] datetime2 NULL,&#xD;
+          [InstitucionEmisora] nvarchar(200) NULL,&#xD;
+          [UsuarioCargaId] uniqueidentifier NOT NULL,&#xD;
+          [Observaciones] nvarchar(1000) NULL,&#xD;
+          [FormalStatus] int NULL,&#xD;
+          [FechaVencimiento] datetime2 NULL,&#xD;
+          [VersionReglaAplicada] nvarchar(max) NULL,&#xD;
+          [FechaEvaluacion] datetime2 NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Documentos] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_Documentos_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Reportes] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [EstadoReporte] int NOT NULL,&#xD;
+          [Resumen] nvarchar(4000) NULL,&#xD;
+          [GeneradoPorUsuarioId] uniqueidentifier NULL,&#xD;
+          [Version] int NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Reportes] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_Reportes_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,&#xD;
+          CONSTRAINT [FK_Reportes_Usuario_GeneradoPorUsuarioId] FOREIGN KEY ([GeneradoPorUsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [ResultadosCrediticios] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [ConsentimientoId] uniqueidentifier NOT NULL,&#xD;
+          [ScoreCrediticio] int NOT NULL,&#xD;
+          [PorcentajeEndeudamiento] decimal(5,2) NOT NULL,&#xD;
+          [CantidadAtrasosUltimos12Meses] int NOT NULL,&#xD;
+          [NivelRiesgo] int NOT NULL,&#xD;
+          [FechaConsultaUtc] datetime2 NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_ResultadosCrediticios] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_ResultadosCrediticios_ConsentimientosFinancieros_ConsentimientoId] FOREIGN KEY ([ConsentimientoId]) REFERENCES [ConsentimientosFinancieros] ([Id]) ON DELETE NO ACTION,&#xD;
+          CONSTRAINT [FK_ResultadosCrediticios_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE NO ACTION&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [SellosIntegridad] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [CodigoSello] nvarchar(50) NOT NULL,&#xD;
+          [Nombre] nvarchar(max) NOT NULL,&#xD;
+          [Nivel] int NOT NULL,&#xD;
+          [UrlQr] nvarchar(500) NOT NULL,&#xD;
+          [FirmaDigital] nvarchar(1000) NOT NULL,&#xD;
+          [FechaEmisionUtc] datetime2 NOT NULL,&#xD;
+          [FechaExpiracionUtc] datetime2 NOT NULL,&#xD;
+          [Estado] int NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_SellosIntegridad] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_SellosIntegridad_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE NO ACTION&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [ValidacionesAyuntamiento] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [Municipio] nvarchar(max) NOT NULL,&#xD;
+          [Result] int NOT NULL,&#xD;
+          [Detalle] nvarchar(max) NULL,&#xD;
+          [FechaConsulta] datetime2 NOT NULL,&#xD;
+          [DisponibilidadServicio] bit NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_ValidacionesAyuntamiento] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_ValidacionesAyuntamiento_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [ValidacionesDgii] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [Rnc] nvarchar(max) NOT NULL,&#xD;
+          [Status] int NOT NULL,&#xD;
+          [TieneDeudas] bit NOT NULL,&#xD;
+          [FechaConsulta] datetime2 NOT NULL,&#xD;
+          [ErrorMessage] nvarchar(max) NULL,&#xD;
+          [OrigenDatos] nvarchar(max) NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_ValidacionesDgii] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_ValidacionesDgii_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [AlertasValidacion] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [DocumentoId] uniqueidentifier NULL,&#xD;
+          [Type] int NOT NULL,&#xD;
+          [Category] int NOT NULL,&#xD;
+          [Titulo] nvarchar(max) NOT NULL,&#xD;
+          [Descripcion] nvarchar(max) NOT NULL,&#xD;
+          [Recomendacion] nvarchar(max) NULL,&#xD;
+          [Resuelta] bit NOT NULL,&#xD;
+          [FechaGeneracion] datetime2 NOT NULL,&#xD;
+          [NivelRiesgo] nvarchar(max) NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_AlertasValidacion] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_AlertasValidacion_Documentos_DocumentoId] FOREIGN KEY ([DocumentoId]) REFERENCES [Documentos] ([Id]),&#xD;
+          CONSTRAINT [FK_AlertasValidacion_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Certificaciones] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [ReporteId] uniqueidentifier NULL,&#xD;
+          [CodigoVerificacion] nvarchar(max) NOT NULL,&#xD;
+          [EstadoCertificacion] int NOT NULL,&#xD;
+          [FechaEmisionUtc] datetime2 NOT NULL,&#xD;
+          [FechaVigenciaUtc] datetime2 NULL,&#xD;
+          [UrlVerificacion] nvarchar(max) NOT NULL,&#xD;
+          [ScoreIntegridad] int NULL,&#xD;
+          [EstadoIntegridad] int NOT NULL,&#xD;
+          [Version] int NOT NULL,&#xD;
+          [EmisorId] uniqueidentifier NOT NULL,&#xD;
+          [Revocado] bit NOT NULL,&#xD;
+          [MotivoRevocacion] nvarchar(max) NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Certificaciones] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_Certificaciones_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,&#xD;
+          CONSTRAINT [FK_Certificaciones_Reportes_ReporteId] FOREIGN KEY ([ReporteId]) REFERENCES [Reportes] ([Id])&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Validaciones] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [DocumentoId] uniqueidentifier NULL,&#xD;
+          [FuenteValidacion] nvarchar(200) NOT NULL,&#xD;
+          [EstadoValidacion] int NOT NULL,&#xD;
+          [EsLegitimo] bit NULL,&#xD;
+          [PorcentajeIntegridad] float NULL,&#xD;
+          [Detalle] nvarchar(2000) NULL,&#xD;
+          [CamposValidadosJson] nvarchar(max) NULL,&#xD;
+          [SelloId] uniqueidentifier NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Validaciones] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_Validaciones_Documentos_DocumentoId] FOREIGN KEY ([DocumentoId]) REFERENCES [Documentos] ([Id]) ON DELETE NO ACTION,&#xD;
+          CONSTRAINT [FK_Validaciones_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,&#xD;
+          CONSTRAINT [FK_Validaciones_SellosIntegridad_SelloId] FOREIGN KEY ([SelloId]) REFERENCES [SellosIntegridad] ([Id]) ON DELETE SET NULL&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [DatoValidado] (&#xD;
+          [Id] int NOT NULL IDENTITY,&#xD;
+          [Campo] nvarchar(max) NOT NULL,&#xD;
+          [ValorEsperado] nvarchar(max) NOT NULL,&#xD;
+          [ValorEncontrado] nvarchar(max) NOT NULL,&#xD;
+          [Coincide] bit NOT NULL,&#xD;
+          [MetodoComparacion] nvarchar(max) NULL,&#xD;
+          [ValidacionId] uniqueidentifier NOT NULL,&#xD;
+          CONSTRAINT [PK_DatoValidado] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_DatoValidado_Validaciones_ValidacionId] FOREIGN KEY ([ValidacionId]) REFERENCES [Validaciones] ([Id]) ON DELETE CASCADE&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [Hallazgos] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ProyectoId] uniqueidentifier NOT NULL,&#xD;
+          [ValidacionId] uniqueidentifier NULL,&#xD;
+          [Severidad] int NOT NULL,&#xD;
+          [Codigo] nvarchar(50) NOT NULL,&#xD;
+          [Titulo] nvarchar(200) NOT NULL,&#xD;
+          [Descripcion] nvarchar(2000) NOT NULL,&#xD;
+          [Recomendacion] nvarchar(2000) NULL,&#xD;
+          [SistemaOrigen] nvarchar(max) NULL,&#xD;
+          [Resuelto] bit NOT NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_Hallazgos] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_Hallazgos_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,&#xD;
+          CONSTRAINT [FK_Hallazgos_Validaciones_ValidacionId] FOREIGN KEY ([ValidacionId]) REFERENCES [Validaciones] ([Id]) ON DELETE NO ACTION&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE TABLE [ResultadosRegla] (&#xD;
+          [Id] uniqueidentifier NOT NULL,&#xD;
+          [ValidacionId] uniqueidentifier NOT NULL,&#xD;
+          [RuleCode] nvarchar(50) NOT NULL,&#xD;
+          [RuleName] nvarchar(200) NOT NULL,&#xD;
+          [Status] int NOT NULL,&#xD;
+          [Message] nvarchar(1000) NOT NULL,&#xD;
+          [Severity] int NULL,&#xD;
+          [RelatedDocumentId] uniqueidentifier NULL,&#xD;
+          [CreatedAtUtc] datetime2 NOT NULL,&#xD;
+          [UpdatedAtUtc] datetime2 NULL,&#xD;
+          CONSTRAINT [PK_ResultadosRegla] PRIMARY KEY ([Id]),&#xD;
+          CONSTRAINT [FK_ResultadosRegla_Validaciones_ValidacionId] FOREIGN KEY ([ValidacionId]) REFERENCES [Validaciones] ([Id]) ON DELETE CASCADE&#xD;
+      );&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_AlertasValidacion_DocumentoId] ON [AlertasValidacion] ([DocumentoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_AlertasValidacion_ProyectoId] ON [AlertasValidacion] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Auditorias_ProyectoId] ON [Auditorias] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Auditorias_UsuarioId] ON [Auditorias] ([UsuarioId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Certificaciones_ProyectoId] ON [Certificaciones] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Certificaciones_ReporteId] ON [Certificaciones] ([ReporteId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_ConsentimientosFinancieros_UsuarioId] ON [ConsentimientosFinancieros] ([UsuarioId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_DatoValidado_ValidacionId] ON [DatoValidado] ([ValidacionId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_DeteccionesDuplicidad_ProyectoDuplicadoId] ON [DeteccionesDuplicidad] ([ProyectoDuplicadoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_DeteccionesDuplicidad_ProyectoId] ON [DeteccionesDuplicidad] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Documentos_Activo] ON [Documentos] ([Activo]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Documentos_ProyectoId] ON [Documentos] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Documentos_TipoDocumento] ON [Documentos] ([TipoDocumento]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Hallazgos_ProyectoId] ON [Hallazgos] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Hallazgos_ValidacionId] ON [Hallazgos] ([ValidacionId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE UNIQUE INDEX [IX_ProyectosInmobiliarios_CodigoInterno] ON [ProyectosInmobiliarios] ([CodigoInterno]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_ProyectosInmobiliarios_IdUsuario] ON [ProyectosInmobiliarios] ([IdUsuario]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Reportes_GeneradoPorUsuarioId] ON [Reportes] ([GeneradoPorUsuarioId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Reportes_ProyectoId] ON [Reportes] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_ResultadosCrediticios_ConsentimientoId] ON [ResultadosCrediticios] ([ConsentimientoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_ResultadosCrediticios_ProyectoId] ON [ResultadosCrediticios] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_ResultadosRegla_ValidacionId] ON [ResultadosRegla] ([ValidacionId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE UNIQUE INDEX [IX_SellosIntegridad_CodigoSello] ON [SellosIntegridad] ([CodigoSello]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_SellosIntegridad_ProyectoId] ON [SellosIntegridad] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Usuario_PlanSuscripcionId] ON [Usuario] ([PlanSuscripcionId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE UNIQUE INDEX [UQ_Usuario_Email] ON [Usuario] ([Email]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Validaciones_DocumentoId] ON [Validaciones] ([DocumentoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Validaciones_ProyectoId] ON [Validaciones] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_Validaciones_SelloId] ON [Validaciones] ([SelloId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_ValidacionesAyuntamiento_ProyectoId] ON [ValidacionesAyuntamiento] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      CREATE INDEX [IX_ValidacionesDgii_ProyectoId] ON [ValidacionesDgii] ([ProyectoId]);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])&#xD;
+      VALUES (N'20260625043417_InitialCreate', N'8.0.2');&#xD;
+info: Program[0]&#xD;
+      Database migrations applied successfully.&#xD;
+info: Infrastructure.Persistence.AppDbContext[0]&#xD;
+      Seeding prototype demo data...&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (15ms) [Parameters=[@__correoElectronico_0='?' (Size = 200)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [u].[IdUsuario], [u].[Activo], [u].[Apellido], [u].[Cedula], [u].[ConsultasUsadas], [u].[ContrasenaHash], [u].[Email], [u].[CreatedAtUtc], [u].[EmailVerificado], [u].[Nombre], [u].[NombreCompleto], [u].[PlanSuscripcionId], [u].[Rol], [u].[RowVersion], [u].[Telefono], [u].[TokenVerificacion], [u].[TokenVerificacionExpiraUtc], [u].[UpdatedAtUtc]&#xD;
+      FROM [Usuario] AS [u]&#xD;
+      WHERE [u].[Email] = @__correoElectronico_0&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (7ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 100), @p2='?' (Size = 15), @p3='?' (Size = 500), @p4='?' (Size = 200), @p5='?' (DbType = DateTime2), @p6='?' (Size = 100), @p7='?' (DbType = Guid), @p8='?' (DbType = Int32), @p9='?' (Size = 15), @p10='?' (Size = 4000), @p11='?' (DbType = DateTime2), @p12='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Usuario] ([IdUsuario], [Apellido], [Cedula], [ContrasenaHash], [Email], [CreatedAtUtc], [Nombre], [PlanSuscripcionId], [Rol], [Telefono], [TokenVerificacion], [TokenVerificacionExpiraUtc], [UpdatedAtUtc])&#xD;
+      OUTPUT INSERTED.[Activo], INSERTED.[ConsultasUsadas], INSERTED.[EmailVerificado], INSERTED.[NombreCompleto], INSERTED.[RowVersion]&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (6ms) [Parameters=[@__correoElectronico_0='?' (Size = 200)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [u].[IdUsuario], [u].[Activo], [u].[Apellido], [u].[Cedula], [u].[ConsultasUsadas], [u].[ContrasenaHash], [u].[Email], [u].[CreatedAtUtc], [u].[EmailVerificado], [u].[Nombre], [u].[NombreCompleto], [u].[PlanSuscripcionId], [u].[Rol], [u].[RowVersion], [u].[Telefono], [u].[TokenVerificacion], [u].[TokenVerificacionExpiraUtc], [u].[UpdatedAtUtc]&#xD;
+      FROM [Usuario] AS [u]&#xD;
+      WHERE [u].[Email] = @__correoElectronico_0&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 100), @p2='?' (Size = 15), @p3='?' (Size = 500), @p4='?' (Size = 200), @p5='?' (DbType = DateTime2), @p6='?' (Size = 100), @p7='?' (DbType = Guid), @p8='?' (DbType = Int32), @p9='?' (Size = 15), @p10='?' (Size = 4000), @p11='?' (DbType = DateTime2), @p12='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Usuario] ([IdUsuario], [Apellido], [Cedula], [ContrasenaHash], [Email], [CreatedAtUtc], [Nombre], [PlanSuscripcionId], [Rol], [Telefono], [TokenVerificacion], [TokenVerificacionExpiraUtc], [UpdatedAtUtc])&#xD;
+      OUTPUT INSERTED.[Activo], INSERTED.[ConsultasUsadas], INSERTED.[EmailVerificado], INSERTED.[NombreCompleto], INSERTED.[RowVersion]&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[@__correoElectronico_0='?' (Size = 200)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [u].[IdUsuario], [u].[Activo], [u].[Apellido], [u].[Cedula], [u].[ConsultasUsadas], [u].[ContrasenaHash], [u].[Email], [u].[CreatedAtUtc], [u].[EmailVerificado], [u].[Nombre], [u].[NombreCompleto], [u].[PlanSuscripcionId], [u].[Rol], [u].[RowVersion], [u].[Telefono], [u].[TokenVerificacion], [u].[TokenVerificacionExpiraUtc], [u].[UpdatedAtUtc]&#xD;
+      FROM [Usuario] AS [u]&#xD;
+      WHERE [u].[Email] = @__correoElectronico_0&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (9ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 100), @p2='?' (Size = 15), @p3='?' (Size = 500), @p4='?' (Size = 200), @p5='?' (DbType = DateTime2), @p6='?' (Size = 100), @p7='?' (DbType = Guid), @p8='?' (DbType = Int32), @p9='?' (Size = 15), @p10='?' (Size = 4000), @p11='?' (DbType = DateTime2), @p12='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Usuario] ([IdUsuario], [Apellido], [Cedula], [ContrasenaHash], [Email], [CreatedAtUtc], [Nombre], [PlanSuscripcionId], [Rol], [Telefono], [TokenVerificacion], [TokenVerificacionExpiraUtc], [UpdatedAtUtc])&#xD;
+      OUTPUT INSERTED.[Activo], INSERTED.[ConsultasUsadas], INSERTED.[EmailVerificado], INSERTED.[NombreCompleto], INSERTED.[RowVersion]&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[@__nombre_0='?' (Size = 200), @__usuarioCreadorId_1='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [p].[IdProyecto], [p].[Categoria], [p].[CodigoInterno], [p].[CreatedAtUtc], [p].[DatosDesarrollador], [p].[DesignacionCatastral], [p].[EstadoIntegridad], [p].[EstadoJuridico], [p].[Status], [p].[Matricula], [p].[NombreProyecto], [p].[RncDesarrollador], [p].[SelladoBloqueado], [p].[UbicacionGps], [p].[UbicacionTexto], [p].[UpdatedAtUtc], [p].[IdUsuario], [p].[ValorEstimado]&#xD;
+      FROM [ProyectosInmobiliarios] AS [p]&#xD;
+      WHERE [p].[NombreProyecto] = @__nombre_0 AND [p].[IdUsuario] = @__usuarioCreadorId_1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = Int32), @p2='?' (Size = 50), @p3='?' (DbType = DateTime2), @p4='?' (Size = 4000), @p5='?' (Size = 4000), @p6='?' (DbType = Int32), @p7='?' (DbType = Int32), @p8='?' (DbType = Int32), @p9='?' (Size = 4000), @p10='?' (Size = 200), @p11='?' (Size = 4000), @p12='?' (DbType = Boolean), @p13='?' (Size = 100), @p14='?' (Size = 500), @p15='?' (DbType = DateTime2), @p16='?' (DbType = Guid), @p17='?' (Precision = 18) (Scale = 2) (DbType = Decimal)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [ProyectosInmobiliarios] ([IdProyecto], [Categoria], [CodigoInterno], [CreatedAtUtc], [DatosDesarrollador], [DesignacionCatastral], [EstadoIntegridad], [EstadoJuridico], [Status], [Matricula], [NombreProyecto], [RncDesarrollador], [SelladoBloqueado], [UbicacionGps], [UbicacionTexto], [UpdatedAtUtc], [IdUsuario], [ValorEstimado])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (9ms) [Parameters=[@__nombre_0='?' (Size = 200), @__usuarioCreadorId_1='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [p].[IdProyecto], [p].[Categoria], [p].[CodigoInterno], [p].[CreatedAtUtc], [p].[DatosDesarrollador], [p].[DesignacionCatastral], [p].[EstadoIntegridad], [p].[EstadoJuridico], [p].[Status], [p].[Matricula], [p].[NombreProyecto], [p].[RncDesarrollador], [p].[SelladoBloqueado], [p].[UbicacionGps], [p].[UbicacionTexto], [p].[UpdatedAtUtc], [p].[IdUsuario], [p].[ValorEstimado]&#xD;
+      FROM [ProyectosInmobiliarios] AS [p]&#xD;
+      WHERE [p].[NombreProyecto] = @__nombre_0 AND [p].[IdUsuario] = @__usuarioCreadorId_1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = Int32), @p2='?' (Size = 50), @p3='?' (DbType = DateTime2), @p4='?' (Size = 4000), @p5='?' (Size = 4000), @p6='?' (DbType = Int32), @p7='?' (DbType = Int32), @p8='?' (DbType = Int32), @p9='?' (Size = 4000), @p10='?' (Size = 200), @p11='?' (Size = 4000), @p12='?' (DbType = Boolean), @p13='?' (Size = 100), @p14='?' (Size = 500), @p15='?' (DbType = DateTime2), @p16='?' (DbType = Guid), @p17='?' (Precision = 18) (Scale = 2) (DbType = Decimal)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [ProyectosInmobiliarios] ([IdProyecto], [Categoria], [CodigoInterno], [CreatedAtUtc], [DatosDesarrollador], [DesignacionCatastral], [EstadoIntegridad], [EstadoJuridico], [Status], [Matricula], [NombreProyecto], [RncDesarrollador], [SelladoBloqueado], [UbicacionGps], [UbicacionTexto], [UpdatedAtUtc], [IdUsuario], [ValorEstimado])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[@__nombre_0='?' (Size = 200), @__usuarioCreadorId_1='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [p].[IdProyecto], [p].[Categoria], [p].[CodigoInterno], [p].[CreatedAtUtc], [p].[DatosDesarrollador], [p].[DesignacionCatastral], [p].[EstadoIntegridad], [p].[EstadoJuridico], [p].[Status], [p].[Matricula], [p].[NombreProyecto], [p].[RncDesarrollador], [p].[SelladoBloqueado], [p].[UbicacionGps], [p].[UbicacionTexto], [p].[UpdatedAtUtc], [p].[IdUsuario], [p].[ValorEstimado]&#xD;
+      FROM [ProyectosInmobiliarios] AS [p]&#xD;
+      WHERE [p].[NombreProyecto] = @__nombre_0 AND [p].[IdUsuario] = @__usuarioCreadorId_1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = Int32), @p2='?' (Size = 50), @p3='?' (DbType = DateTime2), @p4='?' (Size = 4000), @p5='?' (Size = 4000), @p6='?' (DbType = Int32), @p7='?' (DbType = Int32), @p8='?' (DbType = Int32), @p9='?' (Size = 4000), @p10='?' (Size = 200), @p11='?' (Size = 4000), @p12='?' (DbType = Boolean), @p13='?' (Size = 100), @p14='?' (Size = 500), @p15='?' (DbType = DateTime2), @p16='?' (DbType = Guid), @p17='?' (Precision = 18) (Scale = 2) (DbType = Decimal)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [ProyectosInmobiliarios] ([IdProyecto], [Categoria], [CodigoInterno], [CreatedAtUtc], [DatosDesarrollador], [DesignacionCatastral], [EstadoIntegridad], [EstadoJuridico], [Status], [Matricula], [NombreProyecto], [RncDesarrollador], [SelladoBloqueado], [UbicacionGps], [UbicacionTexto], [UpdatedAtUtc], [IdUsuario], [ValorEstimado])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid), @__nombreOriginal_1='?' (Size = 500), @__tipo_2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [d].[Id], [d].[Activo], [d].[ContentType], [d].[CreatedAtUtc], [d].[EstadoDocumento], [d].[Extension], [d].[FechaEmision], [d].[FechaEvaluacion], [d].[FechaVencimiento], [d].[FormalStatus], [d].[InstitucionEmisora], [d].[NombreArchivoAlmacenado], [d].[NombreArchivoOriginal], [d].[Observaciones], [d].[ProyectoId], [d].[RutaArchivo], [d].[TamanoBytes], [d].[TipoDocumento], [d].[UpdatedAtUtc], [d].[UsuarioCargaId], [d].[Version], [d].[VersionReglaAplicada]&#xD;
+      FROM [Documentos] AS [d]&#xD;
+      WHERE [d].[ProyectoId] = @__proyectoId_0 AND [d].[NombreArchivoOriginal] = @__nombreOriginal_1 AND [d].[TipoDocumento] = @__tipo_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = Boolean), @p2='?' (Size = 100), @p3='?' (DbType = DateTime2), @p4='?' (DbType = Int32), @p5='?' (Size = 10), @p6='?' (DbType = DateTime2), @p7='?' (DbType = DateTime2), @p8='?' (DbType = DateTime2), @p9='?' (DbType = Int32), @p10='?' (Size = 200), @p11='?' (Size = 500), @p12='?' (Size = 500), @p13='?' (Size = 1000), @p14='?' (DbType = Guid), @p15='?' (Size = 1000), @p16='?' (DbType = Int64), @p17='?' (DbType = Int32), @p18='?' (DbType = DateTime2), @p19='?' (DbType = Guid), @p20='?' (DbType = Int32), @p21='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Documentos] ([Id], [Activo], [ContentType], [CreatedAtUtc], [EstadoDocumento], [Extension], [FechaEmision], [FechaEvaluacion], [FechaVencimiento], [FormalStatus], [InstitucionEmisora], [NombreArchivoAlmacenado], [NombreArchivoOriginal], [Observaciones], [ProyectoId], [RutaArchivo], [TamanoBytes], [TipoDocumento], [UpdatedAtUtc], [UsuarioCargaId], [Version], [VersionReglaAplicada])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (11ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid), @__nombreOriginal_1='?' (Size = 500), @__tipo_2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [d].[Id], [d].[Activo], [d].[ContentType], [d].[CreatedAtUtc], [d].[EstadoDocumento], [d].[Extension], [d].[FechaEmision], [d].[FechaEvaluacion], [d].[FechaVencimiento], [d].[FormalStatus], [d].[InstitucionEmisora], [d].[NombreArchivoAlmacenado], [d].[NombreArchivoOriginal], [d].[Observaciones], [d].[ProyectoId], [d].[RutaArchivo], [d].[TamanoBytes], [d].[TipoDocumento], [d].[UpdatedAtUtc], [d].[UsuarioCargaId], [d].[Version], [d].[VersionReglaAplicada]&#xD;
+      FROM [Documentos] AS [d]&#xD;
+      WHERE [d].[ProyectoId] = @__proyectoId_0 AND [d].[NombreArchivoOriginal] = @__nombreOriginal_1 AND [d].[TipoDocumento] = @__tipo_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = Boolean), @p2='?' (Size = 100), @p3='?' (DbType = DateTime2), @p4='?' (DbType = Int32), @p5='?' (Size = 10), @p6='?' (DbType = DateTime2), @p7='?' (DbType = DateTime2), @p8='?' (DbType = DateTime2), @p9='?' (DbType = Int32), @p10='?' (Size = 200), @p11='?' (Size = 500), @p12='?' (Size = 500), @p13='?' (Size = 1000), @p14='?' (DbType = Guid), @p15='?' (Size = 1000), @p16='?' (DbType = Int64), @p17='?' (DbType = Int32), @p18='?' (DbType = DateTime2), @p19='?' (DbType = Guid), @p20='?' (DbType = Int32), @p21='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Documentos] ([Id], [Activo], [ContentType], [CreatedAtUtc], [EstadoDocumento], [Extension], [FechaEmision], [FechaEvaluacion], [FechaVencimiento], [FormalStatus], [InstitucionEmisora], [NombreArchivoAlmacenado], [NombreArchivoOriginal], [Observaciones], [ProyectoId], [RutaArchivo], [TamanoBytes], [TipoDocumento], [UpdatedAtUtc], [UsuarioCargaId], [Version], [VersionReglaAplicada])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (8ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid), @__nombreOriginal_1='?' (Size = 500), @__tipo_2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [d].[Id], [d].[Activo], [d].[ContentType], [d].[CreatedAtUtc], [d].[EstadoDocumento], [d].[Extension], [d].[FechaEmision], [d].[FechaEvaluacion], [d].[FechaVencimiento], [d].[FormalStatus], [d].[InstitucionEmisora], [d].[NombreArchivoAlmacenado], [d].[NombreArchivoOriginal], [d].[Observaciones], [d].[ProyectoId], [d].[RutaArchivo], [d].[TamanoBytes], [d].[TipoDocumento], [d].[UpdatedAtUtc], [d].[UsuarioCargaId], [d].[Version], [d].[VersionReglaAplicada]&#xD;
+      FROM [Documentos] AS [d]&#xD;
+      WHERE [d].[ProyectoId] = @__proyectoId_0 AND [d].[NombreArchivoOriginal] = @__nombreOriginal_1 AND [d].[TipoDocumento] = @__tipo_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = Boolean), @p2='?' (Size = 100), @p3='?' (DbType = DateTime2), @p4='?' (DbType = Int32), @p5='?' (Size = 10), @p6='?' (DbType = DateTime2), @p7='?' (DbType = DateTime2), @p8='?' (DbType = DateTime2), @p9='?' (DbType = Int32), @p10='?' (Size = 200), @p11='?' (Size = 500), @p12='?' (Size = 500), @p13='?' (Size = 1000), @p14='?' (DbType = Guid), @p15='?' (Size = 1000), @p16='?' (DbType = Int64), @p17='?' (DbType = Int32), @p18='?' (DbType = DateTime2), @p19='?' (DbType = Guid), @p20='?' (DbType = Int32), @p21='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Documentos] ([Id], [Activo], [ContentType], [CreatedAtUtc], [EstadoDocumento], [Extension], [FechaEmision], [FechaEvaluacion], [FechaVencimiento], [FormalStatus], [InstitucionEmisora], [NombreArchivoAlmacenado], [NombreArchivoOriginal], [Observaciones], [ProyectoId], [RutaArchivo], [TamanoBytes], [TipoDocumento], [UpdatedAtUtc], [UsuarioCargaId], [Version], [VersionReglaAplicada])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (7ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT [t].[Id], [t].[CamposValidadosJson], [t].[CreatedAtUtc], [t].[Detalle], [t].[DocumentoId], [t].[EsLegitimo], [t].[EstadoValidacion], [t].[FuenteValidacion], [t].[PorcentajeIntegridad], [t].[ProyectoId], [t].[SelloId], [t].[UpdatedAtUtc], [d].[Id], [d].[Campo], [d].[Coincide], [d].[MetodoComparacion], [d].[ValidacionId], [d].[ValorEncontrado], [d].[ValorEsperado]&#xD;
+      FROM (&#xD;
+          SELECT TOP(1) [v].[Id], [v].[CamposValidadosJson], [v].[CreatedAtUtc], [v].[Detalle], [v].[DocumentoId], [v].[EsLegitimo], [v].[EstadoValidacion], [v].[FuenteValidacion], [v].[PorcentajeIntegridad], [v].[ProyectoId], [v].[SelloId], [v].[UpdatedAtUtc]&#xD;
+          FROM [Validaciones] AS [v]&#xD;
+          WHERE [v].[ProyectoId] = @__proyectoId_0 AND [v].[FuenteValidacion] = N'Interna'&#xD;
+      ) AS [t]&#xD;
+      LEFT JOIN [DatoValidado] AS [d] ON [t].[Id] = [d].[ValidacionId]&#xD;
+      ORDER BY [t].[Id]&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (9ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 2000), @p4='?' (DbType = Guid), @p5='?' (DbType = Boolean), @p6='?' (DbType = Int32), @p7='?' (Size = 200), @p8='?' (DbType = Double), @p9='?' (DbType = Guid), @p10='?' (DbType = Guid), @p11='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Validaciones] ([Id], [CamposValidadosJson], [CreatedAtUtc], [Detalle], [DocumentoId], [EsLegitimo], [EstadoValidacion], [FuenteValidacion], [PorcentajeIntegridad], [ProyectoId], [SelloId], [UpdatedAtUtc])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (13ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT [t].[Id], [t].[CamposValidadosJson], [t].[CreatedAtUtc], [t].[Detalle], [t].[DocumentoId], [t].[EsLegitimo], [t].[EstadoValidacion], [t].[FuenteValidacion], [t].[PorcentajeIntegridad], [t].[ProyectoId], [t].[SelloId], [t].[UpdatedAtUtc], [d].[Id], [d].[Campo], [d].[Coincide], [d].[MetodoComparacion], [d].[ValidacionId], [d].[ValorEncontrado], [d].[ValorEsperado]&#xD;
+      FROM (&#xD;
+          SELECT TOP(1) [v].[Id], [v].[CamposValidadosJson], [v].[CreatedAtUtc], [v].[Detalle], [v].[DocumentoId], [v].[EsLegitimo], [v].[EstadoValidacion], [v].[FuenteValidacion], [v].[PorcentajeIntegridad], [v].[ProyectoId], [v].[SelloId], [v].[UpdatedAtUtc]&#xD;
+          FROM [Validaciones] AS [v]&#xD;
+          WHERE [v].[ProyectoId] = @__proyectoId_0 AND [v].[FuenteValidacion] = N'Interna'&#xD;
+      ) AS [t]&#xD;
+      LEFT JOIN [DatoValidado] AS [d] ON [t].[Id] = [d].[ValidacionId]&#xD;
+      ORDER BY [t].[Id]&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 2000), @p4='?' (DbType = Guid), @p5='?' (DbType = Boolean), @p6='?' (DbType = Int32), @p7='?' (Size = 200), @p8='?' (DbType = Double), @p9='?' (DbType = Guid), @p10='?' (DbType = Guid), @p11='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Validaciones] ([Id], [CamposValidadosJson], [CreatedAtUtc], [Detalle], [DocumentoId], [EsLegitimo], [EstadoValidacion], [FuenteValidacion], [PorcentajeIntegridad], [ProyectoId], [SelloId], [UpdatedAtUtc])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid), @__titulo_1='?' (Size = 200), @__severidad_2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [h].[Id], [h].[Codigo], [h].[CreatedAtUtc], [h].[Descripcion], [h].[ProyectoId], [h].[Recomendacion], [h].[Resuelto], [h].[Severidad], [h].[SistemaOrigen], [h].[Titulo], [h].[UpdatedAtUtc], [h].[ValidacionId]&#xD;
+      FROM [Hallazgos] AS [h]&#xD;
+      WHERE [h].[ProyectoId] = @__proyectoId_0 AND [h].[Titulo] = @__titulo_1 AND [h].[Severidad] = @__severidad_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 50), @p2='?' (DbType = DateTime2), @p3='?' (Size = 2000), @p4='?' (DbType = Guid), @p5='?' (Size = 2000), @p6='?' (DbType = Boolean), @p7='?' (DbType = Int32), @p8='?' (Size = 4000), @p9='?' (Size = 200), @p10='?' (DbType = DateTime2), @p11='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Hallazgos] ([Id], [Codigo], [CreatedAtUtc], [Descripcion], [ProyectoId], [Recomendacion], [Resuelto], [Severidad], [SistemaOrigen], [Titulo], [UpdatedAtUtc], [ValidacionId])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[@__usuarioId_0='?' (DbType = Guid), @__accion_1='?' (Size = 200), @__proyectoId_2='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [a].[Id], [a].[Accion], [a].[CreatedAtUtc], [a].[Detalle], [a].[Entidad], [a].[EntidadId], [a].[FechaEventoUtc], [a].[IpOrigen], [a].[ProyectoId], [a].[ReferenciaExpedienteId], [a].[Resultado], [a].[TipoEvento], [a].[TipoOperacion], [a].[UpdatedAtUtc], [a].[UserAgent], [a].[UsuarioId]&#xD;
+      FROM [Auditorias] AS [a]&#xD;
+      WHERE [a].[UsuarioId] = @__usuarioId_0 AND [a].[Accion] = @__accion_1 AND [a].[ProyectoId] = @__proyectoId_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 200), @p2='?' (DbType = DateTime2), @p3='?' (Size = 2000), @p4='?' (Size = 4000), @p5='?' (Size = 4000), @p6='?' (DbType = DateTime2), @p7='?' (Size = 50), @p8='?' (DbType = Guid), @p9='?' (DbType = Guid), @p10='?' (Size = 2000), @p11='?' (Size = 4000), @p12='?' (DbType = Int32), @p13='?' (DbType = DateTime2), @p14='?' (Size = 4000), @p15='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Auditorias] ([Id], [Accion], [CreatedAtUtc], [Detalle], [Entidad], [EntidadId], [FechaEventoUtc], [IpOrigen], [ProyectoId], [ReferenciaExpedienteId], [Resultado], [TipoEvento], [TipoOperacion], [UpdatedAtUtc], [UserAgent], [UsuarioId])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (8ms) [Parameters=[@__usuarioId_0='?' (DbType = Guid), @__accion_1='?' (Size = 200), @__proyectoId_2='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [a].[Id], [a].[Accion], [a].[CreatedAtUtc], [a].[Detalle], [a].[Entidad], [a].[EntidadId], [a].[FechaEventoUtc], [a].[IpOrigen], [a].[ProyectoId], [a].[ReferenciaExpedienteId], [a].[Resultado], [a].[TipoEvento], [a].[TipoOperacion], [a].[UpdatedAtUtc], [a].[UserAgent], [a].[UsuarioId]&#xD;
+      FROM [Auditorias] AS [a]&#xD;
+      WHERE [a].[UsuarioId] = @__usuarioId_0 AND [a].[Accion] = @__accion_1 AND [a].[ProyectoId] = @__proyectoId_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 200), @p2='?' (DbType = DateTime2), @p3='?' (Size = 2000), @p4='?' (Size = 4000), @p5='?' (Size = 4000), @p6='?' (DbType = DateTime2), @p7='?' (Size = 50), @p8='?' (DbType = Guid), @p9='?' (DbType = Guid), @p10='?' (Size = 2000), @p11='?' (Size = 4000), @p12='?' (DbType = Int32), @p13='?' (DbType = DateTime2), @p14='?' (Size = 4000), @p15='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Auditorias] ([Id], [Accion], [CreatedAtUtc], [Detalle], [Entidad], [EntidadId], [FechaEventoUtc], [IpOrigen], [ProyectoId], [ReferenciaExpedienteId], [Resultado], [TipoEvento], [TipoOperacion], [UpdatedAtUtc], [UserAgent], [UsuarioId])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [r].[Id], [r].[CreatedAtUtc], [r].[EstadoReporte], [r].[GeneradoPorUsuarioId], [r].[ProyectoId], [r].[Resumen], [r].[UpdatedAtUtc], [r].[Version]&#xD;
+      FROM [Reportes] AS [r]&#xD;
+      WHERE [r].[ProyectoId] = @__proyectoId_0&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (7ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = DateTime2), @p2='?' (DbType = Int32), @p3='?' (DbType = Guid), @p4='?' (DbType = Guid), @p5='?' (Size = 4000), @p6='?' (DbType = DateTime2), @p7='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Reportes] ([Id], [CreatedAtUtc], [EstadoReporte], [GeneradoPorUsuarioId], [ProyectoId], [Resumen], [UpdatedAtUtc], [Version])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (5ms) [Parameters=[@p3='?' (DbType = Guid), @p0='?' (DbType = Int32), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      UPDATE [Reportes] SET [EstadoReporte] = @p0, [Resumen] = @p1, [UpdatedAtUtc] = @p2&#xD;
+      OUTPUT 1&#xD;
+      WHERE [Id] = @p3;&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (6ms) [Parameters=[@__proyectoId_0='?' (DbType = Guid), @__codigoVerificacion_1='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [c].[Id], [c].[CodigoVerificacion], [c].[CreatedAtUtc], [c].[EmisorId], [c].[EstadoCertificacion], [c].[EstadoIntegridad], [c].[FechaEmisionUtc], [c].[FechaVigenciaUtc], [c].[MotivoRevocacion], [c].[ProyectoId], [c].[ReporteId], [c].[Revocado], [c].[ScoreIntegridad], [c].[UpdatedAtUtc], [c].[UrlVerificacion], [c].[Version]&#xD;
+      FROM [Certificaciones] AS [c]&#xD;
+      WHERE [c].[ProyectoId] = @__proyectoId_0 AND [c].[CodigoVerificacion] = @__codigoVerificacion_1&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (DbType = Guid), @p4='?' (DbType = Int32), @p5='?' (DbType = Int32), @p6='?' (DbType = DateTime2), @p7='?' (DbType = DateTime2), @p8='?' (Size = 4000), @p9='?' (DbType = Guid), @p10='?' (DbType = Guid), @p11='?' (DbType = Boolean), @p12='?' (DbType = Int32), @p13='?' (DbType = DateTime2), @p14='?' (Size = 4000), @p15='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Certificaciones] ([Id], [CodigoVerificacion], [CreatedAtUtc], [EmisorId], [EstadoCertificacion], [EstadoIntegridad], [FechaEmisionUtc], [FechaVigenciaUtc], [MotivoRevocacion], [ProyectoId], [ReporteId], [Revocado], [ScoreIntegridad], [UpdatedAtUtc], [UrlVerificacion], [Version])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (3ms) [Parameters=[@__usuarioId_0='?' (DbType = Guid), @__mensaje_1='?' (Size = 4000), @__tipo_2='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [n].[Id], [n].[CreatedAtUtc], [n].[EnlaceRelacionado], [n].[FechaUtc], [n].[Leida], [n].[Mensaje], [n].[Tipo], [n].[UpdatedAtUtc], [n].[UsuarioId]&#xD;
+      FROM [Notificaciones] AS [n]&#xD;
+      WHERE [n].[UsuarioId] = @__usuarioId_0 AND [n].[Mensaje] = @__mensaje_1 AND [n].[Tipo] = @__tipo_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = DateTime2), @p2='?' (Size = 4000), @p3='?' (DbType = DateTime2), @p4='?' (DbType = Boolean), @p5='?' (Size = 4000), @p6='?' (Size = 4000), @p7='?' (DbType = DateTime2), @p8='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Notificaciones] ([Id], [CreatedAtUtc], [EnlaceRelacionado], [FechaUtc], [Leida], [Mensaje], [Tipo], [UpdatedAtUtc], [UsuarioId])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8);&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (17ms) [Parameters=[@__usuarioId_0='?' (DbType = Guid), @__mensaje_1='?' (Size = 4000), @__tipo_2='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT TOP(1) [n].[Id], [n].[CreatedAtUtc], [n].[EnlaceRelacionado], [n].[FechaUtc], [n].[Leida], [n].[Mensaje], [n].[Tipo], [n].[UpdatedAtUtc], [n].[UsuarioId]&#xD;
+      FROM [Notificaciones] AS [n]&#xD;
+      WHERE [n].[UsuarioId] = @__usuarioId_0 AND [n].[Mensaje] = @__mensaje_1 AND [n].[Tipo] = @__tipo_2&#xD;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]&#xD;
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = DateTime2), @p2='?' (Size = 4000), @p3='?' (DbType = DateTime2), @p4='?' (DbType = Boolean), @p5='?' (Size = 4000), @p6='?' (Size = 4000), @p7='?' (DbType = DateTime2), @p8='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']&#xD;
+      SET IMPLICIT_TRANSACTIONS OFF;&#xD;
+      SET NOCOUNT ON;&#xD;
+      INSERT INTO [Notificaciones] ([Id], [CreatedAtUtc], [EnlaceRelacionado], [FechaUtc], [Leida], [Mensaje], [Tipo], [UpdatedAtUtc], [UsuarioId])&#xD;
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8);&#xD;
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]&#xD;
+      Failed executing DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']&#xD;
+      SELECT CASE&#xD;
+          WHEN EXISTS (&#xD;
+              SELECT 1&#xD;
+              FROM [Perfiles] AS [p]) THEN CAST(1 AS bit)&#xD;
+          ELSE CAST(0 AS bit)&#xD;
+      END&#xD;
+fail: Microsoft.EntityFrameworkCore.Query[10100]&#xD;
+      An exception occurred while iterating over the results of a query for context type 'Infrastructure.Persistence.AppDbContext'.&#xD;
+      Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'Perfiles'.&#xD;
+         at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;ExecuteDbDataReaderAsync&gt;b__211_0(Task`1 result)&#xD;
+         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()&#xD;
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)&#xD;
+      --- End of stack trace from previous location ---&#xD;
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)&#xD;
+         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)&#xD;
+      --- End of stack trace from previous location ---&#xD;
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()&#xD;
+      ClientConnectionId:5a32d80b-dfc3-44d2-a946-5692150aaab5&#xD;
+      Error Number:208,State:1,Class:16&#xD;
+      Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'Perfiles'.&#xD;
+         at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;ExecuteDbDataReaderAsync&gt;b__211_0(Task`1 result)&#xD;
+         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()&#xD;
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)&#xD;
+      --- End of stack trace from previous location ---&#xD;
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)&#xD;
+         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)&#xD;
+      --- End of stack trace from previous location ---&#xD;
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()&#xD;
+      ClientConnectionId:5a32d80b-dfc3-44d2-a946-5692150aaab5&#xD;
+      Error Number:208,State:1,Class:16&#xD;
+fail: Infrastructure.Persistence.AppDbContext[0]&#xD;
+      An error occurred while seeding the database.&#xD;
+      Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'Perfiles'.&#xD;
+         at Microsoft.Data.SqlClient.SqlCommand.&lt;&gt;c.&lt;ExecuteDbDataReaderAsync&gt;b__211_0(Task`1 result)&#xD;
+         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()&#xD;
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)&#xD;
+      --- End of stack trace from previous location ---&#xD;
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)&#xD;
+         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)&#xD;
+      --- End of stack trace from previous location ---&#xD;
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()&#xD;
+         at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)&#xD;
+         at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)&#xD;
+         at Infrastructure.Persistence.AppDbContextSeeder.SeedAsync(IServiceProvider serviceProvider) in C:\Users\Admin\Desktop\Anteproyecto-Verify\src\backend\Infrastructure\Persistence\AppDbContextSeeder.cs:line 181&#xD;
+      ClientConnectionId:5a32d80b-dfc3-44d2-a946-5692150aaab5&#xD;
+      Error Number:208,State:1,Class:16&#xD;
+[xUnit.net 00:00:07.83]   Finished:    Api.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T09:59:07.7255244-04:00">
+        <Text>[xUnit.net 00:00:02.37]     Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T09:59:07.7258206-04:00">
+        <Text>[xUnit.net 00:00:02.37]     Api.Tests.ResendEmailServiceTests.SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="ALVAGONZ" outcome="Error" timestamp="2026-06-25T09:59:09.6730347-04:00">
+        <Text>[xUnit.net 00:00:04.34]     Api.Tests.ApiStatusTests.Get_ApiStatus_ReturnsSuccessStatusCode [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

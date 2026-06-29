@@ -2,25 +2,28 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import { PaginatedResponse, UserSettings, ProfilePermissions, SubscriptionPlan, CreateUserDto, UpdateUserDto } from "../types/settings.types";
 
-export const useUsers = (page = 1, pageSize = 50) =>
+export const useUsers = (page = 1, pageSize = 50, enabled = true) =>
   useQuery({
     queryKey: ["settings", "users", page, pageSize],
     queryFn: () =>
       apiClient
         .get<PaginatedResponse<UserSettings>>("/admin/users", { params: { page, pageSize } })
         .then(res => res.data.items),
+    enabled,
   });
 
-export const useProfiles = () =>
+export const useProfiles = (enabled = true) =>
   useQuery({
     queryKey: ["settings", "profiles"],
     queryFn: () => apiClient.get<ProfilePermissions[]>("/admin/profiles").then(res => res.data),
+    enabled,
   });
 
-export const usePlans = () =>
+export const usePlans = (enabled = true) =>
   useQuery({
     queryKey: ["settings", "plans"],
     queryFn: () => apiClient.get<SubscriptionPlan[]>("/admin/plans").then(res => res.data),
+    enabled,
   });
 
 export const useUpdateUserRole = () => {
@@ -79,6 +82,19 @@ export const useDeleteUser = () => {
       apiClient.delete<void>(`/admin/users/${userId}`).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
+    },
+  });
+};
+
+export const useUpdateMyProfile = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["useUpdateMyProfile"],
+    mutationFn: (data: { nombre: string; apellido: string; telefono?: string; currentPassword?: string; newPassword?: string }) =>
+      apiClient.patch("/auth/profile", data).then((res) => res.data),
+    onSuccess: () => {
+      // Invalidate auth/me so AuthContext reflects the new name
+      qc.invalidateQueries({ queryKey: ["auth", "me"] });
     },
   });
 };

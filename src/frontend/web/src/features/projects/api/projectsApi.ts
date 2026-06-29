@@ -6,7 +6,7 @@ import {
   ProjectStatus, 
   IntegrityStatus,
   ProjectError,
-  DocumentDiagnosisDto
+  DocumentDiagnosisDto,
 } from "../types";
 import { success, failure, Result } from "../../../shared/utils/functional";
 
@@ -51,32 +51,54 @@ export const projectsApi = {
     }
   },
 
-  async createProject(data: CreateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
+  async createProject(data: CreateProyectoDto & { fotosNuevas?: File[] }): Promise<Result<ProyectoDto, ProjectError>> {
     try {
-      const payload = {
-        ...data,
-        estadoProyecto: ProjectStatus.Draft,
-        estadoIntegridad: IntegrityStatus.Pending,
-      };
-      const response = await apiClient.post<ProyectoDto>("/projects", payload);
+      let response;
+      if (data.fotosNuevas?.length) {
+        const form = new FormData();
+        const { fotosNuevas, ...rest } = data;
+        Object.entries(rest).forEach(([k, v]) => {
+          if (v !== undefined) form.append(k, String(v));
+        });
+        fotosNuevas.forEach((f) => form.append("fotos", f));
+        response = await apiClient.post<ProyectoDto>("/projects", form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        const { fotosNuevas: _, ...payload } = data as any;
+        const enriched = { ...payload, estadoProyecto: ProjectStatus.Draft, estadoIntegridad: IntegrityStatus.Pending };
+        response = await apiClient.post<ProyectoDto>("/projects", enriched);
+      }
       return success(response.data);
     } catch (error: any) {
       const mapped = mapError(error);
-      if (mapped._tag === "ServerError") {
-        return failure(mapped);
-      }
+      if (mapped._tag === "ServerError") return failure(mapped);
       return failure({ _tag: "ServerError", message: error.message || "Server Error" });
     }
   },
 
-  async updateProject(id: string, data: UpdateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
-    try {
-      const response = await apiClient.put<ProyectoDto>(`/projects/${id}`, data);
-      return success(response.data);
-    } catch (error: any) {
-      return failure(mapError(error, id));
-    }
-  },
+async updateProject(id: string, data: UpdateProyectoDto): Promise<Result<ProyectoDto, ProjectError>> {
+     try {
+       let response;
+       if (data.fotosNuevas?.length) {
+         const form = new FormData();
+         // append all scalar fields
+         Object.entries(data).forEach(([k, v]) => {
+           if (k !== 'fotosNuevas' && v !== undefined) form.append(k, String(v));
+         });
+         data.fotosNuevas.forEach(f => form.append('fotos', f));
+         response = await apiClient.put<ProyectoDto>(`/projects/${id}`, form, {
+           headers: { 'Content-Type': 'multipart/form-data' },
+         });
+       } else {
+         const { fotosNuevas: _, ...payload } = data;
+         response = await apiClient.put<ProyectoDto>(`/projects/${id}`, payload);
+       }
+       return success(response.data);
+     } catch (error: any) {
+       return failure(mapError(error, id));
+     }
+   },
 
   async updateProjectStatus(id: string, status: ProjectStatus): Promise<Result<ProyectoDto, ProjectError>> {
     if (!Object.values(ProjectStatus).includes(status) || typeof status !== "number") {

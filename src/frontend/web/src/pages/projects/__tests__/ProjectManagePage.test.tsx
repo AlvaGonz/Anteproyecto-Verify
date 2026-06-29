@@ -212,6 +212,7 @@ const renderCreate = () =>
           <Routes>
             <Route path="/admin/projects/new" element={<ProjectManagePage />} />
             <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
+            <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
           </Routes>
         </ToastProvider>
       </MemoryRouter>
@@ -274,7 +275,7 @@ describe("ProjectManagePage — CREATE mode", () => {
 
     await waitFor(() => {
       expect(projectsApi.createProject).toHaveBeenCalledOnce();
-      expect(screen.getByTestId("project-detail")).toBeInTheDocument();
+      expect(screen.getByTestId("projects-list")).toBeInTheDocument();
     });
   });
 
@@ -358,7 +359,7 @@ describe("ProjectManagePage — EDIT mode", () => {
         "proj-001",
         expect.objectContaining({ nombre: "Modificado" })
       );
-      expect(screen.getByTestId("project-detail")).toBeInTheDocument();
+      expect(screen.getByTestId("projects-list")).toBeInTheDocument();
     });
   });
 

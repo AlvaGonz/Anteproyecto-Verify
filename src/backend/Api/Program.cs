@@ -51,8 +51,16 @@ try
             if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.SqlServer")
             {
                 logger.LogInformation("Applying database migrations...");
-                await db.Database.MigrateAsync();
-                logger.LogInformation("Database migrations applied successfully.");
+                try
+                {
+                    await db.Database.MigrateAsync();
+                    logger.LogInformation("Database migrations applied successfully.");
+                }
+                catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 2714)
+                {
+                    // ponytail: ignore object already exists. External script built the DB.
+                    logger.LogWarning("Database already initialized via custom SQL script. Skipping migration.");
+                }
             }
             else
             {
