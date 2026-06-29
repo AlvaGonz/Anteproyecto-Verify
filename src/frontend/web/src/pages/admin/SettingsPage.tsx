@@ -51,12 +51,6 @@ export const SettingsPage: React.FC = () => {
     }
   }, [user, activeTab]);
 
-  const loadData = () => {
-    refetchUsers();
-
-    refetchPlans();
-  };
-
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
 
