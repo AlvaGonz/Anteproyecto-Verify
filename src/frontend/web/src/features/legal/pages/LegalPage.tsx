@@ -915,28 +915,28 @@ export const LegalPage: React.FC = () => {
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.billing.cycle.title')}
+                    {t('legal.billing.cycleTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.billing.cycle.content')}
+                    {t('legal.billing.cycleDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.billing.autoRenewal.title')}
+                    {t('legal.billing.autoDebitTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.billing.autoRenewal.content')}
+                    {t('legal.billing.autoDebitDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.billing.priceChanges.title')}
+                    {t('legal.billing.priceChangeTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.billing.priceChanges.content')}
+                    {t('legal.billing.priceChangeDesc')}
                   </p>
                 </div>
               </div>
@@ -951,28 +951,28 @@ export const LegalPage: React.FC = () => {
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.refunds.noRefunds.title')}
+                    {t('legal.refunds.finalTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.refunds.noRefunds.content')}
+                    {t('legal.refunds.finalDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.refunds.cancellation.title')}
+                    {t('legal.refunds.cancelTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.refunds.cancellation.content')}
+                    {t('legal.refunds.cancelDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.refunds.annualPenalty.title')}
+                    {t('legal.refunds.annualPenaltyTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px] p-4 bg-error-container/20 text-error rounded-lg border border-error/20">
-                    {t('legal.refunds.annualPenalty.content')}
+                    {t('legal.refunds.annualPenaltyDesc')}
                   </p>
                 </div>
               </div>
@@ -983,23 +983,26 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
                 VIII. {t('legal.stripeProcessor.title', 'Procesador de Pagos y Seguridad (Stripe)')}
               </h2>
+              <p className="font-body text-on-surface-variant leading-relaxed mb-8">
+                {t('legal.stripeProcessor.desc')}
+              </p>
               <div className="space-y-6">
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.stripeProcessor.provider.title')}
+                    {t('legal.stripeProcessor.acceptTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.stripeProcessor.provider.content')}
+                    {t('legal.stripeProcessor.acceptDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.stripeProcessor.pciCompliance.title')}
+                    {t('legal.stripeProcessor.cookiesTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.stripeProcessor.pciCompliance.content')}
+                    {t('legal.stripeProcessor.cookiesDesc')}
                   </p>
                 </div>
               </div>
@@ -1014,19 +1017,28 @@ export const LegalPage: React.FC = () => {
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.financialLiability.disputes.title')}
+                    {t('legal.financialLiability.unauthorizedTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.financialLiability.disputes.content')}
+                    {t('legal.financialLiability.unauthorizedDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.financialLiability.tax.title')}
+                    {t('legal.financialLiability.availabilityTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.financialLiability.tax.content')}
+                    {t('legal.financialLiability.availabilityDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.financialLiability.capTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.financialLiability.capDesc')}
                   </p>
                 </div>
               </div>
@@ -1041,19 +1053,37 @@ export const LegalPage: React.FC = () => {
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.paymentData.storage.title')}
+                    {t('legal.paymentData.tokenTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.paymentData.storage.content')}
+                    {t('legal.paymentData.tokenDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.paymentData.thirdParty.title')}
+                    {t('legal.paymentData.retentionTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.paymentData.thirdParty.content')}
+                    {t('legal.paymentData.retentionDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.historyTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.historyDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.breachTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.breachDesc')}
                   </p>
                 </div>
               </div>
@@ -1068,19 +1098,28 @@ export const LegalPage: React.FC = () => {
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.acceptableUse.fraud.title')}
+                    {t('legal.acceptableUse.nontransferTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.acceptableUse.fraud.content')}
+                    {t('legal.acceptableUse.nontransferDesc')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-                    {t('legal.acceptableUse.suspension.title')}
+                    {t('legal.acceptableUse.scrapingTitle')}
                   </h3>
                   <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-                    {t('legal.acceptableUse.suspension.content')}
+                    {t('legal.acceptableUse.scrapingDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.acceptableUse.suspensionTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.acceptableUse.suspensionDesc')}
                   </p>
                 </div>
               </div>
@@ -1103,9 +1142,14 @@ export const LegalPage: React.FC = () => {
             </a>
           </div>
           <div>
-            <button className="bg-primary hover:bg-primary-hover text-on-primary font-label font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-raised whitespace-nowrap w-full md:w-auto active:scale-[0.98]">
+            <a 
+              href="https://wa.link/oi1w9m" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-block text-center bg-primary hover:bg-primary-hover text-on-primary font-label font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-raised whitespace-nowrap w-full md:w-auto active:scale-[0.98]"
+            >
               Contactar Soporte
-            </button>
+            </a>
           </div>
         </div>
       </section>
