@@ -1,6 +1,7 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-06-29T23:00:00-04:00 by OpenAgent (ORCH-TEST-001)
+> Last updated: 2026-06-30T02:15:00-04:00 by OpenAgent (COMP-001 Implementation)
 > **📝 ORCH-TEST-001 completed — 12 artifacts across 11 tasks, score 78/100**
+> **📝 COMP-001 consent version gate implemented — ADR-007 gaps closed**
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
@@ -13,6 +14,7 @@
 | README.md full rewrite from codebase graph | N/A | feat-codebase-memory-mcp | efcbffa5 | 2026-06-29 |
 | E2E Test Success for Project Photos | N/A | feat-codebase-memory-mcp | 5661d1a6 | 2026-06-29 |
 | ORCH-TEST-001 — Orchestration Proof Test | N/A | feat-voltagent-upgrade | a1b6b5b5 | 2026-06-29 |
+| COMP-001 — Consent Version Gate (Law 172-13) | ADR-007 | feat-voltagent-upgrade | ee48440d | 2026-06-30 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
@@ -56,7 +58,11 @@
 - [ ] Set GROQ_API_KEY environment variable — all 8 subagents return empty without it (ROOT CAUSE)
 - [x] Create missing agent files: BatchExecutor.md, DocWriter.md (DONE)
 - [x] ADR-006: SEC-001 JWT cookie migration plan (PHASED, APPROVAL REQUIRED)
-- [x] ADR-007: COMP-001 TransUnion consent gate plan (IMPLEMENTATION REQUIRED)
+- [x] ADR-007: COMP-001 TransUnion consent gate plan (IMPLEMENTED — version check + tests)
+  - `ConsentGateConstants.CurrentVersionPolitica = "v1.0"` (Application.Common)
+  - `ConsultarCreditoCommandHandler` blocks TransUnion if version mismatch
+  - `VerificarConsentimientoVigenteQueryHandler` returns false if version mismatch
+  - Test: `CreditCheck_ConsentVersionMismatch_BlocksTransUnion`
 - [ ] Public endpoint changes for Precios page (BUG-005)
 
 ## 🔄 Expanded Scope (Post-Audit — 2026-06-29)
