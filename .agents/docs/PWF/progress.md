@@ -53,9 +53,10 @@
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - [ ] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001
 - [ ] TransUnion consent gate verification (COMP-001) — surfaced in ORCH-TEST-001
-- [ ] Register unreachable subagents: build-error-resolver, refactor-cleaner
-- [ ] Debug empty-output agents: planner, security-reviewer, ley172-13-auditor, code-reviewer
-- [ ] Create missing agent files: BatchExecutor, DocWriter
+- [ ] Set GROQ_API_KEY environment variable — all 8 subagents return empty without it (ROOT CAUSE)
+- [x] Create missing agent files: BatchExecutor.md, DocWriter.md (DONE)
+- [x] ADR-006: SEC-001 JWT cookie migration plan (PHASED, APPROVAL REQUIRED)
+- [x] ADR-007: COMP-001 TransUnion consent gate plan (IMPLEMENTATION REQUIRED)
 - [ ] Public endpoint changes for Precios page (BUG-005)
 
 ## 🔄 Expanded Scope (Post-Audit — 2026-06-29)
