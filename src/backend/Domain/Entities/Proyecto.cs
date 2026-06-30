@@ -17,6 +17,7 @@ public class Proyecto : EntityBase
     public string? Matricula { get; private set; }
     public ProjectCategory Categoria { get; private set; }
     public string? DesignacionCatastral { get; private set; }
+    public string? ImagenUrl { get; private set; }
     public string? IdentificacionCatastral => DesignacionCatastral;
     public Guid PromotorId => UsuarioCreadorId;
     public string? RncPromotor => RncDesarrollador;
@@ -93,6 +94,12 @@ public class Proyecto : EntityBase
     {
         RncDesarrollador = rnc;
         Matricula = matricula;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void SetImagenUrl(string url)
+    {
+        ImagenUrl = url;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

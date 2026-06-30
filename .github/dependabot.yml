@@ -1,14 +1,15 @@
-# .github/dependabot.yml
 version: 2
 updates:
   # Keep GitHub Actions SHAs up to date automatically
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "09:00"
     open-pull-requests-limit: 5
+    rebase-strategy: "auto"
     labels:
       - "dependencies"
       - "github-actions"
@@ -16,12 +17,16 @@ updates:
   # Keep pnpm frontend deps up to date
   - package-ecosystem: "npm"
     directory: "/src/frontend/web"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    rebase-strategy: "auto"
 
   # Keep NuGet backend deps up to date
   - package-ecosystem: "nuget"
     directory: "/src/backend"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
+    rebase-strategy: "auto"

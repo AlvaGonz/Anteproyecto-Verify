@@ -56,10 +56,10 @@ try
                     await db.Database.MigrateAsync();
                     logger.LogInformation("Database migrations applied successfully.");
                 }
-                catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 2714)
+                catch (Exception ex)
                 {
-                    // ponytail: ignore object already exists. External script built the DB.
-                    logger.LogWarning("Database already initialized via custom SQL script. Skipping migration.");
+                    logger.LogError(ex, "Fatal: database migration failed on startup.");
+                    throw;  // App no debe arrancar con DB corrupta
                 }
             }
             else
