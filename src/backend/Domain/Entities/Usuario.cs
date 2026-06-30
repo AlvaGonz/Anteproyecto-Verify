@@ -31,6 +31,12 @@ public class Usuario : EntityBase
     public PlanSuscripcion? Plan { get; private set; }
     public int ConsultasUsadas { get; private set; }
 
+    // Stripe Integration Fields
+    public string? StripeCustomerId { get; private set; }
+    public string? StripeSubscriptionId { get; private set; }
+    public string? SubscriptionStatus { get; private set; }
+    public DateTime? CurrentPeriodEnd { get; private set; }
+
     // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
 
@@ -132,5 +138,20 @@ public class Usuario : EntityBase
     public bool EsAdministrador()
     {
         return Rol == UserRole.Administrator;
+    }
+
+    public void SetStripeCustomerId(string customerId)
+    {
+        if (string.IsNullOrWhiteSpace(customerId)) throw new ArgumentException("Customer ID requerido", nameof(customerId));
+        StripeCustomerId = customerId;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateStripeSubscription(string? subscriptionId, string? status, DateTime? currentPeriodEnd)
+    {
+        StripeSubscriptionId = subscriptionId;
+        SubscriptionStatus = status;
+        CurrentPeriodEnd = currentPeriodEnd;
+        UpdatedAtUtc = DateTime.UtcNow;
     }
 }

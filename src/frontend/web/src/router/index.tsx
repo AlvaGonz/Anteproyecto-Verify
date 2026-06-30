@@ -5,6 +5,8 @@ import { HealthPage } from "../pages/HealthPage";
 
 const LegalPage = lazy(() => import("../features/legal").then(m => ({ default: m.LegalPage })));
 const PricingPage = lazy(() => import("../features/pricing").then(m => ({ default: m.PricingPage })));
+const CheckoutPage = lazy(() => import("../features/pricing/pages/CheckoutPage").then(m => ({ default: m.CheckoutPage })));
+const CheckoutReturnPage = lazy(() => import("../features/pricing/pages/CheckoutReturnPage").then(m => ({ default: m.CheckoutReturnPage })));
 import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage";
 import { ProjectPublicDetailPage } from "../pages/projects/ProjectPublicDetailPage";
 import { ProjectManagePage } from "../pages/projects/ProjectManagePage";
@@ -111,6 +113,26 @@ export const router = createHashRouter([
       {
         path: "/p/:slug",
         element: <ProjectPublicDetailPage />,
+      },
+      {
+        path: "/checkout",
+        element: (
+          <AuthGuard>
+            <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Cargando...</div>}>
+              <CheckoutPage />
+            </Suspense>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/checkout/return",
+        element: (
+          <AuthGuard>
+            <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Cargando...</div>}>
+              <CheckoutReturnPage />
+            </Suspense>
+          </AuthGuard>
+        ),
       },
 
       /* ===== New Spec Routes ===== */

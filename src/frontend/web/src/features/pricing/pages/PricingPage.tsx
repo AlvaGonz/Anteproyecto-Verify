@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { LandingNav } from "../../../shared/components/layout/LandingNav";
 import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
 import { useAuth } from "../../../shared/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import "./PricingPage.module.css";
 
 const ICONS = {
@@ -26,6 +27,13 @@ export const PricingPage: React.FC = () => {
     const timer = setTimeout(() => setIsRevealed(true), 50);
     return () => clearTimeout(timer);
   }, []);
+
+  const navigate = useNavigate();
+
+  const handlePaidPlan = (plan: 'profesional' | 'empresa' | 'enterprise') => {
+    const billing = isAnnual ? 'yearly' : 'monthly'
+    navigate(`/checkout?plan=${plan}&billing=${billing}`)
+  }
 
   const prices = {
     profesional: isAnnual ? "RD$2,800" : "RD$3,500",
@@ -150,12 +158,13 @@ export const PricingPage: React.FC = () => {
                   {t("pricing.cards.pro.feature4")}
                 </li>
               </ul>
-              <Link
-                to="/register?plan=profesional"
+              <button
+                onClick={() => handlePaidPlan('profesional')}
                 className="w-full py-3 rounded-lg bg-primary text-on-primary font-label font-bold hover:bg-primary-hover shadow-md transition-colors btn-interact text-center block"
+                aria-label={t("pricing.cards.pro.button")}
               >
                 {t("pricing.cards.pro.button")}
-              </Link>
+              </button>
             </div>
 
             {/* Card 3: Empresa */}
@@ -195,12 +204,13 @@ export const PricingPage: React.FC = () => {
                 </li>
 
               </ul>
-              <Link
-                to="/register?plan=empresa"
+              <button
+                onClick={() => handlePaidPlan('empresa')}
                 className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
+                aria-label={t("pricing.cards.empresa.button")}
               >
                 {t("pricing.cards.empresa.button")}
-              </Link>
+              </button>
             </div>
 
             {/* Card 4: Enterprise */}
@@ -239,12 +249,13 @@ export const PricingPage: React.FC = () => {
                   {t("pricing.cards.enterprise.feature4")}
                 </li>
               </ul>
-              <Link
-                to={isAuthenticated ? "/contacto" : "/register?plan=enterprise"}
+              <button
+                onClick={() => handlePaidPlan('enterprise')}
                 className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-secondary-container"
+                aria-label={t("pricing.cards.enterprise.button")}
               >
                 {t("pricing.cards.enterprise.button")}
-              </Link>
+              </button>
             </div>
           </div>
         </section>

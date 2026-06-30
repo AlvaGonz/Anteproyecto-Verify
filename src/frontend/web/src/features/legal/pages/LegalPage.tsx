@@ -16,7 +16,10 @@ const ICONS = {
   assignment: "assignment",
   timer: "timer",
   menu_book: "menu_book",
-  visibility: "visibility"
+  visibility: "visibility",
+  payments: "payments",
+  history: "history",
+  security: "security"
 };
 
 export const LegalPage: React.FC = () => {
@@ -176,6 +179,66 @@ export const LegalPage: React.FC = () => {
                   {ICONS.menu_book}
                 </span>
                 Marco Normativo
+              </a>
+              <a
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
+                href="#billing"
+                onClick={(e) => handleSidebarClick(e, "billing")}
+              >
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
+                  {ICONS.payments}
+                </span>
+                {t('legal.billing.title', 'Facturación y Suscripciones')}
+              </a>
+              <a
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
+                href="#refunds"
+                onClick={(e) => handleSidebarClick(e, "refunds")}
+              >
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
+                  {ICONS.history}
+                </span>
+                {t('legal.refunds.title', 'Política de Reembolsos')}
+              </a>
+              <a
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
+                href="#stripeProcessor"
+                onClick={(e) => handleSidebarClick(e, "stripeProcessor")}
+              >
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
+                  {ICONS.security}
+                </span>
+                {t('legal.stripeProcessor.title', 'Procesador de Pagos')}
+              </a>
+              <a
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
+                href="#financialLiability"
+                onClick={(e) => handleSidebarClick(e, "financialLiability")}
+              >
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
+                  {ICONS.gavel}
+                </span>
+                {t('legal.financialLiability.title', 'Responsabilidad Financiera')}
+              </a>
+              <a
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
+                href="#paymentData"
+                onClick={(e) => handleSidebarClick(e, "paymentData")}
+              >
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
+                  {ICONS.database}
+                </span>
+                {t('legal.paymentData.title', 'Datos de Pago')}
+              </a>
+              <a
+                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
+                href="#acceptableUse"
+                onClick={(e) => handleSidebarClick(e, "acceptableUse")}
+              >
+                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
+                  {ICONS.checkCircle}
+                </span>
+                {t('legal.acceptableUse.title', 'Uso Aceptable')}
               </a>
               <div className="mt-8 pt-6 border-t border-outline-variant/30 flex-shrink-0 ml-auto lg:mt-8 lg:pt-6 lg:border-t lg:ml-0">
                 <button 
@@ -839,6 +902,186 @@ export const LegalPage: React.FC = () => {
                       </tbody>
                     </table>
                   </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 6. Facturación y Suscripciones */}
+            <section id="billing" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                VI. {t('legal.billing.title', 'Política de Facturación y Suscripciones')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.billing.cycle.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.billing.cycle.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.billing.autoRenewal.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.billing.autoRenewal.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.billing.priceChanges.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.billing.priceChanges.content')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 7. Reembolsos y Cancelaciones */}
+            <section id="refunds" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                VII. {t('legal.refunds.title', 'Política de Reembolsos y Cancelaciones')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.refunds.noRefunds.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.refunds.noRefunds.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.refunds.cancellation.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.refunds.cancellation.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.refunds.annualPenalty.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px] p-4 bg-error-container/20 text-error rounded-lg border border-error/20">
+                    {t('legal.refunds.annualPenalty.content')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 8. Procesador de Pagos y Seguridad (Stripe) */}
+            <section id="stripeProcessor" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                VIII. {t('legal.stripeProcessor.title', 'Procesador de Pagos y Seguridad (Stripe)')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.stripeProcessor.provider.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.stripeProcessor.provider.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.stripeProcessor.pciCompliance.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.stripeProcessor.pciCompliance.content')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 9. Responsabilidad Financiera */}
+            <section id="financialLiability" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                IX. {t('legal.financialLiability.title', 'Responsabilidad Financiera')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.financialLiability.disputes.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.financialLiability.disputes.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.financialLiability.tax.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.financialLiability.tax.content')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 10. Tratamiento de Datos de Pago */}
+            <section id="paymentData" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                X. {t('legal.paymentData.title', 'Tratamiento de Datos de Pago')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.storage.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.storage.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.thirdParty.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.thirdParty.content')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 11. Uso Aceptable de Pagos */}
+            <section id="acceptableUse" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                XI. {t('legal.acceptableUse.title', 'Uso Aceptable')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.acceptableUse.fraud.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.acceptableUse.fraud.content')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.acceptableUse.suspension.title')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.acceptableUse.suspension.content')}
+                  </p>
                 </div>
               </div>
             </section>
