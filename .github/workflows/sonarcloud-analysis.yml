@@ -1,0 +1,70 @@
+# SonarCloud Analysis Gate (TEC-010)
+# Trigger: On push to develop, main, and all pull requests
+# Purpose: Static analysis with quality gate enforcement
+
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better relevancy
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Begin SonarCloud scan
+        uses: SonarSource/sonarcloud-github-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=verifinca
+            -Dsonar.projectKey=verifinca_anteproyecto-verify
+            -Dsonar.sources=src/
+            -Dsonar.exclusions=**/node_modules/**,**/bin/** ,**/obj/**
+            -Dsonar.tests=src/frontend/web/src/**,src/backend/VeriFinca.Tests/**
+            -Dsonar.test.inclusions=**/*.test.tsx,**/*.test.ts,**/*Tests.cs
+            -Dsonar.typescript.lcov.reportPaths=src/frontend/web/coverage/lcov.info
+            -Dsonar.cs.opencover.reportsPath=src/backend/TestResults/**/coverage.opencover.xml
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=300
+
+      - name: Quality Gate Check
+        run: |
+          echo "SonarCloud Quality Gate completed."
+          echo "Check https://sonarcloud.io/project/overview?id=verifinca_anteproyecto-verify for details."
+
+      - name: Fail on Quality Gate
+        if: ${{ failure() }}
+        run: |
+          echo "❌ SonarCloud Quality Gate FAILED. Fix issues before merging."
+          exit 1

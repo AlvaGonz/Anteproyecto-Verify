@@ -1,9 +1,19 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { RegisterPage } from "../RegisterPage";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useRegister } from "../../../features/auth/api/useAuth";
+
+// ---------------------------------------------------------------------------
+// Mocks
+// ---------------------------------------------------------------------------
+
+vi.mock("../../../features/auth/api/useAuth", () => ({
+  useRegister: vi.fn(),
+}));
 
 vi.mock("framer-motion", async () => {
   const actual = await vi.importActual("framer-motion");
@@ -17,30 +27,68 @@ vi.mock("framer-motion", async () => {
         <button {...props}>{children}</button>
       ),
     },
+    AnimatePresence: ({ children }: React.PropsWithChildren<Record<string, unknown>>) => <>{children}</>,
   };
 });
 
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+    mutations: { retry: false },
+  },
+});
+
+const renderPage = () =>
+  render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ToastProvider>
+          <RegisterPage />
+        </ToastProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+
+/**
+ * Fill every required field in the form with valid data.
+ * Must be called with the same `user` instance that later clicks submit.
+ */
+const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
+  await user.type(screen.getByLabelText(/Nombre completo/i), "Juan");
+  await user.type(screen.getByLabelText(/Apellido/i), "Pérez");
+  await user.type(screen.getByLabelText(/Correo electrónico/i), "juan@example.com");
+  // telefono is mocked — value is set via register("telefono").onChange
+  await user.type(screen.getByLabelText(/Teléfono/i), "8095550199");
+  // Valid RD cédula (check-digit for 001-0000001-7)
+  await user.type(screen.getByLabelText(/Cédula/i), "00100000017");
+  await user.type(screen.getByLabelText(/^Contraseña/i), "Password1!");
+  await user.click(screen.getByRole("checkbox"));
+};
+
+// ---------------------------------------------------------------------------
+// Suite
+// ---------------------------------------------------------------------------
+
 describe("RegisterPage", () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
+  let mockMutate: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockMutate = vi.fn();
+    (useRegister as any).mockReturnValue({
+      mutate: mockMutate,
+      isPending: false,
+      error: null,
+    });
   });
 
-  const renderPage = () =>
-    render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ToastProvider>
-            <RegisterPage />
-          </ToastProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
+  // ── Render ─────────────────────────────────────────────────────────────
 
-  it("renders TRD professional registration fields", () => {
+  it("renders all registration form fields and submit button", () => {
     renderPage();
 
     expect(screen.getByLabelText(/Nombre completo/i)).toBeInTheDocument();
@@ -50,5 +98,160 @@ describe("RegisterPage", () => {
     expect(screen.getByLabelText(/Cédula/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Contraseña/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /crear mi cuenta/i })).toBeInTheDocument();
+  });
+
+  it("renders a link to navigate to the login page", () => {
+    renderPage();
+
+    const loginLink = screen.getByRole("link", { name: /inicia sesión aquí/i });
+    expect(loginLink).toBeInTheDocument();
+    expect(loginLink).toHaveAttribute("href", "/login");
+  });
+
+  // ── Field-level validation errors (triggered on submit) ────────────────
+
+  it("displays validation errors when submitting with empty fields", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole("button", { name: /crear mi cuenta/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/El nombre debe tener al menos 2 caracteres/i)).toBeInTheDocument();
+      expect(screen.getByText(/El apellido debe tener al menos 2 caracteres/i)).toBeInTheDocument();
+      expect(screen.getByText(/El correo es requerido/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows invalid email format error when email is malformed", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByLabelText(/Correo electrónico/i), "not-an-email");
+    // The button is now disabled, but the error appears on change via mode: "onChange"
+    expect(await screen.findByText(/Formato de correo inválido/i)).toBeInTheDocument();
+  });
+
+  it("shows password too short error when password is fewer than 8 characters", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByLabelText(/^Contraseña/i), "Ab1!");
+    // Error appears on change via mode: "onChange"
+    expect(
+      await screen.findByText(/La contraseña debe tener mínimo 8 caracteres/i)
+    ).toBeInTheDocument();
+  });
+
+  it("shows the first password complexity error when requirements are not met", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    // 8 chars but missing uppercase — zod issues /[A-Z]/ failure FIRST
+    await user.type(screen.getByLabelText(/^Contraseña/i), "abcdefgh");
+
+    expect(
+      await screen.findByText(/Debe contener al menos una mayúscula/i)
+    ).toBeInTheDocument();
+  });
+
+  it("shows live password requirements checker when user starts typing", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByLabelText(/^Contraseña/i), "A");
+
+    expect(screen.getByText(/Requisitos de seguridad/i)).toBeInTheDocument();
+    // The checker panel has specific labels distinct from the zod error span
+    expect(screen.getByText("Mínimo 8 caracteres")).toBeInTheDocument();
+    expect(screen.getByText(/Al menos 1 Mayúscula/i)).toBeInTheDocument();
+    expect(screen.getByText(/Al menos 1 Minúscula/i)).toBeInTheDocument();
+    expect(screen.getByText(/Al menos 1 Número/i)).toBeInTheDocument();
+    expect(screen.getByText(/Al menos 1 Carácter Especial/i)).toBeInTheDocument();
+  });
+
+  // ── Submission states ──────────────────────────────────────────────────
+
+  it("calls register mutation with sanitised form data on valid submission", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await fillValidForm(user);
+
+    // After fillValidForm the form should be valid — button enabled
+    await user.click(screen.getByRole("button", { name: /crear mi cuenta/i }));
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledTimes(1);
+    });
+
+    const [data, _options] = mockMutate.mock.calls[0];
+    expect(data).toMatchObject({
+      nombre: "Juan",
+      apellido: "Pérez",
+      email: "juan@example.com",
+    });
+    // acceptedTerms must be stripped before the API call
+    expect(data).not.toHaveProperty("acceptedTerms");
+  });
+
+  it("shows success message after successful registration", async () => {
+    mockMutate.mockImplementation(
+      (_data: unknown, { onSuccess }: { onSuccess?: () => void }) => {
+        onSuccess?.();
+      },
+    );
+
+    const user = userEvent.setup();
+    renderPage();
+    await fillValidForm(user);
+
+    await user.click(screen.getByRole("button", { name: /crear mi cuenta/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Revisa tu correo/i)).toBeInTheDocument();
+      // The email address the user typed should appear in the success message
+      expect(screen.getByText(/juan@example.com/i)).toBeInTheDocument();
+    });
+  });
+
+  it("does not submit the form when fields are invalid", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    // Click submit with empty form — handleSubmit validates and prevents onSubmit
+    await user.click(screen.getByRole("button", { name: /crear mi cuenta/i }));
+
+    // Validation errors must appear
+    await waitFor(() => {
+      expect(screen.getByText(/El correo es requerido/i)).toBeInTheDocument();
+    });
+
+    // But mutation must not have been called
+    expect(mockMutate).not.toHaveBeenCalled();
+  });
+
+  it("shows loading state during form submission", async () => {
+    (useRegister as any).mockReturnValue({
+      mutate: mockMutate,
+      isPending: true,
+      error: null,
+    });
+
+    renderPage();
+
+    expect(screen.getByText(/Procesando Registro/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /procesando registro/i })).toBeDisabled();
+  });
+
+  it("shows API error alert when registration fails", () => {
+    (useRegister as any).mockReturnValue({
+      mutate: mockMutate,
+      isPending: false,
+      error: new Error("El correo electrónico ya está registrado"),
+    });
+
+    renderPage();
+
+    expect(screen.getByText(/El correo electrónico ya está registrado/i)).toBeInTheDocument();
   });
 });
