@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Persistence.IDocumentoRepository, Infrastructure.Persistence.Repositories.DocumentoRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IUsuarioRepository, Infrastructure.Persistence.Repositories.UsuarioRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IPlanSuscripcionRepository, Infrastructure.Persistence.Repositories.PlanSuscripcionRepository>();
+        services.AddScoped<Application.Abstractions.Persistence.IDashboardRepository, Infrastructure.Persistence.Repositories.DashboardRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IValidacionRepository, Infrastructure.Persistence.Repositories.ValidacionRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IHallazgoRepository, Infrastructure.Persistence.Repositories.HallazgoRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IAuditoriaRepository, Infrastructure.Persistence.Repositories.AuditoriaRepository>();
@@ -155,6 +156,9 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
         services.AddSingleton<Application.Abstractions.Security.IJwtTokenGenerator, Infrastructure.Security.JwtTokenGenerator>();
         services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Infrastructure.Security.BCryptPasswordHasher>();
+
+        // Background Jobs
+        services.AddHostedService<Infrastructure.BackgroundJobs.MonthlyResetJob>();
 
         // End of Infrastructure
 

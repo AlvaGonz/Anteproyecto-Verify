@@ -20,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.Consistency.ConsistencyRule>();
 
         // Validation Handlers
+        services.AddScoped<Application.Handlers.Admin.GetDashboardStatsQueryHandler>();
         services.AddScoped<Application.Features.Validation.Commands.ExecuteDgiiValidation.ExecuteDgiiValidationCommandHandler>();
         services.AddScoped<Application.Features.Validation.Commands.ExecuteAyuntamientoValidation.ExecuteAyuntamientoValidationCommandHandler>();
         services.AddScoped<Application.Features.Validation.Commands.CheckDuplicateExpediente.CheckDuplicateExpedienteCommandHandler>();

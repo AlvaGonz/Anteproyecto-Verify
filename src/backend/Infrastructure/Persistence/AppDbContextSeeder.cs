@@ -58,6 +58,9 @@ public static class AppDbContextSeeder
                 telefono: "809-555-3000",
                 cedula: "001-9876543-2");
 
+            await SeedLegacyProfilesAndPermissionsAsync(context, logger, adminUser, devUser, publicUser);
+            await SeedDashboardDummyDataAsync(context, logger, adminUser, devUser, publicUser);
+
             var proyectos = new[]
             {
                 new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Published },
@@ -241,6 +244,86 @@ public static class AppDbContextSeeder
                 soporteTipo: "Account Manager", accesoApi: true);
 
             context.PlanesSuscripcion.AddRange(consulta, profesional, empresa, enterprise);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedLegacyProfilesAndPermissionsAsync(AppDbContext context, ILogger logger, Usuario adminUser, Usuario devUser, Usuario publicUser)
+    {
+        if (!await context.Permisos.AnyAsync())
+        {
+            logger.LogInformation("Seeding legacy profiles and permissions...");
+
+            var permisos = new List<Permiso>
+            {
+                new Permiso { IdPermiso = Guid.NewGuid(), Descripcion = "CrearProyectos" },
+                new Permiso { IdPermiso = Guid.NewGuid(), Descripcion = "ValidarProyectos" },
+                new Permiso { IdPermiso = Guid.NewGuid(), Descripcion = "ConfigurarSistema" },
+                new Permiso { IdPermiso = Guid.NewGuid(), Descripcion = "ConsultarSello" }
+            };
+            context.Permisos.AddRange(permisos);
+
+            var adminPerfil = new Perfil { IdPerfil = Guid.NewGuid(), NombrePerfil = "Administrator" };
+            var devPerfil = new Perfil { IdPerfil = Guid.NewGuid(), NombrePerfil = "Professional" };
+            var publicPerfil = new Perfil { IdPerfil = Guid.NewGuid(), NombrePerfil = "Consultation" };
+
+            context.Perfiles.AddRange(adminPerfil, devPerfil, publicPerfil);
+            await context.SaveChangesAsync();
+
+            foreach (var perm in permisos)
+            {
+                context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = adminPerfil.IdPerfil, IdPermiso = perm.IdPermiso });
+            }
+
+            var pCrear = permisos.FirstOrDefault(p => p.Descripcion == "CrearProyectos");
+            if (pCrear != null)
+                context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = devPerfil.IdPerfil, IdPermiso = pCrear.IdPermiso });
+
+            var pConsultar = permisos.FirstOrDefault(p => p.Descripcion == "ConsultarSello");
+            if (pConsultar != null)
+                context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = publicPerfil.IdPerfil, IdPermiso = pConsultar.IdPermiso });
+
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedDashboardDummyDataAsync(AppDbContext context, ILogger logger, Usuario adminUser, Usuario devUser, Usuario publicUser)
+    {
+        if (!await context.LogConsultas.AnyAsync())
+        {
+            logger.LogInformation("Seeding dummy data for dashboard...");
+
+            var today = DateTime.UtcNow;
+            
+            // Seed some random LogConsultas over the last 30 days
+            var random = new Random(1234);
+            var logs = new List<LogConsulta>();
+            
+            for (int i = 0; i < 50; i++)
+            {
+                var daysAgo = random.Next(0, 30);
+                var isDev = random.Next(0, 2) == 0;
+                var userId = isDev ? devUser.Id : publicUser.Id;
+                
+                var logConsulta = new LogConsulta(userId, random.Next(0, 10) > 1, "Consulta automatizada (Seeder)");
+                typeof(LogConsulta).GetProperty("FechaConsulta")?.SetValue(logConsulta, today.AddDays(-daysAgo).AddHours(-random.Next(0, 24)));
+                logs.Add(logConsulta);
+            }
+            
+            context.LogConsultas.AddRange(logs);
+            
+            // Seed LogProyectos
+            var logProyectos = new List<LogProyecto>();
+            for (int i = 0; i < 15; i++)
+            {
+                var daysAgo = random.Next(0, 30);
+                
+                var logProyecto = new LogProyecto(devUser.Id, Guid.NewGuid(), "Creacion de proyecto (Seeder)");
+                typeof(LogProyecto).GetProperty("FechaCreacion")?.SetValue(logProyecto, today.AddDays(-daysAgo).AddHours(-random.Next(0, 24)));
+                logProyectos.Add(logProyecto);
+            }
+            
+            context.LogProyectos.AddRange(logProyectos);
             await context.SaveChangesAsync();
         }
     }

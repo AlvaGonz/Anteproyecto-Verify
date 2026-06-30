@@ -42,6 +42,10 @@ public class AppDbContext : DbContext
     public DbSet<SelloIntegridad> SellosIntegridad => Set<SelloIntegridad>();
     public DbSet<ReglaValidacion> ReglasValidacion => Set<ReglaValidacion>();
 
+    // Logging & Tokens
+    public DbSet<LogConsulta> LogConsultas => Set<LogConsulta>();
+    public DbSet<LogProyecto> LogProyectos => Set<LogProyecto>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

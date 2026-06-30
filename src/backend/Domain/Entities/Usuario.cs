@@ -148,6 +148,13 @@ public class Usuario : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void ResetearConsumosMensuales()
+    {
+        ConsultasUsadas = 0;
+        ProyectosCreados = 0;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void AsignarTitular(Guid titularId)
     {
         TitularId = titularId;

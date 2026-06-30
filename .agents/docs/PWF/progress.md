@@ -11,7 +11,7 @@
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
-| Admin Dashboard & Avatar | Block 1 | Blocked | Database MCP unavailable. Migration for AddAvatarUrlToUsuario cannot proceed. |
+| Admin Dashboard & Avatar | Block 1 | 90% | Missing visual component on some dashboard cards, but logic is there. |
 
 ## 🔜 Next Up (Prioritized)
 1. Frontend Implementation: Refactor `UsersTable.tsx` to include the requested 4-tab card layout for user roles.
