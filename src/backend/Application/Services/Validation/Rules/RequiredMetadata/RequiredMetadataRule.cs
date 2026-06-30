@@ -32,7 +32,7 @@ public class RequiredMetadataRule : IValidationRule
             if (string.IsNullOrWhiteSpace(doc.ContentType)) missingMetadata.Add("Content Type");
 
             // Example: Title and Permit require emission date
-            if ((doc.TipoDocumento == DocumentType.CertificadoTitulo || doc.TipoDocumento == DocumentType.PermisoConstruccion) && !doc.FechaEmision.HasValue)
+            if ((doc.TipoDocumento == DocumentType.TITLE || doc.TipoDocumento == DocumentType.OTHER) && !doc.FechaEmision.HasValue)
             {
                 missingMetadata.Add("Fecha de Emisión");
             }

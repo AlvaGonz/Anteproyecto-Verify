@@ -98,3 +98,22 @@ export const useUpdateMyProfile = () => {
     },
   });
 };
+
+export const useUploadAvatar = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["useUploadAvatar"],
+    mutationFn: (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      return apiClient.post<{ message: string; url: string }>("/auth/me/avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }).then((res) => res.data);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["auth", "me"] });
+    },
+  });
+};

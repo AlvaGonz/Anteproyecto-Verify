@@ -10,7 +10,7 @@ import {
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { useProject, useCreateProject, useDeleteProject } from "../../features/projects/api/useProjects";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/infrastructure/api/client";
+import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { FileText, ShieldCheck, ClipboardList, ArrowRight } from "lucide-react";
@@ -51,8 +51,10 @@ export const ProjectManagePage: React.FC = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: (data: { id: string; status: string }) => 
-      apiClient.patch<ProyectoDto>(`/projects/${data.id}/status`, { status: data.status }),
+    mutationFn: (data: { id: string; status: ProjectStatus }) => 
+      apiClient.patch<ProyectoDto>(`/projects/${data.id}/status`, data.status, {
+        headers: { 'Content-Type': 'application/json' }
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
     }
@@ -112,8 +114,7 @@ export const ProjectManagePage: React.FC = () => {
     if (!id) return;
     try {
       sanitizeStatus(status);
-      const apiStatus = status === ProjectStatus.Published ? "Activo" : "Pendiente";
-      await updateStatusMutation.mutateAsync({ id: id as string, status: apiStatus });
+      await updateStatusMutation.mutateAsync({ id: id as string, status });
       addToast("Estado actualizado exitosamente", "success");
     } catch {
       addToast("Error al actualizar el estado", "error");

@@ -1,9 +1,10 @@
+// @vitest-environment jsdom
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProjectManagePage } from "../ProjectManagePage";
 import { projectsApi } from "../../../features/projects/api/projectsApi";
 import { useProject, useCreateProject, useDeleteProject } from "../../../features/projects/api/useProjects";
-import { apiClient } from "@/infrastructure/api/client";
+import { apiClient } from "../../../infrastructure/api/client";
 import { ProjectStatus, IntegrityStatus, ProyectoDto } from "../../../features/projects/types";
 import { success, failure } from "../../../shared/utils/functional";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -57,7 +58,7 @@ vi.mock("../../../features/projects/api/useProjects", () => ({
 }));
 
 // Mock apiClient
-vi.mock("@/infrastructure/api/client", () => ({
+vi.mock("../../../infrastructure/api/client", () => ({
   apiClient: {
     put: vi.fn(),
     patch: vi.fn(),
@@ -408,8 +409,7 @@ describe("ProjectManagePage", () => {
       vi.mocked(apiClient.patch).mockImplementation(async (url, payload: any) => {
         const parts = url.split("/");
         const id = parts[2];
-        const statusStr = payload.status;
-        const status = statusStr === "Activo" ? ProjectStatus.Published : ProjectStatus.InReview;
+        const status = payload as ProjectStatus;
         const result = await projectsApi.updateProjectStatus(id, status);
         if (result._tag === "Success") return { data: result.data };
         throw new Error(result.error._tag);

@@ -22,6 +22,8 @@ public class Usuario : EntityBase
     public bool EmailVerificado { get; private set; }
     public string? TokenVerificacion { get; private set; }
     public DateTime? TokenVerificacionExpiraUtc { get; private set; }
+    
+    public string? AvatarUrl { get; private set; }
 
     // Optimistic concurrency token
     [Timestamp]
@@ -83,6 +85,12 @@ public class Usuario : EntityBase
     {
         if (string.IsNullOrWhiteSpace(contrasenaHash)) throw new ArgumentException("Contraseña requerida", nameof(contrasenaHash));
         ContrasenaHash = contrasenaHash;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateAvatarUrl(string avatarUrl)
+    {
+        AvatarUrl = avatarUrl;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

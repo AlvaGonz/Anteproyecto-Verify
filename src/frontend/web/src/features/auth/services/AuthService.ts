@@ -17,6 +17,7 @@ export interface User {
   cedula?: string;
   telefono?: string;
   plan?: string;
+  avatarUrl?: string;
 }
 
 export interface AuthResponse {

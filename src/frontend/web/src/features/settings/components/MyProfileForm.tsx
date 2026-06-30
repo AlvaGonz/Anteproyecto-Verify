@@ -3,18 +3,37 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateProfileSchema, UpdateProfileDto } from "../../auth/schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
-import { useUpdateMyProfile } from "../api/useSettings";
+import { useUpdateMyProfile, useUploadAvatar } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award } from "lucide-react";
+import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Camera, Loader2 } from "lucide-react";
 
 export const MyProfileForm: React.FC = () => {
   const { user, refreshUser } = useAuth();
   const { addToast } = useToast();
   const updateProfile = useUpdateMyProfile();
+  const uploadAvatar = useUploadAvatar();
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [showCurrentPwd, setShowCurrentPwd] = useState(false);
   const [showNewPwd, setShowNewPwd] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      addToast("La imagen no debe exceder los 5MB", "error");
+      return;
+    }
+
+    try {
+      await uploadAvatar.mutateAsync(file);
+      addToast("Avatar actualizado correctamente", "success");
+    } catch (err: any) {
+      addToast(err?.response?.data?.message || "Error al actualizar avatar", "error");
+    }
+  };
 
   const {
     register,
@@ -98,6 +117,39 @@ export const MyProfileForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-xl space-y-6">
+      {/* AVATAR SECTION */}
+      <div className="flex flex-col items-center justify-center space-y-4 mb-6">
+        <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-surface-raised/30 shadow-md">
+            {user?.avatarUrl ? (
+              <img src={`http://localhost:5000${user.avatarUrl}`} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center text-3xl font-bold uppercase">
+                {user?.nombre?.[0] || user?.email?.[0] || "?"}
+              </div>
+            )}
+          </div>
+          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+            {uploadAvatar.isPending ? (
+              <Loader2 className="w-6 h-6 text-white animate-spin" />
+            ) : (
+              <Camera className="w-6 h-6 text-white" />
+            )}
+          </div>
+        </div>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          className="hidden" 
+          accept="image/png, image/jpeg, image/jpg" 
+          onChange={handleAvatarChange} 
+        />
+        <div className="text-center">
+          <p className="text-sm font-bold text-text-primary">Foto de perfil</p>
+          <p className="text-xs text-text-secondary">JPG o PNG, máx 5MB</p>
+        </div>
+      </div>
+
       {/* READ-ONLY identity section */}
       <div className="bg-surface-raised/30 border border-border rounded-2xl p-5 space-y-3">
         <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">

@@ -11,12 +11,13 @@
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
+| Admin Dashboard & Avatar | Block 1 | Blocked | Database MCP unavailable. Migration for AddAvatarUrlToUsuario cannot proceed. |
 
 ## 🔜 Next Up (Prioritized)
-1. Complete verification steps.
+1. Frontend Implementation: Refactor `UsersTable.tsx` to include the requested 4-tab card layout for user roles.
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
-- None
+- Human action required: confirm schema via MCP before proceeding with EF Core migrations.
 
 ## 🚫 Known Constraints
 - None

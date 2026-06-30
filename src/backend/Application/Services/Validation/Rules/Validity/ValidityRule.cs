@@ -45,7 +45,7 @@ public class ValidityRule : IValidationRule
             }
             else
             {
-                if (doc.TipoDocumento == DocumentType.CertificadoTitulo || doc.TipoDocumento == DocumentType.PermisoConstruccion)
+                if (doc.TipoDocumento == DocumentType.TITLE || doc.TipoDocumento == DocumentType.OTHER)
                 {
                     results.Add(ValidationRuleResult.Warn(
                         RuleCode,

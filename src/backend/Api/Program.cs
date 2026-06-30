@@ -38,6 +38,12 @@ try
                 logger.LogInformation("Database connection verified successfully.");
                 break;
             }
+            catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 4060)
+            {
+                logger.LogInformation("SQL Server is up, but database does not exist yet. Proceeding to migrations...");
+                dbConnected = true;
+                break;
+            }
             catch (Exception ex)
             {
                 logger.LogWarning($"Database is not ready yet. Retrying in 2 seconds... ({i + 1}/30). Error: {ex.Message}");

@@ -10,7 +10,7 @@ export interface UserSettings {
   nombre: string;
   apellido: string;
   email: string;
-  role: "admin" | "dev" | "validator" | "user";
+  role: "admin" | "dev" | "validator" | "user" | "owner" | "enterprise" | "business" | "professional" | "consultation";
   telefono: string;
   cedula: string;
   profileId: string | null;
@@ -18,6 +18,7 @@ export interface UserSettings {
   planId: string | null;
   planName: string;
   planPrice: number | null;
+  avatarUrl?: string;
 }
 
 export interface ProfilePermissions {

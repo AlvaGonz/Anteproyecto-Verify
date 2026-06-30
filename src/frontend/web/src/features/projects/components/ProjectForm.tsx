@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } from "../types";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { MapPin, Globe, Compass, Navigation, ImagePlus, X } from "lucide-react";
-import { apiClient } from "@/infrastructure/api/client";
+import { apiClient } from "../../../infrastructure/api/client";
 
 // Fix Leaflet default marker icon paths broken by Vite's asset bundler
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";

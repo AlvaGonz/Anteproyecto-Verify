@@ -105,8 +105,9 @@ async updateProject(id: string, data: UpdateProyectoDto): Promise<Result<Proyect
       throw new Error("Invalid project status");
     }
     try {
-      const apiStatus = status === ProjectStatus.Published ? "Activo" : "Pendiente";
-      const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, { status: apiStatus });
+      const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, status, {
+        headers: { 'Content-Type': 'application/json' }
+      });
       return success(response.data);
     } catch (error: any) {
       return failure(mapError(error, id));

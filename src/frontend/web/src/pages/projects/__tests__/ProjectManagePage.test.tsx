@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -152,8 +153,7 @@ vi.mock("../../../infrastructure/api/client", () => {
       patch: vi.fn().mockImplementation(async (url: string, payload: any) => {
         const parts = url.split("/");
         const id = parts[2];
-        const statusStr = payload.status;
-        const status = statusStr === "Activo" ? ProjectStatus.Published : ProjectStatus.InReview;
+        const status = payload as ProjectStatus;
         const res = await wrapApiCall(projectsApi.updateProjectStatus)(id, status);
         if (res._tag === "Success") return { data: res.data };
         throw new Error(res.error.message || "Error");

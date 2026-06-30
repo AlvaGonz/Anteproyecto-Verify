@@ -31,7 +31,7 @@ export const SettingsPage: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
 
   const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin);
 
@@ -46,7 +46,7 @@ export const SettingsPage: React.FC = () => {
 
   // Security Check: Redirect non-admins away from users/permissions tabs
   useEffect(() => {
-    if (user && user.role !== "admin" && (activeTab === "users")) {
+    if (user && !isAdmin && (activeTab === "users")) {
       setActiveTab("profile");
     }
   }, [user, activeTab]);
@@ -163,7 +163,7 @@ if (formData.telefono) {
           Mi Perfil
         </button>
 
-        {user?.role === "admin" && (
+        {(user?.role === "admin" || user?.role === "owner") && (
           <>
             <button
               onClick={() => setActiveTab("users")}

@@ -20,6 +20,7 @@ public class AuthController : ControllerBase
     private readonly Application.Abstractions.Persistence.IUsuarioRepository _usuarioRepository;
     private readonly IConfiguration _configuration;
     private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler _uploadAvatarHandler;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
 
     public AuthController(
@@ -27,6 +28,7 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler,
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
         Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
+        Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler uploadAvatarHandler,
         Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
         IConfiguration configuration,
         Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator)
@@ -35,6 +37,7 @@ public class AuthController : ControllerBase
         _verifyHandler = verifyHandler;
         _loginHandler = loginHandler;
         _updateProfileHandler = updateProfileHandler;
+        _uploadAvatarHandler = uploadAvatarHandler;
         _usuarioRepository = usuarioRepository;
         _configuration = configuration;
         _jwtTokenGenerator = jwtTokenGenerator;
@@ -190,7 +193,8 @@ public class AuthController : ControllerBase
             Role = roleStr,
             Cedula = user.Cedula ?? string.Empty,
             Telefono = user.Telefono ?? string.Empty,
-            Plan = user.Plan?.NombrePlan ?? "N/A"
+            Plan = user.Plan?.NombrePlan ?? "N/A",
+            AvatarUrl = user.AvatarUrl
         });
     }
 
@@ -269,6 +273,35 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage });
 
         return Ok(new { Message = "Perfil actualizado exitosamente." });
+    }
+
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    [HttpPost("me/avatar")]
+    public async Task<IActionResult> UploadAvatar(IFormFile file, CancellationToken cancellationToken)
+    {
+        var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
+            return Unauthorized(new { Message = "Token inválido o incompleto." });
+
+        if (file == null || file.Length == 0)
+            return BadRequest(new { Message = "Debe proporcionar una imagen." });
+
+        if (file.Length > 5 * 1024 * 1024)
+            return BadRequest(new { Message = "La imagen no debe exceder los 5MB." });
+
+        using var stream = file.OpenReadStream();
+        var command = new Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommand(
+            userId,
+            stream,
+            file.FileName,
+            file.ContentType
+        );
+
+        var result = await _uploadAvatarHandler.Handle(command, cancellationToken);
+        if (!result.IsSuccess)
+            return BadRequest(new { Message = result.ErrorMessage });
+
+        return Ok(new { Message = "Avatar actualizado.", Url = result.Data });
     }
 }
 

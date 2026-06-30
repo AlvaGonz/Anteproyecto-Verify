@@ -25,7 +25,7 @@ public class ConsistencyRule : IValidationRule
 
         // Check for duplicate active documents of the same type (if policy prohibits it)
         // For example, only one active Title is allowed
-        var titleDocs = activeDocs.Where(d => d.TipoDocumento == DocumentType.CertificadoTitulo).ToList();
+        var titleDocs = activeDocs.Where(d => d.TipoDocumento == DocumentType.TITLE).ToList();
         if (titleDocs.Count > 1)
         {
             results.Add(ValidationRuleResult.Fail(

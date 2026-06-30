@@ -15,29 +15,9 @@ echo "================================================"
 
 # 1. Translate MySQL syntax to valid T-SQL on startup
 if [ -f "$SQL_FILE" ]; then
-    echo "[Init] Found SQL file: $SQL_FILE"
-    echo "[Init] Running translation to T-SQL..."
-    python3 "$TRANSLATOR" "$SQL_FILE" "$TSQL_FILE"
-    echo "[Init] Translation finished successfully."
-    
-    # Detect schema changes
-    if [ -f "$HASH_FILE" ]; then
-        SAVED_HASH=$(cat "$HASH_FILE")
-        echo "[Init] Saved schema hash: $SAVED_HASH"
-        echo "[Init] Current schema hash: $CURRENT_HASH"
-        if [ "$SAVED_HASH" != "$CURRENT_HASH" ]; then
-            echo "[Init] Schema changes detected! Will drop and recreate the database."
-            RECREATE_DB=true
-        else
-            echo "[Init] No schema changes detected. Keeping existing database."
-        fi
-    else
-        echo "[Init] No schema hash found. This is a fresh initialization."
-        RECREATE_DB=true
-    fi
+    echo "[Init] Found SQL file: $SQL_FILE, but EF Core will handle database migrations."
 else
-    echo "[ERROR] SQL file not found at $SQL_FILE!"
-    exit 1
+    echo "[Init] SQL file not found at $SQL_FILE, proceeding with EF Core migrations."
 fi
 
 # 2. Start SQL Server in the background
@@ -64,21 +44,7 @@ if ! kill -0 $SQL_PID 2>/dev/null; then
     exit 1
 fi
 
-# 4. Execute the translated T-SQL script
-if [ "$RECREATE_DB" = "true" ]; then
-    echo "[Init] Recreating database because changes were detected or it is a fresh install..."
-    /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -Q "IF EXISTS (SELECT * FROM sys.databases WHERE name = 'verifinca-spm-uce-2026') BEGIN ALTER DATABASE [verifinca-spm-uce-2026] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [verifinca-spm-uce-2026]; END" -C
-fi
-
-echo "[Init] Executing translated T-SQL script to build database..."
-if /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -i "$TSQL_FILE" -C; then
-    echo "[Init] SQL script executed successfully!"
-    # Save the new hash after successful execution
-    echo "$CURRENT_HASH" > "$HASH_FILE"
-    echo "[Init] Schema hash saved successfully: $CURRENT_HASH"
-else
-    echo "[WARNING] SQL script execution reported some issues (e.g. objects already existing, which is expected on persistent runs)."
-fi
+echo "[Init] EF Core will handle schema creation."
 
 echo "================================================"
 echo "   SQL Server Container is Ready and Running   "

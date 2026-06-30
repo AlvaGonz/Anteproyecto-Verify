@@ -87,7 +87,7 @@ public static class AppDbContextSeeder
                     context,
                     proyectoId: p1.Id,
                     usuarioCargaId: devUser.Id,
-                    tipo: DocumentType.CertificadoTitulo,
+                    tipo: DocumentType.TITLE,
                     nombreOriginal: "Certificado_Titulo_BellaVista.pdf",
                     url: "https://mockstorage.blob.core.windows.net/docs/Certificado_Titulo_BellaVista.pdf",
                     status: DocumentStatus.Valid);
@@ -96,7 +96,7 @@ public static class AppDbContextSeeder
                     context,
                     proyectoId: p1.Id,
                     usuarioCargaId: devUser.Id,
-                    tipo: DocumentType.CertificadoEIA,
+                    tipo: DocumentType.OTHER,
                     nombreOriginal: "Permiso_Ambiental_BellaVista.pdf",
                     url: "https://mockstorage.blob.core.windows.net/docs/Permiso_Ambiental_BellaVista.pdf",
                     status: DocumentStatus.Valid);
@@ -105,7 +105,7 @@ public static class AppDbContextSeeder
                     context,
                     proyectoId: p2.Id,
                     usuarioCargaId: devUser.Id,
-                    tipo: DocumentType.PlanosArquitectonicos,
+                    tipo: DocumentType.OTHER,
                     nombreOriginal: "Planos_LosCacicazgos.pdf",
                     url: "https://mockstorage.blob.core.windows.net/docs/Planos_LosCacicazgos.pdf",
                     status: DocumentStatus.Uploaded);
@@ -182,40 +182,6 @@ public static class AppDbContextSeeder
             }
 
             // Seeding Legacy Profiles, Permissions, and Plans
-            if (!await context.Perfiles.AnyAsync())
-            {
-                logger.LogInformation("Seeding legacy profiles...");
-                var adminPerfil = new Perfil { NombrePerfil = "ADMIN" };
-                var devPerfil = new Perfil { NombrePerfil = "DEVELOPER" };
-                var valPerfil = new Perfil { NombrePerfil = "VALIDATOR" };
-                context.Perfiles.AddRange(adminPerfil, devPerfil, valPerfil);
-                await context.SaveChangesAsync();
-            }
-
-            if (!await context.Permisos.AnyAsync())
-            {
-                logger.LogInformation("Seeding legacy permissions...");
-                var perm1 = new Permiso { Descripcion = "GestionarUsuarios" };
-                var perm2 = new Permiso { Descripcion = "ConfigurarReglas" };
-                var perm3 = new Permiso { Descripcion = "VisualizarAuditoria" };
-                var perm4 = new Permiso { Descripcion = "CrearProyectos" };
-                var perm5 = new Permiso { Descripcion = "ValidarProyectos" };
-                context.Permisos.AddRange(perm1, perm2, perm3, perm4, perm5);
-                await context.SaveChangesAsync();
-            }
-
-            if (!await context.PerfilPermisos.AnyAsync())
-            {
-                logger.LogInformation("Seeding legacy profile-permission relations...");
-                var perfiles = await context.Perfiles.ToListAsync();
-                var permisos = await context.Permisos.ToListAsync();
-
-                var admin = perfiles.FirstOrDefault(p => p.NombrePerfil == "ADMIN");
-                var dev = perfiles.FirstOrDefault(p => p.NombrePerfil == "DEVELOPER");
-                var val = perfiles.FirstOrDefault(p => p.NombrePerfil == "VALIDATOR");
-
-                if (admin != null)
-                {
                     foreach (var perm in permisos)
                     {
                         context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = admin.IdPerfil, IdPermiso = perm.IdPermiso });
@@ -322,13 +288,9 @@ public static class AppDbContextSeeder
             await SeedDgiiAsync(context, logger);
 
             var config = scope.ServiceProvider.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
-            if (config == null || config["IsTestingEnvironment"] != "true")
+            if (config != null && config["IsTestingEnvironment"] == "true")
             {
-                await SeedDgiiRncAsync(context, logger);
-            }
-            else
-            {
-                logger.LogInformation("Skipping DGII RNC seeding in Testing environment.");
+                logger.LogInformation("Testing environment.");
             }
         }
         catch (Exception ex)

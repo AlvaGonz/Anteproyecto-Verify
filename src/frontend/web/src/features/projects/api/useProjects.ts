@@ -61,6 +61,18 @@ export const useCreateProject = () => {
   });
 };
 
+export const useUpdateProjectStatus = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['updateProjectStatus'],
+    mutationFn: ({ id, status }: { id: string; status: number }) => 
+      apiClient.patch<ApiProyectoDto>(`/projects/${id}/status`, status, {
+        headers: { 'Content-Type': 'application/json' }
+      }).then(res => mapApiProject(res.data)),
+    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
+  });
+};
+
 export const useProjectDiagnosis = () => {
   return useMutation({
     mutationKey: ['projectDiagnosis'],

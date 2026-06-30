@@ -18,6 +18,11 @@ public class RequiredDocumentsRule : IValidationRule
 
         // Define required document types (could be injected via config)
         var requiredTypes = new[] { 
+            DocumentType.TITLE, 
+            DocumentType.LEGAL_STATUS, 
+            DocumentType.SURVEY,
+            DocumentType.ID,
+            DocumentType.NOTARIAL_POWER,
             DocumentType.CertificadoTitulo, 
             DocumentType.CertificacionEstadoJuridico, 
             DocumentType.PlanosArquitectonicos,

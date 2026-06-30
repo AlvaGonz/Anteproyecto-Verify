@@ -37,6 +37,18 @@ public static class ApplicationBuilderExtensions
             });
         });
 
+        var avatarsDirectory = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "storage", "avatars");
+        if (!System.IO.Directory.Exists(avatarsDirectory))
+        {
+            System.IO.Directory.CreateDirectory(avatarsDirectory);
+        }
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(avatarsDirectory),
+            RequestPath = "/avatars"
+        });
+
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();

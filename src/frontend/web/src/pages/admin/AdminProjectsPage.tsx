@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { ProjectCoverImage } from "../../features/projects/components/ProjectCoverImage";
-import { useProjects, useDeleteProject } from "../../features/projects/api/useProjects";
+import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
 import { 
   FolderKanban, 
   Plus, 
@@ -82,6 +82,7 @@ export const AdminProjectsPage: React.FC = () => {
   const [selectedStatuses, setSelectedStatuses] = useState<ProjectStatus[]>([]);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { mutate: deleteProject } = useDeleteProject();
+  const { mutate: updateStatus } = useUpdateProjectStatus();
 
   const ALL_STATUSES = [
     { value: ProjectStatus.Draft, label: "Borrador" },
@@ -411,6 +412,65 @@ export const AdminProjectsPage: React.FC = () => {
                                 <Activity className="w-4 h-4 text-gray-400" />
                                 Auditoría
                               </Link>
+                              
+                              <div className="my-1 border-t border-gray-100"></div>
+                              
+                              {project.estadoProyecto === ProjectStatus.Draft && (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    updateStatus({ id: project.id, status: ProjectStatus.InReview });
+                                    setOpenMenuId(null);
+                                  }}
+                                  className="flex items-center gap-3 px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 transition-colors w-full"
+                                >
+                                  <Activity className="w-4 h-4" />
+                                  Enviar a Revisión
+                                </button>
+                              )}
+                              
+                              {project.estadoProyecto === ProjectStatus.InReview && (
+                                <>
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      updateStatus({ id: project.id, status: ProjectStatus.Validated });
+                                      setOpenMenuId(null);
+                                    }}
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 transition-colors w-full"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Aprobar (Validado)
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      updateStatus({ id: project.id, status: ProjectStatus.Observed });
+                                      setOpenMenuId(null);
+                                    }}
+                                    className="flex items-center gap-3 px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 transition-colors w-full"
+                                  >
+                                    <AlertTriangle className="w-4 h-4" />
+                                    Observar
+                                  </button>
+                                </>
+                              )}
+
+                              {project.estadoProyecto === ProjectStatus.Validated && (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    updateStatus({ id: project.id, status: ProjectStatus.Published });
+                                    setOpenMenuId(null);
+                                  }}
+                                  className="flex items-center gap-3 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors w-full"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  Publicar (Terminado)
+                                </button>
+                              )}
+                              
+                              <div className="my-1 border-t border-gray-100"></div>
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
