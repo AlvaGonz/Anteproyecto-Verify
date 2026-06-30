@@ -1,5 +1,6 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-06-29T18:35:00-04:00 by Coder
+> Last updated: 2026-06-29T20:00:00-04:00 by DocWriter v1.0 (QA Roadmap from To-do.txt)
+> **📝 Updated by DocWriter — QA Backlog appended below.**
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
@@ -24,3 +25,39 @@
 
 ## 🚫 Known Constraints
 - None
+
+---
+
+## 📋 QA Backlog (from To-do.txt)
+| Priority | Count | Items |
+|---|---|---|
+| 🔴 P0 — Critical | 6 | WBS-001..006 — Routes rotas + E2E tests |
+| 🟠 P1 — High | 8 | WBS-007..014 — Security, Compliance, 17 UIs |
+| 🟡 P2 — Medium | 5 | WBS-015..019 — UX mejoras |
+| 🟢 P3 — Tech Debt | 10 | TEC-001..010 — Accesibilidad, rendimiento, CI |
+
+## 🔄 In Progress (QA Roadmap Phase 0)
+| WBS | Item | Agent | ETA |
+|---|---|---|---|
+| WBS-001 | Fix /#/register | developer-agent | Next |
+| WBS-002 | Fix /#/proyectos | developer-agent | Next |
+| WBS-003 | Fix /#/dashboard | developer-agent | Next |
+| WBS-004 | Fix /#/legal | developer-agent | Next |
+
+## ⚠️ Open Decisions (Human-in-the-Loop Required)
+- [ ] JWT migration from localStorage to HttpOnly cookies (SEC-001)
+- [ ] Consent UI implementation approach (COMP-001, Law 172-13)
+- [ ] Public endpoint changes for Precios page (BUG-005)
+
+## 🔄 Expanded Scope (Post-Audit — 2026-06-29)
+| New ID | Item | Priority | RF | OE |
+|--------|------|----------|----|----|
+| WBS-020 | Sello Digital endpoint + QR (Law 126-02) | P1 | RF-10 | OE-7 |
+| WBS-021 | Documentary Diagnosis UI + Rules Engine | P1 | RF-2 | OE-1 |
+| TEC-011 | DataRetentionPurgeJob (30d/90d/7yr) | P3 | RNF-5 | OE-6 |
+| TEC-012 | Availability monitoring + health checks | P3 | RNF-3 | General |
+| TEC-013 | Load testing target with k6 | P3 | RNF-4 | General |
+
+**Audit findings resolved:** RF-2 gap, RF-10 gap, RNF-3/4/5 gaps, PERF-001 reclassified P1, OE traceability corrected, "47 requisitos" source clarified.
+
+> Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
