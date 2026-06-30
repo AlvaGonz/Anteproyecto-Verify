@@ -25,6 +25,12 @@ public class Usuario : EntityBase
     
     public string? AvatarUrl { get; private set; }
 
+    // Stripe Billing Integration
+    public string? StripeCustomerId { get; private set; }
+    public string? StripeSubscriptionId { get; private set; }
+    public string? SubscriptionStatus { get; private set; }
+    public DateTime? CurrentPeriodEnd { get; private set; }
+
     // Optimistic concurrency token
     [Timestamp]
     public byte[]? RowVersion { get; private set; }
@@ -133,6 +139,15 @@ public class Usuario : EntityBase
     {
         PlanSuscripcionId = planId;
         ConsultasUsadas = 0; // Reset count when changing plans
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdateStripeSubscription(string? stripeCustomerId, string? stripeSubscriptionId, string? status, DateTime? currentPeriodEnd)
+    {
+        if (stripeCustomerId != null) StripeCustomerId = stripeCustomerId;
+        StripeSubscriptionId = stripeSubscriptionId;
+        SubscriptionStatus = status;
+        CurrentPeriodEnd = currentPeriodEnd;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

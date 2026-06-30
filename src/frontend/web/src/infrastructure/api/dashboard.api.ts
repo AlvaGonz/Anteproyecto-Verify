@@ -10,8 +10,10 @@ export interface DashboardStatsDto {
   proyectosPendientes: number;
   proyectosAprobados: number;
   proyectosRechazados: number;
+  usuariosPorRol: Record<string, number>;
+  totalConsultasRealizadas: number;
+  totalProyectosRegistrados: number;
 }
-
 export interface SuscripcionRecienteDto {
   fechaAlta: string;
   plan: string;

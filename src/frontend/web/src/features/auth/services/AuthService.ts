@@ -11,13 +11,13 @@ import { apiClient, setAccessToken } from "../../../infrastructure/api/client";
 export interface User {
   id: string;
   email: string;
-  nombre: string;
-  apellido: string;
-  role: string;
-  cedula?: string;
-  telefono?: string;
-  plan?: string;
+  nombreCompleto: string;
+  rol: string;
   avatarUrl?: string;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  subscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | null | string;
+  currentPeriodEnd?: string | null;
 }
 
 export interface AuthResponse {

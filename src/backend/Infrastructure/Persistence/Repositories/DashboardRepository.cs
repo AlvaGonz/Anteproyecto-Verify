@@ -60,6 +60,14 @@ namespace Infrastructure.Persistence.Repositories
                 })
                 .ToListAsync(cancellationToken);
 
+            var usuariosPorRol = await _context.Set<Usuario>()
+                .GroupBy(u => u.Rol)
+                .Select(g => new { Rol = g.Key.ToString(), Count = g.Count() })
+                .ToDictionaryAsync(x => x.Rol, x => x.Count, cancellationToken);
+                
+            var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
+            var totalProyectosRegistrados = await _context.Set<LogProyecto>().CountAsync(cancellationToken);
+
             return new DashboardStatsDto
             {
                 TotalUsuarios = totalUsuarios,
@@ -70,7 +78,10 @@ namespace Infrastructure.Persistence.Repositories
                 ProyectosAprobados = proyectosAprobados,
                 ProyectosRechazados = proyectosRechazados,
                 SuscripcionesRecientes = suscripcionesRecientes,
-                ProyectosRecientes = proyectosRecientes
+                ProyectosRecientes = proyectosRecientes,
+                UsuariosPorRol = usuariosPorRol,
+                TotalConsultasRealizadas = totalConsultas,
+                TotalProyectosRegistrados = totalProyectosRegistrados
             };
         }
     }

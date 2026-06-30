@@ -11,7 +11,11 @@ public record UsuarioDto(
     string? Cedula,
     UserRole Rol,
     bool Activo,
-    DateTime CreatedAtUtc
+    DateTime CreatedAtUtc,
+    string? StripeCustomerId = null,
+    string? StripeSubscriptionId = null,
+    string? SubscriptionStatus = null,
+    DateTime? CurrentPeriodEnd = null
 );
 
 public record CreateUsuarioDto(

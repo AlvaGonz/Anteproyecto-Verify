@@ -241,7 +241,7 @@ export const DashboardPage: React.FC = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
                    <div className="flex items-center gap-4 mb-2">
                      <div className="w-10 h-10 rounded-full bg-[#223382]/10 flex items-center justify-center">
@@ -261,19 +261,65 @@ export const DashboardPage: React.FC = () => {
                    </div>
                    <p className="text-4xl font-display font-black text-text-primary">{loading ? "..." : statsData?.suscripcionesActivas}</p>
                 </div>
+
+                <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
+                   <div className="flex items-center gap-4 mb-2">
+                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                       <FileCheck className="w-5 h-5 text-primary" />
+                     </div>
+                     <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Flujo: Consultas/Proyectos</p>
+                   </div>
+                   <div className="flex justify-between items-end mt-1">
+                     <div>
+                       <p className="text-xs text-text-secondary">Consultas</p>
+                       <p className="text-2xl font-display font-black text-text-primary">{loading ? "..." : statsData?.totalConsultasRealizadas || 0}</p>
+                     </div>
+                     <div className="text-right">
+                       <p className="text-xs text-text-secondary">Proyectos</p>
+                       <p className="text-2xl font-display font-black text-text-primary">{loading ? "..." : statsData?.totalProyectosRegistrados || 0}</p>
+                     </div>
+                   </div>
+                </div>
                 
                 <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
                    <div className="flex items-center gap-4 mb-2">
                      <div className="w-10 h-10 rounded-full bg-[#F98513]/10 flex items-center justify-center">
                        <CreditCard className="w-5 h-5 text-[#F98513]" />
                      </div>
-                     <p className="text-sm font-bold text-text-secondary uppercase tracking-wider">Flujo Estimado</p>
+                     <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Flujo Mensual Estimado</p>
                    </div>
-                   <p className="text-4xl font-display font-black text-text-primary">${loading ? "..." : statsData?.ingresosMensualesEstimados.toLocaleString()}</p>
+                   <p className="text-3xl font-display font-black text-text-primary">${loading ? "..." : statsData?.ingresosMensualesEstimados.toLocaleString()}</p>
                 </div>
               </div>
 
-              <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                {/* Distribucion de usuarios */}
+                <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                  <div className="px-6 py-4 border-b border-border bg-surface-raised/20">
+                    <h3 className="text-lg font-display font-black text-[#223382] tracking-tight">Flujo de <span className="text-[#F98513]">Usuarios</span></h3>
+                    <p className="text-xs text-text-secondary">Distribución por categoría (Roles)</p>
+                  </div>
+                  <div className="p-6 flex-1 flex flex-col justify-center gap-3">
+                    {loading ? (
+                       <div className="flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#223382]"></div></div>
+                    ) : statsData?.usuariosPorRol && Object.keys(statsData.usuariosPorRol).length > 0 ? (
+                       Object.entries(statsData.usuariosPorRol).map(([rol, count]) => (
+                         <div key={rol} className="flex items-center justify-between">
+                           <div className="flex items-center gap-2">
+                             <div className="w-2 h-2 rounded-full bg-[#223382]"></div>
+                             <span className="text-sm font-medium text-text-primary">{rol}</span>
+                           </div>
+                           <span className="text-sm font-bold bg-surface-raised px-2 py-0.5 rounded-full">{count}</span>
+                         </div>
+                       ))
+                    ) : (
+                      <div className="text-sm text-text-secondary text-center opacity-70">No hay datos de distribución</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Lista de Suscripciones recientes (2/3 width) */}
+                <div className="lg:col-span-2 bg-white border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
                 <div className="px-8 py-6 border-b border-border flex items-center justify-between bg-surface-raised/20">
                   <div>
                     <h3 className="text-xl font-display font-black text-[#223382] tracking-tight">
@@ -315,6 +361,7 @@ export const DashboardPage: React.FC = () => {
                       </div>
                     ))
                   )}
+                </div>
                 </div>
               </div>
             </motion.div>

@@ -14,6 +14,11 @@ namespace Application.DTOs.Admin
         public int ProyectosPendientes { get; init; }
         public int ProyectosAprobados { get; init; }
         public int ProyectosRechazados { get; init; }
+
+        // User Flow Stats
+        public Dictionary<string, int> UsuariosPorRol { get; init; } = new();
+        public int TotalConsultasRealizadas { get; init; }
+        public int TotalProyectosRegistrados { get; init; }
     }
 
     public record SuscripcionRecienteDto

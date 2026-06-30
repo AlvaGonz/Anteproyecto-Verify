@@ -44,21 +44,19 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
     "Administradores": users.filter(u => u.role === "admin" || u.role === "owner"),
     "Enterprise": users.filter(u => u.role === "enterprise"),
     "Business": users.filter(u => u.role === "business"),
-    "Professional": users.filter(u => u.role === "professional" || u.role === "dev" || u.role === "validator"), // Mapping legacy roles to professional for display if needed
+    "Professional": users.filter(u => u.role === "professional" || u.role === "dev" || u.role === "validator"),
     "Consultation": users.filter(u => u.role === "consultation" || u.role === "user")
   };
 
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    "Administradores": true,
-    "Enterprise": true,
-    "Business": true,
-    "Professional": true,
-    "Consultation": true
-  });
+  const [activeTab, setActiveTab] = useState<string>("Enterprise");
 
-  const toggleGroup = (group: string) => {
-    setExpandedGroups(prev => ({ ...prev, [group]: !prev[group] }));
-  };
+  const tabs = [
+    { id: "Enterprise", label: "Enterprise", count: groupedUsers["Enterprise"].length },
+    { id: "Business", label: "Business", count: groupedUsers["Business"].length },
+    { id: "Professional", label: "Professional", count: groupedUsers["Professional"].length },
+    { id: "Consultation", label: "Consultation", count: groupedUsers["Consultation"].length },
+    { id: "Administradores", label: "Admin/Owner", count: groupedUsers["Administradores"].length }
+  ];
 
   const renderUserCard = (u: UserSettings) => (
     <div key={u.id} className="bg-white border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row gap-4 items-start md:items-center">
@@ -155,39 +153,48 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
         </button>
       </div>
 
-      <div className="space-y-4">
-        {Object.entries(groupedUsers).map(([groupName, groupUsers]) => {
-          const isExpanded = expandedGroups[groupName];
-          if (groupUsers.length === 0 && groupName === "Administradores") return null; // Hide empty admin section by default unless needed
+      <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+        {/* TABS HEADER */}
+        <div className="flex overflow-x-auto border-b border-border bg-surface-raised/20">
+          {tabs.map((tab) => {
+             // Hide admin tab if empty
+             if (tab.id === "Administradores" && tab.count === 0) return null;
+             
+             const isActive = activeTab === tab.id;
+             return (
+               <button
+                 key={tab.id}
+                 onClick={() => setActiveTab(tab.id)}
+                 className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap border-b-2 
+                   ${isActive ? 'border-[#223382] text-[#223382] bg-white' : 'border-transparent text-text-secondary hover:text-text-primary hover:bg-surface-raised/50'}`}
+               >
+                 {tab.label}
+                 <span className={`px-2 py-0.5 rounded-full text-xs font-mono
+                   ${isActive ? 'bg-[#223382]/10 text-[#223382]' : 'bg-surface-raised text-text-secondary'}`}
+                 >
+                   {tab.count}
+                 </span>
+               </button>
+             );
+          })}
+        </div>
 
-          return (
-            <div key={groupName} className="bg-surface-raised/20 border border-border rounded-xl overflow-hidden">
-              <button 
-                onClick={() => toggleGroup(groupName)}
-                className="w-full flex items-center justify-between p-4 bg-white hover:bg-surface-raised/40 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  {isExpanded ? <ChevronDown className="w-5 h-5 text-text-secondary" /> : <ChevronRight className="w-5 h-5 text-text-secondary" />}
-                  <h4 className="font-bold text-text-primary text-md">
-                    {groupName} <span className="text-xs font-normal text-text-secondary ml-2 bg-surface-raised px-2 py-0.5 rounded-full">{groupUsers.length} usuarios</span>
-                  </h4>
-                </div>
-              </button>
-              
-              {isExpanded && (
-                <div className="p-4 bg-surface-raised/10 border-t border-border flex flex-col gap-3">
-                  {groupUsers.length > 0 ? (
-                    groupUsers.map(renderUserCard)
-                  ) : (
-                    <div className="text-center py-6 text-sm text-text-secondary bg-white rounded-xl border border-dashed border-border">
-                      No hay usuarios registrados en el grupo {groupName}.
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {/* TAB CONTENT */}
+        <div className="p-6 bg-surface-raised/10">
+          <div className="flex flex-col gap-4">
+            {groupedUsers[activeTab as keyof typeof groupedUsers]?.length > 0 ? (
+              groupedUsers[activeTab as keyof typeof groupedUsers].map(renderUserCard)
+            ) : (
+              <div className="text-center py-10 flex flex-col items-center justify-center bg-white rounded-xl border border-dashed border-border shadow-sm">
+                <Layers className="w-10 h-10 text-text-secondary/50 mb-3" />
+                <h4 className="text-text-primary font-bold">No hay usuarios en este nivel</h4>
+                <p className="text-sm text-text-secondary">
+                  Los usuarios asignados a este rol aparecerán aquí.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
