@@ -250,6 +250,7 @@ write implementation code.
 - **Zombie Revert Prevention:** If you get stuck in a loop trying to fix the same error 
   3 times, **STOP**. Revert your changes to the last green checkpoint and ask the human 
   for strategic guidance. Never attempt a 4th fix on the same failing test.
+- **Final Verification Gate:** An agent MUST NOT set a task or implementation as "done" or completed until ALL of its related tests are green. You MUST always run the final verification gate using `python .agents/scripts/post_task_loop.py` before concluding.
 
 ---
 
@@ -273,53 +274,14 @@ After every successful feature implementation (i.e., after `dotnet test` passes 
 `git commit` is executed), the agent **must** update `.agents/docs/PWF/progress.md` before 
 ending the session. This is non-negotiable.
 
-> ⛔ **FORBIDDEN:** Agents **MUST NOT** write to `tasks/` directory. The `tasks/` folder 
-> is a human-managed area. Any agent that writes `tasks/progress.md` or any file under 
-> `tasks/` is violating this protocol and its output must be discarded.
 
 **Failure to update `.agents/docs/PWF/progress.md` before closing a session = incomplete task.**
 
-### `docs/PWF/progress.md` Schema (enforced structure)
+### `docs/PWF/progress.md` Schema (enforced structure) THIS GONNA BE ACHIEVED BY USING THE SKILL /planning-with-files
 
-```markdown
-# VeriFinca — Agent Progress Tracker
-> Last updated: [ISO8601 timestamp] by [Agent role: Architect/Coder/Reviewer]
+### Rule: Mandatory Task-Specific Rule Evaluation
 
-## ✅ Completed Features
-| Feature | TRD Section | Branch | Commit SHA | Date | OE Satisfied |
-|---|---|---|---|---|---|
-| RegisterProject endpoint | §9, RF-1 | feat/register-project | abc1234 | 2026-05-25 | OE-1 |
-| DocumentDiagnosis Rules Engine | §4, RF-2 | feat/doc-diagnosis | def5678 | 2026-05-27 | OE-1, OE-4 |
-| OCR Azure DocAI integration | §4, RF-3 | feat/ocr-docai | ghi9012 | 2026-05-30 | OE-2, OE-3 |
-
-## 🔄 In Progress
-| Feature | TRD Section | Status | Blocker | OE |
-|---|---|---|---|---|
-| ValidationJobConsumer | §3, RF-3→7 | 60% — OCR done, RI pending | RI API contract unconfirmed | OE-2 |
-
-## 🔜 Next Up (Prioritized)
-1. RF-4 RI Integration — TRD §10.1 (OE-2, OE-3)
-2. RF-5 Catastro Contrast — TRD §10.2 (OE-2, OE-5)
-3. RF-6 DGII Validation — TRD §10.3 (OE-2)
-4. RF-8 Consent Management — TRD §6.4 (OE-6)
-5. RF-9 Credit Verification (TransUnion) — TRD §10.5 (OE-6)
-6. RF-10 Integrity Seal — TRD §11 (OE-7)
-7. RF-11 Public QR Verification — TRD §9 (OE-7)
-
-## ⚠️ Open Decisions (Human-in-the-Loop Required)
-- [ ] RI API: SOAP vs REST endpoint confirmed?
-- [ ] Catastro Nacional: REST API availability and auth method?
-- [ ] TransUnion DR: Production API sandbox available?
-- [ ] DGII public RNC endpoint: rate limit policy?
-- [ ] Azure AI Document Intelligence: Custom model training dataset ready?
-
-## 🚫 Known Constraints
-- Do NOT implement TransUnion query until ConsentRecord gate is merged and green
-- Do NOT delete ConsentRecords or AuditLogs — 7-year retention required by Law 172-13
-- Do NOT bypass FluentValidation on any new DTO
-- Do NOT store secrets in appsettings.json — Key Vault only
-- Do NOT issue IntegritySeal unless ALL ValidationResults.Status = PASS (RF-10 guard)
-```
+Before executing any code changes, the agent **must** examine the task requirements and read all relevant rules from `.agents/rules/` that correspond to the domains involved (e.g., `api-contract.md` for API changes, `desing-system.md` for UI updates, `databa-migrations.md` for DB tasks).
 
 ### Context Recovery Protocol (After `/clear` or New Session)
 
@@ -331,7 +293,8 @@ When starting a new session, the **first action** before any code is written mus
 3. Read @.agents/docs/TRD_VeriFinca.md §[section relevant to next task]
 4. Read @.agents/docs/ARCHITECTURE.md [relevant diagram section]
 5. Read @AGENTS.md
-6. THEN: ask the human to confirm "Next Up" item before proceeding
+6. Read relevant rule files from @.agents/rules/ based on the current task
+7. THEN: ask the human to confirm "Next Up" item before proceeding
 ```
 
 An agent that skips the codebase-memory-mcp bootstrap (§0) and starts coding without 
