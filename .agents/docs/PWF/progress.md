@@ -1,7 +1,8 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-06-30T02:15:00-04:00 by OpenAgent (COMP-001 Implementation)
+> Last updated: 2026-06-30T02:30:00-04:00 by OpenAgent (Unblock Ops)
 > **📝 ORCH-TEST-001 completed — 12 artifacts across 11 tasks, score 78/100**
 > **📝 COMP-001 consent version gate implemented — ADR-007 gaps closed**
+> **📝 GROQ_API_KEY set at Machine/User/Process — Consent tests 6/6 ✅**
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
@@ -21,7 +22,8 @@
 |---|---|---|---|
 
 ## 🔜 Next Up (Prioritized)
-1. Complete verification steps.
+1. **Restart IDE** → run ORCH-TEST-002 (subagent routing with model response)
+2. Verify consent test passes in CI pipeline
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - None
