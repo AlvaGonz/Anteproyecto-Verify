@@ -1,6 +1,6 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-06-29T20:00:00-04:00 by DocWriter v1.0 (QA Roadmap from To-do.txt)
-> **📝 Updated by DocWriter — QA Backlog appended below.**
+> Last updated: 2026-06-29T23:00:00-04:00 by OpenAgent (ORCH-TEST-001)
+> **📝 ORCH-TEST-001 completed — 12 artifacts across 11 tasks, score 78/100**
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
@@ -12,6 +12,7 @@
 | AGENTS.md v5 — codebase-memory-mcp §0 mandatory | N/A | feat-codebase-memory-mcp | 6131fa9a | 2026-06-29 |
 | README.md full rewrite from codebase graph | N/A | feat-codebase-memory-mcp | efcbffa5 | 2026-06-29 |
 | E2E Test Success for Project Photos | N/A | feat-codebase-memory-mcp | 5661d1a6 | 2026-06-29 |
+| ORCH-TEST-001 — Orchestration Proof Test | N/A | feat-voltagent-upgrade | a1b6b5b5 | 2026-06-29 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
@@ -36,17 +37,25 @@
 | 🟡 P2 — Medium | 5 | WBS-015..019 — UX mejoras |
 | 🟢 P3 — Tech Debt | 10 | TEC-001..010 — Accesibilidad, rendimiento, CI |
 
-## 🔄 In Progress (QA Roadmap Phase 0)
-| WBS | Item | Agent | ETA |
+## 🔄 In Progress (QA Roadmap — ORCH-TEST-001 Proof)
+| WBS | Item | Agent | Status |
 |---|---|---|---|
-| WBS-001 | Fix /#/register | developer-agent | Next |
-| WBS-002 | Fix /#/proyectos | developer-agent | Next |
-| WBS-003 | Fix /#/dashboard | developer-agent | Next |
-| WBS-004 | Fix /#/legal | developer-agent | Next |
+| WBS-001 | RegisterPage test | tdd-guide | ✅ 257 lines, 11 tests |
+| WBS-005 | TC-002 coordinates diagnosis | build-error-resolver | ✅ Diagnosis report |
+| WBS-007 | JWT localStorage audit | security-reviewer | ✅ SEC-001 surfaced |
+| WBS-009 | Bundle optimization | refactor-cleaner | ✅ Analysis report |
+| WBS-012 | Password policy xUnit test | tdd-guide | ✅ 6 theory/2 fact tests |
+| WBS-013 | Consent gate audit (Law 172-13) | ley172-13-auditor | ✅ COMP-001 surfaced |
+| WBS-014 | 17 UI screens breakdown | planner | ✅ 17 screens mapped |
+| WBS-020 | RF-10 Integrity Seal ADR | architect | ✅ ADR-005 (357 lines) |
+| TEC-010 | SonarCloud pipeline gate | devops-specialist | ✅ Pipeline config |
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
-- [ ] JWT migration from localStorage to HttpOnly cookies (SEC-001)
-- [ ] Consent UI implementation approach (COMP-001, Law 172-13)
+- [ ] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001
+- [ ] TransUnion consent gate verification (COMP-001) — surfaced in ORCH-TEST-001
+- [ ] Register unreachable subagents: build-error-resolver, refactor-cleaner
+- [ ] Debug empty-output agents: planner, security-reviewer, ley172-13-auditor, code-reviewer
+- [ ] Create missing agent files: BatchExecutor, DocWriter
 - [ ] Public endpoint changes for Precios page (BUG-005)
 
 ## 🔄 Expanded Scope (Post-Audit — 2026-06-29)
