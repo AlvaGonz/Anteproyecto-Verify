@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.ExternalServices.Credit;
 using Application.Abstractions.Persistence;
+using Application.Common;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -64,6 +65,16 @@ public class ConsultarCreditoCommandHandler
             {
                 IsSuccess = false,
                 Mensaje = "No existe un consentimiento financiero vigente para el promotor."
+            };
+        }
+
+        // COMP-001 Gate: consent must be under current policy version (Law 172-13 Art. 17)
+        if (consentimiento.VersionPolitica != ConsentGateConstants.CurrentVersionPolitica)
+        {
+            return new ConsultarCreditoResultDto
+            {
+                IsSuccess = false,
+                Mensaje = $"El consentimiento fue otorgado bajo la versión {consentimiento.VersionPolitica} y la política actual es {ConsentGateConstants.CurrentVersionPolitica}. Se requiere renovar el consentimiento."
             };
         }
 
