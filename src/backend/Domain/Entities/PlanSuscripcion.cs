@@ -13,7 +13,15 @@ public class PlanSuscripcion
     public int MaxProyectos { get; private set; }
     public bool PresentacionPublica { get; private set; }
     public bool QrIncluido { get; private set; }
-    public bool MultiUsuario { get; private set; }
+    public int MaxUsuariosSecundarios { get; private set; }
+    public int MaxAlmacenamientoMb { get; private set; }
+    public bool AlertasTiempoRealDisponible { get; private set; }
+    public bool ModeloLmDisponible { get; private set; }
+    public bool ValidacionLoteDisponible { get; private set; }
+    public bool ExportacionExcelDisponible { get; private set; }
+    public bool ExportacionPdfDisponible { get; private set; }
+    public bool IntegracionCrmDisponible { get; private set; }
+    public string SoporteTipo { get; private set; } = "Comunidad";
     public bool AccesoApi { get; private set; }
 
     private PlanSuscripcion() { } // For EF Core
@@ -21,7 +29,10 @@ public class PlanSuscripcion
     public static PlanSuscripcion Create(
         Guid id, string nombrePlan, decimal precio,
         int maxConsultas, int maxProyectos, bool presentacionPublica,
-        bool qrIncluido, bool multiUsuario, bool accesoApi)
+        bool qrIncluido, int maxUsuariosSecundarios, int maxAlmacenamientoMb,
+        bool alertasTiempoRealDisponible, bool modeloLmDisponible, bool validacionLoteDisponible,
+        bool exportacionExcelDisponible, bool exportacionPdfDisponible, bool integracionCrmDisponible,
+        string soporteTipo, bool accesoApi)
     {
         return new PlanSuscripcion
         {
@@ -32,7 +43,15 @@ public class PlanSuscripcion
             MaxProyectos = maxProyectos,
             PresentacionPublica = presentacionPublica,
             QrIncluido = qrIncluido,
-            MultiUsuario = multiUsuario,
+            MaxUsuariosSecundarios = maxUsuariosSecundarios,
+            MaxAlmacenamientoMb = maxAlmacenamientoMb,
+            AlertasTiempoRealDisponible = alertasTiempoRealDisponible,
+            ModeloLmDisponible = modeloLmDisponible,
+            ValidacionLoteDisponible = validacionLoteDisponible,
+            ExportacionExcelDisponible = exportacionExcelDisponible,
+            ExportacionPdfDisponible = exportacionPdfDisponible,
+            IntegracionCrmDisponible = integracionCrmDisponible,
+            SoporteTipo = soporteTipo,
             AccesoApi = accesoApi
         };
     }

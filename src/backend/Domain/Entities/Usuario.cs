@@ -32,6 +32,11 @@ public class Usuario : EntityBase
     public Guid? PlanSuscripcionId { get; private set; }
     public PlanSuscripcion? Plan { get; private set; }
     public int ConsultasUsadas { get; private set; }
+    public int ProyectosCreados { get; private set; }
+
+    public Guid? TitularId { get; private set; }
+    public Usuario? Titular { get; private set; }
+    public ICollection<Usuario> MiembrosEquipo { get; private set; } = new List<Usuario>();
 
     // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
@@ -137,8 +142,26 @@ public class Usuario : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void IncrementarProyecto()
+    {
+        ProyectosCreados++;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AsignarTitular(Guid titularId)
+    {
+        TitularId = titularId;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void RemoverTitular()
+    {
+        TitularId = null;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public bool EsAdministrador()
     {
-        return Rol == UserRole.Administrator;
+        return Rol == UserRole.Administrator || Rol == UserRole.Owner;
     }
 }

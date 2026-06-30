@@ -15,7 +15,9 @@ public class UploadAvatarCommandHandler
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UploadAvatarCommandHandler(IUsuarioRepository usuarioRepository, IUnitOfWork unitOfWork)
+    public UploadAvatarCommandHandler(
+        IUsuarioRepository usuarioRepository, 
+        IUnitOfWork unitOfWork)
     {
         _usuarioRepository = usuarioRepository;
         _unitOfWork = unitOfWork;
@@ -36,18 +38,8 @@ public class UploadAvatarCommandHandler
         {
             return new UploadAvatarResultDto(false, "Formato de imagen no permitido. Use PNG, JPG o JPEG.", null);
         }
-
-        // Generate unique name
-        var uniqueFileName = $"{user.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}{extension}";
         
-        // Ensure directory exists
-        var avatarsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "storage", "avatars");
-        if (!Directory.Exists(avatarsDirectory))
-        {
-            Directory.CreateDirectory(avatarsDirectory);
-        }
-
-        var filePath = Path.Combine(avatarsDirectory, uniqueFileName);
+        string base64Avatar;
 
         // Resize the image to 300x300 px (maximum side) while maintaining aspect ratio
         using (var image = await Image.LoadAsync(request.FileStream, cancellationToken))
@@ -58,26 +50,23 @@ public class UploadAvatarCommandHandler
                 Mode = ResizeMode.Max
             }));
 
-            await image.SaveAsync(filePath, cancellationToken);
+            using var memoryStream = new MemoryStream();
+            
+            if (extension == ".png")
+                await image.SaveAsync(memoryStream, new SixLabors.ImageSharp.Formats.Png.PngEncoder(), cancellationToken);
+            else
+                await image.SaveAsync(memoryStream, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder(), cancellationToken);
+            
+            var bytes = memoryStream.ToArray();
+            var base64String = Convert.ToBase64String(bytes);
+            var contentType = extension == ".png" ? "image/png" : "image/jpeg";
+            base64Avatar = $"data:{contentType};base64,{base64String}";
         }
 
-        var publicUrl = $"/avatars/{uniqueFileName}"; // In a real app, this would be a configured URL prefix
-
-        // Delete old avatar if it existed (and it's a local file)
-        if (!string.IsNullOrEmpty(user.AvatarUrl) && user.AvatarUrl.StartsWith("/avatars/"))
-        {
-            var oldFileName = Path.GetFileName(user.AvatarUrl);
-            var oldFilePath = Path.Combine(avatarsDirectory, oldFileName);
-            if (File.Exists(oldFilePath))
-            {
-                File.Delete(oldFilePath);
-            }
-        }
-
-        user.UpdateAvatarUrl(publicUrl);
+        user.UpdateAvatarUrl(base64Avatar);
         _usuarioRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new UploadAvatarResultDto(true, null, publicUrl);
+        return new UploadAvatarResultDto(true, null, base64Avatar);
     }
 }

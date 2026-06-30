@@ -89,6 +89,12 @@ try
 }
 catch (Exception ex)
 {
+    if (ex.GetType().Name == "HostAbortedException")
+    {
+        // Ignore this exception as it is thrown intentionally by EF Core tools
+        return;
+    }
+
     Console.Error.WriteLine("=== FATAL STARTUP CRASH ===");
     Console.Error.WriteLine(ex.ToString());
     throw;

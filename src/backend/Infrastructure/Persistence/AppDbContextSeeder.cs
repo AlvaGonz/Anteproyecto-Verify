@@ -26,6 +26,8 @@ public static class AppDbContextSeeder
         {
             logger.LogInformation("Seeding prototype demo data...");
 
+            await SeedPlanesSuscripcionAsync(context, logger);
+
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
                 nombre: "Administrador",
@@ -181,109 +183,6 @@ public static class AppDbContextSeeder
                 logger.LogWarning($"Skipping domain seeding due to missing tables: {ex.Message}");
             }
 
-            // Seeding Legacy Profiles, Permissions, and Plans
-                    foreach (var perm in permisos)
-                    {
-                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = admin.IdPerfil, IdPermiso = perm.IdPermiso });
-                    }
-                }
-                if (dev != null)
-                {
-                    var pCrear = permisos.FirstOrDefault(p => p.Descripcion == "CrearProyectos");
-                    if (pCrear != null)
-                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = dev.IdPerfil, IdPermiso = pCrear.IdPermiso });
-                }
-                if (val != null)
-                {
-                    var pCrear = permisos.FirstOrDefault(p => p.Descripcion == "CrearProyectos");
-                    var pVal = permisos.FirstOrDefault(p => p.Descripcion == "ValidarProyectos");
-                    if (pCrear != null)
-                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = val.IdPerfil, IdPermiso = pCrear.IdPermiso });
-                    if (pVal != null)
-                        context.PerfilPermisos.Add(new PerfilPermiso { IdPerfil = val.IdPerfil, IdPermiso = pVal.IdPermiso });
-                }
-                await context.SaveChangesAsync();
-            }
-
-            if (!await context.PlanesSuscripcion.AnyAsync())
-            {
-                logger.LogInformation("Seeding legacy subscription plans...");
-                context.PlanesSuscripcion.AddRange(
-                    PlanSuscripcion.Create(Guid.NewGuid(), "Gratuito", 0.00m, 5, 1, true, false, false, false),
-                    PlanSuscripcion.Create(Guid.NewGuid(), "Consultor", 1000.00m, 50, 5, true, true, false, false),
-                    PlanSuscripcion.Create(Guid.NewGuid(), "Profesional", 3500.00m, -1, 10, true, true, true, false),
-                    PlanSuscripcion.Create(Guid.NewGuid(), "Empresa", 10000.00m, -1, 50, true, true, true, true),
-                    PlanSuscripcion.Create(Guid.NewGuid(), "Enterprise", 30000.00m, -1, -1, true, true, true, true)
-                );
-                await context.SaveChangesAsync();
-            }
-
-            // Sync default seeded users to legacy Usuario, Acceso, and Pagos
-            var users = await context.Usuarios.ToListAsync();
-            var perfilesList = await context.Perfiles.ToListAsync();
-            var planesList = await context.PlanesSuscripcion.ToListAsync();
-
-            var adminLegacyProfile = perfilesList.FirstOrDefault(p => p.NombrePerfil == "ADMIN");
-            var devLegacyProfile = perfilesList.FirstOrDefault(p => p.NombrePerfil == "DEVELOPER");
-            var valLegacyProfile = perfilesList.FirstOrDefault(p => p.NombrePerfil == "VALIDATOR");
-
-            var freePlan = planesList.FirstOrDefault(p => p.NombrePlan == "Gratuito");
-            var proPlan = planesList.FirstOrDefault(p => p.NombrePlan == "Profesional");
-
-            foreach (var u in users)
-            {
-                var existingLegacy = await context.UsuariosLegacy.FirstOrDefaultAsync(ul => ul.Email == u.Email);
-                if (existingLegacy == null)
-                {
-                    var legacyUser = new UsuarioLegacy
-                    {
-                        Nombre = u.Nombre,
-                        Apellido = u.Apellido,
-                        NombreCompleto = $"{u.Nombre} {u.Apellido}",
-                        Email = u.Email,
-                        ContrasenaHash = u.ContrasenaHash,
-                        Telefono = u.Telefono,
-                        Cedula = u.Cedula
-                    };
-                    context.UsuariosLegacy.Add(legacyUser);
-                    await context.SaveChangesAsync();
-                    existingLegacy = legacyUser;
-                }
-
-                var hasAcceso = await context.Accesos.AnyAsync(a => a.IdUsuario == existingLegacy.IdUsuario);
-                if (!hasAcceso)
-                {
-                    var targetPerfil = u.Rol switch
-                    {
-                        UserRole.Administrator => adminLegacyProfile,
-                        UserRole.User => devLegacyProfile,
-                        _ => devLegacyProfile
-                    };
-
-                    if (targetPerfil != null)
-                    {
-                        context.Accesos.Add(new Acceso { IdUsuario = existingLegacy.IdUsuario, IdPerfil = targetPerfil.IdPerfil });
-                    }
-                }
-
-                var hasPagos = await context.PagosLegacy.AnyAsync(p => p.IdUsuario == existingLegacy.IdUsuario);
-                if (!hasPagos)
-                {
-                    var targetPlan = u.Rol == UserRole.Administrator ? proPlan : freePlan;
-                    if (targetPlan != null)
-                    {
-                        context.PagosLegacy.Add(new Pago
-                        {
-                            IdUsuario = existingLegacy.IdUsuario,
-                            Idsuscripcion = targetPlan.Idsuscripcion,
-                            Monto = targetPlan.Precio,
-                            FechaPago = DateTime.UtcNow
-                        });
-                    }
-                }
-            }
-            await context.SaveChangesAsync();
-
             logger.LogInformation("Prototype demo data seeding completed successfully.");
             await SeedDgiiAsync(context, logger);
 
@@ -296,6 +195,53 @@ public static class AppDbContextSeeder
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while seeding the database.");
+        }
+    }
+
+    private static async Task SeedPlanesSuscripcionAsync(AppDbContext context, ILogger logger)
+    {
+        if (!await context.PlanesSuscripcion.AnyAsync())
+        {
+            logger.LogInformation("Seeding modern subscription plans (Block 2)...");
+            
+            // Consulta (Free)
+            var consulta = PlanSuscripcion.Create(
+                id: Guid.NewGuid(), nombrePlan: "Consulta", precio: 0.00m,
+                maxConsultas: 1, maxProyectos: 0, presentacionPublica: false,
+                qrIncluido: false, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 0,
+                alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
+                exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
+                soporteTipo: "Comunidad", accesoApi: false);
+
+            // Profesional
+            var profesional = PlanSuscripcion.Create(
+                id: Guid.NewGuid(), nombrePlan: "Profesional", precio: 3500.00m,
+                maxConsultas: 25, maxProyectos: 5, presentacionPublica: true,
+                qrIncluido: true, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 200,
+                alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
+                exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: false,
+                soporteTipo: "Email", accesoApi: false);
+
+            // Empresa
+            var empresa = PlanSuscripcion.Create(
+                id: Guid.NewGuid(), nombrePlan: "Empresa", precio: 10000.00m,
+                maxConsultas: 100, maxProyectos: 20, presentacionPublica: true,
+                qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 1024,
+                alertasTiempoRealDisponible: false, modeloLmDisponible: true, validacionLoteDisponible: false,
+                exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: true,
+                soporteTipo: "Prioritario", accesoApi: true);
+
+            // Enterprise
+            var enterprise = PlanSuscripcion.Create(
+                id: Guid.NewGuid(), nombrePlan: "Enterprise", precio: 30000.00m,
+                maxConsultas: -1, maxProyectos: -1, presentacionPublica: true,
+                qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: 10240,
+                alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
+                exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
+                soporteTipo: "Account Manager", accesoApi: true);
+
+            context.PlanesSuscripcion.AddRange(consulta, profesional, empresa, enterprise);
+            await context.SaveChangesAsync();
         }
     }
 

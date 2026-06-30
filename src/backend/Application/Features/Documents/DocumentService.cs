@@ -19,6 +19,7 @@ public class DocumentService : IDocumentService
 {
     private readonly IDocumentoRepository _documentoRepository;
     private readonly IProyectoRepository _proyectoRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
     private readonly IBlobStorageService _blobStorageService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly Application.Abstractions.DocumentIntelligence.IDocumentValidationService _documentValidationService;
@@ -28,6 +29,7 @@ public class DocumentService : IDocumentService
     public DocumentService(
         IDocumentoRepository documentoRepository,
         IProyectoRepository proyectoRepository,
+        IUsuarioRepository usuarioRepository,
         IBlobStorageService blobStorageService,
         IUnitOfWork unitOfWork,
         Application.Abstractions.DocumentIntelligence.IDocumentValidationService documentValidationService,
@@ -36,6 +38,7 @@ public class DocumentService : IDocumentService
     {
         _documentoRepository = documentoRepository;
         _proyectoRepository = proyectoRepository;
+        _usuarioRepository = usuarioRepository;
         _blobStorageService = blobStorageService;
         _unitOfWork = unitOfWork;
         _documentValidationService = documentValidationService;
@@ -52,6 +55,20 @@ public class DocumentService : IDocumentService
         if (!FileSignatureValidator.IsValidFileSignature(fileName, fileStream))
         {
             throw new ArgumentException("El archivo proporcionado no tiene una firma válida o su formato no es soportado.");
+        }
+
+        var usuario = await _usuarioRepository.GetByIdWithPlanAsync(dto.UsuarioCargaId, cancellationToken);
+        if (usuario == null)
+            throw new KeyNotFoundException($"Usuario con ID {dto.UsuarioCargaId} no encontrado.");
+
+        var totalStorageUsed = await _documentoRepository.GetTotalStorageBytesByUsuarioAsync(dto.UsuarioCargaId, cancellationToken);
+        
+        if (!Domain.Policies.SubscriptionTierPolicy.CanStoreDocument(usuario, totalStorageUsed, length))
+        {
+            throw new Application.Common.Exceptions.QuotaExceededException(
+                Domain.Policies.SubscriptionTierPolicy.GetTierName(usuario), 
+                "MaxAlmacenamientoMb", 
+                "Límite de almacenamiento alcanzado para su plan de suscripción actual.");
         }
 
         // Validate document integrity (RS7, RS8)

@@ -122,7 +122,7 @@ export const MyProfileForm: React.FC = () => {
         <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
           <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-surface-raised/30 shadow-md">
             {user?.avatarUrl ? (
-              <img src={`http://localhost:5000${user.avatarUrl}`} alt="Avatar" className="w-full h-full object-cover" />
+              <img src={user.avatarUrl.startsWith('data:') ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center text-3xl font-bold uppercase">
                 {user?.nombre?.[0] || user?.email?.[0] || "?"}

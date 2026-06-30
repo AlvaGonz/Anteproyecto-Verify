@@ -13,6 +13,7 @@ public class InitiateCatastroValidationCommandHandler
 {
     private readonly ICatastroService _catastroService;
     private readonly IProyectoRepository _proyectoRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
     private readonly IValidacionRepository _validacionRepository;
     private readonly IHallazgoRepository _hallazgoRepository;
     private readonly IAuditoriaRepository _auditoriaRepository;
@@ -22,6 +23,7 @@ public class InitiateCatastroValidationCommandHandler
     public InitiateCatastroValidationCommandHandler(
         ICatastroService catastroService,
         IProyectoRepository proyectoRepository,
+        IUsuarioRepository usuarioRepository,
         IValidacionRepository validacionRepository,
         IHallazgoRepository hallazgoRepository,
         IAuditoriaRepository auditoriaRepository,
@@ -30,6 +32,7 @@ public class InitiateCatastroValidationCommandHandler
     {
         _catastroService = catastroService;
         _proyectoRepository = proyectoRepository;
+        _usuarioRepository = usuarioRepository;
         _validacionRepository = validacionRepository;
         _hallazgoRepository = hallazgoRepository;
         _auditoriaRepository = auditoriaRepository;
@@ -42,6 +45,21 @@ public class InitiateCatastroValidationCommandHandler
         var project = await _proyectoRepository.GetByIdAsync(request.ProyectoId, cancellationToken);
         if (project == null)
             throw new KeyNotFoundException($"Proyecto con ID {request.ProyectoId} no encontrado.");
+
+        var usuario = await _usuarioRepository.GetByIdWithPlanAsync(request.UsuarioId, cancellationToken);
+        if (usuario == null)
+            throw new KeyNotFoundException($"Usuario con ID {request.UsuarioId} no encontrado.");
+
+        if (!Domain.Policies.SubscriptionTierPolicy.CanConsult(usuario))
+        {
+            throw new Application.Common.Exceptions.QuotaExceededException(
+                Domain.Policies.SubscriptionTierPolicy.GetTierName(usuario), 
+                "MaxConsultasMensuales", 
+                "Límite de consultas externas alcanzado para su plan actual.");
+        }
+
+        usuario.IncrementarConsulta();
+        _usuarioRepository.Update(usuario);
 
         if (string.IsNullOrWhiteSpace(project.UbicacionGps) || string.IsNullOrWhiteSpace(project.DesignacionCatastral))
         {

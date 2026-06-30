@@ -12,6 +12,7 @@ public class InitiateDgriValidationCommandHandler
 {
     private readonly IDgriService _dgriService;
     private readonly IProyectoRepository _proyectoRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
     private readonly IValidacionRepository _validacionRepository;
     private readonly IAuditoriaRepository _auditoriaRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -19,12 +20,14 @@ public class InitiateDgriValidationCommandHandler
     public InitiateDgriValidationCommandHandler(
         IDgriService dgriService,
         IProyectoRepository proyectoRepository,
+        IUsuarioRepository usuarioRepository,
         IValidacionRepository validacionRepository,
         IAuditoriaRepository auditoriaRepository,
         IUnitOfWork unitOfWork)
     {
         _dgriService = dgriService;
         _proyectoRepository = proyectoRepository;
+        _usuarioRepository = usuarioRepository;
         _validacionRepository = validacionRepository;
         _auditoriaRepository = auditoriaRepository;
         _unitOfWork = unitOfWork;
@@ -35,6 +38,21 @@ public class InitiateDgriValidationCommandHandler
         var project = await _proyectoRepository.GetByIdAsync(request.ProyectoId, cancellationToken);
         if (project == null)
             throw new KeyNotFoundException($"Proyecto con ID {request.ProyectoId} no encontrado.");
+
+        var usuario = await _usuarioRepository.GetByIdWithPlanAsync(request.UsuarioId, cancellationToken);
+        if (usuario == null)
+            throw new KeyNotFoundException($"Usuario con ID {request.UsuarioId} no encontrado.");
+
+        if (!Domain.Policies.SubscriptionTierPolicy.CanConsult(usuario))
+        {
+            throw new Application.Common.Exceptions.QuotaExceededException(
+                Domain.Policies.SubscriptionTierPolicy.GetTierName(usuario), 
+                "MaxConsultasMensuales", 
+                "Límite de consultas externas alcanzado para su plan actual.");
+        }
+
+        usuario.IncrementarConsulta();
+        _usuarioRepository.Update(usuario);
 
         // RS10: Registrar el intento de consulta en auditoría con timestamp
         var auditoriaIntento = new Auditoria(

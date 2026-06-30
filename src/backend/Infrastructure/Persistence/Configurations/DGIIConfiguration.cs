@@ -8,7 +8,7 @@ public class DGIIConfiguration : IEntityTypeConfiguration<DGII>
 {
     public void Configure(EntityTypeBuilder<DGII> builder)
     {
-        builder.ToTable("DGII", t => t.ExcludeFromMigrations());
+        builder.ToTable("DGII");
         builder.HasKey(d => d.Rnc);
         builder.Property(d => d.Rnc).HasMaxLength(20);
         builder.Property(d => d.NombreRazonSocial).IsRequired().HasMaxLength(250);

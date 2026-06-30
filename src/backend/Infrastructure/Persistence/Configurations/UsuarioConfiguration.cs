@@ -29,7 +29,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.EmailVerificado).IsRequired().HasDefaultValue(false);
         builder.Property(u => u.TokenVerificacion).HasMaxLength(4000).IsRequired(false);
         builder.Property(u => u.TokenVerificacionExpiraUtc).IsRequired(false);
-        builder.Property(u => u.AvatarUrl).HasMaxLength(500).IsRequired(false);
+        builder.Property(u => u.AvatarUrl).IsRequired(false);
 
         // Optimistic concurrency token
         builder.Property(u => u.RowVersion).IsRowVersion().IsConcurrencyToken();
@@ -37,10 +37,19 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         // Subscription properties
         builder.Property(u => u.PlanSuscripcionId).IsRequired(false);
         builder.Property(u => u.ConsultasUsadas).IsRequired().HasDefaultValue(0);
+        builder.Property(u => u.ProyectosCreados).IsRequired().HasDefaultValue(0);
 
         builder.HasOne(u => u.Plan)
             .WithMany()
             .HasForeignKey(u => u.PlanSuscripcionId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // Team properties
+        builder.Property(u => u.TitularId).IsRequired(false);
+
+        builder.HasOne(u => u.Titular)
+            .WithMany(u => u.MiembrosEquipo)
+            .HasForeignKey(u => u.TitularId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

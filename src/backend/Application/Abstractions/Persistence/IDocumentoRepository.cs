@@ -13,4 +13,5 @@ public interface IDocumentoRepository
     Task AddAsync(Documento documento, CancellationToken cancellationToken = default);
     void Update(Documento documento);
     void Delete(Documento documento);
+    Task<long> GetTotalStorageBytesByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
 }

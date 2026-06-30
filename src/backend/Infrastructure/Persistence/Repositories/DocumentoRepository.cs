@@ -44,4 +44,11 @@ public class DocumentoRepository : IDocumentoRepository
     {
         _context.Documentos.Remove(documento);
     }
+
+    public async Task<long> GetTotalStorageBytesByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Documentos
+            .Where(d => d.UsuarioCargaId == usuarioId)
+            .SumAsync(d => d.TamanoBytes, cancellationToken);
+    }
 }

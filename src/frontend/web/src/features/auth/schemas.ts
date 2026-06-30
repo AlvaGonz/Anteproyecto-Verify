@@ -112,4 +112,29 @@ telefono: z
   }
 });
 
-export type UpdateProfileDto = z.infer<typeof UpdateProfileSchema>;
+export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>;
+
+export const inviteTeamMemberSchema = z.object({
+  nombre: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(100, "Nombre demasiado largo")
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "El nombre solo puede contener letras"),
+  apellido: z
+    .string()
+    .min(2, "El apellido debe tener al menos 2 caracteres")
+    .max(100, "Apellido demasiado largo")
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "El apellido solo puede contener letras"),
+  email: z
+    .string()
+    .min(1, "El correo es requerido")
+    .email("Formato de correo inválido"),
+  telefono: z
+    .string()
+    .min(1, "El teléfono es requerido")
+    .refine((val) => {
+       const digits = val.replace(/\D/g, "");
+       return /^(809|829|849)\d{7}$/.test(digits);
+     }, "Teléfono inválido. Solo códigos 809, 829 o 849"),
+});
+export type InviteTeamMemberValues = z.infer<typeof inviteTeamMemberSchema>;
