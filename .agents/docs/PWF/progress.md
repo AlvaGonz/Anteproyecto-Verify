@@ -95,3 +95,7 @@
   - **Root Cause:** Stripe redirects to a regular URL which HashRouter misinterprets, preventing `CheckoutReturnPage` from routing and maintaining `session_id` in the real search params.
   - **Fix:** Fixed backend `return_url` to include `/#/`, added `window.location.search` fallback and `sessionStorage` idempotency guard in `CheckoutReturnPage.tsx`.
   - **Commit:** 507891d3
+- **BUG-007:** User session leakage/crossover on login.
+  - **Symptom:** When logging in, the user sees data from a previous session or another user.
+  - **Root Cause:** React Query cache (`queryClient`) was not being cleared on login or logout, leading to old data persisting in the client.
+  - **Fix:** Used TDD to add `queryClient.clear()` in `AuthContext.tsx` on `login`, `logout`, and `auth:force-logout` events.

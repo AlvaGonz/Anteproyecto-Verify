@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
 import { isSome, isSuccess } from "../utils/functional";
+import { queryClient } from "../../infrastructure/api/queryClient";
 
 interface AuthContextType {
   user: User | null;
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const handler = () => {
+      queryClient.clear();
       setUser(null);
       AuthService.logout();
       window.location.hash = '#/login';
@@ -46,6 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
     setError(null);
+    queryClient.clear();
     
     const result = await AuthService.login(email, password);
     
@@ -60,6 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const logout = useCallback(() => {
+    queryClient.clear();
     setUser(null);
     AuthService.logout();
   }, []);
