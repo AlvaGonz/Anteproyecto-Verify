@@ -39,7 +39,8 @@ export const EmailVerifiedPage = () => {
   useEffect(() => {
     if (status === "success") {
       const storedRedirect = localStorage.getItem('redirect_after_verification');
-      const targetUrl = storedRedirect || "/admin";
+      const urlReturnUrl = searchParams.get('returnUrl');
+      const targetUrl = urlReturnUrl || storedRedirect || "/admin";
 
       const interval = setInterval(() => {
         setCountdown((prev) => {
@@ -84,10 +85,11 @@ export const EmailVerifiedPage = () => {
             <button
               onClick={() => {
                 const storedRedirect = localStorage.getItem('redirect_after_verification');
+                const urlReturnUrl = searchParams.get('returnUrl');
                 if (storedRedirect) {
                   localStorage.removeItem('redirect_after_verification');
                 }
-                navigate(storedRedirect || "/admin");
+                navigate(urlReturnUrl || storedRedirect || "/admin");
               }}
               className="vf-btn-primary w-full h-[52px] text-sm font-bold shadow-floating hover:scale-[1.02] transition-transform"
             >

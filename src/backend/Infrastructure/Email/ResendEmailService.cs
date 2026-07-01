@@ -50,9 +50,9 @@ public class ResendEmailService : IEmailService
         }
     }
 
-    public async Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, CancellationToken ct = default)
+    public async Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, string? returnUrl = null, CancellationToken ct = default)
     {
-        var html = EmailTemplates.GetAccountVerificationEmail(userName, verificationToken);
+        var html = EmailTemplates.GetAccountVerificationEmail(userName, verificationToken, returnUrl);
         await SendEmailAsync(toEmail, "Verificación de Cuenta - VeriFinca", html, ct);
     }
 

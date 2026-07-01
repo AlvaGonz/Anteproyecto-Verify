@@ -82,7 +82,7 @@ public class RegisterUserCommandHandler
         // 10. Enviar email de verificación
         if (user.TokenVerificacion != null)
         {
-            await _emailService.SendAccountVerificationAsync(user.Email, user.Nombre, user.TokenVerificacion, cancellationToken);
+            await _emailService.SendAccountVerificationAsync(user.Email, user.Nombre, user.TokenVerificacion, request.ReturnUrl, cancellationToken);
         }
 
         return new RegisterUserResultDto(true, null, user.Id);

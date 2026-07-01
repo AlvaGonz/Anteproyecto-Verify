@@ -185,9 +185,13 @@ public static class EmailTemplates
     // ════════════════════════════════════════════════════════════════════════
     // 1. Account Verification
     // ════════════════════════════════════════════════════════════════════════
-    public static string GetAccountVerificationEmail(string userName, string verificationToken)
+    public static string GetAccountVerificationEmail(string userName, string verificationToken, string? returnUrl = null)
     {
         string verificationUrl = $"http://localhost:3000/#/verify-email?token={verificationToken}";
+        if (!string.IsNullOrEmpty(returnUrl))
+        {
+            verificationUrl += $"&returnUrl={System.Uri.EscapeDataString(returnUrl)}";
+        }
 
         string content = $@"
             <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>

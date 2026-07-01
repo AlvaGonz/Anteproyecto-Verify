@@ -49,7 +49,8 @@ public class AuthController : ControllerBase
             request.Email ?? request.CorreoElectronico ?? string.Empty,
             request.Password ?? request.Contrasena ?? string.Empty,
             request.Telefono ?? "8095550199",
-            request.Cedula ?? "40212345678"
+            request.Cedula ?? "40212345678",
+            request.ReturnUrl
         );
         var result = await _registerHandler.Handle(command, cancellationToken);
         
@@ -343,4 +344,5 @@ public class RegisterRequestDto
     public string? Contrasena { get; set; }
     public string? Telefono { get; set; }
     public string? Cedula { get; set; }
+    public string? ReturnUrl { get; set; }
 }

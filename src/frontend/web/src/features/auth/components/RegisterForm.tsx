@@ -41,10 +41,11 @@ export const RegisterForm = () => {
 const onSubmit = (data: RegisterFormValues) => {
      // Use raw digits from phone hook for submission
      const telefonoDigits = phone.digits;
-     const { acceptedTerms: _, ...submitData } = {
-       ...data,
-       telefono: telefonoDigits,
-     };
+       const { acceptedTerms: _, ...submitData } = {
+         ...data,
+         telefono: telefonoDigits,
+         returnUrl: redirectUrl || undefined
+       };
      register_(submitData, { onSuccess: () => {
        if (redirectUrl) {
          localStorage.setItem('redirect_after_verification', redirectUrl);

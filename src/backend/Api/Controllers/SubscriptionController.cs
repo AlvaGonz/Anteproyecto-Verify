@@ -290,12 +290,14 @@ public class SubscriptionController : ControllerBase
                 "Webhook: Price {PriceId} has no mapping in Stripe:PricePlanMap — plan not updated.", priceId);
         }
 
+        var currentPeriodEnd = subscription.Items?.Data?.FirstOrDefault()?.CurrentPeriodEnd;
+
         // Always sync the Stripe subscription fields
-        user.UpdateStripeSubscription(subscription.Id, subscription.Status, subscription.CurrentPeriodEnd);
+        user.UpdateStripeSubscription(subscription.Id, subscription.Status, currentPeriodEnd);
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation(
             "Webhook: User {UserId} subscription status='{Status}', periodEnd={PeriodEnd}.",
-            user.Id, subscription.Status, subscription.CurrentPeriodEnd);
+            user.Id, subscription.Status, currentPeriodEnd);
     }
 }

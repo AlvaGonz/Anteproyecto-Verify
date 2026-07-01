@@ -19,10 +19,12 @@
 | Stripe Legal Compliance UI & Sections | N/A | develop | (pending) | 2026-06-30 |
 | Subscription Consent Checkbox (IP/Timestamp) | N/A | develop | (pending) | 2026-06-30 |
 | Subscription Settings & Redirection Flow | N/A | develop | (pending) | 2026-07-01 |
+| SubscriptionController CS1061 CurrentPeriodEnd Fix | N/A | develop | (pending) | 2026-07-01 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
+
 
 ## 🔜 Next Up (Prioritized)
 1. **Restart IDE** → run ORCH-TEST-002 (subagent routing with model response)
