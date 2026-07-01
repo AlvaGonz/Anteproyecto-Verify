@@ -24,6 +24,24 @@ export const LandingNav: React.FC = () => {
     { label: "Legal", href: "/legal" },
   ];
 
+  const isDarkBackground = !scrolled && location.pathname === "/projects";
+
+  const linkClassName = isDarkBackground
+    ? "text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 px-4 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    : "text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+
+  const clientAccessClassName = isDarkBackground
+    ? "text-sm font-semibold text-slate-300 hover:text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    : "text-sm font-semibold text-on-surface-variant hover:text-on-surface px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+
+  const hamburgerClassName = isDarkBackground
+    ? "lg:hidden p-2 -mr-2 text-white hover:text-white rounded-lg hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    : "lg:hidden p-2 -mr-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+
+  const logoSrc = isDarkBackground
+    ? "/brand/logotipo/LOGOTIPO WHITE.optimized.svg"
+    : "/brand/logotipo/LOGOTIPO.optimized.svg";
+
   return (
     <div className={`fixed inset-x-0 top-0 z-50 flex justify-center transition-all duration-300 ${scrolled ? "px-4 pt-4" : "px-0 pt-0"}`}>
       <nav
@@ -35,7 +53,7 @@ export const LandingNav: React.FC = () => {
       >
         <Link to="/" className="flex items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg">
           <img
-            src="/brand/logotipo/LOGOTIPO.optimized.svg"
+            src={logoSrc}
             alt="VeriFinca"
             className="h-9 w-auto group-hover:scale-105 transition-transform duration-300"
           />
@@ -44,11 +62,10 @@ export const LandingNav: React.FC = () => {
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-2">
           {navLinks.map((item) => {
-            const className = "text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
             if (item.href.startsWith("/")) {
-              return <Link key={item.label} to={item.href} className={className}>{item.label}</Link>;
+              return <Link key={item.label} to={item.href} className={linkClassName}>{item.label}</Link>;
             }
-            return <a key={item.label} href={item.href} className={className}>{item.label}</a>;
+            return <a key={item.label} href={item.href} className={linkClassName}>{item.label}</a>;
           })}
         </div>
 
@@ -60,7 +77,7 @@ export const LandingNav: React.FC = () => {
             </Link>
           ) : (
             <>
-              <Link to="/login" className="text-sm font-semibold text-on-surface-variant hover:text-on-surface px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+              <Link to="/login" className={clientAccessClassName}>
                 Acceso Clientes
               </Link>
               <Link to="/register" className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
@@ -72,7 +89,7 @@ export const LandingNav: React.FC = () => {
 
         {/* Mobile Hamburger */}
         <button 
-          className="lg:hidden p-2 -mr-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className={hamburgerClassName}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Abrir menú"
         >
