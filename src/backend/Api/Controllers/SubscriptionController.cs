@@ -79,7 +79,7 @@ public class SubscriptionController : ControllerBase
                 UiMode = "embedded_page",
                 Mode = "subscription",
                 Customer = customerId,
-                ReturnUrl = frontendUrl.TrimEnd('/') + "/checkout/return?session_id={CHECKOUT_SESSION_ID}",
+                ReturnUrl = frontendUrl.TrimEnd('/') + "/#/checkout/return?session_id={CHECKOUT_SESSION_ID}",
                 LineItems = new List<SessionLineItemOptions>
                 {
                     new SessionLineItemOptions
