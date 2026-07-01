@@ -1,11 +1,26 @@
 import React from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp, Plus, ArrowRight, Shield } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useProjects } from "../../projects/api/useProjects";
 import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../projects/types";
+import { PlanActivatedBanner } from "../../pricing/components/PlanActivatedBanner";
+import { PlanCapabilities } from "../../pricing/utils/planCapabilities";
 
 export const DashboardPage: React.FC = () => {
+  const location = useLocation();
+  const [showBanner, setShowBanner] = React.useState<boolean>(
+    !!(location.state as any)?.planJustActivated
+  );
+  const activatedPlan = (location.state as any)?.activatedPlan as PlanCapabilities | undefined;
+  const handleDismissBanner = React.useCallback(() => setShowBanner(false), []);
+
+  React.useEffect(() => {
+    if ((location.state as any)?.planJustActivated) {
+      window.history.replaceState({}, '', window.location.href);
+    }
+  }, [location.state]);
+
   const { data: rawProjects = [], isLoading: loading } = useProjects();
   
   const projects = React.useMemo(() => {
@@ -122,6 +137,11 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
+      {showBanner && activatedPlan && (
+        <div className="max-w-4xl mx-auto px-4 pt-4 mb-4">
+          <PlanActivatedBanner plan={activatedPlan} onDismiss={handleDismissBanner} />
+        </div>
+      )}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
         <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
           <h1 className="text-4xl font-display font-black text-secondary tracking-tight">
