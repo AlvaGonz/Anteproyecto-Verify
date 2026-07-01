@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Stripe;
 using Stripe.Checkout;
+using Application.Abstractions.Notifications;
 
 namespace Api.Controllers;
 
@@ -19,12 +20,18 @@ public class SubscriptionController : ControllerBase
     private readonly AppDbContext _dbContext;
     private readonly IConfiguration _configuration;
     private readonly ILogger<SubscriptionController> _logger;
+    private readonly IEmailService _emailService;
 
-    public SubscriptionController(AppDbContext dbContext, IConfiguration configuration, ILogger<SubscriptionController> logger)
+    public SubscriptionController(
+        AppDbContext dbContext, 
+        IConfiguration configuration, 
+        ILogger<SubscriptionController> logger,
+        IEmailService emailService)
     {
         _dbContext = dbContext;
         _configuration = configuration;
         _logger = logger;
+        _emailService = emailService;
         StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
     }
 
@@ -150,8 +157,12 @@ public class SubscriptionController : ControllerBase
 
     [HttpGet("session-status")]
     [Authorize]
-    public async Task<IActionResult> GetSessionStatus([FromQuery] string session_id, CancellationToken ct)
+    public async Task<IActionResult> GetSessionStatus([FromQuery] string? sessionId, [FromQuery] string? session_id, CancellationToken ct)
     {
+        var finalSessionId = sessionId ?? session_id;
+        if (string.IsNullOrEmpty(finalSessionId))
+            return BadRequest(new { message = "sessionId is required." });
+
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdString))
             return Unauthorized();
@@ -159,12 +170,16 @@ public class SubscriptionController : ControllerBase
         try
         {
             var sessionService = new SessionService();
-            var session = await sessionService.GetAsync(session_id, cancellationToken: ct);
+            var session = await sessionService.GetAsync(finalSessionId, cancellationToken: ct);
+            
+            // For testing: we can return a mock plan name if plan details aren't in session,
+            // but Stripe Session doesn't contain a simple "plan" string. It's usually in line_items.
+            // Let's just return the status and email as before, the frontend might need more.
             return Ok(new { status = session.Status, customerEmail = session.CustomerDetails?.Email });
         }
         catch (StripeException e)
         {
-            _logger.LogError(e, "Stripe API error fetching session {SessionId}", session_id);
+            _logger.LogError(e, "Stripe API error fetching session {SessionId}", finalSessionId);
             return StatusCode(500, new { message = e.StripeError.Message });
         }
     }
@@ -285,7 +300,7 @@ public class SubscriptionController : ControllerBase
                     "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",
                     planName, priceId, user.Id);
 
-                ProcessSubscriptionNotification(user, plan, isNewPlan);
+                await ProcessSubscriptionNotificationAsync(user, plan, isNewPlan);
             }
             else
             {
@@ -311,7 +326,7 @@ public class SubscriptionController : ControllerBase
             user.Id, subscription.Status, currentPeriodEnd);
     }
 
-    internal void ProcessSubscriptionNotification(Usuario user, PlanSuscripcion plan, bool isNewPlan)
+    internal async Task ProcessSubscriptionNotificationAsync(Usuario user, PlanSuscripcion plan, bool isNewPlan)
     {
         if (isNewPlan)
         {
@@ -322,6 +337,14 @@ public class SubscriptionController : ControllerBase
                 "/settings/subscription"
             );
             _dbContext.Notificaciones.Add(notification);
+            
+            // Send the email
+            await _emailService.SendSubscriptionActivatedAsync(
+                user.Email,
+                user.NombreCompleto,
+                plan.NombrePlan,
+                plan.Precio
+            );
         }
     }
 }

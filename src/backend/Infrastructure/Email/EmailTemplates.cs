@@ -328,6 +328,42 @@ public static class EmailTemplates
             $"Tu proyecto '{projectName}' fue registrado exitosamente en VeriFinca.",
             content);
     }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // 5. Subscription Activated
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetSubscriptionActivatedEmail(string userName, string planName, decimal planPrice)
+    {
+        string billingUrl = $"http://localhost:3000/#/settings/subscription";
+
+        string infoInner = $@"
+            <strong style=""color:{Navy};"">Plan Contratado</strong><br>
+            <span style=""color:{TextBody};"">{planName}</span><br><br>
+            <strong style=""color:{Navy};"">Precio</strong><br>
+            <span style=""color:{TextBody};"">${planPrice:0.00}</span><br><br>
+            <strong style=""color:{Navy};"">Fecha de Activación</strong><br>
+            <span style=""color:{TextMuted};""> {System.DateTime.Now:dd/MM/yyyy}</span>";
+
+        string content = $@"
+            <h2 style=""margin:0 0 4px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Suscripción Activada!</h2>
+            <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Bienvenido a tu nuevo plan</p>
+
+            <p style=""margin:0 0 16px 0;"">Estimado/a <strong>{userName}</strong>,</p>
+            <p style=""margin:0 0 16px 0;"">¡Felicidades! Has contratado exitosamente tu nuevo nivel de suscripción en VeriFinca.</p>
+
+            {InfoCard(infoInner)}
+
+            <p style=""margin:0 0 24px 0;"">Ya puedes disfrutar de todos los beneficios y herramientas de tu nuevo plan. Puedes gestionar tu suscripción y ver tus recibos en la sección de facturación.</p>
+
+            <div style=""text-align:center;"">
+                {CtaButton(billingUrl, "Ir a Facturación")}
+            </div>";
+
+        return BuildEmailWrapper(
+            "Suscripción Activada — VeriFinca",
+            $"Tu plan '{planName}' ha sido activado exitosamente.",
+            content);
+    }
 }
 
 

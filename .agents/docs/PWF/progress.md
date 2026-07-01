@@ -24,6 +24,7 @@
 | Fix Checkout Return session_id persistence on hard reset | N/A | develop | (pending) | 2026-07-01 |
 | Security Hardening (OWASP A01-A05, Law 172-13) | N/A | develop | (pending) | 2026-07-01 |
 | Subscription Tier Webhook Notification | N/A | feat-stripe | 11620118 | 2026-07-01 |
+| Dashboard Notification + Post-Payment Redirect | N/A | feat-stripe | (pending) | 2026-07-01 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

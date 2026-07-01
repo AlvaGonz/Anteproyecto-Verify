@@ -10,4 +10,5 @@ public interface IEmailService
     Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, CancellationToken ct = default);
     Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, CancellationToken ct = default);
     Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, CancellationToken ct = default);
+    Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, decimal planPrice, CancellationToken ct = default);
 }

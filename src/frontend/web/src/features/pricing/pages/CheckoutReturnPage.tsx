@@ -14,9 +14,13 @@ export const CheckoutReturnPage = () => {
   // HashRouter does not expose query params from the real URL path.
   // Stripe appends ?session_id= to the real URL (before the #), so
   // we must read it from window.location.search directly.
+  const rawSearch = window.location.search;
+  const rawParams = new URLSearchParams(rawSearch);
   const sessionId = 
     searchParams.get('session_id') ?? 
-    new URLSearchParams(window.location.search).get('session_id')
+    rawParams.get('session_id') ??
+    searchParams.get('sessionId') ??
+    rawParams.get('sessionId');
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const redirectedRef = useRef(false)
