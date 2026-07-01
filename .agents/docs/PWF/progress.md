@@ -104,3 +104,7 @@
   - **Symptom:** Login returns 500 Internal Server Error, and create-session returns 400.
   - **Root Cause:** A local dotnet run instance (task-1227) was binding to port 5000 on the host, intercepting traffic meant for the Docker container. It used the Production environment and attempted Windows Authentication against SQLEXPRESS, failing silently due to log level settings.
   - **Fix:** Killed the rogue local process, restoring traffic to the Docker container.
+- **BUG-009:** Stripe API ArgumentException masked as 400 Bad Request.
+  - **Symptom:** Missing Stripe Secret Key causes the `/v1/subscriptions/session-status` endpoint to return `400 Bad Request` instead of `500 Internal Server Error`, misleading the frontend error handling.
+  - **Root Cause:** `StripeConfiguration.ApiKey` was null/empty. When `SessionService.GetAsync()` was called, the Stripe SDK threw an `ArgumentException` directly (bypassing `catch (StripeException e)`). `GlobalExceptionHandler` caught the `ArgumentException` and incorrectly transformed it to `400 Bad Request`.
+  - **Fix:** Added an explicit missing configuration check inside `GetSessionStatus` to return `500 Internal Server Error` before any Stripe API code is invoked. TDD test added.

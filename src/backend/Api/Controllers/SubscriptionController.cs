@@ -160,6 +160,11 @@ public class SubscriptionController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetSessionStatus([FromQuery] string? sessionId, [FromQuery] string? session_id, CancellationToken ct)
     {
+        if (string.IsNullOrEmpty(_configuration["Stripe:SecretKey"]))
+        {
+            return StatusCode(500, new { message = "Stripe Secret Key is not configured on the server." });
+        }
+
         var finalSessionId = sessionId ?? session_id;
         if (string.IsNullOrEmpty(finalSessionId))
             return BadRequest(new { message = "sessionId is required." });
