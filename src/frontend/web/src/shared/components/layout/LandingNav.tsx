@@ -1,79 +1,112 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export const LandingNav: React.FC = () => {
-  const [scrolled, setScrolled] = React.useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
 
-  React.useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location]);
+
+  const navLinks = [
+    { label: "Proyectos", href: "/projects" },
+    { label: "Precios", href: "/precios" },
+    { label: "Legal", href: "/legal" },
+  ];
+
   return (
-    <nav
-      className={`fixed top-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-20 transition-all duration-500 ${scrolled
-        ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm h-16"
-        : "bg-transparent h-24"
+    <div className={`fixed inset-x-0 top-0 z-50 flex justify-center transition-all duration-300 ${scrolled ? "px-4 pt-4" : "px-0 pt-0"}`}>
+      <nav
+        className={`relative w-full max-w-7xl flex justify-between items-center transition-all duration-300 ${
+          scrolled
+            ? "h-16 px-6 md:px-8 bg-surface/90 backdrop-blur-md border border-outline-variant/30 shadow-sm rounded-2xl"
+            : "h-24 px-6 md:px-12 bg-transparent"
         }`}
-    >
-      <Link to="/" className="flex items-center group">
-        <img
-          src="/brand/logotipo/LOGOTIPO.optimized.svg"
-          alt="VeriFinca"
-          className="h-10 w-auto group-hover:scale-105 transition-transform"
-        />
-      </Link>
+      >
+        <Link to="/" className="flex items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg">
+          <img
+            src="/brand/logotipo/LOGOTIPO.optimized.svg"
+            alt="VeriFinca"
+            className="h-9 w-auto group-hover:scale-105 transition-transform duration-300"
+          />
+        </Link>
 
-      <div className="hidden lg:flex items-center gap-10">
-        {[
-          { label: "Proyectos", href: "/projects" },
-          { label: "Precios", href: "/precios" },
-          { label: "Legal", href: "/legal" },
-        ].map((item) => {
-          const className = "text-sm font-bold text-secondary/70 hover:text-secondary transition-colors tracking-tight";
-          if (item.href.startsWith("/")) {
-            return (
-              <Link key={item.label} to={item.href} className={className}>
-                {item.label}
+        {/* Desktop Links */}
+        <div className="hidden lg:flex items-center gap-2">
+          {navLinks.map((item) => {
+            const className = "text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+            if (item.href.startsWith("/")) {
+              return <Link key={item.label} to={item.href} className={className}>{item.label}</Link>;
+            }
+            return <a key={item.label} href={item.href} className={className}>{item.label}</a>;
+          })}
+        </div>
+
+        {/* Desktop Buttons */}
+        <div className="hidden lg:flex items-center gap-3">
+          {isAuthenticated ? (
+            <Link to="/admin/dashboard" className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+              Ir al Portal
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm font-semibold text-on-surface-variant hover:text-on-surface px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                Acceso Clientes
               </Link>
-            );
-          }
-          return (
-            <a key={item.label} href={item.href} className={className}>
-              {item.label}
-            </a>
-          );
-        })}
-      </div>
+              <Link to="/register" className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+                Crear cuenta
+              </Link>
+            </>
+          )}
+        </div>
 
-      <div className="flex items-center gap-4">
-        {isAuthenticated ? (
-          <Link
-            to="/admin/dashboard"
-            className="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all"
-          >
-            Ir al Portal
-          </Link>
-        ) : (
-          <>
-            <Link
-              to="/login"
-              className="hidden sm:block text-sm font-bold text-secondary hover:text-primary px-4 py-2 transition-colors"
-            >
-              Acceso Clientes
-            </Link>
-            <Link
-              to="/register"
-              className="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all"
-            >
-              Crear cuenta
-            </Link>
-          </>
+        {/* Mobile Hamburger */}
+        <button 
+          className="lg:hidden p-2 -mr-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Abrir menú"
+        >
+          <span className="material-symbols-outlined text-2xl">{mobileMenuOpen ? "close" : "menu"}</span>
+        </button>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="absolute top-[calc(100%+8px)] left-0 right-0 p-4 bg-surface/95 backdrop-blur-xl border border-outline-variant/30 shadow-lg rounded-2xl flex flex-col gap-2 lg:hidden animate-in fade-in slide-in-from-top-4 duration-200">
+            {navLinks.map((item) => {
+              const className = "text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low px-4 py-3 rounded-xl transition-colors";
+              if (item.href.startsWith("/")) {
+                return <Link key={item.label} to={item.href} className={className}>{item.label}</Link>;
+              }
+              return <a key={item.label} href={item.href} className={className}>{item.label}</a>;
+            })}
+            <div className="h-px w-full bg-outline-variant/30 my-2" />
+            {isAuthenticated ? (
+              <Link to="/admin/dashboard" className="bg-primary text-on-primary text-center px-5 py-3 rounded-xl font-semibold text-base hover:bg-primary/90 active:scale-[0.98] transition-all">
+                Ir al Portal
+              </Link>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link to="/login" className="text-center text-base font-semibold text-on-surface-variant hover:text-on-surface px-4 py-3 rounded-xl hover:bg-surface-container-low transition-colors">
+                  Acceso Clientes
+                </Link>
+                <Link to="/register" className="bg-primary text-on-primary text-center px-5 py-3 rounded-xl font-semibold text-base hover:bg-primary/90 active:scale-[0.98] transition-all">
+                  Crear cuenta
+                </Link>
+              </div>
+            )}
+          </div>
         )}
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };
