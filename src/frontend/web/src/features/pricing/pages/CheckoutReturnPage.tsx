@@ -1,67 +1,92 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import apiClient from '../../../infrastructure/api/client';
+import { useState, useEffect, useRef } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import apiClient from '../../../infrastructure/api/client'
+import { normalizePlanKey, PLAN_CAPABILITIES } from '../utils/planCapabilities'
+
+type PageStatus = 'loading' | 'success' | 'error'
 
 export const CheckoutReturnPage = () => {
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('session_id');
-  const navigate = useNavigate();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [searchParams] = useSearchParams()
+  const sessionId = searchParams.get('session_id')
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const redirectedRef = useRef(false)
+  const [status, setStatus] = useState<PageStatus>('loading')
 
   useEffect(() => {
-    if (!sessionId) {
-      setStatus('error');
-      return;
+    if (!sessionId) { setStatus('error'); return }
+
+    const verify = async () => {
+      try {
+        const { data } = await apiClient.get(
+          `/v1/subscriptions/session-status?sessionId=${sessionId}`
+        )
+
+        if (data.status !== 'complete') {
+          setStatus('error')
+          return
+        }
+
+        // Invalidate TanStack Query caches so Settings + Dashboard
+        // reflect the new plan without requiring a full page reload
+        await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] })
+        await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
+
+        if (redirectedRef.current) return
+        redirectedRef.current = true
+
+        // Normalize plan name returned by Stripe session (may be 'Profesional', 'empresa', etc.)
+        const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
+        const capabilities = PLAN_CAPABILITIES[planKey]
+
+        // Pass plan context to dashboard via location state
+        navigate('/dashboard', {
+          replace: true,
+          state: {
+            planJustActivated: true,
+            activatedPlan: capabilities,
+          },
+        })
+
+      } catch {
+        setStatus('error')
+      }
     }
 
-    const checkStatus = async () => {
-      try {
-        const response = await apiClient.get(`/v1/subscriptions/session-status?sessionId=${sessionId}`);
-        if (response.data.status === 'complete') {
-          setStatus('success');
-        } else {
-          setStatus('error');
-        }
-      } catch (err) {
-        setStatus('error');
-      }
-    };
-    checkStatus();
-  }, [sessionId]);
+    verify()
+  }, [sessionId, navigate, queryClient])
 
+  // ── Loading ──
   if (status === 'loading') {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-gray-600">Verificando estado del pago...</p>
+      <div className="flex h-screen flex-col items-center justify-center gap-4">
+        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <p className="text-text-secondary text-sm font-medium">
+          Verificando estado del pago...
+        </p>
       </div>
-    );
+    )
   }
 
-  if (status === 'error') {
-    return (
-      <div className="flex flex-col h-screen items-center justify-center gap-4">
-        <p className="text-red-500 font-bold text-xl">Hubo un problema con el pago.</p>
-        <button
-          onClick={() => navigate('/precios')}
-          className="px-6 py-2 bg-primary text-white rounded hover:bg-primary-hover"
-        >
-          Volver a planes
-        </button>
-      </div>
-    );
-  }
-
+  // ── Error ──
   return (
-    <div className="flex flex-col h-screen items-center justify-center gap-4 bg-green-50">
-      <div className="text-green-600 text-5xl mb-4">✓</div>
-      <h1 className="text-3xl font-bold text-green-700">¡Pago Exitoso!</h1>
-      <p className="text-gray-700">Tu suscripción ha sido activada.</p>
+    <div className="flex flex-col h-screen items-center justify-center gap-4 px-4">
+      <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center mb-2">
+        <span className="text-rose-600 text-3xl">✕</span>
+      </div>
+      <h1 className="text-2xl font-bold text-rose-700 text-center">
+        Hubo un problema con el pago
+      </h1>
+      <p className="text-text-secondary text-sm text-center max-w-sm">
+        El pago no pudo confirmarse. Verifica con tu banco o intenta de nuevo.
+      </p>
       <button
-        onClick={() => navigate('/dashboard')}
-        className="mt-6 px-6 py-2 bg-primary text-white rounded hover:bg-primary-hover shadow-md"
+        onClick={() => navigate('/precios')}
+        className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-semibold"
       >
-        Ir a mi Dashboard
+        Volver a planes
       </button>
     </div>
-  );
-};
+  )
+}
