@@ -8,7 +8,12 @@ type PageStatus = 'loading' | 'success' | 'error'
 
 export const CheckoutReturnPage = () => {
   const [searchParams] = useSearchParams()
-  const sessionId = searchParams.get('session_id')
+  // HashRouter does not expose query params from the real URL path.
+  // Stripe appends ?session_id= to the real URL (before the #), so
+  // we must read it from window.location.search directly.
+  const sessionId = 
+    searchParams.get('session_id') ?? 
+    new URLSearchParams(window.location.search).get('session_id')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const redirectedRef = useRef(false)
@@ -18,6 +23,14 @@ export const CheckoutReturnPage = () => {
     if (!sessionId) { setStatus('error'); return }
 
     const verify = async () => {
+      // Idempotency guard — prevents re-processing on hot-reload / StrictMode
+      const processedKey = `vf_session_processed_${sessionId}`
+      if (sessionStorage.getItem(processedKey)) {
+        // Already processed — navigate directly without calling API again
+        navigate('/dashboard', { replace: true })
+        return
+      }
+
       try {
         const { data } = await apiClient.get(
           `/v1/subscriptions/session-status?sessionId=${sessionId}`
@@ -48,6 +61,7 @@ export const CheckoutReturnPage = () => {
             activatedPlan: capabilities,
           },
         })
+        sessionStorage.setItem(processedKey, '1')
 
       } catch {
         setStatus('error')
