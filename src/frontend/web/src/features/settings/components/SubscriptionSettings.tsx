@@ -65,11 +65,14 @@ export const SubscriptionSettings: React.FC = () => {
     ? new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' }).format(currentPeriodEnd)
     : null;
 
-  const formattedPrice = data?.planPrice != null
+  // Only show the price when Stripe is actively billing the user.
+  // Manually-assigned plans (e.g. Consultor/free tier) don't get a price row.
+  const formattedPrice = (isManagedByStripe && data?.planPrice != null)
     ? data.planPrice === 0
       ? "Gratis"
       : new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP', maximumFractionDigits: 0 }).format(data.planPrice) + " / mes"
     : null;
+
 
   return (
     <div className="w-full max-w-4xl space-y-6 animate-in fade-in zoom-in-95 duration-300">
@@ -142,18 +145,18 @@ export const SubscriptionSettings: React.FC = () => {
               )}
             </div>
 
-            {/* Period End / Managed-by-Stripe Card */}
+            {/* Next Billing Card */}
             <div className="bg-surface-raised rounded-2xl p-6 border border-border/60 shadow-sm">
               <div className="flex items-center gap-2 text-text-secondary text-sm font-medium mb-2 uppercase tracking-wider text-[11px]">
                 <Calendar className="w-3.5 h-3.5" />
-                {isManagedByStripe ? "Próximo ciclo / Vencimiento" : "Estado de facturación"}
+                Próximo cobro
               </div>
               {isLoading ? (
                 <div className="h-7 w-36 bg-slate-200 rounded animate-pulse" />
-              ) : isManagedByStripe ? (
+              ) : formattedDate ? (
                 <>
                   <div className="text-xl font-bold text-[#223382]">
-                    {formattedDate ?? <span className="text-text-secondary font-medium text-base">N/A</span>}
+                    {formattedDate}
                   </div>
                   {daysRemaining !== null && daysRemaining >= 0 && (
                     <div className="mt-3 text-sm font-bold flex items-center gap-1.5 text-primary bg-primary/5 w-fit px-3 py-1.5 rounded-lg border border-primary/10">
@@ -163,11 +166,12 @@ export const SubscriptionSettings: React.FC = () => {
                   )}
                 </>
               ) : (
-                <div className="text-base font-semibold text-[#223382]">
-                  {hasPlan ? "Asignado manualmente" : "Sin plan activo"}
+                <div className="text-base font-semibold text-text-secondary">
+                  {hasPlan ? "—" : "Sin plan activo"}
                 </div>
               )}
             </div>
+
           </div>
 
           {/* CTA Footer */}

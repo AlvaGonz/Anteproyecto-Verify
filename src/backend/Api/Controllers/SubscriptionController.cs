@@ -176,30 +176,51 @@ public class SubscriptionController : ControllerBase
             
             var stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, webhookSecret);
 
-            if (stripeEvent.Type == "invoice.paid")
+            // ── Build price-id → plan-name map from configuration ──────────────
+            // Configured in appsettings / env as Stripe:PricePlanMap:{priceId}={planName}
+            var pricePlanMap = _configuration
+                .GetSection("Stripe:PricePlanMap")
+                .GetChildren()
+                .ToDictionary(c => c.Key, c => c.Value ?? string.Empty);
+
+            if (stripeEvent.Type == "checkout.session.completed")
             {
+                // Fires immediately after successful payment — best signal for first subscription
+                var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
+                var customerId = session?.CustomerId;
+                var subscriptionId = session?.SubscriptionId;
+
+                if (customerId != null && subscriptionId != null)
+                {
+                    await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap);
+                }
+            }
+            else if (stripeEvent.Type == "invoice.paid")
+            {
+                // Fires on every renewal — keeps status and period end in sync
                 var invoice = stripeEvent.Data.Object as Stripe.Invoice;
                 var customerId = invoice?.CustomerId;
                 var subscriptionId = invoice?.Lines?.FirstOrDefault()?.SubscriptionId;
-                
+
+                if (customerId != null && subscriptionId != null)
+                {
+                    await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap);
+                }
+            }
+            else if (stripeEvent.Type == "customer.subscription.deleted")
+            {
+                // Subscription cancelled — mark as canceled in DB
+                var subscription = stripeEvent.Data.Object as Stripe.Subscription;
+                var customerId = subscription?.CustomerId;
+
                 if (customerId != null)
                 {
                     var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.StripeCustomerId == customerId);
                     if (user != null)
                     {
-                        // Update to Professional as base - logic can be improved based on price
-                        user.UpdateRol(Domain.Enums.UserRole.Profesional);
-                        
-                        // Retrieve the subscription to get the period end
-                        if (subscriptionId != null)
-                        {
-                            var subService = new SubscriptionService();
-                            var subscription = await subService.GetAsync(subscriptionId);
-                            user.UpdateStripeSubscription(subscription.Id, subscription.Status, invoice?.PeriodEnd);
-                        }
-                        
+                        user.UpdateStripeSubscription(null, "canceled", null);
                         await _dbContext.SaveChangesAsync();
-                        _logger.LogInformation("Webhook: User {UserId} subscription activated.", user.Id);
+                        _logger.LogInformation("Webhook: User {UserId} subscription canceled.", user.Id);
                     }
                 }
             }
@@ -216,5 +237,65 @@ public class SubscriptionController : ControllerBase
             _logger.LogError(e, "Error processing Stripe webhook.");
             return StatusCode(500);
         }
+    }
+
+    /// <summary>
+    /// Shared logic for checkout.session.completed and invoice.paid:
+    /// fetches the Stripe subscription, maps the price to a local PlanSuscripcion,
+    /// and updates the user record.
+    /// </summary>
+    private async Task HandleSubscriptionActivatedAsync(
+        string customerId,
+        string subscriptionId,
+        Dictionary<string, string> pricePlanMap)
+    {
+        var user = await _dbContext.Usuarios
+            .FirstOrDefaultAsync(u => u.StripeCustomerId == customerId);
+
+        if (user == null)
+        {
+            _logger.LogWarning("Webhook: No user found for Stripe customer {CustomerId}.", customerId);
+            return;
+        }
+
+        var subService = new SubscriptionService();
+        var subscription = await subService.GetAsync(subscriptionId);
+
+        // Determine the Stripe price ID from the first subscription item
+        var priceId = subscription.Items?.Data?.FirstOrDefault()?.Price?.Id;
+
+        if (!string.IsNullOrEmpty(priceId) && pricePlanMap.TryGetValue(priceId, out var planName))
+        {
+            // Look up the local PlanSuscripcion by name and assign it
+            var plan = await _dbContext.PlanesSuscripcion
+                .FirstOrDefaultAsync(p => p.NombrePlan == planName);
+
+            if (plan != null)
+            {
+                user.AsignarPlan(plan.Idsuscripcion);
+                _logger.LogInformation(
+                    "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",
+                    planName, priceId, user.Id);
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Webhook: Price {PriceId} mapped to plan '{PlanName}' but no matching PlanSuscripcion found.",
+                    priceId, planName);
+            }
+        }
+        else if (!string.IsNullOrEmpty(priceId))
+        {
+            _logger.LogWarning(
+                "Webhook: Price {PriceId} has no mapping in Stripe:PricePlanMap — plan not updated.", priceId);
+        }
+
+        // Always sync the Stripe subscription fields
+        user.UpdateStripeSubscription(subscription.Id, subscription.Status, subscription.CurrentPeriodEnd);
+        await _dbContext.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Webhook: User {UserId} subscription status='{Status}', periodEnd={PeriodEnd}.",
+            user.Id, subscription.Status, subscription.CurrentPeriodEnd);
     }
 }
