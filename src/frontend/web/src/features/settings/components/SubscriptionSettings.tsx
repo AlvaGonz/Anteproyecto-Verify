@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift } from "lucide-react";
 import { useMySubscription } from "../api/useSettings";
+import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 
 // ── Badge variants keyed by status ──────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
@@ -48,7 +49,9 @@ export const SubscriptionSettings: React.FC = () => {
   const { data, isLoading, isError, refetch } = useMySubscription();
 
   const status = data?.subscriptionStatus ?? null;
-  const planName = data?.plan ?? null;
+  const planName = data?.plan ?? (data as any)?.planName ?? null;
+  const planKey = normalizePlanKey(planName);
+  const planCapabilities = planName ? PLAN_CAPABILITIES[planKey] : null;
   const currentPeriodEnd = data?.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
   const isManagedByStripe = data?.isManagedByStripe ?? false;
 
@@ -136,7 +139,10 @@ export const SubscriptionSettings: React.FC = () => {
               ) : (
                 <>
                   <div className="text-xl font-bold text-[#223382] capitalize mb-1">
-                    {hasPlan ? planName : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>}
+                    {hasPlan
+                      ? <span className={planCapabilities?.color ?? ''}>{planCapabilities?.label ?? planName}</span>
+                      : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>
+                    }
                   </div>
                   {formattedPrice && (
                     <div className="text-sm text-text-secondary font-medium">{formattedPrice}</div>

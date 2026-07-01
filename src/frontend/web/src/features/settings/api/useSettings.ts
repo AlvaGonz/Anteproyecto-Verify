@@ -115,6 +115,8 @@ export const useMySubscription = () =>
       apiClient
         .get<MySubscriptionStatus>("/v1/subscriptions/my-status")
         .then((res) => res.data),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 0,
+    gcTime: 1000 * 30,
+    refetchOnWindowFocus: true,
     retry: 1,
   });
