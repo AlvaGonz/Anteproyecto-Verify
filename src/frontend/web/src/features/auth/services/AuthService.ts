@@ -17,6 +17,8 @@ export interface User {
   cedula?: string;
   telefono?: string;
   plan?: string;
+  subscriptionStatus?: string;
+  currentPeriodEnd?: string;
 }
 
 export interface AuthResponse {

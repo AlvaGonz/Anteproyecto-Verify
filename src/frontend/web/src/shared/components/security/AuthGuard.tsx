@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 interface AuthGuardProps {
@@ -8,6 +8,7 @@ interface AuthGuardProps {
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -18,6 +19,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    if (location.pathname.startsWith('/checkout')) {
+      return <Navigate to={`/register?redirect=${encodeURIComponent(location.pathname + location.search)}`} replace />;
+    }
     return <Navigate to="/login" replace />;
   }
 

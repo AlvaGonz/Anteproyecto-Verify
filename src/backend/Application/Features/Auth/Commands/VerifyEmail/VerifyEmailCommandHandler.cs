@@ -41,6 +41,6 @@ public class VerifyEmailCommandHandler
         _usuarioRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new VerifyEmailResultDto(true, null);
+        return new VerifyEmailResultDto(true, null, user.Id);
     }
 }

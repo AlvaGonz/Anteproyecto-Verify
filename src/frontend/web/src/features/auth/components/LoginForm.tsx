@@ -11,6 +11,7 @@ export const LoginForm = () => {
   const [searchParams] = useSearchParams();
   const verified = searchParams.get("verified") === "true";
   const verificationError = searchParams.get("error");
+  const redirectUrl = searchParams.get("redirect");
   
   const { login } = useAuth();
   const [isPending, setIsPending] = useState(false);
@@ -29,7 +30,11 @@ export const LoginForm = () => {
       setError(null);
       await login(data.email, data.password);
       // Soft update for browser state (React Router navigation)
-      navigate("/admin/dashboard");
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else {
+        navigate("/admin/dashboard");
+      }
     } catch (err: any) {
       setError(new Error(err?.message || "Error de autenticación. Verifique sus credenciales."));
       setIsPending(false);

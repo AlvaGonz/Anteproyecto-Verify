@@ -31,8 +31,13 @@ export const PricingPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handlePaidPlan = (plan: 'profesional' | 'empresa' | 'enterprise') => {
-    const billing = isAnnual ? 'yearly' : 'monthly'
-    navigate(`/checkout?plan=${plan}&billing=${billing}`)
+    const billing = isAnnual ? 'yearly' : 'monthly';
+    const targetUrl = `/checkout?plan=${plan}&billing=${billing}`;
+    if (!isAuthenticated) {
+      navigate(`/register?redirect=${encodeURIComponent(targetUrl)}`);
+    } else {
+      navigate(targetUrl);
+    }
   }
 
   const prices = {

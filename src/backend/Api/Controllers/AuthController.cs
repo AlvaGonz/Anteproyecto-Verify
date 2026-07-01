@@ -124,6 +124,55 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage });
         }
 
+        if (result.UserId.HasValue)
+        {
+            var user = await _usuarioRepository.GetByIdAsync(result.UserId.Value, cancellationToken);
+            if (user != null)
+            {
+                var accessToken = _jwtTokenGenerator.GenerateToken(user);
+                var refreshToken = Guid.NewGuid().ToString("N");
+                _refreshTokens[refreshToken] = user.Id.ToString();
+
+                Response.Cookies.Append("jwt", accessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    Path = "/"
+                });
+
+                Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    Path = "/api/auth/refresh",
+                    MaxAge = TimeSpan.FromDays(30)
+                });
+
+                var roleStr = user.Rol switch
+                {
+                    Domain.Enums.UserRole.Administrator => "admin",
+                    Domain.Enums.UserRole.User => "user",
+                    _ => "user"
+                };
+
+                return Ok(new
+                {
+                    Message = "Correo electrónico verificado exitosamente.",
+                    succeeded = true,
+                    accessToken = accessToken,
+                    user = new
+                    {
+                        id = user.Id,
+                        name = user.Nombre,
+                        email = user.CorreoElectronico,
+                        role = roleStr
+                    }
+                });
+            }
+        }
+
         return Ok(new { Message = "Correo electrónico verificado exitosamente. Ya puede iniciar sesión." });
     }
 
@@ -190,7 +239,9 @@ public class AuthController : ControllerBase
             Role = roleStr,
             Cedula = user.Cedula ?? string.Empty,
             Telefono = user.Telefono ?? string.Empty,
-            Plan = user.Plan?.NombrePlan ?? "N/A"
+            Plan = user.Plan?.NombrePlan ?? "N/A",
+            SubscriptionStatus = user.SubscriptionStatus ?? "N/A",
+            CurrentPeriodEnd = user.CurrentPeriodEnd
         });
     }
 

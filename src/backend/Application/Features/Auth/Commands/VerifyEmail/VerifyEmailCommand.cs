@@ -6,5 +6,6 @@ public record VerifyEmailCommand(string Token);
 
 public record VerifyEmailResultDto(
     bool IsSuccess,
-    string? ErrorMessage
+    string? ErrorMessage,
+    Guid? UserId = null
 );

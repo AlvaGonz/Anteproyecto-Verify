@@ -40,6 +40,11 @@ public class SubscriptionController : ControllerBase
         if (user == null)
             return NotFound(new { message = "User not found." });
 
+        if (string.IsNullOrEmpty(_configuration["Stripe:SecretKey"]))
+        {
+            return StatusCode(500, new { message = "Stripe Secret Key is not configured on the server." });
+        }
+
         try
         {
             var customerId = user.StripeCustomerId;
@@ -83,7 +88,7 @@ public class SubscriptionController : ControllerBase
         catch (StripeException e)
         {
             _logger.LogError(e, "Stripe API error");
-            return StatusCode(500, new { message = e.StripeError.Message });
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
         }
     }
 

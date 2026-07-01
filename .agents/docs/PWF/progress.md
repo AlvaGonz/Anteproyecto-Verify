@@ -18,6 +18,7 @@
 | COMP-001 — Consent Version Gate (Law 172-13) | ADR-007 | feat-voltagent-upgrade | ee48440d | 2026-06-30 |
 | Stripe Legal Compliance UI & Sections | N/A | develop | (pending) | 2026-06-30 |
 | Subscription Consent Checkbox (IP/Timestamp) | N/A | develop | (pending) | 2026-06-30 |
+| Subscription Settings & Redirection Flow | N/A | develop | (pending) | 2026-07-01 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

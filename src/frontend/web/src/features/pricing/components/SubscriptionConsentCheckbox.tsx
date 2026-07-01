@@ -56,13 +56,13 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
 
   const billingCycleText = billing === 'yearly' ? 'año' : 'mes';
   // Fallback text if translation doesn't handle interpolation or is missing
-  const consentLabel = t('legal.consent.label', { planAmount: 'el monto correspondiente', billingCycle: billingCycleText }) 
+  const consentLabel = t('legal.consent.label', { planAmount: 'el monto correspondiente', billingCycle: billingCycleText })
     || `He leído y acepto los Términos de Servicio, la Política de Privacidad y la Política de Facturación de VeriFinca. Autorizo el cobro automático cada ${billingCycleText}.`;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-lg shadow-sm border border-outline-variant/30 max-w-2xl mx-auto my-8">
       <h3 className="text-xl font-headline font-bold text-on-surface mb-4">Confirmación de Suscripción</h3>
-      
+
       <div className="flex items-start gap-3 mb-4">
         <div className="flex items-center h-5 mt-1">
           <input
@@ -81,7 +81,7 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
           </p>
         </div>
       </div>
-      
+
       {errors.accepted && (
         <p className="text-error text-sm font-medium mb-4">{errors.accepted.message}</p>
       )}
@@ -93,9 +93,9 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
       >
         Continuar al Pago
       </button>
-      
+
       <p className="text-[11px] text-on-surface-variant/60 mt-4 text-center">
-        Su dirección IP ({ip || 'cargando...'}) y la marca de tiempo serán registradas como prueba de su consentimiento conforme a la Ley 172-13.
+        Su dirección IP y la marca de tiempo serán registradas como prueba de su consentimiento conforme a la Ley 172-13.
       </p>
     </form>
   );

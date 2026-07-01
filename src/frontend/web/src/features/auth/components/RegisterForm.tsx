@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { registerSchema, type RegisterFormValues } from "../schemas";
 import { useRegister } from "../api/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,6 +21,8 @@ import {
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect');
   const { mutate: register_, isPending, error } = useRegister();
   const [modalType, setModalType] = useState<"terms" | "privacy" | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -43,7 +45,12 @@ const onSubmit = (data: RegisterFormValues) => {
        ...data,
        telefono: telefonoDigits,
      };
-     register_(submitData, { onSuccess: () => setIsSuccess(true) });
+     register_(submitData, { onSuccess: () => {
+       if (redirectUrl) {
+         localStorage.setItem('redirect_after_verification', redirectUrl);
+       }
+       setIsSuccess(true);
+     } });
    };
 
 const password = watch("password") || "";
