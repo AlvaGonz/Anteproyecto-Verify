@@ -124,8 +124,11 @@ export const LegalPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 print:pt-4 print:pb-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Legal Navigation Dropdown */}
           <div className={`w-full fade-up stagger-1 ${isRevealed ? "is-visible" : ""} print:hidden sticky top-[88px] lg:top-[100px] z-40 lg:col-span-3 lg:h-fit`}>
+            <div className="mb-4 hidden lg:block">
+              <h3 className="font-headline font-bold text-lg text-on-surface">{t('legal.complianceCenter', 'Centro de Cumplimiento')}</h3>
+              <p className="font-body text-xs text-on-surface-variant mt-1">v1.1.0 — 2026-06-22</p>
+            </div>
             <div className="relative w-full md:w-[320px] lg:w-full">
               <button 
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}

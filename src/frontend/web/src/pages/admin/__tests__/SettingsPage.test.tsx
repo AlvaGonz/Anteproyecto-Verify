@@ -45,6 +45,7 @@ describe('SettingsPage', () => {
       },
       isAuthenticated: true,
       loading: false,
+      refreshUser: vi.fn(),
     });
 
     renderWithProviders(<SettingsPage />);

@@ -42,6 +42,7 @@ describe('MyProfileForm', () => {
       },
       isAuthenticated: true,
       loading: false,
+      refreshUser: vi.fn(),
     });
 
     renderWithProviders(<MyProfileForm />);

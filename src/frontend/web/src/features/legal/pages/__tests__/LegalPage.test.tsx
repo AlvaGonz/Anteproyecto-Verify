@@ -25,6 +25,15 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
+// Mock AuthContext
+vi.mock("../../../../shared/context/AuthContext", () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    loading: false,
+  }),
+}));
+
 beforeAll(() => {
   class MockIntersectionObserver {
     observe = vi.fn();

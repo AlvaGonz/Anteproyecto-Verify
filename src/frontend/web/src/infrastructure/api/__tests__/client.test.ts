@@ -76,7 +76,7 @@ describe("apiClient — request interceptor", () => {
     expect(capturedAuth).toBeUndefined();
   });
 
-  it("does not attach Bearer token on request because we use HttpOnly cookies", async () => {
+  it("attaches Bearer token on request when accessToken is set", async () => {
     setAccessToken("test-token");
     let capturedAuth: string | undefined;
     mock.onGet("/with-token").reply((config) => {
@@ -86,7 +86,7 @@ describe("apiClient — request interceptor", () => {
 
     await apiClient.get("/with-token");
 
-    expect(capturedAuth).toBeUndefined();
+    expect(capturedAuth).toBe("Bearer test-token");
   });
 });
 
@@ -311,14 +311,14 @@ describe("authApi", () => {
     expect(result).toEqual(payload);
   });
 
-  it("login 401 triggers interceptor which attempts refresh; on refresh failure, dispatches auth:logout", async () => {
-    // 401 on login → interceptor fires → tries /auth/refresh → refresh fails → auth:logout
+  it("login 401 triggers interceptor which attempts refresh; on refresh failure, dispatches auth:force-logout", async () => {
+    // 401 on login → interceptor fires → tries /auth/refresh → refresh fails → auth:force-logout
     mock.onPost("/auth/login").reply(401, { message: "Bad credentials" });
 
     vi.spyOn(axios, "post").mockRejectedValue(new Error("Refresh unavailable"));
 
     const logoutSpy = vi.fn();
-    window.addEventListener("auth:logout", logoutSpy);
+    window.addEventListener("auth:force-logout", logoutSpy);
 
     await expect(
       authApi.login({ email: "bad@test.com", password: "wrong" })
@@ -327,6 +327,6 @@ describe("authApi", () => {
     expect(logoutSpy).toHaveBeenCalledTimes(1);
     expect(getAccessToken()).toBeNull();
 
-    window.removeEventListener("auth:logout", logoutSpy);
+    window.removeEventListener("auth:force-logout", logoutSpy);
   });
 });

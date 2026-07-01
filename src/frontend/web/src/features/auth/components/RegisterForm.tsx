@@ -177,6 +177,7 @@ const password = watch("password") || "";
               <input
                 id="telefono"
                 type="text"
+                {...register("telefono")}
                 placeholder="Teléfono"
                 maxLength={14}
                 inputMode="numeric"
@@ -184,7 +185,6 @@ const password = watch("password") || "";
                 onChange={phone.handleChange}
                 onKeyDown={blockNonDigits}
                 className="vf-input w-full pl-12 h-[52px]"
-                {...register("telefono")}
               />
               {formErrors.telefono && (
                 <span className="text-rose-500 text-[10px] font-medium absolute -bottom-5 left-0">
@@ -307,7 +307,7 @@ const password = watch("password") || "";
           whileHover={isValid ? { scale: 1.01 } : {}}
           whileTap={isValid ? { scale: 0.99 } : {}}
           type="submit"
-          disabled={isPending || !isValid}
+          disabled={isPending}
           className="vf-btn-primary w-full h-[56px] text-base font-bold shadow-floating disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 mt-4"
         >
           {isPending ? (

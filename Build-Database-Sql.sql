@@ -479,3 +479,678 @@ CREATE TABLE Notificaciones (
     UpdatedAtUtc DATETIME2 NULL
 );
 GO
+
+-- =============================================
+-- Tablas y Objetos de EF Core (Migracion InitialCreate)
+-- =============================================
+Build started...
+
+Build succeeded.
+
+IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+
+BEGIN
+
+    CREATE TABLE [__EFMigrationsHistory] (
+
+        [MigrationId] nvarchar(150) NOT NULL,
+
+        [ProductVersion] nvarchar(32) NOT NULL,
+
+        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+
+    );
+
+END;
+GO
+
+CREATE TABLE [Auditorias] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [UsuarioId] uniqueidentifier NULL,
+
+    [ProyectoId] uniqueidentifier NULL,
+
+    [TipoEvento] nvarchar(max) NOT NULL,
+
+    [Accion] nvarchar(200) NOT NULL,
+
+    [Entidad] nvarchar(max) NULL,
+
+    [EntidadId] nvarchar(max) NULL,
+
+    [Detalle] nvarchar(2000) NULL,
+
+    [IpOrigen] nvarchar(50) NULL,
+
+    [UserAgent] nvarchar(max) NULL,
+
+    [FechaEventoUtc] datetime2 NOT NULL,
+
+    [TipoOperacion] int NOT NULL,
+
+    [Resultado] nvarchar(2000) NULL,
+
+    [ReferenciaExpedienteId] uniqueidentifier NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_Auditorias] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_Auditorias_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,
+
+    CONSTRAINT [FK_Auditorias_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
+
+);
+GO
+
+CREATE TABLE [ConsentimientosFinancieros] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [UsuarioId] uniqueidentifier NOT NULL,
+
+    [FechaHoraUtc] datetime2 NOT NULL,
+
+    [IpOrigen] nvarchar(50) NOT NULL,
+
+    [VersionPolitica] nvarchar(20) NOT NULL,
+
+    [Estado] int NOT NULL,
+
+    [FechaExpiracionUtc] datetime2 NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_ConsentimientosFinancieros] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_ConsentimientosFinancieros_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
+
+);
+GO
+
+CREATE TABLE [DeteccionesDuplicidad] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [ProyectoDuplicadoId] uniqueidentifier NULL,
+
+    [NivelRiesgo] int NOT NULL,
+
+    [DescripcionCoincidencia] nvarchar(max) NOT NULL,
+
+    [FechaDeteccion] datetime2 NOT NULL,
+
+    [Bloqueante] bit NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_DeteccionesDuplicidad] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_DeteccionesDuplicidad_ProyectosInmobiliarios_ProyectoDuplicadoId] FOREIGN KEY ([ProyectoDuplicadoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]),
+
+    CONSTRAINT [FK_DeteccionesDuplicidad_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE
+
+);
+GO
+
+CREATE TABLE [Documentos] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [TipoDocumento] int NOT NULL,
+
+    [NombreArchivoOriginal] nvarchar(500) NOT NULL,
+
+    [NombreArchivoAlmacenado] nvarchar(500) NOT NULL,
+
+    [RutaArchivo] nvarchar(1000) NOT NULL,
+
+    [ContentType] nvarchar(100) NOT NULL,
+
+    [Extension] nvarchar(10) NOT NULL,
+
+    [TamanoBytes] bigint NOT NULL,
+
+    [EstadoDocumento] int NOT NULL,
+
+    [Activo] bit NOT NULL,
+
+    [Version] int NOT NULL,
+
+    [FechaEmision] datetime2 NULL,
+
+    [InstitucionEmisora] nvarchar(200) NULL,
+
+    [UsuarioCargaId] uniqueidentifier NOT NULL,
+
+    [Observaciones] nvarchar(1000) NULL,
+
+    [FormalStatus] int NULL,
+
+    [FechaVencimiento] datetime2 NULL,
+
+    [VersionReglaAplicada] nvarchar(max) NULL,
+
+    [FechaEvaluacion] datetime2 NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_Documentos] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_Documentos_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE
+
+);
+GO
+
+CREATE TABLE [ReglasValidacion] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [Nombre] nvarchar(200) NOT NULL,
+
+    [Descripcion] nvarchar(1000) NOT NULL,
+
+    [CondicionLogica] nvarchar(2000) NOT NULL,
+
+    [TipoDocumentoAplicable] int NOT NULL,
+
+    [NivelAlerta] int NOT NULL,
+
+    [TipoProyecto] int NOT NULL,
+
+    [Activa] bit NOT NULL,
+
+    [Version] int NOT NULL,
+
+    [FechaCreacionUtc] datetime2 NOT NULL,
+
+    [CreadaPor] uniqueidentifier NOT NULL,
+
+    [ReglaAnteriorId] uniqueidentifier NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_ReglasValidacion] PRIMARY KEY ([Id])
+
+);
+GO
+
+CREATE TABLE [Reportes] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [EstadoReporte] int NOT NULL,
+
+    [Resumen] nvarchar(4000) NULL,
+
+    [GeneradoPorUsuarioId] uniqueidentifier NULL,
+
+    [Version] int NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_Reportes] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_Reportes_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,
+
+    CONSTRAINT [FK_Reportes_Usuario_GeneradoPorUsuarioId] FOREIGN KEY ([GeneradoPorUsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
+
+);
+GO
+
+CREATE TABLE [SellosIntegridad] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [CodigoSello] nvarchar(50) NOT NULL,
+
+    [Nombre] nvarchar(max) NOT NULL,
+
+    [Nivel] int NOT NULL,
+
+    [UrlQr] nvarchar(500) NOT NULL,
+
+    [FirmaDigital] nvarchar(1000) NOT NULL,
+
+    [FechaEmisionUtc] datetime2 NOT NULL,
+
+    [FechaExpiracionUtc] datetime2 NOT NULL,
+
+    [Estado] int NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_SellosIntegridad] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_SellosIntegridad_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE NO ACTION
+
+);
+GO
+
+CREATE TABLE [UsuarioLegacy] (
+
+    [IdUsuario] uniqueidentifier NOT NULL,
+
+    [Nombre] nvarchar(100) NOT NULL,
+
+    [Apellido] nvarchar(100) NOT NULL,
+
+    [NombreCompleto] AS [Nombre] + ' ' + [Apellido] PERSISTED,
+
+    [Email] nvarchar(100) NOT NULL,
+
+    [ContrasenaHash] nvarchar(255) NOT NULL,
+
+    [Telefono] nvarchar(15) NOT NULL,
+
+    [Cedula] nvarchar(15) NOT NULL,
+
+    CONSTRAINT [PK_UsuarioLegacy] PRIMARY KEY ([IdUsuario])
+
+);
+GO
+
+CREATE TABLE [ValidacionesAyuntamiento] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [Municipio] nvarchar(max) NOT NULL,
+
+    [Result] int NOT NULL,
+
+    [Detalle] nvarchar(max) NULL,
+
+    [FechaConsulta] datetime2 NOT NULL,
+
+    [DisponibilidadServicio] bit NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_ValidacionesAyuntamiento] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_ValidacionesAyuntamiento_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE
+
+);
+GO
+
+CREATE TABLE [ValidacionesDgii] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [Rnc] nvarchar(max) NOT NULL,
+
+    [Status] int NOT NULL,
+
+    [TieneDeudas] bit NOT NULL,
+
+    [FechaConsulta] datetime2 NOT NULL,
+
+    [ErrorMessage] nvarchar(max) NULL,
+
+    [OrigenDatos] nvarchar(max) NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_ValidacionesDgii] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_ValidacionesDgii_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE
+
+);
+GO
+
+CREATE TABLE [ResultadosCrediticios] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [ConsentimientoId] uniqueidentifier NOT NULL,
+
+    [ScoreCrediticio] int NOT NULL,
+
+    [PorcentajeEndeudamiento] decimal(5,2) NOT NULL,
+
+    [CantidadAtrasosUltimos12Meses] int NOT NULL,
+
+    [NivelRiesgo] int NOT NULL,
+
+    [FechaConsultaUtc] datetime2 NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_ResultadosCrediticios] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_ResultadosCrediticios_ConsentimientosFinancieros_ConsentimientoId] FOREIGN KEY ([ConsentimientoId]) REFERENCES [ConsentimientosFinancieros] ([Id]) ON DELETE NO ACTION,
+
+    CONSTRAINT [FK_ResultadosCrediticios_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE NO ACTION
+
+);
+GO
+
+CREATE TABLE [AlertasValidacion] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [DocumentoId] uniqueidentifier NULL,
+
+    [Type] int NOT NULL,
+
+    [Category] int NOT NULL,
+
+    [Titulo] nvarchar(max) NOT NULL,
+
+    [Descripcion] nvarchar(max) NOT NULL,
+
+    [Recomendacion] nvarchar(max) NULL,
+
+    [Resuelta] bit NOT NULL,
+
+    [FechaGeneracion] datetime2 NOT NULL,
+
+    [NivelRiesgo] nvarchar(max) NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_AlertasValidacion] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_AlertasValidacion_Documentos_DocumentoId] FOREIGN KEY ([DocumentoId]) REFERENCES [Documentos] ([Id]),
+
+    CONSTRAINT [FK_AlertasValidacion_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE
+
+);
+GO
+
+CREATE TABLE [Certificaciones] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [ReporteId] uniqueidentifier NULL,
+
+    [CodigoVerificacion] nvarchar(max) NOT NULL,
+
+    [EstadoCertificacion] int NOT NULL,
+
+    [FechaEmisionUtc] datetime2 NOT NULL,
+
+    [FechaVigenciaUtc] datetime2 NULL,
+
+    [UrlVerificacion] nvarchar(max) NOT NULL,
+
+    [ScoreIntegridad] int NULL,
+
+    [EstadoIntegridad] int NOT NULL,
+
+    [Version] int NOT NULL,
+
+    [EmisorId] uniqueidentifier NOT NULL,
+
+    [Revocado] bit NOT NULL,
+
+    [MotivoRevocacion] nvarchar(max) NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_Certificaciones] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_Certificaciones_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,
+
+    CONSTRAINT [FK_Certificaciones_Reportes_ReporteId] FOREIGN KEY ([ReporteId]) REFERENCES [Reportes] ([Id])
+
+);
+GO
+
+CREATE TABLE [Validaciones] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [DocumentoId] uniqueidentifier NULL,
+
+    [FuenteValidacion] nvarchar(200) NOT NULL,
+
+    [EstadoValidacion] int NOT NULL,
+
+    [EsLegitimo] bit NULL,
+
+    [PorcentajeIntegridad] float NULL,
+
+    [Detalle] nvarchar(2000) NULL,
+
+    [CamposValidadosJson] nvarchar(max) NULL,
+
+    [SelloId] uniqueidentifier NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_Validaciones] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_Validaciones_Documentos_DocumentoId] FOREIGN KEY ([DocumentoId]) REFERENCES [Documentos] ([Id]) ON DELETE NO ACTION,
+
+    CONSTRAINT [FK_Validaciones_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,
+
+    CONSTRAINT [FK_Validaciones_SellosIntegridad_SelloId] FOREIGN KEY ([SelloId]) REFERENCES [SellosIntegridad] ([Id]) ON DELETE SET NULL
+
+);
+GO
+
+CREATE TABLE [DatoValidado] (
+
+    [Id] int NOT NULL IDENTITY,
+
+    [Campo] nvarchar(max) NOT NULL,
+
+    [ValorEsperado] nvarchar(max) NOT NULL,
+
+    [ValorEncontrado] nvarchar(max) NOT NULL,
+
+    [Coincide] bit NOT NULL,
+
+    [MetodoComparacion] nvarchar(max) NULL,
+
+    [ValidacionId] uniqueidentifier NOT NULL,
+
+    CONSTRAINT [PK_DatoValidado] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_DatoValidado_Validaciones_ValidacionId] FOREIGN KEY ([ValidacionId]) REFERENCES [Validaciones] ([Id]) ON DELETE CASCADE
+
+);
+GO
+
+CREATE TABLE [Hallazgos] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ProyectoId] uniqueidentifier NOT NULL,
+
+    [ValidacionId] uniqueidentifier NULL,
+
+    [Severidad] int NOT NULL,
+
+    [Codigo] nvarchar(50) NOT NULL,
+
+    [Titulo] nvarchar(200) NOT NULL,
+
+    [Descripcion] nvarchar(2000) NOT NULL,
+
+    [Recomendacion] nvarchar(2000) NULL,
+
+    [SistemaOrigen] nvarchar(max) NULL,
+
+    [Resuelto] bit NOT NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_Hallazgos] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_Hallazgos_ProyectosInmobiliarios_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE,
+
+    CONSTRAINT [FK_Hallazgos_Validaciones_ValidacionId] FOREIGN KEY ([ValidacionId]) REFERENCES [Validaciones] ([Id]) ON DELETE NO ACTION
+
+);
+GO
+
+CREATE TABLE [ResultadosRegla] (
+
+    [Id] uniqueidentifier NOT NULL,
+
+    [ValidacionId] uniqueidentifier NOT NULL,
+
+    [RuleCode] nvarchar(50) NOT NULL,
+
+    [RuleName] nvarchar(200) NOT NULL,
+
+    [Status] int NOT NULL,
+
+    [Message] nvarchar(1000) NOT NULL,
+
+    [Severity] int NULL,
+
+    [RelatedDocumentId] uniqueidentifier NULL,
+
+    [CreatedAtUtc] datetime2 NOT NULL,
+
+    [UpdatedAtUtc] datetime2 NULL,
+
+    CONSTRAINT [PK_ResultadosRegla] PRIMARY KEY ([Id]),
+
+    CONSTRAINT [FK_ResultadosRegla_Validaciones_ValidacionId] FOREIGN KEY ([ValidacionId]) REFERENCES [Validaciones] ([Id]) ON DELETE CASCADE
+
+);
+GO
+
+CREATE INDEX [IX_AlertasValidacion_DocumentoId] ON [AlertasValidacion] ([DocumentoId]);
+GO
+
+CREATE INDEX [IX_AlertasValidacion_ProyectoId] ON [AlertasValidacion] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Auditorias_ProyectoId] ON [Auditorias] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Auditorias_UsuarioId] ON [Auditorias] ([UsuarioId]);
+GO
+
+CREATE INDEX [IX_Certificaciones_ProyectoId] ON [Certificaciones] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Certificaciones_ReporteId] ON [Certificaciones] ([ReporteId]);
+GO
+
+CREATE INDEX [IX_ConsentimientosFinancieros_UsuarioId] ON [ConsentimientosFinancieros] ([UsuarioId]);
+GO
+
+CREATE INDEX [IX_DatoValidado_ValidacionId] ON [DatoValidado] ([ValidacionId]);
+GO
+
+CREATE INDEX [IX_DeteccionesDuplicidad_ProyectoDuplicadoId] ON [DeteccionesDuplicidad] ([ProyectoDuplicadoId]);
+GO
+
+CREATE INDEX [IX_DeteccionesDuplicidad_ProyectoId] ON [DeteccionesDuplicidad] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Documentos_Activo] ON [Documentos] ([Activo]);
+GO
+
+CREATE INDEX [IX_Documentos_ProyectoId] ON [Documentos] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Documentos_TipoDocumento] ON [Documentos] ([TipoDocumento]);
+GO
+
+CREATE INDEX [IX_Hallazgos_ProyectoId] ON [Hallazgos] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Hallazgos_ValidacionId] ON [Hallazgos] ([ValidacionId]);
+GO
+
+CREATE INDEX [IX_Reportes_GeneradoPorUsuarioId] ON [Reportes] ([GeneradoPorUsuarioId]);
+GO
+
+CREATE INDEX [IX_Reportes_ProyectoId] ON [Reportes] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_ResultadosCrediticios_ConsentimientoId] ON [ResultadosCrediticios] ([ConsentimientoId]);
+GO
+
+CREATE INDEX [IX_ResultadosCrediticios_ProyectoId] ON [ResultadosCrediticios] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_ResultadosRegla_ValidacionId] ON [ResultadosRegla] ([ValidacionId]);
+GO
+
+CREATE INDEX [IX_SellosIntegridad_ProyectoId] ON [SellosIntegridad] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Validaciones_DocumentoId] ON [Validaciones] ([DocumentoId]);
+GO
+
+CREATE INDEX [IX_Validaciones_ProyectoId] ON [Validaciones] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_Validaciones_SelloId] ON [Validaciones] ([SelloId]);
+GO
+
+CREATE INDEX [IX_ValidacionesAyuntamiento_ProyectoId] ON [ValidacionesAyuntamiento] ([ProyectoId]);
+GO
+
+CREATE INDEX [IX_ValidacionesDgii_ProyectoId] ON [ValidacionesDgii] ([ProyectoId]);
+GO
+
+
+-- Tabla de historial de migraciones de EF Core
+CREATE TABLE [__EFMigrationsHistory] (
+    [MigrationId] NVARCHAR(150) NOT NULL PRIMARY KEY,
+    [ProductVersion] NVARCHAR(32) NOT NULL
+);
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES ('20260625043417_InitialCreate', '8.0.6');
+GO
