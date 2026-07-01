@@ -100,3 +100,7 @@
   - **Symptom:** When logging in, the user sees data from a previous session or another user.
   - **Root Cause:** React Query cache (`queryClient`) was not being cleared on login or logout, leading to old data persisting in the client.
   - **Fix:** Used TDD to add `queryClient.clear()` in `AuthContext.tsx` on `login`, `logout`, and `auth:force-logout` events.
+- **BUG-008:** Local API process binding intercepting Docker traffic.
+  - **Symptom:** Login returns 500 Internal Server Error, and create-session returns 400.
+  - **Root Cause:** A local dotnet run instance (task-1227) was binding to port 5000 on the host, intercepting traffic meant for the Docker container. It used the Production environment and attempted Windows Authentication against SQLEXPRESS, failing silently due to log level settings.
+  - **Fix:** Killed the rogue local process, restoring traffic to the Docker container.

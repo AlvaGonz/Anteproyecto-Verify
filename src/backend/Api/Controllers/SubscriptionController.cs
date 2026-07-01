@@ -42,6 +42,7 @@ public class SubscriptionController : ControllerBase
         var validationResult = await validator.ValidateAsync(request, ct);
         if (!validationResult.IsValid)
         {
+            _logger.LogWarning("Validation failed for CreateSession: {Errors}", string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
             return BadRequest(new { message = "Validation failed", errors = validationResult.Errors.Select(e => e.ErrorMessage) });
         }
 
