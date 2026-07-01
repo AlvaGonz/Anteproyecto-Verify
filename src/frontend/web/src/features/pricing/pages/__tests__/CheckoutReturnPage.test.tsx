@@ -9,12 +9,20 @@ vi.mock('../../../../infrastructure/api/client', () => ({
   }
 }));
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
+
 describe('CheckoutReturnPage', () => {
   it('renders loading initially', () => {
     render(
-      <MemoryRouter initialEntries={['/checkout/return?session_id=123']}>
-        <CheckoutReturnPage />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/checkout/return?session_id=123']}>
+          <CheckoutReturnPage />
+        </MemoryRouter>
+      </QueryClientProvider>
     );
     expect(screen.getByText(/Verificando estado del pago/i)).toBeInTheDocument();
   });

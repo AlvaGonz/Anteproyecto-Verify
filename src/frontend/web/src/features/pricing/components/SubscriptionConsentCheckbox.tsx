@@ -15,7 +15,7 @@ type ConsentFormValues = z.infer<typeof consentSchema>;
 interface SubscriptionConsentCheckboxProps {
   plan: string;
   billing: string;
-  onConsent: (data: { timestamp: string; ip: string | null; userAgent: string }) => void;
+  onConsent: (data: { timestamp: string; userAgent: string }) => void;
 }
 
 export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxProps> = ({
@@ -23,7 +23,6 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
   onConsent,
 }) => {
   const { t } = useTranslation();
-  const [ip, setIp] = useState<string | null>(null);
 
   const {
     register,
@@ -37,18 +36,10 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
     mode: 'onChange'
   });
 
-  useEffect(() => {
-    fetch('https://api.ipify.org?format=json')
-      .then((res) => res.json())
-      .then((data) => setIp(data.ip))
-      .catch(() => setIp('unknown'));
-  }, []);
-
   const onSubmit = (data: ConsentFormValues) => {
     if (data.accepted) {
       onConsent({
         timestamp: new Date().toISOString(),
-        ip,
         userAgent: navigator.userAgent,
       });
     }
@@ -108,8 +99,8 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
       <div className="mt-6 flex flex-col items-center justify-center gap-2 text-[11px] text-on-surface-variant/60 text-center font-body">
         <span className="material-symbols-outlined text-[18px] opacity-70">gavel</span>
         <p>
-          Tu dirección IP ({ip === 'unknown' ? 'detectando...' : ip}) y la marca de tiempo actual 
-          serán registradas como prueba de consentimiento.
+          Tu dirección IP y la marca de tiempo actual 
+          serán registradas en el servidor como prueba de consentimiento.
         </p>
       </div>
     </form>

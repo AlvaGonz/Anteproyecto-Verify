@@ -55,7 +55,7 @@ export const CheckoutPage = () => {
   const { user } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState<boolean>(false);
-  const [consentData, setConsentData] = useState<{ timestamp: string; ip: string | null; userAgent: string } | null>(null);
+  const [consentData, setConsentData] = useState<{ timestamp: string; userAgent: string } | null>(null);
 
   const planInfo = useMemo(() => PLAN_DETAILS[plan], [plan]);
   const isAnnual = billing === 'yearly';
@@ -66,7 +66,6 @@ export const CheckoutPage = () => {
       // Calls backend: POST /api/v1/subscriptions/create-session
       const response = await apiClient.post('/v1/subscriptions/create-session', {
         priceId,
-        userId: user?.id || '',
         consent: consentData
       });
       return response.data.clientSecret;

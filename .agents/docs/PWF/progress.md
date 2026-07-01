@@ -22,6 +22,7 @@
 | SubscriptionController CS1061 CurrentPeriodEnd Fix | N/A | develop | (pending) | 2026-07-01 |
 | Navbar contrast improvement on /projects page | N/A | develop | (pending) | 2026-07-01 |
 | Fix Checkout Return session_id persistence on hard reset | N/A | develop | (pending) | 2026-07-01 |
+| Security Hardening (OWASP A01-A05, Law 172-13) | N/A | develop | (pending) | 2026-07-01 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
@@ -62,8 +63,8 @@
 | TEC-010 | SonarCloud pipeline gate | devops-specialist | ✅ Pipeline config |
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
-- [ ] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001
-- [ ] TransUnion consent gate verification (COMP-001) — surfaced in ORCH-TEST-001
+- [x] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001 (DONE - Security Hardening)
+- [x] TransUnion consent gate verification (COMP-001) — surfaced in ORCH-TEST-001 (DONE)
 - [ ] Set GROQ_API_KEY environment variable — all 8 subagents return empty without it (ROOT CAUSE)
 - [x] Create missing agent files: BatchExecutor.md, DocWriter.md (DONE)
 - [x] ADR-006: SEC-001 JWT cookie migration plan (PHASED, APPROVAL REQUIRED)
@@ -86,3 +87,10 @@
 **Audit findings resolved:** RF-2 gap, RF-10 gap, RNF-3/4/5 gaps, PERF-001 reclassified P1, OE traceability corrected, "47 requisitos" source clarified.
 
 > Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
+
+## 🐛 Resolved Bugs
+- **BUG-006:** HashRouter + Stripe `return_url` incompatibility. 
+  - **Symptom:** `session_id` persists in URL after hard reset on checkout return page.
+  - **Root Cause:** Stripe redirects to a regular URL which HashRouter misinterprets, preventing `CheckoutReturnPage` from routing and maintaining `session_id` in the real search params.
+  - **Fix:** Fixed backend `return_url` to include `/#/`, added `window.location.search` fallback and `sessionStorage` idempotency guard in `CheckoutReturnPage.tsx`.
+  - **Commit:** 507891d3

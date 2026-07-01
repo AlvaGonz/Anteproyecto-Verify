@@ -6,6 +6,9 @@ import { normalizePlanKey, PLAN_CAPABILITIES } from '../utils/planCapabilities'
 
 type PageStatus = 'loading' | 'success' | 'error'
 
+// Module-level — never persisted to disk, cleared on full navigation
+const _processedSessions = new Set<string>()
+
 export const CheckoutReturnPage = () => {
   const [searchParams] = useSearchParams()
   // HashRouter does not expose query params from the real URL path.
@@ -22,10 +25,17 @@ export const CheckoutReturnPage = () => {
   useEffect(() => {
     if (!sessionId) { setStatus('error'); return }
 
+    // Immediately remove session_id from browser history to prevent
+    // it appearing in Referrer headers or server access logs (OWASP A05)
+    window.history.replaceState(
+      {},
+      '',
+      window.location.pathname  // strips ?session_id=... from real URL
+    )
+
     const verify = async () => {
       // Idempotency guard — prevents re-processing on hot-reload / StrictMode
-      const processedKey = `vf_session_processed_${sessionId}`
-      if (sessionStorage.getItem(processedKey)) {
+      if (_processedSessions.has(sessionId)) {
         // Already processed — navigate directly without calling API again
         navigate('/dashboard', { replace: true })
         return
@@ -61,7 +71,7 @@ export const CheckoutReturnPage = () => {
             activatedPlan: capabilities,
           },
         })
-        sessionStorage.setItem(processedKey, '1')
+        _processedSessions.add(sessionId)
 
       } catch {
         setStatus('error')

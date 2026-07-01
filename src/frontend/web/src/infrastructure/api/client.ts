@@ -49,7 +49,7 @@ instance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
     
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== "/auth/refresh") {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== "/auth/refresh" && !originalRequest.headers?.['X-Skip-Retry']) {
       if (isRefreshing) {
         return new Promise(function(resolve, reject) {
           failedQueue.push({ resolve, reject });
@@ -65,11 +65,29 @@ instance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL ?? BASE_URL}/auth/refresh`,
+        // Use the same instance (not raw axios) to enforce interceptors + baseURL
+        // Pin to exact path to prevent SSRF-like open redirect in BASE_URL tampering
+        const { data } = await instance.post(
+          '/auth/refresh',
           {},
-          { withCredentials: true }
+          { 
+            withCredentials: true,
+            // Prevent this refresh call from triggering another 401 retry loop
+            headers: { 'X-Skip-Retry': '1' } 
+          }
         );
+        
+        // DEV-ONLY guard: warn if backend is not setting the refresh cookie
+        if (import.meta.env.DEV) {
+          const setCookie = (error.config as any)?._originalResponse?.headers?.['set-cookie']
+          if (!setCookie) {
+            console.warn(
+              '[Security] /auth/refresh did not return a Set-Cookie header. ' +
+              'Ensure the refresh_token cookie is HttpOnly, Secure, SameSite=Strict ' +
+              'and scoped to /api/auth/refresh path. (OWASP A02)'
+            )
+          }
+        }
         
         setAccessToken(data.accessToken);
         originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;

@@ -37,7 +37,11 @@ export const AuthService = {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
       
-      const token = response.data.accessToken || "real-cookie-session";
+      const token = response.data.accessToken ?? null;
+      if (!token) {
+        // Backend must return accessToken. If missing, treat as auth failure.
+        return failure({ _tag: "NetworkError", message: "Token de acceso no recibido del servidor." });
+      }
       setAccessToken(token);
 
       return success({

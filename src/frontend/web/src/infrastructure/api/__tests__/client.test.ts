@@ -114,8 +114,8 @@ describe("apiClient — 401 silent refresh", () => {
       return callCount === 1 ? [401, {}] : [200, { data: "ok" }];
     });
 
-    vi.spyOn(axios, "post").mockResolvedValue({
-      data: { accessToken: "refreshed-token", expiresIn: 3600 },
+    mock.onPost("/auth/refresh").reply(200, {
+      accessToken: "refreshed-token", expiresIn: 3600
     });
 
     const response = await apiClient.get("/protected");
@@ -130,9 +130,7 @@ describe("apiClient — 401 silent refresh", () => {
     mock.onGet("/protected2").reply(() => [401, {}]);
     mock.onGet("/protected2").replyOnce(200, {});
 
-    const axiosPostSpy = vi.spyOn(axios, "post").mockResolvedValue({
-      data: { accessToken: "t2", expiresIn: 3600 },
-    });
+    mock.onPost("/auth/refresh").reply(200, { accessToken: "t2", expiresIn: 3600 });
 
     try {
       await apiClient.get("/protected2");
@@ -140,11 +138,10 @@ describe("apiClient — 401 silent refresh", () => {
       // may still fail on second call; we only care about the refresh call args
     }
 
-    expect(axiosPostSpy).toHaveBeenCalledWith(
-      expect.stringContaining("/auth/refresh"),
-      {},
-      { withCredentials: true }
-    );
+    const refreshReq = mock.history.post.find(req => req.url === "/auth/refresh");
+    expect(refreshReq).toBeDefined();
+    expect(refreshReq?.withCredentials).toBe(true);
+    expect(refreshReq?.headers?.['X-Skip-Retry']).toBe('1');
   });
 
   it("dispatches auth:force-logout event and nullifies token when refresh fails", async () => {
@@ -166,25 +163,27 @@ describe("apiClient — 401 silent refresh", () => {
   it("does NOT attempt refresh for non-401 errors (e.g. 500)", async () => {
     mock.onGet("/server-error").reply(500, { message: "Internal Server Error" });
 
-    const axiosPostSpy = vi.spyOn(axios, "post");
+    mock.onPost("/auth/refresh").reply(200, { accessToken: "t2" });
 
     await expect(apiClient.get("/server-error")).rejects.toMatchObject({
       response: { status: 500 },
     });
 
-    expect(axiosPostSpy).not.toHaveBeenCalled();
+    const refreshReq = mock.history.post.find(req => req.url === "/auth/refresh");
+    expect(refreshReq).toBeUndefined();
   });
 
   it("does NOT attempt refresh for 403 Forbidden", async () => {
     mock.onGet("/forbidden").reply(403, { message: "Forbidden" });
 
-    const axiosPostSpy = vi.spyOn(axios, "post");
+    mock.onPost("/auth/refresh").reply(200, { accessToken: "t2" });
 
     await expect(apiClient.get("/forbidden")).rejects.toMatchObject({
       response: { status: 403 },
     });
 
-    expect(axiosPostSpy).not.toHaveBeenCalled();
+    const refreshReq = mock.history.post.find(req => req.url === "/auth/refresh");
+    expect(refreshReq).toBeUndefined();
   });
 });
 
@@ -221,11 +220,9 @@ describe("apiClient — concurrent 401 request queuing", () => {
     // Simulate one slow refresh call
     let refreshResolve: (value: unknown) => void;
     const refreshPromise = new Promise((r) => (refreshResolve = r));
-    vi.spyOn(axios, "post").mockReturnValue(
-      refreshPromise.then(() => ({
-        data: { accessToken: "queued-token", expiresIn: 3600 },
-      })) as ReturnType<typeof axios.post>
-    );
+    mock.onPost("/auth/refresh").reply(() => {
+      return refreshPromise.then(() => [200, { accessToken: "queued-token", expiresIn: 3600 }]);
+    });
 
     const [r1, _r2] = await Promise.all([
       apiClient.get("/queued-1"),
@@ -315,7 +312,7 @@ describe("authApi", () => {
     // 401 on login → interceptor fires → tries /auth/refresh → refresh fails → auth:force-logout
     mock.onPost("/auth/login").reply(401, { message: "Bad credentials" });
 
-    vi.spyOn(axios, "post").mockRejectedValue(new Error("Refresh unavailable"));
+    mock.onPost("/auth/refresh").networkError();
 
     const logoutSpy = vi.fn();
     window.addEventListener("auth:force-logout", logoutSpy);
