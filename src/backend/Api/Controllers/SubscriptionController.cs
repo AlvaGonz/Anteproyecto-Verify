@@ -272,10 +272,14 @@ public class SubscriptionController : ControllerBase
 
             if (plan != null)
             {
+                var isNewPlan = user.PlanSuscripcionId != plan.Idsuscripcion;
+
                 user.AsignarPlan(plan.Idsuscripcion);
                 _logger.LogInformation(
                     "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",
                     planName, priceId, user.Id);
+
+                ProcessSubscriptionNotification(user, plan, isNewPlan);
             }
             else
             {
@@ -299,5 +303,19 @@ public class SubscriptionController : ControllerBase
         _logger.LogInformation(
             "Webhook: User {UserId} subscription status='{Status}', periodEnd={PeriodEnd}.",
             user.Id, subscription.Status, currentPeriodEnd);
+    }
+
+    internal void ProcessSubscriptionNotification(Usuario user, PlanSuscripcion plan, bool isNewPlan)
+    {
+        if (isNewPlan)
+        {
+            var notification = new Notificacion(
+                user.Id,
+                $"¡Felicidades! Has contratado exitosamente el plan de suscripción {plan.NombrePlan}.",
+                "Success",
+                "/settings/subscription"
+            );
+            _dbContext.Notificaciones.Add(notification);
+        }
     }
 }
