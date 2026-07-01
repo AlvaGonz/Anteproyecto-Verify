@@ -1,3 +1,4 @@
 namespace Application.DTOs.Subscriptions;
 
-public record CreateSessionRequest(string PriceId, string UserId);
+public record SubscriptionConsentDto(DateTime? Timestamp, string UserAgent);
+public record CreateSessionRequest(string PriceId, SubscriptionConsentDto Consent);

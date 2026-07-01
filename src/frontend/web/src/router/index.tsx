@@ -29,6 +29,7 @@ import { AdminLayout } from "../shared/components/layout/AdminLayout";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
 import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
+import { GuestGuard } from "../shared/components/security/GuestGuard";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
 
 // New Pages
@@ -84,15 +85,27 @@ export const router = createHashRouter([
       },
       {
         path: "/login",
-        element: <LoginPage />,
+        element: (
+          <GuestGuard>
+            <LoginPage />
+          </GuestGuard>
+        ),
       },
       {
         path: "/register",
-        element: <RegisterPage />,
+        element: (
+          <GuestGuard>
+            <RegisterPage />
+          </GuestGuard>
+        ),
       },
       {
         path: "/verify-email",
-        element: <EmailVerifiedPage />,
+        element: (
+          <GuestGuard>
+            <EmailVerifiedPage />
+          </GuestGuard>
+        ),
       },
       {
         path: "/verify",

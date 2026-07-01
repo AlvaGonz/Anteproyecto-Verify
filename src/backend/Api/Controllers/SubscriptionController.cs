@@ -30,8 +30,14 @@ public class SubscriptionController : ControllerBase
 
     [HttpPost("create-session")]
     [Authorize]
-    public async Task<IActionResult> CreateSession([FromBody] CreateSessionRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateSession([FromBody] CreateSessionRequest request, [FromServices] FluentValidation.IValidator<CreateSessionRequest> validator, CancellationToken ct)
     {
+        var validationResult = await validator.ValidateAsync(request, ct);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(new { message = "Validation failed", errors = validationResult.Errors.Select(e => e.ErrorMessage) });
+        }
+
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdString, out var userId))
             return Unauthorized();

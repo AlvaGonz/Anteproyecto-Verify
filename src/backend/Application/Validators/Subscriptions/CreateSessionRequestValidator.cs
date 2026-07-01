@@ -13,7 +13,17 @@ public class CreateSessionRequestValidator : AbstractValidator<CreateSessionRequ
             .Must(priceId => IsValidPriceId(priceId, configuration))
             .WithMessage("El PriceId proporcionado no es válido.");
 
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.Consent)
+            .NotNull().WithMessage("El consentimiento es requerido.");
+
+        When(x => x.Consent != null, () =>
+        {
+            RuleFor(x => x.Consent.Timestamp)
+                .NotNull().WithMessage("Timestamp de consentimiento requerido.");
+            
+            RuleFor(x => x.Consent.UserAgent)
+                .NotEmpty().WithMessage("UserAgent de consentimiento requerido.");
+        });
     }
 
     private bool IsValidPriceId(string priceId, IConfiguration config)
