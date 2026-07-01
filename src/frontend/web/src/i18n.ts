@@ -51,8 +51,7 @@ const resources = {
         dataProcuraduria: 'Data Procuraduría',
       },
       legal: {
-        complianceCenter: "Compliance Center",
-        complianceVersion: "v2.4 (RD Compliant)",
+        complianceCenter: "Compliance Center", complianceVersion: "v2.4 (RD Compliant)",
         nav: {
           terms: "Términos de Uso",
           privacy: "Política de Privacidad",
@@ -360,7 +359,6 @@ const resources = {
         dataProcuraduria: 'Attorney General Data',
       },
       legal: {
-        complianceCenter: "Compliance Center",
         complianceVersion: "v2.4 (RD Compliant)",
         nav: {
           terms: "Terms of Use",

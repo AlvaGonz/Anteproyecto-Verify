@@ -64,12 +64,22 @@ public class SubscriptionController : ControllerBase
                 customerId = customer.Id;
             }
 
+            var frontendUrl = _configuration["FrontendUrl"];
+            if (string.IsNullOrEmpty(frontendUrl))
+            {
+                frontendUrl = Request.Headers["Origin"].ToString();
+                if (string.IsNullOrEmpty(frontendUrl))
+                {
+                    frontendUrl = "http://localhost:3000";
+                }
+            }
+
             var options = new SessionCreateOptions
             {
-                UiMode = "embedded",
+                UiMode = "embedded_page",
                 Mode = "subscription",
                 Customer = customerId,
-                ReturnUrl = _configuration["FrontendUrl"] + "/checkout/return?session_id={CHECKOUT_SESSION_ID}",
+                ReturnUrl = frontendUrl.TrimEnd('/') + "/checkout/return?session_id={CHECKOUT_SESSION_ID}",
                 LineItems = new List<SessionLineItemOptions>
                 {
                     new SessionLineItemOptions

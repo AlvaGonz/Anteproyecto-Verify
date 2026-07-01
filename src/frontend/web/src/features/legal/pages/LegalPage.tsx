@@ -108,7 +108,7 @@ export const LegalPage: React.FC = () => {
   const getNavLinkClasses = (id: string) => {
     const isActive = activeSection === id;
     const baseClasses = "group flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 font-body text-sm leading-snug w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500";
-    
+
     if (isActive) {
       return `${baseClasses} text-orange-600 bg-orange-50 font-semibold ring-1 ring-orange-200`;
     }
@@ -125,12 +125,8 @@ export const LegalPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 print:pt-4 print:pb-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           <div className={`w-full fade-up stagger-1 ${isRevealed ? "is-visible" : ""} print:hidden sticky top-[88px] lg:top-[100px] z-40 lg:col-span-3 lg:h-fit`}>
-            <div className="mb-4 hidden lg:block">
-              <h3 className="font-headline font-bold text-lg text-on-surface">{t('legal.complianceCenter', 'Centro de Cumplimiento')}</h3>
-              <p className="font-body text-xs text-on-surface-variant mt-1">v1.1.0 — 2026-06-22</p>
-            </div>
             <div className="relative w-full md:w-[320px] lg:w-full">
-              <button 
+              <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="w-full flex items-center justify-between bg-surface/95 backdrop-blur-md border border-outline-variant/50 px-5 py-4 rounded-xl shadow-sm text-slate-900 font-semibold transition-all hover:bg-surface-container-low active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               >
@@ -149,7 +145,7 @@ export const LegalPage: React.FC = () => {
               {isDropdownOpen && (
                 <>
                   {/* Invisible Overlay for clicking outside */}
-                  <div 
+                  <div
                     className="fixed inset-0 z-40"
                     onClick={() => setIsDropdownOpen(false)}
                   />
@@ -172,7 +168,7 @@ export const LegalPage: React.FC = () => {
                         </button>
                       ))}
                       <div className="mt-2 pt-2 border-t border-outline-variant/30">
-                        <button 
+                        <button
                           onClick={() => { window.print(); setIsDropdownOpen(false); }}
                           className="w-full text-left group flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 font-body text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-surface-container-low"
                         >
@@ -213,7 +209,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Términos de Servicio (Terms of Service)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-3">1. Alcance del Servicio</h3>
@@ -316,7 +312,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Política de Privacidad (Privacy Policy)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-4">1. Datos que Recopilamos</h3>
@@ -510,7 +506,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Acuerdo de Procesamiento de Datos (DPA)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-3">1. Estándares de Encriptación</h3>
@@ -586,7 +582,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Acuerdo de Nivel de Servicio (SLA)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-3">1. Compromiso de Disponibilidad</h3>
@@ -1077,10 +1073,10 @@ export const LegalPage: React.FC = () => {
             </a>
           </div>
           <div>
-            <a 
-              href="https://wa.link/oi1w9m" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://wa.link/oi1w9m"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-block text-center bg-primary hover:bg-primary-hover text-on-primary font-label font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-raised whitespace-nowrap w-full md:w-auto active:scale-[0.98]"
             >
               Contactar Soporte
