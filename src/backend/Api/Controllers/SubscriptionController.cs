@@ -102,6 +102,46 @@ public class SubscriptionController : ControllerBase
         }
     }
 
+    [HttpGet("my-status")]
+    [Authorize]
+    public async Task<IActionResult> GetMySubscriptionStatus(CancellationToken ct)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
+            return Unauthorized();
+
+        var user = await _dbContext.Usuarios
+            .Include(u => u.Plan)
+            .FirstOrDefaultAsync(u => u.Id == userId, ct);
+
+        if (user == null)
+            return NotFound(new { message = "User not found." });
+
+        // Derive a meaningful status:
+        // 1. If Stripe has set a status, use it.
+        // 2. If the user has a plan assigned (via seeder or direct assignment) but no Stripe
+        //    subscription yet, treat as "active" — the plan IS in effect.
+        // 3. Otherwise null (no plan).
+        var hasPlan = user.Plan != null;
+        var effectiveStatus = user.SubscriptionStatus
+            ?? (hasPlan ? "active" : null);
+
+        // If a plan is free (price = 0), treat it as "free" tier, not fully "active"
+        var isFree = hasPlan && user.Plan!.Precio == 0m;
+        if (isFree && effectiveStatus == "active")
+            effectiveStatus = "free";
+
+        return Ok(new
+        {
+            plan = user.Plan?.NombrePlan,
+            planPrice = user.Plan?.Precio,
+            subscriptionStatus = effectiveStatus,
+            currentPeriodEnd = user.CurrentPeriodEnd,
+            stripeSubscriptionId = user.StripeSubscriptionId,
+            isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId)
+        });
+    }
+
     [HttpGet("session-status")]
     [Authorize]
     public async Task<IActionResult> GetSessionStatus([FromQuery] string session_id, CancellationToken ct)

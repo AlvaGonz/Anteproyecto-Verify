@@ -265,7 +265,7 @@ const resources = {
             feature2: "API Full Access",
             feature3: "Validaciones en lote",
             feature4: "SLA garantizado 99.9%",
-            button: "Contactar Ventas"
+            button: "Elegir Enterprise"
           }
         },
         comparison: {
@@ -573,7 +573,7 @@ const resources = {
             feature2: "Full Access API",
             feature3: "Bulk validations",
             feature4: "Guaranteed 99.9% SLA",
-            button: "Contact Sales"
+            button: "Choose Enterprise"
           }
         },
         comparison: {
