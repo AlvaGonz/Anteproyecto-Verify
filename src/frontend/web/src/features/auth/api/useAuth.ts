@@ -37,3 +37,10 @@ export const useLogout = () =>
     mutationFn: () => apiClient.post("/auth/logout").then(res => res.data),
     onSuccess: () => setAccessToken(null),
   });
+
+export const useResendVerificationEmail = () =>
+  useMutation({
+    mutationKey: ['useResendVerificationEmail'],
+    mutationFn: (data: { email: string; returnUrl?: string }) =>
+      apiClient.post("/auth/resend-verification", data).then(res => res.data),
+  });

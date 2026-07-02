@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { registerSchema, type RegisterFormValues } from "../schemas";
-import { useRegister } from "../api/useAuth";
+import { useRegister, useResendVerificationEmail } from "../api/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { 
@@ -24,6 +24,7 @@ export const RegisterForm = () => {
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get('redirect');
   const { mutate: register_, isPending, error } = useRegister();
+  const { mutate: resendEmail, isPending: isResending, isSuccess: resendSuccess, error: resendError } = useResendVerificationEmail();
   const [modalType, setModalType] = useState<"terms" | "privacy" | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -101,14 +102,35 @@ const password = watch("password") || "";
         </p>
         <div className="pt-6 border-t border-border/50">
           <p className="text-sm text-text-secondary">
-            ¿No lo recibiste? Revisa tu carpeta de spam o{" "}
+            ¿No lo recibiste? Revisa tu carpeta de spam,{" "}
             <button 
+              type="button"
+              onClick={() => resendEmail({ email: watch("email"), returnUrl: redirectUrl || undefined })}
+              disabled={isResending}
+              className="text-primary hover:text-[#1a2663] hover:underline font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="resend-verification-button"
+            >
+              {isResending ? "reenviando..." : "reenviar correo"}
+            </button>{" "}
+            o{" "}
+            <button 
+              type="button"
               onClick={() => setIsSuccess(false)} 
               className="text-primary hover:text-[#1a2663] hover:underline font-semibold transition-colors"
             >
               intenta registrarte nuevamente
             </button>.
           </p>
+          {resendError && (
+            <div className="mt-4 p-3 bg-rose-50 text-rose-600 rounded-md text-sm text-center font-medium" data-testid="resend-error-message">
+              {(resendError as Error).message || "Error al reenviar el correo."}
+            </div>
+          )}
+          {resendSuccess && (
+            <div className="mt-4 p-3 bg-emerald-50 text-emerald-600 rounded-md text-sm text-center font-medium" data-testid="resend-success-message">
+              Correo de verificación reenviado exitosamente.
+            </div>
+          )}
         </div>
       </div>
     );

@@ -6,7 +6,6 @@ using Application.Abstractions.Persistence;
 using Application.Features.Auth.Commands.UploadAvatar;
 using Domain.Entities;
 using Domain.Enums;
-using FluentAssertions;
 using Moq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -51,8 +50,8 @@ namespace UnitTests.Application.Features.Auth
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.Success.Should().BeFalse();
-            result.ErrorMessage.Should().Contain("no encontrado");
+            Assert.False(result.Success);
+            Assert.Contains("no encontrado", result.ErrorMessage);
         }
 
         [Fact]
@@ -69,8 +68,8 @@ namespace UnitTests.Application.Features.Auth
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.Success.Should().BeFalse();
-            result.ErrorMessage.Should().Contain("Formato de imagen no permitido");
+            Assert.False(result.Success);
+            Assert.Contains("Formato de imagen no permitido", result.ErrorMessage);
         }
 
         [Fact]
@@ -88,11 +87,11 @@ namespace UnitTests.Application.Features.Auth
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.Success.Should().BeTrue();
-            result.AvatarUrl.Should().StartWith("/avatars/");
-            result.AvatarUrl.Should().EndWith(".jpg");
+            Assert.True(result.Success);
+            Assert.StartsWith("/avatars/", result.AvatarUrl);
+            Assert.EndsWith(".jpg", result.AvatarUrl);
 
-            user.AvatarUrl.Should().Be(result.AvatarUrl);
+            Assert.Equal(result.AvatarUrl, user.AvatarUrl);
 
             _usuarioRepositoryMock.Verify(x => x.Update(user), Times.Once);
             _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);

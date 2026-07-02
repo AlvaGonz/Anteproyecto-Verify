@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler>();
+        services.AddScoped<Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler>();
 
         return services;
     }

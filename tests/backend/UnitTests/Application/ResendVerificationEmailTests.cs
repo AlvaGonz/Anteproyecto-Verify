@@ -5,7 +5,6 @@ using Application.Abstractions.Persistence;
 using Application.Features.Auth.Commands.ResendVerificationEmail;
 using Domain.Entities;
 using Domain.Enums;
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Moq;
@@ -50,7 +49,7 @@ public class ResendVerificationEmailTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        Assert.True(result.IsSuccess);
         _emailServiceMock.Verify(e => e.SendAccountVerificationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -72,8 +71,8 @@ public class ResendVerificationEmailTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.ErrorMessage.Should().Contain("ya está verificada");
+        Assert.False(result.IsSuccess);
+        Assert.Contains("ya está verificada", result.ErrorMessage);
     }
 
     [Fact]
@@ -95,9 +94,9 @@ public class ResendVerificationEmailTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
-        user.TokenVerificacion.Should().NotBeNull();
-        user.TokenVerificacion.Should().NotBe(oldToken); // Should be a new token
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(user.TokenVerificacion);
+        Assert.NotEqual(oldToken, user.TokenVerificacion); // Should be a new token
         _emailServiceMock.Verify(e => e.SendAccountVerificationAsync("unverified@example.com", "Juan", user.TokenVerificacion!, "/checkout", It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }

@@ -22,6 +22,7 @@ public class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
     private readonly Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler _uploadAvatarHandler;
+    private readonly Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler _resendVerificationHandler;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
     private readonly IMemoryCache _cache;
 
@@ -31,6 +32,7 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
         Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
         Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler uploadAvatarHandler,
+        Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler resendVerificationHandler,
         Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
         IConfiguration configuration,
         Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator,
@@ -41,6 +43,7 @@ public class AuthController : ControllerBase
         _loginHandler = loginHandler;
         _updateProfileHandler = updateProfileHandler;
         _uploadAvatarHandler = uploadAvatarHandler;
+        _resendVerificationHandler = resendVerificationHandler;
         _usuarioRepository = usuarioRepository;
         _configuration = configuration;
         _jwtTokenGenerator = jwtTokenGenerator;
@@ -67,6 +70,19 @@ public class AuthController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [HttpPost("resend-verification")]
+    public async Task<IActionResult> ResendVerification([FromBody] Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommand request, CancellationToken cancellationToken)
+    {
+        var result = await _resendVerificationHandler.Handle(request, cancellationToken);
+        
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
+
+        return Ok(new { Message = "Correo de verificación reenviado exitosamente." });
     }
 
     [HttpPost("login")]
