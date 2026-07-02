@@ -44,12 +44,6 @@ public class Usuario : EntityBase
     public Usuario? Titular { get; private set; }
     public ICollection<Usuario> MiembrosEquipo { get; private set; } = new List<Usuario>();
 
-    // Stripe Integration Fields
-    public string? StripeCustomerId { get; private set; }
-    public string? StripeSubscriptionId { get; private set; }
-    public string? SubscriptionStatus { get; private set; }
-    public DateTime? CurrentPeriodEnd { get; private set; }
-
     // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
 

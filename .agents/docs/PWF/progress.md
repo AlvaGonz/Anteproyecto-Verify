@@ -114,3 +114,15 @@
   - **Symptom:** `pnpm run test:e2e` fails or hangs, and the `test:e2e` script was missing. `diagnosis-ui.spec.ts` and `project-photos.spec.ts` fail due to timeout waiting for UI elements.
   - **Root Cause:** The `package.json` was missing the `test:e2e` script. The E2E tests for `diagnosis-ui` and `project-photos` did not mock the `**/api/auth/refresh` and `**/api/notifications*` routes, causing the app to hang in a loading state or fail to load data, leading to Playwright timeouts.
   - **Fix:** Added `"test:e2e": "playwright test"` to `package.json`. Added the missing API mocks to the `beforeEach` hooks of both failing test files. Tests now pass.
+- **BUG-011:** Duplicate Stripe integration fields causing CS0102 compilation error.
+  - **Symptom:** `dotnet watch` fails with `CS0102: The type 'Usuario' already contains a definition for 'StripeCustomerId'` (and others).
+  - **Root Cause:** A bad merge duplicated the `StripeCustomerId`, `StripeSubscriptionId`, `SubscriptionStatus`, and `CurrentPeriodEnd` fields in `Usuario.cs`.
+  - **Fix:** Removed the duplicated fields from `Usuario.cs`.
+- **BUG-012:** Missing ConcurrentDictionary namespace causing CS0246 compilation error.
+  - **Symptom:** `dotnet watch` fails with `CS0246: The type or namespace name 'ConcurrentDictionary<,>' could not be found` in `AuthController.cs`.
+  - **Root Cause:** Missing `using System.Collections.Concurrent;` namespace import.
+  - **Fix:** Added `using System.Collections.Concurrent;` to `AuthController.cs`.
+- **BUG-013:** EF Core Migration crash at startup with Error 2705 Column already exists.
+  - **Symptom:** Backend API crashes on startup during `MigrateAsync` with `Error Number:2705` "Column already exists".
+  - **Root Cause:** A duplicated migration `20260630195243_AddStripeFieldsToUsuario.cs` attempted to add Stripe fields that were already added by `20260630163528_Add_Stripe_Fields_To_Usuario.cs`.
+  - **Fix:** Emptied the `Up` and `Down` methods of the duplicate migration `20260630195243_AddStripeFieldsToUsuario.cs` so EF Core treats it as a no-op, preserving the migration chain without throwing.
