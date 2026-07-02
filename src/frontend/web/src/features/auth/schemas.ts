@@ -113,6 +113,7 @@ telefono: z
 });
 
 export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>;
+export type UpdateProfileDto = UpdateProfileFormValues;
 
 export const inviteTeamMemberSchema = z.object({
   nombre: z

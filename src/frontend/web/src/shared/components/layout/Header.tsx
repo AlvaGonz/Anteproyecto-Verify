@@ -102,8 +102,15 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
               <span className="text-xs font-bold text-gray-900">{displayName}</span>
               <span className="text-[9px] font-black text-primary uppercase tracking-widest">{roleLabel}</span>
            </div>
-           <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200 group-hover:border-primary/30 transition-colors">
-              {user ? (
+           <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200 group-hover:border-primary/30 transition-colors overflow-hidden">
+              {user?.avatarUrl ? (
+                <img 
+                  data-testid="header-avatar-img"
+                  src={user.avatarUrl.startsWith('data:') || user.avatarUrl.startsWith('blob:') ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} 
+                  alt="Avatar" 
+                  className="w-full h-full object-cover" 
+                />
+              ) : user ? (
                 <span className="text-sm font-black text-gray-600">{initials}</span>
               ) : (
                 <User className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />

@@ -25,7 +25,7 @@
 | Security Hardening (OWASP A01-A05, Law 172-13) | N/A | develop | (pending) | 2026-07-01 |
 | Subscription Tier Webhook Notification | N/A | feat-stripe | 11620118 | 2026-07-01 |
 | Dashboard Notification + Post-Payment Redirect | N/A | feat-stripe | (pending) | 2026-07-01 |
-
+| Resend Verification Email Flow | N/A | feat-stripe | 9f6df91c | 2026-07-02 |
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
@@ -93,6 +93,10 @@
 > Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
 
 ## 🐛 Resolved Bugs
+- **BUG-007:** 404 Not Found on `/api/auth/resend-verification`.
+  - **Symptom:** The new frontend `useResendVerificationEmail` mutation failed with `404 Not Found` despite the backend having the endpoint correctly implemented.
+  - **Root Cause:** `dotnet watch` inside the Docker container failed to hot-reload and compile the newly added `ResendVerificationEmail` namespace. The `Api` container was still running the older version without the endpoint mapped.
+  - **Fix:** Fixed by manually executing `dotnet build` inside the container or forcing a restart of the container to pick up the new files properly, which successfully compiled the `Api` layer.
 - **BUG-006:** HashRouter + Stripe `return_url` incompatibility. 
   - **Symptom:** `session_id` persists in URL after hard reset on checkout return page.
   - **Root Cause:** Stripe redirects to a regular URL which HashRouter misinterprets, preventing `CheckoutReturnPage` from routing and maintaining `session_id` in the real search params.

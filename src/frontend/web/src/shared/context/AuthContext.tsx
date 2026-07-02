@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateUser: (data: Partial<User>) => void;
   error: AuthError | null;
 }
 
@@ -69,24 +70,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const refreshUser = useCallback(async () => {
-    const currentUserOption = await AuthService.getCurrentUser();
-    if (isSome(currentUserOption)) {
-      setUser(currentUserOption.value);
+    const result = await AuthService.getCurrentUser();
+    if (isSome(result)) {
+      setUser(result.value);
+    } else {
+      setUser(null);
     }
   }, []);
 
+  const updateUser = useCallback((data: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...data } as User : null);
+  }, []);
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated: !!user, 
-        loading, 
-        login, 
-        logout,
-        refreshUser,
-        error 
-      }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, login, logout, refreshUser, updateUser, error }}>
       {children}
     </AuthContext.Provider>
   );
