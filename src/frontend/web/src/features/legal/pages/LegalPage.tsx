@@ -16,13 +16,32 @@ const ICONS = {
   assignment: "assignment",
   timer: "timer",
   menu_book: "menu_book",
-  visibility: "visibility"
+  visibility: "visibility",
+  payments: "payments",
+  history: "history",
+  security: "security"
 };
 
 export const LegalPage: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [isRevealed, setIsRevealed] = React.useState(false);
+  const [activeSection, setActiveSection] = React.useState<string>("terminos");
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+
+  const navItems = [
+    { id: "terminos", icon: ICONS.gavel, label: "Términos de Servicio" },
+    { id: "privacidad", icon: ICONS.privacyTip, label: "Política de Privacidad" },
+    { id: "dpa", icon: ICONS.assignment, label: "Acuerdo de Procesamiento de Datos (DPA)" },
+    { id: "sla", icon: ICONS.timer, label: "Acuerdo de Nivel de Servicio (SLA)" },
+    { id: "marco-legal", icon: ICONS.menu_book, label: "Marco Normativo" },
+    { id: "billing", icon: ICONS.payments, label: t('legal.billing.title', 'Facturación y Suscripciones') },
+    { id: "refunds", icon: ICONS.history, label: t('legal.refunds.title', 'Política de Reembolsos') },
+    { id: "stripeProcessor", icon: ICONS.security, label: t('legal.stripeProcessor.title', 'Procesador de Pagos') },
+    { id: "financialLiability", icon: ICONS.gavel, label: t('legal.financialLiability.title', 'Responsabilidad Financiera') },
+    { id: "paymentData", icon: ICONS.database, label: t('legal.paymentData.title', 'Datos de Pago') },
+    { id: "acceptableUse", icon: ICONS.checkCircle, label: t('legal.acceptableUse.title', 'Uso Aceptable') },
+  ];
 
   React.useEffect(() => {
     const timer = setTimeout(() => setIsRevealed(true), 50);
@@ -59,25 +78,11 @@ export const LegalPage: React.FC = () => {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     window.history.pushState(null, "", `#/legal#${targetId}`);
-
-    const navLinks = document.querySelectorAll<HTMLAnchorElement>(".sidebar-bg a");
-    navLinks.forEach((link) => {
-      link.className =
-        "group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug";
-      const icon = link.querySelector<HTMLElement>(".material-symbols-outlined");
-      if (icon) icon.style.fontVariationSettings = "'FILL' 0";
-
-      if (link.getAttribute("href") === `#${targetId}`) {
-        link.className =
-          "group flex items-start gap-3 text-primary bg-primary/10 font-semibold rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug ring-1 ring-primary/20";
-        if (icon) icon.style.fontVariationSettings = "'FILL' 1";
-      }
-    });
+    setActiveSection(targetId);
   };
 
   React.useEffect(() => {
     const sections = document.querySelectorAll<HTMLElement>("section[id]");
-    const navLinks = document.querySelectorAll<HTMLAnchorElement>(".sidebar-bg a");
 
     const observerOptions = {
       root: null,
@@ -89,19 +94,7 @@ export const LegalPage: React.FC = () => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const id = entry.target.getAttribute("id");
-
-          navLinks.forEach((link) => {
-            link.className =
-              "group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug";
-            const icon = link.querySelector<HTMLElement>(".material-symbols-outlined");
-            if (icon) icon.style.fontVariationSettings = "'FILL' 0";
-
-            if (link.getAttribute("href") === `#${id}`) {
-              link.className =
-                "group flex items-start gap-3 text-primary bg-primary/10 font-semibold rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug ring-1 ring-primary/20";
-              if (icon) icon.style.fontVariationSettings = "'FILL' 1";
-            }
-          });
+          if (id) setActiveSection(id);
         }
       });
     };
@@ -112,6 +105,17 @@ export const LegalPage: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
+  const getNavLinkClasses = (id: string) => {
+    const isActive = activeSection === id;
+    const baseClasses = "group flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 font-body text-sm leading-snug w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500";
+
+    if (isActive) {
+      return `${baseClasses} text-orange-600 bg-orange-50 font-semibold ring-1 ring-orange-200`;
+    }
+
+    return `${baseClasses} text-slate-600 hover:text-slate-900 hover:bg-surface-container-low`;
+  };
+
   return (
     <div className="font-body text-on-surface antialiased min-h-screen bg-neutral">
       <div className="print:hidden">
@@ -119,78 +123,68 @@ export const LegalPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 print:pt-4 print:pb-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Sidebar */}
-          <div className={`w-full lg:col-span-3 fade-up stagger-1 ${isRevealed ? "is-visible" : ""} print:hidden`}>
-            <nav className="sidebar-bg rounded-xl p-4 sticky top-[88px] z-40 flex flex-row overflow-x-auto gap-3 border border-outline-variant/30 no-scrollbar lg:flex-col lg:p-6 lg:top-[100px] bg-surface-raised shadow-raised">
-              <div className="mb-6 border-b border-outline-variant/30 pb-4 hidden lg:block">
-                <h3 className="font-headline font-bold text-lg text-on-surface">Centro de Cumplimiento</h3>
-                <p className="font-body text-sm text-on-surface-variant mt-1">v1.1.0 — Updated: 2026-06-22</p>
-              </div>
-              <a
-                className="group flex items-start gap-3 text-primary bg-primary/10 font-semibold rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug ring-1 ring-primary/20"
-                href="#terminos"
-                onClick={(e) => handleSidebarClick(e, "terminos")}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          <div className={`w-full fade-up stagger-1 ${isRevealed ? "is-visible" : ""} print:hidden sticky top-[88px] lg:top-[100px] z-40 lg:col-span-3 lg:h-fit`}>
+            <div className="relative w-full md:w-[320px] lg:w-full">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-full flex items-center justify-between bg-surface/95 backdrop-blur-md border border-outline-variant/50 px-5 py-4 rounded-xl shadow-sm text-slate-900 font-semibold transition-all hover:bg-surface-container-low active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               >
-                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {ICONS.gavel}
+                <span className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-orange-600" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {navItems.find(i => i.id === activeSection)?.icon || ICONS.menu_book}
+                  </span>
+                  {navItems.find(i => i.id === activeSection)?.label || "Navegación Legal"}
                 </span>
-                Términos de Servicio
-              </a>
-              <a
-                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
-                href="#privacidad"
-                onClick={(e) => handleSidebarClick(e, "privacidad")}
-              >
-                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  {ICONS.privacyTip}
+                <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}>
+                  expand_more
                 </span>
-                Política de Privacidad
-              </a>
-              <a
-                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
-                href="#dpa"
-                onClick={(e) => handleSidebarClick(e, "dpa")}
-              >
-                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  {ICONS.assignment}
-                </span>
-                Acuerdo de Procesamiento de Datos (DPA)
-              </a>
-              <a
-                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
-                href="#sla"
-                onClick={(e) => handleSidebarClick(e, "sla")}
-              >
-                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  {ICONS.timer}
-                </span>
-                Acuerdo de Nivel de Servicio (SLA)
-              </a>
-              <a
-                className="group flex items-start gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-4 py-3 transition-all duration-200 font-body text-sm leading-snug"
-                href="#marco-legal"
-                onClick={(e) => handleSidebarClick(e, "marco-legal")}
-              >
-                <span className="material-symbols-outlined text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 0" }}>
-                  {ICONS.menu_book}
-                </span>
-                Marco Normativo
-              </a>
-              <div className="mt-8 pt-6 border-t border-outline-variant/30 flex-shrink-0 ml-auto lg:mt-8 lg:pt-6 lg:border-t lg:ml-0">
-                <button 
-                  onClick={() => window.print()}
-                  className="w-full bg-surface border border-outline-variant text-on-surface hover:bg-surface-container hover:text-primary font-label text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
-                >
-                  <span className="material-symbols-outlined text-sm">{ICONS.download}</span>
-                  Descargar PDF
-                </button>
-              </div>
-            </nav>
+              </button>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <>
+                  {/* Invisible Overlay for clicking outside */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsDropdownOpen(false)}
+                  />
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-outline-variant/50 rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                    <div className="max-h-[60vh] overflow-y-auto p-2 flex flex-col gap-1">
+                      {navItems.map(item => (
+                        <button
+                          key={item.id}
+                          className={getNavLinkClasses(item.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsDropdownOpen(false);
+                            handleSidebarClick(e as any, item.id);
+                          }}
+                        >
+                          <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: activeSection === item.id ? "'FILL' 1" : "'FILL' 0" }}>
+                            {item.icon}
+                          </span>
+                          {item.label}
+                        </button>
+                      ))}
+                      <div className="mt-2 pt-2 border-t border-outline-variant/30">
+                        <button
+                          onClick={() => { window.print(); setIsDropdownOpen(false); }}
+                          className="w-full text-left group flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 font-body text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-surface-container-low"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">{ICONS.download}</span>
+                          Descargar PDF
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Main Content */}
-          <main className="lg:col-span-9 max-w-[760px] px-2 print:col-span-12 print:max-w-none print:w-full print:px-0">
+          <main className="lg:col-span-9 max-w-[760px] w-full print:col-span-12 print:max-w-none print:w-full print:px-0">
             {/* Header */}
             <div className={`mb-12 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
               <span className="font-sans font-semibold text-[11px] tracking-widest uppercase text-secondary mb-2 block">
@@ -215,7 +209,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Términos de Servicio (Terms of Service)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-3">1. Alcance del Servicio</h3>
@@ -318,7 +312,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Política de Privacidad (Privacy Policy)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-4">1. Datos que Recopilamos</h3>
@@ -512,7 +506,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Acuerdo de Procesamiento de Datos (DPA)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-3">1. Estándares de Encriptación</h3>
@@ -588,7 +582,7 @@ export const LegalPage: React.FC = () => {
               <h2 className="font-headline text-3xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/50">
                 Acuerdo de Nivel de Servicio (SLA)
               </h2>
-              
+
               <div className="space-y-8">
                 <div>
                   <h3 className="font-headline text-xl font-bold text-on-surface mb-3">1. Compromiso de Disponibilidad</h3>
@@ -843,6 +837,225 @@ export const LegalPage: React.FC = () => {
               </div>
             </section>
 
+            {/* 6. Facturación y Suscripciones */}
+            <section id="billing" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                VI. {t('legal.billing.title', 'Política de Facturación y Suscripciones')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.billing.cycleTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.billing.cycleDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.billing.autoDebitTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.billing.autoDebitDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.billing.priceChangeTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.billing.priceChangeDesc')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 7. Reembolsos y Cancelaciones */}
+            <section id="refunds" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                VII. {t('legal.refunds.title', 'Política de Reembolsos y Cancelaciones')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.refunds.finalTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.refunds.finalDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.refunds.cancelTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.refunds.cancelDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.refunds.annualPenaltyTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px] p-4 bg-error-container/20 text-error rounded-lg border border-error/20">
+                    {t('legal.refunds.annualPenaltyDesc')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 8. Procesador de Pagos y Seguridad (Stripe) */}
+            <section id="stripeProcessor" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                VIII. {t('legal.stripeProcessor.title', 'Procesador de Pagos y Seguridad (Stripe)')}
+              </h2>
+              <p className="font-body text-on-surface-variant leading-relaxed mb-8">
+                {t('legal.stripeProcessor.desc')}
+              </p>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.stripeProcessor.acceptTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.stripeProcessor.acceptDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.stripeProcessor.cookiesTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.stripeProcessor.cookiesDesc')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 9. Responsabilidad Financiera */}
+            <section id="financialLiability" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                IX. {t('legal.financialLiability.title', 'Responsabilidad Financiera')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.financialLiability.unauthorizedTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.financialLiability.unauthorizedDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.financialLiability.availabilityTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.financialLiability.availabilityDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.financialLiability.capTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.financialLiability.capDesc')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 10. Tratamiento de Datos de Pago */}
+            <section id="paymentData" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                X. {t('legal.paymentData.title', 'Tratamiento de Datos de Pago')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.tokenTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.tokenDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.retentionTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.retentionDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.historyTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.historyDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.paymentData.breachTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.paymentData.breachDesc')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 11. Uso Aceptable de Pagos */}
+            <section id="acceptableUse" className="scroll-mt-32 mt-16">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
+                XI. {t('legal.acceptableUse.title', 'Uso Aceptable')}
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.acceptableUse.nontransferTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.acceptableUse.nontransferDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.acceptableUse.scrapingTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.acceptableUse.scrapingDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
+                    {t('legal.acceptableUse.suspensionTitle')}
+                  </h3>
+                  <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
+                    {t('legal.acceptableUse.suspensionDesc')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
           </main>
         </div>
       </div>
@@ -860,9 +1073,14 @@ export const LegalPage: React.FC = () => {
             </a>
           </div>
           <div>
-            <button className="bg-primary hover:bg-primary-hover text-on-primary font-label font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-raised whitespace-nowrap w-full md:w-auto active:scale-[0.98]">
+            <a
+              href="https://wa.link/oi1w9m"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-center bg-primary hover:bg-primary-hover text-on-primary font-label font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-raised whitespace-nowrap w-full md:w-auto active:scale-[0.98]"
+            >
               Contactar Soporte
-            </button>
+            </a>
           </div>
         </div>
       </section>

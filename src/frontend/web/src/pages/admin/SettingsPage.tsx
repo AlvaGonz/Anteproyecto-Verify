@@ -1,28 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
 import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
-import { UsersTable, UserFormModal, DeleteModal, MyProfileForm } from "../../features/settings/components";
+import { UsersTable, UserFormModal, DeleteModal, MyProfileForm, SubscriptionSettings } from "../../features/settings/components";
 import {
   Settings,
   Users,
-  Shield,
   Loader2,
-  UserCheck,
-  User
+  User,
+  CreditCard
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
-type TabId = "profile" | "users";
+type TabId = "profile" | "subscription" | "users";
 
 
 
 export const SettingsPage: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<TabId>("profile");
@@ -33,9 +30,9 @@ export const SettingsPage: React.FC = () => {
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
 
-  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin);
+  const { data: users = [], isLoading: isLoadingUsers } = useUsers(1, 50, isAdmin);
 
-  const { data: plans = [], isLoading: isLoadingPlans, refetch: refetchPlans } = usePlans(isAdmin);
+  const { data: plans = [], isLoading: isLoadingPlans } = usePlans(isAdmin);
 
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
@@ -50,12 +47,6 @@ export const SettingsPage: React.FC = () => {
       setActiveTab("profile");
     }
   }, [user, activeTab]);
-
-  const loadData = () => {
-    refetchUsers();
-
-    refetchPlans();
-  };
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,6 +154,17 @@ if (formData.telefono) {
           Mi Perfil
         </button>
 
+        <button
+          onClick={() => setActiveTab("subscription")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "subscription"
+            ? "border-[#223382] text-[#223382]"
+            : "border-transparent text-text-secondary hover:text-text-primary"
+            }`}
+        >
+          <CreditCard className="w-4 h-4" />
+          Suscripción
+        </button>
+
         {(user?.role === "admin" || user?.role === "owner") && (
           <>
             <button
@@ -192,6 +194,18 @@ if (formData.telefono) {
               transition={{ duration: 0.2 }}
             >
               <MyProfileForm />
+            </motion.div>
+          )}
+
+          {activeTab === "subscription" && (
+            <motion.div
+              key="subscription"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <SubscriptionSettings />
             </motion.div>
           )}
 

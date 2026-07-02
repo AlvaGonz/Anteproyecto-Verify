@@ -1,15 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2, ArrowRight, XCircle } from "lucide-react";
 import { apiClient } from "@/infrastructure/api/client";
+import { useAuth } from "../../shared/context/AuthContext";
 
 export const EmailVerifiedPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [countdown, setCountdown] = useState(7);
+  const [countdown, setCountdown] = useState(3);
   const hasAttempted = useRef(false);
+  const { refreshUser } = useAuth();
 
   useEffect(() => {
     if (!token) {
@@ -22,21 +24,32 @@ export const EmailVerifiedPage = () => {
 
     // Call API to verify token
     apiClient.get(`/auth/verify?token=${token}`)
-      .then(() => {
+      .then(async (response) => {
+        // Since backend set cookies, we can just load the user profile
+        if (response.data?.succeeded) {
+            await refreshUser();
+        }
         setStatus("success");
       })
       .catch(() => {
         setStatus("error");
       });
-  }, [token]);
+  }, [token, refreshUser]);
 
   useEffect(() => {
     if (status === "success") {
+      const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
+      const urlReturnUrl = searchParams.get('returnUrl');
+      const targetUrl = urlReturnUrl || storedRedirect || "/admin";
+
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
-            navigate("/login?verified=true");
+            if (storedRedirect) {
+              window.sessionStorage.removeItem('redirect_after_verification');
+            }
+            navigate(targetUrl);
             return 0;
           }
           return prev - 1;
@@ -64,17 +77,24 @@ export const EmailVerifiedPage = () => {
             </div>
             <h2 className="text-2xl font-display font-bold text-[#223382] mb-3">¡Cuenta verificada!</h2>
             <p className="text-text-secondary mb-6">
-              Tu correo electrónico ha sido verificado con éxito. Ya estás registrado en VeriFinca.
+              Tu correo electrónico ha sido verificado con éxito y hemos iniciado sesión por ti.
             </p>
             <div className="text-sm font-medium text-text-secondary mb-8 bg-slate-50 py-3 rounded-lg border border-border/60">
-              Serás redirigido al inicio de sesión en <span className="text-primary font-bold text-base px-1">{countdown}</span> segundos...
+              Serás redirigido en <span className="text-primary font-bold text-base px-1">{countdown}</span> segundos...
             </div>
             <button
-              onClick={() => navigate("/login?verified=true")}
+              onClick={() => {
+                const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
+                const urlReturnUrl = searchParams.get('returnUrl');
+                if (storedRedirect) {
+                  window.sessionStorage.removeItem('redirect_after_verification');
+                }
+                navigate(urlReturnUrl || storedRedirect || "/admin");
+              }}
               className="vf-btn-primary w-full h-[52px] text-sm font-bold shadow-floating hover:scale-[1.02] transition-transform"
             >
               <span className="flex items-center justify-center gap-2">
-                Ir al inicio de sesión ahora <ArrowRight className="w-4 h-4" />
+                Continuar <ArrowRight className="w-4 h-4" />
               </span>
             </button>
           </div>

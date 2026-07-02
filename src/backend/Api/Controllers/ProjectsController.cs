@@ -12,6 +12,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Common.Exceptions;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -31,39 +32,26 @@ public class ProjectsController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(CancellationToken cancellationToken)
     {
-        Domain.Entities.Usuario? loggedInUser = null;
-        var token = Request.Cookies["vf_token"];
-        if (!string.IsNullOrEmpty(token))
+        if (User.Identity?.IsAuthenticated == true)
         {
-            try
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (Guid.TryParse(userIdClaim, out var userId))
             {
-                var userEmail = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
-                loggedInUser = await _usuarioRepository.GetByEmailAsync(userEmail, cancellationToken);
+                var loggedInUser = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
+                if (loggedInUser != null)
+                {
+                    var projects = await _projectService.GetAllProjectsAsync(cancellationToken);
+                    if (loggedInUser.Rol != UserRole.Administrator)
+                    {
+                        projects = projects.Where(p => p.UsuarioCreadorId == userId);
+                    }
+                    return Ok(projects);
+                }
             }
-            catch { }
         }
 
-        if (loggedInUser != null)
-        {
-            var projects = await _projectService.GetAllProjectsAsync(cancellationToken);
-            if (loggedInUser.Rol != UserRole.Administrator)
-            {
-                projects = projects.Where(p => p.UsuarioCreadorId == loggedInUser.Id);
-            }
-            return Ok(projects);
-        }
-
-        var showAll = User.Identity?.IsAuthenticated == true || Request.Headers.ContainsKey("Authorization");
-        if (showAll)
-        {
-            var projects = await _projectService.GetAllProjectsAsync(cancellationToken);
-            return Ok(projects);
-        }
-        else
-        {
-            var projects = await _projectService.GetVisibleProjectsAsync(cancellationToken);
-            return Ok(projects);
-        }
+        var visibleProjects = await _projectService.GetVisibleProjectsAsync(cancellationToken);
+        return Ok(visibleProjects);
     }
 
     [HttpGet("{id:guid}")]

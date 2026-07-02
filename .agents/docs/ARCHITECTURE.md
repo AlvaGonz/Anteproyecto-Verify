@@ -314,6 +314,10 @@ erDiagram
     NVARCHAR20 Role
     DATETIME2 CreatedAt
     BIT IsActive
+    NVARCHAR256 StripeCustomerId
+    NVARCHAR256 StripeSubscriptionId
+    NVARCHAR50 SubscriptionStatus
+    DATETIME2 CurrentPeriodEnd
   }
 
   Projects {

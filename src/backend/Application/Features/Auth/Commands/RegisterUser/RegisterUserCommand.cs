@@ -8,7 +8,8 @@ public record RegisterUserCommand(
     string Email,
     string Password,
     string Telefono,
-    string Cedula
+    string Cedula,
+    string? ReturnUrl = null
 );
 
 public record RegisterUserResultDto(

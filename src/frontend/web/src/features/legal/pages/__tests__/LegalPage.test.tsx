@@ -25,6 +25,15 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
+// Mock AuthContext
+vi.mock("../../../../shared/context/AuthContext", () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    loading: false,
+  }),
+}));
+
 beforeAll(() => {
   class MockIntersectionObserver {
     observe = vi.fn();
@@ -43,7 +52,7 @@ describe("LegalPage", () => {
       </BrowserRouter>
     );
 
-    // Assert that the page renders the complianceCenter i18n key rather than hardcoded Spanish
-    expect(screen.getByText("legal.complianceCenter")).toBeInTheDocument();
+    // Assert that the page renders the billing i18n key rather than hardcoded text
+    expect(screen.getByText(/legal\.billing\.title/i)).toBeInTheDocument();
   });
 });

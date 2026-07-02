@@ -19,6 +19,15 @@ vi.mock("framer-motion", async () => {
   };
 });
 
+// Mock AuthContext
+vi.mock("../../shared/context/AuthContext", () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    loading: false,
+  }),
+}));
+
 describe("LandingPage", () => {
   const queryClient = new QueryClient();
   

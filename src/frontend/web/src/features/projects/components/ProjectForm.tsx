@@ -103,7 +103,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   
   const portraitInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const existingFotoUrls: string[] = initialData?.fotoUrls ?? [];
+  const existingFotoUrls: string[] = initialData?.fotoUrls ?? (initialData && 'imagenUrl' in initialData && initialData.imagenUrl ? [initialData.imagenUrl as string] : []);
 
   // Derivado unificado para el submit — portada siempre primera
   const fotos: File[] = portrait ? [portrait, ...gallery] : gallery;
@@ -759,6 +759,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               ) : (
                 <button
                   type="button"
+                  id="btn-agregar-portada"
                   onClick={() => portraitInputRef.current?.click()}
                   aria-label="Subir foto de portada"
                   className="w-[200px] h-[200px] rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center justify-center gap-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
@@ -772,6 +773,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
               <input
                 ref={portraitInputRef}
+                id="input-portada"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 className="sr-only"

@@ -15,6 +15,7 @@ using Domain.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Xunit;
 
@@ -57,7 +58,8 @@ public class AuthControllerTests
             updateProfileHandler,
             _usuarioRepositoryMock.Object, 
             mockConfig.Object,
-            mockJwtTokenGenerator.Object);
+            mockJwtTokenGenerator.Object,
+            new MemoryCache(new MemoryCacheOptions()));
 
         var httpContext = new DefaultHttpContext();
         _controller.ControllerContext = new ControllerContext()

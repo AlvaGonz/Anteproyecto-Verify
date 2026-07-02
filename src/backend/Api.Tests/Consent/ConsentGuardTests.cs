@@ -184,6 +184,35 @@ public class ConsentGuardTests
     }
 
     [Fact]
+    public async Task CreditCheck_ConsentVersionMismatch_BlocksTransUnion()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var projectId = Guid.NewGuid();
+        var request = new ConsultarCreditoCommand { ProyectoId = projectId, UsuarioId = userId };
+
+        var project = new Proyecto("Test Project", "Location", userId);
+        var developer = new Usuario("Test", "User", "test@test.com", "809", Domain.Enums.UserRole.User, "123456789", "hash");
+        typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(developer, userId);
+
+        // Consent granted under OLD policy version
+        var oldVersionConsent = new ConsentimientoFinanciero(userId, "127.0.0.1", "v0.9", 30);
+
+        _proyectoRepoMock.GetByIdAsync(projectId, Arg.Any<CancellationToken>()).Returns(project);
+        _usuarioRepoMock.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns(developer);
+        _consentRepoMock.GetVigenteByUsuarioIdAsync(userId, Arg.Any<CancellationToken>()).Returns(oldVersionConsent);
+
+        // Act
+        var result = await _creditHandler.Handle(request, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Contains("renovar", result.Mensaje, StringComparison.OrdinalIgnoreCase);
+        // TransUnion must NOT be called when consent version is outdated
+        await _transUnionMock.DidNotReceive().ConsultarHistorialAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public void RevokeConsent_SetsIsRevokedTrue_DoesNotDeleteRow()
     {
         // Arrange

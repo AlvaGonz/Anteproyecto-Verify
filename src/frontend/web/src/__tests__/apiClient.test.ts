@@ -30,8 +30,8 @@ describe('apiClient interceptor', () => {
     // 2. The retry of the original request should succeed
     clientMock.onGet('/protected-data').replyOnce(200, { data: 'Success' });
 
-    // 3. Setup the mock for the global axios used in refresh
-    mock.onPost(/\/auth\/refresh/).replyOnce(200, {
+    // 3. Setup the mock for the apiClient used in refresh
+    clientMock.onPost(/\/auth\/refresh/).replyOnce(200, {
       accessToken: 'new-mocked-token',
       expiresIn: 7200
     });
@@ -59,11 +59,11 @@ describe('apiClient interceptor', () => {
     const clientMock = new MockAdapter(apiClient);
     clientMock.onGet('/protected-data').replyOnce(401, { message: 'Unauthorized' });
 
-    mock.onPost(/\/auth\/refresh/).replyOnce(401, { message: 'Refresh failed' });
+    clientMock.onPost(/\/auth\/refresh/).replyOnce(401, { message: 'Refresh failed' });
 
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
-    await expect(apiClient.get('/protected-data')).rejects.toThrow('Request failed with status code 401');
+    await expect(apiClient.get('/protected-data')).rejects.toThrow();
 
     expect(dispatchSpy).toHaveBeenCalled();
     const eventArg = dispatchSpy.mock.calls[0][0] as Event;

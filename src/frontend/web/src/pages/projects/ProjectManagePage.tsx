@@ -86,6 +86,15 @@ export const ProjectManagePage: React.FC = () => {
           throw new Error("Missing required field: categoria");
         }
         await updateMutation.mutateAsync({ id: id as string, payload: data });
+        if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
+          for (const file of data.fotosNuevas) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("tipoDocumento", "1");
+            await apiClient.post(`/projects/${id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+          }
+          qc.invalidateQueries({ queryKey: ["projects"] });
+        }
         addToast("Proyecto actualizado exitosamente", "success");
         navigate("/admin/projects");
       } else {
@@ -102,6 +111,15 @@ export const ProjectManagePage: React.FC = () => {
           designacionCatastral: data.designacionCatastral,
           ubicacionGps: data.ubicacionGps
         });
+        if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
+          for (const file of data.fotosNuevas) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("tipoDocumento", "1");
+            await apiClient.post(`/projects/${newProj.id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+          }
+          qc.invalidateQueries({ queryKey: ["projects"] });
+        }
         addToast("Proyecto creado exitosamente", "success");
         navigate("/admin/projects");
       }

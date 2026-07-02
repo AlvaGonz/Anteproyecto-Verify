@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Concurrent;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Api.Controllers;
 
@@ -22,6 +22,7 @@ public class AuthController : ControllerBase
     private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
     private readonly Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler _uploadAvatarHandler;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
+    private readonly IMemoryCache _cache;
 
     public AuthController(
         Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler registerHandler,
@@ -31,7 +32,8 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler uploadAvatarHandler,
         Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
         IConfiguration configuration,
-        Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator)
+        Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator,
+        IMemoryCache cache)
     {
         _registerHandler = registerHandler;
         _verifyHandler = verifyHandler;
@@ -41,6 +43,7 @@ public class AuthController : ControllerBase
         _usuarioRepository = usuarioRepository;
         _configuration = configuration;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _cache = cache;
     }
 
     [HttpPost("register")]
@@ -52,7 +55,8 @@ public class AuthController : ControllerBase
             request.Email ?? request.CorreoElectronico ?? string.Empty,
             request.Password ?? request.Contrasena ?? string.Empty,
             request.Telefono ?? "8095550199",
-            request.Cedula ?? "40212345678"
+            request.Cedula ?? "40212345678",
+            request.ReturnUrl
         );
         var result = await _registerHandler.Handle(command, cancellationToken);
         
@@ -88,7 +92,7 @@ public class AuthController : ControllerBase
         });
 
         var refreshToken = Guid.NewGuid().ToString("N");
-        _refreshTokens[refreshToken] = responseData.User.Id.ToString();
+        _cache.Set(refreshToken, responseData.User.Id.ToString(), TimeSpan.FromDays(30));
 
         Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
         {
@@ -127,6 +131,55 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage });
         }
 
+        if (result.UserId.HasValue)
+        {
+            var user = await _usuarioRepository.GetByIdAsync(result.UserId.Value, cancellationToken);
+            if (user != null)
+            {
+                var accessToken = _jwtTokenGenerator.GenerateToken(user);
+                var refreshToken = Guid.NewGuid().ToString("N");
+                _cache.Set(refreshToken, user.Id.ToString(), TimeSpan.FromDays(30));
+
+                Response.Cookies.Append("jwt", accessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    Path = "/"
+                });
+
+                Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    Path = "/api/auth/refresh",
+                    MaxAge = TimeSpan.FromDays(30)
+                });
+
+                var roleStr = user.Rol switch
+                {
+                    Domain.Enums.UserRole.Administrator => "admin",
+                    Domain.Enums.UserRole.User => "user",
+                    _ => "user"
+                };
+
+                return Ok(new
+                {
+                    Message = "Correo electrónico verificado exitosamente.",
+                    succeeded = true,
+                    accessToken = accessToken,
+                    user = new
+                    {
+                        id = user.Id,
+                        name = user.Nombre,
+                        email = user.CorreoElectronico,
+                        role = roleStr
+                    }
+                });
+            }
+        }
+
         return Ok(new { Message = "Correo electrónico verificado exitosamente. Ya puede iniciar sesión." });
     }
 
@@ -136,7 +189,7 @@ public class AuthController : ControllerBase
         var refreshToken = Request.Cookies["refreshToken"];
         if (!string.IsNullOrEmpty(refreshToken))
         {
-            _refreshTokens.TryRemove(refreshToken, out _);
+            _cache.Remove(refreshToken);
         }
 
         Response.Cookies.Append("jwt", "", new CookieOptions
@@ -194,7 +247,9 @@ public class AuthController : ControllerBase
             Cedula = user.Cedula ?? string.Empty,
             Telefono = user.Telefono ?? string.Empty,
             Plan = user.Plan?.NombrePlan ?? "N/A",
-            AvatarUrl = user.AvatarUrl
+            AvatarUrl = user.AvatarUrl,
+            SubscriptionStatus = user.SubscriptionStatus ?? "N/A",
+            CurrentPeriodEnd = user.CurrentPeriodEnd
         });
     }
 
@@ -202,7 +257,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
     {
         var token = Request.Cookies["refreshToken"];
-        if (string.IsNullOrEmpty(token) || !_refreshTokens.TryGetValue(token, out var userIdStr))
+        if (string.IsNullOrEmpty(token) || !_cache.TryGetValue(token, out string? userIdStr) || userIdStr == null)
         {
             return Unauthorized(new { Message = "Token de refresco inválido o expirado." });
         }
@@ -219,13 +274,13 @@ public class AuthController : ControllerBase
         }
 
         // Rotate token (single-use)
-        _refreshTokens.TryRemove(token, out _);
+        _cache.Remove(token);
 
         // Generate real access token
         var newAccessToken = _jwtTokenGenerator.GenerateToken(user);
         
         var newRefreshToken = Guid.NewGuid().ToString("N");
-        _refreshTokens[newRefreshToken] = userId.ToString();
+        _cache.Set(newRefreshToken, userId.ToString(), TimeSpan.FromDays(30));
 
         // Overwrite the jwt cookie with the new valid token
         Response.Cookies.Append("jwt", newAccessToken, new CookieOptions
@@ -325,4 +380,5 @@ public class RegisterRequestDto
     public string? Contrasena { get; set; }
     public string? Telefono { get; set; }
     public string? Cedula { get; set; }
+    public string? ReturnUrl { get; set; }
 }

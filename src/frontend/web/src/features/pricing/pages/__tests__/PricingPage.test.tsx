@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { BrowserRouter, useNavigate } from "react-router-dom";
 import { PricingPage } from "../PricingPage";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock("framer-motion", async () => {
@@ -25,22 +25,91 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
-// Mock AuthContext
+// Mock react-router-dom useNavigate
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual as any,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+// We need to control the mock of AuthContext
+const mockUseAuth = vi.fn();
 vi.mock("../../../../shared/context/AuthContext", () => ({
-  useAuth: () => ({
-    isAuthenticated: false,
-  }),
+  useAuth: () => mockUseAuth(),
 }));
 
 describe("PricingPage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("renders the PricingPage and utilizes internationalized translation keys", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false });
     render(
       <BrowserRouter>
         <PricingPage />
       </BrowserRouter>
     );
 
-    // Assert that the page renders the pricing header tag i18n key rather than hardcoded Spanish
     expect(screen.getByText("pricing.header.tag")).toBeInTheDocument();
+  });
+
+  it("navigates to /register when clicking Free plan and unauthenticated", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false });
+    render(
+      <BrowserRouter>
+        <PricingPage />
+      </BrowserRouter>
+    );
+
+    const freeButton = screen.getByText("pricing.cards.free.button");
+    fireEvent.click(freeButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/register");
+  });
+
+  it("navigates to /dashboard when clicking Free plan and authenticated", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <BrowserRouter>
+        <PricingPage />
+      </BrowserRouter>
+    );
+
+    const freeButton = screen.getByText("pricing.cards.free.button");
+    fireEvent.click(freeButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
+  });
+
+  it("navigates to /register with redirect param when clicking Professional plan and unauthenticated", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false });
+    render(
+      <BrowserRouter>
+        <PricingPage />
+      </BrowserRouter>
+    );
+
+    const proButton = screen.getByText("pricing.cards.pro.button");
+    fireEvent.click(proButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/register?redirect=%2Fcheckout%3Fplan%3Dprofesional%26billing%3Dmonthly");
+  });
+
+  it("navigates to /checkout when clicking Professional plan and authenticated", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <BrowserRouter>
+        <PricingPage />
+      </BrowserRouter>
+    );
+
+    const proButton = screen.getByText("pricing.cards.pro.button");
+    fireEvent.click(proButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/checkout?plan=profesional&billing=monthly");
   });
 });

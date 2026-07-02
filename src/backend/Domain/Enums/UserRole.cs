@@ -8,5 +8,8 @@ public enum UserRole
     Enterprise = 4,
     Business = 5,
     Professional = 6,
-    Consultation = 7
+    Consultation = 7,
+    Consultor = 8,
+    Profesional = 9,
+    Empresa = 10
 }

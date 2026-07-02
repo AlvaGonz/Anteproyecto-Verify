@@ -1,8 +1,6 @@
-Aquí tienes el AGENTS.md expandido y fusionado — zero reducción, todo filtrado y anclado al objetivo del proyecto de grado: VeriFinca como sistema web de verificación y autenticación integral de proyectos inmobiliarios en la República Dominicana.
-
-text
 # AGENTS.md — VeriFinca / Anteproyecto-Verify
-> **Version:** 4.0.0 | **Date:** 2026-06-29 | **Status:** Active & Enforced
+> **Version:** 5.0.0 | **Date:** 2026-06-29 | **Status:** Active & Enforced
+> **codebase-memory-mcp:** Mandatory — every agent session, zero exceptions
 > **Proyecto de Grado:** Sistema web de verificación y autenticación integral de proyectos
 > inmobiliarios para prevención de estafas financieras mediante la validación de documentación
 > legal, financiera y de propiedad en la República Dominicana.
@@ -30,10 +28,117 @@ repository must serve one of the 7 specific thesis objectives:
 
 ---
 
-## 🤖 AGENTIC CONSTITUTION & ORCHESTRATION PROTOCOL (V3.0)
+## 🤖 AGENTIC CONSTITUTION & ORCHESTRATION PROTOCOL (V4.0)
 **Context:** Enterprise-Grade Spec-Driven Development
 **Enforcement:** ALL AI agents MUST read and obey these directives before executing any 
 task in this repository.
+
+---
+
+## 0. 🧠 CODEBASE-MEMORY-MCP — ABSOLUTE MANDATORY (NON-NEGOTIABLE)
+
+> ⛔ **NO AGENT MAY WRITE, READ, MODIFY, OR DELETE ANY FILE IN THIS REPO
+> WITHOUT FIRST COMPLETING THE codebase-memory-mcp BOOTSTRAP SEQUENCE.**
+> Skipping this step = context-blind agent = ZOMBIE REVERT risk = session is invalid.
+
+### Why This Exists
+
+agents lose full context after 15–20 turns. The codebase-memory-mcp
+provides a **live semantic graph** of every symbol, import, dependency, and
+architectural decision in this monorepo. It is the agent's persistent memory
+between sessions.
+
+### Bootstrap Sequence (MANDATORY — Run Every New Session, Every Task)
+
+**Step 1:**
+```
+get_architecture
+```
+→ Full codebase map: languages, packages, routes, hotspots, cluster topology, ADR list
+→ Required context BEFORE any code edit
+
+**Step 2:**
+```
+get_graph_schema
+```
+→ Node/edge count, relationship types, property definitions
+
+**Step 3:**
+```
+search_graph (query: name of the file or symbol you plan to touch)
+```
+→ Confirms the symbol exists, finds what imports it, what it exports
+
+**Step 4 (conditional — if task involves a change):**
+```
+detect_changes
+```
+→ Maps current git diff → affected symbols, blast radius, risk score
+→ MANDATORY before any PR creation or deploy to develop
+
+**Step 5 (conditional — if touching a shared service):**
+```
+trace_path (alias: trace_call_path)
+```
+→ BFS depth ≥ 3 on any Application-layer symbol
+→ MANDATORY before refactoring any service touched by >1 feature
+
+**Step 6 (optional — for bug traces):**
+```
+query_graph       — Cypher-like, read-only
+search_code       — grep-like within indexed project
+get_code_snippet  — fetch source by qualified name
+```
+
+### Tool Reference Table
+
+| When | Tool | Minimum Usage |
+|------|------|---------------|
+| Every session start | `get_architecture` | 1x before any action |
+| Every session start | `get_graph_schema` | 1x |
+| Before reading/editing any file | `search_graph` | 1x per file |
+| Before creating a new file/symbol | `search_graph` | Confirm no duplicate exists |
+| Before PR or merge to develop | `detect_changes` | 1x mandatory |
+| Before refactoring shared services | `trace_path` | Depth ≥ 3 |
+| When index might be stale | `index_status` → `index_repository` | On demand |
+| ADR management | `manage_adr` | On ADR create/update |
+| Runtime HTTP call edges | `ingest_traces` | After integration test runs |
+
+### Enforcement Rules
+
+- **RULE CM-1:** `get_architecture` must be the FIRST tool call of every session.
+  No exceptions. Not even for "small" 1-line fixes.
+
+- **RULE CM-2:** `detect_changes` must run before every `git push` or PR creation.
+  Blast radius must be documented in the PR description.
+
+- **RULE CM-3:** `search_graph` must confirm a symbol does not exist before
+  creating a new file. A file with that name may already exist in the monorepo.
+
+- **RULE CM-4:** `trace_path` (depth ≥ 3) is mandatory before refactoring any
+  class or function in `VeriFinca.Application/` or `src/features/`.
+
+- **RULE CM-5:** If `index_status` reports stale index → run `index_repository`
+  and wait for completion before proceeding. Never act on stale graph data.
+
+- **RULE CM-6:** For any task touching >3 files, run `get_architecture` again
+  mid-task to confirm architectural consistency.
+
+### Scope: Full Codebase Coverage
+
+The codebase-memory-mcp indexes ALL of the following (confirm via `get_architecture`):
+
+| Area | Key Symbols |
+|------|-------------|
+| Backend Domain | `Project`, `Document`, `ConsentRecord`, `IntegritySeal`, `AuditLog` |
+| Backend Application | All Command/Query Handlers, FluentValidation validators, DTOs |
+| Backend Infrastructure | `AppDbContext`, `CertificationEngine`, `ValidationJobConsumer`, external API clients |
+| Backend API | Controllers, Middleware, `Program.cs`, RBAC filters |
+| Frontend Features | `useProjects`, `useDocuments`, `ProjectPhotosSection`, `EditProjectForm` |
+| Frontend Shared | `apiClient`, TanStack Query keys, Zod schemas, design tokens |
+| CI/CD | `.github/workflows/ci.yml`, pre-commit hooks |
+| Docs | `AGENTS.md`, `TRD_VeriFinca.md`, `ARCHITECTURE.md`, `progress.md`, ADRs |
+| Config | `.env.*`, `docker-compose.yml`, `playwright.config.ts` |
 
 ---
 
@@ -66,6 +171,7 @@ outside this immediate repository, you MUST attempt to use an available MCP serv
 
 | MCP Server | When to Connect | Purpose |
 |---|---|---|
+| **codebase-memory-mcp** | **ALWAYS — every session** | Full semantic graph of repo: symbols, imports, call chains, blast radius (see §0) |
 | **GitHub MCP** | PRs, Issues, branch review | Agent reads actual PR diff and comments instead of guessing state |
 | **context7-mcp** | Framework/library syntax questions | Connect via Context7 MCP to get live ASP.NET Core 8, React 19, Zod, Tailwind 4 documentation |
 | **Azure SQL / DB MCP** | Schema-related tasks | Agent reads live `AppDbContext` migrations to prevent hallucinated columns |
@@ -115,11 +221,12 @@ strictly within its boundaries:
 | **Role C: The Reviewer** | Separate chat session | Audits Coder output against TRD spec | Coder's diff + TRD section | Review comments, security findings, refactoring plan |
 
 **Mandatory Transition Protocol:**
+
+```
 [Architect Agent] → Approves spec → [Coder Agent]
 [Coder Agent] → Commits code → [Reviewer Agent]
 [Reviewer Agent] → Approves PR → Merge to branch
-
-text
+```
 
 No agent skips a stage. The Coder Agent must not author specs. The Reviewer Agent must not 
 write implementation code.
@@ -129,31 +236,37 @@ write implementation code.
 ## 5. 📌 COMMIT & CHECKPOINT PROTOCOL
 
 - **Atomic Commits:** Do not batch massive changes. Commit after every logical step:
-git commit -m "test: add failing auth test"
-git commit -m "feat: implement auth logic"
-git commit -m "feat(seal): add RSA-2048 signing guard for RF-10"
-git commit -m "test(consent): add Law172-13 consent gate unit test"
-
-text
+  ```
+  git commit -m "test: add failing auth test"
+  git commit -m "feat: implement auth logic"
+  git commit -m "feat(seal): add RSA-2048 signing guard for RF-10"
+  git commit -m "test(consent): add Law172-13 consent gate unit test"
+  ```
 - **Commit Scope Tags (VeriFinca):** Prefix commits with the relevant RF or OE:
-- `feat(rf-3): implement OCR field extraction for TITULO_PROPIEDAD`
-- `feat(rf-10): emit integrity seal via CertificationEngine`
-- `fix(rf-9): block TransUnion query when consent revoked`
-- `test(oe-3): add duplicate matricula detection test`
+  - `feat(rf-3): implement OCR field extraction for TITULO_PROPIEDAD`
+  - `feat(rf-10): emit integrity seal via CertificationEngine`
+  - `fix(rf-9): block TransUnion query when consent revoked`
+  - `test(oe-3): add duplicate matricula detection test`
 - **Zombie Revert Prevention:** If you get stuck in a loop trying to fix the same error 
-3 times, **STOP**. Revert your changes to the last green checkpoint and ask the human 
-for strategic guidance. Never attempt a 4th fix on the same failing test.
+  3 times, **STOP**. Revert your changes to the last green checkpoint and ask the human 
+  for strategic guidance. Never attempt a 4th fix on the same failing test.
+- **Final Verification Gate:** An agent MUST NOT set a task or implementation as "done" or completed until ALL of its related tests are green. You MUST always run the final verification gate using `python .agents/scripts/post_task_loop.py` before concluding.
 
 ---
 
-## 6. 🧠 AGENTIC MEMORY BANK & CONTEXT CONTINUITY PROTOCOL
+## 6. 🧠 AGENTIC MEMORY: progress.md + codebase-memory-mcp (Unified Protocol)
 
 **Problem:** Cursor/Windsurf agents lose full context after 15–20 turns. Without explicit 
 state tracking, agents re-implement completed features, forget architectural decisions, or 
 contradict previous work in new sessions.
 
-**Solution:** The agent is responsible for maintaining a living `docs/PWF/progress.md` 
-file. This file is the agent's external memory.
+**Solution:** Two complementary memory systems work together:
+1. **progress.md** — Human-readable session log (what was done, what's next)
+2. **codebase-memory-mcp** — Machine-readable semantic graph (what code exists, how it connects)
+
+**After every session, BOTH actions are required:**
+1. Update `.agents/docs/PWF/progress.md`
+2. Run `detect_changes` to confirm blast radius of session work is documented
 
 ### Rule: Mandatory `.agents/docs/PWF/progress.md` Update
 
@@ -161,117 +274,35 @@ After every successful feature implementation (i.e., after `dotnet test` passes 
 `git commit` is executed), the agent **must** update `.agents/docs/PWF/progress.md` before 
 ending the session. This is non-negotiable.
 
-> ⛔ **FORBIDDEN:** Agents **MUST NOT** write to `tasks/` directory. The `tasks/` folder 
-> is a human-managed area. Any agent that writes `tasks/progress.md` or any file under 
-> `tasks/` is violating this protocol and its output must be discarded.
 
 **Failure to update `.agents/docs/PWF/progress.md` before closing a session = incomplete task.**
 
-### `docs/PWF/progress.md` Schema (enforced structure)
+### `docs/PWF/progress.md` Schema (enforced structure) THIS GONNA BE ACHIEVED BY USING THE SKILL /planning-with-files
 
-```markdown
-# VeriFinca — Agent Progress Tracker
-> Last updated: [ISO8601 timestamp] by [Agent role: Architect/Coder/Reviewer]
+### Rule: Mandatory Task-Specific Rule Evaluation
 
-## ✅ Completed Features
-| Feature | TRD Section | Branch | Commit SHA | Date | OE Satisfied |
-|---|---|---|---|---|---|
-| RegisterProject endpoint | §9, RF-1 | feat/register-project | abc1234 | 2026-05-25 | OE-1 |
-| DocumentDiagnosis Rules Engine | §4, RF-2 | feat/doc-diagnosis | def5678 | 2026-05-27 | OE-1, OE-4 |
-| OCR Azure DocAI integration | §4, RF-3 | feat/ocr-docai | ghi9012 | 2026-05-30 | OE-2, OE-3 |
-
-## 🔄 In Progress
-| Feature | TRD Section | Status | Blocker | OE |
-|---|---|---|---|---|
-| ValidationJobConsumer | §3, RF-3→7 | 60% — OCR done, RI pending | RI API contract unconfirmed | OE-2 |
-
-## 🔜 Next Up (Prioritized)
-1. RF-4 RI Integration — TRD §10.1 (OE-2, OE-3)
-2. RF-5 Catastro Contrast — TRD §10.2 (OE-2, OE-5)
-3. RF-6 DGII Validation — TRD §10.3 (OE-2)
-4. RF-8 Consent Management — TRD §6.4 (OE-6)
-5. RF-9 Credit Verification (TransUnion) — TRD §10.5 (OE-6)
-6. RF-10 Integrity Seal — TRD §11 (OE-7)
-7. RF-11 Public QR Verification — TRD §9 (OE-7)
-
-## ⚠️ Open Decisions (Human-in-the-Loop Required)
-- [ ] RI API: SOAP vs REST endpoint confirmed?
-- [ ] Catastro Nacional: REST API availability and auth method?
-- [ ] TransUnion DR: Production API sandbox available?
-- [ ] DGII public RNC endpoint: rate limit policy?
-- [ ] Azure AI Document Intelligence: Custom model training dataset ready?
-
-## 🚫 Known Constraints
-- Do NOT implement TransUnion query until ConsentRecord gate is merged and green
-- Do NOT delete ConsentRecords or AuditLogs — 7-year retention required by Law 172-13
-- Do NOT bypass FluentValidation on any new DTO
-- Do NOT store secrets in appsettings.json — Key Vault only
-- Do NOT issue IntegritySeal unless ALL ValidationResults.Status = PASS (RF-10 guard)
-```
+Before executing any code changes, the agent **must** examine the task requirements and read all relevant rules from `.agents/rules/` that correspond to the domains involved (e.g., `api-contract.md` for API changes, `desing-system.md` for UI updates, `databa-migrations.md` for DB tasks).
 
 ### Context Recovery Protocol (After `/clear` or New Session)
 
 When starting a new session, the **first action** before any code is written must be:
-Read @.agents/docs/PWF/progress.md
 
-Read @.agents/docs/TRD_VeriFinca.md §[section relevant to next task]
+```
+1. codebase-memory-mcp: get_architecture → get_graph_schema (§0 bootstrap)
+2. Read @.agents/docs/PWF/progress.md
+3. Read @.agents/docs/TRD_VeriFinca.md §[section relevant to next task]
+4. Read @.agents/docs/ARCHITECTURE.md [relevant diagram section]
+5. Read @AGENTS.md
+6. Read relevant rule files from @.agents/rules/ based on the current task
+7. THEN: ask the human to confirm "Next Up" item before proceeding
+```
 
-Read @.agents/docs/ARCHITECTURE.md [relevant diagram section]
-
-Read @.agents/docs/AGENTS.md
-
-THEN: ask the human to confirm "Next Up" item before proceeding
-
-text
-
-An agent that skips step 1 and starts coding without reading `.agents/docs/PWF/progress.md` 
-is operating context-blind and **must be stopped**.
-
----
-
-## 7. 🧠 Codebase Intelligence — codebase-memory-mcp (MANDATORY)
-
-**Every agent session MUST start by querying the codebase graph before reading, writing, 
-or modifying any file.** This MCP provides a live semantic graph of the repository. Using 
-it before acting prevents stale reads, zombie reverts, and blast-radius surprises.
-
-### Mandatory Bootstrap Sequence (run in this order)
-get_architecture → Codebase overview: languages, packages, routes, hotspots, clusters, ADR.
-
-get_graph_schema → Node/edge counts, relationship patterns, property definitions.
-
-search_graph → Locate symbols by label, name pattern, or file pattern.
-
-text
-
-### When to Use Each Tool
-
-| Trigger | Tool | Why |
-|---------|------|-----|
-| Starting any task | `get_architecture` | Get full codebase map before touching files |
-| Before reading/editing a file | `search_graph` | Find what imports it, what it exports |
-| Tracing a bug or call chain | `trace_path` (alias `trace_call_path`) | BFS traversal depth 1–5 |
-| Before merging/deploying | `detect_changes` | Map git diff → affected symbols + blast radius + risk |
-| Understanding relationships | `query_graph` | Cypher-like read-only queries |
-| Reading function source | `get_code_snippet` | Fetch source by qualified name |
-| Text/pattern search | `search_code` | Grep-like within indexed project files |
-| Checking index freshness | `index_status` | Verify auto-sync is current |
-| Managing ADRs | `manage_adr` | CRUD for Architecture Decision Records |
-| Validating HTTP call edges | `ingest_traces` | Ingest runtime traces |
-
-### Rules
-
-- **Never skip `get_architecture` at session start.** Even for "small" tasks.
-- **`detect_changes` before every PR or deploy.** Blast radius must be known before 
-  merging to `develop`.
-- **`trace_path` before refactoring any shared service.** Depth 3 minimum on 
-  `Application` layer symbols.
-- **`search_graph` before creating a new file.** A symbol with that name may already exist.
-- If `index_status` shows stale index → run `index_repository` before proceeding.
+An agent that skips the codebase-memory-mcp bootstrap (§0) and starts coding without 
+reading `.agents/docs/PWF/progress.md` is operating context-blind and **must be stopped**.
 
 ---
 
-## 8. 🏗️ Project Structure
+## 7. 🏗️ Project Structure
 
 ### Monorepo Layout
 
@@ -285,42 +316,43 @@ text
 **Frontend entrypoint**: `src/frontend/web/src/main.tsx`
 
 ### Clean Architecture Directory Tree (Enforced)
+
+```
 src/
 ├── VeriFinca.Domain/
-│ ├── Entities/ # Project, Document, ConsentRecord, IntegritySeal, AuditLog
-│ ├── Enums/ # ValidationStatus, DocumentType, Role, AlertCode
-│ ├── Interfaces/ # IProjectRepository, ISealRepository, IConsentRepository
-│ └── Exceptions/ # DomainException, ConsentRequiredException, DuplicateMatriculaException
+│   ├── Entities/       # Project, Document, ConsentRecord, IntegritySeal, AuditLog
+│   ├── Enums/          # ValidationStatus, DocumentType, Role, AlertCode
+│   ├── Interfaces/     # IProjectRepository, ISealRepository, IConsentRepository
+│   └── Exceptions/     # DomainException, ConsentRequiredException, DuplicateMatriculaException
 │
 ├── VeriFinca.Application/
-│ ├── Commands/ # RegisterProjectCommand, IssueIntegritySealCommand, TriggerValidationCommand
-│ ├── Queries/ # GetProjectQuery, GetValidationResultsQuery, GetDocumentDiagnosisQuery
-│ ├── Handlers/ # One handler class per Command/Query (no shared handlers)
-│ ├── DTOs/ # Request / Response records (C# records – immutable)
-│ ├── Validators/ # FluentValidation per DTO (one class per DTO, assembly-scanned)
-│ └── Interfaces/ # IOcrService, IGovernmentApiService, ISealingService, IConsentService
+│   ├── Commands/       # RegisterProjectCommand, IssueIntegritySealCommand, TriggerValidationCommand
+│   ├── Queries/        # GetProjectQuery, GetValidationResultsQuery, GetDocumentDiagnosisQuery
+│   ├── Handlers/       # One handler class per Command/Query (no shared handlers)
+│   ├── DTOs/           # Request / Response records (C# records – immutable)
+│   ├── Validators/     # FluentValidation per DTO (one class per DTO, assembly-scanned)
+│   └── Interfaces/     # IOcrService, IGovernmentApiService, ISealingService, IConsentService
 │
 ├── VeriFinca.Infrastructure/
-│ ├── Persistence/ # AppDbContext, Migrations/, Repositories/
-│ ├── ExternalApis/ # RiClient, DgiiClient, CatastroClient, TransUnionClient (Polly retry)
-│ ├── Messaging/ # ServiceBusPublisher, ValidationJobConsumer (IHostedService)
-│ ├── Ocr/ # AzureDocumentIntelligenceService (implements IOcrService)
-│ ├── Sealing/ # CertificationEngine (Key Vault RSA-2048 signing, Law 126-02)
-│ ├── Security/ # JwtService, KeyVaultSecretProvider (Managed Identity)
-│ └── BackgroundJobs/ # DataRetentionPurgeJob (Law 172-13 TTL enforcement)
+│   ├── Persistence/    # AppDbContext, Migrations/, Repositories/
+│   ├── ExternalApis/   # RiClient, DgiiClient, CatastroClient, TransUnionClient (Polly retry)
+│   ├── Messaging/      # ServiceBusPublisher, ValidationJobConsumer (IHostedService)
+│   ├── Ocr/            # AzureDocumentIntelligenceService (implements IOcrService)
+│   ├── Sealing/        # CertificationEngine (Key Vault RSA-2048 signing, Law 126-02)
+│   ├── Security/       # JwtService, KeyVaultSecretProvider (Managed Identity)
+│   └── BackgroundJobs/ # DataRetentionPurgeJob (Law 172-13 TTL enforcement)
 │
 ├── VeriFinca.Api/
-│ ├── Controllers/ # AuthController, ProjectsController, ValidationController, PublicController
-│ ├── Middleware/ # ErrorHandlingMiddleware, RateLimitMiddleware, SecurityHeadersMiddleware
-│ ├── Filters/ # RbacAuthorizationFilter
-│ └── Program.cs
+│   ├── Controllers/    # AuthController, ProjectsController, ValidationController, PublicController
+│   ├── Middleware/      # ErrorHandlingMiddleware, RateLimitMiddleware, SecurityHeadersMiddleware
+│   ├── Filters/        # RbacAuthorizationFilter
+│   └── Program.cs
 │
 └── VeriFinca.Tests/
-├── Unit/ # xUnit + Moq – Domain, Rules Engine, CertificationEngine guards
-├── Integration/ # TestContainers (SQL Server) + WireMock.NET (govt APIs)
-└── Security/ # OWASP ZAP headless scan scripts
-
-text
+    ├── Unit/           # xUnit + Moq – Domain, Rules Engine, CertificationEngine guards
+    ├── Integration/    # TestContainers (SQL Server) + WireMock.NET (govt APIs)
+    └── Security/       # OWASP ZAP headless scan scripts
+```
 
 **Boundary rule enforced via `dotnet-archunit`:**
 - `Api` → `Application` only (never `Infrastructure` or `Domain` directly).
@@ -338,7 +370,7 @@ text
 
 ---
 
-## 9. 🚀 Quick Start
+## 8. 🚀 Quick Start
 
 ### Docker (Recommended for Full Stack)
 
@@ -366,7 +398,7 @@ pnpm run dev          # starts on port 3000
 
 ---
 
-## 10. 📦 Package Manager
+## 9. 📦 Package Manager
 
 - **pnpm** (v9+) — workspace root has `pnpm-workspace.yaml` pointing to `src/frontend/web`
 - Lockfile: `pnpm-lock.yaml` at root
@@ -375,7 +407,7 @@ pnpm run dev          # starts on port 3000
 
 ---
 
-## 11. 🧪 Testing
+## 10. 🧪 Testing
 
 ### Frontend (Vitest)
 
@@ -425,14 +457,15 @@ dotnet test tests/backend/UnitTests/UnitTests.csproj --filter "FullyQualifiedNam
 | `Infrastructure.ExternalApis` | 70% | Polly retry + circuit breaker paths |
 
 ### Security Test Categories (MUST exist before merging any endpoint)
-tests/backend/UnitTests/Security/
-├── ConsentGateTests.cs # OE-6: TransUnion blocked without consent
-├── IssueIntegritySealGuardTests.cs # OE-7: Seal blocked if any FAIL result
-├── DuplicateMatriculaTests.cs # OE-3: Duplicate detection
-├── RbacTests.cs # ADMIN/DEVELOPER/VALIDATOR/PUBLIC isolation
-└── DataRetentionPurgeTests.cs # Law 172-13 TTL enforcement
 
-text
+```
+tests/backend/UnitTests/Security/
+├── ConsentGateTests.cs               # OE-6: TransUnion blocked without consent
+├── IssueIntegritySealGuardTests.cs   # OE-7: Seal blocked if any FAIL result
+├── DuplicateMatriculaTests.cs        # OE-3: Duplicate detection
+├── RbacTests.cs                      # ADMIN/DEVELOPER/VALIDATOR/PUBLIC isolation
+└── DataRetentionPurgeTests.cs        # Law 172-13 TTL enforcement
+```
 
 ### E2E (Playwright)
 
@@ -455,7 +488,7 @@ pnpm exec playwright test e2e/api/           # API contract tests
 
 ---
 
-## 12. ⚙️ Build & Type Checking
+## 11. ⚙️ Build & Type Checking
 
 ```bash
 # Frontend build (tsc -b && vite build)
@@ -476,7 +509,7 @@ pnpm run lint
 
 ---
 
-## 13. 🗄️ Database
+## 12. 🗄️ Database
 
 - SQL Server via Docker (`docker-compose.yml`)
 - EF Core 8 with SQL Server provider
@@ -506,7 +539,7 @@ pnpm run lint
 
 ---
 
-## 14. 🌍 Environment
+## 13. 🌍 Environment
 
 - Root `.env` file loaded by Docker Compose
 - Frontend env files: `src/frontend/web/.env.development`, `.env.staging`, `.env.production`
@@ -528,7 +561,7 @@ pnpm run lint
 
 ---
 
-## 15. 🔁 CI/CD Pipeline (GitHub Actions)
+## 14. 🔁 CI/CD Pipeline (GitHub Actions)
 
 File: `.github/workflows/ci.yml`
 
@@ -562,7 +595,7 @@ File: `.github/workflows/ci.yml`
 
 ---
 
-## 16. 🏛️ Architecture Notes
+## 15. 🏛️ Architecture Notes
 
 - **Clean Architecture**: Domain has zero dependencies; Application depends on Domain; 
   Infrastructure depends on Application; Api depends on Infrastructure
@@ -608,7 +641,7 @@ All OCR and government API calls are **decoupled from the HTTP request cycle** v
 
 ---
 
-## 17. 🔒 Security Architecture Invariants
+## 16. 🔒 Security Architecture Invariants
 
 These are non-negotiable. Violation of any invariant = CI failure or HUMAN GATE.
 
@@ -625,14 +658,15 @@ These are non-negotiable. Violation of any invariant = CI failure or HUMAN GATE.
 10. **SHA-256 hash all uploaded documents** (`Documents.BlobSha256`). (A08, OE-3)
 
 ### Security Headers (Applied by `SecurityHeadersMiddleware` on every response)
+
+```
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
 Content-Security-Policy: default-src 'self'
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: geolocation=(), camera=(), microphone=()
-
-text
+```
 
 ### Data Retention Schedule (Law 172-13 Enforcement)
 
@@ -650,7 +684,7 @@ Runs: daily cron at 02:00 UTC. Emits `DataRetentionPurgeCompleted` to Applicatio
 
 ---
 
-## 19. 🛠️ Pre-commit Hooks & Other Config
+## 17. 🛠️ Pre-commit Hooks & Other Config
 
 - `.pre-commit-config.yaml` runs `agent-firewall` hook (Python at `.agents/scripts/post_task_loop.py`)
 - Triggers on `.py`, `.js`, `.ts` files
@@ -662,7 +696,7 @@ Runs: daily cron at 02:00 UTC. Emits `DataRetentionPurgeCompleted` to Applicatio
 - `.securecoder.ignore` — SecureCoder ignore rules
 
 | File | Purpose |
-|------|---------|
+|------|---------| 
 | `.editorconfig` | Consistent editor settings across agents |
 | `.npmrc` | npm/pnpm config |
 | `.gitignore` | Git ignore (includes `.env`, `appsettings.*.json`) |
@@ -672,7 +706,7 @@ Runs: daily cron at 02:00 UTC. Emits `DataRetentionPurgeCompleted` to Applicatio
 
 ---
 
-## 20. 📐 Design Tokens (Stitch MCP — Do Not Hallucinate)
+## 18. 📐 Design Tokens (Stitch MCP — Do Not Hallucinate)
 
 | Token | Value | Usage |
 |---|---|---|
@@ -687,7 +721,7 @@ values in component files — use Tailwind CSS design token variables as configu
 
 ---
 
-## 21. 🚦 Human Gate Triggers (STOP — Require Approval)
+## 19. 🚦 Human Gate Triggers (STOP — Require Approval)
 
 These operations require explicit human approval before any agent proceeds:
 

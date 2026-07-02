@@ -126,10 +126,12 @@ vi.mock("../../../features/projects/api/useProjects", async () => {
   };
 });
 
-vi.mock("@tanstack/react-query", () => {
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-query")>();
   return {
+    ...actual,
     useQueryClient: () => ({
-      invalidateQueries: () => {},
+      invalidateQueries: vi.fn(),
     }),
     useMutation: ({ mutationFn }: any) => {
       return {

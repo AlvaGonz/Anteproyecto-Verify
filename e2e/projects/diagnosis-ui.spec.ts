@@ -18,6 +18,22 @@ test.describe("Frontend AI Diagnosis UI E2E", () => {
       });
     });
 
+    await page.route("**/api/notifications*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([])
+      });
+    });
+
+    await page.route("**/api/auth/refresh", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accessToken: "mock-token" })
+      });
+    });
+
     // 2. Intercept /api/projects/:id to load project
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}`, async (route) => {
       await route.fulfill({

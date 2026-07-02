@@ -1,13 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp, Plus, ArrowRight, Shield, CreditCard, Users, LayoutDashboard, Calendar, Activity } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDashboardStats } from "../api/useDashboardStats";
+import { useProjects } from "../../projects/api/useProjects";
+import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../projects/types";
+import { PlanActivatedBanner } from "../../pricing/components/PlanActivatedBanner";
+import { PlanCapabilities } from "../../pricing/utils/planCapabilities";
 
 type DashboardTab = "projects" | "subscriptions";
 
 export const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>("projects");
+  const location = useLocation();
+  const [showBanner, setShowBanner] = useState<boolean>(!!(location.state as any)?.planJustActivated);
+  const activatedPlan = (location.state as any)?.activatedPlan as PlanCapabilities | undefined;
+  const handleDismissBanner = useCallback(() => setShowBanner(false), []);
+
+  useEffect(() => {
+    if ((location.state as any)?.planJustActivated) {
+      window.history.replaceState({}, '', window.location.href);
+    }
+  }, [location.state]);
+
+  const { data: rawProjects = [], isLoading: loadingProjects } = useProjects();
+
+  const projects = useMemo(() =>
+    rawProjects.map((p: any) => ({
+      ...p,
+      id: String(p.idProyecto || p.id),
+      estadoProyecto: p.estadoProyecto as ProjectStatus,
+      estadoIntegridad: p.estadoIntegridad as IntegrityStatus,
+      createdAtUtc: p.fechaCreacion || p.createdAtUtc || new Date().toISOString()
+    })) as unknown as ProyectoDto[],
+  [rawProjects]);
+
   const { data: statsData, isLoading: loading } = useDashboardStats();
 
   const totalProjects = statsData?.totalProyectos || 0;
@@ -46,8 +73,14 @@ export const DashboardPage: React.FC = () => {
   const recentSubscriptions = statsData?.suscripcionesRecientes || [];
 
   return (
-    <div className="animate-fade-in space-y-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+  <div className="animate-fade-in">
+      {showBanner && activatedPlan && (
+        <div className="max-w-4xl mx-auto px-4 pt-4 mb-4">
+          <PlanActivatedBanner plan={activatedPlan} onDismiss={handleDismissBanner} />
+        </div>
+      )}
+      <div className="animate-fade-in space-y-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
         <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
           <h1 className="text-4xl font-display font-black text-[#223382] tracking-tight">
             Dashboard <span className="text-[#F98513] italic">Operativo</span>

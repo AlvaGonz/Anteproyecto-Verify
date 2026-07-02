@@ -5,6 +5,8 @@ import { HealthPage } from "../pages/HealthPage";
 
 const LegalPage = lazy(() => import("../features/legal").then(m => ({ default: m.LegalPage })));
 const PricingPage = lazy(() => import("../features/pricing").then(m => ({ default: m.PricingPage })));
+const CheckoutPage = lazy(() => import("../features/pricing/pages/CheckoutPage").then(m => ({ default: m.CheckoutPage })));
+const CheckoutReturnPage = lazy(() => import("../features/pricing/pages/CheckoutReturnPage").then(m => ({ default: m.CheckoutReturnPage })));
 import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage";
 import { ProjectPublicDetailPage } from "../pages/projects/ProjectPublicDetailPage";
 import { ProjectManagePage } from "../pages/projects/ProjectManagePage";
@@ -27,6 +29,7 @@ import { AdminLayout } from "../shared/components/layout/AdminLayout";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
 import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
+import { GuestGuard } from "../shared/components/security/GuestGuard";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
 
 // New Pages
@@ -59,7 +62,7 @@ export const router = createHashRouter([
         ),
       },
       {
-        path: "/precios",
+        path: "/plans",
         element: (
           <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><span className="font-body text-on-surface-variant">Cargando...</span></div>}>
             <PricingPage />
@@ -82,15 +85,27 @@ export const router = createHashRouter([
       },
       {
         path: "/login",
-        element: <LoginPage />,
+        element: (
+          <GuestGuard>
+            <LoginPage />
+          </GuestGuard>
+        ),
       },
       {
         path: "/register",
-        element: <RegisterPage />,
+        element: (
+          <GuestGuard>
+            <RegisterPage />
+          </GuestGuard>
+        ),
       },
       {
         path: "/verify-email",
-        element: <EmailVerifiedPage />,
+        element: (
+          <GuestGuard>
+            <EmailVerifiedPage />
+          </GuestGuard>
+        ),
       },
       {
         path: "/verify",
@@ -111,6 +126,26 @@ export const router = createHashRouter([
       {
         path: "/p/:slug",
         element: <ProjectPublicDetailPage />,
+      },
+      {
+        path: "/checkout",
+        element: (
+          <AuthGuard>
+            <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Cargando...</div>}>
+              <CheckoutPage />
+            </Suspense>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/checkout/return",
+        element: (
+          <AuthGuard>
+            <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Cargando...</div>}>
+              <CheckoutReturnPage />
+            </Suspense>
+          </AuthGuard>
+        ),
       },
 
       /* ===== New Spec Routes ===== */

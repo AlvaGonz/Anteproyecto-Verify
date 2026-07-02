@@ -331,7 +331,7 @@ export const AdminProjectsPage: React.FC = () => {
               return (
                 <div 
                   key={`${project.id}-${index}`}
-                  className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/20 transition-all group relative"
+                  className="vf-card bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/20 transition-all group relative"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-start gap-5 min-w-0">

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
   Filter,
   ArrowRight,
-  ShieldCheck,
   Building2,
   ChevronRight,
   LayoutGrid,
@@ -39,7 +38,7 @@ export const ProjectsPublicListPage: React.FC = () => {
   const filteredProjects = useMemo(() => {
     return mappedProjects.filter((project) => {
       const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          project.location.toLowerCase().includes(searchQuery.toLowerCase());
+        project.location.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "ALL" || project.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -96,41 +95,32 @@ export const ProjectsPublicListPage: React.FC = () => {
 
       <main className="flex-1">
         {/* Unified Portal Hero */}
-        <section className="relative pt-40 pb-20 px-6 bg-slate-900 overflow-hidden">
+        <section className="relative pt-28 pb-20 px-6 bg-slate-900 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(249,133,19,0.1),transparent)]" />
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')" }} />
-          
-          <div className="relative z-10 max-w-7xl mx-auto flex flex-col items-center text-center">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
-            >
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              <span className="text-primary text-[10px] font-black tracking-[0.2em] uppercase">Portal de Transparencia VeriFinca</span>
-            </motion.div>
 
-            <motion.h1 
+          <div className="relative z-10 max-w-7xl mx-auto flex flex-col items-center text-center">
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight tracking-tight"
+              className="text-4xl md:text-6xl font-black text-white mb-5 leading-tight tracking-tight"
             >
-              Cero Incertidumbre En Su <br/>
+              Cero Incertidumbre En Su <br />
               <span className="text-primary italic">Inversión Inmobiliaria</span>
             </motion.h1>
 
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl font-medium leading-relaxed mb-12 max-w-2xl"
+              className="text-slate-400 text-lg md:text-xl font-medium leading-relaxed mb-5 max-w-2xl"
             >
               Valide la legitimidad de cualquier proyecto o explore nuestro directorio de propiedades certificadas bajo estrictos estándares de transparencia.
             </motion.p>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -151,23 +141,23 @@ export const ProjectsPublicListPage: React.FC = () => {
 
             <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
               <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl">
-                <button 
+                <button
                   onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-white shadow-sm text-primary" : "text-slate-400"}`}
                 >
                   <LayoutGrid size={20} />
                 </button>
-                <button 
+                <button
                   onClick={() => setViewMode("list")}
                   className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-white shadow-sm text-primary" : "text-slate-400"}`}
                 >
                   <List size={20} />
                 </button>
               </div>
-              
+
               <div className="flex items-center gap-2 border-l border-slate-100 pl-4">
                 <Filter size={18} className="text-slate-400" />
-                <select 
+                <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="bg-transparent text-sm font-bold text-slate-700 focus:outline-none"
@@ -193,9 +183,9 @@ export const ProjectsPublicListPage: React.FC = () => {
                   className="group bg-white rounded-[32px] overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col"
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">
-                    <img 
-                      src={project.imageUrl} 
-                      alt={project.name} 
+                    <img
+                      src={project.imageUrl}
+                      alt={project.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute top-6 left-6">
@@ -226,7 +216,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                           <span className="text-primary">{project.completionPercentage}%</span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <motion.div 
+                          <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${project.completionPercentage}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
@@ -235,7 +225,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <Link 
+                      <Link
                         to={`/p/${project.id}`}
                         className="flex items-center justify-center gap-2 w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all group/btn"
                       >
@@ -249,7 +239,7 @@ export const ProjectsPublicListPage: React.FC = () => {
           </div>
 
           {filteredProjects.length === 0 && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-[40px] border border-dashed border-slate-200"
@@ -259,8 +249,8 @@ export const ProjectsPublicListPage: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
               <p className="text-slate-500 max-w-xs mx-auto font-medium">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
-              <button 
-                onClick={() => {setSearchQuery(""); setStatusFilter("ALL");}}
+              <button
+                onClick={() => { setSearchQuery(""); setStatusFilter("ALL"); }}
                 className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
               >
                 Limpiar filtros
@@ -273,7 +263,7 @@ export const ProjectsPublicListPage: React.FC = () => {
         <section className="py-20 px-6">
           <div className="max-w-5xl mx-auto rounded-[48px] bg-primary text-white p-12 md:p-20 relative overflow-hidden shadow-2xl shadow-primary/20">
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl" />
-            
+
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
               <div className="max-w-xl text-center md:text-left">
                 <h2 className="text-3xl md:text-5xl font-black mb-6 leading-tight italic decoration-white/30 underline-offset-8 underline">

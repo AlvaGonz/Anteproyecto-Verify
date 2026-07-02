@@ -50,9 +50,9 @@ public class ResendEmailService : IEmailService
         }
     }
 
-    public async Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, CancellationToken ct = default)
+    public async Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, string? returnUrl = null, CancellationToken ct = default)
     {
-        var html = EmailTemplates.GetAccountVerificationEmail(userName, verificationToken);
+        var html = EmailTemplates.GetAccountVerificationEmail(userName, verificationToken, returnUrl);
         await SendEmailAsync(toEmail, "Verificación de Cuenta - VeriFinca", html, ct);
     }
 
@@ -73,6 +73,12 @@ public class ResendEmailService : IEmailService
     {
         var html = EmailTemplates.GetProjectCreatedEmail(ownerName, projectName, projectId);
         await SendEmailAsync(toEmail, "¡Tu Proyecto ha sido Creado! - VeriFinca", html, ct);
+    }
+
+    public async Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, decimal planPrice, CancellationToken ct = default)
+    {
+        var html = EmailTemplates.GetSubscriptionActivatedEmail(userName, planName, planPrice);
+        await SendEmailAsync(toEmail, "Suscripción Activada - VeriFinca", html, ct);
     }
 }
 

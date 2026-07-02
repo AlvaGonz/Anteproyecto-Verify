@@ -16,6 +16,15 @@ vi.mock("../../features/projects/api/useProjects", () => ({
   })
 }));
 
+// Mock AuthContext
+vi.mock("../../shared/context/AuthContext", () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    loading: false,
+  }),
+}));
+
 describe("ProjectsPublicListPage", () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },

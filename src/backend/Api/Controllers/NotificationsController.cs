@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using Application.Abstractions.Persistence;
 using Application.DTOs.Notifications;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +22,11 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpGet]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public async Task<IActionResult> GetMyNotifications([FromQuery] bool unreadOnly = false, CancellationToken cancellationToken = default)
     {
-        // En un entorno real, obtendríamos el UsuarioId del token JWT.
-        // Por ahora, usamos un Guid hardcodeado o lo pasamos por header para simular.
-        var userIdString = Request.Headers["X-User-Id"].FirstOrDefault() ?? "00000000-0000-0000-0000-000000000001";
-        if (!Guid.TryParse(userIdString, out var userId))
+        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
         {
             return Unauthorized();
         }
@@ -46,12 +46,24 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpPost("{id}/read")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public async Task<IActionResult> MarkAsRead(Guid id, CancellationToken cancellationToken)
     {
+        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
         var notification = await _notificacionRepository.GetByIdAsync(id, cancellationToken);
         if (notification == null)
         {
             return NotFound();
+        }
+
+        if (notification.UsuarioId != userId)
+        {
+            return Forbid();
         }
 
         notification.MarcarComoLeida();

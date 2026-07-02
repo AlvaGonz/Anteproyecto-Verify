@@ -117,3 +117,25 @@ export const useUploadAvatar = () => {
     },
   });
 };
+
+export interface MySubscriptionStatus {
+  plan: string | null;
+  planPrice: number | null;
+  subscriptionStatus: string | null;
+  currentPeriodEnd: string | null;
+  stripeSubscriptionId: string | null;
+  isManagedByStripe: boolean;
+}
+
+export const useMySubscription = () =>
+  useQuery<MySubscriptionStatus>({
+    queryKey: ["subscription", "my-status"],
+    queryFn: () =>
+      apiClient
+        .get<MySubscriptionStatus>("/v1/subscriptions/my-status")
+        .then((res) => res.data),
+    staleTime: 0,
+    gcTime: 1000 * 30,
+    refetchOnWindowFocus: true,
+    retry: 1,
+  });

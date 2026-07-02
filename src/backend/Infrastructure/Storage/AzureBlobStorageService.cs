@@ -16,17 +16,44 @@ public class AzureBlobStorageService : IBlobStorageService
         _options = options.Value;
     }
 
-    public Task<string> UploadAsync(Stream stream, string fileName, string contentType, CancellationToken cancellationToken = default)
+    public async Task<string> UploadAsync(Stream stream, string fileName, string contentType, CancellationToken cancellationToken = default)
     {
-        // Implementation for Azure Blob Storage
-        return Task.FromResult($"https://fakeblob.core.windows.net/{_options.ContainerName}/{fileName}");
+        var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        if (!Directory.Exists(wwwrootPath))
+        {
+            Directory.CreateDirectory(wwwrootPath);
+        }
+
+        var safeFileName = fileName.Replace("/", "\\");
+        var filePath = Path.Combine(wwwrootPath, safeFileName);
+        
+        var directoryPath = Path.GetDirectoryName(filePath);
+        if (directoryPath != null && !Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+        {
+            await stream.CopyToAsync(fileStream, cancellationToken);
+        }
+
+        return $"http://localhost:5000/uploads/{fileName.Replace("\\", "/")}";
     }
 
     public Task<(Stream Stream, string ContentType)> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
     {
-        // Implementation for Azure Blob Storage
-        var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("Fake file content"));
-        return Task.FromResult(((Stream)stream, "application/octet-stream"));
+        var safeFileName = blobName.Replace("/", "\\");
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", safeFileName);
+        
+        if (File.Exists(filePath))
+        {
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return Task.FromResult(((Stream)stream, "application/octet-stream"));
+        }
+
+        var memoryStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("File not found"));
+        return Task.FromResult(((Stream)memoryStream, "application/octet-stream"));
     }
 
     public Task<bool> ExistsAsync(string blobName, CancellationToken cancellationToken = default)
