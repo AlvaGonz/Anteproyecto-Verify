@@ -62,7 +62,7 @@ export const router = createHashRouter([
         ),
       },
       {
-        path: "/precios",
+        path: "/plans",
         element: (
           <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><span className="font-body text-on-surface-variant">Cargando...</span></div>}>
             <PricingPage />

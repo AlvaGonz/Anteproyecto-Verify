@@ -108,3 +108,7 @@
   - **Symptom:** Missing Stripe Secret Key causes the `/v1/subscriptions/session-status` endpoint to return `400 Bad Request` instead of `500 Internal Server Error`, misleading the frontend error handling.
   - **Root Cause:** `StripeConfiguration.ApiKey` was null/empty. When `SessionService.GetAsync()` was called, the Stripe SDK threw an `ArgumentException` directly (bypassing `catch (StripeException e)`). `GlobalExceptionHandler` caught the `ArgumentException` and incorrectly transformed it to `400 Bad Request`.
   - **Fix:** Added an explicit missing configuration check inside `GetSessionStatus` to return `500 Internal Server Error` before any Stripe API code is invoked. TDD test added.
+- **BUG-010:** E2E Tests failing due to stuck loading states and missing package.json scripts.
+  - **Symptom:** `pnpm run test:e2e` fails or hangs, and the `test:e2e` script was missing. `diagnosis-ui.spec.ts` and `project-photos.spec.ts` fail due to timeout waiting for UI elements.
+  - **Root Cause:** The `package.json` was missing the `test:e2e` script. The E2E tests for `diagnosis-ui` and `project-photos` did not mock the `**/api/auth/refresh` and `**/api/notifications*` routes, causing the app to hang in a loading state or fail to load data, leading to Playwright timeouts.
+  - **Fix:** Added `"test:e2e": "playwright test"` to `package.json`. Added the missing API mocks to the `beforeEach` hooks of both failing test files. Tests now pass.

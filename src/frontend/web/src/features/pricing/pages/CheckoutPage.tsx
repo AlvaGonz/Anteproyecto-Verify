@@ -81,7 +81,7 @@ export const CheckoutPage = () => {
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="text-error text-lg font-medium mb-4">Plan o ciclo de facturación inválido.</p>
-          <Link to="/precios" className="text-primary hover:underline font-medium">Volver a Precios</Link>
+          <Link to="/plans" className="text-primary hover:underline font-medium">Volver a Planes</Link>
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ export const CheckoutPage = () => {
     <div className="min-h-screen bg-surface flex flex-col lg:flex-row">
       {/* Left Column: Order Summary */}
       <div className="w-full lg:w-2/5 bg-surface-variant/30 border-r border-outline-variant/30 p-8 lg:p-16 flex flex-col pt-24 lg:pt-32">
-        <Link to="/precios" className="flex items-center text-sm font-medium text-on-surface-variant hover:text-primary mb-12 transition-colors w-fit">
+        <Link to="/plans" className="flex items-center text-sm font-medium text-on-surface-variant hover:text-primary mb-12 transition-colors w-fit">
           <span className="material-symbols-outlined text-[18px] mr-1">arrow_back</span>
           Volver a planes
         </Link>
@@ -117,9 +117,9 @@ export const CheckoutPage = () => {
             {isAnnual && (
               <p className="text-sm font-medium text-primary mt-2">Facturado anualmente. Ahorras 20%.</p>
             )}
-            
+
             <hr className="border-outline-variant/30 my-6" />
-            
+
             <h4 className="font-label font-semibold text-on-surface mb-4">Qué incluye:</h4>
             <ul className="space-y-3 font-body text-sm text-on-surface-variant">
               {planInfo.features.map((featureKey, idx) => (
@@ -148,7 +148,7 @@ export const CheckoutPage = () => {
             <div className="bg-error/10 border border-error/20 rounded-lg p-6 text-center">
               <span className="material-symbols-outlined text-error text-4xl mb-3">error</span>
               <p className="text-error font-medium mb-4">{error}</p>
-              <button 
+              <button
                 onClick={() => setError(null)}
                 className="bg-error text-onError px-6 py-2 rounded-lg font-bold text-sm hover:bg-error/90 transition-colors"
               >
@@ -157,20 +157,20 @@ export const CheckoutPage = () => {
             </div>
           ) : !hasConsented ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <SubscriptionConsentCheckbox 
+              <SubscriptionConsentCheckbox
                 plan={plan}
                 billing={billing}
                 onConsent={(data) => {
                   setConsentData(data);
                   setHasConsented(true);
-                }} 
+                }}
               />
             </div>
           ) : (
             <div id="checkout" className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-2xl font-headline font-bold text-on-surface">Información de pago</h2>
-                <button 
+                <button
                   onClick={() => setHasConsented(false)}
                   className="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors flex items-center"
                 >

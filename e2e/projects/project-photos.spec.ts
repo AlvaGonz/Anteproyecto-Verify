@@ -42,6 +42,22 @@ test.describe("Renderizado de Fotos de Proyecto — E2E con Mock", () => {
       });
     });
 
+    await page.route("**/api/notifications*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([])
+      });
+    });
+
+    await page.route("**/api/auth/refresh", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accessToken: "mock-token" })
+      });
+    });
+
     // 2. Default projects mock list
     await page.route("**/api/projects", async (route) => {
       if (route.request().method() === "GET") {

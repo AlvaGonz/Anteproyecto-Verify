@@ -20,7 +20,7 @@ export const LandingNav: React.FC = () => {
 
   const navLinks = [
     { label: "Proyectos", href: "/projects" },
-    { label: "Precios", href: "/precios" },
+    { label: "Planes", href: "/plans" },
     { label: "Legal", href: "/legal" },
   ];
 
@@ -45,11 +45,10 @@ export const LandingNav: React.FC = () => {
   return (
     <div className={`fixed inset-x-0 top-0 z-50 flex justify-center transition-all duration-300 ${scrolled ? "px-4 pt-4" : "px-0 pt-0"}`}>
       <nav
-        className={`relative w-full max-w-7xl flex justify-between items-center transition-all duration-300 ${
-          scrolled
+        className={`relative w-full max-w-7xl flex justify-between items-center transition-all duration-300 ${scrolled
             ? "h-16 px-6 md:px-8 bg-surface/90 backdrop-blur-md border border-outline-variant/30 shadow-sm rounded-2xl"
             : "h-24 px-6 md:px-12 bg-transparent"
-        }`}
+          }`}
       >
         <Link to="/" className="flex items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg">
           <img
@@ -88,7 +87,7 @@ export const LandingNav: React.FC = () => {
         </div>
 
         {/* Mobile Hamburger */}
-        <button 
+        <button
           className={hamburgerClassName}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Abrir menú"

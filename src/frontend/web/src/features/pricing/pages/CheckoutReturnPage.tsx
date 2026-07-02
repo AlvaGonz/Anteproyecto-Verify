@@ -16,8 +16,8 @@ export const CheckoutReturnPage = () => {
   // we must read it from window.location.search directly.
   const rawSearch = window.location.search;
   const rawParams = new URLSearchParams(rawSearch);
-  const sessionId = 
-    searchParams.get('session_id') ?? 
+  const sessionId =
+    searchParams.get('session_id') ??
     rawParams.get('session_id') ??
     searchParams.get('sessionId') ??
     rawParams.get('sessionId');
@@ -110,7 +110,7 @@ export const CheckoutReturnPage = () => {
         El pago no pudo confirmarse. Verifica con tu banco o intenta de nuevo.
       </p>
       <button
-        onClick={() => navigate('/precios')}
+        onClick={() => navigate('/plans')}
         className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-semibold"
       >
         Volver a planes

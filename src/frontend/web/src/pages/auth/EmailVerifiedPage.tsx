@@ -38,7 +38,7 @@ export const EmailVerifiedPage = () => {
 
   useEffect(() => {
     if (status === "success") {
-      const storedRedirect = localStorage.getItem('redirect_after_verification');
+      const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
       const urlReturnUrl = searchParams.get('returnUrl');
       const targetUrl = urlReturnUrl || storedRedirect || "/admin";
 
@@ -47,7 +47,7 @@ export const EmailVerifiedPage = () => {
           if (prev <= 1) {
             clearInterval(interval);
             if (storedRedirect) {
-              localStorage.removeItem('redirect_after_verification');
+              window.sessionStorage.removeItem('redirect_after_verification');
             }
             navigate(targetUrl);
             return 0;
@@ -84,10 +84,10 @@ export const EmailVerifiedPage = () => {
             </div>
             <button
               onClick={() => {
-                const storedRedirect = localStorage.getItem('redirect_after_verification');
+                const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
                 const urlReturnUrl = searchParams.get('returnUrl');
                 if (storedRedirect) {
-                  localStorage.removeItem('redirect_after_verification');
+                  window.sessionStorage.removeItem('redirect_after_verification');
                 }
                 navigate(urlReturnUrl || storedRedirect || "/admin");
               }}

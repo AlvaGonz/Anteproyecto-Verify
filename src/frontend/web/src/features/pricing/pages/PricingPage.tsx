@@ -40,6 +40,14 @@ export const PricingPage: React.FC = () => {
     }
   }
 
+  const handleFreePlan = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      navigate('/register');
+    }
+  };
+
   const prices = {
     profesional: isAnnual ? "RD$2,800" : "RD$3,500",
     empresa: isAnnual ? "RD$8,000" : "RD$10,000",
@@ -116,12 +124,12 @@ export const PricingPage: React.FC = () => {
                   <span className="material-symbols-outlined text-outline text-xl">{ICONS.cancel}</span> {t("pricing.cards.free.feature3")}
                 </li>
               </ul>
-              <Link
-                to="/register"
+              <button
+                onClick={handleFreePlan}
                 className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
               >
                 {t("pricing.cards.free.button")}
-              </Link>
+              </button>
             </div>
 
             {/* Card 2: Profesional (Featured) */}

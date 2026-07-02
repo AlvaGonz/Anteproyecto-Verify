@@ -186,7 +186,7 @@ export const SubscriptionSettings: React.FC = () => {
               ¿Deseas cambiar tu plan o explorar otras opciones?
             </div>
             <button
-              onClick={() => navigate("/precios")}
+              onClick={() => navigate("/plans")}
               className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
             >
               <span className="flex items-center gap-2">

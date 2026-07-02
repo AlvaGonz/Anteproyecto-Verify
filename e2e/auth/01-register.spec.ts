@@ -14,16 +14,39 @@ test.describe('01 - Register Flow', () => {
   };
 
   test('Happy Path - Should register a new user successfully', async ({ request }) => {
+    const uniqueEmail = `testuser_${Date.now()}@example.com`;
+    const validUserData = {
+      nombre: 'Test',
+      apellidos: 'User',
+      email: uniqueEmail,
+      password: 'Password123!',
+      confirmPassword: 'Password123!'
+    };
+
     const response = await request.post(`${API_URL}/auth/register`, {
       data: validUserData
     });
     
     expect(response.ok()).toBeTruthy();
     const responseBody = await response.json();
-    expect(responseBody.message).toBeDefined();
+    expect(responseBody.isSuccess).toBeTruthy();
   });
 
   test('Edge Case - Should reject duplicate email', async ({ request }) => {
+    const uniqueEmail = `testuser_${Date.now()}@example.com`;
+    const validUserData = {
+      nombre: 'Test',
+      apellidos: 'User',
+      email: uniqueEmail,
+      password: 'Password123!',
+      confirmPassword: 'Password123!'
+    };
+
+    // First attempt to register
+    await request.post(`${API_URL}/auth/register`, {
+      data: validUserData
+    });
+
     // Attempt to register same email again
     const response = await request.post(`${API_URL}/auth/register`, {
       data: validUserData
@@ -45,8 +68,11 @@ test.describe('01 - Register Flow', () => {
   test('Edge Case - Should reject invalid email format', async ({ request }) => {
     const response = await request.post(`${API_URL}/auth/register`, {
       data: {
-        ...validUserData,
-        email: 'invalid-email-format'
+        nombre: 'Test',
+        apellidos: 'User',
+        email: 'invalid-email-format',
+        password: 'Password123!',
+        confirmPassword: 'Password123!'
       }
     });
     
@@ -56,7 +82,8 @@ test.describe('01 - Register Flow', () => {
   test('Edge Case - Should reject weak password', async ({ request }) => {
     const response = await request.post(`${API_URL}/auth/register`, {
       data: {
-        ...validUserData,
+        nombre: 'Test',
+        apellidos: 'User',
         email: `weak_${Date.now()}@example.com`,
         password: '123',
         confirmPassword: '123'

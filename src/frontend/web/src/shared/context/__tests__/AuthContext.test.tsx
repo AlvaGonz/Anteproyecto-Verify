@@ -35,6 +35,11 @@ describe('AuthContext', () => {
       wrapper: AuthProvider
     });
 
+    // Wait for the initial effect to complete (getCurrentUser)
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
     await act(async () => {
       await result.current.login('test@test.com', 'password');
     });
@@ -42,9 +47,14 @@ describe('AuthContext', () => {
     expect(queryClient.clear).toHaveBeenCalledTimes(1);
   });
 
-  it('should clear queryClient cache on logout', () => {
+  it('should clear queryClient cache on logout', async () => {
     const { result } = renderHook(() => useAuth(), {
       wrapper: AuthProvider
+    });
+
+    // Wait for the initial effect to complete (getCurrentUser)
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
     act(() => {

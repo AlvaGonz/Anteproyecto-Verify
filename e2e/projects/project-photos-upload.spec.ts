@@ -32,9 +32,28 @@ test.describe("Subida y Persistencia de Fotos de Proyecto — E2E con Mock state
         body: JSON.stringify({
           id: "user-001",
           email: "admin@verifinca.do",
-          name: "Admin User",
-          role: "ADMIN"
+          nombre: "Admin",
+          apellido: "User",
+          role: "admin",
+          plan: "Profesional",
+          subscriptionStatus: "active"
         })
+      });
+    });
+
+    await page.route("**/api/notifications*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([])
+      });
+    });
+
+    await page.route("**/api/auth/refresh", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accessToken: "mock-token" })
       });
     });
 

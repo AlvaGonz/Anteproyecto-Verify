@@ -48,7 +48,7 @@ const onSubmit = (data: RegisterFormValues) => {
        };
      register_(submitData, { onSuccess: () => {
        if (redirectUrl) {
-         localStorage.setItem('redirect_after_verification', redirectUrl);
+         window.sessionStorage.setItem('redirect_after_verification', redirectUrl);
        }
        setIsSuccess(true);
      } });
