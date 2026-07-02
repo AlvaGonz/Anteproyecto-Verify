@@ -134,8 +134,7 @@ describe("RegisterForm", () => {
       expect.objectContaining({
         email: "juan@example.com",
         returnUrl: "/checkout?plan=pro"
-      }),
-      expect.any(Object)
+      })
     );
     
     // Context should still be preserved
@@ -162,7 +161,7 @@ describe("RegisterForm", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Revisa tu correo/i)).toBeInTheDocument();
-      expect(screen.getByText(/Correo reenviado/i)).toBeInTheDocument();
+      expect(screen.getByText(/Correo de verificación reenviado exitosamente/i)).toBeInTheDocument();
     });
   });
 });
