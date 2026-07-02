@@ -40,7 +40,7 @@ describe('UserAvatarUpload - Reactive Upload', () => {
       error: null
     } as any)
 
-    const mockMutateAsync = vi.fn().mockResolvedValue({ avatarUrl: '/new-avatar.jpg' })
+    const mockMutateAsync = vi.fn().mockResolvedValue({ url: '/new-avatar.jpg' })
     vi.mocked(useUploadAvatar).mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false

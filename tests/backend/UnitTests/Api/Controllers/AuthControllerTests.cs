@@ -89,6 +89,15 @@ public class AuthControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(okResult.Value);
+
+        var valueType = okResult.Value.GetType();
+        var userProp = valueType.GetProperty("user");
+        Assert.NotNull(userProp);
+        var userObj = userProp.GetValue(okResult.Value);
+        Assert.NotNull(userObj);
+
+        var avatarUrlProp = userObj.GetType().GetProperty("avatarUrl");
+        Assert.NotNull(avatarUrlProp);
     }
 
     [Fact]

@@ -22,5 +22,6 @@ public record LoginUserUserDto(
     Guid Id,
     string Email,
     string Name,
-    string Role
+    string Role,
+    string? AvatarUrl
 );

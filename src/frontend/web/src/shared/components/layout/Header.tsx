@@ -1,8 +1,7 @@
 import React from "react";
-import { User, Menu, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { NotificationBell } from "../../../features/notifications/components/NotificationBell";
-import { useAuth } from "../../context/AuthContext";
 
 interface HeaderProps {
   title: string;
@@ -11,7 +10,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -34,24 +32,6 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
       }
     }
   };
-
-  const fullName = user ? `${user.nombre || ""} ${user.apellido || ""}`.trim() : "";
-  const displayName = fullName || "Admin_Verifinca";
-  const initials = fullName
-    ? fullName
-        .split(" ")
-        .filter(Boolean)
-        .map((n: string) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "US";
-  const roleLabel = {
-    admin: "Administrador",
-    dev: "Desarrollador",
-    validator: "Validador",
-    user: "Usuario",
-  }[user?.role || "user"] || "Usuario";
 
   return (
     <header className="sticky top-0 z-20 w-full h-20 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-8">
@@ -94,29 +74,6 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
         {/* VeriFinca AI Status */}
 
         <NotificationBell />
-        
-        <div className="h-8 w-px bg-gray-100 mx-2"></div>
-
-        <button className="flex items-center gap-3 pl-2 pr-1 py-1 hover:bg-gray-50 rounded-2xl transition-colors group">
-           <div className="flex flex-col items-end hidden sm:flex">
-              <span className="text-xs font-bold text-gray-900">{displayName}</span>
-              <span className="text-[9px] font-black text-primary uppercase tracking-widest">{roleLabel}</span>
-           </div>
-           <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200 group-hover:border-primary/30 transition-colors overflow-hidden">
-              {user?.avatarUrl ? (
-                <img 
-                  data-testid="header-avatar-img"
-                  src={user.avatarUrl.startsWith('data:') || user.avatarUrl.startsWith('blob:') ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} 
-                  alt="Avatar" 
-                  className="w-full h-full object-cover" 
-                />
-              ) : user ? (
-                <span className="text-sm font-black text-gray-600">{initials}</span>
-              ) : (
-                <User className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
-              )}
-           </div>
-        </button>
       </div>
     </header>
   );

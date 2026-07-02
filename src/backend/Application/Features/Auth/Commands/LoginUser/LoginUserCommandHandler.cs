@@ -50,7 +50,8 @@ public class LoginUserCommandHandler
             user.Id,
             user.Email,
             user.NombreCompleto,
-            roleStr
+            roleStr,
+            user.AvatarUrl
         );
 
         var token = _jwtTokenGenerator.GenerateToken(user);

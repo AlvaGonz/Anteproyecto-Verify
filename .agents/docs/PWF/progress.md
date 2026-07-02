@@ -26,10 +26,12 @@
 | Subscription Tier Webhook Notification | N/A | feat-stripe | 11620118 | 2026-07-01 |
 | Dashboard Notification + Post-Payment Redirect | N/A | feat-stripe | (pending) | 2026-07-01 |
 | Resend Verification Email Flow | N/A | feat-stripe | 9f6df91c | 2026-07-02 |
+| Avatar Reactive UI & Consumers | N/A | feat-stripe | 7339a5c0 | 2026-07-02 |
+| Remove User Info from Admin Navbar | N/A | feat-stripe | (pending) | 2026-07-02 |
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
-| Admin Dashboard & Avatar | Block 1 | 90% | Missing visual component on some dashboard cards, but logic is there. |
+| Admin Dashboard & Avatar | Block 1 | 100% | None |
 
 
 ## 🔜 Next Up (Prioritized)

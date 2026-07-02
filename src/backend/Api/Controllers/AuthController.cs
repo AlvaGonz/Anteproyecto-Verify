@@ -129,7 +129,8 @@ public class AuthController : ControllerBase
                 id = responseData.User.Id,
                 name = responseData.User.Name,
                 email = responseData.User.Email,
-                role = responseData.User.Role
+                role = responseData.User.Role,
+                avatarUrl = responseData.User.AvatarUrl
             }
         });
     }
