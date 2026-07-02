@@ -402,5 +402,6 @@ export const DashboardPage: React.FC = () => {
         </AnimatePresence>
       </div>
     </div>
+  </div>
   );
 };
