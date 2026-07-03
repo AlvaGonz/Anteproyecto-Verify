@@ -19,7 +19,7 @@ public class SubscriptionTierPolicyTests
         => PlanSuscripcion.Create(
             Guid.NewGuid(), "Test", 0m,
             maxConsultas, maxProyectos,
-            esPublico, qr, multiUser, api);
+            esPublico, qr, 0, 100, multiUser, false, false, api, false, false, "Test", false);
 
     private static Usuario MakeUser(
         UserRole rol, PlanSuscripcion? plan = null,

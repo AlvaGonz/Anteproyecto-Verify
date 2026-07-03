@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Xunit;
+using Application.Features.Auth.Commands.UploadAvatar;
+using Application.Features.Auth.Commands.ResendVerificationEmail;
 
 namespace UnitTests.Api.Controllers;
 
@@ -51,15 +53,23 @@ public class AuthControllerTests
             mockEmailService.Object,
             mockPlanRepo.Object);
 
+        var uploadAvatarHandler = new UploadAvatarCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
+        var mockValidatorResend = new Mock<FluentValidation.IValidator<ResendVerificationEmailCommand>>();
+        var resendEmailHandler = new ResendVerificationEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object, mockValidatorResend.Object, mockEmailService.Object);
+        var mockCache = new Mock<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+
         _controller = new AuthController(
             registerHandler, 
             verifyHandler,
             loginHandler,
             updateProfileHandler,
+            uploadAvatarHandler,
+            resendEmailHandler,
             _usuarioRepositoryMock.Object, 
             mockConfig.Object,
             mockJwtTokenGenerator.Object,
-            new MemoryCache(new MemoryCacheOptions()));
+            mockCache.Object
+        );
 
         var httpContext = new DefaultHttpContext();
         _controller.ControllerContext = new ControllerContext()

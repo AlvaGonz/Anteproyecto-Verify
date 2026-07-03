@@ -112,7 +112,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             <option value="" disabled>Seleccionar Plan...</option>
             {plans.map(p => (
               <option key={p.planId} value={p.planId}>
-                {p.name} {p.price > 0 ? `(RD$${p.price})` : "(Free)"}
+                {p.name} {p.price > 0 ? `($${p.price} USD)` : "(Free)"}
               </option>
             ))}
           </select>

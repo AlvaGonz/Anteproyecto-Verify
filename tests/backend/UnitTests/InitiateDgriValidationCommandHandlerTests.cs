@@ -32,6 +32,7 @@ public class InitiateDgriValidationCommandHandlerTests
         _handler = new InitiateDgriValidationCommandHandler(
             _dgriServiceMock.Object,
             _proyectoRepositoryMock.Object,
+            new Mock<IUsuarioRepository>().Object,
             _validacionRepositoryMock.Object,
             _auditoriaRepositoryMock.Object,
             _unitOfWorkMock.Object

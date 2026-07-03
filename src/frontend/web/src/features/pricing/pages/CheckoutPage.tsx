@@ -14,8 +14,8 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 
 const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYearly: string, features: string[] }> = {
   profesional: {
     name: 'Profesional',
-    priceMonthly: 'RD$3,500',
-    priceYearly: 'RD$2,800',
+    priceMonthly: '$60 USD',
+    priceYearly: '$48 USD',
     features: [
       'pricing.cards.pro.feature1',
       'pricing.cards.pro.feature2',
@@ -25,8 +25,8 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
   },
   empresa: {
     name: 'Empresa',
-    priceMonthly: 'RD$10,000',
-    priceYearly: 'RD$8,000',
+    priceMonthly: '$170 USD',
+    priceYearly: '$136 USD',
     features: [
       'pricing.cards.empresa.feature1',
       'pricing.cards.empresa.feature2',
@@ -36,8 +36,8 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
   },
   enterprise: {
     name: 'Enterprise',
-    priceMonthly: 'RD$30,000',
-    priceYearly: 'RD$24,000',
+    priceMonthly: '$500 USD',
+    priceYearly: '$400 USD',
     features: [
       'pricing.cards.enterprise.feature1',
       'pricing.cards.enterprise.feature2',

@@ -218,7 +218,7 @@ public static class AppDbContextSeeder
 
             // Profesional
             var profesional = PlanSuscripcion.Create(
-                id: Guid.NewGuid(), nombrePlan: "Profesional", precio: 3500.00m,
+                id: Guid.NewGuid(), nombrePlan: "Profesional", precio: 60.00m,
                 maxConsultas: 25, maxProyectos: 5, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 200,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
@@ -227,7 +227,7 @@ public static class AppDbContextSeeder
 
             // Empresa
             var empresa = PlanSuscripcion.Create(
-                id: Guid.NewGuid(), nombrePlan: "Empresa", precio: 10000.00m,
+                id: Guid.NewGuid(), nombrePlan: "Empresa", precio: 170.00m,
                 maxConsultas: 100, maxProyectos: 20, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 1024,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: true, validacionLoteDisponible: false,
@@ -236,7 +236,7 @@ public static class AppDbContextSeeder
 
             // Enterprise
             var enterprise = PlanSuscripcion.Create(
-                id: Guid.NewGuid(), nombrePlan: "Enterprise", precio: 30000.00m,
+                id: Guid.NewGuid(), nombrePlan: "Enterprise", precio: 500.00m,
                 maxConsultas: -1, maxProyectos: -1, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: 10240,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,

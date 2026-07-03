@@ -49,9 +49,9 @@ export const PricingPage: React.FC = () => {
   };
 
   const prices = {
-    profesional: isAnnual ? "RD$2,800" : "RD$3,500",
-    empresa: isAnnual ? "RD$8,000" : "RD$10,000",
-    enterprise: isAnnual ? "RD$24,000" : "RD$30,000",
+    profesional: isAnnual ? "$48 USD" : "$60 USD",
+    empresa: isAnnual ? "$136 USD" : "$170 USD",
+    enterprise: isAnnual ? "$400 USD" : "$500 USD",
   };
 
   return (

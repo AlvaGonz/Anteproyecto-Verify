@@ -38,6 +38,7 @@ public class DocumentServiceTests
         _documentService = new DocumentService(
             _documentoRepositoryMock.Object,
             _proyectoRepositoryMock.Object,
+            new Mock<IUsuarioRepository>().Object,
             _blobStorageServiceMock.Object,
             _unitOfWorkMock.Object,
             _documentValidationServiceMock.Object,
