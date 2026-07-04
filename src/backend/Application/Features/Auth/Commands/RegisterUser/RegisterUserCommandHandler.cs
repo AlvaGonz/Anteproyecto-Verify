@@ -72,6 +72,13 @@ public class RegisterUserCommandHandler
             user.AsignarPlan(consultorPlan.Idsuscripcion);
         }
 
+        // Store pending plan if user came from pricing page
+        // ponytail: PendingPlanCode/PendingBillingCycle drive the post-verify checkout redirect
+        if (!string.IsNullOrWhiteSpace(request.PendingPlanCode))
+        {
+            user.SetPendingPlan(request.PendingPlanCode, request.PendingBillingCycle);
+        }
+
         // 8. Generar token de verificación
         user.GenerarTokenVerificacion();
 

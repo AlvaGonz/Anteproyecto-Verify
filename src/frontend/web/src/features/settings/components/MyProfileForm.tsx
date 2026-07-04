@@ -8,6 +8,7 @@ import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
+import { DeleteAccountSection } from "./DeleteAccountSection";
 
 export const MyProfileForm: React.FC = () => {
   const { user, refreshUser } = useAuth();
@@ -267,6 +268,14 @@ export const MyProfileForm: React.FC = () => {
         >
           {updateProfile.isPending ? "Guardando..." : "Guardar Cambios"}
         </button>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="pt-6 border-t border-border">
+        <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3">
+          Zona de Peligro
+        </p>
+        <DeleteAccountSection />
       </div>
     </form>
   );

@@ -56,7 +56,7 @@ public class AuthControllerTests
         var uploadAvatarHandler = new UploadAvatarCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
         var mockValidatorResend = new Mock<FluentValidation.IValidator<ResendVerificationEmailCommand>>();
         var resendEmailHandler = new ResendVerificationEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object, mockValidatorResend.Object, mockEmailService.Object);
-        var mockCache = new Mock<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+        var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
 
         _controller = new AuthController(
             registerHandler, 
@@ -68,7 +68,7 @@ public class AuthControllerTests
             _usuarioRepositoryMock.Object, 
             mockConfig.Object,
             mockJwtTokenGenerator.Object,
-            mockCache.Object
+            cache
         );
 
         var httpContext = new DefaultHttpContext();

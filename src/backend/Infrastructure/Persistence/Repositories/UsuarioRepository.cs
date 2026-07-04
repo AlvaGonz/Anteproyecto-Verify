@@ -62,4 +62,13 @@ public class UsuarioRepository : IUsuarioRepository
         return await _context.Usuarios
             .FirstOrDefaultAsync(u => u.TokenVerificacion == token, cancellationToken);
     }
+
+    public async Task<List<Usuario>> GetPendingPurgeAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        return await _context.Usuarios
+            .Where(u => u.AccountStatus == Domain.Enums.UserAccountStatus.PendingDeletion)
+            .Where(u => u.PurgeAtUtc != null && u.PurgeAtUtc <= now)
+            .ToListAsync(cancellationToken);
+    }
 }

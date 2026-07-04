@@ -42,11 +42,23 @@ export const RegisterForm = () => {
 const onSubmit = (data: RegisterFormValues) => {
      // Use raw digits from phone hook for submission
      const telefonoDigits = phone.digits;
-       const { acceptedTerms: _, ...submitData } = {
-         ...data,
-         telefono: telefonoDigits,
-         returnUrl: redirectUrl || undefined
-       };
+     // ponytail: extract plan/billing from redirect URL so backend stores as pendingPlanCode
+     let pendingPlanCode: string | undefined;
+     let pendingBillingCycle: string | undefined;
+     if (redirectUrl) {
+       try {
+         const url = new URL(redirectUrl, window.location.origin);
+         pendingPlanCode = url.searchParams.get('plan') ?? undefined;
+         pendingBillingCycle = url.searchParams.get('billing') ?? undefined;
+       } catch { /* ignore malformed redirect URL */ }
+     }
+     const { acceptedTerms: _, ...submitData } = {
+       ...data,
+       telefono: telefonoDigits,
+       returnUrl: redirectUrl || undefined,
+       pendingPlanCode,
+       pendingBillingCycle
+     };
      register_(submitData, { onSuccess: () => {
        if (redirectUrl) {
          window.sessionStorage.setItem('redirect_after_verification', redirectUrl);

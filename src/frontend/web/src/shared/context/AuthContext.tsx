@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   updateUser: (data: Partial<User>) => void;
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('auth:force-logout', handler);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<User> => {
     setLoading(true);
     setError(null);
     queryClient.clear();
@@ -55,12 +55,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSuccess(result)) {
       setUser(result.data.user);
+      setLoading(false);
+      return result.data.user;
     } else {
       setError(result.error);
+      setLoading(false);
       throw result.error;
     }
-    
-    setLoading(false);
   }, []);
 
   const logout = useCallback(() => {

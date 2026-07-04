@@ -9,7 +9,9 @@ public record RegisterUserCommand(
     string Password,
     string Telefono,
     string Cedula,
-    string? ReturnUrl = null
+    string? ReturnUrl = null,
+    string? PendingPlanCode = null,
+    string? PendingBillingCycle = null
 );
 
 public record RegisterUserResultDto(

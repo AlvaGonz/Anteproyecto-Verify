@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { CheckoutReturnPage } from './CheckoutReturnPage';
@@ -30,6 +30,12 @@ describe('CheckoutReturnPage', () => {
       defaultOptions: { queries: { retry: false } },
     });
     vi.clearAllMocks();
+    // make fake timers so retry loop completes instantly
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   const renderWithRouter = (initialUrl: string) => {
@@ -54,8 +60,13 @@ describe('CheckoutReturnPage', () => {
   };
 
   it('redirects to dashboard when session_id is valid and status is complete', async () => {
+    // session-status call
     vi.mocked(apiClient.get).mockResolvedValueOnce({
       data: { status: 'complete', plan: 'Profesional' }
+    });
+    // my-status retry loop — return isManagedByStripe so loop exits immediately
+    vi.mocked(apiClient.get).mockResolvedValue({
+      data: { plan: 'Profesional', isManagedByStripe: true }
     });
 
     renderWithRouter('/checkout/return?session_id=cs_test_123');
@@ -76,8 +87,13 @@ describe('CheckoutReturnPage', () => {
   });
 
   it('sends correct parameter to backend if Stripe uses sessionId instead of session_id', async () => {
+    // session-status call
     vi.mocked(apiClient.get).mockResolvedValueOnce({
       data: { status: 'complete', plan: 'Básico' }
+    });
+    // my-status retry loop — return isManagedByStripe so loop exits immediately
+    vi.mocked(apiClient.get).mockResolvedValue({
+      data: { plan: 'Básico', isManagedByStripe: true }
     });
 
     // Arrange: what if the query param is sessionId?

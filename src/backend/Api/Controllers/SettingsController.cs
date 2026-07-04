@@ -77,14 +77,14 @@ public class SettingsController : ControllerBase
                     let pf = _context.Perfiles.FirstOrDefault(x => x.IdPerfil == a.IdPerfil)
                     let p = _context.PagosLegacy.OrderByDescending(x => x.FechaPago).FirstOrDefault(x => x.IdUsuario == l.IdUsuario)
                     let pl = _context.PlanesSuscripcion.FirstOrDefault(x => x.Idsuscripcion == p.Idsuscripcion)
-                    where u.Activo
+                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active
                     select new AdminUserSettingsDto(
                         u.Id,
                         u.Nombre,
                         u.Apellido,
                         u.CorreoElectronico,
                         pf != null && pf.NombrePerfil == "ADMIN" ? "admin" : "user",
-                        u.Telefono,
+                        u.Telefono ?? string.Empty,
                         u.Cedula,
                         pf != null ? pf.IdPerfil : null,
                         pf != null ? pf.NombrePerfil : string.Empty,

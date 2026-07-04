@@ -60,7 +60,9 @@ public class AuthController : ControllerBase
             request.Password ?? request.Contrasena ?? string.Empty,
             request.Telefono ?? "8095550199",
             request.Cedula ?? "40212345678",
-            request.ReturnUrl
+            request.ReturnUrl,
+            request.PendingPlanCode,
+            request.PendingBillingCycle
         );
         var result = await _registerHandler.Handle(command, cancellationToken);
         
@@ -130,7 +132,10 @@ public class AuthController : ControllerBase
                 name = responseData.User.Name,
                 email = responseData.User.Email,
                 role = responseData.User.Role,
-                avatarUrl = responseData.User.AvatarUrl
+                avatarUrl = responseData.User.AvatarUrl,
+                subscriptionStatus = responseData.User.SubscriptionStatus,
+                pendingPlanCode = responseData.User.PendingPlanCode,
+                pendingBillingCycle = responseData.User.PendingBillingCycle
             }
         });
     }
@@ -267,7 +272,9 @@ public class AuthController : ControllerBase
             Plan = user.Plan?.NombrePlan ?? "N/A",
             AvatarUrl = user.AvatarUrl,
             SubscriptionStatus = user.SubscriptionStatus ?? "N/A",
-            CurrentPeriodEnd = user.CurrentPeriodEnd
+            CurrentPeriodEnd = user.CurrentPeriodEnd,
+            PendingPlanCode = user.PendingPlanCode,
+            PendingBillingCycle = user.PendingBillingCycle
         });
     }
 
@@ -286,7 +293,7 @@ public class AuthController : ControllerBase
         }
 
         var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
-        if (user == null || !user.Activo)
+        if (user == null || !user.Activo || user.AccountStatus == Domain.Enums.UserAccountStatus.PendingDeletion)
         {
             return Unauthorized(new { Message = "Usuario no encontrado o inactivo." });
         }
@@ -399,4 +406,6 @@ public class RegisterRequestDto
     public string? Telefono { get; set; }
     public string? Cedula { get; set; }
     public string? ReturnUrl { get; set; }
+    public string? PendingPlanCode { get; set; }
+    public string? PendingBillingCycle { get; set; }
 }

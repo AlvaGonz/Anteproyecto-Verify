@@ -22,7 +22,7 @@ export const useLogin = () =>
 export const useRegister = () =>
   useMutation({
     mutationKey: ['useRegister'],
-    mutationFn: (data: Omit<RegisterFormValues, "confirmPassword" | "acceptedTerms"> & { returnUrl?: string }) =>
+    mutationFn: (data: Omit<RegisterFormValues, "confirmPassword" | "acceptedTerms"> & { returnUrl?: string; pendingPlanCode?: string; pendingBillingCycle?: string }) =>
       apiClient.post<AuthResponse>("/auth/register", data).then(res => res.data),
     onSuccess: (res) => {
       if (res.accessToken) {

@@ -23,5 +23,8 @@ public record LoginUserUserDto(
     string Email,
     string Name,
     string Role,
-    string? AvatarUrl
+    string? AvatarUrl,
+    string? SubscriptionStatus = null,
+    string? PendingPlanCode = null,
+    string? PendingBillingCycle = null
 );

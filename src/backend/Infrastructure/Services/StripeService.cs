@@ -1,0 +1,28 @@
+namespace Infrastructure.Services;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Abstractions;
+using Stripe;
+using Microsoft.Extensions.Configuration;
+
+public class StripeService : IStripeService
+{
+    private readonly IConfiguration _configuration;
+
+    public StripeService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+        StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
+    }
+
+    public async Task CancelAtPeriodEndAsync(string subscriptionId, CancellationToken cancellationToken = default)
+    {
+        var service = new SubscriptionService();
+        var options = new SubscriptionUpdateOptions
+        {
+            CancelAtPeriodEnd = true
+        };
+        await service.UpdateAsync(subscriptionId, options, cancellationToken: cancellationToken);
+    }
+}

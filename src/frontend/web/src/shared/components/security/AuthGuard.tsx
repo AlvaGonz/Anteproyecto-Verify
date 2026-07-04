@@ -6,8 +6,11 @@ interface AuthGuardProps {
   children: ReactNode;
 }
 
+const isSubscriptionActive = (status?: string | null) =>
+  status === 'active' || status === 'trialing';
+
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -23,6 +26,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       return <Navigate to={`/register?redirect=${encodeURIComponent(location.pathname + location.search)}`} replace />;
     }
     return <Navigate to="/login" replace />;
+  }
+
+  // ponytail: if user has a pending plan but no active subscription, redirect to checkout
+  // skip redirect if already on checkout to avoid redirect loops
+  if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus) && !location.pathname.startsWith('/checkout')) {
+    return <Navigate to={`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`} replace />;
   }
 
   return <>{children}</>;

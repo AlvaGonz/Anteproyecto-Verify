@@ -41,6 +41,22 @@ public class VerifyEmailCommandHandler
         _usuarioRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new VerifyEmailResultDto(true, null, user.Id);
+        // Compute next step based on user's pending plan and subscription status
+        // ponytail: centralize routing decision — frontend just navigates where told
+        string? nextStep;
+        if (user.SubscriptionStatus == "active" || user.SubscriptionStatus == "trialing")
+        {
+            nextStep = "dashboard";
+        }
+        else if (!string.IsNullOrWhiteSpace(user.PendingPlanCode))
+        {
+            nextStep = "checkout";
+        }
+        else
+        {
+            nextStep = "choose-plan";
+        }
+
+        return new VerifyEmailResultDto(true, null, user.Id, nextStep, user.PendingPlanCode, user.PendingBillingCycle);
     }
 }

@@ -159,6 +159,7 @@ public static class DependencyInjection
 
         // Background Jobs
         services.AddHostedService<Infrastructure.BackgroundJobs.MonthlyResetJob>();
+        services.AddHostedService<Infrastructure.BackgroundJobs.AccountPurgeJob>();
 
         // End of Infrastructure
 

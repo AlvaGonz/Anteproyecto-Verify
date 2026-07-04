@@ -13,6 +13,10 @@ export const EmailVerifiedPage = () => {
   const hasAttempted = useRef(false);
   const { refreshUser } = useAuth();
 
+  // ponytail: store nextStep from API to drive post-verify navigation
+  const nextStepRef = useRef<string | null>(null);
+  const pendingPlanRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!token) {
       setStatus("error");
@@ -28,6 +32,9 @@ export const EmailVerifiedPage = () => {
         // Since backend set cookies, we can just load the user profile
         if (response.data?.succeeded) {
             await refreshUser();
+            // Store nextStep and pendingPlan from backend response
+            nextStepRef.current = response.data.nextStep ?? null;
+            pendingPlanRef.current = response.data.pendingPlanCode ?? null;
         }
         setStatus("success");
       })
@@ -36,11 +43,27 @@ export const EmailVerifiedPage = () => {
       });
   }, [token, refreshUser]);
 
+  const computeTargetUrl = (): string => {
+    // New flow: backend tells frontend where to go
+    if (nextStepRef.current === "checkout" && pendingPlanRef.current) {
+      return `/checkout?plan=${pendingPlanRef.current}`;
+    }
+    if (nextStepRef.current === "choose-plan") {
+      return "/pricing";
+    }
+    if (nextStepRef.current === "dashboard") {
+      return "/admin";
+    }
+    // Legacy fallback
+    const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
+    const urlReturnUrl = searchParams.get('returnUrl');
+    return urlReturnUrl || storedRedirect || "/admin";
+  };
+
   useEffect(() => {
     if (status === "success") {
+      const targetUrl = computeTargetUrl();
       const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
-      const urlReturnUrl = searchParams.get('returnUrl');
-      const targetUrl = urlReturnUrl || storedRedirect || "/admin";
 
       const interval = setInterval(() => {
         setCountdown((prev) => {
@@ -58,6 +81,15 @@ export const EmailVerifiedPage = () => {
       return () => clearInterval(interval);
     }
   }, [status, navigate]);
+
+  const handleContinueClick = () => {
+    const targetUrl = computeTargetUrl();
+    const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
+    if (storedRedirect) {
+      window.sessionStorage.removeItem('redirect_after_verification');
+    }
+    navigate(targetUrl);
+  };
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center p-4">
@@ -83,14 +115,7 @@ export const EmailVerifiedPage = () => {
               Serás redirigido en <span className="text-primary font-bold text-base px-1">{countdown}</span> segundos...
             </div>
             <button
-              onClick={() => {
-                const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
-                const urlReturnUrl = searchParams.get('returnUrl');
-                if (storedRedirect) {
-                  window.sessionStorage.removeItem('redirect_after_verification');
-                }
-                navigate(urlReturnUrl || storedRedirect || "/admin");
-              }}
+              onClick={handleContinueClick}
               className="vf-btn-primary w-full h-[52px] text-sm font-bold shadow-floating hover:scale-[1.02] transition-transform"
             >
               <span className="flex items-center justify-center gap-2">

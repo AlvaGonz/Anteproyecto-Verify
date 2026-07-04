@@ -24,14 +24,20 @@ export const LoginForm = () => {
     formState: { errors: formErrors },
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
+  const isSubscriptionActive = (status?: string | null) =>
+    status === 'active' || status === 'trialing';
+
   const onSubmit = async (data: LoginFormValues) => {
     try {
       setIsPending(true);
       setError(null);
-      await login(data.email, data.password);
+      const user = await login(data.email, data.password);
       // Soft update for browser state (React Router navigation)
       if (redirectUrl) {
         navigate(redirectUrl);
+      } else if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus)) {
+        // ponytail: user has pending plan but no active sub → resume checkout
+        navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
       } else {
         navigate("/admin/dashboard");
       }
