@@ -175,13 +175,34 @@ public class SubscriptionController : ControllerBase
 
         try
         {
-            var sessionService = new SessionService();
-            var session = await sessionService.GetAsync(finalSessionId, cancellationToken: ct);
+            var options = new SessionGetOptions();
+            options.AddExpand("line_items");
             
-            // For testing: we can return a mock plan name if plan details aren't in session,
-            // but Stripe Session doesn't contain a simple "plan" string. It's usually in line_items.
-            // Let's just return the status and email as before, the frontend might need more.
-            return Ok(new { status = session.Status, customerEmail = session.CustomerDetails?.Email });
+            var sessionService = new SessionService();
+            var session = await sessionService.GetAsync(finalSessionId, options, cancellationToken: ct);
+            
+            string? planName = null;
+            var priceId = session.LineItems?.Data?.FirstOrDefault()?.Price?.Id;
+            
+            if (!string.IsNullOrEmpty(priceId))
+            {
+                var pricePlanMap = _configuration
+                    .GetSection("Stripe:PricePlanMap")
+                    .GetChildren()
+                    .ToDictionary(c => c.Key, c => c.Value ?? string.Empty);
+
+                if (pricePlanMap.TryGetValue(priceId, out var mappedPlanName))
+                {
+                    planName = mappedPlanName;
+                }
+            }
+
+            return Ok(new 
+            { 
+                status = session.Status, 
+                customerEmail = session.CustomerDetails?.Email,
+                plan = planName
+            });
         }
         catch (StripeException e)
         {

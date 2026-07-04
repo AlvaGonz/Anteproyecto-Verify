@@ -55,6 +55,27 @@ export const CheckoutReturnPage = () => {
           return
         }
 
+        // Normalize plan name returned by Stripe session (may be 'Profesional', 'empresa', etc.)
+        const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
+        const capabilities = PLAN_CAPABILITIES[planKey]
+
+        // Wait for Stripe webhook to process and update the backend database
+        let retries = 0;
+        while (retries < 10) {
+          try {
+            const myStatusRes = await apiClient.get('/v1/subscriptions/my-status');
+            const currentPlanKey = normalizePlanKey(myStatusRes.data.plan ?? myStatusRes.data.planName ?? null);
+            // If the backend plan matches the expected plan, or Stripe took over management
+            if (currentPlanKey === planKey || myStatusRes.data.isManagedByStripe) {
+              break;
+            }
+          } catch (e) {
+            // ignore error and retry
+          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          retries++;
+        }
+
         // Invalidate TanStack Query caches so Settings + Dashboard
         // reflect the new plan without requiring a full page reload
         await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] })
@@ -63,9 +84,7 @@ export const CheckoutReturnPage = () => {
         if (redirectedRef.current) return
         redirectedRef.current = true
 
-        // Normalize plan name returned by Stripe session (may be 'Profesional', 'empresa', etc.)
-        const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
-        const capabilities = PLAN_CAPABILITIES[planKey]
+        // Plan capabilities and key are already resolved above
 
         // Pass plan context to dashboard via location state
         navigate('/admin/dashboard', {
