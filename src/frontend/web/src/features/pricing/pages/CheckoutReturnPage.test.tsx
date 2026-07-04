@@ -62,7 +62,7 @@ describe('CheckoutReturnPage', () => {
 
     // Wait for the navigate to be called
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', expect.objectContaining({
+      expect(mockNavigate).toHaveBeenCalledWith('/admin/dashboard', expect.objectContaining({
         replace: true,
         state: expect.objectContaining({
           planJustActivated: true,

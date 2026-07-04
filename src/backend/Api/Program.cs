@@ -83,6 +83,13 @@ try
         }
     }
 
+    if (string.IsNullOrEmpty(builder.Configuration["Stripe:SecretKey"]))
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogCritical("FATAL STARTUP ERROR: Stripe:SecretKey is not configured. The application cannot start without it.");
+        throw new InvalidOperationException("Stripe:SecretKey is missing from configuration.");
+    }
+
     app.UseApiMiddleware();
 
     app.Run();

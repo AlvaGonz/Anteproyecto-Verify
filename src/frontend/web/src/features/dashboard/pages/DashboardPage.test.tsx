@@ -30,7 +30,7 @@ describe('DashboardPage', () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={initialEntries}>
           <Routes>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/admin/dashboard" element={<DashboardPage />} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -40,7 +40,7 @@ describe('DashboardPage', () => {
   it('renders PlanActivatedBanner when planJustActivated is in location state', () => {
     // Arrange & Act
     renderWithRouter([{
-      pathname: '/dashboard',
+      pathname: '/admin/dashboard',
       state: {
         planJustActivated: true,
         activatedPlan: {
@@ -60,7 +60,7 @@ describe('DashboardPage', () => {
   it('does not render PlanActivatedBanner when planJustActivated is missing', () => {
     // Arrange & Act
     renderWithRouter([{
-      pathname: '/dashboard',
+      pathname: '/admin/dashboard',
       state: null
     }]);
 

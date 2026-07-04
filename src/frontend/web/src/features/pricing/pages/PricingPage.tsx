@@ -42,7 +42,7 @@ export const PricingPage: React.FC = () => {
 
   const handleFreePlan = () => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/admin/dashboard');
     } else {
       navigate('/register');
     }

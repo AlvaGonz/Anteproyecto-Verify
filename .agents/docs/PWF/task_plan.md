@@ -1,21 +1,12 @@
-# Debug Session
+# Debug Session: /#/dashboard crash
 
-## Bug Report
-**ERROR / SÍNTOMA:** 
-`CheckoutReturnPage.tsx:49 GET http://localhost:5000/api/v1/subscriptions/session-status?sessionId=... 400 (Bad Request)`
+## SÍNTOMA
+Luego de un checkout de Stripe exitoso, la aplicación redirige a `/#/dashboard` pero presenta una pantalla de "Error en la aplicacion" (ErrorBoundary) sin mostrar un stack trace claro en la consola del navegador.
 
-**ARCHIVO DONDE OCURRE:** 
-`src/backend/Api/Controllers/SubscriptionController.cs` at `GetSessionStatus`
+## PLAN
 
-**ROOT CAUSE (Diagnosed):**
-Stripe API key is empty (`""`) in `appsettings.Development.json`. `SubscriptionController` sets `StripeConfiguration.ApiKey` to `""`. When `SessionService.GetAsync` is called, Stripe SDK throws an `ArgumentException` ("API key cannot be empty"). `GlobalExceptionHandler` intercepts this `ArgumentException` and maps it to a `400 Bad Request`.
-
-## Plan
-[x] 1. Apply TDD as per `.agents/skills/test-driven-development/SKILL.md`. First, we need to create/fix a test in `src/backend/Api.Tests/Controllers/SubscriptionControllerTests.cs` that verifies this behavior.
-[x] 2. Fix the controller to return a clearer 500 error when Stripe Secret Key is missing, similar to what `CreateSession` does. This ensures it doesn't get masked as a 400 Bad Request by the global exception handler.
-[x] 3. Implement the fix in `SubscriptionController.cs`.
-[x] 4. Run tests to confirm it passes.
-
-## Resolution
-The issue was that `SessionService.GetAsync()` throws an `ArgumentException` directly when `StripeConfiguration.ApiKey` is null/empty. This bypassed the `catch (StripeException e)` block entirely. The `GlobalExceptionHandler` then intercepted the `ArgumentException` and mapped it to a `400 Bad Request`.
-We added an explicit configuration check at the beginning of `GetSessionStatus` to return a `500 Internal Server Error`, bypassing Stripe SDK entirely when the configuration is missing. The TDD tests confirm it works as expected.
+1. **Investigar el ErrorBoundary**: Localizar dónde se renderiza "Error en la aplicacion" para entender qué capa está atrapando el error (Global o por Ruta).
+2. **Investigar la ruta `/dashboard`**: Identificar el componente que se renderiza en `/dashboard`.
+3. **Analizar el componente Dashboard**: Ver qué queries, hooks o estado podría estar fallando al regresar de Stripe (posiblemente falta de datos, estado inconsistente, o error al leer parámetros de la URL).
+4. **Fix**: Aplicar el arreglo con enfoque "Ponytail" (el cambio más pequeño posible que resuelva el root cause).
+5. **Verificación**: Asegurar que pase `npm run lint` y los tests.

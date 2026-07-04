@@ -71,7 +71,7 @@ describe("PricingPage", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/register");
   });
 
-  it("navigates to /dashboard when clicking Free plan and authenticated", () => {
+  it("navigates to /admin/dashboard when clicking Free plan and authenticated", () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true });
     render(
       <BrowserRouter>
@@ -82,7 +82,7 @@ describe("PricingPage", () => {
     const freeButton = screen.getByText("pricing.cards.free.button");
     fireEvent.click(freeButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
+    expect(mockNavigate).toHaveBeenCalledWith("/admin/dashboard");
   });
 
   it("navigates to /register with redirect param when clicking Professional plan and unauthenticated", () => {

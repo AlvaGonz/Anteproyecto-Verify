@@ -41,7 +41,7 @@ export const CheckoutReturnPage = () => {
       // Idempotency guard — prevents re-processing on hot-reload / StrictMode
       if (_processedSessions.has(sessionId)) {
         // Already processed — navigate directly without calling API again
-        navigate('/dashboard', { replace: true })
+        navigate('/admin/dashboard', { replace: true })
         return
       }
 
@@ -68,7 +68,7 @@ export const CheckoutReturnPage = () => {
         const capabilities = PLAN_CAPABILITIES[planKey]
 
         // Pass plan context to dashboard via location state
-        navigate('/dashboard', {
+        navigate('/admin/dashboard', {
           replace: true,
           state: {
             planJustActivated: true,
