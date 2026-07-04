@@ -73,7 +73,7 @@ export const SubscriptionSettings: React.FC = () => {
   const formattedPrice = (isManagedByStripe && data?.planPrice != null)
     ? data.planPrice === 0
       ? "Gratis"
-      : new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP', maximumFractionDigits: 0 }).format(data.planPrice) + " / mes"
+      : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(data.planPrice) + " USD / mes"
     : null;
 
 

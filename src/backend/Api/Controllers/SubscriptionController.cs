@@ -342,7 +342,7 @@ public class SubscriptionController : ControllerBase
                 "Webhook: Price {PriceId} has no mapping in Stripe:PricePlanMap — plan not updated.", priceId);
         }
 
-        var currentPeriodEnd = subscription.Items?.Data?.FirstOrDefault()?.CurrentPeriodEnd;
+        var currentPeriodEnd = subscription.Items?.Data?.FirstOrDefault()?.CurrentPeriodEnd ?? DateTime.UtcNow.AddMonths(1);
 
         // Always sync the Stripe subscription fields
         user.UpdateStripeSubscription(subscription.Id, subscription.Status, currentPeriodEnd);
