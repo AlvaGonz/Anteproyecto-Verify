@@ -18,8 +18,7 @@ export const DeleteAccountSection: React.FC = () => {
   const canSubmit =
     confirmation === "ELIMINAR" && password.length > 0 && !deleteAccount.isPending;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleDelete = async () => {
     if (!canSubmit) return;
 
     try {
@@ -57,7 +56,7 @@ export const DeleteAccountSection: React.FC = () => {
       </button>
 
       {isOpen && (
-        <form onSubmit={handleSubmit} className="px-5 pb-5 pt-2 space-y-4 border-t border-red-100 bg-red-50/30">
+        <div className="px-5 pb-5 pt-2 space-y-4 border-t border-red-100 bg-red-50/30">
           {/* Warning */}
           <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-xl">
             <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -126,14 +125,15 @@ export const DeleteAccountSection: React.FC = () => {
 
           <div className="flex justify-end pt-1">
             <button
-              type="submit"
+              type="button"
+              onClick={handleDelete}
               disabled={!canSubmit}
               className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {deleteAccount.isPending ? "Procesando..." : "Sí, Eliminar mi Cuenta"}
             </button>
           </div>
-        </form>
+        </div>
       )}
     </div>
   );

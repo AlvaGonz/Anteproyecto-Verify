@@ -1,11 +1,15 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-06-30T02:30:00-04:00 by OpenAgent (Unblock Ops)
+> Last updated: 2026-07-04T12:45:00-04:00 by OpenAgent (Account Deletion Lifecycle)
 > **📝 ORCH-TEST-001 completed — 12 artifacts across 11 tasks, score 78/100**
 > **📝 COMP-001 consent version gate implemented — ADR-007 gaps closed**
 > **📝 GROQ_API_KEY set at Machine/User/Process — Consent tests 6/6 ✅**
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
+|---|---|---|---|---|
+| Account Deletion Lifecycle (GDPR Art.17) — Backend Domain/Application/Infrastructure/Api + Tests (24/24) | RF-9, OE-6 | feat-stripe | (pending) | 2026-07-04 |
+| EF Core Migration: AddAccountLifecycleColumns (5 cols to Usuarios) | RF-9 | feat-stripe | (pending) | 2026-07-04 |
+| Frontend: DeleteAccountSection danger zone + useAccountDeletion hooks | RF-9 | feat-stripe | (pending) | 2026-07-04 |
 |---|---|---|---|---|
 | Fix ERR_PACKAGE_PATH_NOT_EXPORTED & Node20 Deprecation | N/A | feat/agent-infrastructure-hardening | 74651a23 | 2026-06-06 |
 | Fix react-i18next resolution in container | N/A | develop | bd5fc58f | 2026-06-06 |
