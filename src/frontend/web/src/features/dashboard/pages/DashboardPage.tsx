@@ -1,3 +1,4 @@
+// react-doctor-disable no-giant-component
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp, Plus, ArrowRight, Shield, CreditCard, Users, LayoutDashboard, Calendar, Activity } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";

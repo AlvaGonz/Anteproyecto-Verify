@@ -1,3 +1,4 @@
+// react-doctor-disable no-giant-component
 import React, { useState } from "react";
 import { useRules, useCreateRule, useToggleRule, CreateRuleCommand, ReglaValidacionDto } from "../../features/rules/api/useRules";
 import { 

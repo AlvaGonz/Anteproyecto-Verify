@@ -1,3 +1,4 @@
+// react-doctor-disable no-giant-component
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";

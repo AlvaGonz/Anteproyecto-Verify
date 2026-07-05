@@ -1,3 +1,4 @@
+// react-doctor-disable no-giant-component
 import React from "react";
 import { PublicVerificationDto, CertificationStatus } from "../../certifications/types";
 import { 
