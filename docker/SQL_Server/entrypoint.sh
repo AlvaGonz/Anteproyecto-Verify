@@ -58,7 +58,7 @@ touch /tmp/db_ready
     echo "[Seed] Waiting for EF Core to create the database schema..."
     for j in {1..60}; do
         MIG_COUNT=$(/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -d "verifinca-spm-uce-2026" -h -1 -Q "SET NOCOUNT ON; IF OBJECT_ID('[__EFMigrationsHistory]') IS NOT NULL SELECT COUNT(*) FROM [__EFMigrationsHistory] ELSE SELECT 0" -C | tr -d ' ' | tr -d '\r')
-        if [ "$MIG_COUNT" = "1" ] || [ "$MIG_COUNT" -gt 0 ] 2>/dev/null; then
+        if [ "$MIG_COUNT" -ge 12 ] 2>/dev/null; then
             echo "[Seed] Database schema is ready. Injecting raw SQL tables..."
             /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -d "verifinca-spm-uce-2026" -i "$SQL_FILE" -C || echo "[Seed] Finished running raw SQL tables."
             

@@ -132,3 +132,18 @@
   - **Symptom:** `/api/admin/dashboard/stats` and `/api/admin/users` endpoints returned 500 Internal Server Errors causing empty dashboards in UI.
   - **Root Cause:** EF Core failed to translate a LINQ expression referencing `Proyecto.Status`, which is a computed unmapped property.
   - **Fix:** Modified `DashboardRepository.cs` to query using the mapped column `EstadoProyecto` instead. Restarted the API container to clear the compiled expression cache. Endpoints now successfully return 200 OK with populated dummy data.
+- **BUG-015:** Unit test failures due to database seeding, model method parameter changes, and schema updates.
+  - **Symptom:** xUnit tests in `UnitTests` failed compiling or running.
+  - **Root Cause:**
+    1. `PlanSuscripcion.Create` parameter count increased from 9 to 17 but test factories and integration helpers still used 9-parameter signatures.
+    2. `RegisterUserTests` expected `"Consultor"` plan but `RegisterUserCommandHandler` requested `"Gratuito"`.
+    3. `InternalValidationEngineTests` expected 20 failed documents but the required document count increased to 25.
+    4. `InitiateDgriValidationCommandHandlerTests` mocked `GetByIdAsync` on `IUsuarioRepository` instead of `GetByIdWithPlanAsync` which was called by the handler, and did not set the user to `UserRole.Administrator` (causing quota check to fail).
+    5. `UploadAvatarCommandHandlerTests` asserted that avatar upload returned a file path starting with `"/avatars/"` but the updated handler returned a base64 Data URI.
+  - **Fix:**
+    1. Updated all test factory creation calls (`TestPlanFactory.cs`, `SubscriptionTierPolicyTests.cs`, `IntegrationTestBase.cs`) to supply all 17 parameters to `PlanSuscripcion.Create`.
+    2. Renamed `"Consultor"` to `"Gratuito"` setup in `RegisterUserTests.cs`.
+    3. Set expected validation failed counts to 25 in `InternalValidationEngineTests.cs`.
+    4. Updated `InitiateDgriValidationCommandHandlerTests.cs` to mock `GetByIdWithPlanAsync` and set user role to `UserRole.Administrator` to bypass quota checks.
+    5. Corrected `UploadAvatarCommandHandlerTests.cs` to assert base64 Data URI format and removed the local file cleanup block.
+

@@ -279,7 +279,6 @@ CREATE TABLE PermisoSuelo (
     Superficie DECIMAL(18,2) NULL,
     TienePermiso VARCHAR(10) NULL,
     Documento VARCHAR(250) NULL,
-    FechaEmision DATE,
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmobiliarios(IdProyecto)
 );
 GO

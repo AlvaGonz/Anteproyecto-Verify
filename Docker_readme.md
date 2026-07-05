@@ -123,7 +123,8 @@ Cuando ejecutas `docker compose up`, el sistema inicializa y puebla las siguient
 Debido a la magnitud del conjunto de datos (más de 3 millones de filas insertadas en total), el primer arranque en limpio del contenedor tomará un tiempo para poblar los volúmenes de base de datos:
 * **Montura DGII (`up_DGII.py`)**: ~3.9 minutos (235 segundos) usando 8 hilos concurrentes y montura por lotes de 150 filas.
 * **Generador de Semillas (`generador_entidades_gubernamentales.py`)**: ~7.8 minutos (470 segundos) para calcular superficies, coordinar provincias/municipios e insertar registros.
-* **Tiempo Total Inicial**: **~12 minutos** para el aprovisionamiento completo del contenedor de base de datos y sus volúmenes asociados.
+* **Tiempo Total Inicial**: **~16.5 minutos** para el aprovisionamiento completo del contenedor de base de datos y sus volúmenes asociados.
+* **Tiempo de Inicio Medido**: total en minutos para inicia: 16.5
 
 > [!TIP]
 > **Arranques posteriores rápidos:** Las tareas de montura de datos implementan un mecanismo inteligente de validación en base de datos. Si detectan que las tablas ya contienen la totalidad de los datos (>= 780,000 registros), el proceso de carga se omitirá en milisegundos, permitiendo que Docker Compose levante todo el ecosistema de forma instantánea.
