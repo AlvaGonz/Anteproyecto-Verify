@@ -16,6 +16,7 @@ public class InitiateDgriValidationCommandHandlerTests
 {
     private readonly Mock<IDgriService> _dgriServiceMock;
     private readonly Mock<IProyectoRepository> _proyectoRepositoryMock;
+    private readonly Mock<IUsuarioRepository> _usuarioRepositoryMock;
     private readonly Mock<IValidacionRepository> _validacionRepositoryMock;
     private readonly Mock<IAuditoriaRepository> _auditoriaRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
@@ -25,6 +26,7 @@ public class InitiateDgriValidationCommandHandlerTests
     {
         _dgriServiceMock = new Mock<IDgriService>();
         _proyectoRepositoryMock = new Mock<IProyectoRepository>();
+        _usuarioRepositoryMock = new Mock<IUsuarioRepository>();
         _validacionRepositoryMock = new Mock<IValidacionRepository>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -32,6 +34,7 @@ public class InitiateDgriValidationCommandHandlerTests
         _handler = new InitiateDgriValidationCommandHandler(
             _dgriServiceMock.Object,
             _proyectoRepositoryMock.Object,
+            _usuarioRepositoryMock.Object,
             _validacionRepositoryMock.Object,
             _auditoriaRepositoryMock.Object,
             _unitOfWorkMock.Object
@@ -54,6 +57,9 @@ public class InitiateDgriValidationCommandHandlerTests
                 Vigencia = "Vigente",
                 TieneCargasJuridicas = false
             });
+
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Administrator, "123", "40200000000");
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
         var command = new InitiateDgriValidationCommand { ProyectoId = projectId, DatosRegistrales = "123", UsuarioId = Guid.NewGuid() };
 
@@ -82,6 +88,9 @@ public class InitiateDgriValidationCommandHandlerTests
                 Vigencia = "Vigente",
                 TieneCargasJuridicas = true
             });
+
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Administrator, "123", "40200000000");
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
         var command = new InitiateDgriValidationCommand { ProyectoId = projectId, DatosRegistrales = "123", UsuarioId = Guid.NewGuid() };
 

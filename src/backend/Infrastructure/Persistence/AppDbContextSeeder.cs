@@ -59,7 +59,6 @@ public static class AppDbContextSeeder
                 cedula: "001-9876543-2");
 
             await SeedLegacyProfilesAndPermissionsAsync(context, logger, adminUser, devUser, publicUser);
-            await SeedDashboardDummyDataAsync(context, logger, adminUser, devUser, publicUser);
 
             var proyectos = new[]
             {
@@ -82,6 +81,8 @@ public static class AppDbContextSeeder
                     status: p.Status);
                 proyectoEntities.Add(proyecto);
             }
+
+            await SeedDashboardDummyDataAsync(context, logger, adminUser, devUser, publicUser, proyectoEntities);
 
             try {
                 var p1 = proyectoEntities[0];
@@ -207,10 +208,19 @@ public static class AppDbContextSeeder
         {
             logger.LogInformation("Seeding modern subscription plans (Block 2)...");
             
-            // Consulta (Free)
-            var consulta = PlanSuscripcion.Create(
-                id: Guid.NewGuid(), nombrePlan: "Consulta", precio: 0.00m,
-                maxConsultas: 1, maxProyectos: 0, presentacionPublica: false,
+            // Gratuito (Free)
+            var gratuito = PlanSuscripcion.Create(
+                id: Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"), nombrePlan: "Gratuito", precio: 0.00m,
+                maxConsultas: 1, maxProyectos: 1, presentacionPublica: false,
+                qrIncluido: false, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 0,
+                alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
+                exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
+                soporteTipo: "Comunidad", accesoApi: false);
+
+            // Consultor (Legacy Free for tests)
+            var consultor = PlanSuscripcion.Create(
+                id: Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"), nombrePlan: "Consultor", precio: 0.00m,
+                maxConsultas: 5, maxProyectos: 5, presentacionPublica: false,
                 qrIncluido: false, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 0,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
@@ -218,7 +228,7 @@ public static class AppDbContextSeeder
 
             // Profesional
             var profesional = PlanSuscripcion.Create(
-                id: Guid.NewGuid(), nombrePlan: "Profesional", precio: 3500.00m,
+                id: Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"), nombrePlan: "Profesional", precio: 3500.00m,
                 maxConsultas: 25, maxProyectos: 5, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 200,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
@@ -227,7 +237,7 @@ public static class AppDbContextSeeder
 
             // Empresa
             var empresa = PlanSuscripcion.Create(
-                id: Guid.NewGuid(), nombrePlan: "Empresa", precio: 10000.00m,
+                id: Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"), nombrePlan: "Empresa", precio: 10000.00m,
                 maxConsultas: 100, maxProyectos: 20, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 1024,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: true, validacionLoteDisponible: false,
@@ -236,14 +246,14 @@ public static class AppDbContextSeeder
 
             // Enterprise
             var enterprise = PlanSuscripcion.Create(
-                id: Guid.NewGuid(), nombrePlan: "Enterprise", precio: 30000.00m,
+                id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Enterprise", precio: 30000.00m,
                 maxConsultas: -1, maxProyectos: -1, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: 10240,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
                 exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
                 soporteTipo: "Account Manager", accesoApi: true);
 
-            context.PlanesSuscripcion.AddRange(consulta, profesional, empresa, enterprise);
+            context.PlanesSuscripcion.AddRange(gratuito, consultor, profesional, empresa, enterprise);
             await context.SaveChangesAsync();
         }
     }
@@ -287,7 +297,7 @@ public static class AppDbContextSeeder
         }
     }
 
-    private static async Task SeedDashboardDummyDataAsync(AppDbContext context, ILogger logger, Usuario adminUser, Usuario devUser, Usuario publicUser)
+    private static async Task SeedDashboardDummyDataAsync(AppDbContext context, ILogger logger, Usuario adminUser, Usuario devUser, Usuario publicUser, List<Proyecto> projects)
     {
         if (!await context.LogConsultas.AnyAsync())
         {
@@ -313,17 +323,22 @@ public static class AppDbContextSeeder
             context.LogConsultas.AddRange(logs);
             
             // Seed LogProyectos
-            var logProyectos = new List<LogProyecto>();
-            for (int i = 0; i < 15; i++)
+            if (projects != null && projects.Any())
             {
-                var daysAgo = random.Next(0, 30);
+                var logProyectos = new List<LogProyecto>();
+                for (int i = 0; i < 15; i++)
+                {
+                    var daysAgo = random.Next(0, 30);
+                    var project = projects[random.Next(projects.Count)];
+                    
+                    var logProyecto = new LogProyecto(devUser.Id, project.Id, "Creacion de proyecto (Seeder)");
+                    typeof(LogProyecto).GetProperty("FechaCreacion")?.SetValue(logProyecto, today.AddDays(-daysAgo).AddHours(-random.Next(0, 24)));
+                    logProyectos.Add(logProyecto);
+                }
                 
-                var logProyecto = new LogProyecto(devUser.Id, Guid.NewGuid(), "Creacion de proyecto (Seeder)");
-                typeof(LogProyecto).GetProperty("FechaCreacion")?.SetValue(logProyecto, today.AddDays(-daysAgo).AddHours(-random.Next(0, 24)));
-                logProyectos.Add(logProyecto);
+                context.LogProyectos.AddRange(logProyectos);
             }
             
-            context.LogProyectos.AddRange(logProyectos);
             await context.SaveChangesAsync();
         }
     }

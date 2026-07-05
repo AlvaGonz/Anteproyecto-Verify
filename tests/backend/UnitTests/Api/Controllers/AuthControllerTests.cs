@@ -12,6 +12,7 @@ using Application.Features.Auth.Commands.VerifyEmail;
 using Application.Features.Auth.Commands.RegisterUser;
 using Domain.Entities;
 using Domain.Enums;
+using Application.Features.Auth.Commands.UploadAvatar;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -51,11 +52,14 @@ public class AuthControllerTests
             mockEmailService.Object,
             mockPlanRepo.Object);
 
+        var uploadAvatarHandler = new UploadAvatarCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
+
         _controller = new AuthController(
             registerHandler, 
             verifyHandler,
             loginHandler,
             updateProfileHandler,
+            uploadAvatarHandler,
             _usuarioRepositoryMock.Object, 
             mockConfig.Object,
             mockJwtTokenGenerator.Object,

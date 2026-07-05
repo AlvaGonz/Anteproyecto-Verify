@@ -3,18 +3,19 @@ import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
 import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
-import { UsersTable, UserFormModal, DeleteModal, MyProfileForm, SubscriptionSettings } from "../../features/settings/components";
+import { UsersTable, UserFormModal, DeleteModal, MyProfileForm, SubscriptionSettings, InviteesSettings } from "../../features/settings/components";
 import {
   Settings,
   Users,
   Loader2,
   User,
-  CreditCard
+  CreditCard,
+  UserPlus
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
-type TabId = "profile" | "subscription" | "users";
+type TabId = "profile" | "subscription" | "users" | "invitees";
 
 
 
@@ -29,6 +30,7 @@ export const SettingsPage: React.FC = () => {
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
+  const isManagementTier = user?.plan === "Enterprise" || user?.plan === "Empresa";
 
   const { data: users = [], isLoading: isLoadingUsers } = useUsers(1, 50, isAdmin);
 
@@ -180,6 +182,19 @@ if (formData.telefono) {
 
           </>
         )}
+
+        {isManagementTier && (
+          <button
+            onClick={() => setActiveTab("invitees")}
+            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "invitees"
+              ? "border-[#223382] text-[#223382]"
+              : "border-transparent text-text-secondary hover:text-text-primary"
+              }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            Usuarios Invitados
+          </button>
+        )}
       </div>
 
       {/* Tab Contents */}
@@ -224,6 +239,18 @@ if (formData.telefono) {
                 onDelete={(id) => setDeleteId(id)}
                 onAddNew={handleAddNewClick}
               />
+            </motion.div>
+          )}
+
+          {activeTab === "invitees" && isManagementTier && (
+            <motion.div
+              key="invitees"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <InviteesSettings />
             </motion.div>
           )}
 

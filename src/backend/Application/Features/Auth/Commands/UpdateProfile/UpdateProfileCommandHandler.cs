@@ -44,6 +44,11 @@ public class UpdateProfileCommandHandler
         
         user.UpdateProfile(nombre, apellido, telefono ?? "0000000000");
 
+        if (request.Rnc != null)
+        {
+            user.UpdateRnc(request.Rnc);
+        }
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new UpdateProfileResultDto(true, null);

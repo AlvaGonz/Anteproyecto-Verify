@@ -18,6 +18,8 @@ export interface User {
   rol?: string;
   cedula?: string;
   telefono?: string;
+  rnc?: string;
+  razonSocial?: string;
   plan?: string;
   avatarUrl?: string;
   stripeCustomerId?: string | null;

@@ -43,7 +43,7 @@ public class ProjectServiceTests
         var userId = Guid.NewGuid();
         var dto = new CreateProyectoDto("Test", "Location", userId, ProjectCategory.Comercial, "DevData", null, "DC-123");
         
-        var plan = Domain.Entities.PlanSuscripcion.Create(Guid.NewGuid(), "Test Plan", 1000m, 100, 10, true, true, true, false);
+        var plan = Domain.Entities.PlanSuscripcion.Create(Guid.NewGuid(), "Test Plan", 1000m, 100, 10, true, true, 0, 100, false, false, false, false, false, false, "Comunidad", false);
         var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
         user.GetType().GetProperty("Id")?.SetValue(user, userId);
         user.GetType().GetProperty("Plan")?.SetValue(user, plan);
