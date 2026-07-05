@@ -31,6 +31,8 @@ export const HeroSection: React.FC = () => {
           muted
           loop
           playsInline
+          aria-hidden="true"
+          tabIndex={-1}
           className="w-full h-full object-cover opacity-40 mix-blend-multiply transition-all duration-1000 z-0 scale-110"
           poster="/media/verifinca_institutional.png"
         >
@@ -68,6 +70,7 @@ export const HeroSection: React.FC = () => {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Nombre del proyecto o código de radicación..."
+                aria-label="Buscar proyecto"
                 className="w-full bg-transparent border-none focus:ring-0 px-3 py-4 text-base font-bold placeholder:text-gray-300 outline-none"
               />
             </div>

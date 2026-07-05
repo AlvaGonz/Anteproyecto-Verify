@@ -9,8 +9,8 @@ export const uploadDocumentSchema = z.object({
     .min(3, "El nombre del documento es requerido")
     .max(200),
   tipo: z.enum(
-    ["Plano", "Permiso", "Titulo", "Fotografia", "Contrato", "Otro"],
-    { errorMap: () => ({ message: "Seleccione un tipo de documento" }) }
+    ["Plano", "Permiso", "Titulo", "Fotografia", "Contrato", "Otro"] as const,
+    { error: () => "Seleccione un tipo de documento" }
   ),
   archivo: z
     .instanceof(File, { message: "Seleccione un archivo" })

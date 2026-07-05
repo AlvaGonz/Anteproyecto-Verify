@@ -25,7 +25,7 @@ export const ProjectAuditPage: React.FC = () => {
       detalle: l.descripcion || "Sin detalles",
       fechaEventoUtc: l.fecha
     })) as AuditDto[];
-  }, [rawLogs, id]);
+  }, [rawLogs]);
 
   return (
     <div>

@@ -18,6 +18,14 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
+const NAVIGATION = [
+  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { name: "Expedientes", href: "/admin/projects", icon: FolderKanban },
+  { name: "Reglas de Validacion", href: "/admin/rules", icon: ShieldAlert },
+  { name: "Logs de Auditoría", href: "/admin/audit-log", icon: History },
+  { name: "Configuracion", href: "/admin/settings", icon: Settings },
+];
+
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -47,14 +55,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     validator: "Validador",
     user: "Usuario",
   }[user?.role || "user"] || "Usuario";
-
-  const navigation = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Expedientes", href: "/admin/projects", icon: FolderKanban },
-    { name: "Reglas de Validacion", href: "/admin/rules", icon: ShieldAlert },
-    { name: "Logs de Auditoría", href: "/admin/audit-log", icon: History },
-    { name: "Configuracion", href: "/admin/settings", icon: Settings },
-  ];
 
   return (
     <div
@@ -91,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Principal</p>
         </div>
         <nav className="space-y-1.5 flex-1">
-          {navigation.map((item) => {
+          {NAVIGATION.map((item) => {
             const isActive = location.pathname.startsWith(item.href);
             return (
               <Link

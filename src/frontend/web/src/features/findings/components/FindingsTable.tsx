@@ -5,7 +5,7 @@ interface FindingsTableRowProps {
   finding: IFinding;
 }
 
-export const FindingsTableRow = ({ finding }: FindingsTableRowProps) => {
+const FindingsTableRow = ({ finding }: FindingsTableRowProps) => {
   const isResolved = finding.status === FindingStatus.RESOLVED;
 
   return (

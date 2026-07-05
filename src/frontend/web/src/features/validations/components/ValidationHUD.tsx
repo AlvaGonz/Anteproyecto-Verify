@@ -6,26 +6,35 @@ interface ValidationHUDProps {
   onComplete: () => void;
 }
 
+const scanSteps = [
+  "Iniciando Módulo de Auditoría Digital v4.0...",
+  "Conectando con Red de Catastro Nacional...",
+  "Estableciendo handshake seguro con DGII (Puerto 5005)...",
+  "Analizando metadatos de archivos adjuntos...",
+  "Verificando firmas digitales en Títulos de Propiedad...",
+  "Cruzando datos georreferenciados con satélite...",
+  "Validando identidad de titulares en Renap...",
+  "Buscando gravámenes pendientes en Registro de Títulos...",
+  "Ejecutando motor de reglas de cumplimiento (VeriRule 2.1)...",
+  "Agregando resultados y generando reporte final...",
+];
+
 export const ValidationHUD: React.FC<ValidationHUDProps> = ({ isScanning, onComplete }) => {
   const [logs, setLogs] = useState<string[]>([]);
+  const [prevIsScanning, setPrevIsScanning] = useState(isScanning);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
-  const scanSteps = [
-    "Iniciando Módulo de Auditoría Digital v4.0...",
-    "Conectando con Red de Catastro Nacional...",
-    "Estableciendo handshake seguro con DGII (Puerto 5005)...",
-    "Analizando metadatos de archivos adjuntos...",
-    "Verificando firmas digitales en Títulos de Propiedad...",
-    "Cruzando datos georreferenciados con satélite...",
-    "Validando identidad de titulares en Renap...",
-    "Buscando gravámenes pendientes en Registro de Títulos...",
-    "Ejecutando motor de reglas de cumplimiento (VeriRule 2.1)...",
-    "Agregando resultados y generando reporte final...",
-  ];
+  if (isScanning !== prevIsScanning) {
+    setPrevIsScanning(isScanning);
+    if (isScanning) {
+      setLogs([]);
+    }
+  }
 
   useEffect(() => {
     if (isScanning) {
-      setLogs([]);
       let currentStep = 0;
       const interval = setInterval(() => {
         if (currentStep < scanSteps.length) {
@@ -33,7 +42,7 @@ export const ValidationHUD: React.FC<ValidationHUDProps> = ({ isScanning, onComp
           currentStep++;
         } else {
           clearInterval(interval);
-          setTimeout(onComplete, 1000);
+          setTimeout(onCompleteRef.current, 1000);
         }
       }, 800);
       return () => clearInterval(interval);
@@ -85,7 +94,7 @@ export const ValidationHUD: React.FC<ValidationHUDProps> = ({ isScanning, onComp
             className="flex-1 bg-black/40 border border-[#223382]/20 rounded p-4 overflow-y-auto max-h-[300px] vf-terminal-text text-primary"
           >
             {logs.map((log, i) => (
-              <div key={i} className="mb-2 last:mb-0 animate-in slide-in-from-left duration-300">
+              <div key={`${log.substring(0, 20)}-${i}`} className="mb-2 last:mb-0 animate-in slide-in-from-left duration-300">
                 {log}
               </div>
             ))}

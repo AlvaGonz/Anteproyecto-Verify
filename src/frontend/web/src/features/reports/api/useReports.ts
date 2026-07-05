@@ -11,6 +11,7 @@ export const useReports = (projectId: string) =>
   });
 
 export const useGeneratePdf = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['useReports'],
     mutationFn: async (projectId: string | number) => {
@@ -20,6 +21,7 @@ export const useGeneratePdf = () =>
   });
 
 export const useGenerateExcel = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['useGenerateExcel'],
     mutationFn: async (projectId: string | number) => {
@@ -29,6 +31,7 @@ export const useGenerateExcel = () =>
   });
 
 export const useQueryGeminiProxy = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['useQueryGeminiProxy'],
     mutationFn: async (projectId: string | number) => {

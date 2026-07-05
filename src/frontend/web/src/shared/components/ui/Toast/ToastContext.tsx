@@ -1,8 +1,9 @@
 import React, {
   createContext,
-  useContext,
+  use,
   useState,
   useCallback,
+  useMemo,
   ReactNode,
 } from "react";
 import { CheckCircle2, AlertTriangle, Info, XCircle, X } from "lucide-react";
@@ -23,7 +24,7 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const useToast = () => {
-  const context = useContext(ToastContext);
+  const context = use(ToastContext);
   if (!context) {
     throw new Error("useToast must be used within a ToastProvider");
   }
@@ -52,8 +53,10 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
+  const value = useMemo(() => ({ addToast, removeToast }), [addToast, removeToast]);
+
   return (
-    <ToastContext.Provider value={{ addToast, removeToast }}>
+    <ToastContext.Provider value={value}>
       {children}
       <div className="fixed top-6 right-6 space-y-3 z-[100] pointer-events-none">
         {toasts.map((toast) => {

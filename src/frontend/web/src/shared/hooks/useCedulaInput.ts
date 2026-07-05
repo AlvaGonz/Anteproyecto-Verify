@@ -1,6 +1,27 @@
 import { useState, useCallback } from 'react';
 
 /**
+ * Extracts only digits from a string
+ */
+const getDigits = (str: string): string => str.replace(/\D/g, '');
+
+/**
+ * Formats digits to XXX-XXXXXXX-X
+ */
+const formatCedula = (digits: string): string => {
+  if (!digits) return '';
+  const cleanDigits = digits.slice(0, 11);
+  if (cleanDigits.length <= 3) return cleanDigits;
+  if (cleanDigits.length <= 10) return `${cleanDigits.slice(0, 3)}-${cleanDigits.slice(3)}`;
+  return `${cleanDigits.slice(0, 3)}-${cleanDigits.slice(3, 10)}-${cleanDigits.slice(10, 11)}`;
+};
+
+/**
+ * Validates if the digits represent a valid RD cédula (exactly 11 digits)
+ */
+const isValidCedula = (digits: string): boolean => /^\d{11}$/.test(digits);
+
+/**
  * Custom hook for handling Dominican Republic cédula input.
  * Provides auto-formatting to XXX-XXXXXXX-X and validates.
  * 
@@ -10,39 +31,6 @@ import { useState, useCallback } from 'react';
  */
 export function useCedulaInput(initialValue: string = '', onChange?: (value: string) => void) {
   const [value, setValue] = useState(initialValue);
-
-  /**
-   * Extracts only digits from a string
-   */
-  const getDigits = (str: string): string => str.replace(/\D/g, '');
-
-  /**
-   * Formats digits to XXX-XXXXXXX-X
-   */
-  const formatCedula = (digits: string): string => {
-    if (!digits) return '';
-
-    // Take only first 11 digits
-    const cleanDigits = digits.slice(0, 11);
-
-    if (cleanDigits.length <= 3) {
-      return `${cleanDigits}`;
-    }
-
-    if (cleanDigits.length <= 10) {
-      return `${cleanDigits.slice(0, 3)}-${cleanDigits.slice(3)}`;
-    }
-
-    return `${cleanDigits.slice(0, 3)}-${cleanDigits.slice(3, 10)}-${cleanDigits.slice(10, 11)}`;
-  };
-
-  /**
-   * Validates if the digits represent a valid RD cédula
-   * (exactly 11 digits)
-   */
-  const isValidCedula = (digits: string): boolean => {
-    return /^\d{11}$/.test(digits);
-  };
 
   /**
    * Handles input changes: formats, validates, updates state, and calls onChange

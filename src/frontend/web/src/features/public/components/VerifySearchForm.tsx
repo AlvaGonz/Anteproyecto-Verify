@@ -103,6 +103,17 @@ const VALIDATION_PATTERNS = {
   }
 } as const;
 
+const validateInput = (value: string, typeId: string): string | null => {
+  if (!value.trim()) return "Por favor, ingrese un valor";
+  
+  const pattern = VALIDATION_PATTERNS[typeId as keyof typeof VALIDATION_PATTERNS];
+  if (pattern && !pattern.regex.test(value)) {
+    return `Formato de ${pattern.name} inválido (Ej: ${pattern.example})`;
+  }
+  
+  return null;
+};
+
 export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({ 
   className,
   variant = "light"
@@ -125,17 +136,6 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const validateInput = (value: string, typeId: string): string | null => {
-    if (!value.trim()) return "Por favor, ingrese un valor";
-    
-    const pattern = VALIDATION_PATTERNS[typeId as keyof typeof VALIDATION_PATTERNS];
-    if (pattern && !pattern.regex.test(value)) {
-      return `Formato de ${pattern.name} inválido (Ej: ${pattern.example})`;
-    }
-    
-    return null;
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,6 +248,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
             type="text"
             required
             placeholder={searchType.placeholder}
+            aria-label={searchType.placeholder}
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             className={cn(

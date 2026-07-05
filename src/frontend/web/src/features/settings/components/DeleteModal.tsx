@@ -11,11 +11,12 @@ interface DeleteModalProps {
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing, onConfirm, onCancel }) => {
   const [confirmText, setConfirmText] = useState("");
+  const [prevDeleteId, setPrevDeleteId] = useState<string | null>(null);
 
-  // Clear text when modal closes/opens
-  useEffect(() => {
+  if (deleteId !== prevDeleteId) {
+    setPrevDeleteId(deleteId);
     if (!deleteId) setConfirmText("");
-  }, [deleteId]);
+  }
 
   if (!deleteId) return null;
 
@@ -35,10 +36,11 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
         </p>
         
         <div className="text-left mb-6">
-          <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+          <label htmlFor="del-modal-confirm" className="block text-xs font-bold text-text-secondary uppercase mb-1">
             Escriba ELIMINAR para confirmar
           </label>
           <input
+            id="del-modal-confirm"
             type="text"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}

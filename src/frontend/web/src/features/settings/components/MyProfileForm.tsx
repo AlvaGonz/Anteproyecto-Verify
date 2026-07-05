@@ -10,6 +10,13 @@ import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, 
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
 import { DeleteAccountSection } from "./DeleteAccountSection";
 
+const ROLE_LABEL: Record<string, string> = {
+  admin: "Administrador",
+  dev: "Desarrollador",
+  validator: "Validador",
+  user: "Usuario",
+};
+
 export const MyProfileForm: React.FC = () => {
   const { user, refreshUser } = useAuth();
   const { addToast } = useToast();
@@ -91,13 +98,6 @@ export const MyProfileForm: React.FC = () => {
     }
   };
 
-  const roleLabel: Record<string, string> = {
-    admin: "Administrador",
-    dev: "Desarrollador",
-    validator: "Validador",
-    user: "Usuario",
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-xl space-y-6">
       {/* AVATAR SECTION */}
@@ -127,7 +127,7 @@ export const MyProfileForm: React.FC = () => {
           <div>
             <p className="text-[10px] text-text-secondary uppercase font-bold">Rol</p>
             <p className="text-sm font-bold text-text-primary">
-              {roleLabel[user?.role ?? "user"] ?? user?.role}
+              {ROLE_LABEL[user?.role ?? "user"] ?? user?.role}
             </p>
           </div>
         </div>
@@ -148,12 +148,13 @@ export const MyProfileForm: React.FC = () => {
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+            <label htmlFor="mp-nombre" className="block text-xs font-bold text-text-secondary uppercase mb-1">
               Nombre
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
               <input
+                id="mp-nombre"
                 {...register("nombre")}
                 type="text"
                 className="vf-input w-full pl-9"
@@ -165,12 +166,13 @@ export const MyProfileForm: React.FC = () => {
             )}
           </div>
           <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+            <label htmlFor="mp-apellido" className="block text-xs font-bold text-text-secondary uppercase mb-1">
               Apellido
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
               <input
+                id="mp-apellido"
                 {...register("apellido")}
                 type="text"
                 className="vf-input w-full pl-9"
@@ -184,12 +186,13 @@ export const MyProfileForm: React.FC = () => {
         </div>
 
 <div>
-           <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                   <label htmlFor="mp-telefono" className="block text-xs font-bold text-text-secondary uppercase mb-1">
              Teléfono
            </label>
            <div className="relative">
              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
 <input
+               id="mp-telefono"
                 {...register("telefono")}
                 type="text"
                 maxLength={14}

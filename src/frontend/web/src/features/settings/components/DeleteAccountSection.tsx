@@ -72,10 +72,11 @@ export const DeleteAccountSection: React.FC = () => {
 
           {/* Confirmation input */}
           <div>
-            <label className="block text-xs font-bold text-red-700 uppercase mb-1">
+            <label htmlFor="del-confirmation" className="block text-xs font-bold text-red-700 uppercase mb-1">
               Escriba <span className="font-black">ELIMINAR</span> para confirmar
             </label>
             <input
+              id="del-confirmation"
               type="text"
               value={confirmation}
               onChange={(e) => setConfirmation(e.target.value)}
@@ -87,11 +88,12 @@ export const DeleteAccountSection: React.FC = () => {
 
           {/* Password input */}
           <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+            <label htmlFor="del-password" className="block text-xs font-bold text-text-secondary uppercase mb-1">
               Contraseña Actual
             </label>
             <div className="relative">
               <input
+                id="del-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -111,10 +113,11 @@ export const DeleteAccountSection: React.FC = () => {
 
           {/* Optional reason */}
           <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+            <label htmlFor="del-reason" className="block text-xs font-bold text-text-secondary uppercase mb-1">
               Motivo (opcional)
             </label>
             <textarea
+              id="del-reason"
               value={deletionReason}
               onChange={(e) => setDeletionReason(e.target.value)}
               className="vf-input w-full min-h-[60px] resize-none"

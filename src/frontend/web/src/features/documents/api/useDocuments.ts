@@ -59,6 +59,7 @@ export const useUpdateDocumentStatus = (projectId: string) => {
 };
 
 export const useDownloadDocument = (projectId: string) => {
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   return useMutation({
     mutationKey: ['useDownloadDocument'],
     mutationFn: (documentId: string) =>

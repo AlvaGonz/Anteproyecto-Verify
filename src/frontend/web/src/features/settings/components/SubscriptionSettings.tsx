@@ -4,6 +4,9 @@ import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, Ref
 import { useMySubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 
+const DATE_FORMATTER = new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' });
+const PRICE_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
 // ── Badge variants keyed by status ──────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
   active: {
@@ -65,7 +68,7 @@ export const SubscriptionSettings: React.FC = () => {
   }
 
   const formattedDate = currentPeriodEnd
-    ? new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' }).format(currentPeriodEnd)
+    ? DATE_FORMATTER.format(currentPeriodEnd)
     : null;
 
   // Only show the price when Stripe is actively billing the user.
@@ -73,7 +76,7 @@ export const SubscriptionSettings: React.FC = () => {
   const formattedPrice = (isManagedByStripe && data?.planPrice != null)
     ? data.planPrice === 0
       ? "Gratis"
-      : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(data.planPrice) + " USD / mes"
+      : PRICE_FORMATTER.format(data.planPrice) + " USD / mes"
     : null;
 
 

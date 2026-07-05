@@ -74,6 +74,7 @@ export const useUpdateProjectStatus = () => {
 };
 
 export const useProjectDiagnosis = () => {
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   return useMutation({
     mutationKey: ['projectDiagnosis'],
     mutationFn: async (id: string) => {

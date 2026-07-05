@@ -88,9 +88,9 @@ export const FindingsPage = () => {
       {/* Breadcrumbs & Title */}
       <div className="flex flex-col gap-2">
         <nav className="flex items-center gap-2 text-[10px] font-black text-text-secondary uppercase tracking-widest">
-          <a href="#" className="hover:text-primary transition-colors">Projects</a>
+          <span className="hover:text-primary transition-colors cursor-default">Projects</span>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <a href="#" className="hover:text-primary transition-colors">Torre Piantini</a>
+          <span className="hover:text-primary transition-colors cursor-default">Torre Piantini</span>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="text-text-primary">Findings</span>
         </nav>
@@ -152,4 +152,4 @@ export const FindingsPage = () => {
   );
 };
 
-export default FindingsPage;
+;

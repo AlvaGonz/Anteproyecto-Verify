@@ -7,7 +7,7 @@ import {
 import { useProject } from "../../features/projects/api/useProjects";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
-import { LandingFooter } from "../../features/public/components";
+import { LandingFooter } from "../../features/public/components/LandingFooter";
 import {
   ArrowLeft,
   MapPin,

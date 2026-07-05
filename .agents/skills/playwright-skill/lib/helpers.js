@@ -224,15 +224,16 @@ async function authenticate(page, credentials, selectors = {}) {
     safeType(page, finalSelectors.username, credentials.username),
     safeType(page, finalSelectors.password, credentials.password)
   ]);
-  await safeClick(page, finalSelectors.submit);
-
-  // Wait for navigation or success indicator
-  await Promise.race([
-    page.waitForNavigation({ waitUntil: 'networkidle' }),
-    page.waitForSelector(selectors.successIndicator || '.dashboard, .user-menu, .logout', { timeout: 10000 })
-  ]).catch(() => {
-    console.log('Login might have completed without navigation');
-  });
+  await Promise.all([
+    safeClick(page, finalSelectors.submit),
+    // Wait for navigation or success indicator
+    Promise.race([
+      page.waitForNavigation({ waitUntil: 'networkidle' }),
+      page.waitForSelector(selectors.successIndicator || '.dashboard, .user-menu, .logout', { timeout: 10000 })
+    ]).catch(() => {
+      console.log('Login might have completed without navigation');
+    })
+  ]);
 }
 
 /**

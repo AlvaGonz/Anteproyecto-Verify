@@ -12,8 +12,8 @@ export const TrustStripSection: React.FC = () => (
         { value: "RD", label: "Alcance Nacional" },
       ].map((stat, i) => (
         <m.div
-          key={stat.label}
           {...fadeInUp}
+          key={stat.label}
           transition={{ ...fadeInUp.transition, delay: i * 0.1 }}
           className="text-center md:text-left space-y-1"
         >

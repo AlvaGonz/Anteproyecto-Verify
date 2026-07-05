@@ -1,13 +1,11 @@
 import React from "react";
-import {
-  LandingNav,
-  HeroSection,
-  TrustStripSection,
-  FeaturedProjectsSection,
-  MethodologySection,
-  CtaSection,
-  LandingFooter
-} from "../features/public/components";
+import { LandingNav } from "../features/public/components/LandingNav";
+import { HeroSection } from "../features/public/components/HeroSection";
+import { TrustStripSection } from "../features/public/components/TrustStripSection";
+import { FeaturedProjectsSection } from "../features/public/components/FeaturedProjectsSection";
+import { MethodologySection } from "../features/public/components/MethodologySection";
+import { CtaSection } from "../features/public/components/CtaSection";
+import { LandingFooter } from "../features/public/components/LandingFooter";
 
 export const LandingPage: React.FC = () => {
   return (

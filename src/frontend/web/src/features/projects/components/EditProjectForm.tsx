@@ -102,6 +102,7 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
         <input
           id="rncDesarrollador"
           type="text"
+          aria-label="RNC del desarrollador"
           value={formattedRnc}
           onChange={(e) => {
             handleCedulaChange(e);

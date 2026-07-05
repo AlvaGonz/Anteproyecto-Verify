@@ -32,8 +32,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="flex h-screen overflow-hidden bg-[#FFF8F3]">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-gray-900/60 backdrop-blur-sm md:hidden transition-opacity"
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-gray-900/60 backdrop-blur-sm md:hidden transition-opacity cursor-default"
+          aria-label="Cerrar panel lateral"
           onClick={() => setSidebarOpen(false)}
         />
       )}

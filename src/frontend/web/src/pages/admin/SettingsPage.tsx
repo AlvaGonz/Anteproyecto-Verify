@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
 import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
-import { UsersTable, UserFormModal, DeleteModal, MyProfileForm, SubscriptionSettings } from "../../features/settings/components";
+import { UsersTable } from "../../features/settings/components/UsersTable";
+import { UserFormModal } from "../../features/settings/components/UserFormModal";
+import { DeleteModal } from "../../features/settings/components/DeleteModal";
+import { MyProfileForm } from "../../features/settings/components/MyProfileForm";
+import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
 import {
   Settings,
   Users,
@@ -40,13 +44,6 @@ export const SettingsPage: React.FC = () => {
 
   const loading = isAdmin && (isLoadingUsers || isLoadingPlans);
   const isProcessing = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
-
-  // Security Check: Redirect non-admins away from users/permissions tabs
-  useEffect(() => {
-    if (user && !isAdmin && (activeTab === "users")) {
-      setActiveTab("profile");
-    }
-  }, [user, activeTab]);
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();

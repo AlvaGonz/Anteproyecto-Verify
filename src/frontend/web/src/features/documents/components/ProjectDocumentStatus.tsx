@@ -51,9 +51,11 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     </div>
   );
 
-  const requiredTypes = Object.keys(DOCUMENT_INFO)
-    .map(Number)
-    .filter(typeId => DOCUMENT_INFO[typeId].categories.includes(projectCategory));
+  const requiredTypes = Object.entries(DOCUMENT_INFO)
+    .reduce<number[]>((acc, [key, info]) => {
+      if (info.categories.includes(projectCategory)) acc.push(Number(key));
+      return acc;
+    }, []);
 
   const uploadedDocs = documents.filter(d => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
   const verifiedDocs = documents.filter(d => d.estadoDocumento === DocumentStatus.Valid && requiredTypes.includes(d.tipoDocumento));

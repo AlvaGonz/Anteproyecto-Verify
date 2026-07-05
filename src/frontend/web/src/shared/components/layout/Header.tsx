@@ -64,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
             ref={searchInputRef}
             type="text"
             placeholder="Buscar expedientes, folios o propietarios..."
+            aria-label="Buscar expedientes"
             className="w-full h-11 pl-11 pr-4 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all group-hover:bg-gray-100"
             onKeyDown={handleSearch}
           />

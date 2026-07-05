@@ -6,6 +6,9 @@ import { loginSchema, type LoginFormValues } from "../schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
+const isSubscriptionActive = (status?: string | null) =>
+  status === 'active' || status === 'trialing';
+
 export const LoginForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -23,9 +26,6 @@ export const LoginForm = () => {
     handleSubmit,
     formState: { errors: formErrors },
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
-
-  const isSubscriptionActive = (status?: string | null) =>
-    status === 'active' || status === 'trialing';
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -115,12 +115,12 @@ export const LoginForm = () => {
         </div>
 
         <div className="flex items-center justify-end pt-1">
-          <a
-            href="#"
+          <button
+            type="button"
             className="text-[13px] text-primary font-bold hover:underline"
           >
             ¿Olvidaste tu contraseña?
-          </a>
+          </button>
         </div>
 
         <button

@@ -92,9 +92,9 @@ export function HealthPage() {
                   </span>
                 </div>
                 <ul className="space-y-2 text-sm">
-                  {health.checks.map((check, i) => (
+                  {health.checks.map((check) => (
                     <li
-                      key={i}
+                      key={check.name}
                       className="flex justify-between items-center bg-gray-50 p-2 rounded"
                     >
                       <span>{check.name}</span>

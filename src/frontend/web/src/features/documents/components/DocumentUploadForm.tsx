@@ -1,7 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import { m, AnimatePresence  } from "framer-motion";
 import { DocumentType, UploadDocumentDto } from "../types";
 import { FileText, Calendar, Landmark, Info, X, CheckCircle2, ShieldCheck } from "lucide-react";
+
+interface FormState {
+  file: File | null;
+  tipoDocumento: DocumentType;
+  fechaEmision: string;
+  institucionEmisora: string;
+  observaciones: string;
+}
+
+const INITIAL_FORM: FormState = {
+  file: null,
+  tipoDocumento: DocumentType.Other,
+  fechaEmision: "",
+  institucionEmisora: "",
+  observaciones: "",
+};
+
+type FormAction =
+  | { type: "SET_FIELD"; field: keyof FormState; value: any }
+  | { type: "RESET" };
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return INITIAL_FORM;
+  }
+}
 
 interface DocumentUploadFormProps {
   projectId: string;
@@ -11,13 +40,7 @@ interface DocumentUploadFormProps {
 export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
   onUpload,
 }) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [tipoDocumento, setTipoDocumento] = useState<DocumentType>(
-    DocumentType.Other,
-  );
-  const [fechaEmision, setFechaEmision] = useState("");
-  const [institucionEmisora, setInstitucionEmisora] = useState("");
-  const [observaciones, setObservaciones] = useState("");
+  const [form, dispatch] = useReducer(formReducer, INITIAL_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -31,10 +54,10 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
   const processFile = (selectedFile: File) => {
     if (selectedFile.size > 10 * 1024 * 1024) {
       setError("El archivo excede el tamaño máximo de 10MB.");
-      setFile(null);
+      dispatch({ type: "SET_FIELD", field: "file", value: null });
     } else {
       setError(null);
-      setFile(selectedFile);
+      dispatch({ type: "SET_FIELD", field: "file", value: selectedFile });
     }
   };
 
@@ -57,7 +80,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) {
+    if (!form.file) {
       setError("Por favor selecciona un archivo.");
       return;
     }
@@ -67,20 +90,16 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
 
     try {
       const dto: UploadDocumentDto = {
-        tipoDocumento: Number(tipoDocumento),
-        fechaEmision: fechaEmision || undefined,
-        institucionEmisora: institucionEmisora || undefined,
-        observaciones: observaciones || undefined,
+        tipoDocumento: Number(form.tipoDocumento),
+        fechaEmision: form.fechaEmision || undefined,
+        institucionEmisora: form.institucionEmisora || undefined,
+        observaciones: form.observaciones || undefined,
       };
 
-      await onUpload(dto, file);
+      await onUpload(dto, form.file);
 
       // Reset form
-      setFile(null);
-      setTipoDocumento(DocumentType.Other);
-      setFechaEmision("");
-      setInstitucionEmisora("");
-      setObservaciones("");
+      dispatch({ type: "RESET" });
 
       // Reset file input
       const fileInput = document.getElementById(
@@ -95,7 +114,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
   };
 
   const removeFile = () => {
-    setFile(null);
+    dispatch({ type: "SET_FIELD", field: "file", value: null });
     const fileInput = document.getElementById("file-upload") as HTMLInputElement;
     if (fileInput) fileInput.value = "";
   };
@@ -118,7 +137,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
           {/* Left Column: File Dropzone */}
           <div className="lg:col-span-12">
             <AnimatePresence mode="wait">
-              {!file ? (
+              {!form.file ? (
                 <m.div
                   key="empty"
                   initial={{ opacity: 0, y: 10 }}
@@ -171,10 +190,10 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                       <FileText className="w-8 h-8" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-base sm:text-lg font-black text-secondary tracking-tight truncate">{file?.name}</p>
+                      <p className="text-base sm:text-lg font-black text-secondary tracking-tight truncate">{form.file?.name}</p>
                       <div className="flex items-center gap-2 mt-1">
                          <span className="px-2 py-0.5 rounded bg-secondary/10 text-[9px] font-black text-secondary uppercase tracking-widest">
-                           {(file.size / 1024 / 1024).toFixed(2)} MB
+                            {(form.file.size / 1024 / 1024).toFixed(2)} MB
                          </span>
                          <span className="h-1 w-1 rounded-full bg-outline-variant"></span>
                          <span className="text-[10px] font-bold text-success flex items-center gap-1">
@@ -197,10 +216,10 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
 
           {/* Right Column: Metadata */}
           <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2 space-y-3">
-              <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.22em] ml-1">
+            <fieldset className="md:col-span-2 space-y-3">
+              <legend className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.22em] ml-1">
                 Clasificación del Acto Jurídico
-              </label>
+              </legend>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { id: DocumentType.CertificadoTitulo, label: 'Título', icon: Landmark },
@@ -211,33 +230,33 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                   <button
                     key={cat.id}
                     type="button"
-                    onClick={() => setTipoDocumento(cat.id)}
+                    onClick={() => dispatch({ type: "SET_FIELD", field: "tipoDocumento", value: cat.id })}
                     className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all gap-2 ${
-                      tipoDocumento === cat.id 
+                      form.tipoDocumento === cat.id 
                         ? 'border-primary bg-primary/[0.08] text-primary shadow-md' 
                         : 'border-outline-variant/20 bg-surface-container-low text-secondary hover:border-primary/30'
                     }`}
                   >
-                    <cat.icon className={`w-5 h-5 ${tipoDocumento === cat.id ? 'animate-bounce-subtle' : ''}`} />
+                    <cat.icon className={`w-5 h-5 ${form.tipoDocumento === cat.id ? 'animate-bounce-subtle' : ''}`} />
                     <span className="text-[10px] font-black uppercase tracking-tighter">{cat.label}</span>
                   </button>
                 ))}
               </div>
-              
 
-            </div>
+            </fieldset>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">
+              <label htmlFor="institucion-emisora" className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">
                 Institución Emisora
               </label>
               <div className="relative group">
                 <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
                 <input
+                  id="institucion-emisora"
                   type="text"
                   placeholder="Ej: Registro de Títulos"
-                  value={institucionEmisora}
-                  onChange={(e) => setInstitucionEmisora(e.target.value)}
+                  value={form.institucionEmisora}
+                  onChange={(e) => dispatch({ type: "SET_FIELD", field: "institucionEmisora", value: e.target.value })}
                   className="w-full h-12 pl-12 pr-4 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-bold text-secondary focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
                 />
               </div>
@@ -252,23 +271,24 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                 <input
                   id="fecha-emision"
                   type="date"
-                  value={fechaEmision}
-                  onChange={(e) => setFechaEmision(e.target.value)}
+                  value={form.fechaEmision}
+                  onChange={(e) => dispatch({ type: "SET_FIELD", field: "fechaEmision", value: e.target.value })}
                   className="w-full h-12 pl-12 pr-4 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-bold text-secondary focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">
+              <label htmlFor="observaciones" className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">
                 Observaciones Clave
               </label>
               <div className="relative group">
                 <Info className="absolute left-4 top-4 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
                 <textarea
+                  id="observaciones"
                   placeholder="Detalles adicionales..."
-                  value={observaciones}
-                  onChange={(e) => setObservaciones(e.target.value)}
+                  value={form.observaciones}
+                  onChange={(e) => dispatch({ type: "SET_FIELD", field: "observaciones", value: e.target.value })}
                   rows={1}
                   className="w-full py-4 pl-12 pr-4 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-bold text-secondary focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none min-h-[48px]"
                 />
@@ -282,7 +302,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={isSubmitting || !file}
+            disabled={isSubmitting || !form.file}
             className="vf-btn-primary min-w-[240px] shadow-lg shadow-primary/20 flex items-center justify-center gap-3 relative overflow-hidden group"
           >
             {isSubmitting ? (

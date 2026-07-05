@@ -11,7 +11,7 @@ export const createProjectSchema = z.object({
     .min(5, "Ingrese una ubicación válida")
     .max(500, "Ubicación demasiado larga"),
   categoria: z.nativeEnum(ProjectCategory, {
-    errorMap: () => ({ message: "Seleccione una categoría válida" }),
+    error: () => "Seleccione una categoría válida",
   }),
   datosDesarrollador: z.string().max(1000).optional(),
   rncDesarrollador: z.string().optional(),
@@ -21,14 +21,14 @@ export const createProjectSchema = z.object({
     .optional()
     .or(z.literal("")),
   valorEstimado: z
-    .number({ invalid_type_error: "Debe ser un número" })
-    .positive("El valor debe ser positivo")
-    .max(999_999_999, "Valor fuera de rango")
+    .number({ error: () => "Debe ser un número" })
+    .positive({ error: "El valor debe ser positivo" })
+    .max(999_999_999, { error: "Valor fuera de rango" })
     .optional(),
   superficieM2: z
-    .number({ invalid_type_error: "Debe ser un número" })
-    .positive("Debe ser mayor a 0")
-    .max(999_999, "Valor fuera de rango")
+    .number({ error: () => "Debe ser un número" })
+    .positive({ error: "Debe ser mayor a 0" })
+    .max(999_999, { error: "Valor fuera de rango" })
     .optional(),
   fotos: z
     .custom<FileList>()

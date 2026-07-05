@@ -4,6 +4,10 @@ import { useCertification, useIssueSeal } from "../api/useCertifications";
 import { CertificationQr } from "./CertificationQr";
 import { CertificationStatusBadge } from "./CertificationStatusBadge";
 
+const handleDownload = () => {
+  window.print();
+};
+
 interface CertificationSectionProps {
   projectId: string;
 }
@@ -49,10 +53,6 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
     } catch (err: any) {
       console.error("Error al emitir la certificación.", err);
     }
-  };
-
-  const handleDownload = () => {
-    window.print();
   };
 
   if (isLoading)

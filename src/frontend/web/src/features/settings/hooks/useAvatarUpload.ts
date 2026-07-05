@@ -28,7 +28,7 @@ export const useAvatarUpload = () => {
     // OWASP validation with Zod
     const validationResult = AvatarSchema.safeParse(file);
     if (!validationResult.success) {
-      addToast(validationResult.error.errors[0].message, "error");
+      addToast(validationResult.error.issues[0].message, "error");
       return;
     }
 

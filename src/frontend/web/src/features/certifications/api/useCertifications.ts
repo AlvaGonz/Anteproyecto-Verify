@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import type { SelloIntegridadDto } from "./types";
 
-export const certificationKeys = {
+const certificationKeys = {
   byProject: (projectId: string) => ["certifications", projectId] as const,
 };
 

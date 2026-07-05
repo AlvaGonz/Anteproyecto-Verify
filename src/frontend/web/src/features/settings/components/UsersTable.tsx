@@ -81,8 +81,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
       
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-auto">
         <div className="flex flex-col gap-1 w-full md:w-auto min-w-[140px]">
-          <label className="text-[10px] font-bold text-text-secondary uppercase">Rol en Sistema</label>
+          <label htmlFor={`role-${u.id}`} className="text-[10px] font-bold text-text-secondary uppercase">Rol en Sistema</label>
           <select
+            id={`role-${u.id}`}
             value={u.role}
             onChange={(e) => handleRoleChange(u.id, e.target.value)}
             disabled={isUpdating || u.role === "owner"}
@@ -102,8 +103,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
         </div>
 
         <div className="flex flex-col gap-1 w-full md:w-auto min-w-[140px]">
-          <label className="text-[10px] font-bold text-text-secondary uppercase">Suscripción</label>
+          <label htmlFor={`plan-${u.id}`} className="text-[10px] font-bold text-text-secondary uppercase">Suscripción</label>
           <select
+            id={`plan-${u.id}`}
             value={u.planId || ""}
             onChange={(e) => handlePlanChange(u.id, e.target.value)}
             disabled={isUpdating || u.role === "owner"}

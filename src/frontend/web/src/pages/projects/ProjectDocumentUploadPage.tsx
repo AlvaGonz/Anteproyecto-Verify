@@ -24,6 +24,16 @@ interface FileUpload {
   type: string;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, staggerChildren: 0.1 } }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 }
+};
+
 export const ProjectDocumentUploadPage: React.FC = () => {
   const [files, setFiles] = useState<FileUpload[]>([
     { id: "1", name: "ESCRITURA_PROPIEDAD.PDF", size: "2.5 MB", progress: 100, status: "completed", type: "pdf" },
@@ -32,17 +42,6 @@ export const ProjectDocumentUploadPage: React.FC = () => {
   ]);
 
   const [isDragging, setIsDragging] = useState(false);
-
-  // Animations variants
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, staggerChildren: 0.1 } }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 }
-  };
 
   const removeFile = (id: string) => {
     setFiles(files.filter(f => f.id !== id));

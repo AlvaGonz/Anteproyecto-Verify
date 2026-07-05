@@ -89,7 +89,7 @@ export const ProjectDiagnosisPanel: React.FC<{ projectId: string }> = ({ project
                 </div>
                 <ul className="list-disc pl-5 space-y-1">
                   {result.missingDocuments.map((doc, idx) => (
-                    <li key={idx} className="text-xs font-bold text-secondary">{doc}</li>
+                    <li key={doc} className="text-xs font-bold text-secondary">{doc}</li>
                   ))}
                 </ul>
               </div>

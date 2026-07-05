@@ -1,0 +1,6 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "rules": ["react-doctor/zod-v4-no-deprecated-schema-apis"]
+  }
+}

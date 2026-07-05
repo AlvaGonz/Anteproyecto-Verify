@@ -74,7 +74,7 @@ export const CheckoutPage = () => {
       setError('Error al iniciar el proceso de pago. Por favor intente más tarde.');
       throw err;
     }
-  }, [plan, billing, user?.id, consentData]);
+  }, [plan, billing, consentData]);
 
   if (!plan || !billing || !planInfo) {
     return (

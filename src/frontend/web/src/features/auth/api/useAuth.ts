@@ -8,6 +8,7 @@ interface AuthResponse {
 }
 
 export const useLogin = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['useLogin'],
     mutationFn: (data: LoginFormValues) =>
@@ -20,6 +21,7 @@ export const useLogin = () =>
   });
 
 export const useRegister = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['useRegister'],
     mutationFn: (data: Omit<RegisterFormValues, "confirmPassword" | "acceptedTerms"> & { returnUrl?: string; pendingPlanCode?: string; pendingBillingCycle?: string }) =>
@@ -32,6 +34,7 @@ export const useRegister = () =>
   });
 
 export const useLogout = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['useLogout'],
     mutationFn: () => apiClient.post("/auth/logout").then(res => res.data),
@@ -39,6 +42,7 @@ export const useLogout = () =>
   });
 
 export const useResendVerificationEmail = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['useResendVerificationEmail'],
     mutationFn: (data: { email: string; returnUrl?: string }) =>

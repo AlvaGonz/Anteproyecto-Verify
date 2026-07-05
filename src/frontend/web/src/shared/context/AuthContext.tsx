@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { createContext, use, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
 import { isSome, isSuccess } from "../utils/functional";
 import { queryClient } from "../../infrastructure/api/queryClient";
@@ -83,15 +83,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(prev => prev ? { ...prev, ...data } as User : null);
   }, []);
 
+  const value = useMemo(() => ({ 
+    user, 
+    isAuthenticated: !!user, 
+    loading, 
+    login, 
+    logout, 
+    refreshUser, 
+    updateUser, 
+    error 
+  }), [user, loading, login, logout, refreshUser, updateUser, error]);
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, login, logout, refreshUser, updateUser, error }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = use(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }

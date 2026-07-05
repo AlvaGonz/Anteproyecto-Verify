@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 const consentSchema = z.object({
   accepted: z.literal(true, {
-    errorMap: () => ({ message: 'Debe aceptar los términos para continuar' }),
+    error: () => 'Debe aceptar los términos para continuar',
   }),
 });
 

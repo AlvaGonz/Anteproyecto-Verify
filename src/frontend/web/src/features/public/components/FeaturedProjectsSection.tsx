@@ -15,15 +15,27 @@ interface Project {
   totalDocs: number;
 }
 
+const FALLBACK_PROJECTS: Project[] = [
+  {
+    name: "Blue Forest Residences",
+    location: "Las Terrenas, Samaná",
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    status: "Auditado",
+    risk: "Bajo",
+    deliveredDocs: 10,
+    totalDocs: 12,
+  }
+];
+
 export const FeaturedProjectsSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isMouseDownRef = useRef(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isButtonScrolling, setIsButtonScrolling] = useState(false);
+  const isHoveredRef = useRef(false);
+  const isButtonScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef<any>(null);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftVal, setScrollLeftVal] = useState(0);
-  const [hasDragged, setHasDragged] = useState(false);
+  const startXRef = useRef(0);
+  const scrollLeftValRef = useRef(0);
+  const hasDraggedRef = useRef(false);
 
   const { data: realProjects = [] } = useProjects();
   
@@ -37,19 +49,7 @@ export const FeaturedProjectsSection: React.FC = () => {
     totalDocs: 10,
   }));
 
-  const fallbackProjects: Project[] = [
-    {
-      name: "Blue Forest Residences",
-      location: "Las Terrenas, Samaná",
-      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-      status: "Auditado",
-      risk: "Bajo",
-      deliveredDocs: 10,
-      totalDocs: 12,
-    }
-  ];
-
-  const projectsToUse = formattedProjects.length > 0 ? formattedProjects : fallbackProjects;
+  const projectsToUse = formattedProjects.length > 0 ? formattedProjects : FALLBACK_PROJECTS;
 
   const filteredProjects = projectsToUse.filter(
     (p) => (p.deliveredDocs / p.totalDocs) >= 0.8
@@ -64,7 +64,7 @@ export const FeaturedProjectsSection: React.FC = () => {
 
     const autoScroll = () => {
       const container = containerRef.current;
-      if (container && !isMouseDownRef.current && !isHovered && !isButtonScrolling) {
+      if (container && !isMouseDownRef.current && !isHoveredRef.current && !isButtonScrollingRef.current) {
         container.scrollLeft += 0.8; // Constant scrolling speed
 
         const singleSetWidth = container.scrollWidth / 3;
@@ -81,7 +81,7 @@ export const FeaturedProjectsSection: React.FC = () => {
 
     animationFrameId = requestAnimationFrame(autoScroll);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isHovered, isButtonScrolling]);
+  }, []);
 
   const handleScroll = () => {
     if (containerRef.current) {
@@ -101,7 +101,7 @@ export const FeaturedProjectsSection: React.FC = () => {
   useEffect(() => {
     const el = containerRef.current;
     if (el) {
-      el.addEventListener("scroll", handleScroll);
+      el.addEventListener("scroll", handleScroll, { passive: true });
       
       const initScroll = () => {
         const singleSetWidth = el.scrollWidth / 3;
@@ -130,19 +130,19 @@ export const FeaturedProjectsSection: React.FC = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     isMouseDownRef.current = true;
-    setStartX(e.clientX - containerRef.current.offsetLeft);
-    setScrollLeftVal(containerRef.current.scrollLeft);
-    setHasDragged(false);
+    startXRef.current = e.clientX - containerRef.current.offsetLeft;
+    scrollLeftValRef.current = containerRef.current.scrollLeft;
+    hasDraggedRef.current = false;
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isMouseDownRef.current || !containerRef.current) return;
     e.preventDefault();
     const x = e.clientX - containerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    containerRef.current.scrollLeft = scrollLeftVal - walk;
+    const walk = (x - startXRef.current) * 1.5;
+    containerRef.current.scrollLeft = scrollLeftValRef.current - walk;
     if (Math.abs(walk) > 5) {
-      setHasDragged(true);
+      hasDraggedRef.current = true;
     }
   };
 
@@ -152,7 +152,7 @@ export const FeaturedProjectsSection: React.FC = () => {
 
   const scroll = (direction: "left" | "right") => {
     if (containerRef.current) {
-      setIsButtonScrolling(true);
+      isButtonScrollingRef.current = true;
 
       // Clear previous timeout if exists
       if (scrollTimeoutRef.current) {
@@ -167,7 +167,7 @@ export const FeaturedProjectsSection: React.FC = () => {
 
       // Pause auto-scroll during smooth scroll transition (500ms)
       scrollTimeoutRef.current = setTimeout(() => {
-        setIsButtonScrolling(false);
+        isButtonScrollingRef.current = false;
       }, 500);
     }
   };
@@ -219,11 +219,13 @@ export const FeaturedProjectsSection: React.FC = () => {
 
       <div 
         className="relative"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => { isHoveredRef.current = true; }}
+        onMouseLeave={() => { isHoveredRef.current = false; }}
       >
         <div 
           ref={containerRef}
+          role="region"
+          aria-label="Proyectos destacados"
           className="overflow-x-auto no-scrollbar flex gap-8 px-6 py-4 cursor-grab active:cursor-grabbing select-none"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -272,11 +274,11 @@ export const FeaturedProjectsSection: React.FC = () => {
                        </div>
                        <Link 
                          to="/projects" 
-                         onClick={(e) => {
-                           if (hasDragged) {
-                             e.preventDefault();
-                           }
-                         }}
+                          onClick={(e) => {
+                            if (hasDraggedRef.current) {
+                              e.preventDefault();
+                            }
+                          }}
                          className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm"
                        >
                          <ChevronRight className="w-6 h-6" />

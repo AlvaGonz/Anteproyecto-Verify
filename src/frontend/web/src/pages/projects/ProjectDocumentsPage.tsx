@@ -251,6 +251,7 @@ export const ProjectDocumentsPage: React.FC = () => {
                 <input 
                   type="text" 
                   placeholder="Buscar en el repositorio..."
+                  aria-label="Buscar documentos"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full h-12 pl-12 pr-4 bg-transparent text-sm font-bold text-secondary outline-none placeholder:text-on-surface-variant/40"

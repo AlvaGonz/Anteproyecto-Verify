@@ -11,7 +11,10 @@ import {
   AlertCircle
 } from "lucide-react";
 import { m, AnimatePresence  } from "framer-motion";
-import { LandingNav, LandingFooter, ProjectStatusBadge, VerifySearchForm } from "../../features/public/components";
+import { LandingNav } from "../../features/public/components/LandingNav";
+import { LandingFooter } from "../../features/public/components/LandingFooter";
+import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
+import { VerifySearchForm } from "../../features/public/components/VerifySearchForm";
 
 import { useProjects } from "../../features/projects/api/useProjects";
 

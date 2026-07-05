@@ -27,81 +27,91 @@ export const CheckoutReturnPage = () => {
   const [status, setStatus] = useState<PageStatus>('loading')
 
   useEffect(() => {
-    if (!sessionId) { setStatus('error'); return }
+    let timeoutId: ReturnType<typeof setTimeout>;
 
-    // Immediately remove session_id from browser history to prevent
-    // it appearing in Referrer headers or server access logs (OWASP A05)
-    window.history.replaceState(
-      {},
-      '',
-      window.location.pathname  // strips ?session_id=... from real URL
-    )
+    if (!sessionId) {
+      setStatus('error');
+    } else {
+      // Immediately remove session_id from browser history to prevent
+      // it appearing in Referrer headers or server access logs (OWASP A05)
+      window.history.replaceState(
+        {},
+        '',
+        window.location.pathname  // strips ?session_id=... from real URL
+      )
 
-    const verify = async () => {
-      // Idempotency guard — prevents re-processing on hot-reload / StrictMode
-      if (_processedSessions.has(sessionId)) {
-        // Already processed — navigate directly without calling API again
-        navigate('/admin/dashboard', { replace: true })
-        return
-      }
-
-      try {
-        const { data } = await apiClient.get(
-          `/v1/subscriptions/session-status?sessionId=${sessionId}`
-        )
-
-        if (data.status !== 'complete') {
-          setStatus('error')
+      const verify = async () => {
+        // Idempotency guard — prevents re-processing on hot-reload / StrictMode
+        if (_processedSessions.has(sessionId)) {
+          // Already processed — navigate directly without calling API again
+          navigate('/admin/dashboard', { replace: true })
           return
         }
 
-        // Normalize plan name returned by Stripe session (may be 'Profesional', 'empresa', etc.)
-        const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
-        const capabilities = PLAN_CAPABILITIES[planKey]
+        try {
+          const { data } = await apiClient.get(
+            `/v1/subscriptions/session-status?sessionId=${sessionId}`
+          )
 
-        // Wait for Stripe webhook to process and update the backend database
-        let retries = 0;
-        while (retries < 10) {
-          try {
-            const myStatusRes = await apiClient.get('/v1/subscriptions/my-status');
-            const currentPlanKey = normalizePlanKey(myStatusRes.data.plan ?? myStatusRes.data.planName ?? null);
-            // If the backend plan matches the expected plan, or Stripe took over management
-            if (currentPlanKey === planKey || myStatusRes.data.isManagedByStripe) {
-              break;
-            }
-          } catch (e) {
-            // ignore error and retry
+          if (data.status !== 'complete') {
+            setStatus('error')
+            return
           }
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          retries++;
+
+          // Normalize plan name returned by Stripe session (may be 'Profesional', 'empresa', etc.)
+          const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
+          const capabilities = PLAN_CAPABILITIES[planKey]
+
+          // Wait for Stripe webhook to process and update the backend database
+          let retries = 0;
+          while (retries < 10) {
+            try {
+              const myStatusRes = await apiClient.get('/v1/subscriptions/my-status');
+              const currentPlanKey = normalizePlanKey(myStatusRes.data.plan ?? myStatusRes.data.planName ?? null);
+              // If the backend plan matches the expected plan, or Stripe took over management
+              if (currentPlanKey === planKey || myStatusRes.data.isManagedByStripe) {
+                break;
+              }
+            } catch (e) {
+              // ignore error and retry
+            }
+            await new Promise(resolve => {
+              timeoutId = setTimeout(resolve, 1000);
+            });
+            retries++;
+          }
+
+          // Invalidate TanStack Query caches so Settings + Dashboard
+          // reflect the new plan without requiring a full page reload
+          await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] })
+          await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
+
+          if (redirectedRef.current) return
+          redirectedRef.current = true
+
+          // Plan capabilities and key are already resolved above
+
+          // Pass plan context to dashboard via location state
+          navigate('/admin/dashboard', {
+            replace: true,
+            state: {
+              planJustActivated: true,
+              activatedPlan: capabilities,
+            },
+          })
+          _processedSessions.add(sessionId)
+
+        } catch {
+          setStatus('error')
         }
-
-        // Invalidate TanStack Query caches so Settings + Dashboard
-        // reflect the new plan without requiring a full page reload
-        await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] })
-        await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
-
-        if (redirectedRef.current) return
-        redirectedRef.current = true
-
-        // Plan capabilities and key are already resolved above
-
-        // Pass plan context to dashboard via location state
-        navigate('/admin/dashboard', {
-          replace: true,
-          state: {
-            planJustActivated: true,
-            activatedPlan: capabilities,
-          },
-        })
-        _processedSessions.add(sessionId)
-
-      } catch {
-        setStatus('error')
       }
+
+      verify()
     }
 
-    verify()
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
   }, [sessionId, navigate, queryClient])
 
   // ── Loading ──

@@ -19,7 +19,8 @@ export const useDeleteAccount = () => {
   });
 };
 
-export const useRecoverAccount = () =>
+const useRecoverAccount = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ["useRecoverAccount"],
     mutationFn: () =>

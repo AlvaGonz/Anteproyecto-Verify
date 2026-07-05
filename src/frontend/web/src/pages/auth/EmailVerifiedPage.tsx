@@ -43,7 +43,7 @@ export const EmailVerifiedPage = () => {
       });
   }, [token, refreshUser]);
 
-  const computeTargetUrl = (): string => {
+  const computeTargetUrl = useCallback((): string => {
     // New flow: backend tells frontend where to go
     if (nextStepRef.current === "checkout" && pendingPlanRef.current) {
       return `/checkout?plan=${pendingPlanRef.current}`;
@@ -58,7 +58,7 @@ export const EmailVerifiedPage = () => {
     const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
     const urlReturnUrl = searchParams.get('returnUrl');
     return urlReturnUrl || storedRedirect || "/admin";
-  };
+  }, [searchParams]);
 
   useEffect(() => {
     if (status === "success") {
@@ -80,7 +80,7 @@ export const EmailVerifiedPage = () => {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [status, navigate]);
+  }, [status, navigate, computeTargetUrl]);
 
   const handleContinueClick = () => {
     const targetUrl = computeTargetUrl();

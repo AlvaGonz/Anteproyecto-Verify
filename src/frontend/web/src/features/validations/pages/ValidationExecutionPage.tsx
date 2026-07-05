@@ -6,6 +6,13 @@ import { ValidationHUD } from "../components/ValidationHUD";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { ValidationExecutionResult } from "../types";
 
+const SYSTEM_STATS = [
+  { label: "Core Security", value: "Level 7", icon: ShieldCheck, color: "text-primary" },
+  { label: "Neural Load", value: "O-Sync", icon: Activity, color: "text-success" },
+  { label: "Network", value: "Gov-Net", icon: Globe, color: "text-secondary" },
+  { label: "Encryption", value: "AES-512", icon: Lock, color: "text-text-primary" },
+];
+
 export const ValidationExecutionPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const { addToast } = useToast();
@@ -14,14 +21,6 @@ export const ValidationExecutionPage: React.FC = () => {
   const [result, setResult] = useState<ValidationExecutionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uptime, setUptime] = useState(0);
-
-  // Stats for the "Control Center" feel
-  const systemStats = [
-    { label: "Core Security", value: "Level 7", icon: ShieldCheck, color: "text-primary" },
-    { label: "Neural Load", value: "O-Sync", icon: Activity, color: "text-success" },
-    { label: "Network", value: "Gov-Net", icon: Globe, color: "text-secondary" },
-    { label: "Encryption", value: "AES-512", icon: Lock, color: "text-text-primary" },
-  ];
 
   useEffect(() => {
     const timer = setInterval(() => setUptime(prev => prev + 1), 1000);
@@ -180,7 +179,7 @@ export const ValidationExecutionPage: React.FC = () => {
             </h3>
             <div className="grid grid-cols-1 gap-3">
               {systemStats.map((stat, idx) => (
-                <div key={idx} className="bg-white p-5 rounded-2xl border border-border/20 shadow-raised flex items-center justify-between group hover:border-primary/30 transition-all duration-500">
+                <div key={stat.label} className="bg-white p-5 rounded-2xl border border-border/20 shadow-raised flex items-center justify-between group hover:border-primary/30 transition-all duration-500">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center ${stat.color}`}>
                       <stat.icon size={20} />
@@ -212,7 +211,7 @@ export const ValidationExecutionPage: React.FC = () => {
                     { node: "REGISTRY_API", load: 67, status: "BUSY" },
                     { node: "GEO_SAT_V4", load: 12, status: "UP" }
                   ].map((n, i) => (
-                    <div key={i} className="space-y-2">
+                    <div key={n.node} className="space-y-2">
                       <div className="flex justify-between items-end">
                         <span className="text-[10px] font-mono text-white/80">{n.node}</span>
                         <span className={`text-[10px] font-mono ${n.status === 'UP' ? 'text-success' : 'text-primary'}`}>{n.status}</span>

@@ -51,6 +51,7 @@ export const FindingsFilterBar = ({
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-10 pr-4 py-2 w-full md:w-64 rounded-lg border-border text-sm focus:ring-primary focus:border-primary bg-surface outline-none" 
           placeholder="Search by ID or Title..." 
+          aria-label="Search findings"
           type="text"
         />
       </div>

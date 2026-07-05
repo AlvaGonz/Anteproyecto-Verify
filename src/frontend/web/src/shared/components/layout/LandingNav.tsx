@@ -2,27 +2,30 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+const NAV_LINKS = [
+  { label: "Proyectos", href: "/projects" },
+  { label: "Planes", href: "/plans" },
+  { label: "Legal", href: "/legal" },
+];
+
 export const LandingNav: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
+  const [prevPath, setPrevPath] = useState(location.pathname);
+
+  if (location.pathname !== prevPath) {
+    setPrevPath(location.pathname);
+    setMobileMenuOpen(false);
+  }
+
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handler);
+    window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
-
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location]);
-
-  const navLinks = [
-    { label: "Proyectos", href: "/projects" },
-    { label: "Planes", href: "/plans" },
-    { label: "Legal", href: "/legal" },
-  ];
 
   const isDarkBackground = !scrolled && location.pathname === "/projects";
 
@@ -60,7 +63,7 @@ export const LandingNav: React.FC = () => {
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-2">
-          {navLinks.map((item) => {
+          {NAV_LINKS.map((item) => {
             if (item.href.startsWith("/")) {
               return <Link key={item.label} to={item.href} className={linkClassName}>{item.label}</Link>;
             }
@@ -98,7 +101,7 @@ export const LandingNav: React.FC = () => {
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
           <div className="absolute top-[calc(100%+8px)] left-0 right-0 p-4 bg-surface/95 backdrop-blur-xl border border-outline-variant/30 shadow-lg rounded-2xl flex flex-col gap-2 lg:hidden animate-in fade-in slide-in-from-top-4 duration-200">
-            {navLinks.map((item) => {
+            {NAV_LINKS.map((item) => {
               const className = "text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low px-4 py-3 rounded-xl transition-colors";
               if (item.href.startsWith("/")) {
                 return <Link key={item.label} to={item.href} className={className}>{item.label}</Link>;
