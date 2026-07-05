@@ -39,13 +39,13 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
     }
   };
 
-  // Group users by role categories
+  // Group users by plan categories
   const groupedUsers = {
     "Administradores": users.filter(u => u.role === "admin" || u.role === "owner"),
-    "Enterprise": users.filter(u => u.role === "enterprise"),
-    "Business": users.filter(u => u.role === "business"),
-    "Professional": users.filter(u => u.role === "professional" || u.role === "dev" || u.role === "validator"),
-    "Consultation": users.filter(u => u.role === "consultation" || u.role === "user")
+    "Enterprise": users.filter(u => u.planName === "Enterprise" && u.role !== "admin" && u.role !== "owner"),
+    "Business": users.filter(u => u.planName === "Empresa" && u.role !== "admin" && u.role !== "owner"),
+    "Professional": users.filter(u => u.planName === "Profesional" && u.role !== "admin" && u.role !== "owner"),
+    "Consultation": users.filter(u => (u.planName === "Gratuito" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner")
   };
 
   const [activeTab, setActiveTab] = useState<string>("Enterprise");
@@ -59,7 +59,8 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
   ];
 
   const renderUserCard = (u: UserSettings) => (
-    <div key={u.id} className="bg-white border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row gap-4 items-start md:items-center">
+    <div key={u.id} className="bg-white border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4 items-start md:items-stretch">
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center w-full">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <h4 className="font-bold text-text-primary text-base truncate">{u.nombre} {u.apellido}</h4>
@@ -77,6 +78,40 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
           <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5" /> {u.telefono || "N/A"}</span>
           <span className="font-mono text-[11px] bg-surface-raised px-1.5 py-0.5 rounded text-text-primary">{u.cedula || "N/A"}</span>
         </div>
+        
+        {/* Additional Tags */}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {u.razonSocial && (
+            <span className="bg-blue-50 text-blue-800 text-[11px] px-2 py-0.5 rounded border border-blue-100 flex items-center gap-1">
+              <span className="font-bold">Razn Social:</span> {u.razonSocial} {u.rnc && `(RNC: ${u.rnc})`}
+            </span>
+          )}
+          {u.planCreatedAt && (
+            <span className="bg-gray-50 text-gray-700 text-[11px] px-2 py-0.5 rounded border border-gray-200">
+              <span className="font-bold">Creado:</span> {new Date(u.planCreatedAt).toLocaleDateString()}
+            </span>
+          )}
+          {u.planExpiresAt && (
+            <span className="bg-gray-50 text-gray-700 text-[11px] px-2 py-0.5 rounded border border-gray-200">
+              <span className="font-bold">Expira:</span> {new Date(u.planExpiresAt).toLocaleDateString()}
+            </span>
+          )}
+          {u.maxInvitees !== undefined && u.maxInvitees > 0 && (
+            <span className="bg-purple-50 text-purple-800 text-[11px] px-2 py-0.5 rounded border border-purple-100">
+              <span className="font-bold">Usuarios:</span> {u.inviteesCount || 0} / {u.maxInvitees}
+            </span>
+          )}
+          {u.usedProjects !== undefined && (
+            <span className="bg-green-50 text-green-800 text-[11px] px-2 py-0.5 rounded border border-green-100">
+              <span className="font-bold">Proyectos:</span> {u.usedProjects}
+            </span>
+          )}
+          {u.usedQueries !== undefined && (
+            <span className="bg-amber-50 text-amber-800 text-[11px] px-2 py-0.5 rounded border border-amber-100">
+              <span className="font-bold">Consultas:</span> {u.usedQueries}
+            </span>
+          )}
+        </div>
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-auto">
@@ -90,14 +125,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
           >
             <option value="owner" disabled>Owner (Super Admin)</option>
             <option value="admin">Administrador</option>
-            <option value="enterprise">Enterprise</option>
-            <option value="business">Business</option>
-            <option value="professional">Professional</option>
-            <option value="consultation">Consultation (Free)</option>
-            {/* Legacy Fallbacks */}
-            <option value="dev" disabled>Developer (Legacy)</option>
-            <option value="validator" disabled>Validator (Legacy)</option>
-            <option value="user" disabled>User (Legacy)</option>
+            <option value="dev">Developer (Legacy)</option>
+            <option value="validator">Validator (Legacy)</option>
+            <option value="user">Usuario (Consulta)</option>
           </select>
         </div>
 
@@ -136,6 +166,27 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
           </button>
         </div>
       </div>
+      </div>
+
+      {/* Invitees List */}
+      {u.inviteesList && u.inviteesList.length > 0 && (
+        <div className="w-full mt-4 pt-4 border-t border-dashed border-border">
+          <h5 className="text-xs font-bold text-text-secondary uppercase mb-2">Usuarios Invitados</h5>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {u.inviteesList.map(invitee => (
+              <div key={invitee.id} className="bg-surface-raised p-2 rounded flex items-center gap-2 border border-border/50">
+                <div className="w-6 h-6 rounded-full bg-[#223382]/10 flex items-center justify-center text-[10px] font-bold text-[#223382]">
+                  {invitee.nombre.charAt(0)}{invitee.apellido.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-text-primary truncate">{invitee.nombre} {invitee.apellido}</p>
+                  <p className="text-[10px] text-text-secondary truncate">{invitee.email}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 

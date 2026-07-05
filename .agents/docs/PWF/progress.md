@@ -126,3 +126,7 @@
   - **Symptom:** Backend API crashes on startup during `MigrateAsync` with `Error Number:2705` "Column already exists".
   - **Root Cause:** A duplicated migration `20260630195243_AddStripeFieldsToUsuario.cs` attempted to add Stripe fields that were already added by `20260630163528_Add_Stripe_Fields_To_Usuario.cs`.
   - **Fix:** Emptied the `Up` and `Down` methods of the duplicate migration `20260630195243_AddStripeFieldsToUsuario.cs` so EF Core treats it as a no-op, preserving the migration chain without throwing.
+- **BUG-014:** Dashboard Stats and Settings endpoints fail (500 Error & Empty UI).
+  - **Symptom:** `/api/admin/dashboard/stats` and `/api/admin/users` endpoints returned 500 Internal Server Errors causing empty dashboards in UI.
+  - **Root Cause:** EF Core failed to translate a LINQ expression referencing `Proyecto.Status`, which is a computed unmapped property.
+  - **Fix:** Modified `DashboardRepository.cs` to query using the mapped column `EstadoProyecto` instead. Restarted the API container to clear the compiled expression cache. Endpoints now successfully return 200 OK with populated dummy data.

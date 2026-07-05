@@ -247,6 +247,8 @@ public class AuthController : ControllerBase
             Role = roleStr,
             Cedula = user.Cedula ?? string.Empty,
             Telefono = user.Telefono ?? string.Empty,
+            Rnc = user.Rnc,
+            RazonSocial = (string?)null,
             Plan = user.Plan?.NombrePlan ?? "N/A",
             AvatarUrl = user.AvatarUrl,
             SubscriptionStatus = user.SubscriptionStatus ?? "N/A",
@@ -320,6 +322,7 @@ public class AuthController : ControllerBase
             request.Nombre,
             request.Apellido,
             request.Telefono,
+            request.Rnc,
             request.CurrentPassword,
             request.NewPassword
         );
@@ -366,6 +369,7 @@ public class UpdateProfileRequestDto
     public string? Nombre { get; set; }
     public string? Apellido { get; set; }
     public string? Telefono { get; set; }
+    public string? Rnc { get; set; }
     public string? CurrentPassword { get; set; }
     public string? NewPassword { get; set; }
 }

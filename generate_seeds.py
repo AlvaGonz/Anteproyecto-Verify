@@ -74,6 +74,8 @@ def main():
 
     # Users
     users = []
+    company_titulars = []
+    enterprise_titulars = []
     # 25 Freemium
     for i in range(25):
         users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[0], "role": perfiles[0]})
@@ -82,29 +84,47 @@ def main():
         users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[1], "role": perfiles[1]})
     # 25 Company
     for i in range(25):
-        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[2], "role": perfiles[2]})
+        u_id = str(uuid.uuid4()).upper()
+        users.append({"id": u_id, "plan": plans[2], "role": perfiles[2], "rnc": f"101{random.randint(100000, 999999)}"})
+        company_titulars.append(u_id)
     # 25 Enterprise
     for i in range(25):
-        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[3], "role": perfiles[3]})
+        u_id = str(uuid.uuid4()).upper()
+        users.append({"id": u_id, "plan": plans[3], "role": perfiles[3], "rnc": f"130{random.randint(100000, 999999)}"})
+        enterprise_titulars.append(u_id)
     
     # 35 Guests divided into Company and Enterprise
     # Company guests: 17, Enterprise guests: 18
     for i in range(17):
-        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[2], "role": perfiles[4], "is_guest": True})
+        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[2], "role": perfiles[4], "is_guest": True, "titular": random.choice(company_titulars)})
     for i in range(18):
-        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[3], "role": perfiles[4], "is_guest": True})
+        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[3], "role": perfiles[4], "is_guest": True, "titular": random.choice(enterprise_titulars)})
+    
+    # Names for random generation
+    first_names = ["Juan", "Maria", "Carlos", "Ana", "Luis", "Elena", "Pedro", "Laura", "Jose", "Carmen", "Miguel", "Isabel", "Francisco", "Sofia", "Antonio"]
+    last_names = ["Perez", "Rodriguez", "Gomez", "Fernandez", "Lopez", "Martinez", "Sanchez", "Diaz", "Gonzalez", "Romero", "Alvarez", "Torres", "Ruiz"]
+    company_names = ["Constructora ABC", "Inmobiliaria XYZ", "Bienes Raices Global", "Desarrollos Urbanos", "Proyectos del Caribe", "Grupo Inversor Sur", "Edificaciones Modernas"]
     
     with open(f"{output_dir}/05_Usuario.sql", "w") as f:
         f.write("-- Seed for Usuario\n")
         f.write("SET NOCOUNT ON;\n")
         f.write("SET QUOTED_IDENTIFIER ON;\n")
         for idx, u in enumerate(users):
-            nombre = f"User{idx}"
-            apellido = f"LastName{idx}"
-            email = f"user{idx}@example.com"
+            nombre = random.choice(first_names)
+            apellido = random.choice(last_names)
+            email = f"{nombre.lower()}.{apellido.lower()}.{idx}@example.com"
             cedula = f"402-0000{str(idx).zfill(3)}-1"
+            titular_val = f"'{u['titular']}'" if "titular" in u else "NULL"
+            rnc_val = f"'{u['rnc']}'" if "rnc" in u else "NULL"
+            
             f.write(f"IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = '{u['id']}')\n")
-            f.write(f"INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc) VALUES ('{u['id']}', '{nombre}', '{apellido}', '{email}', 'HASHED_PWD', '809-555-0000', '{cedula}', 2, 1, 1, '{u['plan']['id']}', GETUTCDATE(), GETUTCDATE());\n")
+            f.write(f"INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, TitularId, Rnc) VALUES ('{u['id']}', '{nombre}', '{apellido}', '{email}', 'HASHED_PWD', '809-555-0000', '{cedula}', 2, 1, 1, '{u['plan']['id']}', GETUTCDATE(), GETUTCDATE(), {titular_val}, {rnc_val});\n")
+            
+            if "rnc" in u:
+                company_name = random.choice(company_names) + f" {idx}"
+                f.write(f"IF NOT EXISTS (SELECT 1 FROM DGII WHERE Rnc = '{u['rnc']}')\n")
+                f.write(f"INSERT INTO DGII (Rnc, NombreRazonSocial, Estado, Categoria, FechaModificacion) VALUES ('{u['rnc']}', '{company_name}', 'ACTIVO', 'INMOBILIARIA', GETUTCDATE());\n")
+
 
     # UsuarioLegacy - Let's pick 5 users to simulate migrated ones
     with open(f"{output_dir}/06_UsuarioLegacy.sql", "w") as f:

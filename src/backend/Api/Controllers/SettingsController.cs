@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 /// <summary>
 /// Response DTO for admin user settings with profile and plan information
 /// </summary>
+public record BasicUserDto(Guid Id, string Nombre, string Apellido, string Email);
+
 public record AdminUserSettingsDto(
     Guid Id,
     string Nombre,
@@ -24,11 +26,21 @@ public record AdminUserSettingsDto(
     string Role,
     string Telefono,
     string Cedula,
+    string? Rnc,
+    string? RazonSocial,
     Guid? ProfileId,
     string ProfileName,
     Guid? PlanId,
     string PlanName,
-    decimal? PlanPrice
+    decimal? PlanPrice,
+    DateTime? PlanCreatedAt,
+    DateTime? PlanExpiresAt,
+    int UsedProjects,
+    int UsedQueries,
+    int MaxInvitees,
+    int InviteesCount,
+    IEnumerable<BasicUserDto> InviteesList,
+    Guid? TitularId
 );
 
 /// <summary>
@@ -70,34 +82,67 @@ public class SettingsController : ControllerBase
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 200);
 
-        // Single optimized query with server-side joins and projection
         var query = from u in _context.Usuarios
-                    let l = _context.UsuariosLegacy.FirstOrDefault(x => x.Email == u.CorreoElectronico)
-                    let a = _context.Accesos.FirstOrDefault(x => x.IdUsuario == l.IdUsuario)
-                    let pf = _context.Perfiles.FirstOrDefault(x => x.IdPerfil == a.IdPerfil)
-                    let p = _context.PagosLegacy.OrderByDescending(x => x.FechaPago).FirstOrDefault(x => x.IdUsuario == l.IdUsuario)
-                    let pl = _context.PlanesSuscripcion.FirstOrDefault(x => x.Idsuscripcion == p.Idsuscripcion)
+                    let dgii = _context.DGII.FirstOrDefault(x => x.Rnc == u.Rnc)
+                    let inviteesCount = _context.Usuarios.Count(x => x.TitularId == u.Id)
                     where u.Activo
-                    select new AdminUserSettingsDto(
+                    select new {
                         u.Id,
                         u.Nombre,
                         u.Apellido,
-                        u.CorreoElectronico,
-                        pf != null && pf.NombrePerfil == "ADMIN" ? "admin" : "user",
+                        Email = u.CorreoElectronico,
+                        Role = u.Rol == Domain.Enums.UserRole.Administrator ? "admin" : "user",
                         u.Telefono,
                         u.Cedula,
-                        pf != null ? pf.IdPerfil : null,
-                        pf != null ? pf.NombrePerfil : string.Empty,
-                        pl != null ? pl.Idsuscripcion : null,
-                        pl != null ? pl.NombrePlan : string.Empty,
-                        pl != null ? pl.Precio : null
-                    );
+                        u.Rnc,
+                        RazonSocial = dgii != null ? dgii.NombreRazonSocial : null,
+                        PlanId = u.PlanSuscripcionId,
+                        PlanName = u.Plan != null ? u.Plan.NombrePlan : "Gratuito",
+                        PlanPrice = u.Plan != null ? u.Plan.Precio : 0m,
+                        PlanCreatedAt = u.CreatedAtUtc,
+                        PlanExpiresAt = u.CurrentPeriodEnd,
+                        UsedProjects = u.ProyectosCreados,
+                        UsedQueries = u.ConsultasUsadas,
+                        MaxInvitees = u.Plan != null && u.Plan.NombrePlan == "Enterprise" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0),
+                        InviteesCount = inviteesCount
+                    };
 
         var totalCount = await query.CountAsync(cancellationToken);
-        var items = await query
+        var rawItems = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+
+        var itemIds = rawItems.Select(x => x.Id).ToList();
+        var allInvitees = await _context.Usuarios
+            .Where(x => x.TitularId != null && itemIds.Contains(x.TitularId.Value))
+            .Select(x => new { x.TitularId, User = new BasicUserDto(x.Id, x.Nombre, x.Apellido, x.CorreoElectronico) })
+            .ToListAsync(cancellationToken);
+
+        var items = rawItems.Select(r => new AdminUserSettingsDto(
+            r.Id,
+            r.Nombre,
+            r.Apellido,
+            r.Email,
+            r.Role,
+            r.Telefono,
+            r.Cedula,
+            r.Rnc,
+            r.RazonSocial,
+            null,
+            string.Empty,
+            r.PlanId,
+            r.PlanName,
+            r.PlanPrice,
+            r.PlanCreatedAt,
+            r.PlanExpiresAt,
+            r.UsedProjects,
+            r.UsedQueries,
+            r.MaxInvitees,
+            r.InviteesCount,
+            allInvitees.Where(i => i.TitularId == r.Id).Select(i => i.User).ToList(),
+            allInvitees.Any(i => i.User.Id == r.Id) ? allInvitees.First(i => i.User.Id == r.Id).TitularId : null
+        )).ToList();
 
         var response = new PaginatedResponse<AdminUserSettingsDto>(items, totalCount, page, pageSize);
         return Ok(response);
@@ -108,8 +153,13 @@ public class SettingsController : ControllerBase
     {
         if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
 
+        if (request.Nombre != null && request.Nombre.Any(char.IsDigit))
+            return BadRequest(new { Message = "El nombre no puede contener números." });
+        if (request.Apellido != null && request.Apellido.Any(char.IsDigit))
+            return BadRequest(new { Message = "El apellido no puede contener números." });
+
         if (await _context.Usuarios.AnyAsync(u => u.CorreoElectronico == request.Email, cancellationToken))
-            return BadRequest(new { Message = "El correo electrÃ³nico ya estÃ¡ en uso." });
+            return BadRequest(new { Message = "El correo electrónico ya está en uso." });
 
         UserRole role = request.Role.ToLower() switch
         {
@@ -169,6 +219,11 @@ public class SettingsController : ControllerBase
         var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
         if (user == null) return NotFound(new { Message = "Usuario no encontrado." });
 
+        if (request.Nombre != null && request.Nombre.Any(char.IsDigit))
+            return BadRequest(new { Message = "El nombre no puede contener números." });
+        if (request.Apellido != null && request.Apellido.Any(char.IsDigit))
+            return BadRequest(new { Message = "El apellido no puede contener números." });
+
         var (targetRole, targetProfileName) = RoleProfileMapper.MapRole(request.Role);
         if (targetRole == null)
         {
@@ -205,6 +260,12 @@ public class SettingsController : ControllerBase
             {
                 acceso.IdPerfil = perf.IdPerfil;
             }
+        }
+
+        // Update Rnc if provided
+        if (request.Rnc != null)
+        {
+            user.UpdateRnc(request.Rnc);
         }
 
         // Single SaveChangesAsync for entire operation
@@ -246,14 +307,22 @@ public class SettingsController : ControllerBase
             if (consentimientos.Any()) _context.ConsentimientosFinancieros.RemoveRange(consentimientos);
         } catch {}
 
-        _context.Usuarios.Remove(user);
-        
-        // Remove legacy dependencies
+        try {
+            var invitees = await _context.Usuarios.Where(u => u.TitularId == id).ToListAsync(cancellationToken);
+            foreach(var invitee in invitees) {
+                // Remove reference to avoid FK conflict
+                _context.Entry(invitee).Property("TitularId").CurrentValue = null;
+            }
+        } catch {}
+
+        // Remove legacy dependencies first to avoid FK conflicts
         var access = await _context.Accesos.Where(a => a.IdUsuario == user.Id).ToListAsync(cancellationToken);
-        _context.Accesos.RemoveRange(access);
+        if (access.Any()) _context.Accesos.RemoveRange(access);
         
         var pagos = await _context.PagosLegacy.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
-        _context.PagosLegacy.RemoveRange(pagos);
+        if (pagos.Any()) _context.PagosLegacy.RemoveRange(pagos);
+
+        _context.Usuarios.Remove(user);
         
         // Do not remove from UsuariosLegacy since it is a view over Usuarios
 
@@ -343,8 +412,10 @@ public class SettingsController : ControllerBase
         var plan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.Idsuscripcion == request.PlanId, cancellationToken);
         if (plan == null)
         {
-            return BadRequest(new { Message = "El plan de suscripciÃ³n seleccionado no existe." });
+            return BadRequest(new { Message = "El plan de suscripción seleccionado no existe." });
         }
+
+        u.AsignarPlan(plan.Idsuscripcion);
 
         // Sync legacy user if missing
         await SyncUserLegacyAsync(u, cancellationToken);
@@ -362,7 +433,44 @@ public class SettingsController : ControllerBase
         // Single SaveChangesAsync for entire operation
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Ok(new { Message = "SuscripciÃ³n asignada y pago registrado exitosamente." });
+        return Ok(new { Message = "Suscripción asignada y pago registrado exitosamente." });
+    }
+
+    [HttpPost("users/{id}/invitees/{inviteeId}")]
+    public async Task<IActionResult> AddInvitee(Guid id, Guid inviteeId, CancellationToken cancellationToken)
+    {
+        if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
+
+        var titular = await _context.Usuarios.Include(user => user.Plan).FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
+        if (titular == null) return NotFound(new { Message = "Usuario titular no encontrado." });
+
+        var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId, cancellationToken);
+        if (invitee == null) return NotFound(new { Message = "Usuario a invitar no encontrado." });
+
+        int maxInvitees = titular.Plan != null && titular.Plan.NombrePlan == "Enterprise" ? 10 : (titular.Plan != null && titular.Plan.NombrePlan == "Empresa" ? 5 : 0);
+        int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == titular.Id, cancellationToken);
+
+        if (currentInvitees >= maxInvitees)
+            return BadRequest(new { Message = "El titular ha alcanzado el límite de usuarios invitados para su plan." });
+
+        invitee.AsignarTitular(titular.Id);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { Message = "Usuario invitado agregado exitosamente." });
+    }
+
+    [HttpDelete("users/{id}/invitees/{inviteeId}")]
+    public async Task<IActionResult> RemoveInvitee(Guid id, Guid inviteeId, CancellationToken cancellationToken)
+    {
+        if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
+
+        var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId && user.TitularId == id, cancellationToken);
+        if (invitee == null) return NotFound(new { Message = "Usuario invitado no encontrado o no pertenece al titular." });
+
+        _context.Entry(invitee).Property("TitularId").CurrentValue = null;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { Message = "Usuario invitado removido exitosamente." });
     }
 
     [HttpGet("profiles")]
@@ -503,6 +611,7 @@ public class UpdateUserDto
     public string Role { get; set; } = "user";
     public string? Telefono { get; set; }
     public string? Cedula { get; set; }
+    public string? Rnc { get; set; }
 }
 
 /// <summary>

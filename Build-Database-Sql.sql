@@ -44,6 +44,7 @@ SELECT
     ContrasenaHash,
     Telefono,
     Cedula,
+    Rnc,
     PlanSuscripcionId,
     ConsultasUsadas
 FROM Usuario;
@@ -771,6 +772,7 @@ CREATE TABLE [UsuarioLegacy] (
     [Telefono] nvarchar(15) NOT NULL,
 
     [Cedula] nvarchar(15) NOT NULL,
+    [Rnc] varchar(20) NULL,
 
     CONSTRAINT [PK_UsuarioLegacy] PRIMARY KEY ([IdUsuario])
 

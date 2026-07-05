@@ -5,6 +5,13 @@ export interface PaginatedResponse<T> {
   pageSize: number;
 }
 
+export interface BasicUserDto {
+  id: string;
+  nombre: string;
+  apellido: string;
+  email: string;
+}
+
 export interface UserSettings {
   id: string;
   nombre: string;
@@ -13,11 +20,20 @@ export interface UserSettings {
   role: "admin" | "dev" | "validator" | "user" | "owner" | "enterprise" | "business" | "professional" | "consultation";
   telefono: string;
   cedula: string;
+  rnc?: string;
+  razonSocial?: string;
   profileId: string | null;
   profileName: string;
   planId: string | null;
   planName: string;
   planPrice: number | null;
+  planCreatedAt?: string;
+  planExpiresAt?: string;
+  usedProjects?: number;
+  usedQueries?: number;
+  maxInvitees?: number;
+  inviteesCount?: number;
+  inviteesList?: BasicUserDto[];
   avatarUrl?: string;
 }
 

@@ -29,9 +29,9 @@ namespace Infrastructure.Persistence.Repositories
                 .SumAsync(u => u.Plan!.Precio, cancellationToken);
 
             var totalProyectos = await _context.Set<Proyecto>().CountAsync(cancellationToken);
-            var proyectosPendientes = await _context.Set<Proyecto>().CountAsync(p => p.Status == Domain.Enums.ProjectStatus.Draft, cancellationToken);
-            var proyectosAprobados = await _context.Set<Proyecto>().CountAsync(p => p.Status == Domain.Enums.ProjectStatus.Published, cancellationToken);
-            var proyectosRechazados = await _context.Set<Proyecto>().CountAsync(p => p.Status == Domain.Enums.ProjectStatus.Rejected, cancellationToken);
+            var proyectosPendientes = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Draft || p.EstadoProyecto == Domain.Enums.ProjectStatus.InReview, cancellationToken);
+            var proyectosAprobados = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Validated || p.EstadoProyecto == Domain.Enums.ProjectStatus.Published, cancellationToken);
+            var proyectosRechazados = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Rejected || p.EstadoProyecto == Domain.Enums.ProjectStatus.Observed, cancellationToken);
 
             var suscripcionesRecientes = await _context.Set<Usuario>()
                 .Include(u => u.Plan)
@@ -56,7 +56,7 @@ namespace Infrastructure.Persistence.Repositories
                     FechaRegistro = p.CreatedAtUtc,
                     Nombre = p.Nombre,
                     Desarrollador = p.UsuarioCreador != null ? p.UsuarioCreador.NombreCompleto : "Desconocido",
-                    Estado = p.Status.ToString()
+                    Estado = p.EstadoProyecto.ToString()
                 })
                 .ToListAsync(cancellationToken);
 
@@ -65,8 +65,8 @@ namespace Infrastructure.Persistence.Repositories
                 .Select(g => new { Rol = g.Key.ToString(), Count = g.Count() })
                 .ToDictionaryAsync(x => x.Rol, x => x.Count, cancellationToken);
                 
-            var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
-            var totalProyectosRegistrados = await _context.Set<LogProyecto>().CountAsync(cancellationToken);
+            var totalConsultas = await _context.Set<Usuario>().SumAsync(u => u.ConsultasUsadas, cancellationToken);
+            var totalProyectosRegistrados = await _context.Set<Usuario>().SumAsync(u => u.ProyectosCreados, cancellationToken);
 
             return new DashboardStatsDto
             {
