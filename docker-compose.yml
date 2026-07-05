@@ -71,6 +71,7 @@ services:
     volumes:
       - mssql-data:/var/opt/mssql/data
       - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
+      - ./src/backend/Tools/DbSeeder/Scripts:/usr/config/seeds:ro
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "test -f /tmp/db_ready && /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Your_password123' -Q 'SELECT 1' -C" ]
@@ -102,6 +103,14 @@ services:
           cpus: "0.5"
         reservations:
           memory: 64M
+
+  python_env:
+    image: python:3.12-slim
+    profiles: ["manual"]
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: python -c "import time; print('Python environment started. Will auto-shutdown in 30 seconds.'); time.sleep(30)"
 
 volumes:
   mssql-data:

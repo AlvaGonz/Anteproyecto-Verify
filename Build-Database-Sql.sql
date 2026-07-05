@@ -340,6 +340,9 @@ CREATE TABLE Recibo (
     IdUsuario UNIQUEIDENTIFIER,
     Monto DECIMAL(10,2),
     FechaPago DATE,
+    Detalle VARCHAR(500) NULL,
+    Categoria VARCHAR(100) NULL,
+    Desglose VARCHAR(MAX) NULL,
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
 );
 GO
@@ -483,9 +486,9 @@ GO
 -- =============================================
 -- Tablas y Objetos de EF Core (Migracion InitialCreate)
 -- =============================================
-Build started...
+-- Build started...
 
-Build succeeded.
+-- Build succeeded.
 
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 
