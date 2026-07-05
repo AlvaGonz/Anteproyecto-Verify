@@ -17,20 +17,14 @@ def main():
     output_dir = "src/backend/Tools/DbSeeder/Scripts"
     os.makedirs(output_dir, exist_ok=True)
 
-    # 1. Plans (PlanSuscripcion)
+    # 1. Plans (PlanSuscripcion) - Using DB GUIDs
     plans = [
-        {"id": "536D8D31-F1CE-42ED-8ED2-C0223BE3F1B9", "name": "Freemium", "price": 0.0},
-        {"id": "B704881E-AC38-436B-A81B-FA9374542C77", "name": "Intermedio", "price": 1000.0},
-        {"id": "93350FC6-6A0C-4EB2-BD4D-A605ECF7DA03", "name": "Company", "price": 2500.0},
-        {"id": "95A53EFA-37CD-40E0-949F-E7E63D39FCF0", "name": "Enterprise", "price": 5000.0}
+        {"id": "5F1F3417-402F-4CAC-AE39-F9802A5E72D2", "name": "Freemium", "price": 0.0},
+        {"id": "66AFDABF-632E-434C-86F4-6F9060D2656F", "name": "Intermedio", "price": 1000.0},
+        {"id": "41037268-58B6-40A3-A8AE-C18EFE00C7D3", "name": "Company", "price": 2500.0},
+        {"id": "F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4", "name": "Enterprise", "price": 5000.0}
     ]
-    with open(f"{output_dir}/01_PlanSuscripcion.sql", "w") as f:
-        f.write("-- Seed for PlanSuscripcion\n")
-        f.write("SET NOCOUNT ON;\n")
-        f.write("SET QUOTED_IDENTIFIER ON;\n")
-        for p in plans:
-            f.write(f"IF NOT EXISTS (SELECT 1 FROM PlanSuscripcion WHERE Idsuscripcion = '{p['id']}')\n")
-            f.write(f"INSERT INTO PlanSuscripcion (Idsuscripcion, NombrePlan, Precio, AccesoApi, MaxConsultas, MaxProyectos, MultiUsuario, PresentacionPublica, QrIncluido) VALUES ('{p['id']}', '{p['name']}', {p['price']}, 1, 100, 10, 1, 1, 1);\n")
+    # We do NOT generate 01_PlanSuscripcion.sql because these plans are already seeded by EF Core.
 
     # Roles / Perfiles
     perfil_ids = generate_guids(5)
@@ -187,6 +181,17 @@ def main():
             if random.random() > 0.5:
                 notif2_id = generate_guids(1)[0]
                 f.write(f"INSERT INTO Notificaciones (Id, UsuarioId, Mensaje, Tipo, Leida, FechaUtc, CreatedAtUtc) VALUES ('{notif2_id}', '{u['id']}', 'Bienvenido a VeriFinca', 'INFO', 1, GETUTCDATE(), GETUTCDATE());\n")
+
+    # DGII
+    with open(f"{output_dir}/13_DGII.sql", "w") as f:
+        f.write("-- Seed for DGII\n")
+        f.write("SET NOCOUNT ON;\n")
+        f.write("SET QUOTED_IDENTIFIER ON;\n")
+        for idx, u in enumerate(users):
+            rnc = f"4020000{str(idx).zfill(3)}1"
+            nombre = f"User{idx} LastName{idx}"
+            f.write(f"IF NOT EXISTS (SELECT 1 FROM DGII WHERE Rnc = '{rnc}')\n")
+            f.write(f"INSERT INTO DGII (Rnc, NombreRazonSocial, NombreComercial, Categoria, RegimenPagos, Estado, ActividadEconomica, AdministracionLocal, FacturadorElectronico, LicenciasVhm, FechaModificacion) VALUES ('{rnc}', 'Razon Social {nombre}', 'Comercial {nombre}', 'MIPYME', 'NORMAL', 'ACTIVO', 'SERVICIOS INMOBILIARIOS', 'SAN PEDRO DE MACORIS', 'SI', 'NO', GETUTCDATE());\n")
 
 if __name__ == "__main__":
     # Clear append files
