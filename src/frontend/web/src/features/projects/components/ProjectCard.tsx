@@ -11,7 +11,7 @@ import {
   ChevronRight,
   Calendar
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 interface ProjectCardProps {
   project: ProyectoDto;
@@ -28,7 +28,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const isValidated = project.estadoProyecto === ProjectStatus.Validated && allVerified;
 
   return (
-    <motion.div 
+    <m.div 
       initial={{ opacity: 0, scale: 0.95 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
@@ -102,6 +102,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };

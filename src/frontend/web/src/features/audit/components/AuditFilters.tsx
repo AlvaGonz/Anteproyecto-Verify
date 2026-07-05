@@ -82,12 +82,14 @@ export const AuditFiltersComponent: React.FC<AuditFiltersProps> = ({
       </div>
       <div className="flex space-x-2">
         <button
+          type="button"
           onClick={handleApply}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none"
         >
           Filtrar
         </button>
         <button
+          type="button"
           onClick={handleClear}
           className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
         >

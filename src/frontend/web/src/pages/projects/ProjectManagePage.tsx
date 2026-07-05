@@ -87,12 +87,12 @@ export const ProjectManagePage: React.FC = () => {
         }
         await updateMutation.mutateAsync({ id: id as string, payload: data });
         if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
-          for (const file of data.fotosNuevas) {
+          await Promise.all(data.fotosNuevas.map((file: File) => {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("tipoDocumento", "1");
-            await apiClient.post(`/projects/${id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }
+            return apiClient.post(`/projects/${id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+          }));
           qc.invalidateQueries({ queryKey: ["projects"] });
         }
         addToast("Proyecto actualizado exitosamente", "success");
@@ -112,12 +112,12 @@ export const ProjectManagePage: React.FC = () => {
           ubicacionGps: data.ubicacionGps
         });
         if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
-          for (const file of data.fotosNuevas) {
+          await Promise.all(data.fotosNuevas.map((file: File) => {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("tipoDocumento", "1");
-            await apiClient.post(`/projects/${newProj.id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }
+            return apiClient.post(`/projects/${newProj.id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+          }));
           qc.invalidateQueries({ queryKey: ["projects"] });
         }
         addToast("Proyecto creado exitosamente", "success");

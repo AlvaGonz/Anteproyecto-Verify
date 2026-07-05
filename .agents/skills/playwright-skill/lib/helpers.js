@@ -121,13 +121,14 @@ async function safeClick(page, selector, options = {}) {
   const maxRetries = options.retries || 3;
   const retryDelay = options.retryDelay || 1000;
 
-  // react-doctor-disable-next-line async-await-in-loop
   for (let i = 0; i < maxRetries; i++) {
     try {
+      // react-doctor-disable-next-line async-await-in-loop
       await page.waitForSelector(selector, {
         state: 'visible',
         timeout: options.timeout || 5000
       });
+      // react-doctor-disable-next-line async-await-in-loop
       await page.click(selector, {
         force: options.force || false,
         timeout: options.timeout || 5000
@@ -139,6 +140,7 @@ async function safeClick(page, selector, options = {}) {
         throw e;
       }
       console.log(`Retry ${i + 1}/${maxRetries} for clicking ${selector}`);
+      // react-doctor-disable-next-line async-await-in-loop
       await page.waitForTimeout(retryDelay);
     }
   }
@@ -336,11 +338,13 @@ async function retryWithBackoff(fn, maxRetries = 3, initialDelay = 1000) {
 
   for (let i = 0; i < maxRetries; i++) {
     try {
+      // react-doctor-disable-next-line async-await-in-loop
       return await fn();
     } catch (error) {
       lastError = error;
       const delay = initialDelay * Math.pow(2, i);
       console.log(`Attempt ${i + 1} failed, retrying in ${delay}ms...`);
+      // react-doctor-disable-next-line async-await-in-loop
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
@@ -393,7 +397,7 @@ async function detectDevServers(customPorts = []) {
 
   console.log('🔍 Checking for running dev servers...');
 
-  for (const port of allPorts) {
+  await Promise.all(allPorts.map(async (port) => {
     try {
       await new Promise((resolve, reject) => {
         const req = http.request({
@@ -421,7 +425,7 @@ async function detectDevServers(customPorts = []) {
     } catch (e) {
       // Port not available, continue
     }
-  }
+  }));
 
   if (detectedServers.length === 0) {
     console.log('  ❌ No dev servers detected');
