@@ -38,7 +38,7 @@ export const FindingsTableRow = ({ finding }: FindingsTableRowProps) => {
         </div>
       </td>
       <td className="px-6 py-4 text-right">
-        <button className="text-primary font-bold text-sm hover:underline hover:text-primary-hover transition-colors">
+        <button type="button" className="text-primary font-bold text-sm hover:underline hover:text-primary-hover transition-colors">
           Ver detalle
         </button>
       </td>

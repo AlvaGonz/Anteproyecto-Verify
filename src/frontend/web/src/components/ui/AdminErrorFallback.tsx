@@ -26,7 +26,7 @@ export const AdminErrorFallback: React.FC<{ error?: any }> = ({ error: propError
       <p className="text-[var(--color-text-strong)] opacity-70 mb-6 max-w-md">
         {errorMessage}
       </p>
-      <button 
+      <button type="button" 
         onClick={() => navigate("/admin/dashboard")}
         className="vf-btn-primary flex items-center gap-2"
       >

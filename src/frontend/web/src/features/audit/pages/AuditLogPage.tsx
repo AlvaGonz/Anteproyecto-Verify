@@ -88,7 +88,7 @@ export const AuditLogPage: React.FC = () => {
             Historial completo de eventos críticos y acciones administrativas del sistema.
           </p>
         </div>
-        <button 
+        <button type="button" 
           onClick={handleExport}
           disabled={exportMutation.isPending}
           className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-xl font-sans font-bold text-sm text-secondary hover:bg-surface-raised transition-all shadow-raised hover:shadow-floating disabled:opacity-50"
@@ -222,15 +222,15 @@ export const AuditLogPage: React.FC = () => {
             Mostrando {logs.length} registros del historial
           </span>
           <div className="flex gap-2">
-            <button className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all disabled:opacity-30 shadow-raised" disabled>
+            <button type="button" className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all disabled:opacity-30 shadow-raised" disabled>
               <ChevronLeft className="w-4 h-4" />
             </button>
             <div className="flex gap-1 shrink-0">
-              <button className="w-8 h-8 rounded-xl bg-secondary text-white text-[10px] font-black">1</button>
-              <button className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">2</button>
-              <button className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">3</button>
+              <button type="button" className="w-8 h-8 rounded-xl bg-secondary text-white text-[10px] font-black">1</button>
+              <button type="button" className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">2</button>
+              <button type="button" className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">3</button>
             </div>
-            <button className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all shadow-raised">
+            <button type="button" className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all shadow-raised">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

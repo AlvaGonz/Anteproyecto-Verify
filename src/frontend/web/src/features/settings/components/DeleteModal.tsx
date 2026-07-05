@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Trash2 } from "lucide-react";
 
 interface DeleteModalProps {
@@ -21,7 +21,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center"
@@ -48,13 +48,13 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
         </div>
 
         <div className="flex gap-3 justify-center">
-          <button
+          <button type="button"
             onClick={onCancel}
             className="vf-btn-secondary w-full"
           >
             Cancelar
           </button>
-          <button
+          <button type="button"
             onClick={onConfirm}
             disabled={isProcessing || confirmText !== "ELIMINAR"}
             className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -62,7 +62,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
             Sí, Eliminar
           </button>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
     <header className="sticky top-0 z-20 w-full h-20 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-8">
       <div className="flex items-center gap-4">
         {onMenuClick && (
-          <button
+          <button type="button"
             onClick={onMenuClick}
             className="p-2 md:hidden hover:bg-gray-100 rounded-xl transition-colors"
           >

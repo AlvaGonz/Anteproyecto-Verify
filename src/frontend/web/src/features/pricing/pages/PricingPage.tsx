@@ -78,13 +78,13 @@ export const PricingPage: React.FC = () => {
             id="billingToggle"
           >
             <div className="toggle-slider"></div>
-            <button
+            <button type="button"
               className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${!isAnnual ? "text-primary font-bold" : "text-on-surface-variant"}`}
               onClick={() => setIsAnnual(false)}
             >
               {t("pricing.header.monthly")}
             </button>
-            <button
+            <button type="button"
               className={`px-6 py-2 rounded-full font-label font-semibold text-sm relative z-10 transition-colors duration-300 ${isAnnual ? "text-primary font-bold" : "text-on-surface-variant"}`}
               onClick={() => setIsAnnual(true)}
             >
@@ -124,7 +124,7 @@ export const PricingPage: React.FC = () => {
                   <span className="material-symbols-outlined text-outline text-xl">{ICONS.cancel}</span> {t("pricing.cards.free.feature3")}
                 </li>
               </ul>
-              <button
+              <button type="button"
                 onClick={handleFreePlan}
                 className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
               >
@@ -171,7 +171,7 @@ export const PricingPage: React.FC = () => {
                   {t("pricing.cards.pro.feature4")}
                 </li>
               </ul>
-              <button
+              <button type="button"
                 onClick={() => handlePaidPlan('profesional')}
                 className="w-full py-3 rounded-lg bg-primary text-on-primary font-label font-bold hover:bg-primary-hover shadow-md transition-colors btn-interact text-center block"
                 aria-label={t("pricing.cards.pro.button")}
@@ -217,7 +217,7 @@ export const PricingPage: React.FC = () => {
                 </li>
 
               </ul>
-              <button
+              <button type="button"
                 onClick={() => handlePaidPlan('empresa')}
                 className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
                 aria-label={t("pricing.cards.empresa.button")}
@@ -262,7 +262,7 @@ export const PricingPage: React.FC = () => {
                   {t("pricing.cards.enterprise.feature4")}
                 </li>
               </ul>
-              <button
+              <button type="button"
                 onClick={() => handlePaidPlan('enterprise')}
                 className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-secondary-container"
                 aria-label={t("pricing.cards.enterprise.button")}

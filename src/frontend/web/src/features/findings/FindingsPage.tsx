@@ -100,7 +100,7 @@ export const FindingsPage = () => {
             <h1 className="text-4xl font-black text-text-primary font-display tracking-tight">Torre Piantini</h1>
             <p className="text-text-secondary text-sm mt-1 font-medium">Validation Audit Findings & Discrepancies</p>
           </div>
-          <button className="bg-primary text-text-on-primary px-6 py-3 rounded-xl font-black text-xs shadow-raised hover:bg-primary-hover hover:shadow-floating transition-all flex items-center gap-2 active:scale-95">
+          <button type="button" className="bg-primary text-text-on-primary px-6 py-3 rounded-xl font-black text-xs shadow-raised hover:bg-primary-hover hover:shadow-floating transition-all flex items-center gap-2 active:scale-95">
             <span className="material-symbols-outlined text-[18px]">download</span>
             Export Report
           </button>
@@ -130,13 +130,13 @@ export const FindingsPage = () => {
             Showing {filteredFindings.length} of {mappedFindings.length} findings
           </span>
           <div className="flex items-center gap-2">
-            <button className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:bg-surface-raised transition-colors disabled:opacity-30" disabled>
+            <button type="button" className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:bg-surface-raised transition-colors disabled:opacity-30" disabled>
               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
             </button>
-            <button className="w-8 h-8 rounded-lg border border-primary bg-primary text-text-on-primary flex items-center justify-center text-xs font-black">
+            <button type="button" className="w-8 h-8 rounded-lg border border-primary bg-primary text-text-on-primary flex items-center justify-center text-xs font-black">
               1
             </button>
-            <button className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:bg-surface-raised transition-colors">
+            <button type="button" className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:bg-surface-raised transition-colors">
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
           </div>

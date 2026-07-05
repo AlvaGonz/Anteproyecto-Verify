@@ -79,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </div>
         </Link>
         {onClose && (
-          <button onClick={onClose} className="absolute top-10 right-4 md:hidden text-white/40 hover:text-white p-2">
+          <button type="button" onClick={onClose} className="absolute top-10 right-4 md:hidden text-white/40 hover:text-white p-2">
             <X className="w-5 h-5" />
           </button>
         )}
@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             <p className="text-[9px] text-white/30 font-black uppercase tracking-widest mt-0.5">{roleLabel}</p>
           </div>
         </Link>
-        <button
+        <button type="button"
           onClick={handleLogout}
           className="mt-3 flex items-center gap-2 w-full px-2 py-2 text-[10px] font-black text-white/30 hover:text-red-400 transition-colors uppercase tracking-widest rounded-xl hover:bg-white/5"
         >

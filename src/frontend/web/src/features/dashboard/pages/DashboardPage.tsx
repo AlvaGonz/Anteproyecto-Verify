@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp, Plus, ArrowRight, Shield, CreditCard, Users, LayoutDashboard, Calendar, Activity } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 import { useDashboardStats } from "../api/useDashboardStats";
 import { useProjects } from "../../projects/api/useProjects";
 import { ProyectoDto, ProjectStatus, IntegrityStatus } from "../../projects/types";
@@ -100,7 +100,7 @@ export const DashboardPage: React.FC = () => {
 
       {/* Tabs */}
       <div className="flex border-b border-border mt-4">
-        <button
+        <button type="button"
           onClick={() => setActiveTab("projects")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
             activeTab === "projects"
@@ -112,7 +112,7 @@ export const DashboardPage: React.FC = () => {
           Flujo de Proyectos
         </button>
 
-        <button
+        <button type="button"
           onClick={() => setActiveTab("subscriptions")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
             activeTab === "subscriptions"
@@ -128,7 +128,7 @@ export const DashboardPage: React.FC = () => {
       <div className="pt-4">
         <AnimatePresence mode="wait">
           {activeTab === "projects" && (
-            <motion.div
+            <m.div
               key="projects"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -138,7 +138,7 @@ export const DashboardPage: React.FC = () => {
               {/* Stats Section with Premium Gradients */}
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
                 {stats.map((item, idx) => (
-                  <motion.div
+                  <m.div
                     key={item.name}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -158,13 +158,13 @@ export const DashboardPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 {/* Recent Projects */}
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
@@ -189,7 +189,7 @@ export const DashboardPage: React.FC = () => {
                       </div>
                     ) : (
                       recentProjects.map((p, idx) => (
-                        <motion.div
+                        <m.div
                           key={`${p.nombre}-${idx}`}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -223,15 +223,15 @@ export const DashboardPage: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                        </motion.div>
+                        </m.div>
                       ))
                     )}
                   </div>
-                </motion.div>
+                </m.div>
 
                 {/* Integrity Pulse */}
                 <div className="flex flex-col gap-8 animate-fade-in-up" style={{ animationDelay: "800ms" }}>
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 }}
@@ -260,14 +260,14 @@ export const DashboardPage: React.FC = () => {
                     <div className="absolute -right-6 -bottom-6 opacity-5 rotate-12">
                       <Shield className="w-48 h-48" />
                     </div>
-                  </motion.div>
+                  </m.div>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "subscriptions" && (
-            <motion.div
+            <m.div
               key="subscriptions"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -397,7 +397,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

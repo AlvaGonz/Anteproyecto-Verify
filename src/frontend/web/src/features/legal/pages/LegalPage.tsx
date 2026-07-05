@@ -126,7 +126,7 @@ export const LegalPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           <div className={`w-full fade-up stagger-1 ${isRevealed ? "is-visible" : ""} print:hidden sticky top-[88px] lg:top-[100px] z-40 lg:col-span-3 lg:h-fit`}>
             <div className="relative w-full md:w-[320px] lg:w-full">
-              <button
+              <button type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="w-full flex items-center justify-between bg-surface/95 backdrop-blur-md border border-outline-variant/50 px-5 py-4 rounded-xl shadow-sm text-slate-900 font-semibold transition-all hover:bg-surface-container-low active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               >
@@ -152,7 +152,7 @@ export const LegalPage: React.FC = () => {
                   <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-outline-variant/50 rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                     <div className="max-h-[60vh] overflow-y-auto p-2 flex flex-col gap-1">
                       {navItems.map(item => (
-                        <button
+                        <button type="button"
                           key={item.id}
                           className={getNavLinkClasses(item.id)}
                           onClick={(e) => {
@@ -168,7 +168,7 @@ export const LegalPage: React.FC = () => {
                         </button>
                       ))}
                       <div className="mt-2 pt-2 border-t border-outline-variant/30">
-                        <button
+                        <button type="button"
                           onClick={() => { window.print(); setIsDropdownOpen(false); }}
                           className="w-full text-left group flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 font-body text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-surface-container-low"
                         >

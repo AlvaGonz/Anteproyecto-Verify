@@ -5,7 +5,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { registerSchema, type RegisterFormValues } from "../schemas";
 import { useRegister } from "../api/useAuth";
 import { VerificationEmailActions } from "./VerificationEmailActions";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { 
   User, 
@@ -308,7 +308,7 @@ const password = watch("password") || "";
         </div>
 
         {/* CTA Button */}
-        <motion.button
+        <m.button
           whileHover={isValid ? { scale: 1.01 } : {}}
           whileTap={isValid ? { scale: 0.99 } : {}}
           type="submit"
@@ -325,7 +325,7 @@ const password = watch("password") || "";
               Crear mi cuenta <ArrowRight className="w-5 h-5" />
             </span>
           )}
-        </motion.button>
+        </m.button>
       </form>
 
       {/* Social Google Registration */}
@@ -366,7 +366,7 @@ const password = watch("password") || "";
       <AnimatePresence>
         {modalType && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -494,7 +494,7 @@ const password = watch("password") || "";
                   <Check className="w-4 h-4 font-bold" /> Aceptar y Continuar
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

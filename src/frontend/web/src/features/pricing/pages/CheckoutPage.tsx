@@ -148,7 +148,7 @@ export const CheckoutPage = () => {
             <div className="bg-error/10 border border-error/20 rounded-lg p-6 text-center">
               <span className="material-symbols-outlined text-error text-4xl mb-3">error</span>
               <p className="text-error font-medium mb-4">{error}</p>
-              <button
+              <button type="button"
                 onClick={() => setError(null)}
                 className="bg-error text-onError px-6 py-2 rounded-lg font-bold text-sm hover:bg-error/90 transition-colors"
               >
@@ -170,7 +170,7 @@ export const CheckoutPage = () => {
             <div id="checkout" className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-2xl font-headline font-bold text-on-surface">Información de pago</h2>
-                <button
+                <button type="button"
                   onClick={() => setHasConsented(false)}
                   className="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors flex items-center"
                 >

@@ -11,7 +11,7 @@ import {
   Gavel
 } from "lucide-react";
 import { ProjectCategory } from "../../projects/types";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 
 interface ProjectDocumentStatusProps {
   projectId: string;
@@ -70,7 +70,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isValid;
 
     return (
-      <motion.div 
+      <m.div 
         key={typeId}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -123,7 +123,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               </div>
            )}
         </div>
-      </motion.div>
+      </m.div>
     );
   };
 
@@ -168,7 +168,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
 
       <AnimatePresence>
         {missingCount > 0 && (
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -184,7 +184,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
                 Este expediente requiere atención inmediata para alcanzar el Sello de Integridad Suprema.
               </p>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

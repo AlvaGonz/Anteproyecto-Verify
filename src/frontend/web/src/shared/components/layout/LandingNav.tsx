@@ -87,7 +87,7 @@ export const LandingNav: React.FC = () => {
         </div>
 
         {/* Mobile Hamburger */}
-        <button
+        <button type="button"
           className={hamburgerClassName}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Abrir menú"

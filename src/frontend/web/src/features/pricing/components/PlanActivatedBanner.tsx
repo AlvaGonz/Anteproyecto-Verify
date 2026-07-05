@@ -62,7 +62,7 @@ export const PlanActivatedBanner: React.FC<Props> = ({ plan, onDismiss }) => {
           ))}
         </ul>
       </div>
-      <button
+      <button type="button"
         onClick={onDismiss}
         aria-label="Cerrar notificación"
         className="flex-shrink-0 text-text-secondary hover:text-text-primary transition-colors"

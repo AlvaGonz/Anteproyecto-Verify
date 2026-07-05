@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { X } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
@@ -36,7 +36,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
@@ -45,7 +45,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
           <h2 className="text-lg font-bold text-[#223382]">
             {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-surface rounded-full transition-colors">
+          <button type="button" onClick={onClose} className="p-2 hover:bg-surface rounded-full transition-colors">
             <X className="w-5 h-5 text-text-secondary" />
           </button>
         </div>
@@ -187,7 +187,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
             </button>
           </div>
         </form>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

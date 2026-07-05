@@ -42,7 +42,7 @@ export const ProjectDiagnosisPanel: React.FC<{ projectId: string }> = ({ project
             <p className="text-sm font-medium text-secondary text-center mb-4 max-w-xs">
               El asistente de IA revisará todos los documentos cargados y emitirá un reporte de cumplimiento y recomendaciones.
             </p>
-            <button
+            <button type="button"
               onClick={handleDiagnose}
               disabled={diagnosisMutation.isPending}
               className="vf-btn-primary w-full"
@@ -95,7 +95,7 @@ export const ProjectDiagnosisPanel: React.FC<{ projectId: string }> = ({ project
               </div>
             )}
 
-            <button
+            <button type="button"
               onClick={handleDiagnose}
               disabled={diagnosisMutation.isPending}
               className="mt-4 text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-2 hover:underline disabled:opacity-50"

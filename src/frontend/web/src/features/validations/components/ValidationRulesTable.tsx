@@ -102,7 +102,7 @@ export const ValidationRulesTable: React.FC<ValidationRulesTableProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-border/50 text-text-secondary hover:text-primary">
+                    <button type="button" className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-border/50 text-text-secondary hover:text-primary">
                       <ExternalLink className="w-4 h-4" />
                     </button>
                   </td>
@@ -115,7 +115,7 @@ export const ValidationRulesTable: React.FC<ValidationRulesTableProps> = ({
 
       {/* Table Footer */}
       <div className="p-4 bg-surface-raised/30 border-t border-border/30 flex justify-center">
-         <button className="text-[10px] font-black text-secondary/40 hover:text-secondary tracking-[0.2em] uppercase transition-colors">
+         <button type="button" className="text-[10px] font-black text-secondary/40 hover:text-secondary tracking-[0.2em] uppercase transition-colors">
            Ver Protocolo Completo de Auditoría
          </button>
       </div>

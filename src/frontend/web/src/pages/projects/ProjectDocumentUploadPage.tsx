@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 import { 
   CheckCircle2, 
   FileText, 
@@ -50,7 +50,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
 
   return (
     <ProfessionalLayout>
-      <motion.div 
+      <m.div 
         initial="hidden"
         animate="visible"
         variants={containerVariants}
@@ -72,13 +72,13 @@ export const ProjectDocumentUploadPage: React.FC = () => {
 
           {/* Step 2: Active */}
           <div className="flex flex-col items-center gap-2">
-            <motion.div 
+            <m.div 
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ repeat: Infinity, duration: 2 }}
               className="w-10 h-10 rounded-full bg-[#ffdbbe] flex items-center justify-center text-[#331600] shadow-lg ring-8 ring-white"
             >
               <FileText size={20} />
-            </motion.div>
+            </m.div>
             <span className="text-[10px] font-black uppercase text-[#F98513] tracking-widest">Documentos</span>
           </div>
 
@@ -118,7 +118,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
           {/* UPLOAD SECTION (Left 2/3) */}
           <div className="md:col-span-2 space-y-6">
             {/* DROPZONE */}
-            <motion.div
+            <m.div
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
               className={clsx(
@@ -128,20 +128,20 @@ export const ProjectDocumentUploadPage: React.FC = () => {
                   : "border-[#DAD1C8] bg-white hover:border-[#9BACD8]"
               )}
             >
-              <motion.div 
+              <m.div 
                 animate={isDragging ? { scale: [1, 1.1, 1] } : {}}
                 className="w-20 h-20 bg-[#F4F1EC] rounded-full flex items-center justify-center text-[#F98513]"
               >
                 <UploadCloud size={40} />
-              </motion.div>
+              </m.div>
               <div className="text-center">
                 <p className="text-xl font-black text-[#111144]">Arrastre sus archivos aquí</p>
                 <p className="text-[#5C5C5C] mt-2">o haga clic para explorar (PDF, JPG, PNG)</p>
               </div>
-              <button className="mt-4 px-8 py-3 bg-[#223382] text-white rounded-full font-bold text-sm hover:bg-[#111144] transition-colors shadow-lg">
+              <button type="button" className="mt-4 px-8 py-3 bg-[#223382] text-white rounded-full font-bold text-sm hover:bg-[#111144] transition-colors shadow-lg">
                 Seleccionar Archivos
               </button>
-            </motion.div>
+            </m.div>
 
             {/* TIPS / GUIDANCE */}
             <div className="flex gap-4 p-4 bg-[#F4F1EC] rounded-2xl border border-[#DAD1C8]/50">
@@ -164,7 +164,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
             <div className="flex-1 p-6 space-y-4 max-h-[400px] overflow-y-auto">
               <AnimatePresence>
                 {files.map((file) => (
-                  <motion.div
+                  <m.div
                     key={file.id}
                     variants={itemVariants}
                     layout
@@ -179,7 +179,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
                         <p className="text-xs font-black text-[#111144] truncate">{file.name}</p>
                         <p className="text-[10px] text-[#5C5C5C]">{file.size}</p>
                       </div>
-                      <button 
+                      <button type="button" 
                         onClick={() => removeFile(file.id)}
                         className="text-[#C62828] hover:bg-[#C62828]/10 p-2 rounded-full transition-colors"
                       >
@@ -194,7 +194,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
                           <span>{file.progress}%</span>
                         </div>
                         <div className="h-1.5 w-full bg-[#ffdbbe]/50 rounded-full overflow-hidden">
-                          <motion.div 
+                          <m.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${file.progress}%` }}
                             className="h-full bg-[#F98513]" 
@@ -209,7 +209,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
                         <span>ARCHIVO CARGADO</span>
                       </div>
                     )}
-                  </motion.div>
+                  </m.div>
                 ))}
               </AnimatePresence>
               
@@ -226,7 +226,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
                   <span className="text-[#5C5C5C]">Peso total:</span>
                   <span className="font-bold text-[#111144]">4.5 MB / 100 MB</span>
                </div>
-               <button 
+               <button type="button" 
                 onClick={() => setFiles([])}
                 className="w-full py-3 flex items-center justify-center gap-2 text-[#C62828] font-black text-[10px] uppercase tracking-widest hover:bg-[#C62828]/5 rounded-xl transition-all"
                >
@@ -239,21 +239,21 @@ export const ProjectDocumentUploadPage: React.FC = () => {
 
         {/* FOOTER ACTIONS */}
         <div className="flex items-center justify-between pt-8 border-t border-[#DAD1C8]">
-          <button className="flex items-center gap-2 px-6 py-3 text-[#223382] font-black text-sm hover:underline">
+          <button type="button" className="flex items-center gap-2 px-6 py-3 text-[#223382] font-black text-sm hover:underline">
             <ArrowLeft size={20} />
             Regresar
           </button>
           <div className="flex gap-4">
-            <button className="px-8 py-4 bg-[#DAD1C8] text-[#5C5C5C] rounded-2xl font-black text-sm cursor-not-allowed">
+            <button type="button" className="px-8 py-4 bg-[#DAD1C8] text-[#5C5C5C] rounded-2xl font-black text-sm cursor-not-allowed">
               Guardar Borrador
             </button>
-            <button className="flex items-center gap-3 px-10 py-4 bg-[#F98513] text-white rounded-2xl font-black text-sm shadow-premium-sm hover:bg-[#E07610] transition-all transform hover:scale-[1.02] active:scale-95 group">
+            <button type="button" className="flex items-center gap-3 px-10 py-4 bg-[#F98513] text-white rounded-2xl font-black text-sm shadow-premium-sm hover:bg-[#E07610] transition-all transform hover:scale-[1.02] active:scale-95 group">
               Siguiente Paso
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </ProfessionalLayout>
   );
 };

@@ -128,7 +128,7 @@ export const CheckoutReturnPage = () => {
       <p className="text-text-secondary text-sm text-center max-w-sm">
         El pago no pudo confirmarse. Verifica con tu banco o intenta de nuevo.
       </p>
-      <button
+      <button type="button"
         onClick={() => navigate('/plans')}
         className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-semibold"
       >

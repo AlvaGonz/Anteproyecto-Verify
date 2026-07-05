@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 import { LandingNav, LandingFooter, ProjectStatusBadge, VerifySearchForm } from "../../features/public/components";
 
 import { useProjects } from "../../features/projects/api/useProjects";
@@ -101,7 +101,7 @@ export const ProjectsPublicListPage: React.FC = () => {
 
           <div className="relative z-10 max-w-7xl mx-auto flex flex-col items-center text-center">
 
-            <motion.h1
+            <m.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -109,25 +109,25 @@ export const ProjectsPublicListPage: React.FC = () => {
             >
               Cero Incertidumbre En Su <br />
               <span className="text-primary italic">Inversión Inmobiliaria</span>
-            </motion.h1>
+            </m.h1>
 
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl font-medium leading-relaxed mb-5 max-w-2xl"
             >
               Valide la legitimidad de cualquier proyecto o explore nuestro directorio de propiedades certificadas bajo estrictos estándares de transparencia.
-            </motion.p>
+            </m.p>
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               className="w-full max-w-2xl"
             >
               <VerifySearchForm variant="dark" className="border-white/5" />
-            </motion.div>
+            </m.div>
           </div>
         </section>
 
@@ -141,13 +141,13 @@ export const ProjectsPublicListPage: React.FC = () => {
 
             <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
               <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl">
-                <button
+                <button type="button"
                   onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-white shadow-sm text-primary" : "text-slate-400"}`}
                 >
                   <LayoutGrid size={20} />
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setViewMode("list")}
                   className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-white shadow-sm text-primary" : "text-slate-400"}`}
                 >
@@ -173,7 +173,7 @@ export const ProjectsPublicListPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="popLayout">
               {filteredProjects.map((project, idx) => (
-                <motion.div
+                <m.div
                   key={project.id}
                   layout
                   initial={{ opacity: 0, y: 20 }}
@@ -216,7 +216,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                           <span className="text-primary">{project.completionPercentage}%</span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <motion.div
+                          <m.div
                             initial={{ width: 0 }}
                             animate={{ width: `${project.completionPercentage}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
@@ -233,13 +233,13 @@ export const ProjectsPublicListPage: React.FC = () => {
                       </Link>
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
               ))}
             </AnimatePresence>
           </div>
 
           {filteredProjects.length === 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-[40px] border border-dashed border-slate-200"
@@ -249,13 +249,13 @@ export const ProjectsPublicListPage: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
               <p className="text-slate-500 max-w-xs mx-auto font-medium">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
-              <button
+              <button type="button"
                 onClick={() => { setSearchQuery(""); setStatusFilter("ALL"); }}
                 className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
               >
                 Limpiar filtros
               </button>
-            </motion.div>
+            </m.div>
           )}
         </section>
 

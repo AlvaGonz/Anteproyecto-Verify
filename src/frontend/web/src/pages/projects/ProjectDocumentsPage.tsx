@@ -6,7 +6,7 @@ import { DocumentUploadForm } from "../../features/documents/components/Document
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { 
   ArrowLeft, 
   ShieldCheck, 
@@ -178,7 +178,7 @@ export const ProjectDocumentsPage: React.FC = () => {
           <Link to={`/admin/projects/${id}/edit`} className="vf-btn-secondary h-12">
             <ArrowLeft className="w-4 h-4" /> Volver
           </Link>
-          <button className="h-12 w-12 rounded-2xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center">
+          <button type="button" className="h-12 w-12 rounded-2xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center">
              <MoreVertical className="w-5 h-5" />
           </button>
         </div>
@@ -192,7 +192,7 @@ export const ProjectDocumentsPage: React.FC = () => {
           { label: 'Archivados', value: documents.filter(d => !d.activo).length, icon: Clock, color: 'text-warning' },
           { label: 'Storage', value: `${(documents.reduce((acc, d) => acc + d.tamanoBytes, 0) / (1024 * 1024)).toFixed(2)} MB`, icon: HardDrive, color: 'text-secondary' },
         ].map((stat, i) => (
-          <motion.div
+          <m.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -211,7 +211,7 @@ export const ProjectDocumentsPage: React.FC = () => {
                 <h3 className="text-2xl font-display font-black text-secondary tracking-tighter leading-none">{stat.value}</h3>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
@@ -257,7 +257,7 @@ export const ProjectDocumentsPage: React.FC = () => {
                 />
              </div>
              <div className="h-10 w-[2px] bg-outline-variant/10 hidden sm:block"></div>
-             <button className="h-12 px-6 rounded-2xl bg-surface-container-high hover:bg-secondary hover:text-white text-secondary font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 group w-full sm:w-auto">
+             <button type="button" className="h-12 px-6 rounded-2xl bg-surface-container-high hover:bg-secondary hover:text-white text-secondary font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 group w-full sm:w-auto">
                 <Filter className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                 Filtros Avanzados
              </button>
@@ -281,11 +281,11 @@ export const ProjectDocumentsPage: React.FC = () => {
                 </p>
              </div>
              <div className="flex items-center gap-2">
-                <button className="h-8 w-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant disabled:opacity-30" disabled>
+                <button type="button" className="h-8 w-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant disabled:opacity-30" disabled>
                    <ArrowLeft className="w-4 h-4 rotate-0" />
                 </button>
                 <div className="px-3 h-8 rounded-lg bg-primary text-white text-[10px] font-black flex items-center justify-center">1</div>
-                <button className="h-8 w-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant disabled:opacity-30" disabled>
+                <button type="button" className="h-8 w-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant disabled:opacity-30" disabled>
                    <ArrowLeft className="w-4 h-4 rotate-180" />
                 </button>
              </div>

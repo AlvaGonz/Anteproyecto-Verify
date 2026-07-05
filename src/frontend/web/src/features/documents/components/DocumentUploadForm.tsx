@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 import { DocumentType, UploadDocumentDto } from "../types";
 import { FileText, Calendar, Landmark, Info, X, CheckCircle2, ShieldCheck } from "lucide-react";
 
@@ -119,7 +119,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
           <div className="lg:col-span-12">
             <AnimatePresence mode="wait">
               {!file ? (
-                <motion.div
+                <m.div
                   key="empty"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -154,9 +154,9 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                     onChange={handleFileChange}
                     accept=".pdf,.jpg,.jpeg,.png"
                   />
-                </motion.div>
+                </m.div>
               ) : (
-                <motion.div 
+                <m.div 
                   key="selected"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -190,7 +190,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
                   >
                     <X className="w-6 h-6" />
                   </button>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
@@ -278,7 +278,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
         </div>
 
         <div className="mt-8 flex justify-end">
-          <motion.button
+          <m.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
@@ -297,7 +297,7 @@ export const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({
               </>
             )}
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-          </motion.button>
+          </m.button>
         </div>
       </form>
     </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -20,7 +20,7 @@ export const HeroSection: React.FC = () => {
         <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px] z-[5]" />
 
         {/* Animated Scan Line */}
-        <motion.div
+        <m.div
           animate={{ top: ['0%', '100%', '0%'] }}
           transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
           className="absolute left-0 w-full h-[2px] bg-primary/40 z-20 shadow-[0_0_20px_rgba(249,133,19,0.7)]"
@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
       </div>
 
       <div className="relative z-10 max-w-5xl space-y-12">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
@@ -52,9 +52,9 @@ export const HeroSection: React.FC = () => {
           <p className="text-gray-500 text-lg md:text-xl max-w-xl font-medium leading-relaxed">
             La plataforma líder en validación de proyectos inmobiliarios en RD. Conectamos datos institucionales en tiempo real para inversores y desarrolladores.
           </p>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
@@ -90,7 +90,7 @@ export const HeroSection: React.FC = () => {
               <Building2 className="w-3.5 h-3.5 text-primary" /> {t('hero.dataProcuraduria')}
             </Link>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

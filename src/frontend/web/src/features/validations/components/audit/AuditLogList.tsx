@@ -118,7 +118,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
                         Node: {log.ipAddress}
                       </span>
                     )}
-                    <button className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[9px] font-black text-primary uppercase tracking-widest">
+                    <button type="button" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[9px] font-black text-primary uppercase tracking-widest">
                        Ver Metadata <ArrowRight className="w-2.5 h-2.5" />
                     </button>
                   </div>

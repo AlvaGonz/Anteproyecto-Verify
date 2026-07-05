@@ -112,7 +112,7 @@ export const ValidationExecutionPage: React.FC = () => {
                   <p className="max-w-md text-xs text-text-secondary leading-relaxed mb-10 font-medium">
                     Inicie el protocolo de validación para contrastar los metadatos del proyecto con las bases de datos gubernamentales y el motor de reglas institucional.
                   </p>
-                  <button 
+                  <button type="button" 
                     onClick={startValidation}
                     className="vf-btn-primary group"
                   >
@@ -146,7 +146,7 @@ export const ValidationExecutionPage: React.FC = () => {
                           >
                             Ver Dashboard de Resultados <ArrowRight size={14} />
                           </Link>
-                          <button 
+                          <button type="button" 
                             onClick={() => { setResult(null); setIsScanning(false); }}
                             className="h-14 px-8 rounded-xl bg-white border border-border/30 text-secondary font-black text-[11px] uppercase tracking-widest flex items-center gap-2 hover:border-primary transition-all"
                           >

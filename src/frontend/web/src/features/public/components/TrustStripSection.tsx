@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { fadeInUp } from "./motion";
 
 export const TrustStripSection: React.FC = () => (
@@ -11,7 +11,7 @@ export const TrustStripSection: React.FC = () => (
         { value: "24h", label: "Garantía de Respuesta" },
         { value: "RD", label: "Alcance Nacional" },
       ].map((stat, i) => (
-        <motion.div
+        <m.div
           key={stat.label}
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: i * 0.1 }}
@@ -23,7 +23,7 @@ export const TrustStripSection: React.FC = () => (
           <p className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.2em]">
             {stat.label}
           </p>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   </section>

@@ -69,7 +69,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 <Icon className={`w-5 h-5 flex-shrink-0 ${style.text}`} />
               </div>
               <p className={`text-[14px] font-bold ${style.text} flex-1`}>{toast.message}</p>
-              <button
+              <button type="button"
                 onClick={() => removeToast(toast.id)}
                 className="p-2 rounded-xl hover:bg-black/5 transition-colors flex-shrink-0"
               >

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
 import { useProjects } from "../../projects/api/useProjects";
@@ -198,14 +198,14 @@ export const FeaturedProjectsSection: React.FC = () => {
             </Link>
             
             <div className="flex items-center gap-3">
-              <button 
+              <button type="button" 
                 onClick={() => scroll("left")}
                 className="w-14 h-14 bg-white text-secondary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md rounded-2xl flex items-center justify-center border border-gray-200/60 shadow-sm transition-all duration-300 active:scale-95 cursor-pointer"
                 aria-label="Proyectos anteriores"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <button 
+              <button type="button" 
                 onClick={() => scroll("right")}
                 className="w-14 h-14 bg-white text-secondary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md rounded-2xl flex items-center justify-center border border-gray-200/60 shadow-sm transition-all duration-300 active:scale-95 cursor-pointer"
                 aria-label="Siguientes proyectos"
@@ -285,7 +285,7 @@ export const FeaturedProjectsSection: React.FC = () => {
                      
                      <div className="space-y-2">
                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                         <motion.div 
+                         <m.div 
                            initial={{ width: 0 }}
                            whileInView={{ width: `${deliveryPercentage}%` }}
                            transition={{ duration: 1, delay: 0.2 }}

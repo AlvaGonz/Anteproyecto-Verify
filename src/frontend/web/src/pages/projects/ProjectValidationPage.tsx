@@ -130,14 +130,14 @@ export const ProjectValidationPage: React.FC = () => {
           
           <div className="flex flex-wrap items-center gap-3">
             {!isEvaluating && (
-              <button
+              <button type="button"
                 onClick={handleRunValidation}
                 className="h-14 px-8 rounded-xl bg-white text-secondary font-black text-xs uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all duration-300 flex items-center gap-3 active:scale-95"
               >
                 <RefreshCw className="w-4 h-4" /> Ejecutar Auditoría Integral
               </button>
             )}
-            <button className="h-14 w-14 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all flex items-center justify-center border border-white/10 group/ext">
+            <button type="button" className="h-14 w-14 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all flex items-center justify-center border border-white/10 group/ext">
                <ExternalLink className="w-5 h-5 group-hover/ext:scale-110 transition-transform" />
             </button>
           </div>
@@ -162,19 +162,19 @@ export const ProjectValidationPage: React.FC = () => {
       {/* Tabs Navigation Premium */}
       {!isEvaluating && (
         <div className="flex flex-wrap items-center gap-2 mb-10 p-1.5 bg-white rounded-[20px] w-fit border border-border/30 shadow-raised shadow-transparent hover:shadow-floating transition-all duration-500">
-          <button 
+          <button type="button" 
             onClick={() => setActiveTab('analysis')}
             className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'analysis' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
             <Cpu className="w-3.5 h-3.5" /> 01. Análisis Integral
           </button>
-          <button 
+          <button type="button" 
             onClick={() => setActiveTab('findings')}
             className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'findings' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
             <Fingerprint className="w-3.5 h-3.5" /> 02. Hallazgos ({findings.length})
           </button>
-          <button 
+          <button type="button" 
             onClick={() => setActiveTab('audit')}
             className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'audit' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
@@ -226,7 +226,7 @@ export const ProjectValidationPage: React.FC = () => {
                             <p className="text-xs text-text-secondary leading-relaxed mb-6 group-hover:text-text-primary transition-colors">{source.summary}</p>
                             <div className="flex items-center justify-between mt-auto">
                               <span className="text-[9px] font-mono text-text-secondary/50">TRACK_ID: {source.referenceCode || '8X-990-21'}</span>
-                              <button className="text-[10px] font-black text-primary flex items-center gap-1 group/btn">
+                              <button type="button" className="text-[10px] font-black text-primary flex items-center gap-1 group/btn">
                                 ANALIZAR <ExternalLink className="w-3 h-3 group-hover/btn:scale-110 transition-transform" />
                               </button>
                             </div>
@@ -307,7 +307,7 @@ export const ProjectValidationPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <button className="w-full py-5 bg-secondary text-white text-[10px] font-black uppercase tracking-[0.3em] hover:bg-primary transition-colors flex items-center justify-center gap-3">
+                  <button type="button" className="w-full py-5 bg-secondary text-white text-[10px] font-black uppercase tracking-[0.3em] hover:bg-primary transition-colors flex items-center justify-center gap-3">
                     <FileText className="w-4 h-4" /> Exportar Ledger Maestro
                   </button>
                 </div>

@@ -11,7 +11,7 @@ import {
   User,
   CreditCard
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
 type TabId = "profile" | "subscription" | "users";
@@ -143,7 +143,7 @@ if (formData.telefono) {
 
       {/* Navigation tabs */}
       <div className="flex border-b border-border">
-        <button
+        <button type="button"
           onClick={() => setActiveTab("profile")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "profile"
             ? "border-[#223382] text-[#223382]"
@@ -154,7 +154,7 @@ if (formData.telefono) {
           Mi Perfil
         </button>
 
-        <button
+        <button type="button"
           onClick={() => setActiveTab("subscription")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "subscription"
             ? "border-[#223382] text-[#223382]"
@@ -167,7 +167,7 @@ if (formData.telefono) {
 
         {(user?.role === "admin" || user?.role === "owner") && (
           <>
-            <button
+            <button type="button"
               onClick={() => setActiveTab("users")}
               className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "users"
                 ? "border-[#223382] text-[#223382]"
@@ -186,7 +186,7 @@ if (formData.telefono) {
       <div className="mt-6">
         <AnimatePresence mode="wait">
           {activeTab === "profile" && (
-            <motion.div
+            <m.div
               key="profile"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -194,11 +194,11 @@ if (formData.telefono) {
               transition={{ duration: 0.2 }}
             >
               <MyProfileForm />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "subscription" && (
-            <motion.div
+            <m.div
               key="subscription"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -206,11 +206,11 @@ if (formData.telefono) {
               transition={{ duration: 0.2 }}
             >
               <SubscriptionSettings />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "users" && (
-            <motion.div
+            <m.div
               key="users"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -224,7 +224,7 @@ if (formData.telefono) {
                 onDelete={(id) => setDeleteId(id)}
                 onAddNew={handleAddNewClick}
               />
-            </motion.div>
+            </m.div>
           )}
 
 

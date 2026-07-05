@@ -111,8 +111,9 @@ export const ProjectManagePage: React.FC = () => {
           designacionCatastral: data.designacionCatastral,
           ubicacionGps: data.ubicacionGps
         });
-        if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
-          await Promise.all(data.fotosNuevas.map((file: File) => {
+        const fotos = (data as any).fotosNuevas as File[];
+        if (fotos && fotos.length > 0) {
+          await Promise.all(fotos.map((file: File) => {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("tipoDocumento", "1");
@@ -236,7 +237,7 @@ export const ProjectManagePage: React.FC = () => {
             </h2>
             <div className="flex flex-wrap gap-2 mb-3">
               {[ProjectStatus.Draft, ProjectStatus.InReview, ProjectStatus.Published, ProjectStatus.Observed].map((status) => (
-                <button
+                <button type="button"
                   key={status}
                   onClick={() => handleStatusChange(status)}
                   className="bg-[var(--color-brand-primary)]/10 hover:bg-[var(--color-brand-primary)]/20 text-[var(--color-text-strong)] py-2 px-4 rounded-lg"

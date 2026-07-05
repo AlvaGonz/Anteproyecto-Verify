@@ -114,7 +114,7 @@ export const EmailVerifiedPage = () => {
             <div className="text-sm font-medium text-text-secondary mb-8 bg-slate-50 py-3 rounded-lg border border-border/60">
               Serás redirigido en <span className="text-primary font-bold text-base px-1">{countdown}</span> segundos...
             </div>
-            <button
+            <button type="button"
               onClick={handleContinueClick}
               className="vf-btn-primary w-full h-[52px] text-sm font-bold shadow-floating hover:scale-[1.02] transition-transform"
             >
@@ -134,7 +134,7 @@ export const EmailVerifiedPage = () => {
             <p className="text-text-secondary mb-6">
               El enlace de verificación es inválido o ha expirado. Por favor, intenta registrarte nuevamente o solicita un nuevo enlace.
             </p>
-            <button
+            <button type="button"
               onClick={() => navigate("/login")}
               className="vf-btn-secondary w-full h-[52px] text-sm font-bold bg-slate-100 hover:bg-slate-200 text-text-primary rounded-xl transition-colors"
             >

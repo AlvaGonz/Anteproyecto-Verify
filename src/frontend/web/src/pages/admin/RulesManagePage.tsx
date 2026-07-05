@@ -14,7 +14,7 @@ import {
   BookOpen,
   LayoutDashboard
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence  } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 
@@ -107,7 +107,7 @@ export const RulesManagePage: React.FC = () => {
           </p>
         </div>
         
-        <button 
+        <button type="button" 
           onClick={() => setShowForm(!showForm)} 
           className={`vf-btn-primary h-14 !rounded-2xl shadow-lg transition-all ${showForm ? '!bg-secondary' : ''}`}
         >
@@ -126,7 +126,7 @@ export const RulesManagePage: React.FC = () => {
           // ⚠️ HUMAN REVIEW: Mock value
           { label: 'Versión Motor', value: 'v2.4.0', icon: Settings2, color: 'text-secondary' },
         ].map((stat, i) => (
-          <motion.div
+          <m.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -145,13 +145,13 @@ export const RulesManagePage: React.FC = () => {
                 <h3 className="text-2xl font-display font-black text-secondary tracking-tighter leading-none">{stat.value}</h3>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
       <AnimatePresence>
         {showForm && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -240,7 +240,7 @@ export const RulesManagePage: React.FC = () => {
                 </div>
               </form>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -310,7 +310,7 @@ export const RulesManagePage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <button
+                      <button type="button"
                         onClick={() => handleToggle(rule.id, rule.nombre, !rule.activa)}
                         className={`h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                           rule.activa 

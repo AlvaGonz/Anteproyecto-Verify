@@ -122,7 +122,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
               </div>
 
               <div className="flex items-center gap-2 self-end md:self-center w-full md:w-auto">
-                <button
+                <button type="button"
                   onClick={() => onDownload(doc.id)}
                   className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-surface-container-high hover:bg-primary hover:text-white text-secondary font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2"
                 >
@@ -130,7 +130,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                   Descargar
                 </button>
                 
-                <button
+                <button type="button"
                   onClick={() => onToggleStatus(doc.id, !doc.activo)}
                   className={`flex-1 md:flex-none h-10 px-4 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
                     doc.activo 
@@ -151,7 +151,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                   )}
                 </button>
                 
-                <button className="h-10 w-10 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center">
+                <button type="button" className="h-10 w-10 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center">
                    <ExternalLink className="w-4 h-4" />
                 </button>
               </div>

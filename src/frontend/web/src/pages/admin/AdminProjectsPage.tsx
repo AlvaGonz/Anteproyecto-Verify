@@ -191,7 +191,7 @@ export const AdminProjectsPage: React.FC = () => {
             { id: "validated", label: "Validados" },
             { id: "review", label: "En Revisión" },
           ].map((f) => (
-            <button
+            <button type="button"
               key={f.id}
               onClick={() => {
                 setActiveFilter(f.id);
@@ -218,7 +218,7 @@ export const AdminProjectsPage: React.FC = () => {
         </div>
 
         <div className="relative">
-          <button 
+          <button type="button" 
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
             className={`p-3 rounded-2xl transition-all ${
               selectedStatuses.length > 0 
@@ -271,7 +271,7 @@ export const AdminProjectsPage: React.FC = () => {
                   );
                 })}
                 {selectedStatuses.length > 0 && (
-                  <button 
+                  <button type="button" 
                     onClick={() => {
                       setSelectedStatuses([]);
                       setActiveFilter("all");
@@ -373,7 +373,7 @@ export const AdminProjectsPage: React.FC = () => {
                       </span>
                       
                       <div className="flex items-center gap-2 relative">
-                        <button
+                        <button type="button"
                           onClick={(e) => {
                             e.preventDefault();
                             setOpenMenuId(openMenuId === project.id ? null : project.id);
@@ -416,7 +416,7 @@ export const AdminProjectsPage: React.FC = () => {
                               <div className="my-1 border-t border-gray-100"></div>
                               
                               {project.estadoProyecto === ProjectStatus.Draft && (
-                                <button
+                                <button type="button"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     updateStatus({ id: project.id, status: ProjectStatus.InReview });
@@ -431,7 +431,7 @@ export const AdminProjectsPage: React.FC = () => {
                               
                               {project.estadoProyecto === ProjectStatus.InReview && (
                                 <>
-                                  <button
+                                  <button type="button"
                                     onClick={(e) => {
                                       e.preventDefault();
                                       updateStatus({ id: project.id, status: ProjectStatus.Validated });
@@ -442,7 +442,7 @@ export const AdminProjectsPage: React.FC = () => {
                                     <CheckCircle2 className="w-4 h-4" />
                                     Aprobar (Validado)
                                   </button>
-                                  <button
+                                  <button type="button"
                                     onClick={(e) => {
                                       e.preventDefault();
                                       updateStatus({ id: project.id, status: ProjectStatus.Observed });
@@ -457,7 +457,7 @@ export const AdminProjectsPage: React.FC = () => {
                               )}
 
                               {project.estadoProyecto === ProjectStatus.Validated && (
-                                <button
+                                <button type="button"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     updateStatus({ id: project.id, status: ProjectStatus.Published });
@@ -471,7 +471,7 @@ export const AdminProjectsPage: React.FC = () => {
                               )}
                               
                               <div className="my-1 border-t border-gray-100"></div>
-                              <button
+                              <button type="button"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   if (window.confirm(`¿Eliminar "${project.nombre}"? Esta acción no se puede deshacer.`)) {

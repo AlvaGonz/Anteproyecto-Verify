@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { fadeInUp } from "./motion";
 
 export const CtaSection: React.FC = () => (
   <section id="servicios" className="py-20 px-6 bg-white mt-12">
-    <motion.div
+    <m.div
       {...fadeInUp}
       className="max-w-7xl mx-auto bg-primary rounded-[48px] p-12 md:p-24 relative overflow-hidden text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-12"
     >
@@ -27,6 +27,6 @@ export const CtaSection: React.FC = () => (
         </Link>
         <span className="text-white/60 text-xs font-black uppercase tracking-[0.3em]">Garantía VeriFinca</span>
       </div>
-    </motion.div>
+    </m.div>
   </section>
 );
