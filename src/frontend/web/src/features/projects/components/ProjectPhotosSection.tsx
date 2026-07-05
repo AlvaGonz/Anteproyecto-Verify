@@ -93,17 +93,18 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
 
     const toRevoke = pendingPhotos.map((p) => p.previewUrl);
 
-    for (const { file } of ordered) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("tipoDocumento", "1"); // Use an existing enum value; backend handles images based on Content-Type
-
-      try {
-        await uploadDocumentAsync(formData);
-      } catch {
-        setUploadError("Error al subir una imagen. Intenta nuevamente.");
-        return;
-      }
+    try {
+      await Promise.all(
+        ordered.map(({ file }) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("tipoDocumento", "1"); // Use an existing enum value; backend handles images based on Content-Type
+          return uploadDocumentAsync(formData);
+        })
+      );
+    } catch {
+      setUploadError("Error al subir una imagen. Intenta nuevamente.");
+      return;
     }
 
     toRevoke.forEach((url) => URL.revokeObjectURL(url));

@@ -12,7 +12,8 @@
     "db:seed": "docker compose exec -T api dotnet run --project /src/src/backend/Tools/DbSeeder/DbSeeder.csproj",
     "agent:session": "node scripts/session-init.mjs session-init",
     "agent:session:list": "ls .agents/sessions/",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

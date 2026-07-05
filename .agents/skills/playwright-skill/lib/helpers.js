@@ -121,6 +121,7 @@ async function safeClick(page, selector, options = {}) {
   const maxRetries = options.retries || 3;
   const retryDelay = options.retryDelay || 1000;
 
+  // react-doctor-disable-next-line async-await-in-loop
   for (let i = 0; i < maxRetries; i++) {
     try {
       await page.waitForSelector(selector, {
@@ -175,7 +176,10 @@ async function safeType(page, selector, text, options = {}) {
 async function extractTexts(page, selector) {
   await page.waitForSelector(selector, { timeout: 10000 });
   return await page.$$eval(selector, elements =>
-    elements.map(el => el.textContent?.trim()).filter(Boolean)
+    elements.flatMap(el => {
+      const text = el.textContent?.trim();
+      return text ? [text] : [];
+    })
   );
 }
 
@@ -214,8 +218,10 @@ async function authenticate(page, credentials, selectors = {}) {
 
   const finalSelectors = { ...defaultSelectors, ...selectors };
 
-  await safeType(page, finalSelectors.username, credentials.username);
-  await safeType(page, finalSelectors.password, credentials.password);
+  await Promise.all([
+    safeType(page, finalSelectors.username, credentials.username),
+    safeType(page, finalSelectors.password, credentials.password)
+  ]);
   await safeClick(page, finalSelectors.submit);
 
   // Wait for navigation or success indicator
