@@ -108,6 +108,28 @@ Una vez finalizado el Paso 4, puedes iniciar sesión inmediatamente con:
 
 ---
 
+## 📊 Carga y Siembra Masiva de Datos Gubernamentales (DGII, IPI, Catastro, Suelos)
+
+El ecosistema integra un servicio automatizado en Docker (`python_env`) para cargar y sembrar de manera masiva registros reales de la Dirección General de Impuestos Internos (DGII) y generar semillas coherentes para las validaciones catastrales y de suelo.
+
+### 🗄️ Tablas Involucradas y Volúmenes de Registros
+Cuando ejecutas `docker compose up`, el sistema inicializa y puebla las siguientes tablas con **780,396 registros cada una**:
+* **DGII**: Datos reales de contribuyentes extraídos y validados del padrón de la DGII (`DGII_RNC.TXT`).
+* **PagoIPI**: Historial de pagos simulados (cuota y estatus de pago/no pago) enlazados por RNC.
+* **CatastroTitulo**: Títulos de propiedad con coordenadas geográficas reales basadas en las 32 provincias dominicanas y superficies según su categoría (House, Apartment, Residential, Offices).
+* **PermisoSuelo**: Permisos de uso de suelo municipales georreferenciados y enlazados por RNC.
+
+### ⏱️ Tiempos de Carga Estimados (Fresh Startup / Primera Vez)
+Debido a la magnitud del conjunto de datos (más de 3 millones de filas insertadas en total), el primer arranque en limpio del contenedor tomará un tiempo para poblar los volúmenes de base de datos:
+* **Montura DGII (`up_DGII.py`)**: ~3.9 minutos (235 segundos) usando 8 hilos concurrentes y montura por lotes de 150 filas.
+* **Generador de Semillas (`generador_entidades_gubernamentales.py`)**: ~7.8 minutos (470 segundos) para calcular superficies, coordinar provincias/municipios e insertar registros.
+* **Tiempo Total Inicial**: **~12 minutos** para el aprovisionamiento completo del contenedor de base de datos y sus volúmenes asociados.
+
+> [!TIP]
+> **Arranques posteriores rápidos:** Las tareas de montura de datos implementan un mecanismo inteligente de validación en base de datos. Si detectan que las tablas ya contienen la totalidad de los datos (>= 780,000 registros), el proceso de carga se omitirá en milisegundos, permitiendo que Docker Compose levante todo el ecosistema de forma instantánea.
+
+---
+
 ## 📊 Información Técnica y Conexiones
 
 ### 💾 Base de Datos (SQL Server)

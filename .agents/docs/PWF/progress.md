@@ -25,6 +25,8 @@
 | Security Hardening (OWASP A01-A05, Law 172-13) | N/A | develop | (pending) | 2026-07-01 |
 | Subscription Tier Webhook Notification | N/A | feat-stripe | 11620118 | 2026-07-01 |
 | Dashboard Notification + Post-Payment Redirect | N/A | feat-stripe | (pending) | 2026-07-01 |
+| Massive Seeding and Mounting of 780,396 Records (DGII, PagoIPI, Catastro, Suelos) | N/A | develop | (pending) | 2026-07-05 |
+| Docker compose integration for automated DB seeding with skip-check | N/A | develop | (pending) | 2026-07-05 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

@@ -106,11 +106,15 @@ services:
 
   python_env:
     image: python:3.12-slim
-    profiles: ["manual"]
     volumes:
       - .:/src
     working_dir: /src
-    command: python -c "import time; print('Python environment started. Will auto-shutdown in 30 seconds.'); time.sleep(30)"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Initial Catalog=verifinca-spm-uce-2026;User ID=sa;Password=Your_password123;TrustServerCertificate=True;
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    command: sh -c "pip install pymssql && python -u Bots/DGII/code/up_DGII.py && python -u generador_entidades_gubernamentales.py"
 
 volumes:
   mssql-data:
