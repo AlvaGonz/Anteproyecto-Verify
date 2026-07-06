@@ -71,3 +71,4 @@ public class SubscriptionIntegrityTests
         Assert.Equal("incomplete", effectiveStatus);
     }
 }
+// verified subscription integrity tests
