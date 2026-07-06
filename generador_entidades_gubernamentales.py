@@ -86,6 +86,50 @@ def get_conn_params(conn_str):
 
 conn_params = get_conn_params(conn_str)
 
+def wait_for_database():
+    """Connect to 'master' and wait for the target database to exist."""
+    target_db = conn_params["database"]
+    print(f"[WaitDB] Waiting for database '{target_db}' to exist...")
+    for attempt in range(60):
+        for h in ["sqlserver", conn_params["server"], "localhost", "127.0.0.1"]:
+            if not h:
+                continue
+            try:
+                if db_lib == "pymssql":
+                    server = h
+                    port = conn_params["port"]
+                    if "," in server:
+                        server, port_str = server.split(",", 1)
+                        port = int(port_str.strip())
+                    conn = pymssql.connect(server=server, port=port, user=conn_params["user"],
+                                           password=conn_params["password"], database="master",
+                                           autocommit=False, login_timeout=3)
+                else:
+                    srv = h
+                    if "," not in srv and conn_params["port"]:
+                        srv = f"{srv},{conn_params['port']}"
+                    conn = pyodbc.connect(
+                        f"DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={srv};DATABASE=master;"
+                        f"UID={conn_params['user']};PWD={conn_params['password']};"
+                        f"TrustServerCertificate=yes;Connection Timeout=3;"
+                    )
+                cursor = conn.cursor()
+                cursor.execute(f"SELECT COUNT(*) FROM sys.databases WHERE name = '{target_db}'")
+                exists = cursor.fetchone()[0] > 0
+                conn.close()
+                if exists:
+                    print(f"[WaitDB] Database '{target_db}' exists. Proceeding.")
+                    return True
+            except Exception:
+                continue
+        if attempt % 10 == 0:
+            print(f"[WaitDB] Still waiting for database '{target_db}'... ({attempt+1}/60)")
+        time.sleep(2)
+    print(f"[WaitDB] Database '{target_db}' not found after 60 attempts. Proceeding anyway (will fail gracefully).")
+    return False
+
+wait_for_database()
+
 def get_db_connection():
     hosts_to_try = [conn_params["server"], "localhost", "127.0.0.1", "sqlserver"]
     seen = set()
