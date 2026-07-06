@@ -37,10 +37,12 @@
 | React Doctor 100/100 — 0 warnings across 267 files | N/A | develop | (pending) | 2026-07-05 |
 | Massive Seeding and Mounting of 780,396 Records (DGII, PagoIPI, Catastro, Suelos) | N/A | develop | (pending) | 2026-07-05 |
 | Docker compose integration for automated DB seeding with skip-check | N/A | develop | (pending) | 2026-07-05 |
+| Restrict 'Flujo de Usuarios' Dashboard tab to Admin/Owner only | N/A | develop | (pending) | 2026-07-06 |
+
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
-| Admin Dashboard & Avatar | Block 1 | 100% | None |
+| None | N/A | 100% | None |
 
 
 ## 🔜 Next Up (Prioritized)
@@ -141,17 +143,15 @@
   - **Symptom:** Backend API crashes on startup during `MigrateAsync` with `Error Number:2705` "Column already exists".
   - **Root Cause:** A duplicated migration `20260630195243_AddStripeFieldsToUsuario.cs` attempted to add Stripe fields that were already added by `20260630163528_Add_Stripe_Fields_To_Usuario.cs`.
   - **Fix:** Emptied the `Up` and `Down` methods of the duplicate migration `20260630195243_AddStripeFieldsToUsuario.cs` so EF Core treats it as a no-op, preserving the migration chain without throwing.
-<<<<<<< HEAD
 - **BUG-014:** Application crash ("Error en la aplicacion") after successful Stripe checkout.
   - **Symptom:** After a successful Stripe checkout, the application redirects to `/#/dashboard` but shows an ErrorBoundary screen instead of the dashboard.
   - **Root Cause:** The `CheckoutReturnPage` and `PricingPage` components were navigating to the non-existent `/dashboard` route instead of the correct `/admin/dashboard` route. This caused the router to hit the `*` wildcard route which renders the `ErrorBoundary` directly.
   - **Fix:** Updated the `navigate` calls in `CheckoutReturnPage.tsx`, `PricingPage.tsx`, and their corresponding test files to point to `/admin/dashboard`.
-=======
-- **BUG-014:** Dashboard Stats and Settings endpoints fail (500 Error & Empty UI).
+- **BUG-015:** Dashboard Stats and Settings endpoints fail (500 Error & Empty UI).
   - **Symptom:** `/api/admin/dashboard/stats` and `/api/admin/users` endpoints returned 500 Internal Server Errors causing empty dashboards in UI.
   - **Root Cause:** EF Core failed to translate a LINQ expression referencing `Proyecto.Status`, which is a computed unmapped property.
   - **Fix:** Modified `DashboardRepository.cs` to query using the mapped column `EstadoProyecto` instead. Restarted the API container to clear the compiled expression cache. Endpoints now successfully return 200 OK with populated dummy data.
-- **BUG-015:** Unit test failures due to database seeding, model method parameter changes, and schema updates.
+- **BUG-016:** Unit test failures due to database seeding, model method parameter changes, and schema updates.
   - **Symptom:** xUnit tests in `UnitTests` failed compiling or running.
   - **Root Cause:**
     1. `PlanSuscripcion.Create` parameter count increased from 9 to 17 but test factories and integration helpers still used 9-parameter signatures.
@@ -165,5 +165,3 @@
     3. Set expected validation failed counts to 25 in `InternalValidationEngineTests.cs`.
     4. Updated `InitiateDgriValidationCommandHandlerTests.cs` to mock `GetByIdWithPlanAsync` and set user role to `UserRole.Administrator` to bypass quota checks.
     5. Corrected `UploadAvatarCommandHandlerTests.cs` to assert base64 Data URI format and removed the local file cleanup block.
-
->>>>>>> develop

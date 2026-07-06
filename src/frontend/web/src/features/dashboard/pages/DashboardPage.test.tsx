@@ -9,6 +9,13 @@ import React from 'react';
 vi.mock('../components/DashboardStats', () => ({
   DashboardStats: () => <div data-testid="dashboard-stats" />
 }));
+vi.mock('../../../shared/context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: '1', email: 'admin@verifinca.do', role: 'admin' },
+    isAuthenticated: true,
+    loading: false,
+  }),
+}));
 vi.mock('../../../components/layout/AppLayout', () => ({
   default: ({ children }: { children: React.ReactNode }) => <div data-testid="app-layout">{children}</div>
 }));

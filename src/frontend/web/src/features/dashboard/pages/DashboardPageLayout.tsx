@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React, { useEffect } from "react";
 import { Plus, LayoutDashboard, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { m, AnimatePresence } from "framer-motion";
@@ -10,6 +10,7 @@ import { DashboardCharts } from "./DashboardCharts";
 import { DashboardProjectList } from "./DashboardProjectList";
 import { DashboardRecentActivity } from "./DashboardRecentActivity";
 import type { StatItem } from "./DashboardStatsRow";
+import { useAuth } from "../../../shared/context/AuthContext";
 
 export type DashboardTab = "projects" | "subscriptions";
 
@@ -42,6 +43,16 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
   verified,
   statsData,
 }) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
+
+  // ponytail: Auto fallback to projects tab if a non-admin has activeTab set to subscriptions
+  useEffect(() => {
+    if (!isAdmin && activeTab === "subscriptions") {
+      setActiveTab("projects");
+    }
+  }, [isAdmin, activeTab, setActiveTab]);
+
   return (
     <div className="animate-fade-in">
       {showBanner && activatedPlan && (
@@ -69,31 +80,33 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-border mt-4">
-          <button type="button"
-            onClick={() => setActiveTab("projects")}
-            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-              activeTab === "projects"
-                ? "border-[#223382] text-[#223382]"
-                : "border-transparent text-text-secondary hover:text-text-primary"
-            }`}
-          >
-            <LayoutDashboard className="w-4 h-4" />
-            Flujo de Proyectos
-          </button>
+        {isAdmin && (
+          <div className="flex border-b border-border mt-4">
+            <button type="button"
+              onClick={() => setActiveTab("projects")}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
+                activeTab === "projects"
+                  ? "border-[#223382] text-[#223382]"
+                  : "border-transparent text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Flujo de Proyectos
+            </button>
 
-          <button type="button"
-            onClick={() => setActiveTab("subscriptions")}
-            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-              activeTab === "subscriptions"
-                ? "border-[#223382] text-[#223382]"
-                : "border-transparent text-text-secondary hover:text-text-primary"
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            Flujo de Usuarios
-          </button>
-        </div>
+            <button type="button"
+              onClick={() => setActiveTab("subscriptions")}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
+                activeTab === "subscriptions"
+                  ? "border-[#223382] text-[#223382]"
+                  : "border-transparent text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              Flujo de Usuarios
+            </button>
+          </div>
+        )}
 
         <div className="pt-4">
           <AnimatePresence mode="wait">
@@ -114,7 +127,7 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
               </m.div>
             )}
 
-            {activeTab === "subscriptions" && (
+            {activeTab === "subscriptions" && isAdmin && (
               <m.div
                 key="subscriptions"
                 initial={{ opacity: 0, y: 10 }}
