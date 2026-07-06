@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { m } from "framer-motion";
+import { motion as m } from "framer-motion";
 import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -43,9 +43,7 @@ export const HeroSection: React.FC = () => {
 
       <div className="relative z-10 max-w-5xl space-y-12">
         <m.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
+          initial={{ opacity: 1, x: 0 }}
           className="space-y-6"
         >
           <h1 className="text-5xl md:text-8xl font-display font-black text-secondary leading-[0.95] tracking-tight">

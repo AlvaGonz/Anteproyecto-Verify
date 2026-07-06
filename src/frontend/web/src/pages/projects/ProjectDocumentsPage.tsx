@@ -6,7 +6,7 @@ import { DocumentUploadForm } from "../../features/documents/components/Document
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { m } from "framer-motion";
+import { motion as m } from "framer-motion";
 import { 
   ArrowLeft, 
   ShieldCheck, 

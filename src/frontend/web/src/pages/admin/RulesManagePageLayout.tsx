@@ -13,7 +13,7 @@ import {
   BookOpen,
   LayoutDashboard,
 } from "lucide-react";
-import { m, AnimatePresence } from "framer-motion";
+import { motion as m, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CreateRuleCommand, ReglaValidacionDto } from "../../features/rules/api/useRules";
 

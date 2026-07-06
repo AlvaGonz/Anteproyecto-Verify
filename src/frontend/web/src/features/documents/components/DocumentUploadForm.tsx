@@ -1,5 +1,5 @@
 import React, { useState, useReducer } from "react";
-import { m, AnimatePresence  } from "framer-motion";
+import { motion as m, AnimatePresence } from "framer-motion";
 import { DocumentType, UploadDocumentDto } from "../types";
 import { FileText, Calendar, Landmark, Info, X, CheckCircle2, ShieldCheck } from "lucide-react";
 

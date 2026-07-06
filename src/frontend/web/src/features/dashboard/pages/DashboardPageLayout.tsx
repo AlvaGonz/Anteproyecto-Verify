@@ -1,7 +1,7 @@
 import React from "react";
 import { Plus, LayoutDashboard, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import { m, AnimatePresence } from "framer-motion";
+import { motion as m, AnimatePresence } from "framer-motion";
 import { PlanActivatedBanner } from "../../pricing/components/PlanActivatedBanner";
 import type { PlanCapabilities } from "../../pricing/utils/planCapabilities";
 import type { DashboardStatsDto, ProyectoRecienteDto, SuscripcionRecienteDto } from "../../../infrastructure/api/dashboard.api";

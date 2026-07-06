@@ -1,6 +1,6 @@
 import React from "react";
 import { FolderKanban } from "lucide-react";
-import { m } from "framer-motion";
+import { motion as m } from "framer-motion";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
 
 export interface DashboardProjectListProps {

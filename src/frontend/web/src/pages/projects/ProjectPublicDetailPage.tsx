@@ -25,7 +25,7 @@ import {
   Lock,
   Landmark
 } from "lucide-react";
-import { m } from "framer-motion";
+import { motion as m } from "framer-motion";
 
 const getCategoryLabel = (cat: ProjectCategory) => {
   switch (cat) {

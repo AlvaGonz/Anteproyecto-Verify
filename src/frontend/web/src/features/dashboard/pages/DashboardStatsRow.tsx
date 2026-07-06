@@ -1,5 +1,5 @@
 import React from "react";
-import { m } from "framer-motion";
+import { motion as m } from "framer-motion";
 
 export interface StatItem {
   name: string;

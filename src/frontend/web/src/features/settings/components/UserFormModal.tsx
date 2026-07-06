@@ -1,5 +1,5 @@
 import React from "react";
-import { m } from "framer-motion";
+import { motion as m } from "framer-motion";
 import { X } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";

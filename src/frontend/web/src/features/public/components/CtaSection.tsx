@@ -1,12 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { m } from "framer-motion";
-import { fadeInUp } from "./motion";
+import { motion as m } from "framer-motion";
 
 export const CtaSection: React.FC = () => (
   <section id="servicios" className="py-20 px-6 bg-white mt-12">
     <m.div
-      {...fadeInUp}
+      initial={{ opacity: 1 }}
       className="max-w-7xl mx-auto bg-primary rounded-[48px] p-12 md:p-24 relative overflow-hidden text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-12"
     >
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />

@@ -15,7 +15,7 @@ import {
   User,
   CreditCard
 } from "lucide-react";
-import { m, AnimatePresence  } from "framer-motion";
+import { motion as m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
 type TabId = "profile" | "subscription" | "users";

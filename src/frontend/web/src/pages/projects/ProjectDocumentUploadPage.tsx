@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { m, AnimatePresence  } from "framer-motion";
+import { motion as m, AnimatePresence } from "framer-motion";
 import { 
   CheckCircle2, 
   FileText, 

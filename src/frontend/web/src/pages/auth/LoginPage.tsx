@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { m } from "framer-motion";
+import { motion as m } from "framer-motion";
 import { ShieldCheck, Zap } from "lucide-react";
 import { LoginForm } from "../../features/auth/components/LoginForm";
 

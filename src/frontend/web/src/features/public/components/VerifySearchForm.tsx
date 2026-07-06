@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { m, AnimatePresence  } from "framer-motion";
+import { motion as m, AnimatePresence } from "framer-motion";
 import { 
   Search, 
   QrCode, 

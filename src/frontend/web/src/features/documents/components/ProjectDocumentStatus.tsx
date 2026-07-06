@@ -11,7 +11,7 @@ import {
   Gavel
 } from "lucide-react";
 import { ProjectCategory } from "../../projects/types";
-import { m, AnimatePresence  } from "framer-motion";
+import { motion as m, AnimatePresence } from "framer-motion";
 
 interface ProjectDocumentStatusProps {
   projectId: string;
