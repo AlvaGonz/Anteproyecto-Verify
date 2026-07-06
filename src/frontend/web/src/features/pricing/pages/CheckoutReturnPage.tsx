@@ -2,15 +2,16 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import apiClient from '../../../infrastructure/api/client'
+import { useAuth } from '../../../shared/context/AuthContext'
+import { resolvePostCheckoutState } from '../utils/postCheckoutResolver'
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../utils/planCapabilities'
-
 type PageStatus = 'loading' | 'success' | 'error'
 
 // Module-level — never persisted to disk, cleared on full navigation
 const _processedSessions = new Set<string>()
 
 export const CheckoutReturnPage = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   // HashRouter does not expose query params from the real URL path.
   // Stripe appends ?session_id= to the real URL (before the #), so
   // we must read it from window.location.search directly.
@@ -24,21 +25,36 @@ export const CheckoutReturnPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const redirectedRef = useRef(false)
+  const { refreshUser, user } = useAuth()
   const [status, setStatus] = useState<PageStatus>('loading')
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
+    let isPolling = true;
 
     if (!sessionId) {
       setStatus('error');
     } else {
       // Immediately remove session_id from browser history to prevent
       // it appearing in Referrer headers or server access logs (OWASP A05)
-      window.history.replaceState(
-        {},
-        '',
-        window.location.pathname  // strips ?session_id=... from real URL
-      )
+      try {
+        const newUrl = new URL(window.location.href, window.location.origin !== 'null' ? window.location.origin : 'http://localhost');
+        if (newUrl.searchParams.has('session_id') || newUrl.searchParams.has('sessionId')) {
+          newUrl.searchParams.delete('session_id');
+          newUrl.searchParams.delete('sessionId');
+          // In some test environments newUrl.toString() forces the base URL. 
+          // newUrl.pathname + newUrl.search + newUrl.hash is safer for relative replacements.
+          window.history.replaceState({}, '', newUrl.pathname + newUrl.search + newUrl.hash);
+        }
+      } catch (e) {
+        // Ignore parsing errors in test environments
+      }
+      
+      if (searchParams.has('session_id') || searchParams.has('sessionId')) {
+        searchParams.delete('session_id');
+        searchParams.delete('sessionId');
+        setSearchParams(searchParams, { replace: true });
+      }
 
       const verify = async () => {
         // Idempotency guard — prevents re-processing on hot-reload / StrictMode
@@ -53,29 +69,55 @@ export const CheckoutReturnPage = () => {
             `/v1/subscriptions/session-status?sessionId=${sessionId}`
           )
 
-          if (data.status !== 'complete') {
+          let state = resolvePostCheckoutState({
+            sessionStatus: data.status,
+            userSubscriptionStatus: user?.subscriptionStatus
+          });
+
+          if (state === 'error') {
             setStatus('error')
             return
           }
 
-          // Normalize plan name returned by Stripe session
-          const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
-          const capabilities = PLAN_CAPABILITIES[planKey]
+          if (state === 'checkout') {
+            navigate('/checkout', { replace: true })
+            return
+          }
 
-          // Invalidate TanStack Query caches so Settings + Dashboard
-          // reflect the new plan without requiring a full page reload
-          await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] })
-          await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
+          // Polling control
+          let attempts = 0;
+          while (state === 'pending_confirmation' && attempts < 5 && isPolling) {
+            attempts++;
+            await new Promise(resolve => {
+              timeoutId = setTimeout(resolve, 2000);
+            });
+            
+            // Invalidate caches to fetch latest user status
+            await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] })
+            await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
+            await refreshUser();
+            
+            // Fetch directly to get the current state synchronously for the next check
+            const authRes = await apiClient.get('/auth/me');
+            const latestStatus = authRes.data.subscriptionStatus;
 
-          // Give Stripe webhook a moment to process before redirecting.
-          // The webhook updates the DB asynchronously; TanStack will
-          // refetch when components mount.
-          await new Promise(resolve => {
-            timeoutId = setTimeout(resolve, 3000);
-          });
+            state = resolvePostCheckoutState({
+              sessionStatus: data.status,
+              userSubscriptionStatus: latestStatus
+            });
+          }
+
+          if (state !== 'dashboard') {
+            // Could not verify active subscription after polling
+            setStatus('error')
+            return
+          }
 
           if (redirectedRef.current) return
           redirectedRef.current = true
+
+          const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
+          const capabilities = PLAN_CAPABILITIES[planKey]
 
           navigate('/admin/dashboard', {
             replace: true,
@@ -95,9 +137,10 @@ export const CheckoutReturnPage = () => {
     }
 
     return () => {
+      isPolling = false;
       if (timeoutId) clearTimeout(timeoutId);
     }
-  }, [sessionId, navigate, queryClient])
+  }, [sessionId, navigate, queryClient, refreshUser, user?.subscriptionStatus])
 
   // ── Loading ──
   if (status === 'loading') {

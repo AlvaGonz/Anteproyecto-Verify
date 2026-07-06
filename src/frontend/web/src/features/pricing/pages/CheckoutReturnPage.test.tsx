@@ -12,6 +12,15 @@ vi.mock('../../../infrastructure/api/client', () => ({
   },
 }));
 
+// Mock useAuth
+const mockRefreshUser = vi.fn();
+vi.mock('../../../shared/context/AuthContext', () => ({
+  useAuth: () => ({
+    refreshUser: mockRefreshUser,
+    user: { subscriptionStatus: 'inactive' }
+  })
+}));
+
 // Mock react-router-dom useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -57,9 +66,15 @@ describe('CheckoutReturnPage', () => {
   };
 
   it('redirects to dashboard when session is complete', async () => {
-    // session-status returns complete with plan
-    vi.mocked(apiClient.get).mockResolvedValue({
-      data: { status: 'complete', plan: 'Empresa' }
+    // Mock the endpoints called
+    vi.mocked(apiClient.get).mockImplementation(async (url) => {
+      if (url.includes('session-status')) {
+        return { data: { status: 'complete', plan: 'Empresa' } };
+      }
+      if (url.includes('/auth/me')) {
+        return { data: { subscriptionStatus: 'active' } };
+      }
+      return { data: {} };
     });
 
     renderWithRouter('/checkout/return?session_id=cs_test_123');
@@ -94,7 +109,7 @@ describe('CheckoutReturnPage', () => {
     });
   });
 
-  it('shows error page when payment status is not complete', async () => {
+  it('redirects to checkout when payment status is open', async () => {
     vi.mocked(apiClient.get).mockResolvedValue({
       data: { status: 'open', plan: null }
     });
@@ -102,7 +117,7 @@ describe('CheckoutReturnPage', () => {
     renderWithRouter('/checkout/return?session_id=cs_test_fail');
 
     await waitFor(() => {
-      expect(screen.getByText('Hubo un problema con el pago')).toBeTruthy();
+      expect(mockNavigate).toHaveBeenCalledWith('/checkout', { replace: true });
     });
   });
 

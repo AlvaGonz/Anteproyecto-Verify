@@ -167,3 +167,7 @@
     3. Set expected validation failed counts to 25 in `InternalValidationEngineTests.cs`.
     4. Updated `InitiateDgriValidationCommandHandlerTests.cs` to mock `GetByIdWithPlanAsync` and set user role to `UserRole.Administrator` to bypass quota checks.
     5. Corrected `UploadAvatarCommandHandlerTests.cs` to assert base64 Data URI format and removed the local file cleanup block.
+- **BUG-017:** HashRouter URL wiped out by replaceState on Checkout Return.
+  - **Symptom:** After a successful Stripe checkout, the application redirects to `http://localhost:3000/` instead of `/admin/dashboard`.
+  - **Root Cause:** `CheckoutReturnPage` used `window.history.replaceState({}, '', window.location.pathname)` to strip `session_id`. Because `HashRouter` is used, `pathname` is `/`, which effectively dropped the `#/...` from the URL, causing React Router to reset to the landing page `/`.
+  - **Fix:** Switched to safely cleaning up `session_id` from the raw URL (`newUrl.searchParams.delete()`) and the hash query parameters using `setSearchParams` without wiping the hash component itself.
