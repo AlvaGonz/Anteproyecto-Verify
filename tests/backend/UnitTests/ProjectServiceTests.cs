@@ -47,6 +47,7 @@ public class ProjectServiceTests
         var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
         user.GetType().GetProperty("Id")?.SetValue(user, userId);
         user.GetType().GetProperty("Plan")?.SetValue(user, plan);
+        user.UpdateStripeSubscription("mock_sub", "active", DateTime.UtcNow.AddMonths(1));
         
         _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);

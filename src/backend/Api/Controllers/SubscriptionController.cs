@@ -145,6 +145,15 @@ public class SubscriptionController : ControllerBase
         if (isFree && effectiveStatus == "active")
             effectiveStatus = "free";
 
+        // If they have a Stripe Customer ID but no subscription ID/status, and the assigned plan is not free,
+        // it means the checkout was incomplete (Paco Mico's case).
+        if (!string.IsNullOrEmpty(user.StripeCustomerId) && 
+            string.IsNullOrEmpty(user.StripeSubscriptionId) && 
+            hasPlan && !isFree)
+        {
+            effectiveStatus = "incomplete";
+        }
+
         return Ok(new
         {
             plan = user.Plan?.NombrePlan,
@@ -249,6 +258,17 @@ public class SubscriptionController : ControllerBase
                 var invoice = stripeEvent.Data.Object as Stripe.Invoice;
                 var customerId = invoice?.CustomerId;
                 var subscriptionId = invoice?.Lines?.FirstOrDefault()?.SubscriptionId;
+
+                if (customerId != null && subscriptionId != null)
+                {
+                    await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap);
+                }
+            }
+            else if (stripeEvent.Type == "customer.subscription.created" || stripeEvent.Type == "customer.subscription.updated")
+            {
+                var subscription = stripeEvent.Data.Object as Stripe.Subscription;
+                var customerId = subscription?.CustomerId;
+                var subscriptionId = subscription?.Id;
 
                 if (customerId != null && subscriptionId != null)
                 {
@@ -374,4 +394,87 @@ public class SubscriptionController : ControllerBase
             );
         }
     }
+
+    [HttpPost("reconcile")]
+    [Authorize]
+    public async Task<IActionResult> ReconcileSubscription([FromBody] ReconcileRequest request, CancellationToken ct)
+    {
+        var isAdmin = await IsAdminAsync();
+        if (!isAdmin)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Acceso denegado. Se requieren permisos de administrador." });
+        }
+
+        if (string.IsNullOrEmpty(request?.StripeCustomerId))
+        {
+            return BadRequest(new { message = "Stripe Customer ID is required." });
+        }
+
+        var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.StripeCustomerId == request.StripeCustomerId, ct);
+        if (user == null)
+        {
+            return NotFound(new { message = $"Usuario con Stripe Customer ID {request.StripeCustomerId} no encontrado." });
+        }
+
+        try
+        {
+            var subService = new SubscriptionService();
+            var options = new SubscriptionListOptions
+            {
+                Customer = request.StripeCustomerId,
+                Status = "all",
+                Limit = 1
+            };
+            
+            var subscriptions = await subService.ListAsync(options, cancellationToken: ct);
+            var activeSub = subscriptions.FirstOrDefault(s => s.Status == "active" || s.Status == "trialing")
+                            ?? subscriptions.FirstOrDefault();
+
+            if (activeSub == null)
+            {
+                return BadRequest(new { message = $"No Stripe subscriptions found for customer {request.StripeCustomerId}." });
+            }
+
+            var pricePlanMap = _configuration
+                .GetSection("Stripe:PricePlanMap")
+                .GetChildren()
+                .ToDictionary(c => c.Key, c => c.Value ?? string.Empty);
+
+            await HandleSubscriptionActivatedAsync(request.StripeCustomerId, activeSub.Id, pricePlanMap);
+
+            return Ok(new { 
+                message = "Suscripción reconciliada exitosamente.",
+                subscriptionId = activeSub.Id,
+                status = activeSub.Status,
+                periodEnd = activeSub.Items?.Data?.FirstOrDefault()?.CurrentPeriodEnd
+            });
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe API error during subscription reconciliation for Customer {CustomerId}", request.StripeCustomerId);
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
+        }
+    }
+
+    private Task<bool> IsAdminAsync()
+    {
+        if (User?.Identity?.IsAuthenticated != true)
+        {
+            return Task.FromResult(false);
+        }
+
+        var roles = User.Claims
+            .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role || c.Type == "role")
+            .Select(c => c.Value)
+            .ToList();
+
+        return Task.FromResult(roles.Any(r => 
+            string.Equals(r, "admin", StringComparison.OrdinalIgnoreCase) || 
+            string.Equals(r, "Administrator", StringComparison.OrdinalIgnoreCase)));
+    }
+}
+
+public class ReconcileRequest
+{
+    public string StripeCustomerId { get; set; } = string.Empty;
 }

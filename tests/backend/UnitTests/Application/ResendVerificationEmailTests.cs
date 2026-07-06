@@ -62,7 +62,8 @@ public class ResendVerificationEmailTests
             .ReturnsAsync(new ValidationResult());
         
         var user = new Usuario("Juan", "Perez", "verified@example.com", "hash", UserRole.User, "8095550199", "40212345678");
-        user.VerificarEmail("dummy-token"); // Make it verified
+        user.GenerarTokenVerificacion();
+        user.VerificarEmail(user.TokenVerificacion!); // Make it verified
 
         _usuarioRepositoryMock.Setup(r => r.GetByEmailAsync(command.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);

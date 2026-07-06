@@ -10,7 +10,8 @@ public static class TestUsuarioFactory
     public static Usuario Create(
         UserRole rol,
         PlanSuscripcion? plan = null,
-        int consultasUsadas = 0)
+        int consultasUsadas = 0,
+        bool activeSubscription = true)
     {
         // Add a mock user with reflection setting
         var user = new Usuario(
@@ -18,7 +19,13 @@ public static class TestUsuarioFactory
             "hashedpw", rol, "8091234567", "001-0000001-1");
 
         if (plan is not null)
+        {
             user.AsignarPlan(plan.Idsuscripcion);
+            if (activeSubscription)
+            {
+                user.UpdateStripeSubscription("mock_sub", "active", DateTime.UtcNow.AddYears(1));
+            }
+        }
 
         // Use reflection to set navigation property and ConsultasUsadas:
         typeof(Usuario)
