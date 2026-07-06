@@ -6,8 +6,7 @@ import { loginSchema, type LoginFormValues } from "../schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
-const isSubscriptionActive = (status?: string | null) =>
-  status === 'active' || status === 'trialing';
+import { isSubscriptionActive } from "../../pricing/utils/planPermissions";
 
 export const LoginForm = () => {
   const navigate = useNavigate();

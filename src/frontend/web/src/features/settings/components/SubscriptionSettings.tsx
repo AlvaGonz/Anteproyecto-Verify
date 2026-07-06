@@ -39,6 +39,11 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; icon: Re
     className: "bg-amber-50 text-amber-700 border-amber-200",
     icon: <AlertCircle className="w-4 h-4" />,
   },
+  incomplete: {
+    label: "Verificando suscripción",
+    className: "bg-amber-50 text-amber-700 border-amber-200 animate-pulse",
+    icon: <Clock className="w-4 h-4" />,
+  },
 };
 
 const NO_PLAN_CONFIG = {
@@ -123,6 +128,26 @@ export const SubscriptionSettings: React.FC = () => {
               >
                 <RefreshCw className="w-4 h-4" />
                 Reintentar
+              </button>
+            </div>
+          )}
+
+          {/* Incomplete Status Alert Box */}
+          {!isLoading && !isError && status === 'incomplete' && (
+            <div className="mb-8 p-5 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3 text-amber-700">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-sm">Pago en proceso o verificación requerida</h4>
+                  <p className="text-xs mt-1">Hemos detectado que iniciaste el proceso de pago pero aún no se ha confirmado. Si acabas de realizar el pago, por favor espera unos minutos o recarga la página. Si el problema persiste, contacta al soporte técnico.</p>
+                </div>
+              </div>
+              <button type="button"
+                onClick={() => refetch()}
+                className="flex items-center gap-1.5 text-sm font-bold text-amber-700 hover:text-amber-900 transition-colors whitespace-nowrap bg-amber-100 hover:bg-amber-200 px-4 py-2 rounded-xl border border-amber-200/50"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Actualizar
               </button>
             </div>
           )}

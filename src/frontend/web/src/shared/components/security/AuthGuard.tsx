@@ -2,12 +2,11 @@ import React, { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+import { isSubscriptionActive } from "../../../features/pricing/utils/planPermissions";
+
 interface AuthGuardProps {
   children: ReactNode;
 }
-
-const isSubscriptionActive = (status?: string | null) =>
-  status === 'active' || status === 'trialing';
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { isAuthenticated, loading, user } = useAuth();
