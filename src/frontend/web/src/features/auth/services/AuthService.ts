@@ -26,6 +26,9 @@ export interface User {
   stripeSubscriptionId?: string | null;
   subscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | null | string;
   currentPeriodEnd?: string | null;
+  // ponytail: pendingPlanCode/billingCycle drive the post-registration checkout redirect
+  pendingPlanCode?: string | null;
+  pendingBillingCycle?: string | null;
 }
 
 export interface AuthResponse {

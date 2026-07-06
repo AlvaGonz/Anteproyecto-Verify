@@ -12,14 +12,12 @@
     "db:seed": "docker compose exec -T api dotnet run --project /src/src/backend/Tools/DbSeeder/DbSeeder.csproj",
     "agent:session": "node scripts/session-init.mjs session-init",
     "agent:session:list": "ls .agents/sessions/",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
-    "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
     "clsx": "^2.1.1",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
     "framer-motion": "^12.38.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.479.0",
@@ -29,7 +27,6 @@
     "react-dom": "^19.0.0",
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^7.13.2",
-    "stripe": "^22.3.0",
     "tailwind-merge": "^2.5.2",
     "zod": "^4.4.3"
   },

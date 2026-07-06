@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState } from "react";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
 import { CreateUserDto, UserSettings } from "../../features/settings/types/settings.types";
-import { UsersTable, UserFormModal, DeleteModal, MyProfileForm, SubscriptionSettings, InviteesSettings } from "../../features/settings/components";
+import { UsersTable } from "../../features/settings/components/UsersTable";
+import { UserFormModal } from "../../features/settings/components/UserFormModal";
+import { DeleteModal } from "../../features/settings/components/DeleteModal";
+import { MyProfileForm } from "../../features/settings/components/MyProfileForm";
+import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
+import { InviteesSettings } from "../../features/settings/components/InviteesSettings";
 import {
   Settings,
   Users,
@@ -12,7 +17,7 @@ import {
   CreditCard,
   UserPlus
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
 type TabId = "profile" | "subscription" | "users" | "invitees";
@@ -42,13 +47,6 @@ export const SettingsPage: React.FC = () => {
 
   const loading = isAdmin && (isLoadingUsers || isLoadingPlans);
   const isProcessing = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
-
-  // Security Check: Redirect non-admins away from users/permissions tabs
-  useEffect(() => {
-    if (user && !isAdmin && (activeTab === "users")) {
-      setActiveTab("profile");
-    }
-  }, [user, activeTab]);
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +143,7 @@ if (formData.telefono) {
 
       {/* Navigation tabs */}
       <div className="flex border-b border-border">
-        <button
+        <button type="button"
           onClick={() => setActiveTab("profile")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "profile"
             ? "border-[#223382] text-[#223382]"
@@ -156,7 +154,7 @@ if (formData.telefono) {
           Mi Perfil
         </button>
 
-        <button
+        <button type="button"
           onClick={() => setActiveTab("subscription")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "subscription"
             ? "border-[#223382] text-[#223382]"
@@ -169,7 +167,7 @@ if (formData.telefono) {
 
         {(user?.role === "admin" || user?.role === "owner") && (
           <>
-            <button
+            <button type="button"
               onClick={() => setActiveTab("users")}
               className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "users"
                 ? "border-[#223382] text-[#223382]"
@@ -185,6 +183,7 @@ if (formData.telefono) {
 
         {isManagementTier && (
           <button
+            type="button"
             onClick={() => setActiveTab("invitees")}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "invitees"
               ? "border-[#223382] text-[#223382]"
@@ -201,7 +200,7 @@ if (formData.telefono) {
       <div className="mt-6">
         <AnimatePresence mode="wait">
           {activeTab === "profile" && (
-            <motion.div
+            <m.div
               key="profile"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -209,11 +208,11 @@ if (formData.telefono) {
               transition={{ duration: 0.2 }}
             >
               <MyProfileForm />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "subscription" && (
-            <motion.div
+            <m.div
               key="subscription"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -221,11 +220,11 @@ if (formData.telefono) {
               transition={{ duration: 0.2 }}
             >
               <SubscriptionSettings />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "users" && (
-            <motion.div
+            <m.div
               key="users"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -239,11 +238,11 @@ if (formData.telefono) {
                 onDelete={(id) => setDeleteId(id)}
                 onAddNew={handleAddNewClick}
               />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "invitees" && isManagementTier && (
-            <motion.div
+            <m.div
               key="invitees"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -251,7 +250,7 @@ if (formData.telefono) {
               transition={{ duration: 0.2 }}
             >
               <InviteesSettings />
-            </motion.div>
+            </m.div>
           )}
 
 

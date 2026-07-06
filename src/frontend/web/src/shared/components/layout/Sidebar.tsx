@@ -18,6 +18,14 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
+const NAVIGATION = [
+  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { name: "Expedientes", href: "/admin/projects", icon: FolderKanban },
+  { name: "Reglas de Validacion", href: "/admin/rules", icon: ShieldAlert },
+  { name: "Logs de Auditoría", href: "/admin/audit-log", icon: History },
+  { name: "Configuracion", href: "/admin/settings", icon: Settings },
+];
+
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -48,14 +56,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     user: "Usuario",
   }[user?.role || "user"] || "Usuario";
 
-  const navigation = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Expedientes", href: "/admin/projects", icon: FolderKanban },
-    { name: "Reglas de Validacion", href: "/admin/rules", icon: ShieldAlert },
-    { name: "Logs de Auditoría", href: "/admin/audit-log", icon: History },
-    { name: "Configuracion", href: "/admin/settings", icon: Settings },
-  ];
-
   return (
     <div
       className="flex flex-col w-[280px] h-full bg-secondary text-white relative overflow-hidden"
@@ -79,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </div>
         </Link>
         {onClose && (
-          <button onClick={onClose} className="absolute top-10 right-4 md:hidden text-white/40 hover:text-white p-2">
+          <button type="button" onClick={onClose} className="absolute top-10 right-4 md:hidden text-white/40 hover:text-white p-2">
             <X className="w-5 h-5" />
           </button>
         )}
@@ -91,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Principal</p>
         </div>
         <nav className="space-y-1.5 flex-1">
-          {navigation.map((item) => {
+          {NAVIGATION.map((item) => {
             const isActive = location.pathname.startsWith(item.href);
             return (
               <Link
@@ -151,7 +151,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <Link to="/admin/settings" className="flex items-center gap-3 hover:bg-white/5 p-2 -m-2 rounded-xl transition-colors cursor-pointer">
           <div className="relative">
              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-sm font-black text-white shadow-lg overflow-hidden border border-white/10">
-                {initials}
+                {user?.avatarUrl ? (
+                  <img 
+                    data-testid="sidebar-avatar-img"
+                    src={user.avatarUrl.startsWith('data:') || user.avatarUrl.startsWith('blob:') ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} 
+                    alt="Avatar" 
+                    className="w-full h-full object-cover" 
+                  />
+                ) : (
+                  initials
+                )}
              </div>
              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-success rounded-full border-2 border-secondary overflow-hidden"></div>
           </div>
@@ -160,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             <p className="text-[9px] text-white/30 font-black uppercase tracking-widest mt-0.5">{roleLabel}</p>
           </div>
         </Link>
-        <button
+        <button type="button"
           onClick={handleLogout}
           className="mt-3 flex items-center gap-2 w-full px-2 py-2 text-[10px] font-black text-white/30 hover:text-red-400 transition-colors uppercase tracking-widest rounded-xl hover:bg-white/5"
         >

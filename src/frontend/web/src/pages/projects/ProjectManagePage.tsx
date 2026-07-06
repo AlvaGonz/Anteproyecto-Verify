@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
@@ -60,15 +60,15 @@ export const ProjectManagePage: React.FC = () => {
     }
   });
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
 
   const handleDelete = () => {
     if (!id) return;
-    setShowDeleteConfirm(true);
+    deleteDialogRef.current?.showModal();
   };
 
   const handleConfirmDelete = async () => {
-    setShowDeleteConfirm(false);
+    deleteDialogRef.current?.close();
     try {
       await deleteMutation.mutateAsync(id as string);
       addToast("Proyecto eliminado exitosamente", "success");
@@ -87,12 +87,12 @@ export const ProjectManagePage: React.FC = () => {
         }
         await updateMutation.mutateAsync({ id: id as string, payload: data });
         if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
-          for (const file of data.fotosNuevas) {
+          await Promise.all(data.fotosNuevas.map((file: File) => {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("tipoDocumento", "1");
-            await apiClient.post(`/projects/${id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }
+            return apiClient.post(`/projects/${id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+          }));
           qc.invalidateQueries({ queryKey: ["projects"] });
         }
         addToast("Proyecto actualizado exitosamente", "success");
@@ -111,13 +111,14 @@ export const ProjectManagePage: React.FC = () => {
           designacionCatastral: data.designacionCatastral,
           ubicacionGps: data.ubicacionGps
         });
-        if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
-          for (const file of data.fotosNuevas) {
+        const fotos = (data as any).fotosNuevas as File[];
+        if (fotos && fotos.length > 0) {
+          await Promise.all(fotos.map((file: File) => {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("tipoDocumento", "1");
-            await apiClient.post(`/projects/${newProj.id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }
+            return apiClient.post(`/projects/${newProj.id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+          }));
           qc.invalidateQueries({ queryKey: ["projects"] });
         }
         addToast("Proyecto creado exitosamente", "success");
@@ -167,48 +168,45 @@ export const ProjectManagePage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-4">
 
-      {/* ── Inline Delete Confirmation Modal ── */}
-      {showDeleteConfirm && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in"
-          onClick={() => setShowDeleteConfirm(false)}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 space-y-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-red-600 text-2xl">⚠</span>
-              </div>
-              <div>
-                <h2 className="text-lg font-black text-gray-900">Eliminar Proyecto</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer.</p>
-              </div>
+      {/* ── Delete Confirmation Dialog ── */}
+      <dialog
+        ref={deleteDialogRef}
+        className="rounded-2xl shadow-2xl max-w-md w-[90vw] p-0 border-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+        aria-labelledby="delete-dialog-title"
+        onClose={() => deleteDialogRef.current?.close()}
+      >
+        <div className="p-8 space-y-5">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <span className="text-red-600 text-2xl">⚠</span>
             </div>
-            <p className="text-sm text-gray-700">
-              ¿Está seguro de que desea eliminar este proyecto permanentemente? Todos los datos asociados serán borrados.
-            </p>
-            <div className="flex gap-3 justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-6 py-3 rounded-xl font-bold text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                disabled={deleteMutation.isPending}
-                className="px-6 py-3 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-              >
-                {deleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
-              </button>
+            <div>
+              <h2 id="delete-dialog-title" className="text-lg font-black text-gray-900">Eliminar Proyecto</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer.</p>
             </div>
           </div>
+          <p className="text-sm text-gray-700">
+            ¿Está seguro de que desea eliminar este proyecto permanentemente? Todos los datos asociados serán borrados.
+          </p>
+          <div className="flex gap-3 justify-end pt-2">
+            <button
+              type="button"
+              onClick={() => deleteDialogRef.current?.close()}
+              className="px-6 py-3 rounded-xl font-bold text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending}
+              className="px-6 py-3 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+            >
+              {deleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </button>
+          </div>
         </div>
-      )}
+      </dialog>
 
       <div className="mb-8 text-center animate-fade-in">
         <h1 className="text-4xl font-extrabold text-[var(--color-text-strong)] tracking-tight">
@@ -236,7 +234,7 @@ export const ProjectManagePage: React.FC = () => {
             </h2>
             <div className="flex flex-wrap gap-2 mb-3">
               {[ProjectStatus.Draft, ProjectStatus.InReview, ProjectStatus.Published, ProjectStatus.Observed].map((status) => (
-                <button
+                <button type="button"
                   key={status}
                   onClick={() => handleStatusChange(status)}
                   className="bg-[var(--color-brand-primary)]/10 hover:bg-[var(--color-brand-primary)]/20 text-[var(--color-text-strong)] py-2 px-4 rounded-lg"
@@ -272,9 +270,10 @@ export const ProjectManagePage: React.FC = () => {
             href: `/admin/projects/${id}/reports`,
             label: "Ver Reportes",
           }].map((item) => (
-            <div
+            <button
+              type="button"
               key={item.href}
-              className="bg-[var(--color-surface-primary)] p-5 rounded-lg flex items-center justify-between gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform"
+              className="bg-[var(--color-surface-primary)] p-5 rounded-lg flex items-center justify-between gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform w-full text-left"
               onClick={() => navigate(item.href)}
             >
               <div className="flex items-center gap-3">
@@ -287,7 +286,7 @@ export const ProjectManagePage: React.FC = () => {
                 </div>
               </div>
               <ArrowRight className="w-5 h-5 text-[var(--color-surface-muted)]" />
-            </div>
+            </button>
           ))}
         </div>
       )}

@@ -21,6 +21,7 @@ const renderGuard = (initialRoute: string) => {
         <Route path="/register" element={<LocationDisplay />} />
         <Route path="/*" element={
           <AuthGuard>
+            <LocationDisplay />
             <div data-testid="protected-content">Protected Content</div>
           </AuthGuard>
         } />
@@ -37,7 +38,7 @@ describe("AuthGuard", () => {
   });
 
   it("renders children when authenticated", () => {
-    (useAuth as any).mockReturnValue({ isAuthenticated: true, loading: false });
+    (useAuth as any).mockReturnValue({ isAuthenticated: true, loading: false, user: {} });
     renderGuard("/dashboard");
     expect(screen.getByTestId("protected-content")).toBeInTheDocument();
   });
@@ -52,5 +53,59 @@ describe("AuthGuard", () => {
     (useAuth as any).mockReturnValue({ isAuthenticated: false, loading: false });
     renderGuard("/checkout?plan=pro");
     expect(screen.getByTestId("location-display")).toHaveTextContent("/register?redirect=%2Fcheckout%3Fplan%3Dpro");
+  });
+
+  // ─────────────────────────────────────────────────
+  // Pending Plan & Subscription Redirects
+  // ─────────────────────────────────────────────────
+
+  it("redirects authenticated user with pending plan and no active subscription to checkout", () => {
+    (useAuth as any).mockReturnValue({
+      isAuthenticated: true,
+      loading: false,
+      user: { pendingPlanCode: "profesional", pendingBillingCycle: "monthly", subscriptionStatus: null }
+    });
+    renderGuard("/dashboard");
+    expect(screen.getByTestId("location-display")).toHaveTextContent("/checkout?plan=profesional&billing=monthly");
+  });
+
+  it("renders children when authenticated with active subscription even with pending plan", () => {
+    (useAuth as any).mockReturnValue({
+      isAuthenticated: true,
+      loading: false,
+      user: { pendingPlanCode: "profesional", pendingBillingCycle: "monthly", subscriptionStatus: "active" }
+    });
+    renderGuard("/dashboard");
+    expect(screen.getByTestId("protected-content")).toBeInTheDocument();
+  });
+
+  it("renders children when authenticated with trialing subscription", () => {
+    (useAuth as any).mockReturnValue({
+      isAuthenticated: true,
+      loading: false,
+      user: { pendingPlanCode: "profesional", pendingBillingCycle: "monthly", subscriptionStatus: "trialing" }
+    });
+    renderGuard("/dashboard");
+    expect(screen.getByTestId("protected-content")).toBeInTheDocument();
+  });
+
+  it("renders children when authenticated without pending plan", () => {
+    (useAuth as any).mockReturnValue({
+      isAuthenticated: true,
+      loading: false,
+      user: { pendingPlanCode: null, pendingBillingCycle: null, subscriptionStatus: null }
+    });
+    renderGuard("/dashboard");
+    expect(screen.getByTestId("protected-content")).toBeInTheDocument();
+  });
+
+  it("renders children when already on /checkout even with pending plan (no redirect loop)", () => {
+    (useAuth as any).mockReturnValue({
+      isAuthenticated: true,
+      loading: false,
+      user: { pendingPlanCode: "profesional", pendingBillingCycle: "monthly", subscriptionStatus: null }
+    });
+    renderGuard("/checkout?plan=profesional&billing=monthly");
+    expect(screen.getByTestId("protected-content")).toBeInTheDocument();
   });
 });

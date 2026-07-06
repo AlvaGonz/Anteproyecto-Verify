@@ -10,6 +10,12 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 const isImageDoc = (nombre: string) =>
   IMAGE_EXTENSIONS.includes(nombre.split(".").pop()?.toLowerCase() ?? "");
 
+const validateFile = (file: File): string | null => {
+  if (!file.type.startsWith("image/")) return "Solo se permiten imágenes.";
+  if (file.size > MAX_SIZE_BYTES) return `${file.name} supera 5MB.`;
+  return null;
+};
+
 interface PendingPhoto {
   file: File;
   previewUrl: string;
@@ -50,12 +56,6 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
   const galleryDocs = existingImages.slice(1);
   const totalCount = existingImages.length + pendingPhotos.length;
 
-  const validateFile = (file: File): string | null => {
-    if (!file.type.startsWith("image/")) return "Solo se permiten imágenes.";
-    if (file.size > MAX_SIZE_BYTES) return `${file.name} supera 5MB.`;
-    return null;
-  };
-
   const handleFileSelect = (files: FileList | null, role: "portrait" | "gallery") => {
     if (!files) return;
     setUploadError(null);
@@ -93,17 +93,18 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
 
     const toRevoke = pendingPhotos.map((p) => p.previewUrl);
 
-    for (const { file } of ordered) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("tipoDocumento", "1"); // Use an existing enum value; backend handles images based on Content-Type
-
-      try {
-        await uploadDocumentAsync(formData);
-      } catch {
-        setUploadError("Error al subir una imagen. Intenta nuevamente.");
-        return;
-      }
+    try {
+      await Promise.all(
+        ordered.map(({ file }) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("tipoDocumento", "1"); // Use an existing enum value; backend handles images based on Content-Type
+          return uploadDocumentAsync(formData);
+        })
+      );
+    } catch {
+      setUploadError("Error al subir una imagen. Intenta nuevamente.");
+      return;
     }
 
     toRevoke.forEach((url) => URL.revokeObjectURL(url));
@@ -169,7 +170,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
                 {/* Thumbnail pending portada */}
                 {pendingPortrait.map((p, i) => (
                   <div
-                    key={`pending-portrait-${i}`}
+                    key={`pending-portrait-${p.previewUrl}`}
                     className="relative w-14 h-14 rounded-md overflow-hidden border border-dashed border-amber-400 flex-shrink-0"
                   >
                     <img src={p.previewUrl} alt="Portada pendiente" className="w-full h-full object-cover" />

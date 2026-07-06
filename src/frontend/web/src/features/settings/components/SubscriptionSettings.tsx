@@ -4,6 +4,9 @@ import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, Ref
 import { useMySubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 
+const DATE_FORMATTER = new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' });
+const PRICE_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
 // ── Badge variants keyed by status ──────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
   active: {
@@ -65,7 +68,7 @@ export const SubscriptionSettings: React.FC = () => {
   }
 
   const formattedDate = currentPeriodEnd
-    ? new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' }).format(currentPeriodEnd)
+    ? DATE_FORMATTER.format(currentPeriodEnd)
     : null;
 
   // Only show the price when Stripe is actively billing the user.
@@ -73,7 +76,7 @@ export const SubscriptionSettings: React.FC = () => {
   const formattedPrice = (isManagedByStripe && data?.planPrice != null)
     ? data.planPrice === 0
       ? "Gratis"
-      : new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP', maximumFractionDigits: 0 }).format(data.planPrice) + " / mes"
+      : PRICE_FORMATTER.format(data.planPrice) + " USD / mes"
     : null;
 
 
@@ -114,7 +117,7 @@ export const SubscriptionSettings: React.FC = () => {
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <p className="text-sm font-medium">No se pudo cargar la información de suscripción.</p>
               </div>
-              <button
+              <button type="button"
                 onClick={() => refetch()}
                 className="flex items-center gap-1.5 text-sm font-semibold text-rose-700 hover:text-rose-900 transition-colors"
               >
@@ -185,7 +188,7 @@ export const SubscriptionSettings: React.FC = () => {
             <div className="text-sm text-text-secondary font-medium">
               ¿Deseas cambiar tu plan o explorar otras opciones?
             </div>
-            <button
+            <button type="button"
               onClick={() => navigate("/plans")}
               className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
             >

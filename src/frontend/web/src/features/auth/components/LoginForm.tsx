@@ -6,6 +6,9 @@ import { loginSchema, type LoginFormValues } from "../schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
+const isSubscriptionActive = (status?: string | null) =>
+  status === 'active' || status === 'trialing';
+
 export const LoginForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -28,10 +31,13 @@ export const LoginForm = () => {
     try {
       setIsPending(true);
       setError(null);
-      await login(data.email, data.password);
+      const user = await login(data.email, data.password);
       // Soft update for browser state (React Router navigation)
       if (redirectUrl) {
         navigate(redirectUrl);
+      } else if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus)) {
+        // ponytail: user has pending plan but no active sub → resume checkout
+        navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
       } else {
         navigate("/admin/dashboard");
       }
@@ -109,12 +115,12 @@ export const LoginForm = () => {
         </div>
 
         <div className="flex items-center justify-end pt-1">
-          <a
-            href="#"
+          <button
+            type="button"
             className="text-[13px] text-primary font-bold hover:underline"
           >
             ¿Olvidaste tu contraseña?
-          </a>
+          </button>
         </div>
 
         <button

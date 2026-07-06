@@ -9,16 +9,16 @@ import {
 } from "lucide-react";
 import { clsx } from "clsx";
 
+const NAV_ITEMS = [
+  { name: "Mis Proyectos", href: "/projects", icon: FolderOpen },
+  { name: "Cargar Documentos", href: "#", icon: CloudUpload, active: true },
+  { name: "Estado de Validación", href: "/validations", icon: FileCheck },
+  { name: "Reportes", href: "/reports", icon: BarChart },
+  { name: "Configuración", href: "/settings", icon: Settings },
+];
+
 export const PortalSidebarNav: React.FC = () => {
   const location = useLocation();
-
-  const navItems = [
-    { name: "Mis Proyectos", href: "/projects", icon: FolderOpen },
-    { name: "Cargar Documentos", href: "#", icon: CloudUpload, active: true }, // Placeholder for now or specific to upload
-    { name: "Estado de Validación", href: "/validations", icon: FileCheck },
-    { name: "Reportes", href: "/reports", icon: BarChart },
-    { name: "Configuración", href: "/settings", icon: Settings },
-  ];
 
   return (
     <nav className="fixed left-0 top-0 h-full w-64 bg-[#223382] py-8 z-50 flex flex-col shadow-premium">
@@ -34,7 +34,7 @@ export const PortalSidebarNav: React.FC = () => {
 
       {/* Nav List */}
       <ul className="flex-1 px-4 space-y-2">
-        {navItems.map((item) => {
+        {NAV_ITEMS.map((item) => {
           const isActive = item.active || location.pathname.includes(item.href);
           return (
             <li key={item.name}>

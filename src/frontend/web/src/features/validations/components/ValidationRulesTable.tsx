@@ -6,49 +6,49 @@ interface ValidationRulesTableProps {
   results: ValidationRuleResultDto[];
 }
 
+const getStatusConfig = (status: RuleStatus) => {
+  switch (status) {
+    case RuleStatus.Passed:
+      return {
+        icon: <CheckCircle2 className="w-4 h-4 text-success" />,
+        label: "CUMPLIDO",
+        className: "bg-success/10 text-success border-success/20",
+        dots: "bg-success"
+      };
+    case RuleStatus.Warning:
+      return {
+        icon: <AlertTriangle className="w-4 h-4 text-warning" />,
+        label: "OBSERVACIÓN",
+        className: "bg-warning/10 text-warning border-warning/20",
+        dots: "bg-warning"
+      };
+    case RuleStatus.Failed:
+      return {
+        icon: <XCircle className="w-4 h-4 text-error" />,
+        label: "VIOLACIÓN",
+        className: "bg-error/10 text-error border-error/20",
+        dots: "bg-error"
+      };
+    case RuleStatus.NotApplicable:
+      return {
+        icon: <MinusCircle className="w-4 h-4 text-text-secondary" />,
+        label: "N/A",
+        className: "bg-black/5 text-text-secondary border-black/10",
+        dots: "bg-text-secondary"
+      };
+    default:
+      return {
+        icon: <Info className="w-4 h-4 text-text-secondary" />,
+        label: "PENDIENTE",
+        className: "bg-black/5 text-text-secondary border-black/10",
+        dots: "bg-text-secondary"
+      };
+  }
+};
+
 export const ValidationRulesTable: React.FC<ValidationRulesTableProps> = ({
   results,
 }) => {
-  const getStatusConfig = (status: RuleStatus) => {
-    switch (status) {
-      case RuleStatus.Passed:
-        return {
-          icon: <CheckCircle2 className="w-4 h-4 text-success" />,
-          label: "CUMPLIDO",
-          className: "bg-success/10 text-success border-success/20",
-          dots: "bg-success"
-        };
-      case RuleStatus.Warning:
-        return {
-          icon: <AlertTriangle className="w-4 h-4 text-warning" />,
-          label: "OBSERVACIÓN",
-          className: "bg-warning/10 text-warning border-warning/20",
-          dots: "bg-warning"
-        };
-      case RuleStatus.Failed:
-        return {
-          icon: <XCircle className="w-4 h-4 text-error" />,
-          label: "VIOLACIÓN",
-          className: "bg-error/10 text-error border-error/20",
-          dots: "bg-error"
-        };
-      case RuleStatus.NotApplicable:
-        return {
-          icon: <MinusCircle className="w-4 h-4 text-text-secondary" />,
-          label: "N/A",
-          className: "bg-black/5 text-text-secondary border-black/10",
-          dots: "bg-text-secondary"
-        };
-      default:
-        return {
-          icon: <Info className="w-4 h-4 text-text-secondary" />,
-          label: "PENDIENTE",
-          className: "bg-black/5 text-text-secondary border-black/10",
-          dots: "bg-text-secondary"
-        };
-    }
-  };
-
   return (
     <div className="w-full">
       {/* Table Header Controls */}
@@ -102,7 +102,7 @@ export const ValidationRulesTable: React.FC<ValidationRulesTableProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-border/50 text-text-secondary hover:text-primary">
+                    <button type="button" className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-border/50 text-text-secondary hover:text-primary">
                       <ExternalLink className="w-4 h-4" />
                     </button>
                   </td>
@@ -115,7 +115,7 @@ export const ValidationRulesTable: React.FC<ValidationRulesTableProps> = ({
 
       {/* Table Footer */}
       <div className="p-4 bg-surface-raised/30 border-t border-border/30 flex justify-center">
-         <button className="text-[10px] font-black text-secondary/40 hover:text-secondary tracking-[0.2em] uppercase transition-colors">
+         <button type="button" className="text-[10px] font-black text-secondary/40 hover:text-secondary tracking-[0.2em] uppercase transition-colors">
            Ver Protocolo Completo de Auditoría
          </button>
       </div>

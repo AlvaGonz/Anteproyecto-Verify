@@ -3,7 +3,7 @@ import { useParams, Link, useLocation } from "react-router-dom";
 
 import { usePublicVerification } from "../../features/public-verification/api/usePublicVerification";
 import { VerificationResultCard } from "../../features/public-verification/components/VerificationResultCard";
-import { LandingFooter } from "../../features/public/components";
+import { LandingFooter } from "../../features/public/components/LandingFooter";
 import {
   ShieldCheck,
   Search,
@@ -165,7 +165,7 @@ export const PublicVerifyResultPage: React.FC = () => {
         {/* Support Section */}
         <div className="max-w-4xl mx-auto mt-16 text-center print:hidden">
           <p className="text-on-surface-variant text-sm font-medium mb-8">
-            ¿Tiene dudas sobre este certificado? <a href="#" className="text-secondary font-black underline decoration-primary underline-offset-4">Contacte a Soporte Institucional</a>
+            ¿Tiene dudas sobre este certificado? <a href="mailto:soporte@verifinca.do" className="text-secondary font-black underline decoration-primary underline-offset-4">Contacte a Soporte Institucional</a>
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-30 px-12 grayscale hover:grayscale-0 transition-all duration-500">

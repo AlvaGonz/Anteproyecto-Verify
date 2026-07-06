@@ -25,7 +25,7 @@ export const ProjectAuditPage: React.FC = () => {
       detalle: l.descripcion || "Sin detalles",
       fechaEventoUtc: l.fecha
     })) as AuditDto[];
-  }, [rawLogs, id]);
+  }, [rawLogs]);
 
   return (
     <div>
@@ -39,7 +39,7 @@ export const ProjectAuditPage: React.FC = () => {
             Historial detallado de eventos y acciones operativas.
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => id && (window.location.href = `${import.meta.env.VITE_API_URL}/projects/${id}/audit/export`)}
           className="vf-btn-secondary"
         >

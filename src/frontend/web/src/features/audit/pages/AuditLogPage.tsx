@@ -12,6 +12,19 @@ import {
 import { useGlobalAuditTrail, useExportGlobalAudit } from "../api/useAudit";
 import { AuditDto, AuditFilters } from "../types";
 
+const getStatusBadge = (tipoEvento: string) => {
+  switch (tipoEvento) {
+    case "ProjectCreated":
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">Creación</span>;
+    case "DocumentUploaded":
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">Carga Doc</span>;
+    case "ValidationExecuted":
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">Validación</span>;
+    default:
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">{tipoEvento}</span>;
+  }
+};
+
 export const AuditLogPage: React.FC = () => {
   const [filters, setFilters] = useState<AuditFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,18 +70,7 @@ export const AuditLogPage: React.FC = () => {
     return filtered;
   }, [rawLogs, searchQuery]);
 
-  const getStatusBadge = (tipoEvento: string) => {
-    switch (tipoEvento) {
-      case "ProjectCreated":
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">Creación</span>;
-      case "DocumentUploaded":
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">Carga Doc</span>;
-      case "ValidationExecuted":
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">Validación</span>;
-      default:
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">{tipoEvento}</span>;
-    }
-  };
+  // ponytail: moved outside component
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -88,7 +90,7 @@ export const AuditLogPage: React.FC = () => {
             Historial completo de eventos críticos y acciones administrativas del sistema.
           </p>
         </div>
-        <button 
+        <button type="button" 
           onClick={handleExport}
           disabled={exportMutation.isPending}
           className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-xl font-sans font-bold text-sm text-secondary hover:bg-surface-raised transition-all shadow-raised hover:shadow-floating disabled:opacity-50"
@@ -101,11 +103,13 @@ export const AuditLogPage: React.FC = () => {
       {/* Filters Area (Bento Style) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 bg-white rounded-3xl border border-border/40 shadow-raised">
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Búsqueda</label>
+          <label htmlFor="audit-search" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Búsqueda</label>
           <div className="relative group">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary w-4 h-4 group-focus-within:text-primary transition-colors" />
             <input 
+              id="audit-search"
               type="text"
+              aria-label="Buscar por detalle"
               placeholder="Buscar por detalle..."
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-surface-raised border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium"
               value={searchQuery}
@@ -115,8 +119,10 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Tipo de Evento</label>
+          <label htmlFor="audit-tipo" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Tipo de Evento</label>
           <select 
+            id="audit-tipo"
+            aria-label="Filtrar por tipo de evento"
             className="w-full px-4 py-2.5 text-sm bg-surface-raised border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none"
             onChange={(e) => setFilters({...filters, tipoEvento: e.target.value})}
           >
@@ -128,11 +134,13 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Fecha Desde</label>
+          <label htmlFor="audit-fecha-desde" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Fecha Desde</label>
           <div className="relative group">
             <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary w-4 h-4" />
             <input 
+              id="audit-fecha-desde"
               type="date"
+              aria-label="Fecha desde"
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-surface-raised border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium"
               onChange={(e) => setFilters({...filters, fromDate: e.target.value})}
             />
@@ -140,11 +148,13 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Fecha Hasta</label>
+          <label htmlFor="audit-fecha-hasta" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Fecha Hasta</label>
           <div className="relative group">
             <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary w-4 h-4" />
             <input 
+              id="audit-fecha-hasta"
               type="date"
+              aria-label="Fecha hasta"
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-surface-raised border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium"
               onChange={(e) => setFilters({...filters, toDate: e.target.value})}
             />
@@ -222,15 +232,15 @@ export const AuditLogPage: React.FC = () => {
             Mostrando {logs.length} registros del historial
           </span>
           <div className="flex gap-2">
-            <button className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all disabled:opacity-30 shadow-raised" disabled>
+            <button type="button" className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all disabled:opacity-30 shadow-raised" disabled>
               <ChevronLeft className="w-4 h-4" />
             </button>
             <div className="flex gap-1 shrink-0">
-              <button className="w-8 h-8 rounded-xl bg-secondary text-white text-[10px] font-black">1</button>
-              <button className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">2</button>
-              <button className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">3</button>
+              <button type="button" className="w-8 h-8 rounded-xl bg-secondary text-white text-[10px] font-black">1</button>
+              <button type="button" className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">2</button>
+              <button type="button" className="w-8 h-8 rounded-xl bg-white border border-border/40 text-[10px] font-black text-text-secondary hover:bg-surface-raised">3</button>
             </div>
-            <button className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all shadow-raised">
+            <button type="button" className="p-2 rounded-xl bg-white border border-border/40 hover:bg-surface-raised transition-all shadow-raised">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

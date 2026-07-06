@@ -162,7 +162,7 @@ const resources = {
           postCancelDesc: "El servicio permanece activo hasta el fin del período ya pagado. Al vencer, el acceso se revierte automáticamente al plan gratuito.",
           annualPenaltyTitle: "Penalización por Cancelación Anticipada — Plan Anual",
           annualPenaltyDesc: "Si cancelas un plan de suscripción anual antes de completar los 12 meses del período contratado, se aplicará una penalización equivalente al 20% del valor total anual del plan. Este monto será deducido del reembolso proporcional correspondiente a los meses no consumidos, o cobrado al método de pago registrado si no hay saldo a favor.",
-          annualPenaltyExample: "Ejemplo: si el plan anual cuesta RD$12,000 y cancelas tras 4 meses, el reembolso proporcional de los 8 meses restantes (RD$8,000) se reduce en un 20% (RD$2,400), resultando en un reembolso neto de RD$5,600.",
+          annualPenaltyExample: "Ejemplo: si el plan anual cuesta $1,200 USD y cancelas tras 4 meses, el reembolso proporcional de los 8 meses restantes ($800 USD) se reduce en un 20% ($240 USD), resultando en un reembolso neto de $560 USD.",
           annualPenaltyExceptionTitle: "Excepciones",
           annualPenaltyExceptionDesc: "La penalización no aplica si la cancelación se debe a un error de facturación comprobable por parte de VeriFinca, o si el servicio ha presentado una interrupción acumulada superior al 5% del tiempo mensual dentro del período afectado (ver SLA).",
           monthlyNoPenaltyTitle: "Planes Mensuales",

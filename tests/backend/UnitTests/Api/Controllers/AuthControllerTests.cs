@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Xunit;
+using Application.Features.Auth.Commands.UploadAvatar;
+using Application.Features.Auth.Commands.ResendVerificationEmail;
 
 namespace UnitTests.Api.Controllers;
 
@@ -53,6 +55,9 @@ public class AuthControllerTests
             mockPlanRepo.Object);
 
         var uploadAvatarHandler = new UploadAvatarCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
+        var mockValidatorResend = new Mock<FluentValidation.IValidator<ResendVerificationEmailCommand>>();
+        var resendEmailHandler = new ResendVerificationEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object, mockValidatorResend.Object, mockEmailService.Object);
+        var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
 
         _controller = new AuthController(
             registerHandler, 
@@ -60,10 +65,12 @@ public class AuthControllerTests
             loginHandler,
             updateProfileHandler,
             uploadAvatarHandler,
+            resendEmailHandler,
             _usuarioRepositoryMock.Object, 
             mockConfig.Object,
             mockJwtTokenGenerator.Object,
-            new MemoryCache(new MemoryCacheOptions()));
+            cache
+        );
 
         var httpContext = new DefaultHttpContext();
         _controller.ControllerContext = new ControllerContext()
@@ -93,6 +100,15 @@ public class AuthControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(okResult.Value);
+
+        var valueType = okResult.Value.GetType();
+        var userProp = valueType.GetProperty("user");
+        Assert.NotNull(userProp);
+        var userObj = userProp.GetValue(okResult.Value);
+        Assert.NotNull(userObj);
+
+        var avatarUrlProp = userObj.GetType().GetProperty("avatarUrl");
+        Assert.NotNull(avatarUrlProp);
     }
 
     [Fact]

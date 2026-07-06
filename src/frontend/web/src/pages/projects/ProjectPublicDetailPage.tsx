@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   IntegrityStatus,
@@ -7,7 +7,7 @@ import {
 import { useProject } from "../../features/projects/api/useProjects";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
-import { LandingFooter } from "../../features/public/components";
+import { LandingFooter } from "../../features/public/components/LandingFooter";
 import {
   ArrowLeft,
   MapPin,
@@ -25,7 +25,7 @@ import {
   Lock,
   Landmark
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 const getCategoryLabel = (cat: ProjectCategory) => {
   switch (cat) {
@@ -96,10 +96,10 @@ export const ProjectPublicDetailPage: React.FC = () => {
             </div>
          </div>
          <div className="hidden md:flex items-center gap-4">
-            <button className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all">
+            <button type="button" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all">
                <Share2 className="w-5 h-5" />
             </button>
-            <button className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all">
+            <button type="button" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all">
                <Download className="w-5 h-5" />
             </button>
             <Link to={`/admin/projects/${project.id}/edit`} className="vf-btn-primary h-12 !rounded-2xl px-8 ml-4 text-xs font-black tracking-widest border-none bg-primary text-white shadow-xl shadow-primary/20">
@@ -111,7 +111,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
       <main className="pt-40 pb-32 px-10 max-w-7xl mx-auto">
         <header className="mb-20">
           <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-12">
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
@@ -146,9 +146,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
             
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", damping: 15 }}
@@ -161,7 +161,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 block mb-0.5">Estado de Integridad</span>
                 <span className="font-display font-black text-2xl tracking-tighter italic">{integrityInfo.label}</span>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </header>
 
@@ -272,7 +272,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                      </div>
                   </div>
 
-                  <button className="w-full bg-[#F98513] hover:bg-[#ff962b] text-white h-16 rounded-[1.5rem] font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3 active:scale-95 duration-200">
+                  <button type="button" className="w-full bg-[#F98513] hover:bg-[#ff962b] text-white h-16 rounded-[1.5rem] font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3 active:scale-95 duration-200">
                      VER CERTIFICADO OFICIAL
                   </button>
                </div>
@@ -291,7 +291,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
         {/* Global Seal / Trust Bar */}
         {project.estadoIntegridad === IntegrityStatus.Verified && (
-          <motion.section 
+          <m.section 
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             className="mt-40 text-center space-y-12"
@@ -307,11 +307,11 @@ export const ProjectPublicDetailPage: React.FC = () => {
                  "Este activo inmobiliario cuenta con el respaldo institucional de <span className="text-secondary font-black">VeriFinca</span>, certificando la autenticidad de sus títulos y la transparencia de su estructura legal."
                </p>
                <div className="pt-8 flex flex-col sm:flex-row justify-center items-center gap-6">
-                  <button className="vf-btn-primary h-14 !rounded-2xl px-12 text-[10px] font-black uppercase tracking-[0.3em]">DESCARGAR EXPEDIENTE</button>
+                  <button type="button" className="vf-btn-primary h-14 !rounded-2xl px-12 text-[10px] font-black uppercase tracking-[0.3em]">DESCARGAR EXPEDIENTE</button>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 italic">Expediente firmado digitalmente por autoridad central</p>
                </div>
             </div>
-          </motion.section>
+          </m.section>
         )}
       </main>
 

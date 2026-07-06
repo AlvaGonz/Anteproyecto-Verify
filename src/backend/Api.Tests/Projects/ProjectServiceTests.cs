@@ -53,7 +53,7 @@ public class ProjectServiceTests
         SetPrivateProperty(user, "Id", userId);
 
         var premiumPlanId = Guid.NewGuid();
-        var premiumPlan = PlanSuscripcion.Create(premiumPlanId, "Premium", 100, -1, 100, true, true, true, true);
+        var premiumPlan = PlanSuscripcion.Create(premiumPlanId, "Premium", 100, -1, 100, true, true, 10, 1024, true, true, true, true, true, true, "Premium", true);
         user.AsignarPlan(premiumPlanId);
         SetPrivateProperty(user, "Plan", premiumPlan);
 
@@ -116,7 +116,7 @@ public class ProjectServiceTests
         SetPrivateProperty(user, "Id", userId);
 
         var basicPlanId = Guid.NewGuid();
-        var basicPlan = PlanSuscripcion.Create(basicPlanId, "Basico", 0, 10, 3, false, false, false, false);
+        var basicPlan = PlanSuscripcion.Create(basicPlanId, "Basico", 0, 10, 3, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false);
         user.AsignarPlan(basicPlanId);
         SetPrivateProperty(user, "Plan", basicPlan);
 

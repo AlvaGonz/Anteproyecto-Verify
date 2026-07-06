@@ -116,8 +116,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
       
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-auto">
         <div className="flex flex-col gap-1 w-full md:w-auto min-w-[140px]">
-          <label className="text-[10px] font-bold text-text-secondary uppercase">Rol en Sistema</label>
+          <label htmlFor={`role-${u.id}`} className="text-[10px] font-bold text-text-secondary uppercase">Rol en Sistema</label>
           <select
+            id={`role-${u.id}`}
             value={u.role}
             onChange={(e) => handleRoleChange(u.id, e.target.value)}
             disabled={isUpdating || u.role === "owner"}
@@ -132,8 +133,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
         </div>
 
         <div className="flex flex-col gap-1 w-full md:w-auto min-w-[140px]">
-          <label className="text-[10px] font-bold text-text-secondary uppercase">Suscripción</label>
+          <label htmlFor={`plan-${u.id}`} className="text-[10px] font-bold text-text-secondary uppercase">Suscripción</label>
           <select
+            id={`plan-${u.id}`}
             value={u.planId || ""}
             onChange={(e) => handlePlanChange(u.id, e.target.value)}
             disabled={isUpdating || u.role === "owner"}
@@ -142,21 +144,21 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             <option value="" disabled>Seleccionar Plan...</option>
             {plans.map(p => (
               <option key={p.planId} value={p.planId}>
-                {p.name} {p.price > 0 ? `(RD$${p.price})` : "(Free)"}
+                {p.name} {p.price > 0 ? `($${p.price} USD)` : "(Free)"}
               </option>
             ))}
           </select>
         </div>
 
         <div className="flex gap-2 justify-end w-full md:w-auto pt-2 md:pt-0">
-          <button 
+          <button type="button" 
             onClick={() => onEdit(u)} 
             className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" 
             title="Editar Perfil"
           >
             <Pencil className="w-4 h-4" />
           </button>
-          <button 
+          <button type="button" 
             onClick={() => onDelete(u.id)} 
             disabled={u.role === "owner"}
             className="p-2 text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors" 
@@ -199,7 +201,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             Gestión estructurada por niveles de suscripción y perfil de usuario.
           </p>
         </div>
-        <button onClick={onAddNew} className="vf-btn-primary flex items-center gap-2 text-sm px-4 py-2">
+        <button type="button" onClick={onAddNew} className="vf-btn-primary flex items-center gap-2 text-sm px-4 py-2">
           <Plus className="w-4 h-4" /> Nuevo Usuario
         </button>
       </div>
@@ -213,7 +215,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
              
              const isActive = activeTab === tab.id;
              return (
-               <button
+               <button type="button"
                  key={tab.id}
                  onClick={() => setActiveTab(tab.id)}
                  className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap border-b-2 

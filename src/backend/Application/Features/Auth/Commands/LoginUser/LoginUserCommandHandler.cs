@@ -38,6 +38,9 @@ public class LoginUserCommandHandler
         if (!user.Activo)
             return new LoginUserResultDto(false, "La cuenta de usuario está inactiva.", null);
 
+        if (user.AccountStatus == Domain.Enums.UserAccountStatus.PendingDeletion)
+            return new LoginUserResultDto(false, "La cuenta está pendiente de eliminación.", null);
+
         if (!user.EmailVerificado)
             return new LoginUserResultDto(false, "Debe verificar su correo electrónico antes de iniciar sesión.", null);
 
@@ -50,7 +53,11 @@ public class LoginUserCommandHandler
             user.Id,
             user.Email,
             user.NombreCompleto,
-            roleStr
+            roleStr,
+            user.AvatarUrl,
+            user.SubscriptionStatus,
+            user.PendingPlanCode,
+            user.PendingBillingCycle
         );
 
         var token = _jwtTokenGenerator.GenerateToken(user);

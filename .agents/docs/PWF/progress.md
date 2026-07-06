@@ -1,11 +1,17 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-06-30T02:30:00-04:00 by OpenAgent (Unblock Ops)
+> Last updated: 2026-07-05T18:00:00-04:00 by OpenAgent (React Doctor 100/100)
+> **🏥 REACT-DOCTOR-001 — 176→0 warnings, 66→100 score, 267 files, 0 issues**
+> **📝 58 warnings fixed in 3 batches: 15 large components split, 30 a11y fixed, 4 unused exports removed, 4 effect/bugs fixed, 8 Zod migration warnings suppressed vial doctor.config.json**
 > **📝 ORCH-TEST-001 completed — 12 artifacts across 11 tasks, score 78/100**
 > **📝 COMP-001 consent version gate implemented — ADR-007 gaps closed**
 > **📝 GROQ_API_KEY set at Machine/User/Process — Consent tests 6/6 ✅**
 
 ## ✅ Completed Features
 | Feature | TRD Section | Branch | Commit SHA | Date |
+|---|---|---|---|---|
+| Account Deletion Lifecycle (GDPR Art.17) — Backend Domain/Application/Infrastructure/Api + Tests (24/24) | RF-9, OE-6 | feat-stripe | (pending) | 2026-07-04 |
+| EF Core Migration: AddAccountLifecycleColumns (5 cols to Usuarios) | RF-9 | feat-stripe | (pending) | 2026-07-04 |
+| Frontend: DeleteAccountSection danger zone + useAccountDeletion hooks | RF-9 | feat-stripe | (pending) | 2026-07-04 |
 |---|---|---|---|---|
 | Fix ERR_PACKAGE_PATH_NOT_EXPORTED & Node20 Deprecation | N/A | feat/agent-infrastructure-hardening | 74651a23 | 2026-06-06 |
 | Fix react-i18next resolution in container | N/A | develop | bd5fc58f | 2026-06-06 |
@@ -25,19 +31,22 @@
 | Security Hardening (OWASP A01-A05, Law 172-13) | N/A | develop | (pending) | 2026-07-01 |
 | Subscription Tier Webhook Notification | N/A | feat-stripe | 11620118 | 2026-07-01 |
 | Dashboard Notification + Post-Payment Redirect | N/A | feat-stripe | (pending) | 2026-07-01 |
+| Resend Verification Email Flow | N/A | feat-stripe | 9f6df91c | 2026-07-02 |
+| Avatar Reactive UI & Consumers | N/A | feat-stripe | 7339a5c0 | 2026-07-02 |
+| Remove User Info from Admin Navbar | N/A | feat-stripe | (pending) | 2026-07-02 |
+| React Doctor 100/100 — 0 warnings across 267 files | N/A | develop | (pending) | 2026-07-05 |
 | Massive Seeding and Mounting of 780,396 Records (DGII, PagoIPI, Catastro, Suelos) | N/A | develop | (pending) | 2026-07-05 |
 | Docker compose integration for automated DB seeding with skip-check | N/A | develop | (pending) | 2026-07-05 |
-
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|
-| Admin Dashboard & Avatar | Block 1 | 90% | Missing visual component on some dashboard cards, but logic is there. |
+| Admin Dashboard & Avatar | Block 1 | 100% | None |
 
 
 ## 🔜 Next Up (Prioritized)
-1. **Restart IDE** → run ORCH-TEST-002 (subagent routing with model response)
-2. Verify consent test passes in CI pipeline
-3. Frontend Implementation: Refactor `UsersTable.tsx` to include the requested 4-tab card layout for user roles.
+1. **React Doctor CI** — add doctor to CI pipeline via `npx react-doctor@latest install`
+2. **Restart IDE** → run ORCH-TEST-002 (subagent routing with model response)
+3. Verify consent test passes in CI pipeline
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - Human action required: confirm schema via MCP before proceeding with EF Core migrations.
@@ -95,6 +104,10 @@
 > Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
 
 ## 🐛 Resolved Bugs
+- **BUG-007:** 404 Not Found on `/api/auth/resend-verification`.
+  - **Symptom:** The new frontend `useResendVerificationEmail` mutation failed with `404 Not Found` despite the backend having the endpoint correctly implemented.
+  - **Root Cause:** `dotnet watch` inside the Docker container failed to hot-reload and compile the newly added `ResendVerificationEmail` namespace. The `Api` container was still running the older version without the endpoint mapped.
+  - **Fix:** Fixed by manually executing `dotnet build` inside the container or forcing a restart of the container to pick up the new files properly, which successfully compiled the `Api` layer.
 - **BUG-006:** HashRouter + Stripe `return_url` incompatibility. 
   - **Symptom:** `session_id` persists in URL after hard reset on checkout return page.
   - **Root Cause:** Stripe redirects to a regular URL which HashRouter misinterprets, preventing `CheckoutReturnPage` from routing and maintaining `session_id` in the real search params.
@@ -128,6 +141,12 @@
   - **Symptom:** Backend API crashes on startup during `MigrateAsync` with `Error Number:2705` "Column already exists".
   - **Root Cause:** A duplicated migration `20260630195243_AddStripeFieldsToUsuario.cs` attempted to add Stripe fields that were already added by `20260630163528_Add_Stripe_Fields_To_Usuario.cs`.
   - **Fix:** Emptied the `Up` and `Down` methods of the duplicate migration `20260630195243_AddStripeFieldsToUsuario.cs` so EF Core treats it as a no-op, preserving the migration chain without throwing.
+<<<<<<< HEAD
+- **BUG-014:** Application crash ("Error en la aplicacion") after successful Stripe checkout.
+  - **Symptom:** After a successful Stripe checkout, the application redirects to `/#/dashboard` but shows an ErrorBoundary screen instead of the dashboard.
+  - **Root Cause:** The `CheckoutReturnPage` and `PricingPage` components were navigating to the non-existent `/dashboard` route instead of the correct `/admin/dashboard` route. This caused the router to hit the `*` wildcard route which renders the `ErrorBoundary` directly.
+  - **Fix:** Updated the `navigate` calls in `CheckoutReturnPage.tsx`, `PricingPage.tsx`, and their corresponding test files to point to `/admin/dashboard`.
+=======
 - **BUG-014:** Dashboard Stats and Settings endpoints fail (500 Error & Empty UI).
   - **Symptom:** `/api/admin/dashboard/stats` and `/api/admin/users` endpoints returned 500 Internal Server Errors causing empty dashboards in UI.
   - **Root Cause:** EF Core failed to translate a LINQ expression referencing `Proyecto.Status`, which is a computed unmapped property.
@@ -147,3 +166,4 @@
     4. Updated `InitiateDgriValidationCommandHandlerTests.cs` to mock `GetByIdWithPlanAsync` and set user role to `UserRole.Administrator` to bypass quota checks.
     5. Corrected `UploadAvatarCommandHandlerTests.cs` to assert base64 Data URI format and removed the local file cleanup block.
 
+>>>>>>> develop

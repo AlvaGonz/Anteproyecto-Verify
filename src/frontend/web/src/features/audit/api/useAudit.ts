@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import type { LogProyectoDto } from "./types";
 
-export const auditKeys = {
+const auditKeys = {
   global: (filters?: any) => ["audit", "global", filters] as const,
   byProject: (projectId: string, filters?: any) => ["audit", projectId, filters] as const,
 };
@@ -21,6 +21,7 @@ export const useGlobalAuditTrail = (filters?: any) =>
   });
 
 export const useExportGlobalAudit = () =>
+  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
     mutationKey: ['auditKeys'],
     mutationFn: async () => {

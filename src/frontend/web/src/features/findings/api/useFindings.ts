@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import type { HallazgoDto } from "./types";
 
-export const findingKeys = {
+const findingKeys = {
   byProject: (projectId: number) => ["findings", projectId] as const,
 };
 

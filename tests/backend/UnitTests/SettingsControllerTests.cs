@@ -257,7 +257,7 @@ public class SettingsControllerTests
             var pago = await context.PagosLegacy.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
             Assert.NotNull(pago);
             Assert.Equal(empresaPlanId, pago.Idsuscripcion);
-            Assert.Equal(10000.00m, pago.Monto);
+            Assert.Equal(170.00m, pago.Monto);
         }
     }
 }

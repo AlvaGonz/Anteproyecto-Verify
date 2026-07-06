@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+﻿import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { 
   Search, 
   QrCode, 
@@ -103,6 +103,17 @@ const VALIDATION_PATTERNS = {
   }
 } as const;
 
+const validateInput = (value: string, typeId: string): string | null => {
+  if (!value.trim()) return "Por favor, ingrese un valor";
+  
+  const pattern = VALIDATION_PATTERNS[typeId as keyof typeof VALIDATION_PATTERNS];
+  if (pattern && !pattern.regex.test(value)) {
+    return `Formato de ${pattern.name} inválido (Ej: ${pattern.example})`;
+  }
+  
+  return null;
+};
+
 export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({ 
   className,
   variant = "light"
@@ -125,17 +136,6 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const validateInput = (value: string, typeId: string): string | null => {
-    if (!value.trim()) return "Por favor, ingrese un valor";
-    
-    const pattern = VALIDATION_PATTERNS[typeId as keyof typeof VALIDATION_PATTERNS];
-    if (pattern && !pattern.regex.test(value)) {
-      return `Formato de ${pattern.name} inválido (Ej: ${pattern.example})`;
-    }
-    
-    return null;
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,7 +206,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
 
           <AnimatePresence>
             {isDropdownOpen && (
-              <motion.div 
+              <m.div 
                 initial={{ opacity: 0, y: -10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -218,7 +218,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
               >
                 <div className="p-2 space-y-1">
                   {SEARCH_TYPES.map((type) => (
-                    <button
+                    <button type="button"
                       key={type.id}
                       onClick={() => handleTypeSelect(type)}
                       className={cn(
@@ -236,7 +236,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
                     </button>
                   ))}
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
@@ -248,6 +248,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
             type="text"
             required
             placeholder={searchType.placeholder}
+            aria-label={searchType.placeholder}
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             className={cn(
@@ -264,7 +265,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
           
           <AnimatePresence>
             {error && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
@@ -273,7 +274,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
                 <span className="text-[10px] font-black text-error uppercase tracking-widest bg-error/10 px-3 py-0.5 rounded-full border border-error/10">
                   {error}
                 </span>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

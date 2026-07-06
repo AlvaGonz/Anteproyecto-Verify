@@ -88,7 +88,5 @@ const filesToFix = process.argv.slice(2);
 if (filesToFix.length === 0) {
     console.log("Usage: node groq-autofix.js <file1> <file2> ...");
 } else {
-    for (const file of filesToFix) {
-        await auditFile(file);
-    }
+    await Promise.all(filesToFix.map(file => auditFile(file)));
 }

@@ -1,5 +1,5 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+﻿import React from "react";
+import { m, AnimatePresence } from "framer-motion";
 import { FindingDto, FindingSeverity } from "../../types";
 import { 
   AlertCircle, 
@@ -90,7 +90,7 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
           const Icon = config.icon;
 
           return (
-            <motion.div
+            <m.div
               key={finding.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -145,11 +145,11 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
                    <Clock className="w-3.5 h-3.5" />
                    <span className="text-[10px] font-bold">DETECTADO: {new Date(finding.createdAtUtc).toLocaleDateString()}</span>
                 </div>
-                <button className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest flex items-center gap-1 transition-all hover:gap-2">
+                <button type="button" className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest flex items-center gap-1 transition-all hover:gap-2">
                    Ver Evidencia Asociada <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>

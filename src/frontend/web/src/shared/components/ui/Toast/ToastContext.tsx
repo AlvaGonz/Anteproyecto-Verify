@@ -1,8 +1,9 @@
 import React, {
   createContext,
-  useContext,
+  use,
   useState,
   useCallback,
+  useMemo,
   ReactNode,
 } from "react";
 import { CheckCircle2, AlertTriangle, Info, XCircle, X } from "lucide-react";
@@ -23,7 +24,7 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const useToast = () => {
-  const context = useContext(ToastContext);
+  const context = use(ToastContext);
   if (!context) {
     throw new Error("useToast must be used within a ToastProvider");
   }
@@ -52,8 +53,10 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
+  const value = useMemo(() => ({ addToast, removeToast }), [addToast, removeToast]);
+
   return (
-    <ToastContext.Provider value={{ addToast, removeToast }}>
+    <ToastContext.Provider value={value}>
       {children}
       <div className="fixed top-6 right-6 space-y-3 z-[100] pointer-events-none">
         {toasts.map((toast) => {
@@ -69,7 +72,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 <Icon className={`w-5 h-5 flex-shrink-0 ${style.text}`} />
               </div>
               <p className={`text-[14px] font-bold ${style.text} flex-1`}>{toast.message}</p>
-              <button
+              <button type="button"
                 onClick={() => removeToast(toast.id)}
                 className="p-2 rounded-xl hover:bg-black/5 transition-colors flex-shrink-0"
               >

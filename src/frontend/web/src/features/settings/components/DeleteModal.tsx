@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+﻿import React, { useState, useEffect } from "react";
+import { m } from "framer-motion";
 import { Trash2 } from "lucide-react";
 
 interface DeleteModalProps {
@@ -11,17 +11,18 @@ interface DeleteModalProps {
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing, onConfirm, onCancel }) => {
   const [confirmText, setConfirmText] = useState("");
+  const [prevDeleteId, setPrevDeleteId] = useState<string | null>(null);
 
-  // Clear text when modal closes/opens
-  useEffect(() => {
+  if (deleteId !== prevDeleteId) {
+    setPrevDeleteId(deleteId);
     if (!deleteId) setConfirmText("");
-  }, [deleteId]);
+  }
 
   if (!deleteId) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center"
@@ -35,10 +36,11 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
         </p>
         
         <div className="text-left mb-6">
-          <label className="block text-xs font-bold text-text-secondary uppercase mb-1">
+          <label htmlFor="del-modal-confirm" className="block text-xs font-bold text-text-secondary uppercase mb-1">
             Escriba ELIMINAR para confirmar
           </label>
           <input
+            id="del-modal-confirm"
             type="text"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
@@ -48,13 +50,13 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
         </div>
 
         <div className="flex gap-3 justify-center">
-          <button
+          <button type="button"
             onClick={onCancel}
             className="vf-btn-secondary w-full"
           >
             Cancelar
           </button>
-          <button
+          <button type="button"
             onClick={onConfirm}
             disabled={isProcessing || confirmText !== "ELIMINAR"}
             className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -62,7 +64,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
             Sí, Eliminar
           </button>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

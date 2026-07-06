@@ -114,8 +114,9 @@ telefono: z
 });
 
 export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>;
+export type UpdateProfileDto = UpdateProfileFormValues;
 
-export const inviteTeamMemberSchema = z.object({
+const inviteTeamMemberSchema = z.object({
   nombre: z
     .string()
     .min(2, "El nombre debe tener al menos 2 caracteres")

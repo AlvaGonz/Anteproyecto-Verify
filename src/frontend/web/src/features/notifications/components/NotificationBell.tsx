@@ -42,7 +42,7 @@ export const NotificationBell: React.FC = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
+      <button type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg text-text-primary opacity-60 hover:opacity-100 hover:bg-surface-raised/30 transition-all relative"
       >
@@ -82,7 +82,7 @@ export const NotificationBell: React.FC = () => {
                           {new Date(notification.fechaUtc).toLocaleString()}
                         </p>
                       </div>
-                      <button
+                      <button type="button"
                         onClick={() => handleMarkAsRead(notification.id)}
                         className="text-xs text-primary hover:underline flex-shrink-0"
                       >

@@ -85,7 +85,7 @@ public class SettingsController : ControllerBase
         var query = from u in _context.Usuarios
                     let dgii = _context.DGII.FirstOrDefault(x => x.Rnc == u.Rnc)
                     let inviteesCount = _context.Usuarios.Count(x => x.TitularId == u.Id)
-                    where u.Activo
+                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active
                     select new {
                         u.Id,
                         u.Nombre,

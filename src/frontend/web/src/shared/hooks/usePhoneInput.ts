@@ -1,6 +1,28 @@
 import { useState, useCallback } from 'react';
 
 /**
+ * Extracts only digits from a string
+ */
+const getDigits = (str: string): string => str.replace(/\D/g, '');
+
+/**
+ * Formats digits to (XXX) XXX-XXXX
+ */
+const formatPhoneNumber = (digits: string): string => {
+  if (!digits) return '';
+  const cleanDigits = digits.slice(0, 10);
+  if (cleanDigits.length <= 3) return `(${cleanDigits}`;
+  if (cleanDigits.length <= 6) return `(${cleanDigits.slice(0, 3)}) ${cleanDigits.slice(3)}`;
+  return `(${cleanDigits.slice(0, 3)}) ${cleanDigits.slice(3, 6)}-${cleanDigits.slice(6)}`;
+};
+
+/**
+ * Validates if the digits represent a valid RD phone number
+ * (starts with 809, 829, or 849 and has exactly 10 digits)
+ */
+const isValidRDPhone = (digits: string): boolean => /^(809|829|849)\d{7}$/.test(digits);
+
+/**
  * Custom hook for handling Dominican Republic phone number input.
  * Provides auto-formatting to (XXX) XXX-XXXX and validates RD codes (809, 829, 849).
  * 
@@ -10,39 +32,6 @@ import { useState, useCallback } from 'react';
  */
 export function usePhoneInput(initialValue: string = '', onChange?: (value: string) => void) {
   const [value, setValue] = useState(initialValue);
-
-  /**
-   * Extracts only digits from a string
-   */
-  const getDigits = (str: string): string => str.replace(/\D/g, '');
-
-  /**
-   * Formats digits to (XXX) XXX-XXXX
-   */
-  const formatPhoneNumber = (digits: string): string => {
-    if (!digits) return '';
-    
-    // Take only first 10 digits
-    const cleanDigits = digits.slice(0, 10);
-    
-    if (cleanDigits.length <= 3) {
-      return `(${cleanDigits}`;
-    }
-    
-    if (cleanDigits.length <= 6) {
-      return `(${cleanDigits.slice(0, 3)}) ${cleanDigits.slice(3)}`;
-    }
-    
-    return `(${cleanDigits.slice(0, 3)}) ${cleanDigits.slice(3, 6)}-${cleanDigits.slice(6)}`;
-  };
-
-  /**
-   * Validates if the digits represent a valid RD phone number
-   * (starts with 809, 829, or 849 and has exactly 10 digits)
-   */
-  const isValidRDPhone = (digits: string): boolean => {
-    return /^(809|829|849)\d{7}$/.test(digits);
-  };
 
   /**
    * Handles input changes: formats, validates, updates state, and calls onChange

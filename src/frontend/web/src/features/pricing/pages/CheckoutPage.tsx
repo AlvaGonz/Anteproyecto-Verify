@@ -14,8 +14,8 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 
 const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYearly: string, features: string[] }> = {
   profesional: {
     name: 'Profesional',
-    priceMonthly: 'RD$3,500',
-    priceYearly: 'RD$2,800',
+    priceMonthly: '$60 USD',
+    priceYearly: '$48 USD',
     features: [
       'pricing.cards.pro.feature1',
       'pricing.cards.pro.feature2',
@@ -25,8 +25,8 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
   },
   empresa: {
     name: 'Empresa',
-    priceMonthly: 'RD$10,000',
-    priceYearly: 'RD$8,000',
+    priceMonthly: '$170 USD',
+    priceYearly: '$136 USD',
     features: [
       'pricing.cards.empresa.feature1',
       'pricing.cards.empresa.feature2',
@@ -36,8 +36,8 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
   },
   enterprise: {
     name: 'Enterprise',
-    priceMonthly: 'RD$30,000',
-    priceYearly: 'RD$24,000',
+    priceMonthly: '$500 USD',
+    priceYearly: '$400 USD',
     features: [
       'pricing.cards.enterprise.feature1',
       'pricing.cards.enterprise.feature2',
@@ -74,7 +74,7 @@ export const CheckoutPage = () => {
       setError('Error al iniciar el proceso de pago. Por favor intente más tarde.');
       throw err;
     }
-  }, [plan, billing, user?.id, consentData]);
+  }, [plan, billing, consentData]);
 
   if (!plan || !billing || !planInfo) {
     return (
@@ -148,7 +148,7 @@ export const CheckoutPage = () => {
             <div className="bg-error/10 border border-error/20 rounded-lg p-6 text-center">
               <span className="material-symbols-outlined text-error text-4xl mb-3">error</span>
               <p className="text-error font-medium mb-4">{error}</p>
-              <button
+              <button type="button"
                 onClick={() => setError(null)}
                 className="bg-error text-onError px-6 py-2 rounded-lg font-bold text-sm hover:bg-error/90 transition-colors"
               >
@@ -170,7 +170,7 @@ export const CheckoutPage = () => {
             <div id="checkout" className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-2xl font-headline font-bold text-on-surface">Información de pago</h2>
-                <button
+                <button type="button"
                   onClick={() => setHasConsented(false)}
                   className="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors flex items-center"
                 >

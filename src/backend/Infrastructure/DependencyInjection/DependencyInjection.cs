@@ -3,6 +3,7 @@ namespace Infrastructure.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Infrastructure.Configuration;
+using Application.Abstractions;
 using Application.Abstractions.Storage;
 using Infrastructure.Storage;
 using Infrastructure.Persistence;
@@ -156,9 +157,16 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
         services.AddSingleton<Application.Abstractions.Security.IJwtTokenGenerator, Infrastructure.Security.JwtTokenGenerator>();
         services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Infrastructure.Security.BCryptPasswordHasher>();
+        services.AddScoped<IStripeService, Services.StripeService>();
+
+        // Account Deletion
+        services.AddScoped<Application.Features.Account.Commands.RequestAccountDeletion.RequestAccountDeletionCommandHandler>();
+        services.AddScoped<Application.Features.Account.Commands.RecoverAccount.RecoverAccountCommandHandler>();
+        services.AddScoped<Application.Features.Account.Commands.PurgeAccounts.PurgeAccountsCommandHandler>();
 
         // Background Jobs
         services.AddHostedService<Infrastructure.BackgroundJobs.MonthlyResetJob>();
+        services.AddHostedService<Infrastructure.BackgroundJobs.AccountPurgeJob>();
 
         // End of Infrastructure
 

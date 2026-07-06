@@ -68,6 +68,7 @@ export const InviteesSettings: React.FC = () => {
                     <p className="text-xs text-text-secondary">{invitee.email}</p>
                   </div>
                   <button
+                    type="button"
                     onClick={() => handleRemoveInvitee(invitee.id)}
                     disabled={removeInviteeMutation.isPending}
                     className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
@@ -99,6 +100,7 @@ export const InviteesSettings: React.FC = () => {
                     <p className="text-xs text-text-secondary">{pUser.email}</p>
                   </div>
                   <button
+                    type="button"
                     onClick={() => handleAddInvitee(pUser.id)}
                     disabled={addInviteeMutation.isPending}
                     className="p-2 text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors disabled:opacity-50"

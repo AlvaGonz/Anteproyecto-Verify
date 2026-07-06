@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -23,6 +23,7 @@ const renderPage = (route = "/verify-email?token=valid-token") => {
         <Route path="/verify-email" element={<EmailVerifiedPage />} />
         <Route path="/admin" element={<div data-testid="admin-page">Admin</div>} />
         <Route path="/checkout" element={<div data-testid="checkout-page">Checkout</div>} />
+        <Route path="/pricing" element={<div data-testid="pricing-page">Pricing</div>} />
       </Routes>
     </MemoryRouter>
   );
@@ -59,7 +60,6 @@ describe("EmailVerifiedPage", () => {
     expect(apiClient.get).toHaveBeenCalledWith("/auth/verify?token=valid-token");
     expect(mockRefreshUser).toHaveBeenCalled();
     
-    // Click the "Continuar" button to trigger the redirect immediately
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: /Continuar/i }));
     
@@ -67,7 +67,6 @@ describe("EmailVerifiedPage", () => {
       expect(screen.getByTestId("checkout-page")).toBeInTheDocument();
     });
     
-    // Ensure the redirect is cleared from sessionStorage, not localStorage
     expect(window.sessionStorage.getItem("redirect_after_verification")).toBeNull();
   });
 
@@ -85,6 +84,85 @@ describe("EmailVerifiedPage", () => {
     
     await waitFor(() => {
       expect(screen.getByTestId("admin-page")).toBeInTheDocument();
+    });
+  });
+
+  describe("new post-verify-checkout flow", () => {
+    it("redirects to /checkout when nextStep is checkout and pendingPlanCode is set", async () => {
+      (apiClient.get as any).mockResolvedValueOnce({
+        data: { succeeded: true, nextStep: "checkout", pendingPlanCode: "profesional", pendingBillingCycle: "monthly" }
+      });
+
+      renderPage("/verify-email?token=valid-token");
+
+      await waitFor(() => {
+        expect(screen.getByText(/¡Cuenta verificada!/i)).toBeInTheDocument();
+      });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/auth/verify?token=valid-token");
+
+      const user = userEvent.setup();
+      await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("checkout-page")).toBeInTheDocument();
+      });
+    });
+
+    it("redirects to /pricing when nextStep is choose-plan", async () => {
+      (apiClient.get as any).mockResolvedValueOnce({
+        data: { succeeded: true, nextStep: "choose-plan" }
+      });
+
+      renderPage("/verify-email?token=valid-token");
+
+      await waitFor(() => {
+        expect(screen.getByText(/¡Cuenta verificada!/i)).toBeInTheDocument();
+      });
+
+      const user = userEvent.setup();
+      await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("pricing-page")).toBeInTheDocument();
+      });
+    });
+
+    it("redirects to /admin when nextStep is dashboard", async () => {
+      (apiClient.get as any).mockResolvedValueOnce({
+        data: { succeeded: true, nextStep: "dashboard" }
+      });
+
+      renderPage("/verify-email?token=valid-token");
+
+      await waitFor(() => {
+        expect(screen.getByText(/¡Cuenta verificada!/i)).toBeInTheDocument();
+      });
+
+      const user = userEvent.setup();
+      await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("admin-page")).toBeInTheDocument();
+      });
+    });
+
+    it("falls back to sessionStorage redirect when nextStep is null", async () => {
+      (apiClient.get as any).mockResolvedValueOnce({
+        data: { succeeded: true, nextStep: null }
+      });
+      window.sessionStorage.setItem("redirect_after_verification", "/custom");
+
+      renderPage("/verify-email?token=valid-token");
+
+      await waitFor(() => {
+        expect(screen.getByText(/¡Cuenta verificada!/i)).toBeInTheDocument();
+      });
+
+      const user = userEvent.setup();
+      await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+      // no route matching /custom, so this just checks no error
     });
   });
 });

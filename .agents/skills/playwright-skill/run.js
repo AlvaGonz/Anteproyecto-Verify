@@ -212,7 +212,7 @@ async function main() {
 
     // Execute the code
     console.log('🚀 Starting automation...\n');
-    require(tempFile);
+    require('child_process').execSync(`node "${tempFile}"`, { stdio: 'inherit' });
 
     // Note: Temp file will be cleaned up on next run
     // This allows long-running async operations to complete safely

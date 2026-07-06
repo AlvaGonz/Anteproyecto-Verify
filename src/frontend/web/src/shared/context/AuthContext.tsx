@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { createContext, use, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
 import { isSome, isSuccess } from "../utils/functional";
 import { queryClient } from "../../infrastructure/api/queryClient";
@@ -7,9 +7,10 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateUser: (data: Partial<User>) => void;
   error: AuthError | null;
 }
 
@@ -45,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('auth:force-logout', handler);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<User> => {
     setLoading(true);
     setError(null);
     queryClient.clear();
@@ -54,12 +55,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSuccess(result)) {
       setUser(result.data.user);
+      setLoading(false);
+      return result.data.user;
     } else {
       setError(result.error);
+      setLoading(false);
       throw result.error;
     }
-    
-    setLoading(false);
   }, []);
 
   const logout = useCallback(() => {
@@ -69,31 +71,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const refreshUser = useCallback(async () => {
-    const currentUserOption = await AuthService.getCurrentUser();
-    if (isSome(currentUserOption)) {
-      setUser(currentUserOption.value);
+    const result = await AuthService.getCurrentUser();
+    if (isSome(result)) {
+      setUser(result.value);
+    } else {
+      setUser(null);
     }
   }, []);
 
+  const updateUser = useCallback((data: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...data } as User : null);
+  }, []);
+
+  const value = useMemo(() => ({ 
+    user, 
+    isAuthenticated: !!user, 
+    loading, 
+    login, 
+    logout, 
+    refreshUser, 
+    updateUser, 
+    error 
+  }), [user, loading, login, logout, refreshUser, updateUser, error]);
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated: !!user, 
-        loading, 
-        login, 
-        logout,
-        refreshUser,
-        error 
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = use(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }

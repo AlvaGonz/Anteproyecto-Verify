@@ -13,6 +13,10 @@ export const EmailVerifiedPage = () => {
   const hasAttempted = useRef(false);
   const { refreshUser } = useAuth();
 
+  // ponytail: store nextStep from API to drive post-verify navigation
+  const nextStepRef = useRef<string | null>(null);
+  const pendingPlanRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!token) {
       setStatus("error");
@@ -28,6 +32,9 @@ export const EmailVerifiedPage = () => {
         // Since backend set cookies, we can just load the user profile
         if (response.data?.succeeded) {
             await refreshUser();
+            // Store nextStep and pendingPlan from backend response
+            nextStepRef.current = response.data.nextStep ?? null;
+            pendingPlanRef.current = response.data.pendingPlanCode ?? null;
         }
         setStatus("success");
       })
@@ -36,11 +43,27 @@ export const EmailVerifiedPage = () => {
       });
   }, [token, refreshUser]);
 
+  const computeTargetUrl = useCallback((): string => {
+    // New flow: backend tells frontend where to go
+    if (nextStepRef.current === "checkout" && pendingPlanRef.current) {
+      return `/checkout?plan=${pendingPlanRef.current}`;
+    }
+    if (nextStepRef.current === "choose-plan") {
+      return "/pricing";
+    }
+    if (nextStepRef.current === "dashboard") {
+      return "/admin";
+    }
+    // Legacy fallback
+    const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
+    const urlReturnUrl = searchParams.get('returnUrl');
+    return urlReturnUrl || storedRedirect || "/admin";
+  }, [searchParams]);
+
   useEffect(() => {
     if (status === "success") {
+      const targetUrl = computeTargetUrl();
       const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
-      const urlReturnUrl = searchParams.get('returnUrl');
-      const targetUrl = urlReturnUrl || storedRedirect || "/admin";
 
       const interval = setInterval(() => {
         setCountdown((prev) => {
@@ -57,7 +80,16 @@ export const EmailVerifiedPage = () => {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [status, navigate]);
+  }, [status, navigate, computeTargetUrl]);
+
+  const handleContinueClick = () => {
+    const targetUrl = computeTargetUrl();
+    const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
+    if (storedRedirect) {
+      window.sessionStorage.removeItem('redirect_after_verification');
+    }
+    navigate(targetUrl);
+  };
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center p-4">
@@ -82,15 +114,8 @@ export const EmailVerifiedPage = () => {
             <div className="text-sm font-medium text-text-secondary mb-8 bg-slate-50 py-3 rounded-lg border border-border/60">
               Serás redirigido en <span className="text-primary font-bold text-base px-1">{countdown}</span> segundos...
             </div>
-            <button
-              onClick={() => {
-                const storedRedirect = window.sessionStorage.getItem('redirect_after_verification');
-                const urlReturnUrl = searchParams.get('returnUrl');
-                if (storedRedirect) {
-                  window.sessionStorage.removeItem('redirect_after_verification');
-                }
-                navigate(urlReturnUrl || storedRedirect || "/admin");
-              }}
+            <button type="button"
+              onClick={handleContinueClick}
               className="vf-btn-primary w-full h-[52px] text-sm font-bold shadow-floating hover:scale-[1.02] transition-transform"
             >
               <span className="flex items-center justify-center gap-2">
@@ -109,7 +134,7 @@ export const EmailVerifiedPage = () => {
             <p className="text-text-secondary mb-6">
               El enlace de verificación es inválido o ha expirado. Por favor, intenta registrarte nuevamente o solicita un nuevo enlace.
             </p>
-            <button
+            <button type="button"
               onClick={() => navigate("/login")}
               className="vf-btn-secondary w-full h-[52px] text-sm font-bold bg-slate-100 hover:bg-slate-200 text-text-primary rounded-xl transition-colors"
             >

@@ -1,4 +1,4 @@
-export enum ValidationStatus {
+enum ValidationStatus {
   Pending = 1,
   InProgress = 2,
   Success = 3,
@@ -6,7 +6,7 @@ export enum ValidationStatus {
   Failed = 5,
 }
 
-export enum ValidationExecutionStatus {
+enum ValidationExecutionStatus {
   Pending = 1,
   Running = 2,
   Completed = 3,

@@ -85,4 +85,49 @@ describe("LoginPage", () => {
       expect(screen.getByTestId("checkout")).toBeInTheDocument();
     });
   });
+
+  it("redirects to checkout when user has pending plan and no active subscription", async () => {
+    // login() returns user with pending plan
+    mockLogin = vi.fn().mockResolvedValue({
+      id: "u1",
+      email: "user@example.com",
+      pendingPlanCode: "profesional",
+      pendingBillingCycle: "monthly",
+      subscriptionStatus: null,
+    });
+    (useAuth as any).mockReturnValue({ login: mockLogin });
+
+    const user = userEvent.setup();
+    renderPage("/login");
+
+    await user.type(screen.getByLabelText(/Correo electrónico/i), "user@example.com");
+    await user.type(screen.getByLabelText(/Contraseña/i), "Password123!");
+    await user.click(screen.getByRole("button", { name: /iniciar sesión/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("checkout")).toBeInTheDocument();
+    });
+  });
+
+  it("redirects to dashboard when user has pending plan but active subscription", async () => {
+    mockLogin = vi.fn().mockResolvedValue({
+      id: "u1",
+      email: "user@example.com",
+      pendingPlanCode: "profesional",
+      pendingBillingCycle: "monthly",
+      subscriptionStatus: "active",
+    });
+    (useAuth as any).mockReturnValue({ login: mockLogin });
+
+    const user = userEvent.setup();
+    renderPage("/login");
+
+    await user.type(screen.getByLabelText(/Correo electrónico/i), "user@example.com");
+    await user.type(screen.getByLabelText(/Contraseña/i), "Password123!");
+    await user.click(screen.getByRole("button", { name: /iniciar sesión/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("dashboard")).toBeInTheDocument();
+    });
+  });
 });

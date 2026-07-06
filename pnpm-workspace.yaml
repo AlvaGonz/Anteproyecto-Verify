@@ -4,3 +4,5 @@ allowBuilds:
   '@google/genai': true
   esbuild: true
   protobufjs: true
+minimumReleaseAge: 10080
+trustPolicy: any

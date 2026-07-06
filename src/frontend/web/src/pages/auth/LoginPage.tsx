@@ -1,6 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ShieldCheck, Zap } from "lucide-react";
 import { LoginForm } from "../../features/auth/components/LoginForm";
 
@@ -8,7 +8,7 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F4F1EC] flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
       {/* Background Decor */}
-      <motion.div
+      <m.div
         animate={{
           scale: [1, 1.2, 1],
           rotate: [0, 90, 0],
@@ -17,7 +17,7 @@ export const LoginPage: React.FC = () => {
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"
       />
-      <motion.div
+      <m.div
         animate={{
           scale: [1, 1.1, 1],
           x: [0, -30, 0],
@@ -27,7 +27,7 @@ export const LoginPage: React.FC = () => {
         className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none"
       />
 
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -105,7 +105,7 @@ export const LoginPage: React.FC = () => {
         <div className="flex-1 p-12 flex items-center justify-center">
           <LoginForm />
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

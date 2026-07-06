@@ -13,6 +13,7 @@ import { useRegister } from "../../../features/auth/api/useAuth";
 
 vi.mock("../../../features/auth/api/useAuth", () => ({
   useRegister: vi.fn(),
+  useResendVerificationEmail: vi.fn(() => ({ mutate: vi.fn(), isPending: false, isSuccess: false })),
 }));
 
 vi.mock("framer-motion", async () => {

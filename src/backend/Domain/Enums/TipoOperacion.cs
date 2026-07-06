@@ -10,5 +10,8 @@ public enum TipoOperacion
     Sistema = 5,
     EmailEnviado = 6,
     EmailFallido = 7,
-    ReglaModificada = 8
+    ReglaModificada = 8,
+    CuentaEliminada = 9,
+    CuentaRecuperada = 10,
+    CuentaPurgada = 11
 }

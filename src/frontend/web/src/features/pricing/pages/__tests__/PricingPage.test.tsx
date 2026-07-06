@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { BrowserRouter, useNavigate } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { PricingPage } from "../PricingPage";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -71,7 +71,7 @@ describe("PricingPage", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/register");
   });
 
-  it("navigates to /dashboard when clicking Free plan and authenticated", () => {
+  it("navigates to /admin/dashboard when clicking Free plan and authenticated", () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true });
     render(
       <BrowserRouter>
@@ -82,7 +82,7 @@ describe("PricingPage", () => {
     const freeButton = screen.getByText("pricing.cards.free.button");
     fireEvent.click(freeButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
+    expect(mockNavigate).toHaveBeenCalledWith("/admin/dashboard");
   });
 
   it("navigates to /register with redirect param when clicking Professional plan and unauthenticated", () => {
@@ -111,5 +111,34 @@ describe("PricingPage", () => {
     fireEvent.click(proButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/checkout?plan=profesional&billing=monthly");
+  });
+
+  it("displays correct USD prices for monthly subscription plans", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <BrowserRouter>
+        <PricingPage />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByText("$60 USD")).toBeInTheDocument();
+    expect(screen.getByText("$170 USD")).toBeInTheDocument();
+    expect(screen.getByText("$500 USD")).toBeInTheDocument();
+  });
+
+  it("displays correct USD prices with 20% discount for annual subscription plans", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <BrowserRouter>
+        <PricingPage />
+      </BrowserRouter>
+    );
+
+    const yearlyButton = screen.getByText("pricing.header.yearly");
+    fireEvent.click(yearlyButton);
+
+    expect(screen.getByText("$48 USD")).toBeInTheDocument();
+    expect(screen.getByText("$136 USD")).toBeInTheDocument();
+    expect(screen.getByText("$400 USD")).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
-import React from "react";
-import { motion } from "framer-motion";
+﻿import React from "react";
+import { m } from "framer-motion";
 import { X } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
@@ -23,8 +23,6 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   onSubmit,
   onClose,
 }) => {
-  if (!isOpen) return null;
-
   const update = (partial: Partial<CreateUserDto>) => onChange({ ...formData, ...partial });
   const phone = usePhoneInput(
     formData.telefono ? formData.telefono.replace(/\D/g, '') : "",
@@ -34,9 +32,11 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
     }
   );
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
@@ -45,7 +45,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
           <h2 className="text-lg font-bold text-[#223382]">
             {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-surface rounded-full transition-colors">
+          <button type="button" onClick={onClose} className="p-2 hover:bg-surface rounded-full transition-colors">
             <X className="w-5 h-5 text-text-secondary" />
           </button>
         </div>
@@ -53,8 +53,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
         <form onSubmit={onSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre</label>
+              <label htmlFor="uf-nombre" className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre</label>
               <input
+                id="uf-nombre"
                 type="text"
                 required
                 value={formData.nombre}
@@ -64,8 +65,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Apellido</label>
+              <label htmlFor="uf-apellido" className="block text-xs font-bold text-text-secondary uppercase mb-1">Apellido</label>
               <input
+                id="uf-apellido"
                 type="text"
                 required
                 value={formData.apellido}
@@ -77,8 +79,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Correo Electrónico</label>
+            <label htmlFor="uf-email" className="block text-xs font-bold text-text-secondary uppercase mb-1">Correo Electrónico</label>
             <input
+              id="uf-email"
               type="email"
               required={!editingUser}
               value={formData.email}
@@ -97,8 +100,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Teléfono</label>
+              <label htmlFor="uf-telefono" className="block text-xs font-bold text-text-secondary uppercase mb-1">Teléfono</label>
               <input
+                id="uf-telefono"
                 type="text"
                 maxLength={14}
                 inputMode="numeric"
@@ -115,8 +119,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
+              <label htmlFor="uf-cedula" className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
               <input
+                id="uf-cedula"
                 type="text"
                 readOnly={!!editingUser}
                 value={formData.cedula || ""}
@@ -146,8 +151,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
 
           {!editingUser && (
             <div>
-              <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Contraseña Temporal (Opcional)</label>
+              <label htmlFor="uf-password" className="block text-xs font-bold text-text-secondary uppercase mb-1">Contraseña Temporal (Opcional)</label>
               <input
+                id="uf-password"
                 type="text"
                 value={formData.password || ""}
                 onChange={e => update({ password: e.target.value })}
@@ -159,8 +165,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
           )}
 
           <div>
-            <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Rol de Acceso</label>
+            <label htmlFor="uf-role" className="block text-xs font-bold text-text-secondary uppercase mb-1">Rol de Acceso</label>
             <select
+              id="uf-role"
               value={formData.role}
               onChange={e => update({ role: e.target.value as any })}
               className="vf-input w-full"
@@ -187,7 +194,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
             </button>
           </div>
         </form>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

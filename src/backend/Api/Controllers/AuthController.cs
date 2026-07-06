@@ -22,6 +22,7 @@ public class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
     private readonly Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler _uploadAvatarHandler;
+    private readonly Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler _resendVerificationHandler;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
     private readonly IMemoryCache _cache;
 
@@ -31,6 +32,7 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
         Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
         Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler uploadAvatarHandler,
+        Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler resendVerificationHandler,
         Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
         IConfiguration configuration,
         Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator,
@@ -41,6 +43,7 @@ public class AuthController : ControllerBase
         _loginHandler = loginHandler;
         _updateProfileHandler = updateProfileHandler;
         _uploadAvatarHandler = uploadAvatarHandler;
+        _resendVerificationHandler = resendVerificationHandler;
         _usuarioRepository = usuarioRepository;
         _configuration = configuration;
         _jwtTokenGenerator = jwtTokenGenerator;
@@ -57,7 +60,9 @@ public class AuthController : ControllerBase
             request.Password ?? request.Contrasena ?? string.Empty,
             request.Telefono ?? "8095550199",
             request.Cedula ?? "40212345678",
-            request.ReturnUrl
+            request.ReturnUrl,
+            request.PendingPlanCode,
+            request.PendingBillingCycle
         );
         var result = await _registerHandler.Handle(command, cancellationToken);
         
@@ -67,6 +72,19 @@ public class AuthController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [HttpPost("resend-verification")]
+    public async Task<IActionResult> ResendVerification([FromBody] Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommand request, CancellationToken cancellationToken)
+    {
+        var result = await _resendVerificationHandler.Handle(request, cancellationToken);
+        
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
+
+        return Ok(new { Message = "Correo de verificación reenviado exitosamente." });
     }
 
     [HttpPost("login")]
@@ -113,7 +131,11 @@ public class AuthController : ControllerBase
                 id = responseData.User.Id,
                 name = responseData.User.Name,
                 email = responseData.User.Email,
-                role = responseData.User.Role
+                role = responseData.User.Role,
+                avatarUrl = responseData.User.AvatarUrl,
+                subscriptionStatus = responseData.User.SubscriptionStatus,
+                pendingPlanCode = responseData.User.PendingPlanCode,
+                pendingBillingCycle = responseData.User.PendingBillingCycle
             }
         });
     }
@@ -252,7 +274,9 @@ public class AuthController : ControllerBase
             Plan = user.Plan?.NombrePlan ?? "N/A",
             AvatarUrl = user.AvatarUrl,
             SubscriptionStatus = user.SubscriptionStatus ?? "N/A",
-            CurrentPeriodEnd = user.CurrentPeriodEnd
+            CurrentPeriodEnd = user.CurrentPeriodEnd,
+            PendingPlanCode = user.PendingPlanCode,
+            PendingBillingCycle = user.PendingBillingCycle
         });
     }
 
@@ -271,7 +295,7 @@ public class AuthController : ControllerBase
         }
 
         var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
-        if (user == null || !user.Activo)
+        if (user == null || !user.Activo || user.AccountStatus == Domain.Enums.UserAccountStatus.PendingDeletion)
         {
             return Unauthorized(new { Message = "Usuario no encontrado o inactivo." });
         }
@@ -386,4 +410,6 @@ public class RegisterRequestDto
     public string? Telefono { get; set; }
     public string? Cedula { get; set; }
     public string? ReturnUrl { get; set; }
+    public string? PendingPlanCode { get; set; }
+    public string? PendingBillingCycle { get; set; }
 }

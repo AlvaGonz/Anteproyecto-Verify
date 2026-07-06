@@ -123,10 +123,12 @@ async function safeClick(page, selector, options = {}) {
 
   for (let i = 0; i < maxRetries; i++) {
     try {
+      // react-doctor-disable-next-line async-await-in-loop
       await page.waitForSelector(selector, {
         state: 'visible',
         timeout: options.timeout || 5000
       });
+      // react-doctor-disable-next-line async-await-in-loop
       await page.click(selector, {
         force: options.force || false,
         timeout: options.timeout || 5000
@@ -138,6 +140,7 @@ async function safeClick(page, selector, options = {}) {
         throw e;
       }
       console.log(`Retry ${i + 1}/${maxRetries} for clicking ${selector}`);
+      // react-doctor-disable-next-line async-await-in-loop
       await page.waitForTimeout(retryDelay);
     }
   }
@@ -175,7 +178,10 @@ async function safeType(page, selector, text, options = {}) {
 async function extractTexts(page, selector) {
   await page.waitForSelector(selector, { timeout: 10000 });
   return await page.$$eval(selector, elements =>
-    elements.map(el => el.textContent?.trim()).filter(Boolean)
+    elements.flatMap(el => {
+      const text = el.textContent?.trim();
+      return text ? [text] : [];
+    })
   );
 }
 
@@ -214,17 +220,20 @@ async function authenticate(page, credentials, selectors = {}) {
 
   const finalSelectors = { ...defaultSelectors, ...selectors };
 
-  await safeType(page, finalSelectors.username, credentials.username);
-  await safeType(page, finalSelectors.password, credentials.password);
-  await safeClick(page, finalSelectors.submit);
-
-  // Wait for navigation or success indicator
-  await Promise.race([
-    page.waitForNavigation({ waitUntil: 'networkidle' }),
-    page.waitForSelector(selectors.successIndicator || '.dashboard, .user-menu, .logout', { timeout: 10000 })
-  ]).catch(() => {
-    console.log('Login might have completed without navigation');
-  });
+  await Promise.all([
+    safeType(page, finalSelectors.username, credentials.username),
+    safeType(page, finalSelectors.password, credentials.password)
+  ]);
+  await Promise.all([
+    safeClick(page, finalSelectors.submit),
+    // Wait for navigation or success indicator
+    Promise.race([
+      page.waitForNavigation({ waitUntil: 'networkidle' }),
+      page.waitForSelector(selectors.successIndicator || '.dashboard, .user-menu, .logout', { timeout: 10000 })
+    ]).catch(() => {
+      console.log('Login might have completed without navigation');
+    })
+  ]);
 }
 
 /**
@@ -330,11 +339,13 @@ async function retryWithBackoff(fn, maxRetries = 3, initialDelay = 1000) {
 
   for (let i = 0; i < maxRetries; i++) {
     try {
+      // react-doctor-disable-next-line async-await-in-loop
       return await fn();
     } catch (error) {
       lastError = error;
       const delay = initialDelay * Math.pow(2, i);
       console.log(`Attempt ${i + 1} failed, retrying in ${delay}ms...`);
+      // react-doctor-disable-next-line async-await-in-loop
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
@@ -387,7 +398,7 @@ async function detectDevServers(customPorts = []) {
 
   console.log('🔍 Checking for running dev servers...');
 
-  for (const port of allPorts) {
+  await Promise.all(allPorts.map(async (port) => {
     try {
       await new Promise((resolve, reject) => {
         const req = http.request({
@@ -415,7 +426,7 @@ async function detectDevServers(customPorts = []) {
     } catch (e) {
       // Port not available, continue
     }
-  }
+  }));
 
   if (detectedServers.length === 0) {
     console.log('  ❌ No dev servers detected');
