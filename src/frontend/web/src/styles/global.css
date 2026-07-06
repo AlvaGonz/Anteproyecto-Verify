@@ -182,6 +182,21 @@ h4 {
       opacity: 1 !important;
       transform: none !important;
     }
+
+    /* ─── PDF / Print margins ───────────────────────────────────────────────
+       @page sets the physical page margin (browser PDF dialog).
+       The padding on main is a react-to-print safety net — some renderers
+       ignore @page. Adjust the values below to taste:
+         - @page margin  → outer whitespace on the physical page
+         - main padding  → inner breathing room around the content block
+       ──────────────────────────────────────────────────────────────────── */
+    @page {
+      margin: 20mm 18mm 20mm 22mm; /* top right bottom left */
+    }
+
+    main {
+      padding: 0 2rem 0 2.5rem; /* extra left buffer inside the content box */
+    }
   }
 }
 
