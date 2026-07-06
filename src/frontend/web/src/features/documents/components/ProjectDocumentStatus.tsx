@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
 import { useDocuments } from "../api/useDocuments";
 import { 
@@ -11,7 +11,7 @@ import {
   Gavel
 } from "lucide-react";
 import { ProjectCategory } from "../../projects/types";
-import { motion as m, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 
 interface ProjectDocumentStatusProps {
   projectId: string;

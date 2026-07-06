@@ -12,6 +12,7 @@ using Application.Features.Auth.Commands.VerifyEmail;
 using Application.Features.Auth.Commands.RegisterUser;
 using Domain.Entities;
 using Domain.Enums;
+using Application.Features.Auth.Commands.UploadAvatar;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

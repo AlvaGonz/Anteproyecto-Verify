@@ -1,10 +1,13 @@
 using System;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Infrastructure.Persistence.Migrations
 {
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20260630154200_AddLogsAuditoria")]
     public partial class AddLogsAuditoria : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,7 +31,7 @@ namespace Infrastructure.Persistence.Migrations
                         name: "FK_LogConsultas_Usuario_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "Usuario",
-                        principalColumn: "Id",
+                        principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -50,14 +53,14 @@ namespace Infrastructure.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_LogProyectos_Proyectos_ProyectoId",
                         column: x => x.ProyectoId,
-                        principalTable: "Proyectos",
-                        principalColumn: "Id",
+                        principalTable: "ProyectosInmobiliarios",
+                        principalColumn: "IdProyecto",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_LogProyectos_Usuario_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "Usuario",
-                        principalColumn: "Id",
+                        principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
                 });
 

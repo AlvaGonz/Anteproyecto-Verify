@@ -1,5 +1,5 @@
-import React from "react";
-import { motion as m } from "framer-motion";
+﻿import React from "react";
+import { m } from "framer-motion";
 import { Zap } from "lucide-react";
 import { fadeInUp } from "./motion";
 

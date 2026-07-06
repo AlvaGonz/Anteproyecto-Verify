@@ -1,6 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { Shield } from "lucide-react";
-import { motion as m } from "framer-motion";
+import { m } from "framer-motion";
 
 export interface DashboardChartsProps {
   totalProjects: number;

@@ -7,6 +7,7 @@ public record UpdateProfileCommand(
     string? Nombre,
     string? Apellido,
     string? Telefono,
+    string? Rnc,
     string? CurrentPassword,
     string? NewPassword
 );

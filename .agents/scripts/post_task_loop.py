@@ -874,13 +874,13 @@ class TestSuiteRunner:
     Runs project tests BEFORE any LLM call. Fail-fast if floor breaks.
     """
     TEST_COMMANDS = [
+        ["docker", "compose", "exec", "-T", "api", "dotnet", "test", "--filter", "Category!=Integration", "--no-build", "-q"],
         ["npx", "playwright", "test"],
         ["pytest", "--tb=short", "-q", "--no-header"],
         ["python", "-m", "pytest", "--tb=short", "-q"],
         ["npm", "test", "--", "--run"],
         ["pnpm", "test", "--", "--run"],
         ["npx", "vitest", "run"],
-        ["dotnet", "test", "--no-build", "-q"],
     ]
     CHANGED_ONLY_VARIANTS = {
         "pytest":   ["pytest", "--tb=short", "-q", "--no-header", "--lf"],

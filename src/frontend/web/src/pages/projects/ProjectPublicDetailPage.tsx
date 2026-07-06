@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   IntegrityStatus,
@@ -25,7 +25,7 @@ import {
   Lock,
   Landmark
 } from "lucide-react";
-import { motion as m } from "framer-motion";
+import { m } from "framer-motion";
 
 const getCategoryLabel = (cat: ProjectCategory) => {
   switch (cat) {

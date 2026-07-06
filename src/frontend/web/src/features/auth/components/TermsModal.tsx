@@ -1,5 +1,5 @@
-import React from "react";
-import { motion as m, AnimatePresence } from "framer-motion";
+﻿import React from "react";
+import { m, AnimatePresence } from "framer-motion";
 import { ShieldCheck, X, Check } from "lucide-react";
 
 export interface TermsModalProps {

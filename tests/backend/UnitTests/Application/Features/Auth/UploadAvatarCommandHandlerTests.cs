@@ -50,15 +50,15 @@ namespace UnitTests.Application.Features.Auth
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Contains("no encontrado", result.ErrorMessage);
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorMessage.Should().Contain("no encontrado");
         }
 
         [Fact]
         public async Task Handle_ShouldReturnError_WhenExtensionIsInvalid()
         {
             // Arrange
-            var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Professional, "123", "40200000000");
+            var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123", "402-0000000-1");
             _usuarioRepositoryMock.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
@@ -68,15 +68,15 @@ namespace UnitTests.Application.Features.Auth
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Contains("Formato de imagen no permitido", result.ErrorMessage);
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorMessage.Should().Contain("Formato de imagen no permitido");
         }
 
         [Fact]
         public async Task Handle_ShouldSucceed_WhenImageIsValid()
         {
             // Arrange
-            var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Professional, "123", "40200000000");
+            var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123", "402-0000000-1");
             _usuarioRepositoryMock.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
@@ -87,23 +87,13 @@ namespace UnitTests.Application.Features.Auth
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
-            Assert.StartsWith("/avatars/", result.Data);
-            Assert.EndsWith(".jpg", result.Data);
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().StartWith("data:image/jpeg;base64,");
 
-            Assert.Equal(result.Data, user.AvatarUrl);
+            user.AvatarUrl.Should().Be(result.Data);
 
             _usuarioRepositoryMock.Verify(x => x.Update(user), Times.Once);
             _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-
-            // Cleanup local file
-            var avatarsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "storage", "avatars");
-            var fileName = Path.GetFileName(result.Data!);
-            var filePath = Path.Combine(avatarsDirectory, fileName);
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
         }
     }
 }

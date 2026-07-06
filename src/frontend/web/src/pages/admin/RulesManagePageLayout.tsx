@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import {
   Plus,
   Power,
@@ -13,7 +13,7 @@ import {
   BookOpen,
   LayoutDashboard,
 } from "lucide-react";
-import { motion as m, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CreateRuleCommand, ReglaValidacionDto } from "../../features/rules/api/useRules";
 

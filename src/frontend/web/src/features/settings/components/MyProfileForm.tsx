@@ -38,6 +38,7 @@ export const MyProfileForm: React.FC = () => {
       nombre: user?.nombre ?? "",
       apellido: user?.apellido ?? "",
       telefono: user?.telefono ?? "",
+      rnc: user?.rnc ?? "",
       changePassword: false,
     },
 });
@@ -142,6 +143,17 @@ export const MyProfileForm: React.FC = () => {
             </div>
           </div>
         )}
+        {user?.razonSocial && (
+          <div className="flex items-center gap-3">
+            <Shield className="w-4 h-4 text-text-secondary shrink-0" />
+            <div>
+              <p className="text-[10px] text-text-secondary uppercase font-bold">Razn Social (DGII)</p>
+              <p className="text-sm font-bold text-primary">
+                {user.razonSocial}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* EDITABLE fields */}
@@ -211,6 +223,27 @@ export const MyProfileForm: React.FC = () => {
            </div>
            {errors.telefono && (
              <p className="text-[10px] text-red-500 mt-1">{errors.telefono.message}</p>
+           )}
+         </div>
+
+         {/* RNC Field */}
+         <div>
+           <label htmlFor="rnc" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+             RNC
+           </label>
+           <div className="relative">
+             <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+             <input
+               {...register("rnc")}
+               id="rnc"
+               type="text"
+               maxLength={20}
+               className="vf-input w-full pl-9"
+               placeholder="Ej: 101000000"
+             />
+           </div>
+           {errors.rnc && (
+             <p className="text-[10px] text-red-500 mt-1">{errors.rnc.message}</p>
            )}
          </div>
       </div>

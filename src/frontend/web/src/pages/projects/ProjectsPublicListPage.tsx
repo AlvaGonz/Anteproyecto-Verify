@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+﻿import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   Filter,
@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
-import { motion as m, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
 import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";

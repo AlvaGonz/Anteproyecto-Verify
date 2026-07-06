@@ -18,6 +18,7 @@ public class Usuario : EntityBase
     public string ContrasenaHash { get; private set; } = null!;
     public string Telefono { get; private set; } = null!;
     public string Cedula { get; private set; } = null!;
+    public string? Rnc { get; private set; }
     public string Identificacion => Cedula;
     public UserRole Rol { get; private set; }
     public bool Activo { get; private set; }
@@ -121,6 +122,12 @@ public class Usuario : EntityBase
     public void UpdateRol(UserRole rol)
     {
         Rol = rol;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+    
+    public void UpdateRnc(string rnc)
+    {
+        Rnc = rnc;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

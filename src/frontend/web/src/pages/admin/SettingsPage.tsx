@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
@@ -8,17 +8,19 @@ import { UserFormModal } from "../../features/settings/components/UserFormModal"
 import { DeleteModal } from "../../features/settings/components/DeleteModal";
 import { MyProfileForm } from "../../features/settings/components/MyProfileForm";
 import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
+import { InviteesSettings } from "../../features/settings/components/InviteesSettings";
 import {
   Settings,
   Users,
   Loader2,
   User,
-  CreditCard
+  CreditCard,
+  UserPlus
 } from "lucide-react";
-import { motion as m, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
-type TabId = "profile" | "subscription" | "users";
+type TabId = "profile" | "subscription" | "users" | "invitees";
 
 
 
@@ -33,6 +35,7 @@ export const SettingsPage: React.FC = () => {
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
+  const isManagementTier = user?.plan === "Enterprise" || user?.plan === "Empresa";
 
   const { data: users = [], isLoading: isLoadingUsers } = useUsers(1, 50, isAdmin);
 
@@ -177,6 +180,20 @@ if (formData.telefono) {
 
           </>
         )}
+
+        {isManagementTier && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("invitees")}
+            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "invitees"
+              ? "border-[#223382] text-[#223382]"
+              : "border-transparent text-text-secondary hover:text-text-primary"
+              }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            Usuarios Invitados
+          </button>
+        )}
       </div>
 
       {/* Tab Contents */}
@@ -221,6 +238,18 @@ if (formData.telefono) {
                 onDelete={(id) => setDeleteId(id)}
                 onAddNew={handleAddNewClick}
               />
+            </m.div>
+          )}
+
+          {activeTab === "invitees" && isManagementTier && (
+            <m.div
+              key="invitees"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <InviteesSettings />
             </m.div>
           )}
 

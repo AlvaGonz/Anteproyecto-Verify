@@ -18,6 +18,7 @@ public class DocumentServiceTests
 {
     private readonly Mock<IDocumentoRepository> _documentoRepositoryMock;
     private readonly Mock<IProyectoRepository> _proyectoRepositoryMock;
+    private readonly Mock<IUsuarioRepository> _usuarioRepositoryMock;
     private readonly Mock<IBlobStorageService> _blobStorageServiceMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IDocumentValidationService> _documentValidationServiceMock;
@@ -29,6 +30,7 @@ public class DocumentServiceTests
     {
         _documentoRepositoryMock = new Mock<IDocumentoRepository>();
         _proyectoRepositoryMock = new Mock<IProyectoRepository>();
+        _usuarioRepositoryMock = new Mock<IUsuarioRepository>();
         _blobStorageServiceMock = new Mock<IBlobStorageService>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _documentValidationServiceMock = new Mock<IDocumentValidationService>();
@@ -38,7 +40,7 @@ public class DocumentServiceTests
         _documentService = new DocumentService(
             _documentoRepositoryMock.Object,
             _proyectoRepositoryMock.Object,
-            new Mock<IUsuarioRepository>().Object,
+            _usuarioRepositoryMock.Object,
             _blobStorageServiceMock.Object,
             _unitOfWorkMock.Object,
             _documentValidationServiceMock.Object,

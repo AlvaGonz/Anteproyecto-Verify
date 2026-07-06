@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { motion as m } from "framer-motion";
+﻿import React, { useState, useEffect } from "react";
+import { m } from "framer-motion";
 import { Trash2 } from "lucide-react";
 
 interface DeleteModalProps {

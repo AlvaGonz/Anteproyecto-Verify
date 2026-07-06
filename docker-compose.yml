@@ -71,6 +71,7 @@ services:
     volumes:
       - mssql-data:/var/opt/mssql/data
       - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
+      - ./src/backend/Tools/DbSeeder/Scripts:/usr/config/seeds:ro
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "test -f /tmp/db_ready && /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Your_password123' -Q 'SELECT 1' -C" ]
@@ -102,6 +103,18 @@ services:
           cpus: "0.5"
         reservations:
           memory: 64M
+
+  python_env:
+    image: python:3.12-slim
+    volumes:
+      - .:/src
+    working_dir: /src
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Initial Catalog=verifinca-spm-uce-2026;User ID=sa;Password=Your_password123;TrustServerCertificate=True;
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    command: sh -c "pip install pymssql && python -u Bots/DGII/code/up_DGII.py && python -u generador_entidades_gubernamentales.py"
 
 volumes:
   mssql-data:

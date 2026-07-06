@@ -44,6 +44,7 @@ SELECT
     ContrasenaHash,
     Telefono,
     Cedula,
+    Rnc,
     PlanSuscripcionId,
     ConsultasUsadas
 FROM Usuario;
@@ -267,9 +268,17 @@ GO
 -- Tabla PermisoSuelo
 CREATE TABLE PermisoSuelo (
     IdPSuelo UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    IdProyecto UNIQUEIDENTIFIER,
-    NumeroPermiso VARCHAR(50),
-    FechaEmision DATE,
+    IdProyecto UNIQUEIDENTIFIER NULL,
+    NumeroPermiso VARCHAR(50) NULL,
+    FechaEmision DATE NULL,
+    Rnc VARCHAR(20) NULL,
+    Provincia VARCHAR(100) NULL,
+    Municipio VARCHAR(100) NULL,
+    Latitud DECIMAL(9,6) NULL,
+    Longitud DECIMAL(9,6) NULL,
+    Superficie DECIMAL(18,2) NULL,
+    TienePermiso VARCHAR(10) NULL,
+    Documento VARCHAR(250) NULL,
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmobiliarios(IdProyecto)
 );
 GO
@@ -286,9 +295,25 @@ GO
 -- Tabla CatastroTitulo
 CREATE TABLE CatastroTitulo (
     IdCatastroTitulo UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    IdProyecto UNIQUEIDENTIFIER,
-    NumeroTitulo VARCHAR(50),
+    IdProyecto UNIQUEIDENTIFIER NULL,
+    NumeroTitulo VARCHAR(50) NULL,
+    Rnc VARCHAR(20) NULL,
+    Provincia VARCHAR(100) NULL,
+    Municipio VARCHAR(100) NULL,
+    Latitud DECIMAL(9,6) NULL,
+    Longitud DECIMAL(9,6) NULL,
+    Superficie DECIMAL(18,2) NULL,
+    Matricula VARCHAR(50) NULL,
     FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmobiliarios(IdProyecto)
+);
+GO
+
+-- Tabla PagoIPI
+CREATE TABLE PagoIPI (
+    Rnc VARCHAR(20) PRIMARY KEY,
+    Cuota_ipi DECIMAL(18,2) NOT NULL,
+    Estatus VARCHAR(20) NOT NULL,
+    FechaCreacion DATETIME2 NOT NULL DEFAULT GETUTCDATE()
 );
 GO
 
@@ -340,6 +365,9 @@ CREATE TABLE Recibo (
     IdUsuario UNIQUEIDENTIFIER,
     Monto DECIMAL(10,2),
     FechaPago DATE,
+    Detalle VARCHAR(500) NULL,
+    Categoria VARCHAR(100) NULL,
+    Desglose VARCHAR(MAX) NULL,
     FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
 );
 GO
@@ -483,9 +511,9 @@ GO
 -- =============================================
 -- Tablas y Objetos de EF Core (Migracion InitialCreate)
 -- =============================================
-Build started...
+-- Build started...
 
-Build succeeded.
+-- Build succeeded.
 
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 
@@ -768,6 +796,7 @@ CREATE TABLE [UsuarioLegacy] (
     [Telefono] nvarchar(15) NOT NULL,
 
     [Cedula] nvarchar(15) NOT NULL,
+    [Rnc] varchar(20) NULL,
 
     CONSTRAINT [PK_UsuarioLegacy] PRIMARY KEY ([IdUsuario])
 

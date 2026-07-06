@@ -53,5 +53,29 @@ echo "================================================"
 # Signal that the database is fully initialized
 touch /tmp/db_ready
 
+# Spawn background job to load dummy data once EF Core schema is ready
+(
+    echo "[Seed] Waiting for EF Core to create the database schema..."
+    for j in {1..60}; do
+        MIG_COUNT=$(/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -d "verifinca-spm-uce-2026" -h -1 -Q "SET NOCOUNT ON; IF OBJECT_ID('[__EFMigrationsHistory]') IS NOT NULL SELECT COUNT(*) FROM [__EFMigrationsHistory] ELSE SELECT 0" -C | tr -d ' ' | tr -d '\r')
+        if [ "$MIG_COUNT" -ge 12 ] 2>/dev/null; then
+            echo "[Seed] Database schema is ready. Injecting raw SQL tables..."
+            /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -d "verifinca-spm-uce-2026" -i "$SQL_FILE" -C || echo "[Seed] Finished running raw SQL tables."
+            
+            echo "[Seed] Loading dummy data seeds..."
+            for seed_file in /usr/config/seeds/*.sql; do
+                if [ -f "$seed_file" ]; then
+                    echo "[Seed] Executing $seed_file..."
+                    /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -d "verifinca-spm-uce-2026" -i "$seed_file" -C || echo "[Seed] Warning: Failed to execute $seed_file"
+                fi
+            done
+            echo "[Seed] Dummy data seeding complete!"
+            break
+        else
+            sleep 3
+        fi
+    done
+) &
+
 # 5. Keep the container alive by waiting for the SQL Server process
 wait $SQL_PID

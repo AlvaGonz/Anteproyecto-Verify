@@ -1,6 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
-import { motion as m } from "framer-motion";
+import { m } from "framer-motion";
 
 export const CtaSection: React.FC = () => (
   <section id="servicios" className="py-20 px-6 bg-white mt-12">

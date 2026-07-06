@@ -52,7 +52,11 @@ public abstract class IntegrationTestBase : IClassFixture<VeriFincaWebFactory>
             var maxProyectos = planTier == "Enterprise" ? -1 : (planTier == "Consultor" ? 1 : 0);
             plan = PlanSuscripcion.Create(
                 Guid.NewGuid(), planTier, 100m,
-                maxConsultas, maxProyectos, false, false, false, false);
+                maxConsultas, maxProyectos,
+                false, false,
+                0, 100,
+                false, false, false, false, false, false,
+                "Comunidad", false);
             db.Set<PlanSuscripcion>().Add(plan);
             await db.SaveChangesAsync();
         }

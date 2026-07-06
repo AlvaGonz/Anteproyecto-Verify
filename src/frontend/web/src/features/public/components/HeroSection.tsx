@@ -1,6 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
-import { motion as m } from "framer-motion";
+import { m } from "framer-motion";
 import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 

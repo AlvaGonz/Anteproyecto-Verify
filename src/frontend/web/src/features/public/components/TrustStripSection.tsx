@@ -1,5 +1,5 @@
-import React from "react";
-import { motion as m } from "framer-motion";
+﻿import React from "react";
+import { m } from "framer-motion";
 import { fadeInUp } from "./motion";
 
 export const TrustStripSection: React.FC = () => (
