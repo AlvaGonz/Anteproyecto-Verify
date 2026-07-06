@@ -1,4 +1,4 @@
-servic/es:
+services:
   api:
     build:
       context: .
@@ -18,7 +18,7 @@ servic/es:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - UseMockData=false
-      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Initial Catalog=verifinca-spm-uce-2026;User ID=sa;Password=Your_password123;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=$ConnectionStrings__DockerConnection
     env_file:
       - .env
     restart: unless-stopped
@@ -67,14 +67,14 @@ servic/es:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Your_password123
+      - MSSQL_SA_PASSWORD=$DB_PASSWORD
     volumes:
       - mssql-data:/var/opt/mssql/data
       - ./Build-Database-Sql.sql:/usr/config/Build-Database-Sql.sql:ro
       - ./src/backend/Tools/DbSeeder/Scripts:/usr/config/seeds:ro
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "test -f /tmp/db_ready && /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Your_password123' -Q 'SELECT 1' -C" ]
+      test: [ "CMD-SHELL", "test -f /tmp/db_ready && /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '$DB_PASSWORD' -Q 'SELECT 1' -C" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -109,8 +109,10 @@ servic/es:
     volumes:
       - .:/src
     working_dir: /src
+    env_file:
+      - .env
     environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Initial Catalog=verifinca-spm-uce-2026;User ID=sa;Password=Your_password123;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=$ConnectionStrings__DockerConnection
     depends_on:
       sqlserver:
         condition: service_healthy
