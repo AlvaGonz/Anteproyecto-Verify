@@ -203,8 +203,7 @@ export const LegalPage: React.FC = () => {
           </div>
 
           {/* Main Content */}
-          <div ref={contentRef}>
-            <main className="lg:col-span-9 max-w-[760px] w-full">
+          <main ref={contentRef} className="lg:col-span-9 min-w-0 w-full">
             {/* Header */}
             <div className={`mb-12 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
               <span className="font-sans font-semibold text-[11px] tracking-widest uppercase text-secondary mb-2 block">
@@ -213,7 +212,7 @@ export const LegalPage: React.FC = () => {
               <h1 className="font-headline text-4xl md:text-5xl font-black text-on-surface mb-4 leading-tight">
                 Documentación Legal
               </h1>
-              <p className="font-body text-lg text-on-surface-variant mb-6 leading-relaxed">
+              <p className="font-body text-lg text-on-surface-variant mb-6 leading-relaxed max-w-[65ch]">
                 Términos de servicio, políticas de privacidad y acuerdos de cumplimiento que rigen el uso de VeriFinca.
               </p>
               <div className="inline-flex items-center gap-2 bg-surface-raised px-3 py-1.5 rounded-full border border-outline-variant">
@@ -235,9 +234,7 @@ export const LegalPage: React.FC = () => {
             <FinancialLiabilitySection t={t} ICONS={ICONS} />
             <PaymentDataSection t={t} ICONS={ICONS} />
             <AcceptableUseSection t={t} ICONS={ICONS} />
-
           </main>
-          </div>
         </div>
       </div>
 
