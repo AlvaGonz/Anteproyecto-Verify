@@ -70,10 +70,10 @@ public class ProjectService : IProjectService
                 "Límite de proyectos alcanzado para su plan actual. Considere mejorar su plan.");
         }
 
-        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
+        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi);
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {
-            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
+            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi);
         }
         if (!string.IsNullOrEmpty(dto.RncDesarrollador) || !string.IsNullOrEmpty(dto.Matricula))
         {
@@ -94,7 +94,7 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
-        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral);
+        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi);
         proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
         
         _proyectoRepository.Update(proyecto);
@@ -157,6 +157,9 @@ public class ProjectService : IProjectService
             proyecto.RncDesarrollador,
             proyecto.DesignacionCatastral,
             proyecto.Matricula,
+            proyecto.Propietario,
+            proyecto.CedulaRncPropietario,
+            proyecto.Ipi,
             proyecto.EstadoProyecto,
             proyecto.EstadoIntegridad,
             proyecto.UsuarioCreadorId,

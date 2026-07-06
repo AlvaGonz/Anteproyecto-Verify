@@ -12,5 +12,8 @@ public record UpdateProyectoDto(
     string? DatosDesarrollador,
     string? RncDesarrollador,
     string? DesignacionCatastral,
-    string? Matricula
+    string? Matricula,
+    string? Propietario,
+    string? CedulaRncPropietario,
+    string? Ipi
 );

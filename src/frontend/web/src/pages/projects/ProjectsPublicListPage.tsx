@@ -1,5 +1,5 @@
-﻿import React, { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Filter,
   ArrowRight,
@@ -17,35 +17,54 @@ import { ProjectStatusBadge } from "../../features/public/components/ProjectStat
 import { VerifySearchForm } from "../../features/public/components/VerifySearchForm";
 
 import { useProjects } from "../../features/projects/api/useProjects";
+import { useSearchPublicProjects } from "../../features/projects/api/useSearchPublicProjects";
 
 export const ProjectsPublicListPage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const { data: rawProjects = [], isLoading } = useProjects();
+  const { data: rawProjects = [], isLoading: isLoadingAll } = useProjects();
+  const { data: searchResults = [], isLoading: isLoadingSearch } = useSearchPublicProjects(searchQuery);
+
+  const isLoading = isLoadingAll || isLoadingSearch;
+
+  // Sync search input to URL query param
+  useEffect(() => {
+    if (searchQuery) {
+      setSearchParams({ q: searchQuery });
+    } else {
+      setSearchParams({});
+    }
+  }, [searchQuery, setSearchParams]);
 
   const mappedProjects = useMemo(() => {
-    return rawProjects.map((p) => ({
+    // If there is a search query, use the search results, otherwise use the full list
+    const sourceData = searchQuery ? searchResults : rawProjects;
+    
+    return sourceData.map((p: any) => ({
       id: String(p.id),
-      name: p.nombre,
+      // Handle both DTO formats:
+      name: p.nombre || p.nombreProyecto,
       location: p.ubicacionTexto || "Ubicación no especificada",
-      status: p.estadoProyecto === 4 ? "CERTIFIED" : "PROCESSING",
+      // raw projects use estadoProyecto (int), search results use estadoValidacion (string)
+      status: p.estadoValidacion === "Verificado" || p.estadoProyecto === 4 ? "CERTIFIED" : "PROCESSING",
       imageUrl: p.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
       lastVerification: p.createdAtUtc ? p.createdAtUtc.split("T")[0] : new Date().toISOString().split("T")[0],
-      description: "", // Removed from backend
-      completionPercentage: p.estadoProyecto === 4 ? 100 : 50,
+      description: "", 
+      completionPercentage: (p.estadoValidacion === "Verificado" || p.estadoProyecto === 4) ? 100 : 50,
     }));
-  }, [rawProjects]);
+  }, [rawProjects, searchResults, searchQuery]);
 
   const filteredProjects = useMemo(() => {
     return mappedProjects.filter((project) => {
-      const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.location.toLowerCase().includes(searchQuery.toLowerCase());
+      // Name and location filter is removed since the backend search handles all fields
       const matchesStatus = statusFilter === "ALL" || project.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      return matchesStatus;
     });
-  }, [mappedProjects, searchQuery, statusFilter]);
+  }, [mappedProjects, statusFilter]);
 
   if (isLoading) {
     return (

@@ -17,6 +17,9 @@ public class ProyectoConfiguration : IEntityTypeConfiguration<Proyecto>
         builder.Property(p => p.UbicacionTexto).IsRequired().HasMaxLength(500);
         builder.Property(p => p.UbicacionGps).HasMaxLength(100);
         builder.Property(p => p.ImagenUrl).HasMaxLength(2048);
+        builder.Property(p => p.Propietario).HasMaxLength(200);
+        builder.Property(p => p.CedulaRncPropietario).HasMaxLength(50);
+        builder.Property(p => p.Ipi).HasMaxLength(50);
         builder.Property(p => p.ValorEstimado).HasColumnType("decimal(18,2)");
         builder.Property(p => p.EstadoProyecto).HasColumnName("Status").IsRequired();
         builder.Property(p => p.EstadoIntegridad).IsRequired();

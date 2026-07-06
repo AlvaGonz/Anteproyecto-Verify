@@ -38,6 +38,8 @@
 | Massive Seeding and Mounting of 780,396 Records (DGII, PagoIPI, Catastro, Suelos) | N/A | develop | (pending) | 2026-07-05 |
 | Docker compose integration for automated DB seeding with skip-check | N/A | develop | (pending) | 2026-07-05 |
 | Restrict 'Flujo de Usuarios' Dashboard tab to Admin/Owner only | N/A | develop | (pending) | 2026-07-06 |
+| Implement `/api/public/projects/search` (DB schema/DTOs/Frontend Integration) | RF-3 | develop | (pending) | 2026-07-06 |
+| Create `VerificationMatrix.md` (Project types & compliance rules) | OE-1..7 | develop | (pending) | 2026-07-06 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

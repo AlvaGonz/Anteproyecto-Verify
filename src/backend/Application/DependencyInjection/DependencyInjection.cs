@@ -33,6 +33,8 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler>();
+        services.AddScoped<Application.Features.PublicConsulta.Queries.GetPublicProjectStatus.GetPublicProjectStatusQueryHandler>();
+        services.AddScoped<Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler>();
 
         return services;
     }

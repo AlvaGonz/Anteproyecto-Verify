@@ -40,6 +40,20 @@ public class ProyectoRepository : IProyectoRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default)
+    {
+        return await _context.Proyectos
+            .Include(p => p.UsuarioCreador)
+            .Where(p => 
+                p.CedulaRncPropietario == query ||
+                p.Ipi == query ||
+                p.RncDesarrollador == query ||
+                p.Matricula == query ||
+                _context.Set<SelloIntegridad>().Any(s => s.ProyectoId == p.Id && s.CodigoSello == query)
+            )
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<int> CountByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
         return await _context.Proyectos

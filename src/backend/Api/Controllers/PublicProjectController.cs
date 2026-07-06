@@ -12,10 +12,28 @@ using Microsoft.AspNetCore.Mvc;
 public class PublicProjectController : ControllerBase
 {
     private readonly GetPublicProjectStatusQueryHandler _handler;
+    private readonly Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler _searchHandler;
 
-    public PublicProjectController(GetPublicProjectStatusQueryHandler handler)
+    public PublicProjectController(
+        GetPublicProjectStatusQueryHandler handler,
+        Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler searchHandler)
     {
         _handler = handler;
+        _searchHandler = searchHandler;
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string q, CancellationToken ct)
+    {
+        var query = new Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQuery
+        {
+            Query = q,
+            IpOrigen = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            UserAgent = Request.Headers["User-Agent"].ToString()
+        };
+
+        var result = await _searchHandler.Handle(query, ct);
+        return Ok(result);
     }
 
     [HttpGet("{codigoPublico}")]

@@ -72,7 +72,7 @@ public class ProjectServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null, null, null, null);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -95,7 +95,7 @@ public class ProjectServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null, null, null, null);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Proyecto?)null);
 

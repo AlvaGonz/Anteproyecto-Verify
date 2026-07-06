@@ -848,6 +848,18 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("RncDesarrollador")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CedulaRncPropietario")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Ipi")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Propietario")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<bool>("SelladoBloqueado")
                         .HasColumnType("bit");
 

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { m, AnimatePresence } from "framer-motion";
 import { 
@@ -146,12 +146,11 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
       return;
     }
 
-    setError(null);
     if (code.trim()) {
       if (searchType.id === "cert") {
-        navigate(`/projects/verify/${code.trim()}`);
+        navigate(`/projects/verify/${encodeURIComponent(code.trim())}`);
       } else {
-        navigate(`/projects/verify/${code.trim()}?type=${searchType.id}`);
+        navigate(`/projects?q=${encodeURIComponent(code.trim())}`);
       }
     }
   };
