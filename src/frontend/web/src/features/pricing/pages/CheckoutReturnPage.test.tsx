@@ -30,7 +30,6 @@ describe('CheckoutReturnPage', () => {
       defaultOptions: { queries: { retry: false } },
     });
     vi.clearAllMocks();
-    // make fake timers so retry loop completes instantly
     vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
@@ -39,13 +38,11 @@ describe('CheckoutReturnPage', () => {
   });
 
   const renderWithRouter = (initialUrl: string) => {
-    // We override window.location.search for the test since the component reads from it
     Object.defineProperty(window, 'location', {
       value: { search: initialUrl.split('?')[1] ? `?${initialUrl.split('?')[1]}` : '', pathname: '/checkout/return' },
       writable: true,
     });
     
-    // Also mock history.replaceState so it doesn't crash in JSDOM
     vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
 
     return render(
@@ -59,48 +56,61 @@ describe('CheckoutReturnPage', () => {
     );
   };
 
-  it('redirects to dashboard when session_id is valid and status is complete', async () => {
-    // session-status call
-    vi.mocked(apiClient.get).mockResolvedValueOnce({
-      data: { status: 'complete', plan: 'Profesional' }
-    });
-    // my-status retry loop — return isManagedByStripe so loop exits immediately
+  it('redirects to dashboard when session is complete', async () => {
+    // session-status returns complete with plan
     vi.mocked(apiClient.get).mockResolvedValue({
-      data: { plan: 'Profesional', isManagedByStripe: true }
+      data: { status: 'complete', plan: 'Empresa' }
     });
 
     renderWithRouter('/checkout/return?session_id=cs_test_123');
 
-    // Wait for the navigate to be called
+    // Advance past the 3s webhook buffer
+    await vi.advanceTimersByTimeAsync(5000);
+
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/admin/dashboard', expect.objectContaining({
         replace: true,
         state: expect.objectContaining({
           planJustActivated: true,
-          activatedPlan: expect.any(Object)
+          activatedPlan: expect.objectContaining({ label: 'Empresa' })
         })
       }));
     });
 
-    // Check if apiClient was called with camelCase sessionId
     expect(apiClient.get).toHaveBeenCalledWith('/v1/subscriptions/session-status?sessionId=cs_test_123');
   });
 
-  it('sends correct parameter to backend if Stripe uses sessionId instead of session_id', async () => {
-    // session-status call
-    vi.mocked(apiClient.get).mockResolvedValueOnce({
-      data: { status: 'complete', plan: 'Básico' }
-    });
-    // my-status retry loop — return isManagedByStripe so loop exits immediately
+  it('sends sessionId when Stripe uses camelCase param', async () => {
     vi.mocked(apiClient.get).mockResolvedValue({
-      data: { plan: 'Básico', isManagedByStripe: true }
+      data: { status: 'complete', plan: 'Profesional' }
     });
 
-    // Arrange: what if the query param is sessionId?
     renderWithRouter('/checkout/return?sessionId=cs_test_abc');
+
+    await vi.advanceTimersByTimeAsync(5000);
 
     await waitFor(() => {
       expect(apiClient.get).toHaveBeenCalledWith('/v1/subscriptions/session-status?sessionId=cs_test_abc');
+    });
+  });
+
+  it('shows error page when payment status is not complete', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({
+      data: { status: 'open', plan: null }
+    });
+
+    renderWithRouter('/checkout/return?session_id=cs_test_fail');
+
+    await waitFor(() => {
+      expect(screen.getByText('Hubo un problema con el pago')).toBeTruthy();
+    });
+  });
+
+  it('shows error page when no session_id is provided', async () => {
+    renderWithRouter('/checkout/return');
+
+    await waitFor(() => {
+      expect(screen.getByText('Hubo un problema con el pago')).toBeTruthy();
     });
   });
 });

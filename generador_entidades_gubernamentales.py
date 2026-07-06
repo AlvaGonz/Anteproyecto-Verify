@@ -74,10 +74,8 @@ def get_conn_params(conn_str):
                 kl = k.strip().lower()
                 vl = v.strip()
                 if kl in ["server", "data source"]:
-                    if vl.lower() == "sqlserver":
-                        params["server"] = "127.0.0.1"
-                    else:
-                        params["server"] = vl
+                    # Use the server name as provided (e.g., sqlserver for Docker service)
+                    params["server"] = vl
                 elif kl in ["database", "initial catalog"]:
                     params["database"] = vl
                 elif kl in ["user id", "uid"]:

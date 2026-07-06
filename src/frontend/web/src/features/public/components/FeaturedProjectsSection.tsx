@@ -4,6 +4,7 @@ import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
 import { useProjects } from "../../projects/api/useProjects";
+import { ProjectStatus } from "../../projects/types";
 
 interface Project {
   name: string;
@@ -39,11 +40,14 @@ export const FeaturedProjectsSection: React.FC = () => {
 
   const { data: realProjects = [] } = useProjects();
   
-  const formattedProjects: Project[] = realProjects.map(p => ({
+  // Filter only validated projects (estadoProyecto === ProjectStatus.Validated)
+  const validatedProjects = realProjects.filter(p => p.estadoProyecto === ProjectStatus.Validated);
+  
+  const formattedProjects: Project[] = validatedProjects.map(p => ({
     name: p.nombre,
     location: p.ubicacionTexto,
     image: p.imagenUrl || "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-    status: p.estadoProyecto === 1 ? "Publicado" : "En Proceso",
+    status: "Validado",
     risk: "Calculando",
     deliveredDocs: p.completionRate ? Math.round(p.completionRate * 10) : 5,
     totalDocs: 10,

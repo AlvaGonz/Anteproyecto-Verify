@@ -6,6 +6,7 @@ using Application.Abstractions.Persistence;
 using Application.Features.Auth.Commands.UploadAvatar;
 using Domain.Entities;
 using Domain.Enums;
+using FluentAssertions;
 using Moq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;

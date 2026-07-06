@@ -13,14 +13,13 @@ using Application.Features.Auth.Commands.RegisterUser;
 using Domain.Entities;
 using Domain.Enums;
 using Application.Features.Auth.Commands.UploadAvatar;
+using Application.Features.Auth.Commands.ResendVerificationEmail;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Xunit;
-using Application.Features.Auth.Commands.UploadAvatar;
-using Application.Features.Auth.Commands.ResendVerificationEmail;
 
 namespace UnitTests.Api.Controllers;
 

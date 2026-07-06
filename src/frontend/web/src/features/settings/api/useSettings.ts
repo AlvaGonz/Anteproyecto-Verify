@@ -127,7 +127,7 @@ export interface MySubscriptionStatus {
   isManagedByStripe: boolean;
 }
 
-export const useMySubscription = () =>
+export const useMySubscription = (options?: { refetchInterval?: number }) =>
   useQuery<MySubscriptionStatus>({
     queryKey: ["subscription", "my-status"],
     queryFn: () =>
@@ -137,6 +137,7 @@ export const useMySubscription = () =>
     staleTime: 0,
     gcTime: 1000 * 30,
     refetchOnWindowFocus: true,
+    refetchInterval: options?.refetchInterval ?? 15_000,
     retry: 1,
   });
 
