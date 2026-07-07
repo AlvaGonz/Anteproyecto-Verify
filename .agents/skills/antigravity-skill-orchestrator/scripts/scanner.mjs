@@ -159,10 +159,11 @@ async function scanDirectory(skillsDir, source) {
   }
 
   const dirs = entries.filter((e) => e.isDirectory());
+  const files = entries.filter((e) => e.isFile() && e.name.endsWith('.md'));
 
   // Process in parallel with individual error handling
-  const results = await Promise.allSettled(
-    dirs.map(async (entry) => {
+  const results = await Promise.allSettled([
+    ...dirs.map(async (entry) => {
       const skillDir = join(skillsDir, entry.name);
       const skillMdPath = join(skillDir, "SKILL.md");
 
@@ -195,8 +196,36 @@ async function scanDirectory(skillsDir, source) {
         );
         return null;
       }
+    }),
+    ...files.map(async (entry) => {
+      const skillMdPath = join(skillsDir, entry.name);
+
+      try {
+        const fd = await readFile(skillMdPath, { encoding: "utf-8" });
+        const head = fd.slice(0, 2048);
+
+        const meta = parseFrontmatter(head);
+        if (!meta) {
+          return null;
+        }
+
+        const baseName = entry.name.replace(/\.md$/, "");
+
+        return {
+          name: meta.name || baseName,
+          description: meta.description || "",
+          category: meta.category || null,
+          tags: meta.tags || null,
+          source,
+          path: skillMdPath,
+          dirName: baseName,
+        };
+      } catch (err) {
+        log(`WARN: Failed to read ${skillMdPath}: ${err.code || err.message}`);
+        return null;
+      }
     })
-  );
+  ]);
 
   for (const result of results) {
     if (result.status === "fulfilled" && result.value !== null) {

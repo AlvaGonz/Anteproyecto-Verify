@@ -21,6 +21,7 @@
 | README.md full rewrite from codebase graph | N/A | feat-codebase-memory-mcp | efcbffa5 | 2026-06-29 |
 | E2E Test Success for Project Photos | N/A | feat-codebase-memory-mcp | 5661d1a6 | 2026-06-29 |
 | ORCH-TEST-001 — Orchestration Proof Test | N/A | feat-voltagent-upgrade | a1b6b5b5 | 2026-06-29 |
+| ORCH-TEST-002 — Subagent Routing Fixed | N/A | develop | (pending) | 2026-07-07 |
 | COMP-001 — Consent Version Gate (Law 172-13) | ADR-007 | feat-voltagent-upgrade | ee48440d | 2026-06-30 |
 | Stripe Legal Compliance UI & Sections | N/A | develop | (pending) | 2026-06-30 |
 | Subscription Consent Checkbox (IP/Timestamp) | N/A | develop | (pending) | 2026-06-30 |
@@ -40,6 +41,8 @@
 | Restrict 'Flujo de Usuarios' Dashboard tab to Admin/Owner only | N/A | develop | (pending) | 2026-07-06 |
 | Implement `/api/public/projects/search` (DB schema/DTOs/Frontend Integration) | RF-3 | develop | (pending) | 2026-07-06 |
 | Create `VerificationMatrix.md` (Project types & compliance rules) | OE-1..7 | develop | (pending) | 2026-07-06 |
+| Checkout E2E verify (Dashboard redirect, Subscription tab, Session status) | N/A | develop | (pending) | 2026-07-06 |
+| React Doctor CI pipeline setup (npx react-doctor@latest install, pinned SHAs) | N/A | develop | (pending) | 2026-07-07 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
@@ -48,9 +51,7 @@
 
 
 ## 🔜 Next Up (Prioritized)
-1. **React Doctor CI** — add doctor to CI pipeline via `npx react-doctor@latest install`
-2. **Restart IDE** → run ORCH-TEST-002 (subagent routing with model response)
-3. Verify consent test passes in CI pipeline
+1. Verify consent test passes in CI pipeline
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - Human action required: confirm schema via MCP before proceeding with EF Core migrations.

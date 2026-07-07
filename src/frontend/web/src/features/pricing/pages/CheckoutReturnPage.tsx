@@ -17,11 +17,16 @@ export const CheckoutReturnPage = () => {
   // we must read it from window.location.search directly.
   const rawSearch = window.location.search;
   const rawParams = new URLSearchParams(rawSearch);
-  const sessionId =
+  
+  // Use a ref to store the initial sessionId so it survives URL cleanup
+  const initialSessionIdRef = useRef<string | null>(
     searchParams.get('session_id') ??
     rawParams.get('session_id') ??
     searchParams.get('sessionId') ??
-    rawParams.get('sessionId');
+    rawParams.get('sessionId')
+  );
+  const sessionId = initialSessionIdRef.current;
+
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const redirectedRef = useRef(false)
@@ -86,7 +91,7 @@ export const CheckoutReturnPage = () => {
 
           // Polling control
           let attempts = 0;
-          while (state === 'pending_confirmation' && attempts < 5 && isPolling) {
+          while (state === 'pending_confirmation' && attempts < 15 && isPolling) {
             attempts++;
             await new Promise(resolve => {
               timeoutId = setTimeout(resolve, 2000);
