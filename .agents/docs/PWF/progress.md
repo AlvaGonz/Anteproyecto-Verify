@@ -172,3 +172,7 @@
   - **Symptom:** After a successful Stripe checkout, the application redirects to `http://localhost:3000/` instead of `/admin/dashboard`.
   - **Root Cause:** `CheckoutReturnPage` used `window.history.replaceState({}, '', window.location.pathname)` to strip `session_id`. Because `HashRouter` is used, `pathname` is `/`, which effectively dropped the `#/...` from the URL, causing React Router to reset to the landing page `/`.
   - **Fix:** Switched to safely cleaning up `session_id` from the raw URL (`newUrl.searchParams.delete()`) and the hash query parameters using `setSearchParams` without wiping the hash component itself.
+-   * * C O M P - 0 0 1 : * *   V e r i f y   c o n s e n t   t e s t   p a s s e s   i n   C I   p i p e l i n e . 
+     -   * * S t a t u s : * *   C o m p l e t e 
+     -   * * D e t a i l s : * *   V e r i f i e d   v i a   l o c a l   D o c k e r   c o n t a i n e r   r u n n i n g   . N E T   8 . 0   S D K   ( P a s s e d :   7 / 7 )   a n d   v i a   G i t H u b   A c t i o n s   C I   p i p e l i n e   ( b a c k e n d   j o b s   s u c c e s s f u l   o n   b r a n c h   ` v e r i f y - c i - c o n s e n t ` ) .  
+ 
