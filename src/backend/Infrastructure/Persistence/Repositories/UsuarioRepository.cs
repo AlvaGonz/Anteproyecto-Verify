@@ -25,6 +25,8 @@ public class UsuarioRepository : IUsuarioRepository
     {
         return await _context.Usuarios
             .Include(u => u.Plan)
+            .Include(u => u.Titular)
+                .ThenInclude(t => t!.Plan)
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 

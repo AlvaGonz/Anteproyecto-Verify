@@ -7,6 +7,15 @@ public static class SubscriptionTierPolicy
 {
     private static PlanSuscripcion? GetEffectivePlan(Usuario usuario)
     {
+        if (usuario.TitularId != null && usuario.Titular != null)
+        {
+            var titularPlan = GetEffectivePlan(usuario.Titular);
+            if (titularPlan != null && (titularPlan.MaxUsuariosSecundarios == -1 || titularPlan.MaxUsuariosSecundarios > 0))
+            {
+                return titularPlan;
+            }
+        }
+
         if (usuario.Plan == null) return null;
         if (usuario.Plan.Precio == 0m) return usuario.Plan; // Free plan is always active
         if (usuario.SubscriptionStatus == "active" || usuario.SubscriptionStatus == "trialing")

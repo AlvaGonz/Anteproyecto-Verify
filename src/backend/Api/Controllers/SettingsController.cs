@@ -417,6 +417,22 @@ public class SettingsController : ControllerBase
 
         u.AsignarPlan(plan.Idsuscripcion);
 
+        // Enforce team member limit for the new plan
+        int maxInvitees = plan.NombrePlan == "Enterprise" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
+        var currentInvitees = await _context.Usuarios
+            .Where(usr => usr.TitularId == u.Id)
+            .ToListAsync(cancellationToken);
+
+        if (currentInvitees.Count > maxInvitees)
+        {
+            var excessInvitees = currentInvitees.Skip(maxInvitees).ToList();
+            foreach (var invitee in excessInvitees)
+            {
+                invitee.RemoverTitular();
+                invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+            }
+        }
+
         // Sync legacy user if missing
         await SyncUserLegacyAsync(u, cancellationToken);
 
@@ -467,7 +483,8 @@ public class SettingsController : ControllerBase
         var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId && user.TitularId == id, cancellationToken);
         if (invitee == null) return NotFound(new { Message = "Usuario invitado no encontrado o no pertenece al titular." });
 
-        _context.Entry(invitee).Property("TitularId").CurrentValue = null;
+        invitee.RemoverTitular();
+        invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok(new { Message = "Usuario invitado removido exitosamente." });

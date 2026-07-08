@@ -93,14 +93,29 @@ Una vez finalizado el Paso 4, puedes iniciar sesión inmediatamente con:
   * **Contraseña:** `AdminVerifinca2026!`
   * *(Estado: Verificado y Activo)*
 
-* **Desarrollador Premium (Professional)**:
-  * **Usuario:** `dev@constructora.do`
-  * **Contraseña:** `DevVerifinca2026!`
+* **Usuario Gratuito (Freemium)**:
+  * **Usuario:** `freemium@verifinca.do`
+  * **Contraseña:** `FreemiumVerifinca2026!`
   * *(Estado: Verificado y Activo)*
 
-* **Usuario Validador (Consultation)**:
-  * **Usuario:** `validador@verifinca.do`
-  * **Contraseña:** `Validador2026!`
+* **Usuario Consultor (Consultor)**:
+  * **Usuario:** `consultor@verifinca.do`
+  * **Contraseña:** `ConsultorVerifinca2026!`
+  * *(Estado: Verificado y Activo)*
+
+* **Usuario Profesional (Profesional)**:
+  * **Usuario:** `profesional@verifinca.do`
+  * **Contraseña:** `ProfesionalVerifinca2026!`
+  * *(Estado: Verificado y Activo)*
+
+* **Usuario Empresa (Empresa)**:
+  * **Usuario:** `empresa@verifinca.do`
+  * **Contraseña:** `EmpresaVerifinca2026!`
+  * *(Estado: Verificado y Activo)*
+
+* **Usuario Enterprise (Enterprise)**:
+  * **Usuario:** `enterprise@verifinca.do`
+  * **Contraseña:** `EnterpriseVerifinca2026!`
   * *(Estado: Verificado y Activo)*
 
 > [!NOTE]

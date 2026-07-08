@@ -56,6 +56,7 @@ public class ProjectServiceTests
         var premiumPlan = PlanSuscripcion.Create(premiumPlanId, "Premium", 100, -1, 100, true, true, 10, 1024, true, true, true, true, true, true, "Premium", true);
         user.AsignarPlan(premiumPlanId);
         SetPrivateProperty(user, "Plan", premiumPlan);
+        user.UpdateStripeSubscription("customer123", "sub123", "active", DateTime.UtcNow.AddMonths(1));
 
         _usuarioRepoMock.GetByIdWithPlanAsync(userId, Arg.Any<CancellationToken>()).Returns(user);
         _proyectoRepoMock.CountByUsuarioAsync(userId, Arg.Any<CancellationToken>()).Returns(1);

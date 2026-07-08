@@ -287,8 +287,20 @@ public class SubscriptionController : ControllerBase
                     if (user != null)
                     {
                         user.UpdateStripeSubscription(null, "canceled", null);
+                        user.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+
+                        // Revert all team members/invitees of this user to Freemium
+                        var invitees = await _dbContext.Usuarios
+                            .Where(u => u.TitularId == user.Id)
+                            .ToListAsync();
+                        foreach (var invitee in invitees)
+                        {
+                            invitee.RemoverTitular();
+                            invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+                        }
+
                         await _dbContext.SaveChangesAsync();
-                        _logger.LogInformation("Webhook: User {UserId} subscription canceled.", user.Id);
+                        _logger.LogInformation("Webhook: User {UserId} subscription canceled, reverted user and team to Freemium.", user.Id);
                     }
                 }
             }
@@ -346,6 +358,22 @@ public class SubscriptionController : ControllerBase
                 _logger.LogInformation(
                     "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",
                     planName, priceId, user.Id);
+
+                // Enforce team member limit for the new plan
+                int maxInvitees = plan.NombrePlan == "Enterprise" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
+                var currentInvitees = await _dbContext.Usuarios
+                    .Where(usr => usr.TitularId == user.Id)
+                    .ToListAsync();
+
+                if (currentInvitees.Count > maxInvitees)
+                {
+                    var excessInvitees = currentInvitees.Skip(maxInvitees).ToList();
+                    foreach (var invitee in excessInvitees)
+                    {
+                        invitee.RemoverTitular();
+                        invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+                    }
+                }
 
                 await ProcessSubscriptionNotificationAsync(user, plan, isNewPlan);
             }

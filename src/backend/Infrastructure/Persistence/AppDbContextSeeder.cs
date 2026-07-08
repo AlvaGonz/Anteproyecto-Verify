@@ -38,27 +38,64 @@ public static class AppDbContextSeeder
                 telefono: "809-555-1000",
                 cedula: "001-1234567-8");
 
-            var devUser = await GetOrCreateUsuarioAsync(
-                context,
-                nombre: "Desarrollador",
-                apellido: "Premium",
-                correoElectronico: "dev@constructora.do",
-                contrasenaHash: passwordHasher.HashPassword("DevVerifinca2026!"),
-                rol: UserRole.Professional,
-                telefono: "809-555-2000",
-                cedula: "402-7654321-9");
-
-            var publicUser = await GetOrCreateUsuarioAsync(
+            var freemiumUser = await GetOrCreateUsuarioAsync(
                 context,
                 nombre: "Usuario",
-                apellido: "Validador",
-                correoElectronico: "validador@verifinca.do",
-                contrasenaHash: passwordHasher.HashPassword("Validador2026!"),
-                rol: UserRole.Consultation,
-                telefono: "809-555-3000",
-                cedula: "001-9876543-2");
+                apellido: "Freemium",
+                correoElectronico: "freemium@verifinca.do",
+                contrasenaHash: passwordHasher.HashPassword("FreemiumVerifinca2026!"),
+                rol: UserRole.User,
+                telefono: "809-555-2001",
+                cedula: "402-0000001-1");
+            freemiumUser.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
 
-            await SeedLegacyProfilesAndPermissionsAsync(context, logger, adminUser, devUser, publicUser);
+            var consultorUser = await GetOrCreateUsuarioAsync(
+                context,
+                nombre: "Usuario",
+                apellido: "Consultor",
+                correoElectronico: "consultor@verifinca.do",
+                contrasenaHash: passwordHasher.HashPassword("ConsultorVerifinca2026!"),
+                rol: UserRole.User,
+                telefono: "809-555-2002",
+                cedula: "402-0000002-1");
+            consultorUser.AsignarPlan(Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"));
+
+            var profesionalUser = await GetOrCreateUsuarioAsync(
+                context,
+                nombre: "Usuario",
+                apellido: "Profesional",
+                correoElectronico: "profesional@verifinca.do",
+                contrasenaHash: passwordHasher.HashPassword("ProfesionalVerifinca2026!"),
+                rol: UserRole.User,
+                telefono: "809-555-2003",
+                cedula: "402-0000003-1");
+            profesionalUser.AsignarPlan(Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"));
+
+            var empresaUser = await GetOrCreateUsuarioAsync(
+                context,
+                nombre: "Usuario",
+                apellido: "Empresa",
+                correoElectronico: "empresa@verifinca.do",
+                contrasenaHash: passwordHasher.HashPassword("EmpresaVerifinca2026!"),
+                rol: UserRole.User,
+                telefono: "809-555-2004",
+                cedula: "402-0000004-1");
+            empresaUser.AsignarPlan(Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"));
+
+            var enterpriseUser = await GetOrCreateUsuarioAsync(
+                context,
+                nombre: "Usuario",
+                apellido: "Enterprise",
+                correoElectronico: "enterprise@verifinca.do",
+                contrasenaHash: passwordHasher.HashPassword("EnterpriseVerifinca2026!"),
+                rol: UserRole.User,
+                telefono: "809-555-2005",
+                cedula: "402-0000005-1");
+            enterpriseUser.AsignarPlan(Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"));
+
+            await context.SaveChangesAsync();
+
+            await SeedLegacyProfilesAndPermissionsAsync(context, logger, adminUser, profesionalUser, freemiumUser);
 
             var proyectos = new[]
             {
@@ -74,7 +111,7 @@ public static class AppDbContextSeeder
                     context,
                     nombre: p.Nombre,
                     ubicacionTexto: p.Ubicacion,
-                    usuarioCreadorId: devUser.Id,
+                    usuarioCreadorId: profesionalUser.Id,
                     categoria: p.Categoria,
                     datosDesarrollador: p.Dev,
                     designacionCatastral: p.Cat,
@@ -82,7 +119,7 @@ public static class AppDbContextSeeder
                 proyectoEntities.Add(proyecto);
             }
 
-            await SeedDashboardDummyDataAsync(context, logger, adminUser, devUser, publicUser, proyectoEntities);
+            await SeedDashboardDummyDataAsync(context, logger, adminUser, profesionalUser, freemiumUser, proyectoEntities);
 
             try {
                 var p1 = proyectoEntities[0];
@@ -92,7 +129,7 @@ public static class AppDbContextSeeder
                 await GetOrCreateDocumentoAsync(
                     context,
                     proyectoId: p1.Id,
-                    usuarioCargaId: devUser.Id,
+                    usuarioCargaId: profesionalUser.Id,
                     tipo: DocumentType.TITLE,
                     nombreOriginal: "Certificado_Titulo_BellaVista.pdf",
                     url: "https://mockstorage.blob.core.windows.net/docs/Certificado_Titulo_BellaVista.pdf",
@@ -101,7 +138,7 @@ public static class AppDbContextSeeder
                 await GetOrCreateDocumentoAsync(
                     context,
                     proyectoId: p1.Id,
-                    usuarioCargaId: devUser.Id,
+                    usuarioCargaId: profesionalUser.Id,
                     tipo: DocumentType.OTHER,
                     nombreOriginal: "Permiso_Ambiental_BellaVista.pdf",
                     url: "https://mockstorage.blob.core.windows.net/docs/Permiso_Ambiental_BellaVista.pdf",
@@ -110,7 +147,7 @@ public static class AppDbContextSeeder
                 await GetOrCreateDocumentoAsync(
                     context,
                     proyectoId: p2.Id,
-                    usuarioCargaId: devUser.Id,
+                    usuarioCargaId: profesionalUser.Id,
                     tipo: DocumentType.OTHER,
                     nombreOriginal: "Planos_LosCacicazgos.pdf",
                     url: "https://mockstorage.blob.core.windows.net/docs/Planos_LosCacicazgos.pdf",
@@ -129,7 +166,7 @@ public static class AppDbContextSeeder
 
                 await GetOrCreateAuditoriaAsync(
                     context,
-                    usuarioId: devUser.Id,
+                    usuarioId: profesionalUser.Id,
                     accion: "ProjectCreated",
                     tipoEvento: "PROYECTO",
                     entidad: "Proyecto",
@@ -170,7 +207,7 @@ public static class AppDbContextSeeder
 
                 await GetOrCreateNotificacionAsync(
                     context,
-                    usuarioId: devUser.Id,
+                    usuarioId: profesionalUser.Id,
                     mensaje: "El proyecto Torre Bella Vista Piantini ha sido publicado.",
                     tipo: "ProjectPublished",
                     ruta: $"/admin/projects/{p1.Id}",
@@ -178,7 +215,7 @@ public static class AppDbContextSeeder
 
                 await GetOrCreateNotificacionAsync(
                     context,
-                    usuarioId: devUser.Id,
+                    usuarioId: profesionalUser.Id,
                     mensaje: "Validación fallida para Proyecto Costero La Romana.",
                     tipo: "ValidationFailed",
                     ruta: $"/admin/projects/{p3.Id}",
