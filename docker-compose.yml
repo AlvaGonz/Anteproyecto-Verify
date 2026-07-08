@@ -21,6 +21,7 @@ services:
       - ConnectionStrings__DefaultConnection=$ConnectionStrings__DockerConnection
     env_file:
       - .env
+    entrypoint: ["dotnet", "run", "--urls", "http://0.0.0.0:8080"]
     restart: unless-stopped
     depends_on:
       sqlserver:
