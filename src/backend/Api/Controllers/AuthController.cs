@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.EntityFrameworkCore;
+using Infrastructure.Persistence;
 
 namespace Api.Controllers;
 
@@ -25,6 +27,7 @@ public class AuthController : ControllerBase
     private readonly Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler _resendVerificationHandler;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
     private readonly IMemoryCache _cache;
+    private readonly AppDbContext _context;
 
     public AuthController(
         Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler registerHandler,
@@ -36,7 +39,8 @@ public class AuthController : ControllerBase
         Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
         IConfiguration configuration,
         Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator,
-        IMemoryCache cache)
+        IMemoryCache cache,
+        AppDbContext context)
     {
         _registerHandler = registerHandler;
         _verifyHandler = verifyHandler;
@@ -48,6 +52,7 @@ public class AuthController : ControllerBase
         _configuration = configuration;
         _jwtTokenGenerator = jwtTokenGenerator;
         _cache = cache;
+        _context = context;
     }
 
     [HttpPost("register")]
@@ -260,6 +265,17 @@ public class AuthController : ControllerBase
             _ => "user"
         };
 
+        // DGII lookup by RNC first, fallback to Cedula (individuals use cédula as RNC)
+        var lookupKey = !string.IsNullOrWhiteSpace(user.Rnc) ? user.Rnc : user.Cedula;
+        Domain.Entities.DGII? dgii = null;
+        if (!string.IsNullOrWhiteSpace(lookupKey))
+        {
+            var cleanKey = lookupKey.Replace("-", "");
+            dgii = await _context.DGII
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.Rnc == cleanKey, cancellationToken);
+        }
+
         return Ok(new
         {
             Id = user.Id.ToString(),
@@ -270,7 +286,9 @@ public class AuthController : ControllerBase
             Cedula = user.Cedula ?? string.Empty,
             Telefono = user.Telefono ?? string.Empty,
             Rnc = user.Rnc,
-            RazonSocial = (string?)null,
+            RazonSocial = dgii?.NombreRazonSocial,
+            NombreComercial = dgii?.NombreComercial,
+            ActividadEconomica = dgii?.ActividadEconomica,
             Plan = user.Plan?.NombrePlan ?? "N/A",
             AvatarUrl = user.AvatarUrl,
             SubscriptionStatus = user.SubscriptionStatus ?? "N/A",

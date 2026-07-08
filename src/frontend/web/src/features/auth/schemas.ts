@@ -88,6 +88,10 @@ export const UpdateProfileSchema = z.object({
 telefono: z
      .string()
      .optional()
+     .transform((val) => {
+       if (!val) return val;
+       return val.replace(/\D/g, '');
+     })
      .refine((val) => {
        if (val === undefined || val === "") return true;
        return /^(809|829|849)\d{7}$/.test(val);

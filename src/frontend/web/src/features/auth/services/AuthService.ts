@@ -20,6 +20,8 @@ export interface User {
   telefono?: string;
   rnc?: string;
   razonSocial?: string;
+  nombreComercial?: string;
+  actividadEconomica?: string;
   plan?: string;
   avatarUrl?: string;
   stripeCustomerId?: string | null;
