@@ -22,6 +22,7 @@ export interface UserSettings {
   cedula: string;
   rnc?: string;
   razonSocial?: string;
+  nombreComercial?: string;
   profileId: string | null;
   profileName: string;
   planId: string | null;

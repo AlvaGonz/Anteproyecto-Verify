@@ -58,17 +58,6 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
       </div>
 
       <div className="hidden md:flex flex-1 max-w-md mx-12">
-        <div className="relative w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Buscar expedientes, folios o propietarios..."
-            aria-label="Buscar expedientes"
-            className="w-full h-11 pl-11 pr-4 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all group-hover:bg-gray-100"
-            onKeyDown={handleSearch}
-          />
-        </div>
       </div>
 
       <div className="flex items-center gap-3">

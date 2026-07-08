@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { m } from "framer-motion";
 import { X } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
@@ -164,18 +164,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
             </div>
           )}
 
-          <div>
-            <label htmlFor="uf-role" className="block text-xs font-bold text-text-secondary uppercase mb-1">Rol de Acceso</label>
-            <select
-              id="uf-role"
-              value={formData.role}
-              onChange={e => update({ role: e.target.value as any })}
-              className="vf-input w-full"
-            >
-              <option value="user">Usuario Regular</option>
-              <option value="admin">Administrador</option>
-            </select>
-          </div>
+          {/* Role access selection removed */}
 
           <div className="pt-4 flex gap-3 justify-end border-t border-border mt-6">
             <button
