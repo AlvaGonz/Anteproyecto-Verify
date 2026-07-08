@@ -1,10 +1,14 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Infrastructure.Persistence;
 
 #nullable disable
 
 namespace Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20260706170900_Add_Propietario_IPI_To_Proyectos")]
     public partial class Add_Propietario_IPI_To_Proyectos : Migration
     {
         /// <inheritdoc />
