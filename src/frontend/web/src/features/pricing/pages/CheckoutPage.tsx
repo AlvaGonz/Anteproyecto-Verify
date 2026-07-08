@@ -52,6 +52,13 @@ export const CheckoutPage = () => {
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan') as PlanId;
   const billing = searchParams.get('billing') as BillingCycle;
+  const source = searchParams.get('source');
+  const getBackLink = (src: string | null) => {
+    if (src === 'settings') return '/admin/settings';
+    if (src === 'portal') return '/admin/dashboard';
+    return '/plans';
+  };
+  const backLink = getBackLink(source);
   const { user } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState<boolean>(false);
@@ -81,7 +88,7 @@ export const CheckoutPage = () => {
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="text-error text-lg font-medium mb-4">Plan o ciclo de facturación inválido.</p>
-          <Link to="/plans" className="text-primary hover:underline font-medium">Volver a Planes</Link>
+          <Link to={backLink} className="text-primary hover:underline font-medium">Volver a Planes</Link>
         </div>
       </div>
     );
@@ -91,7 +98,7 @@ export const CheckoutPage = () => {
     <div className="min-h-screen bg-surface flex flex-col lg:flex-row">
       {/* Left Column: Order Summary */}
       <div className="w-full lg:w-2/5 bg-surface-variant/30 border-r border-outline-variant/30 p-8 lg:p-16 flex flex-col pt-24 lg:pt-32">
-        <Link to="/plans" className="flex items-center text-sm font-medium text-on-surface-variant hover:text-primary mb-12 transition-colors w-fit">
+        <Link to={backLink} className="flex items-center text-sm font-medium text-on-surface-variant hover:text-primary mb-12 transition-colors w-fit">
           <span className="material-symbols-outlined text-[18px] mr-1">arrow_back</span>
           Volver a planes
         </Link>

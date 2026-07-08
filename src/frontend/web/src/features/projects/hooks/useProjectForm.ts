@@ -127,7 +127,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
   useEffect(() => {
     const cleaned = rncDesarrollador.replace(/[- ]/g, "").trim();
-    if (cleaned.length === 11) {
+    if (cleaned.length === 11 || cleaned.length === 9) {
       handleRncSearch(rncDesarrollador);
     }
   }, [rncDesarrollador]);

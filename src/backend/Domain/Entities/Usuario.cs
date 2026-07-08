@@ -19,6 +19,9 @@ public class Usuario : EntityBase
     public string Telefono { get; private set; } = null!;
     public string Cedula { get; private set; } = null!;
     public string? Rnc { get; private set; }
+    public string? RazonSocial { get; private set; }
+    public string? NombreComercial { get; private set; }
+    public string? ActividadEconomica { get; private set; }
     public string Identificacion => Cedula;
     public UserRole Rol { get; private set; }
     public bool Activo { get; private set; }
@@ -125,9 +128,12 @@ public class Usuario : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
     
-    public void UpdateRnc(string rnc)
+    public void UpdateRnc(string? rnc, string? razonSocial = null, string? nombreComercial = null, string? actividadEconomica = null)
     {
         Rnc = rnc;
+        RazonSocial = razonSocial;
+        NombreComercial = nombreComercial;
+        ActividadEconomica = actividadEconomica;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

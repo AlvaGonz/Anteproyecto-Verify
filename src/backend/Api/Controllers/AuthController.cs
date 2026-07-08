@@ -286,9 +286,9 @@ public class AuthController : ControllerBase
             Cedula = user.Cedula ?? string.Empty,
             Telefono = user.Telefono ?? string.Empty,
             Rnc = user.Rnc,
-            RazonSocial = dgii?.NombreRazonSocial,
-            NombreComercial = dgii?.NombreComercial,
-            ActividadEconomica = dgii?.ActividadEconomica,
+            RazonSocial = user.RazonSocial ?? dgii?.NombreRazonSocial,
+            NombreComercial = user.NombreComercial ?? dgii?.NombreComercial,
+            ActividadEconomica = user.ActividadEconomica ?? dgii?.ActividadEconomica,
             Plan = user.Plan?.NombrePlan ?? "N/A",
             AvatarUrl = user.AvatarUrl,
             SubscriptionStatus = user.SubscriptionStatus ?? "N/A",
@@ -365,6 +365,9 @@ public class AuthController : ControllerBase
             request.Apellido,
             request.Telefono,
             request.Rnc,
+            request.RazonSocial,
+            request.NombreComercial,
+            request.ActividadEconomica,
             request.CurrentPassword,
             request.NewPassword
         );
@@ -412,6 +415,9 @@ public class UpdateProfileRequestDto
     public string? Apellido { get; set; }
     public string? Telefono { get; set; }
     public string? Rnc { get; set; }
+    public string? RazonSocial { get; set; }
+    public string? NombreComercial { get; set; }
+    public string? ActividadEconomica { get; set; }
     public string? CurrentPassword { get; set; }
     public string? NewPassword { get; set; }
 }

@@ -46,7 +46,12 @@ public class UpdateProfileCommandHandler
 
         if (request.Rnc != null)
         {
-            user.UpdateRnc(request.Rnc);
+            user.UpdateRnc(
+                string.IsNullOrWhiteSpace(request.Rnc) ? null! : request.Rnc,
+                string.IsNullOrWhiteSpace(request.RazonSocial) ? null : request.RazonSocial,
+                string.IsNullOrWhiteSpace(request.NombreComercial) ? null : request.NombreComercial,
+                string.IsNullOrWhiteSpace(request.ActividadEconomica) ? null : request.ActividadEconomica
+            );
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

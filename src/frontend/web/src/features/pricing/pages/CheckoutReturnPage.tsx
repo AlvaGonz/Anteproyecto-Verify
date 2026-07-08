@@ -26,6 +26,10 @@ export const CheckoutReturnPage = () => {
     rawParams.get('sessionId')
   );
   const sessionId = initialSessionIdRef.current;
+  
+  // Keep source parameter for returning to previous tab
+  const source = searchParams.get('source') ?? rawParams.get('source');
+  const backLink = source === 'settings' ? '/admin/settings' : '/plans';
 
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -172,7 +176,7 @@ export const CheckoutReturnPage = () => {
         El pago no pudo confirmarse. Verifica con tu banco o intenta de nuevo.
       </p>
       <button type="button"
-        onClick={() => navigate('/plans')}
+        onClick={() => navigate(backLink)}
         className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-semibold"
       >
         Volver a planes

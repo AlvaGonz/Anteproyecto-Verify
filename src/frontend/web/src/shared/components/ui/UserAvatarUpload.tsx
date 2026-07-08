@@ -9,7 +9,7 @@ export const UserAvatarUpload: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4 mb-6">
+    <div className="flex flex-col items-center justify-center space-y-4">
       <button type="button" className="relative group cursor-pointer" aria-label="Cambiar foto de perfil" onClick={() => fileInputRef.current?.click()}>
         <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-surface-raised/30 shadow-md">
           {user?.avatarUrl ? (

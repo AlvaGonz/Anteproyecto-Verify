@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift } from "lucide-react";
 import { useMySubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
+import { PlansModal } from "./PlansModal";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' });
 const PRICE_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -54,6 +55,7 @@ const NO_PLAN_CONFIG = {
 
 export const SubscriptionSettings: React.FC = () => {
   const navigate = useNavigate();
+  const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
   const { data, isLoading, isError, refetch } = useMySubscription();
 
   const status = data?.subscriptionStatus ?? null;
@@ -214,7 +216,7 @@ export const SubscriptionSettings: React.FC = () => {
               ¿Deseas cambiar tu plan o explorar otras opciones?
             </div>
             <button type="button"
-              onClick={() => navigate("/plans")}
+              onClick={() => setIsPlansModalOpen(true)}
               className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
             >
               <span className="flex items-center gap-2">
@@ -224,6 +226,11 @@ export const SubscriptionSettings: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      <PlansModal 
+        isOpen={isPlansModalOpen} 
+        onClose={() => setIsPlansModalOpen(false)} 
+      />
     </div>
   );
 };

@@ -57,8 +57,11 @@ export const MyProfileForm: React.FC = () => {
    const currentRnc = watch("rnc");
 
    useEffect(() => {
-     if (currentRnc && currentRnc.replace(/\D/g, "").length === 11) {
-       handleSearchRnc(currentRnc);
+     if (currentRnc) {
+       const cleaned = currentRnc.replace(/\D/g, "");
+       if (cleaned.length === 11 || cleaned.length === 9) {
+         handleSearchRnc(currentRnc);
+       }
      } else {
        if (previewDgii) setPreviewDgii(null);
        if (rncSearchError) setRncSearchError(null);
@@ -69,6 +72,7 @@ export const MyProfileForm: React.FC = () => {
      const data = await searchRnc(val);
      if (data) {
        setPreviewDgii(data);
+       setValue("rnc", val, { shouldDirty: true });
      } else {
        setPreviewDgii(null);
      }
@@ -111,10 +115,15 @@ export const MyProfileForm: React.FC = () => {
 
   const onSubmit = async (data: UpdateProfileDto) => {
     try {
+      const isRncEmpty = !data.rnc || data.rnc.trim() === "";
       await updateProfile.mutateAsync({
         nombre: data.nombre,
         apellido: data.apellido,
         telefono: data.telefono || undefined,
+        rnc: data.rnc ?? "",
+        razonSocial: isRncEmpty ? "" : (previewDgii?.nombreRazonSocial || user?.razonSocial || ""),
+        nombreComercial: isRncEmpty ? "" : (previewDgii?.nombreComercial || user?.nombreComercial || ""),
+        actividadEconomica: isRncEmpty ? "" : (previewDgii?.actividadEconomica || user?.actividadEconomica || ""),
         ...(data.changePassword && {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword,
@@ -136,15 +145,14 @@ export const MyProfileForm: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
         {/* ═══ LEFT COLUMN: Avatar + Read-only Identity ═══ */}
-        <div className="space-y-6">
-          {/* AVATAR SECTION */}
-          <UserAvatarUpload />
-
-          {/* READ-ONLY identity section */}
-          <div className="bg-surface-raised/30 border border-border rounded-2xl p-5 space-y-3">
-            <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">
-              Datos de Identidad
-            </p>
+        <div className="flex flex-col gap-6 h-full">
+          {/* READ-ONLY identity section with Avatar */}
+          <div className="bg-surface-raised/30 border border-border rounded-2xl p-5 space-y-3 flex-1 flex flex-col">
+            <UserAvatarUpload />
+            <div className="flex-1 space-y-3">
+              <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">
+                Datos de Identidad
+              </p>
             <div className="flex items-center gap-3">
               <Mail className="w-4 h-4 text-text-secondary shrink-0" />
               <div>
@@ -206,14 +214,15 @@ export const MyProfileForm: React.FC = () => {
                 </p>
               </div>
             </div>
+            </div>
           </div>
         </div>
 
         {/* ═══ RIGHT COLUMN: Editable fields + Buttons ═══ */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6 h-full">
 
           {/* Editable fields card */}
-          <div className="bg-surface-raised/30 border border-border rounded-2xl p-5 space-y-4">
+          <div className="bg-surface-raised/30 border border-border rounded-2xl p-5 flex flex-col gap-4 flex-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="mp-nombre" className="block text-xs font-bold text-text-secondary uppercase mb-1">
@@ -360,9 +369,11 @@ export const MyProfileForm: React.FC = () => {
               )}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Buttons card */}
-          <div className="bg-surface-raised/30 border border-border rounded-2xl p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      {/* Warning / Danger area + Save Button */}
+      <div className="mt-8 bg-rose-50 border border-rose-100 rounded-2xl p-5 flex flex-col sm:flex-row gap-4 items-center justify-between shrink-0">
             <div className="flex-1">
               <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-2">
                 Zona de Peligro
@@ -376,9 +387,6 @@ export const MyProfileForm: React.FC = () => {
             >
               {updateProfile.isPending ? "Guardando..." : "Guardar Cambios"}
             </button>
-          </div>
-
-        </div>
       </div>
     </form>
   );
