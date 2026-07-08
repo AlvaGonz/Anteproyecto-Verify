@@ -33,6 +33,8 @@ Object.defineProperty(globalThis, "IntersectionObserver", {
 });
 
 
+import { ProjectStatus } from "../../projects/types";
+
 describe("FeaturedProjectsSection Component", () => {
   let scrollByMock: any;
 
@@ -43,11 +45,11 @@ describe("FeaturedProjectsSection Component", () => {
 
     vi.mocked(useProjects).mockReturnValue({
       data: [
-        { id: "1", nombre: "Blue Forest Residences", ubicacionTexto: "Location 1", imagenUrl: "img1", estadoProyecto: 1, completionRate: 0.85 }, // 8.5/10 => ~85%
-        { id: "2", nombre: "Marina Reef", ubicacionTexto: "Location 2", imagenUrl: "img2", estadoProyecto: 1, completionRate: 1.0 }, // 10/10 => 100%
-        { id: "3", nombre: "Vista Playa", ubicacionTexto: "Location 3", imagenUrl: "img3", estadoProyecto: 1, completionRate: 0.9 }, // 9/10 => 90%
-        { id: "4", nombre: "Central Park SD", ubicacionTexto: "Location 4", imagenUrl: "img4", estadoProyecto: 1, completionRate: 0.9 }, // 9/10 => 90%
-        { id: "5", nombre: "Sky Tower SD", ubicacionTexto: "Location 5", imagenUrl: "img5", estadoProyecto: 1, completionRate: 0.5 }, // 5/10 => 50%
+        { id: "1", nombre: "Blue Forest Residences", ubicacionTexto: "Location 1", imagenUrl: "img1", estadoProyecto: ProjectStatus.Validated, completionRate: 0.85 }, // 8.5/10 => ~85%
+        { id: "2", nombre: "Marina Reef", ubicacionTexto: "Location 2", imagenUrl: "img2", estadoProyecto: ProjectStatus.Validated, completionRate: 1.0 }, // 10/10 => 100%
+        { id: "3", nombre: "Vista Playa", ubicacionTexto: "Location 3", imagenUrl: "img3", estadoProyecto: ProjectStatus.Validated, completionRate: 0.9 }, // 9/10 => 90%
+        { id: "4", nombre: "Central Park SD", ubicacionTexto: "Location 4", imagenUrl: "img4", estadoProyecto: ProjectStatus.Validated, completionRate: 0.9 }, // 9/10 => 90%
+        { id: "5", nombre: "Sky Tower SD", ubicacionTexto: "Location 5", imagenUrl: "img5", estadoProyecto: ProjectStatus.Validated, completionRate: 0.5 }, // 5/10 => 50%
       ],
       isLoading: false,
       error: null,

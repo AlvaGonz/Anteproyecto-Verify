@@ -161,6 +161,7 @@ Senior DevSecOps Engineer.
   This is both a security AND legal compliance requirement (OE-6).
 - **Law 126-02 Gate:** The Digital Integrity Seal (OE-7) must use RSA-2048 signing via 
   Azure Key Vault. Never implement a custom crypto scheme or hardcode keys.
+- **Login Verification Guard (Gate 0):** Never commit or save changes if the user login or authentication process is broken or fails. The integrity of the authentication flow (including `/api/auth/login`, `/api/auth/me`, `/api/auth/refresh`) must be verified as fully operational through tests or manual checks before finalizing any change.
 
 ---
 
