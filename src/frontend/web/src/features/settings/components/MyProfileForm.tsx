@@ -373,20 +373,22 @@ export const MyProfileForm: React.FC = () => {
       </div>
 
       {/* Warning / Danger area + Save Button */}
-      <div className="mt-8 bg-rose-50 border border-rose-100 rounded-2xl p-5 flex flex-col sm:flex-row gap-4 items-center justify-between shrink-0">
-            <div className="flex-1">
-              <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-2">
-                Zona de Peligro
-              </p>
-              <DeleteAccountSection />
-            </div>
-            <button
-              type="submit"
-              disabled={!isDirty || updateProfile.isPending}
-              className="vf-btn-primary disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-            >
-              {updateProfile.isPending ? "Guardando..." : "Guardar Cambios"}
-            </button>
+      <div className="mt-8 bg-rose-50 border border-rose-100 rounded-2xl p-5 shrink-0">
+        <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-2">
+          Zona de Peligro
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 items-start justify-between">
+          <div className="flex-1 w-full">
+            <DeleteAccountSection />
+          </div>
+          <button
+            type="submit"
+            disabled={!isDirty || updateProfile.isPending}
+            className="vf-btn-primary disabled:opacity-40 disabled:cursor-not-allowed shrink-0 py-3"
+          >
+            {updateProfile.isPending ? "Guardando..." : "Guardar Cambios"}
+          </button>
+        </div>
       </div>
     </form>
   );

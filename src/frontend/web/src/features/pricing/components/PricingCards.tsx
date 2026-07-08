@@ -11,6 +11,8 @@ interface PricingCardsProps {
   prices: { profesional: string; empresa: string; enterprise: string };
   handleFreePlan: () => void;
   handlePaidPlan: (plan: "profesional" | "empresa" | "enterprise") => void;
+  modalMode?: boolean;
+  currentPlan?: string | null;
 }
 
 export const PricingCards: React.FC<PricingCardsProps> = ({
@@ -19,14 +21,38 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
   prices,
   handleFreePlan,
   handlePaidPlan,
+  modalMode,
+  currentPlan,
 }) => {
+  const getCardClasses = (planKey: string, isDefaultPopular: boolean, staggerNum: number) => {
+    const isEmbossed = modalMode ? currentPlan === planKey : isDefaultPopular;
+    
+    if (isEmbossed) {
+      return `bg-surface rounded-xl p-6 xl:p-8 border-2 border-primary shadow-xl flex flex-col text-left relative transform md:-translate-y-4 card-enter card-stagger-${staggerNum} hover:-translate-y-6 hover:shadow-2xl transition-all duration-300 z-10 ${isRevealed ? "is-visible" : ""}`;
+    }
+    return `bg-surface rounded-xl p-6 xl:p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-${staggerNum} hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`;
+  };
+
+  const renderBadge = (planKey: string, isDefaultPopular: boolean) => {
+    const isEmbossed = modalMode ? currentPlan === planKey : isDefaultPopular;
+    if (!isEmbossed) return null;
+    
+    const badgeText = modalMode ? "PLAN ACTUAL" : t("pricing.cards.popular");
+    return (
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-on-primary text-xs font-label font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm badge-pulse whitespace-nowrap">
+        {badgeText}
+      </div>
+    );
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-6 pb-24 reveal-section">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Card 1: Consulta */}
         <div
-          className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-1 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}
+          className={getCardClasses("consultor", false, 1)}
         >
+          {renderBadge("consultor", false)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
             {t("pricing.cards.free.title")}
           </h3>
@@ -70,16 +96,14 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
 
         {/* Card 2: Profesional (Featured) */}
         <div
-          className={`bg-surface rounded-xl p-8 border-2 border-primary shadow-xl flex flex-col text-left relative transform md:-translate-y-4 card-enter card-stagger-2 hover:-translate-y-6 hover:shadow-2xl transition-all duration-300 z-10 ${isRevealed ? "is-visible" : ""}`}
+          className={getCardClasses("profesional", true, 2)}
         >
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-on-primary text-xs font-label font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm badge-pulse">
-            {t("pricing.cards.popular")}
-          </div>
+          {renderBadge("profesional", true)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
             {t("pricing.cards.pro.title")}
           </h3>
           <div className="mb-6 flex items-baseline">
-            <span className="text-3xl font-headline font-extrabold text-primary">
+            <span className="text-3xl font-headline font-extrabold text-primary whitespace-nowrap">
               {prices.profesional}
             </span>
             <span className="text-on-surface-variant font-body text-sm ml-2">
@@ -127,13 +151,14 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
 
         {/* Card 3: Empresa */}
         <div
-          className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-3 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}
+          className={getCardClasses("empresa", false, 3)}
         >
+          {renderBadge("empresa", false)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
             {t("pricing.cards.empresa.title")}
           </h3>
           <div className="mb-6 flex items-baseline">
-            <span className="text-3xl font-headline font-extrabold text-secondary">
+            <span className="text-3xl font-headline font-extrabold text-secondary whitespace-nowrap">
               {prices.empresa}
             </span>
             <span className="text-on-surface-variant font-body text-sm ml-2">
@@ -181,13 +206,14 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
 
         {/* Card 4: Enterprise */}
         <div
-          className={`bg-surface rounded-xl p-8 border border-outline-variant/50 shadow-sm flex flex-col text-left card-enter card-stagger-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 ${isRevealed ? "is-visible" : ""}`}
+          className={getCardClasses("enterprise", false, 4)}
         >
+          {renderBadge("enterprise", false)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
             {t("pricing.cards.enterprise.title")}
           </h3>
           <div className="mb-6 flex items-baseline">
-            <span className="text-3xl font-headline font-extrabold text-on-surface">
+            <span className="text-3xl font-headline font-extrabold text-on-surface whitespace-nowrap">
               {prices.enterprise}
             </span>
             <span className="text-on-surface-variant font-body text-sm ml-2">

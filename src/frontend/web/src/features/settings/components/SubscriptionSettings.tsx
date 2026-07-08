@@ -230,6 +230,7 @@ export const SubscriptionSettings: React.FC = () => {
       <PlansModal 
         isOpen={isPlansModalOpen} 
         onClose={() => setIsPlansModalOpen(false)} 
+        currentPlan={planKey}
       />
     </div>
   );
