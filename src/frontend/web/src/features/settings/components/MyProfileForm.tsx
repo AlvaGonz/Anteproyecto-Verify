@@ -9,6 +9,7 @@ import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
 import { DeleteAccountSection } from "./DeleteAccountSection";
+import { useDgiiLookup, DgiiData } from "../../../shared/hooks/useDgiiLookup";
 
 const ROLE_LABEL: Record<string, string> = {
   admin: "Administrador",
@@ -49,6 +50,36 @@ export const MyProfileForm: React.FC = () => {
      const digits = formattedValue.replace(/\D/g, '');
      setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
    });
+
+   // RNC auto-search logic
+   const { searchRnc, isSearching: isSearchingRnc, error: rncSearchError, setError: setRncSearchError } = useDgiiLookup();
+   const [previewDgii, setPreviewDgii] = useState<DgiiData | null>(null);
+   const currentRnc = watch("rnc");
+
+   useEffect(() => {
+     if (currentRnc && currentRnc.replace(/\D/g, "").length === 11) {
+       handleSearchRnc(currentRnc);
+     } else {
+       if (previewDgii) setPreviewDgii(null);
+       if (rncSearchError) setRncSearchError(null);
+     }
+   }, [currentRnc]);
+
+   const handleSearchRnc = async (val: string) => {
+     const data = await searchRnc(val);
+     if (data) {
+       setPreviewDgii(data);
+     } else {
+       setPreviewDgii(null);
+     }
+   };
+
+   const handleRncKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+     if (e.key === "Enter") {
+       e.preventDefault();
+       handleSearchRnc(currentRnc || "");
+     }
+   };
 
    useEffect(() => {
      refreshUser();
@@ -153,7 +184,7 @@ export const MyProfileForm: React.FC = () => {
               <div>
                 <p className="text-[10px] text-text-secondary uppercase font-bold">Razón Social (DGII)</p>
                 <p className="text-sm font-bold text-text-primary">
-                  {user?.razonSocial || "******* ******* *******"}
+                  {previewDgii?.nombreRazonSocial || user?.razonSocial || "******* ******* *******"}
                 </p>
               </div>
             </div>
@@ -162,7 +193,7 @@ export const MyProfileForm: React.FC = () => {
               <div>
                 <p className="text-[10px] text-text-secondary uppercase font-bold">Nombre Comercial</p>
                 <p className="text-sm font-bold text-text-primary">
-                  {user?.nombreComercial || "******* ******* *******"}
+                  {previewDgii?.nombreComercial || user?.nombreComercial || "******* ******* *******"}
                 </p>
               </div>
             </div>
@@ -171,7 +202,7 @@ export const MyProfileForm: React.FC = () => {
               <div>
                 <p className="text-[10px] text-text-secondary uppercase font-bold">Actividad Económica</p>
                 <p className="text-sm font-bold text-text-primary">
-                  {user?.actividadEconomica || "******* ******* *******"}
+                  {previewDgii?.actividadEconomica || user?.actividadEconomica || "******* ******* *******"}
                 </p>
               </div>
             </div>
@@ -263,12 +294,21 @@ export const MyProfileForm: React.FC = () => {
                   id="rnc"
                   type="text"
                   maxLength={20}
-                  className="vf-input w-full pl-9"
+                  onKeyDown={handleRncKeyDown}
+                  className={`vf-input w-full pl-9 ${rncSearchError ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
                   placeholder="Ej: 101000000"
                 />
+                {isSearchingRnc && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
               </div>
               {errors.rnc && (
                 <p className="text-[10px] text-red-500 mt-1">{errors.rnc.message}</p>
+              )}
+              {rncSearchError && !errors.rnc && (
+                <p className="text-[10px] text-red-500 mt-1">{rncSearchError}</p>
               )}
             </div>
 

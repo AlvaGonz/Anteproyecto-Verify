@@ -125,6 +125,13 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     }
   };
 
+  useEffect(() => {
+    const cleaned = rncDesarrollador.replace(/[- ]/g, "").trim();
+    if (cleaned.length === 11) {
+      handleRncSearch(rncDesarrollador);
+    }
+  }, [rncDesarrollador]);
+
   // ── Photo Handlers ─────────────────────────────────────────────────────────
   const handlePortraitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFotosError(null);

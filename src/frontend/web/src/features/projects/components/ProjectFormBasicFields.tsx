@@ -142,9 +142,15 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
             setRncDesarrollador(e.target.value);
             if (rncError) setRncError(null);
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleRncSearch(rncDesarrollador);
+            }
+          }}
           onBlur={() => handleRncSearch(rncDesarrollador)}
           className={`vf-input ${rncError ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
-          placeholder="Ingrese RNC o Cédula (ej: 02601322098) y presione Tab"
+          placeholder="Ingrese RNC o Cédula (ej: 02601322098)"
         />
         {isSearchingRnc && (
           <div className="absolute right-3 top-3.5 flex items-center">
