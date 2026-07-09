@@ -80,12 +80,16 @@ export const SubscriptionSettings: React.FC = () => {
 
   // Only show the price when Stripe is actively billing the user.
   // Manually-assigned plans (e.g. Consultor/free tier) don't get a price row.
-  const formattedPrice = (isManagedByStripe && data?.planPrice != null)
-    ? data.planPrice === 0
-      ? "Gratis"
-      : PRICE_FORMATTER.format(data.planPrice) + " USD / mes"
-    : null;
-
+  let formattedPrice: string | null = null;
+  if (isManagedByStripe && data?.planPrice != null) {
+    if (data.planPrice === 0) {
+      formattedPrice = "Gratis";
+    } else {
+      const priceVal = data.planPrice;
+      const isAnnual = priceVal === 48 || priceVal === 136 || priceVal === 400;
+      formattedPrice = PRICE_FORMATTER.format(priceVal) + ` USD ${isAnnual ? '(anual)' : ''} / mes`;
+    }
+  }
 
   return (
     <div className="w-full max-w-4xl space-y-6 animate-in fade-in zoom-in-95 duration-300">
