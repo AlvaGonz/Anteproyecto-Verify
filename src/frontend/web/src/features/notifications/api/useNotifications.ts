@@ -19,3 +19,13 @@ export const useMarkAsRead = () => {
   });
 };
 
+export const useMarkAllAsRead = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useNotifications_markAll'],
+    mutationFn: () =>
+      apiClient.post(`/notifications/read-all`).then(res => res.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+  });
+};
+

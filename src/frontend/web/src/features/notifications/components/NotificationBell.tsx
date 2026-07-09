@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
 import { NotificationDto } from "../types";
-import { useNotifications, useMarkAsRead } from "../api/useNotifications";
+import { useNotifications, useMarkAsRead, useMarkAllAsRead } from "../api/useNotifications";
 
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +9,7 @@ export const NotificationBell: React.FC = () => {
 
   const { data: rawNotifications = [] } = useNotifications(true);
   const markAsReadMutation = useMarkAsRead();
+  const markAllAsReadMutation = useMarkAllAsRead();
 
   // Mapping from API model to UI model
   const notifications = React.useMemo(() => {
@@ -40,6 +41,14 @@ export const NotificationBell: React.FC = () => {
     }
   };
 
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllAsReadMutation.mutateAsync();
+    } catch (error) {
+      console.error("Error marking all as read", error);
+    }
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button type="button"
@@ -57,9 +66,21 @@ export const NotificationBell: React.FC = () => {
         <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-xl shadow-2xl bg-surface border border-border z-[100] overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
           <div className="py-3 px-4 border-b border-border/50 flex justify-between items-center bg-surface">
             <h3 className="text-sm font-bold text-text-primary">Notificaciones</h3>
-            <span className="text-xs text-text-primary opacity-50">
-              {notifications.length} nuevas
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-text-primary opacity-50">
+                {notifications.length} nuevas
+              </span>
+              {notifications.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleMarkAllAsRead}
+                  disabled={markAllAsReadMutation.isPending}
+                  className="text-xs text-primary hover:underline font-medium"
+                >
+                  Limpiar todas
+                </button>
+              )}
+            </div>
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (

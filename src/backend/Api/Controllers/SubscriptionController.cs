@@ -154,6 +154,24 @@ public class SubscriptionController : ControllerBase
             effectiveStatus = "incomplete";
         }
 
+        string? billingCycle = null;
+        if (!string.IsNullOrEmpty(user.StripeSubscriptionId))
+        {
+            try
+            {
+                var subService = new SubscriptionService();
+                var sub = await subService.GetAsync(user.StripeSubscriptionId, cancellationToken: ct);
+                if (sub != null && sub.Items.Data.Count > 0)
+                {
+                    billingCycle = sub.Items.Data[0].Price.Recurring.Interval;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not fetch Stripe subscription for User {UserId}", user.Id);
+            }
+        }
+
         return Ok(new
         {
             plan = user.Plan?.NombrePlan,
@@ -161,7 +179,8 @@ public class SubscriptionController : ControllerBase
             subscriptionStatus = effectiveStatus,
             currentPeriodEnd = user.CurrentPeriodEnd,
             stripeSubscriptionId = user.StripeSubscriptionId,
-            isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId)
+            isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId),
+            billingCycle = billingCycle
         });
     }
 

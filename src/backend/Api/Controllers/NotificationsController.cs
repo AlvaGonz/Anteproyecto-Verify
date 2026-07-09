@@ -71,4 +71,24 @@ public class NotificationsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost("read-all")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var notifications = await _notificacionRepository.GetByUsuarioIdAsync(userId, true, cancellationToken);
+        foreach (var notification in notifications)
+        {
+            notification.MarcarComoLeida();
+            await _notificacionRepository.UpdateAsync(notification, cancellationToken);
+        }
+
+        return NoContent();
+    }
 }
