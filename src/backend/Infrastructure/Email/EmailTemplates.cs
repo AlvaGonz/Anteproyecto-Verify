@@ -335,12 +335,15 @@ public static class EmailTemplates
     public static string GetSubscriptionActivatedEmail(string userName, string planName, decimal planPrice)
     {
         string billingUrl = $"http://localhost:3000/#/settings/subscription";
+        
+        bool isAnual = planPrice == 48m || planPrice == 136m || planPrice == 400m;
+        string priceSuffix = isAnual ? " USD anual /mes" : " USD /mes";
 
         string infoInner = $@"
             <strong style=""color:{Navy};"">Plan Contratado</strong><br>
             <span style=""color:{TextBody};"">{planName}</span><br><br>
             <strong style=""color:{Navy};"">Precio</strong><br>
-            <span style=""color:{TextBody};"">${planPrice:0.00}</span><br><br>
+            <span style=""color:{TextBody};"">${planPrice:0.00}{priceSuffix}</span><br><br>
             <strong style=""color:{Navy};"">Fecha de Activación</strong><br>
             <span style=""color:{TextMuted};""> {System.DateTime.Now:dd/MM/yyyy}</span>";
 
