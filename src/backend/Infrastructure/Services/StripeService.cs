@@ -25,4 +25,15 @@ public class StripeService : IStripeService
         };
         await service.UpdateAsync(subscriptionId, options, cancellationToken: cancellationToken);
     }
+
+    public async Task ReactivateSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default)
+    {
+        var service = new SubscriptionService();
+        var options = new SubscriptionUpdateOptions
+        {
+            CancelAtPeriodEnd = false
+        };
+
+        await service.UpdateAsync(subscriptionId, options, cancellationToken: cancellationToken);
+    }
 }

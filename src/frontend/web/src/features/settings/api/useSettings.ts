@@ -154,6 +154,29 @@ export const useSyncSubscription = () => {
   });
 };
 
+export const useCancelSubscription = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["useCancelSubscription"],
+    mutationFn: () => apiClient.post<{message: string}>("/v1/subscriptions/cancel").then(res => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+    }
+  });
+};
+
+export const useReactivateSubscription = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["useReactivateSubscription"],
+    mutationFn: () => apiClient.post<{message: string}>("/v1/subscriptions/reactivate").then(res => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+    }
+  });
+};
+
+
 export const usePotentialInvitees = () =>
   useQuery({
     queryKey: ["settings", "potential-invitees"],

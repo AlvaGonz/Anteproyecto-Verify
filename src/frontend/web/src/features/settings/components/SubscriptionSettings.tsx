@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift } from "lucide-react";
-import { useMySubscription, useSyncSubscription } from "../api/useSettings";
+import { useMySubscription, useSyncSubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 import { PlansModal } from "./PlansModal";
 
@@ -28,6 +28,11 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; icon: Re
   canceled: {
     label: "Suscripción Cancelada",
     className: "bg-rose-50 text-rose-700 border-rose-200",
+    icon: <AlertCircle className="w-4 h-4" />,
+  },
+  canceling: {
+    label: "Cancelación Programada",
+    className: "bg-orange-50 text-orange-700 border-orange-200",
     icon: <AlertCircle className="w-4 h-4" />,
   },
   past_due: {
@@ -101,6 +106,8 @@ export const SubscriptionSettings: React.FC = () => {
   }
 
   const { mutate: syncSubscription, isPending: isSyncing } = useSyncSubscription();
+  const { mutate: cancelSubscription, isPending: isCanceling } = useCancelSubscription();
+  const { mutate: reactivateSubscription, isPending: isReactivating } = useReactivateSubscription();
 
   return (
     <div className="w-full max-w-4xl space-y-6 animate-in fade-in zoom-in-95 duration-300">
@@ -241,14 +248,44 @@ export const SubscriptionSettings: React.FC = () => {
             <div className="text-sm text-text-secondary font-medium">
               ¿Deseas cambiar tu plan o explorar otras opciones?
             </div>
-            <button type="button"
-              onClick={() => setIsPlansModalOpen(true)}
-              className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
-            >
-              <span className="flex items-center gap-2">
-                {hasPlan ? "Modificar Suscripción" : "Ver Planes"} <ArrowRight className="w-4 h-4" />
-              </span>
-            </button>
+            <div className="flex gap-2">
+              {status === 'active' && data?.isManagedByStripe && (
+                <button type="button"
+                  onClick={() => {
+                    if (confirm("¿Estás seguro que deseas cancelar tu suscripción? Se mantendrá activa hasta el final del período actual.")) {
+                      cancelSubscription();
+                    }
+                  }}
+                  disabled={isCanceling}
+                  className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 disabled:opacity-50"
+                >
+                  <span className="flex items-center gap-2">
+                    {isCanceling ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                    Cancelar Suscripción
+                  </span>
+                </button>
+              )}
+              {status === 'canceling' && data?.isManagedByStripe && (
+                <button type="button"
+                  onClick={() => reactivateSubscription()}
+                  disabled={isReactivating}
+                  className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 disabled:opacity-50"
+                >
+                  <span className="flex items-center gap-2">
+                    {isReactivating ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                    Reactivar Suscripción
+                  </span>
+                </button>
+              )}
+              <button type="button"
+                onClick={() => setIsPlansModalOpen(true)}
+                className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
+              >
+                <span className="flex items-center gap-2">
+                  {hasPlan ? "Modificar Suscripción" : "Ver Planes"} <ArrowRight className="w-4 h-4" />
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

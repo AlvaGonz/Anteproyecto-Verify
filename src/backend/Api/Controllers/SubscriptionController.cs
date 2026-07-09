@@ -160,6 +160,11 @@ public class SubscriptionController : ControllerBase
             effectiveStatus = "incomplete";
         }
 
+        if (effectiveStatus == "active" && user.CancelAtPeriodEnd)
+        {
+            effectiveStatus = "canceling";
+        }
+
         string? billingCycle = user.PendingBillingCycle;
         if (string.IsNullOrEmpty(billingCycle) && !string.IsNullOrEmpty(user.StripeSubscriptionId))
         {
@@ -184,6 +189,8 @@ public class SubscriptionController : ControllerBase
             planPrice = user.Plan?.Precio,
             subscriptionStatus = effectiveStatus,
             currentPeriodEnd = user.CurrentPeriodEnd,
+            cancelAtPeriodEnd = user.CancelAtPeriodEnd,
+            cancelAt = user.CancelAt,
             stripeSubscriptionId = user.StripeSubscriptionId,
             isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId),
             billingCycle = !string.IsNullOrEmpty(user.PendingBillingCycle) ? user.PendingBillingCycle : billingCycle
@@ -506,6 +513,16 @@ public class SubscriptionController : ControllerBase
 
         // Always sync the Stripe subscription fields
         user.UpdateStripeSubscription(subscription.Id, subscription.Status, currentPeriodEnd);
+        
+        if (subscription.CancelAtPeriodEnd)
+        {
+            user.SetCancellationScheduled(subscription.CancelAt);
+        }
+        else
+        {
+            user.ClearCancellationScheduled();
+        }
+
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation(
@@ -611,6 +628,66 @@ public class SubscriptionController : ControllerBase
         return Task.FromResult(roles.Any(r => 
             string.Equals(r, "admin", StringComparison.OrdinalIgnoreCase) || 
             string.Equals(r, "Administrator", StringComparison.OrdinalIgnoreCase)));
+    }
+
+    [HttpPost("cancel")]
+    [Authorize]
+    public async Task<IActionResult> CancelSubscription([FromServices] Application.Abstractions.IStripeService stripeService, CancellationToken ct)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null || string.IsNullOrEmpty(user.StripeSubscriptionId))
+            return BadRequest(new { message = "Suscripción no encontrada o no gestionada por Stripe." });
+
+        try
+        {
+            await stripeService.CancelAtPeriodEndAsync(user.StripeSubscriptionId, ct);
+            
+            var subService = new SubscriptionService();
+            var sub = await subService.GetAsync(user.StripeSubscriptionId, cancellationToken: ct);
+            
+            user.SetCancellationScheduled(sub.CancelAt);
+            await _dbContext.SaveChangesAsync(ct);
+
+            return Ok(new { message = "Cancelación programada." });
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe error cancelling subscription.");
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
+        }
+    }
+
+    [HttpPost("reactivate")]
+    [Authorize]
+    public async Task<IActionResult> ReactivateSubscription([FromServices] Application.Abstractions.IStripeService stripeService, CancellationToken ct)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null || string.IsNullOrEmpty(user.StripeSubscriptionId))
+            return BadRequest(new { message = "Suscripción no encontrada." });
+
+        if (!user.CancelAtPeriodEnd)
+            return BadRequest(new { message = "La suscripción no está en proceso de cancelación." });
+
+        try
+        {
+            await stripeService.ReactivateSubscriptionAsync(user.StripeSubscriptionId, ct);
+            
+            user.ClearCancellationScheduled();
+            await _dbContext.SaveChangesAsync(ct);
+
+            return Ok(new { message = "Suscripción reactivada exitosamente." });
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe error reactivating subscription.");
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
+        }
     }
 }
 
