@@ -242,7 +242,7 @@ export const LegalPage: React.FC = () => {
       <section className="bg-secondary w-full py-12 px-4 sm:px-6 lg:px-8 mt-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-white text-center md:text-left">
-            <h3 className="font-headline text-2xl font-bold mb-2">¿Necesita asistencia legal?</h3>
+            <h3 className="font-headline text-2xl font-bold mb-2">¿Necesita asistencia?</h3>
             <p className="font-body text-sm opacity-90 mb-1">
               Contáctenos para consultas sobre privacidad o términos de servicio.
             </p>

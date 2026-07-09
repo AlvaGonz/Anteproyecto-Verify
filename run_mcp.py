@@ -1,7 +1,7 @@
 import subprocess
 import json
 
-exe = r"C:\Users\Admin\AppData\Local\Programs\codebase-memory-mcp\codebase-memory-mcp.exe"
+exe = r"C:\Users\Alva\AppData\Local\Programs\codebase-memory-mcp\codebase-memory-mcp.exe"
 query_obj = {
     "project": "C-Users-Admin-Desktop-Anteproyecto-Verify",
     "query": """MATCH (f:Function)

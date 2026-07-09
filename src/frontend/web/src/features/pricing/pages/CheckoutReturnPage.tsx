@@ -117,9 +117,31 @@ export const CheckoutReturnPage = () => {
           }
 
           if (state !== 'dashboard') {
-            // Could not verify active subscription after polling
-            setStatus('error')
-            return
+            // As a final fallback, manually trigger a sync in case the webhook was missed or delayed
+            try {
+              await apiClient.post('/v1/subscriptions/sync');
+              
+              // Invalidate caches and fetch one last time
+              await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] });
+              await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+              await refreshUser();
+              
+              const authRes = await apiClient.get('/auth/me');
+              const finalStatus = authRes.data.subscriptionStatus;
+              
+              state = resolvePostCheckoutState({
+                sessionStatus: data.status,
+                userSubscriptionStatus: finalStatus
+              });
+            } catch (syncError) {
+              // Ignore sync error and proceed to error state
+            }
+
+            if (state !== 'dashboard') {
+              // Could not verify active subscription after polling and sync fallback
+              setStatus('error');
+              return;
+            }
           }
 
           if (redirectedRef.current) return

@@ -220,6 +220,84 @@ public class SubscriptionController : ControllerBase
         }
     }
 
+    [HttpPost("create-portal-session")]
+    [Authorize]
+    public async Task<IActionResult> CreatePortalSession(CancellationToken ct)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
+            return Unauthorized();
+
+        var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null || string.IsNullOrEmpty(user.StripeCustomerId))
+            return BadRequest(new { message = "Usuario no tiene un Stripe Customer ID asociado." });
+
+        try
+        {
+            var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:3000";
+            var options = new Stripe.BillingPortal.SessionCreateOptions
+            {
+                Customer = user.StripeCustomerId,
+                ReturnUrl = frontendUrl.TrimEnd('/') + "/#/admin/settings",
+            };
+
+            var service = new Stripe.BillingPortal.SessionService();
+            var session = await service.CreateAsync(options, cancellationToken: ct);
+
+            return Ok(new { url = session.Url });
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe Portal API error");
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
+        }
+    }
+
+    [HttpPost("sync")]
+    [Authorize]
+    public async Task<IActionResult> SyncSubscription(CancellationToken ct)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
+            return Unauthorized();
+
+        var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null || string.IsNullOrEmpty(user.StripeCustomerId))
+            return BadRequest(new { message = "Usuario no tiene un Stripe Customer ID asociado." });
+
+        try
+        {
+            var subService = new SubscriptionService();
+            var options = new SubscriptionListOptions
+            {
+                Customer = user.StripeCustomerId,
+                Status = "all",
+                Limit = 1
+            };
+            
+            var subscriptions = await subService.ListAsync(options, cancellationToken: ct);
+            var activeSub = subscriptions.FirstOrDefault(s => s.Status == "active" || s.Status == "trialing")
+                            ?? subscriptions.FirstOrDefault();
+
+            if (activeSub != null)
+            {
+                var pricePlanMap = _configuration
+                    .GetSection("Stripe:PricePlanMap")
+                    .GetChildren()
+                    .ToDictionary(c => c.Key, c => c.Value ?? string.Empty);
+
+                await HandleSubscriptionActivatedAsync(user.StripeCustomerId, activeSub.Id, pricePlanMap);
+            }
+
+            return Ok(new { message = "Suscripción sincronizada." });
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe API error during sync for user {UserId}", userId);
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
+        }
+    }
+
     [HttpPost("webhook")]
     [AllowAnonymous]
     public async Task<IActionResult> Webhook()
@@ -309,12 +387,12 @@ public class SubscriptionController : ControllerBase
         }
         catch (StripeException e)
         {
-            _logger.LogError(e, "Stripe webhook signature validation failed.");
+            _logger.LogError(e, "Stripe webhook signature validation failed. Header: {Signature}, Error: {Message}", Request.Headers["Stripe-Signature"], e.Message);
             return BadRequest();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error processing Stripe webhook.");
+            _logger.LogError(e, "Error processing Stripe webhook: {Message}", e.Message);
             return StatusCode(500);
         }
     }

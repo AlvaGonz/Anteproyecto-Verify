@@ -125,18 +125,20 @@ export const PricingPageLayout: React.FC<PricingPageLayoutProps> = ({
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto shrink-0">
-              <Link
-                to="/contacto"
+              <a
+                href="https://wa.link/oi1w9m"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-primary hover:bg-primary-hover text-on-primary font-label font-bold px-6 py-3 rounded-lg shadow-md transition-colors flex items-center justify-center gap-2 btn-interact text-center"
               >
                 {t("pricing.cta.sales")}
-              </Link>
-              <a
-                href="https://portal.verifinca.com/legal#terminos"
+              </a>
+              <Link
+                to="/legal#billing"
                 className="bg-transparent border border-outline-variant hover:bg-white/10 text-secondary-container text-on-secondary font-label font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 btn-interact text-center"
               >
                 {t("pricing.cta.docs")}
-              </a>
+              </Link>
             </div>
           </div>
         </section>
