@@ -15,10 +15,12 @@ using Microsoft.AspNetCore.Mvc;
 public class NotificationsController : ControllerBase
 {
     private readonly INotificacionRepository _notificacionRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public NotificationsController(INotificacionRepository notificacionRepository)
+    public NotificationsController(INotificacionRepository notificacionRepository, IUnitOfWork unitOfWork)
     {
         _notificacionRepository = notificacionRepository;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
@@ -68,6 +70,7 @@ public class NotificationsController : ControllerBase
 
         notification.MarcarComoLeida();
         await _notificacionRepository.UpdateAsync(notification, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return NoContent();
     }
@@ -88,6 +91,8 @@ public class NotificationsController : ControllerBase
             notification.MarcarComoLeida();
             await _notificacionRepository.UpdateAsync(notification, cancellationToken);
         }
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return NoContent();
     }
