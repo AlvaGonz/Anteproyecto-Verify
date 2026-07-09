@@ -59,6 +59,12 @@ public class SubscriptionController : ControllerBase
             return StatusCode(500, new { message = "Stripe Secret Key is not configured on the server." });
         }
 
+        if (!string.IsNullOrEmpty(request.PlanCode) || !string.IsNullOrEmpty(request.BillingCycle))
+        {
+            user.SetPendingPlan(request.PlanCode ?? user.PendingPlanCode, request.BillingCycle ?? user.PendingBillingCycle);
+            await _dbContext.SaveChangesAsync(ct);
+        }
+
         try
         {
             var customerId = user.StripeCustomerId;
@@ -452,6 +458,14 @@ public class SubscriptionController : ControllerBase
                 var isNewPlan = user.PlanSuscripcionId != plan.Idsuscripcion;
 
                 user.AsignarPlan(plan.Idsuscripcion);
+
+                var interval = subscription.Items?.Data?.FirstOrDefault()?.Price?.Recurring?.Interval 
+                               ?? subscription.Items?.Data?.FirstOrDefault()?.Plan?.Interval;
+                if (!string.IsNullOrEmpty(interval))
+                {
+                    user.SetPendingPlan(user.PendingPlanCode, interval == "year" ? "yearly" : "monthly");
+                }
+
                 _logger.LogInformation(
                     "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",
                     planName, priceId, user.Id);

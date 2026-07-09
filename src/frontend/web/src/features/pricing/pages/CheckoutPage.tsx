@@ -73,6 +73,8 @@ export const CheckoutPage = () => {
       // Calls backend: POST /api/v1/subscriptions/create-session
       const response = await apiClient.post('/v1/subscriptions/create-session', {
         priceId,
+        planCode: plan,
+        billingCycle: billing,
         consent: consentData
       });
       return response.data.clientSecret;
