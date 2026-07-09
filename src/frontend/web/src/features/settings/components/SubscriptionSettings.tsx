@@ -81,7 +81,7 @@ export const SubscriptionSettings: React.FC = () => {
   let formattedPrice: string | null = null;
   if (isManagedByStripe && hasPlan) {
     // Determine the price based on the plan name and billing cycle (since DB stores DOP and we want USD UI)
-    const isAnnual = data.billingCycle === 'year';
+    const isAnnual = data.billingCycle === 'year' || data.billingCycle === 'yearly';
     let priceVal = 0;
 
     if (planKey === 'profesional') {
