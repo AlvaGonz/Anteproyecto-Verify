@@ -75,9 +75,9 @@ public class ResendEmailService : IEmailService
         await SendEmailAsync(toEmail, "¡Tu Proyecto ha sido Creado! - VeriFinca", html, ct);
     }
 
-    public async Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, decimal planPrice, CancellationToken ct = default)
+    public async Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, string interval, CancellationToken ct = default)
     {
-        var html = EmailTemplates.GetSubscriptionActivatedEmail(userName, planName, planPrice);
+        var html = EmailTemplates.GetSubscriptionActivatedEmail(userName, planName, interval);
         await SendEmailAsync(toEmail, "Suscripción Activada - VeriFinca", html, ct);
     }
 }

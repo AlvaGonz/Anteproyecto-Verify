@@ -332,18 +332,35 @@ public static class EmailTemplates
     // ════════════════════════════════════════════════════════════════════════
     // 5. Subscription Activated
     // ════════════════════════════════════════════════════════════════════════
-    public static string GetSubscriptionActivatedEmail(string userName, string planName, decimal planPrice)
+    public static string GetSubscriptionActivatedEmail(string userName, string planName, string interval)
     {
         string billingUrl = $"http://localhost:3000/#/settings/subscription";
         
-        bool isAnual = planPrice == 48m || planPrice == 136m || planPrice == 400m;
-        string priceSuffix = isAnual ? " USD anual /mes" : " USD /mes";
+        bool isAnual = interval == "yearly";
+        string priceDisplay = "";
+        
+        if (planName.Contains("Profesional", System.StringComparison.OrdinalIgnoreCase))
+        {
+            priceDisplay = isAnual ? "$48 USD anual /mes" : "$60 USD /mes";
+        }
+        else if (planName.Contains("Empresa", System.StringComparison.OrdinalIgnoreCase))
+        {
+            priceDisplay = isAnual ? "$136 USD anual /mes" : "$170 USD /mes";
+        }
+        else if (planName.Contains("Enterprise", System.StringComparison.OrdinalIgnoreCase))
+        {
+            priceDisplay = isAnual ? "$400 USD anual /mes" : "$500 USD /mes";
+        }
+        else 
+        {
+            priceDisplay = isAnual ? "Suscripción anual" : "Suscripción mensual";
+        }
 
         string infoInner = $@"
             <strong style=""color:{Navy};"">Plan Contratado</strong><br>
             <span style=""color:{TextBody};"">{planName}</span><br><br>
             <strong style=""color:{Navy};"">Precio</strong><br>
-            <span style=""color:{TextBody};"">${planPrice:0.00}{priceSuffix}</span><br><br>
+            <span style=""color:{TextBody};"">{priceDisplay}</span><br><br>
             <strong style=""color:{Navy};"">Fecha de Activación</strong><br>
             <span style=""color:{TextMuted};""> {System.DateTime.Now:dd/MM/yyyy}</span>";
 

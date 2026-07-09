@@ -463,17 +463,17 @@ public class SubscriptionController : ControllerBase
 
             if (plan != null)
             {
-                var pricesConfig = _configuration.GetSection("Stripe:Prices").GetChildren();
-                var isAnnualPrice = pricesConfig.Any(p => p.Key.EndsWith("Anual", StringComparison.OrdinalIgnoreCase) && p.Value == priceId);
-                var interval = isAnnualPrice ? "yearly" : "monthly";
+                var recurringInterval = subscription.Items?.Data?.FirstOrDefault()?.Price?.Recurring?.Interval;
+                var interval = !string.IsNullOrEmpty(recurringInterval) ? recurringInterval : "monthly";
                 var oldPlanId = user.PlanSuscripcionId;
                 var oldInterval = user.PendingBillingCycle;
 
                 user.AsignarPlan(plan.Idsuscripcion);
                 user.SetPendingPlan(user.PendingPlanCode, interval);
 
-                var isNewPlan = oldPlanId != plan.Idsuscripcion || oldInterval != interval || isCheckout;
-
+                bool isNewPlan = (oldPlanId != plan.Idsuscripcion) || (oldInterval != interval) || isCheckout;
+                await ProcessSubscriptionNotificationAsync(user, plan, isNewPlan, interval);
+                
                 _logger.LogInformation(
                     "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",
                     planName, priceId, user.Id);
@@ -493,8 +493,6 @@ public class SubscriptionController : ControllerBase
                         invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
                     }
                 }
-
-                await ProcessSubscriptionNotificationAsync(user, plan, isNewPlan);
             }
             else
             {
@@ -530,7 +528,7 @@ public class SubscriptionController : ControllerBase
             user.Id, subscription.Status, currentPeriodEnd);
     }
 
-    internal async Task ProcessSubscriptionNotificationAsync(Usuario user, PlanSuscripcion plan, bool isNewPlan)
+    internal async Task ProcessSubscriptionNotificationAsync(Usuario user, PlanSuscripcion plan, bool isNewPlan, string interval)
     {
         if (isNewPlan)
         {
@@ -547,7 +545,7 @@ public class SubscriptionController : ControllerBase
                 user.Email,
                 user.NombreCompleto,
                 plan.NombrePlan,
-                plan.Precio
+                interval
             );
         }
     }

@@ -15,7 +15,24 @@ export const useMarkAsRead = () => {
     mutationKey: ['useNotifications'],
     mutationFn: (id: string) =>
       apiClient.post(`/notifications/${id}/read`).then(res => res.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ["notifications"] });
+      const previousNotifications = qc.getQueryData(["notifications", true]);
+      qc.setQueryData(["notifications", true], (old: any) => {
+        if (!old) return [];
+        return old.filter((n: any) => {
+          const nId = n.idNotificacion || n.id || n.Id || n.ID;
+          return nId !== id;
+        });
+      });
+      return { previousNotifications };
+    },
+    onError: (err, id, context) => {
+      if (context?.previousNotifications) {
+        qc.setQueryData(["notifications", true], context.previousNotifications);
+      }
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
   });
 };
 
@@ -25,7 +42,18 @@ export const useMarkAllAsRead = () => {
     mutationKey: ['useNotifications_markAll'],
     mutationFn: () =>
       apiClient.post(`/notifications/read-all`).then(res => res.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ["notifications"] });
+      const previousNotifications = qc.getQueryData(["notifications", true]);
+      qc.setQueryData(["notifications", true], []);
+      return { previousNotifications };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousNotifications) {
+        qc.setQueryData(["notifications", true], context.previousNotifications);
+      }
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
   });
 };
 
