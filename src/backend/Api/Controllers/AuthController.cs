@@ -101,7 +101,25 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage, succeeded = false });
         }
 
-        var responseData = result.Data;
+        return GenerateSessionCookiesAndResponse(result.Data);
+    }
+
+    [HttpPost("google")]
+    public async Task<IActionResult> GoogleLogin([FromBody] Application.Features.Auth.Commands.GoogleLoginUser.GoogleLoginUserCommand request, CancellationToken cancellationToken)
+    {
+        var handler = HttpContext.RequestServices.GetRequiredService<Application.Features.Auth.Commands.GoogleLoginUser.GoogleLoginUserCommandHandler>();
+        var result = await handler.Handle(request, cancellationToken);
+        
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage, succeeded = false });
+        }
+
+        return GenerateSessionCookiesAndResponse(result.Data);
+    }
+
+    private IActionResult GenerateSessionCookiesAndResponse(Application.Features.Auth.Commands.LoginUser.LoginUserResponseDto? responseData)
+    {
         if (responseData == null)
         {
             return BadRequest(new { Message = "Error al generar sesión." });
@@ -144,6 +162,7 @@ public class AuthController : ControllerBase
             }
         });
     }
+
 
     [HttpGet("verify")]
     public async Task<IActionResult> Verify([FromQuery] string token, CancellationToken cancellationToken)

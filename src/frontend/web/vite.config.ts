@@ -15,6 +15,9 @@ export default defineConfig({
         host: process.env.NODE_ENV === 'development' ? '0.0.0.0' : 'localhost',
         watch: {
             usePolling: true
+        },
+        headers: {
+            'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
         }
     }
 });

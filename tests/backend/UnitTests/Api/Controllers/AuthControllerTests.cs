@@ -68,7 +68,8 @@ public class AuthControllerTests
             _usuarioRepositoryMock.Object, 
             mockConfig.Object,
             mockJwtTokenGenerator.Object,
-            cache
+            cache,
+            null! // AppDbContext is not directly used in the mocked handlers' tests
         );
 
         var httpContext = new DefaultHttpContext();

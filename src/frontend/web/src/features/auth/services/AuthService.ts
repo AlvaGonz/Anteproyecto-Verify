@@ -71,6 +71,31 @@ export const AuthService = {
     }
   },
 
+  async googleLogin(credential: string): Promise<Result<AuthResponse, AuthError>> {
+    try {
+      const response = await apiClient.post('/auth/google', { credential });
+      
+      const token = response.data.accessToken ?? null;
+      if (!token) {
+        return failure({ _tag: "NetworkError", message: "Token de acceso no recibido del servidor." });
+      }
+      setAccessToken(token);
+
+      return success({
+        user: response.data.user,
+        token: token
+      });
+    } catch (e: any) {
+      if (e.response?.status === 401 || e.response?.status === 400) {
+        return failure({ _tag: "InvalidCredentials" });
+      }
+      return failure({ 
+        _tag: "NetworkError", 
+        message: e.response?.data?.message || "Error al iniciar sesión con Google" 
+      });
+    }
+  },
+
   async register(
     nombre: string,
     apellido: string,

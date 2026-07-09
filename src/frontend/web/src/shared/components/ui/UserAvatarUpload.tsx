@@ -15,8 +15,9 @@ export const UserAvatarUpload: React.FC = () => {
           {user?.avatarUrl ? (
             <img 
               data-testid="user-avatar-img"
-              src={user.avatarUrl.startsWith('data:') || user.avatarUrl.startsWith('blob:') ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} 
+              src={/^(data|blob|http)/.test(user.avatarUrl) ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} 
               alt="Avatar" 
+              referrerPolicy="no-referrer"
               className="w-full h-full object-cover" 
             />
           ) : (

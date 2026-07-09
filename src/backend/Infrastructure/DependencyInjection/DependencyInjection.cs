@@ -157,6 +157,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
         services.AddSingleton<Application.Abstractions.Security.IJwtTokenGenerator, Infrastructure.Security.JwtTokenGenerator>();
         services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Infrastructure.Security.BCryptPasswordHasher>();
+        services.AddScoped<Application.Abstractions.Security.IGoogleAuthService, Infrastructure.Security.GoogleAuthService>();
         services.AddScoped<IStripeService, Services.StripeService>();
 
         // Account Deletion

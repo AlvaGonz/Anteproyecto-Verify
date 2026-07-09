@@ -154,8 +154,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                 {user?.avatarUrl ? (
                   <img 
                     data-testid="sidebar-avatar-img"
-                    src={user.avatarUrl.startsWith('data:') || user.avatarUrl.startsWith('blob:') ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} 
+                    src={/^(data|blob|http)/.test(user.avatarUrl) ? user.avatarUrl : `http://localhost:5000${user.avatarUrl}`} 
                     alt="Avatar" 
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover" 
                   />
                 ) : (

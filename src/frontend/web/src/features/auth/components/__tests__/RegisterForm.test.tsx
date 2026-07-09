@@ -6,6 +6,12 @@ import { RegisterForm } from "../RegisterForm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRegister, useResendVerificationEmail } from "../../api/useAuth";
 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+vi.mock("../../../../shared/context/AuthContext", () => ({
+  useAuth: vi.fn(() => ({ googleLogin: vi.fn() })),
+}));
+
 vi.mock("../../api/useAuth", () => ({
   useRegister: vi.fn(),
   useResendVerificationEmail: vi.fn(),
@@ -37,11 +43,13 @@ const queryClient = new QueryClient({
 const renderForm = (route = "/") => {
   window.history.pushState({}, "Test page", route);
   return render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <RegisterForm />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId="test-client-id">
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RegisterForm />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 };
 

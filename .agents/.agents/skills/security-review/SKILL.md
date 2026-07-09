@@ -417,7 +417,6 @@ npm ci  # Instead of npm install
 - [ ] Dependencies up to date
 - [ ] No known vulnerabilities (npm audit clean)
 - [ ] Lock files committed
-- [ ] Dependabot enabled on GitHub
 - [ ] Regular security updates
 
 ## Security Testing

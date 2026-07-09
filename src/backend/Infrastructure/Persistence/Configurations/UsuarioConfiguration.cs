@@ -30,6 +30,8 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.TokenVerificacion).HasMaxLength(4000).IsRequired(false);
         builder.Property(u => u.TokenVerificacionExpiraUtc).IsRequired(false);
         builder.Property(u => u.AvatarUrl).IsRequired(false);
+        builder.Property(u => u.SocialLogin).IsRequired().HasDefaultValue(false);
+        builder.Property(u => u.GoogleId).HasMaxLength(100).IsRequired(false);
 
         // Optimistic concurrency token
         builder.Property(u => u.RowVersion).IsRowVersion().IsConcurrencyToken();

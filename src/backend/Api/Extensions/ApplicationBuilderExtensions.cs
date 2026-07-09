@@ -9,6 +9,8 @@ public static class ApplicationBuilderExtensions
 {
     public static IApplicationBuilder UseApiMiddleware(this WebApplication app)
     {
+
+
         app.UseExceptionHandler(opt => { }); // Minimal config to satisfy the middleware if ProblemDetails handles it
 
         app.UseSwagger();

@@ -3,13 +3,14 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ProjectForm } from "./ProjectForm";
 import { AuthProvider } from "../../../shared/context/AuthContext";
 
-// Mock AuthService so AuthProvider doesn't make real HTTP calls in tests.
-vi.mock("../../../features/auth/services/AuthService", () => ({
-  AuthService: {
-    getCurrentUser: vi.fn().mockResolvedValue({ _tag: "None" }),
+// Mock useAuth so we don't need the real AuthProvider which causes state update act() warnings.
+vi.mock("../../../shared/context/AuthContext", () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: "1", role: "DEVELOPER" },
+    isAuthenticated: true,
     login: vi.fn(),
     logout: vi.fn(),
-  },
+  })),
 }));
 
 // Also mock Leaflet since jsdom doesn't have a real canvas/DOM layout engine.
@@ -36,7 +37,7 @@ vi.mock("leaflet/dist/images/marker-icon.png", () => ({ default: "" }));
 vi.mock("leaflet/dist/images/marker-shadow.png", () => ({ default: "" }));
 
 const renderWithAuth = (ui: React.ReactElement) =>
-  render(<AuthProvider>{ui}</AuthProvider>);
+  render(<>{ui}</>);
 
 describe("ProjectForm", () => {
   beforeEach(() => { vi.clearAllMocks(); });

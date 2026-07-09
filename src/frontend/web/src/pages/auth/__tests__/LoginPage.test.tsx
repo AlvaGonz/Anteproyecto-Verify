@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter, MemoryRouter, Routes, Route } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { LoginPage } from "../LoginPage";
 import { useAuth } from "../../../shared/context/AuthContext";
 
@@ -27,13 +28,15 @@ vi.mock("framer-motion", async () => {
 
 const renderPage = (route = "/login") => {
   return render(
-    <MemoryRouter initialEntries={[route]}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin/dashboard" element={<div data-testid="dashboard">Dashboard</div>} />
-        <Route path="/checkout" element={<div data-testid="checkout">Checkout</div>} />
-      </Routes>
-    </MemoryRouter>
+    <GoogleOAuthProvider clientId="test-client-id">
+      <MemoryRouter initialEntries={[route]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin/dashboard" element={<div data-testid="dashboard">Dashboard</div>} />
+          <Route path="/checkout" element={<div data-testid="checkout">Checkout</div>} />
+        </Routes>
+      </MemoryRouter>
+    </GoogleOAuthProvider>
   );
 };
 

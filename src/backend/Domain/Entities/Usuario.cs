@@ -42,6 +42,10 @@ public class Usuario : EntityBase
     public string? SubscriptionStatus { get; private set; }
     public DateTime? CurrentPeriodEnd { get; private set; }
 
+    // Google Auth
+    public bool SocialLogin { get; private set; }
+    public string? GoogleId { get; private set; }
+
     // Post-verify checkout flow: plan selected before registration, completed after verification
     // ponytail: PendingPlanCode holds the plan key (profesional/empresa/enterprise), PendingBillingCycle holds monthly/yearly
     public string? PendingPlanCode { get; private set; }
@@ -298,5 +302,14 @@ public class Usuario : EntityBase
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         var hash = Convert.ToHexString(bytes).ToLowerInvariant();
         return $"{hash}@anon.verifinca.do";
+    }
+
+    public void VincularGoogleAccount(string googleId)
+    {
+        if (string.IsNullOrWhiteSpace(googleId)) throw new ArgumentException("Google ID requerido", nameof(googleId));
+        SocialLogin = true;
+        GoogleId = googleId;
+        EmailVerificado = true; // Google verifies the email
+        UpdatedAtUtc = DateTime.UtcNow;
     }
 }

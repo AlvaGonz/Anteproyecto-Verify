@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Validation.Queries.GetActiveAlertsByProject.GetActiveAlertsByProjectQueryHandler>();
         services.AddScoped<Application.Features.Auth.Commands.RegisterUser.RegisterUserCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler>();
+        services.AddScoped<Application.Features.Auth.Commands.GoogleLoginUser.GoogleLoginUserCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler>();
         services.AddScoped<Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler>();

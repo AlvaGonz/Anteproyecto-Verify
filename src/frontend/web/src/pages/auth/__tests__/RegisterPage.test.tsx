@@ -6,10 +6,15 @@ import { RegisterPage } from "../RegisterPage";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRegister } from "../../../features/auth/api/useAuth";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
+
+vi.mock("../../../shared/context/AuthContext", () => ({
+  useAuth: vi.fn(() => ({ googleLogin: vi.fn() })),
+}));
 
 vi.mock("../../../features/auth/api/useAuth", () => ({
   useRegister: vi.fn(),
@@ -45,13 +50,15 @@ const queryClient = new QueryClient({
 
 const renderPage = () =>
   render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ToastProvider>
-          <RegisterPage />
-        </ToastProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId="test-client-id">
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ToastProvider>
+            <RegisterPage />
+          </ToastProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 
 /**

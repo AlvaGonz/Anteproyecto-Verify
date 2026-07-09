@@ -12,6 +12,7 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
   updateUser: (data: Partial<User>) => void;
   error: AuthError | null;
+  googleLogin: (credential: string) => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,6 +65,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const googleLogin = useCallback(async (credential: string): Promise<User> => {
+    setLoading(true);
+    setError(null);
+    queryClient.clear();
+    
+    const result = await AuthService.googleLogin(credential);
+    
+    if (isSuccess(result)) {
+      setUser(result.data.user);
+      setLoading(false);
+      return result.data.user;
+    } else {
+      setError(result.error);
+      setLoading(false);
+      throw result.error;
+    }
+  }, []);
+
   const logout = useCallback(() => {
     queryClient.clear();
     setUser(null);
@@ -91,8 +110,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout, 
     refreshUser, 
     updateUser, 
-    error 
-  }), [user, loading, login, logout, refreshUser, updateUser, error]);
+    error,
+    googleLogin
+  }), [user, loading, login, logout, refreshUser, updateUser, error, googleLogin]);
 
   return (
     <AuthContext.Provider value={value}>
