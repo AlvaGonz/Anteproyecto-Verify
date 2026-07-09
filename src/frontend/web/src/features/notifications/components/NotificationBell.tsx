@@ -16,10 +16,10 @@ export const NotificationBell: React.FC = () => {
     if (!Array.isArray(rawNotifications)) return [];
     return rawNotifications.map((n: any) => ({
       ...n,
-      id: String(n.idNotificacion || n.id),
-      usuarioId: String(n.idUsuario || n.usuarioId),
-      fechaUtc: n.fechaCreacionUtc || n.fechaUtc,
-      tipo: n.tipoNotificacion || n.tipo,
+      id: n.idNotificacion || n.id || n.Id || n.ID || "",
+      usuarioId: n.idUsuario || n.usuarioId || n.UsuarioId || "",
+      fechaUtc: n.fechaCreacionUtc || n.fechaUtc || n.FechaUtc || new Date().toISOString(),
+      tipo: n.tipoNotificacion || n.tipo || n.Tipo || "Info",
     })) as unknown as NotificationDto[];
   }, [rawNotifications]);
 
@@ -44,6 +44,7 @@ export const NotificationBell: React.FC = () => {
   const handleMarkAllAsRead = async () => {
     try {
       await markAllAsReadMutation.mutateAsync();
+      setIsOpen(false);
     } catch (error) {
       console.error("Error marking all as read", error);
     }

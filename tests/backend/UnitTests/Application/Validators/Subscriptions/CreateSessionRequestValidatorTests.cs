@@ -24,7 +24,7 @@ public class CreateSessionRequestValidatorTests
     [Fact]
     public void Validator_ShouldHaveError_WhenPriceIdIsEmpty()
     {
-        var request = new CreateSessionRequest(string.Empty, new SubscriptionConsentDto(DateTime.UtcNow, "Mozilla"));
+        var request = new CreateSessionRequest(string.Empty, null, null, new SubscriptionConsentDto(DateTime.UtcNow, "Mozilla"));
         var result = _validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.PriceId);
     }
@@ -32,7 +32,7 @@ public class CreateSessionRequestValidatorTests
     [Fact]
     public void Validator_ShouldHaveError_WhenPriceIdIsInvalid()
     {
-        var request = new CreateSessionRequest("invalid_price", new SubscriptionConsentDto(DateTime.UtcNow, "Mozilla"));
+        var request = new CreateSessionRequest("invalid_price", null, null, new SubscriptionConsentDto(DateTime.UtcNow, "Mozilla"));
         var result = _validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.PriceId)
               .WithErrorMessage("El PriceId proporcionado no es válido.");
@@ -41,7 +41,7 @@ public class CreateSessionRequestValidatorTests
     [Fact]
     public void Validator_ShouldNotHaveError_WhenRequestIsValid()
     {
-        var request = new CreateSessionRequest("price_pro_mo", new SubscriptionConsentDto(DateTime.UtcNow, "Mozilla"));
+        var request = new CreateSessionRequest("price_pro_mo", null, null, new SubscriptionConsentDto(DateTime.UtcNow, "Mozilla"));
         var result = _validator.TestValidate(request);
         result.ShouldNotHaveAnyValidationErrors();
     }
@@ -49,7 +49,7 @@ public class CreateSessionRequestValidatorTests
     [Fact]
     public void Validator_ShouldHaveError_WhenConsentIsNull()
     {
-        var request = new CreateSessionRequest("price_pro_mo", null!);
+        var request = new CreateSessionRequest("price_pro_mo", null, null, null!);
         var result = _validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.Consent)
               .WithErrorMessage("El consentimiento es requerido.");
@@ -58,7 +58,7 @@ public class CreateSessionRequestValidatorTests
     [Fact]
     public void Validator_ShouldHaveError_WhenConsentTimestampIsNull()
     {
-        var request = new CreateSessionRequest("price_pro_mo", new SubscriptionConsentDto(null, "Mozilla"));
+        var request = new CreateSessionRequest("price_pro_mo", null, null, new SubscriptionConsentDto(null, "Mozilla"));
         var result = _validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.Consent.Timestamp);
     }
@@ -66,7 +66,7 @@ public class CreateSessionRequestValidatorTests
     [Fact]
     public void Validator_ShouldHaveError_WhenConsentUserAgentIsEmpty()
     {
-        var request = new CreateSessionRequest("price_pro_mo", new SubscriptionConsentDto(DateTime.UtcNow, ""));
+        var request = new CreateSessionRequest("price_pro_mo", null, null, new SubscriptionConsentDto(DateTime.UtcNow, ""));
         var result = _validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.Consent.UserAgent);
     }

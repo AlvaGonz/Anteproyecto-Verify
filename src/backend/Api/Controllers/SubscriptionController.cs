@@ -160,8 +160,8 @@ public class SubscriptionController : ControllerBase
             effectiveStatus = "incomplete";
         }
 
-        string? billingCycle = null;
-        if (!string.IsNullOrEmpty(user.StripeSubscriptionId))
+        string? billingCycle = user.PendingBillingCycle;
+        if (string.IsNullOrEmpty(billingCycle) && !string.IsNullOrEmpty(user.StripeSubscriptionId))
         {
             try
             {
@@ -352,7 +352,7 @@ public class SubscriptionController : ControllerBase
 
                 if (customerId != null && subscriptionId != null)
                 {
-                    await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap);
+                    await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap, isCheckout: true);
                 }
             }
             else if (stripeEvent.Type == "invoice.paid")
@@ -430,7 +430,8 @@ public class SubscriptionController : ControllerBase
     private async Task HandleSubscriptionActivatedAsync(
         string customerId,
         string subscriptionId,
-        Dictionary<string, string> pricePlanMap)
+        Dictionary<string, string> pricePlanMap,
+        bool isCheckout = false)
     {
         var user = await _dbContext.Usuarios
             .FirstOrDefaultAsync(u => u.StripeCustomerId == customerId);
@@ -455,16 +456,16 @@ public class SubscriptionController : ControllerBase
 
             if (plan != null)
             {
-                var isNewPlan = user.PlanSuscripcionId != plan.Idsuscripcion;
+                var pricesConfig = _configuration.GetSection("Stripe:Prices").GetChildren();
+                var isAnnualPrice = pricesConfig.Any(p => p.Key.EndsWith("Anual", StringComparison.OrdinalIgnoreCase) && p.Value == priceId);
+                var interval = isAnnualPrice ? "yearly" : "monthly";
+                var oldPlanId = user.PlanSuscripcionId;
+                var oldInterval = user.PendingBillingCycle;
 
                 user.AsignarPlan(plan.Idsuscripcion);
+                user.SetPendingPlan(user.PendingPlanCode, interval);
 
-                var interval = subscription.Items?.Data?.FirstOrDefault()?.Price?.Recurring?.Interval 
-                               ?? subscription.Items?.Data?.FirstOrDefault()?.Plan?.Interval;
-                if (!string.IsNullOrEmpty(interval))
-                {
-                    user.SetPendingPlan(user.PendingPlanCode, interval == "year" ? "yearly" : "monthly");
-                }
+                var isNewPlan = oldPlanId != plan.Idsuscripcion || oldInterval != interval || isCheckout;
 
                 _logger.LogInformation(
                     "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",

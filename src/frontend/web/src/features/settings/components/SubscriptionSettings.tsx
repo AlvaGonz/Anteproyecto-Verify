@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift } from "lucide-react";
-import { useMySubscription } from "../api/useSettings";
+import { useMySubscription, useSyncSubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 import { PlansModal } from "./PlansModal";
 
@@ -61,9 +61,8 @@ export const SubscriptionSettings: React.FC = () => {
   const status = data?.subscriptionStatus ?? null;
   const planName = data?.plan ?? (data as any)?.planName ?? null;
   const planKey = normalizePlanKey(planName);
-  const planCapabilities = planName ? PLAN_CAPABILITIES[planKey] : null;
+  const planCapabilities = planName ? PLAN_CAPABILITIES[planKey as keyof typeof PLAN_CAPABILITIES] : null;
   const currentPeriodEnd = data?.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
-  const isManagedByStripe = data?.isManagedByStripe ?? false;
 
   const badgeConfig = status ? (STATUS_CONFIG[status] ?? STATUS_CONFIG.active) : NO_PLAN_CONFIG;
   const hasPlan = !!planName;
@@ -79,7 +78,7 @@ export const SubscriptionSettings: React.FC = () => {
     : null;
 
   let formattedPrice: string | null = null;
-  if (isManagedByStripe && hasPlan) {
+  if (hasPlan && data) {
     // Determine the price based on the plan name and billing cycle (since DB stores DOP and we want USD UI)
     const isAnnual = data.billingCycle === 'year' || data.billingCycle === 'yearly';
     let priceVal = 0;
@@ -96,8 +95,12 @@ export const SubscriptionSettings: React.FC = () => {
       formattedPrice = PRICE_FORMATTER.format(priceVal) + ` USD ${isAnnual ? '(anual)' : ''} / mes`;
     } else if (data.planPrice === 0) {
       formattedPrice = "Gratis";
+    } else if (data.planPrice && data.planPrice > 0) {
+      formattedPrice = PRICE_FORMATTER.format(data.planPrice) + " USD / mes";
     }
   }
+
+  const { mutate: syncSubscription, isPending: isSyncing } = useSyncSubscription();
 
   return (
     <div className="w-full max-w-4xl space-y-6 animate-in fade-in zoom-in-95 duration-300">
@@ -109,10 +112,21 @@ export const SubscriptionSettings: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
             <div>
-              <h2 className="text-2xl font-display font-bold text-[#223382] mb-2 flex items-center gap-3">
-                <CreditCard className="w-6 h-6 text-primary" />
-                Mi Suscripción
-              </h2>
+              <div className="flex items-center gap-4 mb-2">
+                <h2 className="text-2xl font-display font-bold text-[#223382] flex items-center gap-3">
+                  <CreditCard className="w-6 h-6 text-primary" />
+                  Mi Suscripción
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => syncSubscription()}
+                  disabled={isSyncing || isLoading}
+                  className="flex items-center gap-2 text-sm text-primary hover:text-primary-hover font-medium bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                  Sincronizar
+                </button>
+              </div>
               <p className="text-text-secondary text-sm">
                 Gestiona tu plan actual y estado de facturación.
               </p>

@@ -55,13 +55,13 @@ export const InviteesSettings: React.FC = () => {
           <h3 className="font-bold text-lg text-text-primary mb-4 flex items-center gap-2">
             <Shield className="w-5 h-5" /> Usuarios Actualmente Invitados
           </h3>
-          {(!user?.inviteesList || user.inviteesList.length === 0) ? (
+          {(!(user as any)?.inviteesList || (user as any).inviteesList.length === 0) ? (
             <div className="p-6 bg-surface-raised/50 rounded-xl border border-dashed border-border text-center text-text-secondary">
               No tienes usuarios invitados en tu cuenta actualmente.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {user.inviteesList.map((invitee: any) => (
+              {(user as any).inviteesList.map((invitee: any) => (
                 <div key={invitee.id} className="bg-white p-4 rounded-xl border border-border shadow-sm flex items-center justify-between">
                   <div>
                     <h4 className="font-bold text-text-primary">{invitee.nombre} {invitee.apellido}</h4>
