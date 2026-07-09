@@ -163,16 +163,37 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
               <span className="font-bold">Usuarios:</span> {u.inviteesCount || 0} / {u.maxInvitees}
             </span>
           )}
-          {u.usedProjects !== undefined && (
-            <span className="bg-green-50 text-green-800 text-[11px] px-2 py-0.5 rounded border border-green-100">
-              <span className="font-bold">Proyectos:</span> {u.usedProjects}
-            </span>
-          )}
-          {u.usedQueries !== undefined && (
-            <span className="bg-amber-50 text-amber-800 text-[11px] px-2 py-0.5 rounded border border-amber-100">
-              <span className="font-bold">Consultas:</span> {u.usedQueries}
-            </span>
-          )}
+          {(() => {
+            const plan = (u.planName || u.role || "").toLowerCase();
+            let maxProjects: number | string = 5;
+            let maxQueries: number | string = 1;
+
+            if (plan.includes("empresa") || plan.includes("business")) {
+              maxProjects = 50;
+              maxQueries = 100;
+            } else if (plan.includes("profesional") || plan.includes("professional")) {
+              maxProjects = 15;
+              maxQueries = 25;
+            } else if (plan.includes("enterprise") || u.role === "admin" || u.role === "owner") {
+              maxProjects = "∞";
+              maxQueries = "∞";
+            }
+
+            return (
+              <>
+                {u.usedProjects !== undefined && (
+                  <span className="bg-green-50 text-green-800 text-[11px] px-2 py-0.5 rounded border border-green-100">
+                    <span className="font-bold">Proyectos:</span> {u.usedProjects} / {maxProjects}
+                  </span>
+                )}
+                {u.usedQueries !== undefined && (
+                  <span className="bg-amber-50 text-amber-800 text-[11px] px-2 py-0.5 rounded border border-amber-100">
+                    <span className="font-bold">Consultas:</span> {u.usedQueries} / {maxQueries}
+                  </span>
+                )}
+              </>
+            );
+          })()}
         </div>
       </div>
       
