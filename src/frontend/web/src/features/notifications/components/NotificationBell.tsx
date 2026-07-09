@@ -35,7 +35,7 @@ export const NotificationBell: React.FC = () => {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      await markAsReadMutation.mutateAsync(Number(id));
+      await markAsReadMutation.mutateAsync(id);
     } catch (error) {
       console.error("Error marking as read", error);
     }

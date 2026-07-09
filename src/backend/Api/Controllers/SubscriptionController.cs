@@ -180,7 +180,7 @@ public class SubscriptionController : ControllerBase
             currentPeriodEnd = user.CurrentPeriodEnd,
             stripeSubscriptionId = user.StripeSubscriptionId,
             isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId),
-            billingCycle = billingCycle
+            billingCycle = !string.IsNullOrEmpty(user.PendingBillingCycle) ? user.PendingBillingCycle : billingCycle
         });
     }
 
