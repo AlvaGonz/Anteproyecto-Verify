@@ -183,6 +183,10 @@
   - **Fix:**
     1. Updated the `.env` file to configure the missing `DB_PASSWORD`, `ConnectionStrings__DockerConnection`, and `Stripe__SecretKey` (using `sk_test_mock` as fallback).
     2. Added the `[DbContext(typeof(AppDbContext))]` and `[Migration("20260706170900_Add_Propietario_IPI_To_Proyectos")]` attributes to the migration class so EF Core scans and applies the schema changes properly.
+- **BUG-019:** Google Login 500 Error - Invalid column name CancelAt.
+  - **Symptom:** When logging in with Google OAuth, the backend returned a 500 Internal Server Error.
+  - **Root Cause:** The `Usuario.cs` entity was updated with `CancelAt` and `CancelAtPeriodEnd` for the Stripe Subscription Cancellation feature, but the database schema lacked these columns, causing an EF Core `SqlException`.
+  - **Fix:** Generated the missing EF Core migration (`Add_CancelAt_To_Usuario`), applied it, and restarted the container to ensure `AppDbContext` creates the columns properly during startup seeding. Verified the columns exist using sqlcmd.
 
 -   * * C O M P - 0 0 1 : * *   V e r i f y   c o n s e n t   t e s t   p a s s e s   i n   C I   p i p e l i n e . 
      -   * * S t a t u s : * *   C o m p l e t e 

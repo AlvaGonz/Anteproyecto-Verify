@@ -641,12 +641,9 @@ public class SubscriptionController : ControllerBase
 
         try
         {
-            await stripeService.CancelAtPeriodEndAsync(user.StripeSubscriptionId, ct);
+            var cancelAt = await stripeService.CancelAtPeriodEndAsync(user.StripeSubscriptionId, ct);
             
-            var subService = new SubscriptionService();
-            var sub = await subService.GetAsync(user.StripeSubscriptionId, cancellationToken: ct);
-            
-            user.SetCancellationScheduled(sub.CancelAt);
+            user.SetCancellationScheduled(cancelAt);
             await _dbContext.SaveChangesAsync(ct);
 
             return Ok(new { message = "Cancelación programada." });

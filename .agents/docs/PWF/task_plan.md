@@ -1,17 +1,15 @@
-# Debug Session: /#/dashboard crash
+# Debug Session: Google Login 500 Error - Invalid column name CancelAt
 
 ## SÍNTOMA
-Luego de un checkout de Stripe exitoso, la aplicación redirige a `/#/dashboard` pero presenta una pantalla de "Error en la aplicacion" (ErrorBoundary) sin mostrar un stack trace claro en la consola del navegador.
+Cuando se intenta iniciar sesión con Google OAuth, el backend arroja un error 500 Internal Server Error.
+Los logs del backend indican: `SqlException: Invalid column name 'CancelAt'. Invalid column name 'CancelAtPeriodEnd'.` en `UsuarioRepository.GetByEmailAsync`.
 
 ## PLAN
+1. **Verificar el Modelo vs Base de Datos**: Identificar por qué `CancelAt` y `CancelAtPeriodEnd` están en la entidad `Usuario.cs` pero no en la base de datos local.
+2. **Crear / Aplicar Migración**: Generar la migración de EF Core para agregar estas dos columnas (y cualquier otra de Stripe que falte y esté mapeada) a la tabla `Usuario`.
+3. **Validación de la Base de Datos**: Ejecutar las migraciones y confirmar con el MCP (o herramienta similar) que las columnas existen.
+4. **Verificación**: Intentar de nuevo el login y comprobar que ya no ocurre el error 500.
 
-1. **Investigar el ErrorBoundary**: Localizar dónde se renderiza "Error en la aplicacion" para entender qué capa está atrapando el error (Global o por Ruta).
-2. **Investigar la ruta `/dashboard`**: Identificar el componente que se renderiza en `/dashboard`.
-3. **Analizar el componente Dashboard**: Ver qué queries, hooks o estado podría estar fallando al regresar de Stripe (posiblemente falta de datos, estado inconsistente, o error al leer parámetros de la URL).
-4. **Fix**: Aplicar el arreglo con enfoque "Ponytail" (el cambio más pequeño posible que resuelva el root cause).
-5. **Verificación**: Asegurar que pase `npm run lint` y los tests.
-
-- [x] Phase 1 - RED (Failing Tests)
-- [x] Phase 2 - GREEN (Implementation)
-- [x] Phase 3 - Portal & Refactor
-- [x] Verification
+- [x] Paso 1: Verificar el modelo
+- [x] Paso 2: Generar y aplicar migración EF Core
+- [x] Paso 3: Validar

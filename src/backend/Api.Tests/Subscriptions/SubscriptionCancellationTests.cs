@@ -64,6 +64,9 @@ public class SubscriptionCancellationTests
 
         var (controller, dbContext, stripeService) = CreateControllerAndMocks(userId, user);
 
+        stripeService.CancelAtPeriodEndAsync("sub_123", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<DateTime?>(DateTime.UtcNow.AddDays(10)));
+
         // Act
         var result = await controller.CancelSubscription(stripeService, CancellationToken.None);
 
@@ -82,6 +85,8 @@ public class SubscriptionCancellationTests
         typeof(Usuario).BaseType?.GetProperty("Id")?.SetValue(user, userId);
 
         var (controller, dbContext, stripeService) = CreateControllerAndMocks(userId, user);
+
+        user.SetCancellationScheduled(DateTime.UtcNow.AddDays(10));
 
         // Act
         var result = await controller.ReactivateSubscription(stripeService, CancellationToken.None);
