@@ -23,7 +23,7 @@ public class ResendEmailService : IEmailService
         _logger = logger;
         
         var section = configuration.GetSection("Resend");
-        _fromEmail = section.GetValue<string>("FromEmail") ?? "noreply@handymansolutionrd.lat";
+        _fromEmail = section.GetValue<string>("FromEmail") ?? "hola@handymansolutionrd.lat";
         _fromName = section.GetValue<string>("FromName") ?? "VeriFinca";
     }
 

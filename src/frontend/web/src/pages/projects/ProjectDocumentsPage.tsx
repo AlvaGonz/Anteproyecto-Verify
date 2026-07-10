@@ -19,7 +19,8 @@ import {
   HardDrive,
   Search,
   Filter,
-  FileCheck2
+  FileCheck2,
+  ChevronDown
 } from "lucide-react";
 
 const RequiredDocumentsList: React.FC<{ 
@@ -214,11 +215,9 @@ export const ProjectDocumentsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-        {/* Column Left: Checklist + Upload Form */}
-        <div className="xl:col-span-4 flex flex-col gap-6">
-          <ProjectDiagnosisPanel projectId={projectId} />
-          
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start mb-12">
+        {/* Column Left: Checklist + Upload Form (Main Focus) */}
+        <div className="xl:col-span-8 flex flex-col gap-6 order-2 xl:order-1">
           <RequiredDocumentsList 
             documents={documents} 
             categoryId={project?.categoria || 1} 
@@ -226,8 +225,30 @@ export const ProjectDocumentsPage: React.FC = () => {
           />
         </div>
 
-        {/* Column Right: Document Explorer */}
-        <div className="xl:col-span-8 space-y-6 lg:min-h-[800px]">
+        {/* Column Right: Diagnosis Panel */}
+        <div className="xl:col-span-4 space-y-6 order-1 xl:order-2">
+          <ProjectDiagnosisPanel projectId={projectId} />
+        </div>
+      </div>
+
+      {/* Document Explorer (Collapsible) */}
+      <details className="group vf-card p-0 overflow-hidden bg-surface-container-low/30 border-2 border-dashed">
+        <summary className="p-6 flex items-center justify-between cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+          <div className="flex items-center gap-4">
+             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+               <Files className="w-5 h-5" />
+             </div>
+             <div>
+               <h3 className="text-xl font-display font-black text-secondary tracking-tight">Expedientes <span className="text-primary italic">Digitalizados</span></h3>
+               <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mt-1">Explorar todos los archivos del repositorio histórico</p>
+             </div>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center group-open:rotate-180 transition-transform duration-300">
+             <ChevronDown className="w-4 h-4 text-secondary" />
+          </div>
+        </summary>
+        
+        <div className="px-6 pb-6 pt-2 border-t border-outline-variant/10 space-y-6">
           <div className="vf-card !p-3 flex flex-col sm:flex-row items-center gap-3">
              <div className="relative flex-1 group w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
@@ -247,7 +268,7 @@ export const ProjectDocumentsPage: React.FC = () => {
              </button>
           </div>
 
-          <div className="vf-card p-6 lg:min-h-[800px]">
+          <div className="vf-card p-6 min-h-[400px]">
             <ProjectDocumentsList
               documents={filteredDocuments}
               onDownload={handleDownload}
@@ -275,7 +296,7 @@ export const ProjectDocumentsPage: React.FC = () => {
              </div>
           </div>
         </div>
-      </div>
+      </details>
     </div>
   );
 };

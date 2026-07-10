@@ -28,7 +28,7 @@ public class ResendEmailServiceTests
 
         var inMemorySettings = new Dictionary<string, string?> {
             {"Resend:ApiToken", "fake-token"},
-            {"Resend:FromEmail", "noreply@verifinca.com"},
+            {"Resend:FromEmail", "hola@verifinca.com"},
             {"Resend:FromName", "VeriFinca Test"}
         };
 
@@ -62,7 +62,7 @@ public class ResendEmailServiceTests
 
         // Assert
         Assert.NotNull(capturedMsg);
-        Assert.Equal("noreply@verifinca.com", capturedMsg!.From.Email);
+        Assert.Equal("hola@verifinca.com", capturedMsg!.From.Email);
         Assert.Equal("VeriFinca Test", capturedMsg.From.DisplayName);
         Assert.Equal(subject, capturedMsg.Subject);
         Assert.Equal(body, capturedMsg.HtmlBody);
