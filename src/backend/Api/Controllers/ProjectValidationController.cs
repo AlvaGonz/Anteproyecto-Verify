@@ -8,7 +8,7 @@ using Application.Services.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/projects/{projectId}/validate")]
+[Route("api/projects/{projectId}")]
 public class ProjectValidationController : ControllerBase
 {
     private readonly IProjectValidationOrchestrator _orchestrator;
@@ -18,7 +18,7 @@ public class ProjectValidationController : ControllerBase
         _orchestrator = orchestrator;
     }
 
-    [HttpPost]
+    [HttpPost("validate")]
     public async Task<IActionResult> RunValidation(Guid projectId, CancellationToken cancellationToken)
     {
         try
@@ -38,8 +38,7 @@ public class ProjectValidationController : ControllerBase
         }
     }
 
-    [HttpGet]
-    [Route("../validation-result")]
+    [HttpGet("validation-result")]
     public async Task<IActionResult> GetValidationResult(Guid projectId, CancellationToken cancellationToken)
     {
         var result = await _orchestrator.GetLatestValidationResultAsync(projectId, cancellationToken);

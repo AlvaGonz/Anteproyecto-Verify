@@ -1,7 +1,10 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { DocumentDto, UploadDocumentDto, DocumentType } from "../../features/documents/types";
 import { useDocuments, useUploadDocument, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
+import { useProject } from "../../features/projects/api/useProjects";
+import { getRequirementsForCategory, resolveRequirementStatus } from "../../features/documents/requirementCatalog";
+import { RequirementUploadRow } from "../../features/documents/components/RequirementUploadRow";
 import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
@@ -18,20 +21,16 @@ import {
   Search,
   Filter,
   FileCheck2,
-  CheckCircle2,
   Upload
 } from "lucide-react";
 
-// Configuración de documentos obligatorios para el checklist
-const REQUIRED_DOCUMENTS = [
-  { id: "titulo", label: "Título de Propiedad", category: DocumentType.CertificadoTitulo, categoryLabel: "TITULO", description: "Documento notarial original o copia certificada" },
-  { id: "estado_juridico", label: "Estado Jurídico", category: DocumentType.CertificacionEstadoJuridico, categoryLabel: "ESTADO J.", description: "Certificación de estado legal del inmueble" },
-  { id: "mensura", label: "Plano de Mensura", category: DocumentType.PlanoMensuraCatastral, categoryLabel: "MENSURA", description: "Plano catastral aprobado por autoridad competente" },
-  { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.CopiaCedulaIdentidad, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
-  { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
-];
+const RequiredDocumentsList: React.FC<{ 
+  documents: DocumentDto[]; 
+  categoryId: number;
+  onUpload: (tipoDocumento: DocumentType, observaciones: string, file: File) => Promise<void>;
+}> = ({ documents, categoryId, onUpload }) => {
+  const requirements = getRequirementsForCategory(categoryId);
 
-const RequiredDocumentsList: React.FC<{ documents: DocumentDto[] }> = ({ documents }) => {
   return (
     <div className="vf-card p-6 bg-surface-container-low/30 overflow-hidden relative group">
       <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -45,39 +44,32 @@ const RequiredDocumentsList: React.FC<{ documents: DocumentDto[] }> = ({ documen
       </div>
 
       <div className="space-y-3 relative z-10">
-        {REQUIRED_DOCUMENTS.map((doc) => {
-          const isUploaded = documents.some(u => u.tipoDocumento === doc.category && u.activo);
-          
+        {requirements.map((req) => {
+          const status = resolveRequirementStatus(req, documents);
+          const uploadedDocument = documents.find(d => {
+            if (d.tipoDocumento === DocumentType.Other && req.documentType === DocumentType.Other) {
+              return d.observaciones === req.code && d.activo;
+            }
+            return d.tipoDocumento === req.documentType && d.activo;
+          });
           return (
-            <div 
-              key={doc.id}
-              className={`p-4 rounded-2xl border transition-all flex items-center justify-between group/item ${
-                isUploaded 
-                  ? 'bg-success/5 border-success/20' 
-                  : 'bg-white border-outline-variant/30 hover:border-primary/30'
-              }`}
-            >
-              <div className="flex items-center gap-4 min-w-0 flex-1">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0 ${
-                  isUploaded ? 'bg-success text-white' : 'bg-surface-container-high text-on-surface-variant'
-                }`}>
-                  {isUploaded ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-4 h-4 opacity-40" />}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-xs font-black tracking-tight truncate ${isUploaded ? 'text-success' : 'text-secondary'}`}>
-                    {doc.label}
-                  </p>
-                  <p className="text-[10px] font-bold text-on-surface-variant opacity-60 leading-tight truncate">
-                    {doc.description}
-                  </p>
-                </div>
-              </div>
-              <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${
-                isUploaded ? 'bg-success/20 text-success' : 'bg-surface-container-highest text-on-surface-variant'
-              }`}>
-                {doc.categoryLabel}
-              </span>
-            </div>
+            <RequirementUploadRow
+              key={req.code}
+              requirementCode={req.code}
+              title={req.label}
+              description={req.description}
+              status={status}
+              uploadedDocument={uploadedDocument}
+              required={req.required}
+              acceptedTypes={req.acceptedMimeTypes}
+              maxSizeBytes={req.maxSizeBytes}
+              isUploading={false}
+              onUpload={async (file) => {
+                const tipo = req.documentType;
+                const obs = tipo === DocumentType.Other ? req.code : "";
+                await onUpload(tipo, obs, file);
+              }}
+            />
           );
         })}
       </div>
@@ -92,7 +84,10 @@ export const ProjectDocumentsPage: React.FC = () => {
   
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: rawDocuments = [], isLoading: loading, error: fetchError } = useDocuments(projectId);
+  const { data: rawDocuments = [], isLoading: loadingDocs, error: fetchError } = useDocuments(projectId);
+  const { data: project, isLoading: loadingProject } = useProject(projectId);
+  
+  const loading = loadingDocs || loadingProject;
   const error = fetchError ? (fetchError as Error).message : null;
 
   const uploadMutation = useUploadDocument(projectId);
@@ -116,6 +111,22 @@ export const ProjectDocumentsPage: React.FC = () => {
       addToast(err.message || "Error al procesar el expediente", "error");
     }
   };
+
+  const handleUploadRequirement = async (tipoDocumento: DocumentType, observaciones: string, file: File) => {
+    if (!id) return;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("tipoDocumento", String(tipoDocumento));
+      formData.append("observaciones", observaciones);
+      await uploadMutation.mutateAsync(formData);
+      addToast("Documento adjuntado exitosamente", "success");
+    } catch (err: any) {
+      addToast(err.message || "Error al procesar el documento", "error");
+      throw err;
+    }
+  };
+
 
   const handleDownload = async (documentId: string) => {
     if (!id) return;
@@ -227,7 +238,11 @@ export const ProjectDocumentsPage: React.FC = () => {
         <div className="xl:col-span-4 flex flex-col gap-6">
           <ProjectDiagnosisPanel projectId={projectId} />
           
-          <RequiredDocumentsList documents={documents} />
+          <RequiredDocumentsList 
+            documents={documents} 
+            categoryId={project?.categoria || 1} 
+            onUpload={handleUploadRequirement} 
+          />
 
           <div className="vf-card p-6 border-dashed border-2 bg-surface-container-low/30">
             <div className="flex items-center gap-3 mb-6">

@@ -188,6 +188,10 @@
   - **Symptom:** When logging in with Google OAuth, the backend returned a 500 Internal Server Error.
   - **Root Cause:** The `Usuario.cs` entity was updated with `CancelAt` and `CancelAtPeriodEnd` for the Stripe Subscription Cancellation feature, but the database schema lacked these columns, causing an EF Core `SqlException`.
   - **Fix:** Generated the missing EF Core migration (`Add_CancelAt_To_Usuario`), applied it, and restarted the container to ensure `AppDbContext` creates the columns properly during startup seeding. Verified the columns exist using sqlcmd.
+- **BUG-020:** 404 Not Found on Validation Result endpoint.
+  - **Symptom:** The frontend UI returns a 404 Not Found when trying to fetch the validation result (`GET /projects/{id}/validations/result`) and when triggering the validation (`POST /projects/{id}/validations/run`).
+  - **Root Cause:** The frontend `useValidations.ts` was calling an endpoint path that didn't match the backend. The `ProjectValidationController` is mapped to `api/projects/{projectId}/validate` for POST, and `api/projects/{projectId}/validation-result` for GET, while the frontend attempted to call `/validations/run` and `/validations/result`.
+  - **Fix:** Aligned the frontend `apiClient` requests in `useValidations.ts` to exactly match the existing backend routing paths (`/validate` and `/validation-result`).
 
 -   * * C O M P - 0 0 1 : * *   V e r i f y   c o n s e n t   t e s t   p a s s e s   i n   C I   p i p e l i n e . 
      -   * * S t a t u s : * *   C o m p l e t e 

@@ -1,15 +1,22 @@
-# Debug Session: Google Login 500 Error - Invalid column name CancelAt
+# Debug Session: 404 Not Found on /api/projects/{id}/validations/result
 
 ## SÍNTOMA
-Cuando se intenta iniciar sesión con Google OAuth, el backend arroja un error 500 Internal Server Error.
-Los logs del backend indican: `SqlException: Invalid column name 'CancelAt'. Invalid column name 'CancelAtPeriodEnd'.` en `UsuarioRepository.GetByEmailAsync`.
+El frontend reporta un error 404 al intentar obtener los resultados de validación de un proyecto:
+`GET http://localhost:5000/api/projects/e0a95362-fd62-4b6c-91e8-6255b16c0fcf/validations/result 404 (Not Found)`
+El componente frontend involucrado es `useValidations.ts`.
+
+## LÍMITES DE PONYTAIL (Lazy Senior)
+- **YAGNI**: No crear nuevas abstracciones, controladores, ni middlewares si no es necesario.
+- **Root Cause**: Buscar por qué la ruta `api/projects/{id}/validations/result` devuelve 404. ¿El nombre del endpoint cambió? ¿La ruta en el frontend está mal? ¿El controlador no tiene el endpoint?
+- **Shortest diff**: Arreglar la ruta en el frontend o agregar el atributo de ruta faltante en el controlador del backend.
 
 ## PLAN
-1. **Verificar el Modelo vs Base de Datos**: Identificar por qué `CancelAt` y `CancelAtPeriodEnd` están en la entidad `Usuario.cs` pero no en la base de datos local.
-2. **Crear / Aplicar Migración**: Generar la migración de EF Core para agregar estas dos columnas (y cualquier otra de Stripe que falte y esté mapeada) a la tabla `Usuario`.
-3. **Validación de la Base de Datos**: Ejecutar las migraciones y confirmar con el MCP (o herramienta similar) que las columnas existen.
-4. **Verificación**: Intentar de nuevo el login y comprobar que ya no ocurre el error 500.
+1. **Buscar la ruta en el Frontend**: Encontrar dónde se hace la petición en el frontend (`useValidations.ts` / `validations.api.ts`).
+2. **Buscar el controlador en el Backend**: Buscar en `src/backend/Api/Controllers/` la ruta que maneje resultados de validaciones. Comparar la ruta mapeada con la solicitada.
+3. **Corregir**: Alinear el frontend con la ruta real del backend o arreglar el backend si le falta el endpoint, manteniendo la convención de `api-contract.md`.
+4. **Verificar**: Construir/testear.
 
-- [x] Paso 1: Verificar el modelo
-- [x] Paso 2: Generar y aplicar migración EF Core
-- [x] Paso 3: Validar
+- [x] Buscar la ruta en Frontend
+- [x] Buscar la ruta en Backend
+- [x] Implementar la corrección
+- [x] Verificar
