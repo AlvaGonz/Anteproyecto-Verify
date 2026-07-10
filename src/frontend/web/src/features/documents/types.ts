@@ -51,12 +51,6 @@ export enum DocumentStatus {
   Invalid = 3,
 }
 
-export interface UploadDocumentDto {
-  tipoDocumento: DocumentType;
-  fechaEmision?: string;
-  institucionEmisora?: string;
-  observaciones?: string;
-}
 
 export interface UpdateDocumentStatusDto {
   estadoDocumento?: DocumentStatus;

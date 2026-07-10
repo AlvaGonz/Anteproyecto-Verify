@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { DocumentDto, UploadDocumentDto, DocumentType } from "../../features/documents/types";
+import { DocumentDto, DocumentType } from "../../features/documents/types";
 import { useDocuments, useUploadDocument, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
 import { useProject } from "../../features/projects/api/useProjects";
 import { getRequirementsForCategory, resolveRequirementStatus } from "../../features/documents/requirementCatalog";
 import { RequirementUploadRow } from "../../features/documents/components/RequirementUploadRow";
-import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
@@ -20,8 +19,7 @@ import {
   HardDrive,
   Search,
   Filter,
-  FileCheck2,
-  Upload
+  FileCheck2
 } from "lucide-react";
 
 const RequiredDocumentsList: React.FC<{ 
@@ -95,23 +93,6 @@ export const ProjectDocumentsPage: React.FC = () => {
   const statusMutation = useUpdateDocumentStatus(projectId);
 
   const documents = rawDocuments;
-
-  const handleUpload = async (dto: UploadDocumentDto, file: File) => {
-    if (!id) return;
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("tipoDocumento", String(dto.tipoDocumento));
-      formData.append("observaciones", dto.observaciones || "");
-      if (dto.fechaEmision) formData.append("fechaEmision", dto.fechaEmision);
-      if (dto.institucionEmisora) formData.append("institucionEmisora", dto.institucionEmisora);
-      await uploadMutation.mutateAsync(formData);
-      addToast("Expediente digitalizado exitosamente", "success");
-    } catch (err: any) {
-      addToast(err.message || "Error al procesar el expediente", "error");
-    }
-  };
-
   const handleUploadRequirement = async (tipoDocumento: DocumentType, observaciones: string, file: File) => {
     if (!id) return;
     try {
@@ -243,19 +224,6 @@ export const ProjectDocumentsPage: React.FC = () => {
             categoryId={project?.categoria || 1} 
             onUpload={handleUploadRequirement} 
           />
-
-          <div className="vf-card p-6 border-dashed border-2 bg-surface-container-low/30">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <Upload className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-xl font-display font-black text-secondary tracking-tight">Nueva <span className="text-primary italic">Carga</span></h3>
-                <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mt-1">Añadir evidencia legal</p>
-              </div>
-            </div>
-            <DocumentUploadForm projectId={id!} onUpload={handleUpload} />
-          </div>
         </div>
 
         {/* Column Right: Document Explorer */}
