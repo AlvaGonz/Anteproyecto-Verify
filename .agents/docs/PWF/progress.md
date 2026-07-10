@@ -45,6 +45,7 @@
 | React Doctor CI pipeline setup (npx react-doctor@latest install, pinned SHAs) | N/A | develop | (pending) | 2026-07-07 |
 | Google Sign-In button redesign + backend access_token verification | N/A | develop | (pending) | 2026-07-09 |
 | Stripe Subscription Cancellation, Reactivation & Notification Fixes | RF-8 | feat/Stripe Subscription Cancellation & Reactivation | 248b79a6 | 2026-07-09 |
+| Subscription Cancellation custom modal UI | RF-8 | feat/Stripe Subscription Cancellation & Reactivation | (pending) | 2026-07-09 |
 
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |

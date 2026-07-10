@@ -4,6 +4,7 @@ import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, Ref
 import { useMySubscription, useSyncSubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 import { PlansModal } from "./PlansModal";
+import { CancelSubscriptionModal } from "./CancelSubscriptionModal";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' });
 const PRICE_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -61,6 +62,7 @@ const NO_PLAN_CONFIG = {
 export const SubscriptionSettings: React.FC = () => {
   const navigate = useNavigate();
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const { data, isLoading, isError, refetch } = useMySubscription();
 
   const status = data?.subscriptionStatus ?? null;
@@ -251,11 +253,7 @@ export const SubscriptionSettings: React.FC = () => {
             <div className="flex gap-2">
               {status === 'active' && data?.isManagedByStripe && (
                 <button type="button"
-                  onClick={() => {
-                    if (confirm("¿Estás seguro que deseas cancelar tu suscripción? Se mantendrá activa hasta el final del período actual.")) {
-                      cancelSubscription();
-                    }
-                  }}
+                  onClick={() => setIsCancelModalOpen(true)}
                   disabled={isCanceling}
                   className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 disabled:opacity-50"
                 >
@@ -294,6 +292,18 @@ export const SubscriptionSettings: React.FC = () => {
         isOpen={isPlansModalOpen} 
         onClose={() => setIsPlansModalOpen(false)} 
         currentPlan={planKey}
+      />
+
+      <CancelSubscriptionModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={(feedback) => {
+          // If we want to send feedback to the backend later, we can attach it to cancelSubscription.
+          // For now we just call it.
+          cancelSubscription();
+          setIsCancelModalOpen(false);
+        }}
+        isCanceling={isCanceling}
       />
     </div>
   );

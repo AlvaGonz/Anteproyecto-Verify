@@ -83,11 +83,12 @@ test.describe('Subscription Cancellation and Reactivation UX', () => {
       });
     });
 
-    // Mock window.confirm to return true
-    page.on('dialog', dialog => dialog.accept());
+    // Click cancel button to open modal
+    await page.locator('text=Cancelar Suscripción').first().click();
 
-    // Click cancel button
-    await page.locator('text=Cancelar Suscripción').click();
+    // Verify modal appears and click confirmation button
+    await expect(page.locator('text=¿Estás seguro de que deseas cancelar tu suscripción?')).toBeVisible();
+    await page.locator('text=Sí, cancelar suscripción').click();
 
     // Verify the status updates to canceling and reactivate button appears
     await expect(page.locator('text=Cancelación Programada')).toBeVisible();
