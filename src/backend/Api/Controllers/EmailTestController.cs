@@ -172,5 +172,53 @@ public class EmailTestController : ControllerBase
             return StatusCode(500, new { useCase = "UC-04", error = ex.Message });
         }
     }
-}
+    /// <summary>UC-05: Suscripción activada</summary>
+    [HttpPost("uc-05-subscription-activated")]
+    public async Task<IActionResult> TestSubscriptionActivated([FromBody] EmailTestRequest? request)
+    {
+        string recipient = (request?.Email ?? TestEmail).ToLowerInvariant();
+        string name = request?.Name ?? "Adrian Alvarez";
+        _logger.LogInformation("[EmailTest] Disparando UC-05: SubscriptionActivated → {Email}", recipient);
+        try
+        {
+            await _emailService.SendSubscriptionActivatedAsync(
+                toEmail: recipient,
+                userName: name,
+                planName: "Empresa",
+                interval: "monthly"
+            );
+            return Ok(new { useCase = "UC-05", status = "sent", to = recipient, template = "SubscriptionActivated" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[EmailTest] UC-05 FAILED");
+            return StatusCode(500, new { useCase = "UC-05", error = ex.Message });
+        }
+    }
 
+    /// <summary>UC-06: Cambio de estado de proyecto (Notificaciones)</summary>
+    [HttpPost("uc-06-project-status-change")]
+    public async Task<IActionResult> TestProjectStatusChange([FromBody] EmailTestRequest? request)
+    {
+        string recipient = (request?.Email ?? TestEmail).ToLowerInvariant();
+        string name = request?.Name ?? "Adrian Alvarez";
+        _logger.LogInformation("[EmailTest] Disparando UC-06: ProjectStatusChange → {Email}", recipient);
+        try
+        {
+            // We use SendProjectStatusUpdateAsync directly here
+            await _emailService.SendProjectStatusUpdateAsync(
+                toEmail: recipient,
+                userName: name,
+                projectName: "Finca Los Álamos",
+                newStatus: "Aprobado (Verificado)"
+            );
+            
+            return Ok(new { useCase = "UC-06", status = "sent", to = recipient, template = "ProjectStatusChange" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[EmailTest] UC-06 FAILED");
+            return StatusCode(500, new { useCase = "UC-06", error = ex.Message });
+        }
+    }
+}

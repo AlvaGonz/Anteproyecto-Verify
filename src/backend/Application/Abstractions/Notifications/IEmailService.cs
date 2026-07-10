@@ -11,4 +11,5 @@ public interface IEmailService
     Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, CancellationToken ct = default);
     Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, CancellationToken ct = default);
     Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, string interval, CancellationToken ct = default);
+    Task SendProjectStatusUpdateAsync(string toEmail, string userName, string projectName, string newStatus, CancellationToken ct = default);
 }

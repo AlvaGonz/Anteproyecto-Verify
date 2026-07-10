@@ -384,6 +384,55 @@ public static class EmailTemplates
             $"Tu plan '{planName}' ha sido activado exitosamente.",
             content);
     }
+    // ════════════════════════════════════════════════════════════════════════
+    // 6. Project Status Update
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetProjectStatusUpdateEmail(string userName, string projectName, string status)
+    {
+        bool isApproved = status.Contains("Aprobado", System.StringComparison.OrdinalIgnoreCase);
+        bool isRejected = status.Contains("Rechazado", System.StringComparison.OrdinalIgnoreCase);
+        
+        string badgeHtml = Badge(isApproved, status);
+        if (!isApproved && !isRejected) 
+        {
+            // For other statuses like InProgress, Pending, etc.
+            badgeHtml = $@"<span style=""display:inline-block;background-color:#E2E8F0;color:#334155;padding:4px 12px;border-radius:20px;font-family:'Inter',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2px;"">●&nbsp; {status}</span>";
+        }
+
+        string infoInner = $@"
+            <strong style=""color:{Navy};"">Proyecto</strong><br>
+            <span style=""color:{TextBody};"">{projectName}</span><br><br>
+            <strong style=""color:{Navy};"">Nuevo Estatus</strong><br>
+            {badgeHtml}<br><br>
+            <strong style=""color:{Navy};"">Fecha de Actualización</strong><br>
+            <span style=""color:{TextMuted};""> {System.DateTime.Now:dd/MM/yyyy HH:mm}</span>";
+
+        string statusMessage = isApproved 
+            ? "¡Su proyecto ha sido aprobado satisfactoriamente! Ya puede proceder con los siguientes pasos en la plataforma." 
+            : isRejected 
+                ? "El estatus de su proyecto ha sido marcado como rechazado. Por favor ingrese a la plataforma para ver los detalles y las acciones requeridas."
+                : "El estatus de su proyecto ha cambiado. Ingrese a la plataforma para conocer los detalles.";
+
+        string content = $@"
+            <h2 style=""margin:0 0 4px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">Actualización de Estado</h2>
+            <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Estatus del Proyecto</p>
+
+            <p style=""margin:0 0 16px 0;"">Estimado/a <strong>{userName}</strong>,</p>
+            <p style=""margin:0 0 16px 0;"">Le informamos que el estado de su proyecto en VeriFinca ha sido actualizado:</p>
+
+            {InfoCard(infoInner)}
+
+            <p style=""margin:16px 0 24px 0;"">{statusMessage}</p>
+
+            <div style=""text-align:center;"">
+                {CtaButton("http://localhost:3000/dashboard", "Ir al Panel de Control")}
+            </div>";
+
+        return BuildEmailWrapper(
+            $"Actualización de Estado: Proyecto {projectName} — VeriFinca",
+            $"El proyecto '{projectName}' cambió a estado: {status}.",
+            content);
+    }
 }
 
 

@@ -33,7 +33,6 @@ public class EmailNotificationService : IEmailNotificationService
 
     public async Task SendProjectStatusChangeAsync(string recipientEmail, Proyecto proyecto, CancellationToken ct = default)
     {
-        string subject = $"Actualización de Estado: Proyecto {proyecto.Nombre}";
         string statusStr = proyecto.Status switch
         {
             ProjectStatus.Approved => "Aprobado (Verificado)",
@@ -41,22 +40,10 @@ public class EmailNotificationService : IEmailNotificationService
             _ => proyecto.Status.ToString()
         };
 
-        string body = $@"
-Estimado Desarrollador,
-
-Le informamos que el estado de su proyecto '{proyecto.Nombre}' ha sido actualizado.
-
-Nuevo Estado: {statusStr}
-
-Para más detalles, por favor ingrese a la plataforma VeriFinca.
-
-Atentamente,
-El equipo de VeriFinca
-";
-
         try
         {
-            await _emailService.SendEmailAsync(recipientEmail, subject, body, ct);
+            // We pass "Desarrollador" as userName since Proyecto doesn't have User info attached directly here
+            await _emailService.SendProjectStatusUpdateAsync(recipientEmail, "Desarrollador", proyecto.Nombre, statusStr, ct);
 
             await _auditLogger.AppendAsync(new AuditEntryDto
             {

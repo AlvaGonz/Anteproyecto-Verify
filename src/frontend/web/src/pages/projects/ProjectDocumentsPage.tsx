@@ -217,7 +217,7 @@ export const ProjectDocumentsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start mb-12">
         {/* Column Left: Checklist + Upload Form (Main Focus) */}
-        <div className="xl:col-span-8 flex flex-col gap-6 order-2 xl:order-1">
+        <div className="xl:col-span-8 flex flex-col gap-6 order-1">
           <RequiredDocumentsList 
             documents={documents} 
             categoryId={project?.categoria || 1} 
@@ -226,7 +226,7 @@ export const ProjectDocumentsPage: React.FC = () => {
         </div>
 
         {/* Column Right: Diagnosis Panel */}
-        <div className="xl:col-span-4 space-y-6 order-1 xl:order-2">
+        <div className="xl:col-span-4 space-y-6 order-2">
           <ProjectDiagnosisPanel projectId={projectId} />
         </div>
       </div>

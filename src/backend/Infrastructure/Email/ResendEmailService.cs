@@ -85,6 +85,13 @@ public class ResendEmailService : IEmailService
         var html = EmailTemplates.GetSubscriptionActivatedEmail(userName, planName, interval);
         await SendEmailInternalAsync(toEmail, "Suscripción Activada - VeriFinca", html, "suscripciones@handymansolutionrd.lat", ct);
     }
+
+    public async Task SendProjectStatusUpdateAsync(string toEmail, string userName, string projectName, string newStatus, CancellationToken ct = default)
+    {
+        var html = EmailTemplates.GetProjectStatusUpdateEmail(userName, projectName, newStatus);
+        string subject = $"Actualización de Estado: Proyecto {projectName}";
+        await SendEmailInternalAsync(toEmail, subject, html, "notificaciones@handymansolutionrd.lat", ct);
+    }
 }
 
 
