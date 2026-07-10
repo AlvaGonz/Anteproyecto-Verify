@@ -89,6 +89,7 @@ public class ResendEmailServiceTests
         // Assert
         Assert.NotNull(capturedMsg);
         Assert.Contains(capturedMsg!.To, addr => addr.Email == to);
+        Assert.Equal("mail@handymansolutionrd.lat", capturedMsg.From.Email);
         Assert.Contains("Verificación de Cuenta", capturedMsg.Subject);
         Assert.Contains("John Doe", capturedMsg.HtmlBody);
         Assert.Contains("token123", capturedMsg.HtmlBody);
@@ -115,6 +116,7 @@ public class ResendEmailServiceTests
         // Assert
         Assert.NotNull(capturedMsg);
         Assert.Contains(capturedMsg!.To, addr => addr.Email == to);
+        Assert.Equal("notificaciones@handymansolutionrd.lat", capturedMsg.From.Email);
         Assert.Contains("Confirmación de Recepción de Documento", capturedMsg.Subject);
         Assert.Contains("My Estate", capturedMsg.HtmlBody);
         Assert.Contains("Title", capturedMsg.HtmlBody);
@@ -141,6 +143,7 @@ public class ResendEmailServiceTests
         // Assert
         Assert.NotNull(capturedMsg);
         Assert.Contains(capturedMsg!.To, addr => addr.Email == to);
+        Assert.Equal("notificaciones@handymansolutionrd.lat", capturedMsg.From.Email);
         Assert.Contains("Estatus de Documento Actualizado", capturedMsg.Subject);
         Assert.Contains("badge-verified", capturedMsg.HtmlBody);
         Assert.Contains("Verificado / Aprobado", capturedMsg.HtmlBody);
@@ -168,6 +171,7 @@ public class ResendEmailServiceTests
         // Assert
         Assert.NotNull(capturedMsg);
         Assert.Contains(capturedMsg!.To, addr => addr.Email == to);
+        Assert.Equal("notificaciones@handymansolutionrd.lat", capturedMsg.From.Email);
         Assert.Contains("Estatus de Documento Actualizado", capturedMsg.Subject);
         Assert.Contains("badge-rejected", capturedMsg.HtmlBody);
         Assert.Contains("Missing signature", capturedMsg.HtmlBody);
@@ -194,6 +198,7 @@ public class ResendEmailServiceTests
         // Assert
         Assert.NotNull(capturedMsg);
         Assert.Contains(capturedMsg!.To, addr => addr.Email == to);
+        Assert.Equal("notificaciones@handymansolutionrd.lat", capturedMsg.From.Email);
         Assert.Contains("¡Tu Proyecto ha sido Creado!", capturedMsg.Subject);
         Assert.Contains("My Estate", capturedMsg.HtmlBody);
         Assert.Contains("proj-123", capturedMsg.HtmlBody);
