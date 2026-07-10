@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
@@ -99,7 +99,7 @@ if (formData.telefono) {
 
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
-    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: u.role, telefono: u.telefono || "", cedula: u.cedula || "" });
+    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "dev", "validator", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
     setIsModalOpen(true);
   };
 

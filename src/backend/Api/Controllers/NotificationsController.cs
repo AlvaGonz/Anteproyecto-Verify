@@ -15,10 +15,12 @@ using Microsoft.AspNetCore.Mvc;
 public class NotificationsController : ControllerBase
 {
     private readonly INotificacionRepository _notificacionRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public NotificationsController(INotificacionRepository notificacionRepository)
+    public NotificationsController(INotificacionRepository notificacionRepository, IUnitOfWork unitOfWork)
     {
         _notificacionRepository = notificacionRepository;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
@@ -68,6 +70,29 @@ public class NotificationsController : ControllerBase
 
         notification.MarcarComoLeida();
         await _notificacionRepository.UpdateAsync(notification, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpPost("read-all")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var notifications = await _notificacionRepository.GetByUsuarioIdAsync(userId, true, cancellationToken);
+        foreach (var notification in notifications)
+        {
+            notification.MarcarComoLeida();
+            await _notificacionRepository.UpdateAsync(notification, cancellationToken);
+        }
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return NoContent();
     }

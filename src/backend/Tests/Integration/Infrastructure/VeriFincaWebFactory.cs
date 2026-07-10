@@ -96,6 +96,8 @@ internal sealed class NullEmailService : Application.Abstractions.Notifications.
     public Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, System.Threading.CancellationToken ct = default)
         => Task.CompletedTask;
 
-    public Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, decimal planPrice, System.Threading.CancellationToken ct = default)
-        => Task.CompletedTask;
+    public Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, string interval, System.Threading.CancellationToken ct = default)
+    {
+        return Task.CompletedTask;
+    }
 }

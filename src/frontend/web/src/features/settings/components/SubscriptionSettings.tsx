@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift } from "lucide-react";
-import { useMySubscription } from "../api/useSettings";
+import { useMySubscription, useSyncSubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 import { PlansModal } from "./PlansModal";
+import { CancelSubscriptionModal } from "./CancelSubscriptionModal";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' });
 const PRICE_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -28,6 +29,11 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; icon: Re
   canceled: {
     label: "Suscripción Cancelada",
     className: "bg-rose-50 text-rose-700 border-rose-200",
+    icon: <AlertCircle className="w-4 h-4" />,
+  },
+  canceling: {
+    label: "Cancelación Programada",
+    className: "bg-orange-50 text-orange-700 border-orange-200",
     icon: <AlertCircle className="w-4 h-4" />,
   },
   past_due: {
@@ -56,14 +62,14 @@ const NO_PLAN_CONFIG = {
 export const SubscriptionSettings: React.FC = () => {
   const navigate = useNavigate();
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const { data, isLoading, isError, refetch } = useMySubscription();
 
   const status = data?.subscriptionStatus ?? null;
   const planName = data?.plan ?? (data as any)?.planName ?? null;
   const planKey = normalizePlanKey(planName);
-  const planCapabilities = planName ? PLAN_CAPABILITIES[planKey] : null;
+  const planCapabilities = planName ? PLAN_CAPABILITIES[planKey as keyof typeof PLAN_CAPABILITIES] : null;
   const currentPeriodEnd = data?.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
-  const isManagedByStripe = data?.isManagedByStripe ?? false;
 
   const badgeConfig = status ? (STATUS_CONFIG[status] ?? STATUS_CONFIG.active) : NO_PLAN_CONFIG;
   const hasPlan = !!planName;
@@ -78,14 +84,32 @@ export const SubscriptionSettings: React.FC = () => {
     ? DATE_FORMATTER.format(currentPeriodEnd)
     : null;
 
-  // Only show the price when Stripe is actively billing the user.
-  // Manually-assigned plans (e.g. Consultor/free tier) don't get a price row.
-  const formattedPrice = (isManagedByStripe && data?.planPrice != null)
-    ? data.planPrice === 0
-      ? "Gratis"
-      : PRICE_FORMATTER.format(data.planPrice) + " USD / mes"
-    : null;
+  let formattedPrice: string | null = null;
+  if (hasPlan && data) {
+    // Determine the price based on the plan name and billing cycle (since DB stores DOP and we want USD UI)
+    const isAnnual = data.billingCycle === 'year' || data.billingCycle === 'yearly';
+    let priceVal = 0;
 
+    if (planKey === 'profesional') {
+      priceVal = isAnnual ? 48 : 60;
+    } else if (planKey === 'empresa') {
+      priceVal = isAnnual ? 136 : 170;
+    } else if (planKey === 'enterprise') {
+      priceVal = isAnnual ? 400 : 500;
+    }
+
+    if (priceVal > 0) {
+      formattedPrice = PRICE_FORMATTER.format(priceVal) + ` USD ${isAnnual ? '(anual)' : ''} / mes`;
+    } else if (data.planPrice === 0) {
+      formattedPrice = "Gratis";
+    } else if (data.planPrice && data.planPrice > 0) {
+      formattedPrice = PRICE_FORMATTER.format(data.planPrice) + " USD / mes";
+    }
+  }
+
+  const { mutate: syncSubscription, isPending: isSyncing } = useSyncSubscription();
+  const { mutate: cancelSubscription, isPending: isCanceling } = useCancelSubscription();
+  const { mutate: reactivateSubscription, isPending: isReactivating } = useReactivateSubscription();
 
   return (
     <div className="w-full max-w-4xl space-y-6 animate-in fade-in zoom-in-95 duration-300">
@@ -97,10 +121,21 @@ export const SubscriptionSettings: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
             <div>
-              <h2 className="text-2xl font-display font-bold text-[#223382] mb-2 flex items-center gap-3">
-                <CreditCard className="w-6 h-6 text-primary" />
-                Mi Suscripción
-              </h2>
+              <div className="flex items-center gap-4 mb-2">
+                <h2 className="text-2xl font-display font-bold text-[#223382] flex items-center gap-3">
+                  <CreditCard className="w-6 h-6 text-primary" />
+                  Mi Suscripción
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => syncSubscription()}
+                  disabled={isSyncing || isLoading}
+                  className="flex items-center gap-2 text-sm text-primary hover:text-primary-hover font-medium bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                  Sincronizar
+                </button>
+              </div>
               <p className="text-text-secondary text-sm">
                 Gestiona tu plan actual y estado de facturación.
               </p>
@@ -215,14 +250,40 @@ export const SubscriptionSettings: React.FC = () => {
             <div className="text-sm text-text-secondary font-medium">
               ¿Deseas cambiar tu plan o explorar otras opciones?
             </div>
-            <button type="button"
-              onClick={() => setIsPlansModalOpen(true)}
-              className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
-            >
-              <span className="flex items-center gap-2">
-                {hasPlan ? "Modificar Suscripción" : "Ver Planes"} <ArrowRight className="w-4 h-4" />
-              </span>
-            </button>
+            <div className="flex gap-2">
+              {status === 'active' && data?.isManagedByStripe && (
+                <button type="button"
+                  onClick={() => setIsCancelModalOpen(true)}
+                  disabled={isCanceling}
+                  className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 disabled:opacity-50"
+                >
+                  <span className="flex items-center gap-2">
+                    {isCanceling ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                    Cancelar Suscripción
+                  </span>
+                </button>
+              )}
+              {status === 'canceling' && data?.isManagedByStripe && (
+                <button type="button"
+                  onClick={() => reactivateSubscription()}
+                  disabled={isReactivating}
+                  className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 disabled:opacity-50"
+                >
+                  <span className="flex items-center gap-2">
+                    {isReactivating ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                    Reactivar Suscripción
+                  </span>
+                </button>
+              )}
+              <button type="button"
+                onClick={() => setIsPlansModalOpen(true)}
+                className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
+              >
+                <span className="flex items-center gap-2">
+                  {hasPlan ? "Modificar Suscripción" : "Ver Planes"} <ArrowRight className="w-4 h-4" />
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -231,6 +292,18 @@ export const SubscriptionSettings: React.FC = () => {
         isOpen={isPlansModalOpen} 
         onClose={() => setIsPlansModalOpen(false)} 
         currentPlan={planKey}
+      />
+
+      <CancelSubscriptionModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={(feedback) => {
+          // If we want to send feedback to the backend later, we can attach it to cancelSubscription.
+          // For now we just call it.
+          cancelSubscription();
+          setIsCancelModalOpen(false);
+        }}
+        isCanceling={isCanceling}
       />
     </div>
   );

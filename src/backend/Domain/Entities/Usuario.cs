@@ -41,6 +41,8 @@ public class Usuario : EntityBase
     public string? StripeSubscriptionId { get; private set; }
     public string? SubscriptionStatus { get; private set; }
     public DateTime? CurrentPeriodEnd { get; private set; }
+    public bool CancelAtPeriodEnd { get; private set; }
+    public DateTime? CancelAt { get; private set; }
 
     // Google Auth
     public bool SocialLogin { get; private set; }
@@ -243,6 +245,20 @@ public class Usuario : EntityBase
         StripeSubscriptionId = subscriptionId;
         SubscriptionStatus = status;
         CurrentPeriodEnd = currentPeriodEnd;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void SetCancellationScheduled(DateTime? cancelAt)
+    {
+        CancelAtPeriodEnd = true;
+        CancelAt = cancelAt;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void ClearCancellationScheduled()
+    {
+        CancelAtPeriodEnd = false;
+        CancelAt = null;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

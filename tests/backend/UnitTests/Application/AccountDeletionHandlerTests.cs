@@ -56,7 +56,7 @@ public class AccountDeletionHandlerTests
             .ReturnsAsync(user);
         _uow.Setup(u => u.SaveChangesAsync(default)).ReturnsAsync(1);
         _stripeService.Setup(s => s.CancelAtPeriodEndAsync("sub_456", default))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(DateTime.UtcNow.AddMonths(1));
 
         var cmd = new RequestAccountDeletionCommand(userId, null);
         var handler = new RequestAccountDeletionCommandHandler(

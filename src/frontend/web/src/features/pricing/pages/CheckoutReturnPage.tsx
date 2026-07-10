@@ -80,7 +80,9 @@ export const CheckoutReturnPage = () => {
 
           let state = resolvePostCheckoutState({
             sessionStatus: data.status,
-            userSubscriptionStatus: user?.subscriptionStatus
+            userSubscriptionStatus: user?.subscriptionStatus ?? undefined,
+            sessionPlan: data.plan ?? undefined,
+            userPlanName: user?.plan ?? undefined
           });
 
           if (state === 'error') {
@@ -104,15 +106,19 @@ export const CheckoutReturnPage = () => {
             // Invalidate caches to fetch latest user status
             await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] })
             await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
+            await queryClient.invalidateQueries({ queryKey: ['notifications'] })
             await refreshUser();
             
             // Fetch directly to get the current state synchronously for the next check
-            const authRes = await apiClient.get('/auth/me');
-            const latestStatus = authRes.data.subscriptionStatus;
+            const statusRes = await apiClient.get('/v1/subscriptions/my-status');
+            const latestStatus = statusRes.data.subscriptionStatus;
+            const latestPlan = statusRes.data.plan;
 
             state = resolvePostCheckoutState({
               sessionStatus: data.status,
-              userSubscriptionStatus: latestStatus
+              userSubscriptionStatus: latestStatus ?? undefined,
+              sessionPlan: data.plan ?? undefined,
+              userPlanName: latestPlan ?? undefined
             });
           }
 
@@ -124,14 +130,18 @@ export const CheckoutReturnPage = () => {
               // Invalidate caches and fetch one last time
               await queryClient.invalidateQueries({ queryKey: ['subscription', 'my-status'] });
               await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+              await queryClient.invalidateQueries({ queryKey: ['notifications'] });
               await refreshUser();
               
-              const authRes = await apiClient.get('/auth/me');
-              const finalStatus = authRes.data.subscriptionStatus;
+              const statusRes = await apiClient.get('/v1/subscriptions/my-status');
+              const finalStatus = statusRes.data.subscriptionStatus;
+              const finalPlan = statusRes.data.plan;
               
               state = resolvePostCheckoutState({
                 sessionStatus: data.status,
-                userSubscriptionStatus: finalStatus
+                userSubscriptionStatus: finalStatus ?? undefined,
+                sessionPlan: data.plan ?? undefined,
+                userPlanName: finalPlan ?? undefined
               });
             } catch (syncError) {
               // Ignore sync error and proceed to error state

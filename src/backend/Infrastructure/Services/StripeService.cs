@@ -1,5 +1,6 @@
 namespace Infrastructure.Services;
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions;
@@ -16,13 +17,25 @@ public class StripeService : IStripeService
         StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
     }
 
-    public async Task CancelAtPeriodEndAsync(string subscriptionId, CancellationToken cancellationToken = default)
+    public async Task<DateTime?> CancelAtPeriodEndAsync(string subscriptionId, CancellationToken cancellationToken = default)
     {
         var service = new SubscriptionService();
         var options = new SubscriptionUpdateOptions
         {
             CancelAtPeriodEnd = true
         };
+        var sub = await service.UpdateAsync(subscriptionId, options, cancellationToken: cancellationToken);
+        return sub.CancelAt;
+    }
+
+    public async Task ReactivateSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default)
+    {
+        var service = new SubscriptionService();
+        var options = new SubscriptionUpdateOptions
+        {
+            CancelAtPeriodEnd = false
+        };
+
         await service.UpdateAsync(subscriptionId, options, cancellationToken: cancellationToken);
     }
 }

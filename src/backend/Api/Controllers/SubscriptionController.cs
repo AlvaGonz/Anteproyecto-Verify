@@ -59,6 +59,12 @@ public class SubscriptionController : ControllerBase
             return StatusCode(500, new { message = "Stripe Secret Key is not configured on the server." });
         }
 
+        if (!string.IsNullOrEmpty(request.PlanCode) || !string.IsNullOrEmpty(request.BillingCycle))
+        {
+            user.SetPendingPlan(request.PlanCode ?? user.PendingPlanCode, request.BillingCycle ?? user.PendingBillingCycle);
+            await _dbContext.SaveChangesAsync(ct);
+        }
+
         try
         {
             var customerId = user.StripeCustomerId;
@@ -154,14 +160,40 @@ public class SubscriptionController : ControllerBase
             effectiveStatus = "incomplete";
         }
 
+        if (effectiveStatus == "active" && user.CancelAtPeriodEnd)
+        {
+            effectiveStatus = "canceling";
+        }
+
+        string? billingCycle = user.PendingBillingCycle;
+        if (string.IsNullOrEmpty(billingCycle) && !string.IsNullOrEmpty(user.StripeSubscriptionId))
+        {
+            try
+            {
+                var subService = new SubscriptionService();
+                var sub = await subService.GetAsync(user.StripeSubscriptionId, cancellationToken: ct);
+                if (sub != null && sub.Items.Data.Count > 0)
+                {
+                    billingCycle = sub.Items.Data[0].Price.Recurring.Interval;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not fetch Stripe subscription for User {UserId}", user.Id);
+            }
+        }
+
         return Ok(new
         {
             plan = user.Plan?.NombrePlan,
             planPrice = user.Plan?.Precio,
             subscriptionStatus = effectiveStatus,
             currentPeriodEnd = user.CurrentPeriodEnd,
+            cancelAtPeriodEnd = user.CancelAtPeriodEnd,
+            cancelAt = user.CancelAt,
             stripeSubscriptionId = user.StripeSubscriptionId,
-            isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId)
+            isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId),
+            billingCycle = !string.IsNullOrEmpty(user.PendingBillingCycle) ? user.PendingBillingCycle : billingCycle
         });
     }
 
@@ -327,7 +359,7 @@ public class SubscriptionController : ControllerBase
 
                 if (customerId != null && subscriptionId != null)
                 {
-                    await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap);
+                    await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap, isCheckout: true);
                 }
             }
             else if (stripeEvent.Type == "invoice.paid")
@@ -405,7 +437,8 @@ public class SubscriptionController : ControllerBase
     private async Task HandleSubscriptionActivatedAsync(
         string customerId,
         string subscriptionId,
-        Dictionary<string, string> pricePlanMap)
+        Dictionary<string, string> pricePlanMap,
+        bool isCheckout = false)
     {
         var user = await _dbContext.Usuarios
             .FirstOrDefaultAsync(u => u.StripeCustomerId == customerId);
@@ -430,9 +463,17 @@ public class SubscriptionController : ControllerBase
 
             if (plan != null)
             {
-                var isNewPlan = user.PlanSuscripcionId != plan.Idsuscripcion;
+                var recurringInterval = subscription.Items?.Data?.FirstOrDefault()?.Price?.Recurring?.Interval;
+                var interval = !string.IsNullOrEmpty(recurringInterval) ? recurringInterval : "monthly";
+                var oldPlanId = user.PlanSuscripcionId;
+                var oldInterval = user.PendingBillingCycle;
 
                 user.AsignarPlan(plan.Idsuscripcion);
+                user.SetPendingPlan(user.PendingPlanCode, interval);
+
+                bool isNewPlan = (oldPlanId != plan.Idsuscripcion) || (oldInterval != interval) || isCheckout;
+                await ProcessSubscriptionNotificationAsync(user, plan, isNewPlan, interval);
+                
                 _logger.LogInformation(
                     "Webhook: Assigned plan '{PlanName}' (priceId={PriceId}) to user {UserId}.",
                     planName, priceId, user.Id);
@@ -452,8 +493,6 @@ public class SubscriptionController : ControllerBase
                         invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
                     }
                 }
-
-                await ProcessSubscriptionNotificationAsync(user, plan, isNewPlan);
             }
             else
             {
@@ -472,6 +511,16 @@ public class SubscriptionController : ControllerBase
 
         // Always sync the Stripe subscription fields
         user.UpdateStripeSubscription(subscription.Id, subscription.Status, currentPeriodEnd);
+        
+        if (subscription.CancelAtPeriodEnd)
+        {
+            user.SetCancellationScheduled(subscription.CancelAt);
+        }
+        else
+        {
+            user.ClearCancellationScheduled();
+        }
+
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation(
@@ -479,7 +528,7 @@ public class SubscriptionController : ControllerBase
             user.Id, subscription.Status, currentPeriodEnd);
     }
 
-    internal async Task ProcessSubscriptionNotificationAsync(Usuario user, PlanSuscripcion plan, bool isNewPlan)
+    internal async Task ProcessSubscriptionNotificationAsync(Usuario user, PlanSuscripcion plan, bool isNewPlan, string interval)
     {
         if (isNewPlan)
         {
@@ -496,7 +545,7 @@ public class SubscriptionController : ControllerBase
                 user.Email,
                 user.NombreCompleto,
                 plan.NombrePlan,
-                plan.Precio
+                interval
             );
         }
     }
@@ -577,6 +626,63 @@ public class SubscriptionController : ControllerBase
         return Task.FromResult(roles.Any(r => 
             string.Equals(r, "admin", StringComparison.OrdinalIgnoreCase) || 
             string.Equals(r, "Administrator", StringComparison.OrdinalIgnoreCase)));
+    }
+
+    [HttpPost("cancel")]
+    [Authorize]
+    public async Task<IActionResult> CancelSubscription([FromServices] Application.Abstractions.IStripeService stripeService, CancellationToken ct)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null || string.IsNullOrEmpty(user.StripeSubscriptionId))
+            return BadRequest(new { message = "Suscripción no encontrada o no gestionada por Stripe." });
+
+        try
+        {
+            var cancelAt = await stripeService.CancelAtPeriodEndAsync(user.StripeSubscriptionId, ct);
+            
+            user.SetCancellationScheduled(cancelAt);
+            await _dbContext.SaveChangesAsync(ct);
+
+            return Ok(new { message = "Cancelación programada." });
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe error cancelling subscription.");
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
+        }
+    }
+
+    [HttpPost("reactivate")]
+    [Authorize]
+    public async Task<IActionResult> ReactivateSubscription([FromServices] Application.Abstractions.IStripeService stripeService, CancellationToken ct)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null || string.IsNullOrEmpty(user.StripeSubscriptionId))
+            return BadRequest(new { message = "Suscripción no encontrada." });
+
+        if (!user.CancelAtPeriodEnd)
+            return BadRequest(new { message = "La suscripción no está en proceso de cancelación." });
+
+        try
+        {
+            await stripeService.ReactivateSubscriptionAsync(user.StripeSubscriptionId, ct);
+            
+            user.ClearCancellationScheduled();
+            await _dbContext.SaveChangesAsync(ct);
+
+            return Ok(new { message = "Suscripción reactivada exitosamente." });
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe error reactivating subscription.");
+            return StatusCode(500, new { message = e.StripeError?.Message ?? e.Message });
+        }
     }
 }
 

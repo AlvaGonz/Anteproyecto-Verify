@@ -45,7 +45,7 @@ export const MyProfileForm: React.FC = () => {
 });
 
    // Phone input hook
-   const phoneValueRaw = watch("telefono") ? watch("telefono").replace(/\D/g, '') : "";
+   const phoneValueRaw = watch("telefono") ? watch("telefono")!.replace(/\D/g, '') : "";
    const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
      const digits = formattedValue.replace(/\D/g, '');
      setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
