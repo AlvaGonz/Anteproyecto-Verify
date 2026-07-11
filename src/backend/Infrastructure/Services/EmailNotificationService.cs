@@ -41,22 +41,18 @@ public class EmailNotificationService : IEmailNotificationService
             _ => proyecto.Status.ToString()
         };
 
-        string body = $@"
-Estimado Desarrollador,
-
-Le informamos que el estado de su proyecto '{proyecto.Nombre}' ha sido actualizado.
-
-Nuevo Estado: {statusStr}
-
-Para más detalles, por favor ingrese a la plataforma VeriFinca.
-
-Atentamente,
-El equipo de VeriFinca
-";
+        bool isApproved = proyecto.Status == ProjectStatus.Approved;
+        
+        string body = Infrastructure.Email.EmailTemplates.GetProjectStatusChangeEmail(
+            proyecto.Nombre,
+            proyecto.Id.ToString(),
+            statusStr,
+            isApproved
+        );
 
         try
         {
-            await _emailService.SendEmailAsync(recipientEmail, subject, body, ct);
+            await _emailService.SendEmailAsync(recipientEmail, subject, body, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
 
             await _auditLogger.AppendAsync(new AuditEntryDto
             {

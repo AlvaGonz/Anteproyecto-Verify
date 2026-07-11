@@ -126,6 +126,10 @@ public static class AppDbContextSeeder
                 var p2 = proyectoEntities[1];
                 var p3 = proyectoEntities[2];
 
+                p1.UpdateDetails(p1.Nombre, p1.UbicacionTexto, null, null, p1.Categoria, p1.DatosDesarrollador, p1.DesignacionCatastral, "Propietario Test", "402-1234567-8", "1-01-99999-9");
+                p1.UpdateRncYMatricula("1-30-12345-1", "001-02-003");
+                await context.SaveChangesAsync();
+
                 await GetOrCreateDocumentoAsync(
                     context,
                     proyectoId: p1.Id,
@@ -204,6 +208,15 @@ public static class AppDbContextSeeder
                     urlVerificacion: "https://verifinca.do/verify/VF-2026-ABC123XYZ",
                     score: 95,
                     estadoIntegridad: IntegrityStatus.Valid);
+
+                await GetOrCreateSelloIntegridadAsync(
+                    context,
+                    proyectoId: p1.Id,
+                    codigoSello: "VF-2026-ABC123XYZ",
+                    nombre: "Sello VeriFinca Oro",
+                    nivel: NivelSelloIntegridad.Oro,
+                    urlQr: "https://verifinca.do/verify/VF-2026-ABC123XYZ",
+                    firmaDigital: "firma-digital-simulada");
 
                 await GetOrCreateNotificacionAsync(
                     context,
@@ -539,11 +552,44 @@ public static class AppDbContextSeeder
             c.ProyectoId == proyectoId && c.CodigoVerificacion == codigoVerificacion);
         if (existing != null) return existing;
 
-        var cert = new Certificacion(proyectoId, reporteId, codigoVerificacion, urlVerificacion, score, estadoIntegridad, emisorId, version: 1);
-        cert.UpdateStatus(CertificationStatus.Vigente, score, version: 1);
-        context.Certificaciones.Add(cert);
+        var entity = new Certificacion(
+            proyectoId,
+            reporteId,
+            codigoVerificacion,
+            urlVerificacion,
+            score,
+            estadoIntegridad,
+            emisorId);
+        
+        context.Certificaciones.Add(entity);
         await context.SaveChangesAsync();
-        return cert;
+        return entity;
+    }
+
+    private static async Task<SelloIntegridad> GetOrCreateSelloIntegridadAsync(
+        AppDbContext context,
+        Guid proyectoId,
+        string codigoSello,
+        string nombre,
+        NivelSelloIntegridad nivel,
+        string urlQr,
+        string firmaDigital)
+    {
+        var existing = await context.SellosIntegridad.FirstOrDefaultAsync(s => 
+            s.ProyectoId == proyectoId && s.CodigoSello == codigoSello);
+        if (existing != null) return existing;
+
+        var entity = new SelloIntegridad(
+            proyectoId,
+            codigoSello,
+            nombre,
+            nivel,
+            urlQr,
+            firmaDigital);
+            
+        context.SellosIntegridad.Add(entity);
+        await context.SaveChangesAsync();
+        return entity;
     }
 
     private static async Task<Notificacion> GetOrCreateNotificacionAsync(

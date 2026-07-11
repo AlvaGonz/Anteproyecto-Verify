@@ -384,6 +384,44 @@ public static class EmailTemplates
             $"Tu plan '{planName}' ha sido activado exitosamente.",
             content);
     }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // 6. Project Status Update
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetProjectStatusChangeEmail(string projectName, string projectId, string statusStr, bool isPositive)
+    {
+        string projectUrl = $"http://localhost:3000/projects/{projectId}";
+        
+        string badgeHtml = Badge(isPositive, statusStr);
+
+        string infoInner = $@"
+            <strong style=""color:{Navy};"">Proyecto</strong><br>
+            <span style=""color:{TextBody};"">{projectName}</span><br><br>
+            <strong style=""color:{Navy};"">ID Único</strong><br>
+            <span style=""font-family:'Courier New',Courier,monospace;font-size:13px;color:{TextMuted};background:#EEF2F7;padding:2px 6px;border-radius:4px;"">{projectId}</span><br><br>
+            <strong style=""color:{Navy};"">Nuevo Estado</strong><br>
+            {badgeHtml}";
+
+        string content = $@"
+            <h2 style=""margin:0 0 4px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">Actualización de Estado</h2>
+            <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Cambio en el estatus de tu proyecto</p>
+
+            <p style=""margin:0 0 16px 0;"">Estimado/a <strong>Desarrollador</strong>,</p>
+            <p style=""margin:0 0 16px 0;"">Le informamos que el estado de su proyecto <strong>{projectName}</strong> ha sido actualizado en VeriFinca.</p>
+
+            {InfoCard(infoInner)}
+
+            <p style=""margin:0 0 24px 0;"">Para más detalles sobre esta actualización y continuar con los procesos correspondientes, por favor ingrese a la plataforma VeriFinca.</p>
+
+            <div style=""text-align:center;"">
+                {CtaButton(projectUrl, "Ver Proyecto")}
+            </div>";
+
+        return BuildEmailWrapper(
+            $"Actualización de Estado: Proyecto {projectName} — VeriFinca",
+            $"El estado de tu proyecto {projectName} ha cambiado a {statusStr}.",
+            content);
+    }
 }
 
 

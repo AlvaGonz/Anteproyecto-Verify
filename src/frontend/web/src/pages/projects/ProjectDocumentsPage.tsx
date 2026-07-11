@@ -1,10 +1,11 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { DocumentDto, UploadDocumentDto, DocumentType } from "../../features/documents/types";
 import { useDocuments, useUploadDocument, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
 import { DocumentUploadForm } from "../../features/documents/components/DocumentUploadForm";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
+import { RequirementUploadRow } from "../../features/documents/components/RequirementUploadRow";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { m } from "framer-motion";
 import { 
@@ -31,7 +32,7 @@ const REQUIRED_DOCUMENTS = [
   { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
 ];
 
-const RequiredDocumentsList: React.FC<{ documents: DocumentDto[] }> = ({ documents }) => {
+const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDto[] }> = ({ projectId, documents }) => {
   return (
     <div className="vf-card p-6 bg-surface-container-low/30 overflow-hidden relative group">
       <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -49,35 +50,15 @@ const RequiredDocumentsList: React.FC<{ documents: DocumentDto[] }> = ({ documen
           const isUploaded = documents.some(u => u.tipoDocumento === doc.category && u.activo);
           
           return (
-            <div 
+            <RequirementUploadRow
               key={doc.id}
-              className={`p-4 rounded-2xl border transition-all flex items-center justify-between group/item ${
-                isUploaded 
-                  ? 'bg-success/5 border-success/20' 
-                  : 'bg-white border-outline-variant/30 hover:border-primary/30'
-              }`}
-            >
-              <div className="flex items-center gap-4 min-w-0 flex-1">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0 ${
-                  isUploaded ? 'bg-success text-white' : 'bg-surface-container-high text-on-surface-variant'
-                }`}>
-                  {isUploaded ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-4 h-4 opacity-40" />}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-xs font-black tracking-tight truncate ${isUploaded ? 'text-success' : 'text-secondary'}`}>
-                    {doc.label}
-                  </p>
-                  <p className="text-[10px] font-bold text-on-surface-variant opacity-60 leading-tight truncate">
-                    {doc.description}
-                  </p>
-                </div>
-              </div>
-              <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${
-                isUploaded ? 'bg-success/20 text-success' : 'bg-surface-container-highest text-on-surface-variant'
-              }`}>
-                {doc.categoryLabel}
-              </span>
-            </div>
+              projectId={projectId}
+              requirementCode={doc.categoryLabel} // Using categoryLabel as requirementCode for now
+              label={doc.label}
+              description={doc.description}
+              categoryLabel={doc.categoryLabel}
+              isUploaded={isUploaded}
+            />
           );
         })}
       </div>
@@ -227,7 +208,7 @@ export const ProjectDocumentsPage: React.FC = () => {
         <div className="xl:col-span-4 flex flex-col gap-6">
           <ProjectDiagnosisPanel projectId={projectId} />
           
-          <RequiredDocumentsList documents={documents} />
+          <RequiredDocumentsList projectId={projectId} documents={documents} />
 
           <div className="vf-card p-6 border-dashed border-2 bg-surface-container-low/30">
             <div className="flex items-center gap-3 mb-6">

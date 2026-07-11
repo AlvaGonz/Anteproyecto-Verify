@@ -48,6 +48,22 @@ export const useUploadDocument = (projectId: string) => {
   });
 };
 
+export const useUploadRequirementDocument = (projectId: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['uploadRequirementDocument', projectId],
+    mutationFn: ({ requirementCode, file }: { requirementCode: string; file: File }) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      // Ensure we hit the v1 endpoint explicitly
+      return apiClient.post<ApiDocumentoDto>(`/v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      }).then(res => mapApiDocument(res.data));
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
+  });
+};
+
 export const useUpdateDocumentStatus = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
