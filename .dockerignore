@@ -1,28 +1,37 @@
-**/.git
-**/node_modules
-**/bin
-**/obj
-**/dist
-**/dist-ssr
-**/.vscode
-**/.antigravity
-**/.gemini
-.env
-README.md
-docker/*
+# Ignore most files
+**/*
+
+# Explicitly allow source files needed for build
+!docker/
+!src/
+!Build-Database-Sql.sql
+!.env
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!*.sln
+!*.csproj
+!tsconfig.json
+!vite.config.ts
+!playwright.config.ts
+
+# Ignore nested items
+docker/**
 !docker/SQL_Server/
-scripts/
+!docker/SQL_Server/Dockerfile
+!docker/SQL_Server/entrypoint.sh
+!docker/SQL_Server/translate.py
+!docker/api.dev.Dockerfile
+!docker/web.dev.Dockerfile
+!docker/azurite.Dockerfile
 
-
-
-# Test and scratch files
-*.test.js
-*.ps1
-test_*.js
-scratch_*.ps1
-scratch_*.js
-
-# IDE and OS
-**/.idea
-**/.DS_Store
+# Exclude build artifacts deeply
+**/bin/
+**/obj/
+**/dist/
+**/dist-ssr/
+**/node_modules/
+**/.git/
+**/.vscode/
+**/.DS_Store/
 **/Thumbs.db
