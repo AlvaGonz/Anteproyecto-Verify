@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 vi.mock('../../../infrastructure/api/client', () => ({
   default: {
     get: vi.fn(),
+    post: vi.fn(),
   },
 }));
 
@@ -74,8 +75,12 @@ describe('CheckoutReturnPage', () => {
       if (url.includes('/auth/me')) {
         return { data: { subscriptionStatus: 'active' } };
       }
+      if (url.includes('my-status')) {
+        return { data: { subscriptionStatus: 'active', plan: 'Empresa' } };
+      }
       return { data: {} };
     });
+    vi.mocked(apiClient.post).mockResolvedValue({ data: { message: 'ok' } });
 
     renderWithRouter('/checkout/return?session_id=cs_test_123');
 

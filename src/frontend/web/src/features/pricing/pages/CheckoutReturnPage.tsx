@@ -38,11 +38,18 @@ export const CheckoutReturnPage = () => {
   const [status, setStatus] = useState<PageStatus>('loading')
 
   useEffect(() => {
+    // ponytail: use local flag (not shared ref) to prevent StrictMode double-mount
+    // race: each effect instance has its OWN `mounted`, so mount 1's cleanup sets
+    // mount 1's flag to false, and mount 2's verify can only see mount 2's flag.
+    let mounted = true;
     let timeoutId: ReturnType<typeof setTimeout>;
     let isPolling = true;
 
+    const safeStatus = (s: PageStatus) => { if (mounted) setStatus(s) }
+    const safeNavigate = (to: string, opts?: any) => { if (mounted) navigate(to, opts) }
+
     if (!sessionId) {
-      setStatus('error');
+      safeStatus('error');
     } else {
       // Immediately remove session_id from browser history to prevent
       // it appearing in Referrer headers or server access logs (OWASP A05)
@@ -69,7 +76,7 @@ export const CheckoutReturnPage = () => {
         // Idempotency guard — prevents re-processing on hot-reload / StrictMode
         if (_processedSessions.has(sessionId)) {
           // Already processed — navigate directly without calling API again
-          navigate('/admin/dashboard', { replace: true })
+          safeNavigate('/admin/dashboard', { replace: true })
           return
         }
 
@@ -86,18 +93,18 @@ export const CheckoutReturnPage = () => {
           });
 
           if (state === 'error') {
-            setStatus('error')
+            safeStatus('error')
             return
           }
 
           if (state === 'checkout') {
-            navigate('/checkout', { replace: true })
+            safeNavigate('/checkout', { replace: true })
             return
           }
 
           // Polling control
           let attempts = 0;
-          while (state === 'pending_confirmation' && attempts < 15 && isPolling) {
+          while (state === 'pending_confirmation' && attempts < 15 && mounted && isPolling) {
             attempts++;
             await new Promise(resolve => {
               timeoutId = setTimeout(resolve, 2000);
@@ -149,7 +156,7 @@ export const CheckoutReturnPage = () => {
 
             if (state !== 'dashboard') {
               // Could not verify active subscription after polling and sync fallback
-              setStatus('error');
+              safeStatus('error');
               return;
             }
           }
@@ -160,7 +167,7 @@ export const CheckoutReturnPage = () => {
           const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
           const capabilities = PLAN_CAPABILITIES[planKey]
 
-          navigate('/admin/dashboard', {
+          safeNavigate('/admin/dashboard', {
             replace: true,
             state: {
               planJustActivated: true,
@@ -170,7 +177,7 @@ export const CheckoutReturnPage = () => {
           _processedSessions.add(sessionId)
 
         } catch {
-          setStatus('error')
+          safeStatus('error')
         }
       }
 
@@ -178,6 +185,7 @@ export const CheckoutReturnPage = () => {
     }
 
     return () => {
+      mounted = false
       isPolling = false;
       if (timeoutId) clearTimeout(timeoutId);
     }

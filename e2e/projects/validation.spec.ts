@@ -32,33 +32,39 @@ test.describe("Document Upload Validation E2E", () => {
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents`, async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) });
     });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents/diagnosis`, async (route) => {
+      await route.fulfill({
+        status: 200, contentType: "application/json",
+        body: JSON.stringify({ requirements: [], documents: [] })
+      });
+    });
   });
 
-  test("Client-side validation rejects files that are too large", async ({ page }) => {
+  test("Backend rejects files that are too large, status remains Pendiente", async ({ page }) => {
     await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/documents`);
     
     // Wait for the requirement row
-    const row = page.getByTestId("requirement-row-TITULO_PROPIEDAD");
+    const row = page.getByTestId("requirement-row-titulo");
     await expect(row).toBeVisible({ timeout: 5000 });
-
-    // Provide a file larger than 10MB (mocking file size might be tricky in Playwright, 
-    // but we can intercept the alert dialog).
-    // Actually, in Playwright, we can just use setFiles with a buffer.
-    // 10MB is 10 * 1024 * 1024 bytes. We will create an 11MB buffer.
     
-    // Setup dialog handler
-    let dialogMessage = "";
-    page.on("dialog", dialog => {
-      dialogMessage = dialog.message();
-      dialog.dismiss();
+    // Intercept the document upload POST and reject with entity too large (upload goes to /api/v1/projects/.../requirements/.../upload)
+    await page.route(`**/api/v1/projects/${MOCK_PROJECT_ID}/documents/requirements/**`, async (route) => {
+      await route.fulfill({
+        status: 413,
+        contentType: "application/json",
+        body: JSON.stringify({
+          message: "El archivo excede el límite permitido de 10MB",
+          error: "El archivo excede el límite permitido"
+        })
+      });
     });
 
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByTestId("requirement-row-TITULO_PROPIEDAD").getByRole("button", { name: /adjuntar/i }).click();
+    await page.getByTestId("requirement-row-titulo").getByRole("button", { name: /subir/i }).click();
     const fileChooser = await fileChooserPromise;
 
-    // Buffer of 11MB
-    const largeBuffer = Buffer.alloc(11 * 1024 * 1024, "a");
+    // The API mock returns 413 regardless of file size, no need for large buffer
+    const largeBuffer = Buffer.from('mock content');
 
     await fileChooser.setFiles({
       name: 'huge-titulo.pdf',
@@ -66,11 +72,11 @@ test.describe("Document Upload Validation E2E", () => {
       buffer: largeBuffer
     });
 
-    // Check if dialog was triggered
-    expect(dialogMessage).toContain("excede el límite permitido");
+    // Check that the error message from the backend is displayed
+    await expect(page.getByText(/excede el límite permitido/i).first()).toBeVisible({ timeout: 5000 });
     
     // Check that the status is still Pendiente
-    const status = page.getByTestId("requirement-status-TITULO_PROPIEDAD");
-    await expect(status).toHaveText("Pendiente");
+    const status = page.getByTestId("requirement-status-titulo");
+    await expect(status).toContainText("Pendiente");
   });
 });

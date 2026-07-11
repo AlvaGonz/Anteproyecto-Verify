@@ -4,12 +4,12 @@ import { MemoryRouter } from "react-router-dom";
 import { ProjectsPublicListPage } from "./ProjectsPublicListPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-vi.mock("../../features/projects/api/useProjects", () => ({
-  useProjects: () => ({
+vi.mock("../../features/projects/api/useSearchPublicProjects", () => ({
+  useSearchPublicProjects: () => ({
     data: [
-      { id: 1, nombre: "Residencial Terra Noble", categoria: "Residencial", estado: "Aprobado", idVerificacionPublica: "VF-1" },
-      { id: 2, nombre: "Torre San Gerónimo", categoria: "Comercial", estado: "Aprobado", idVerificacionPublica: "VF-2" },
-      { id: 3, nombre: "Plaza Central Mall", categoria: "Comercial", estado: "Aprobado", idVerificacionPublica: "VF-3" }
+      { id: "1", nombreProyecto: "Residencial Terra Noble", categoria: "Residencial", estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo" },
+      { id: "2", nombreProyecto: "Torre San Gerónimo", categoria: "Comercial", estadoValidacion: "Verificado", ubicacionTexto: "Santiago" },
+      { id: "3", nombreProyecto: "Plaza Central Mall", categoria: "Comercial", estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo" }
     ],
     isLoading: false,
     isError: false,

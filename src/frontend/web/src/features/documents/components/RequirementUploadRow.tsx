@@ -44,7 +44,7 @@ export const RequirementUploadRow: React.FC<RequirementUploadRowProps> = ({
   };
 
   return (
-    <div className="group/item relative flex items-start space-x-4 py-4 px-4 bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <div data-testid={`requirement-row-${requirementCode}`} className="group/item relative flex items-start space-x-4 py-4 px-4 bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900 truncate">
           {label}
@@ -63,12 +63,13 @@ export const RequirementUploadRow: React.FC<RequirementUploadRowProps> = ({
 
       <div className="flex items-center space-x-2 shrink-0">
         {isUploaded ? (
-          <div className="flex items-center text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
+          <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
             <CheckCircle className="w-4 h-4 mr-2" />
             <span className="text-sm font-medium">Cargado</span>
           </div>
         ) : (
-          <div>
+          <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-400">Pendiente</span>
             <input
               type="file"
               className="hidden"

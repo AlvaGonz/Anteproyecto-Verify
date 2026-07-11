@@ -32,36 +32,38 @@ test.describe("Upload Edge Cases E2E", () => {
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents`, async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) });
     });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents/diagnosis`, async (route) => {
+      await route.fulfill({
+        status: 200, contentType: "application/json",
+        body: JSON.stringify({ requirements: [], documents: [] })
+      });
+    });
   });
 
   test("Shows an error message if the backend upload request fails", async ({ page }) => {
     await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/documents`);
     
     // Wait for the requirement row
-    const row = page.getByTestId("requirement-row-TITULO_PROPIEDAD");
+    const row = page.getByTestId("requirement-row-titulo");
     await expect(row).toBeVisible({ timeout: 5000 });
 
-    // Intercept upload and force failure
-    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents`, async (route) => {
-      if (route.request().method() === "POST") {
-        await route.fulfill({
+    // Intercept upload and force failure (upload goes to /api/v1/projects/.../requirements/.../upload)
+    await page.route(`**/api/v1/projects/${MOCK_PROJECT_ID}/documents/requirements/**`, async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({
+          message: "Error Interno al subir archivo",
+          type: "https://verifinca.do/errors/server-error",
+          title: "Error Interno",
           status: 500,
-          contentType: "application/json",
-          body: JSON.stringify({
-            message: "Error Interno al subir archivo",
-            type: "https://verifinca.do/errors/server-error",
-            title: "Error Interno",
-            status: 500,
-            detail: "Hubo un problema al subir el archivo"
-          })
-        });
-      } else {
-        await route.continue();
-      }
+          detail: "Hubo un problema al subir el archivo"
+        })
+      });
     });
 
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByTestId("requirement-row-TITULO_PROPIEDAD").getByRole("button", { name: /adjuntar/i }).click();
+    await page.getByTestId("requirement-row-titulo").getByRole("button", { name: /subir/i }).click();
     const fileChooser = await fileChooserPromise;
 
     // Provide a valid file
@@ -74,8 +76,8 @@ test.describe("Upload Edge Cases E2E", () => {
     // Wait for the error toast
     await expect(page.getByText(/Error/i).first()).toBeVisible({ timeout: 5000 });
 
-    // The status should remain Pendiente
-    const status = page.getByTestId("requirement-status-TITULO_PROPIEDAD");
-    await expect(status).toHaveText("Pendiente");
+    // The status should remain Pendiente (the row still shows the "Subir" button alongside the text)
+    const status = page.getByTestId("requirement-status-titulo");
+    await expect(status).toContainText("Pendiente");
   });
 });

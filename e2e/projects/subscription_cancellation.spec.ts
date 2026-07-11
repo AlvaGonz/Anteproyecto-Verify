@@ -12,7 +12,7 @@ test.describe('Subscription Cancellation and Reactivation UX', () => {
 
   test.beforeEach(async ({ page }) => {
     // Mock user login
-    await page.route('**/api/v1/auth/me', async route => {
+    await page.route('**/api/auth/me', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -20,10 +20,15 @@ test.describe('Subscription Cancellation and Reactivation UX', () => {
           id: 'test-user-id',
           nombre: 'Test',
           apellido: 'User',
-          correoElectronico: 'test@example.com',
-          rol: 'DEVELOPER'
+          role: 'DEVELOPER'
         })
       });
+    });
+    await page.route('**/api/auth/refresh', async route => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ accessToken: 'mock-token' }) });
+    });
+    await page.route('**/api/notifications*', async route => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
 
     // Mock initial subscription state
