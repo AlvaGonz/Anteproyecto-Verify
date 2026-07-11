@@ -384,53 +384,42 @@ public static class EmailTemplates
             $"Tu plan '{planName}' ha sido activado exitosamente.",
             content);
     }
+
     // ════════════════════════════════════════════════════════════════════════
     // 6. Project Status Update
     // ════════════════════════════════════════════════════════════════════════
-    public static string GetProjectStatusUpdateEmail(string userName, string projectName, string status)
+    public static string GetProjectStatusChangeEmail(string projectName, string projectId, string statusStr, bool isPositive)
     {
-        bool isApproved = status.Contains("Aprobado", System.StringComparison.OrdinalIgnoreCase);
-        bool isRejected = status.Contains("Rechazado", System.StringComparison.OrdinalIgnoreCase);
+        string projectUrl = $"http://localhost:3000/projects/{projectId}";
         
-        string badgeHtml = Badge(isApproved, status);
-        if (!isApproved && !isRejected) 
-        {
-            // For other statuses like InProgress, Pending, etc.
-            badgeHtml = $@"<span style=""display:inline-block;background-color:#E2E8F0;color:#334155;padding:4px 12px;border-radius:20px;font-family:'Inter',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2px;"">●&nbsp; {status}</span>";
-        }
+        string badgeHtml = Badge(isPositive, statusStr);
 
         string infoInner = $@"
             <strong style=""color:{Navy};"">Proyecto</strong><br>
             <span style=""color:{TextBody};"">{projectName}</span><br><br>
-            <strong style=""color:{Navy};"">Nuevo Estatus</strong><br>
-            {badgeHtml}<br><br>
-            <strong style=""color:{Navy};"">Fecha de Actualización</strong><br>
-            <span style=""color:{TextMuted};""> {System.DateTime.Now:dd/MM/yyyy HH:mm}</span>";
-
-        string statusMessage = isApproved 
-            ? "¡Su proyecto ha sido aprobado satisfactoriamente! Ya puede proceder con los siguientes pasos en la plataforma." 
-            : isRejected 
-                ? "El estatus de su proyecto ha sido marcado como rechazado. Por favor ingrese a la plataforma para ver los detalles y las acciones requeridas."
-                : "El estatus de su proyecto ha cambiado. Ingrese a la plataforma para conocer los detalles.";
+            <strong style=""color:{Navy};"">ID Único</strong><br>
+            <span style=""font-family:'Courier New',Courier,monospace;font-size:13px;color:{TextMuted};background:#EEF2F7;padding:2px 6px;border-radius:4px;"">{projectId}</span><br><br>
+            <strong style=""color:{Navy};"">Nuevo Estado</strong><br>
+            {badgeHtml}";
 
         string content = $@"
             <h2 style=""margin:0 0 4px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">Actualización de Estado</h2>
-            <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Estatus del Proyecto</p>
+            <p style=""margin:0 0 24px 0;font-size:15px;color:{TextMuted};"">Cambio en el estatus de tu proyecto</p>
 
-            <p style=""margin:0 0 16px 0;"">Estimado/a <strong>{userName}</strong>,</p>
-            <p style=""margin:0 0 16px 0;"">Le informamos que el estado de su proyecto en VeriFinca ha sido actualizado:</p>
+            <p style=""margin:0 0 16px 0;"">Estimado/a <strong>Desarrollador</strong>,</p>
+            <p style=""margin:0 0 16px 0;"">Le informamos que el estado de su proyecto <strong>{projectName}</strong> ha sido actualizado en VeriFinca.</p>
 
             {InfoCard(infoInner)}
 
-            <p style=""margin:16px 0 24px 0;"">{statusMessage}</p>
+            <p style=""margin:0 0 24px 0;"">Para más detalles sobre esta actualización y continuar con los procesos correspondientes, por favor ingrese a la plataforma VeriFinca.</p>
 
             <div style=""text-align:center;"">
-                {CtaButton("http://localhost:3000/dashboard", "Ir al Panel de Control")}
+                {CtaButton(projectUrl, "Ver Proyecto")}
             </div>";
 
         return BuildEmailWrapper(
             $"Actualización de Estado: Proyecto {projectName} — VeriFinca",
-            $"El proyecto '{projectName}' cambió a estado: {status}.",
+            $"El estado de tu proyecto {projectName} ha cambiado a {statusStr}.",
             content);
     }
 }

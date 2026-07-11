@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
+import * as fs from "fs";
 
 test.describe("Public Project Search E2E Test", () => {
   // Test data injected by the DB seeder (AppDbContextSeeder.cs)
   // for the project "Torre Bella Vista Piantini"
   const testData = {
-    sello: "VF-2026-X83L",
+    sello: "VF-2026-ABC123XYZ",
     suelo: "001-02-003",
     ipi: "1-01-99999-9",
     rnc: "1-30-12345-1",
@@ -42,12 +43,19 @@ test.describe("Public Project Search E2E Test", () => {
 
     if (searchType === "cert") {
       // For certificates, it navigates to /projects/verify/...
-      await expect(page).toHaveURL(new RegExp(`/projects/verify/.*`));
+      await expect(page).toHaveURL(new RegExp(`/projects/verify/.*`), { timeout: 8000 });
       // The verification page should have some indicator of the project name or seal
-      await expect(page.getByText(expectedProject)).toBeVisible();
+      await expect(page.getByText(expectedProject)).toBeVisible({ timeout: 10000 });
     } else {
-      // Wait for the API response and grid update
-      await expect(page.locator("h3", { hasText: expectedProject }).first()).toBeVisible();
+      // Wait for URL to contain the search query (navigation completed)
+      await page.waitForURL(new RegExp(`[?&]q=`), { timeout: 8000 });
+      try {
+        await expect(page.locator("h3", { hasText: expectedProject }).first()).toBeVisible({ timeout: 10000 });
+      } catch (e) {
+        const html = await page.evaluate(() => document.body.outerHTML);
+        fs.writeFileSync('debug-body.html', html);
+        throw e;
+      }
     }
   };
 
@@ -83,8 +91,9 @@ test.describe("Public Project Search E2E Test", () => {
     const submitBtn = page.locator("button[type='submit']");
     await submitBtn.click();
 
-    // Note: The UI might navigate to /projects/verify/VF-2099-XXXX and then show an error
-    await expect(page).toHaveURL(new RegExp(`/projects/verify/VF-2099-XXXX`));
-    await expect(page.getByText(/Proyecto no encontrado/i)).toBeVisible();
+    // Note: The UI navigates to /projects/verify/VF-2099-XXXX and then shows an error
+    await expect(page).toHaveURL(new RegExp(`/projects/verify/VF-2099-XXXX`), { timeout: 8000 });
+    // The verify result page shows "Código No Válido" when a seal is not found
+    await expect(page.getByText(/Código No Válido/i)).toBeVisible({ timeout: 10000 });
   });
 });

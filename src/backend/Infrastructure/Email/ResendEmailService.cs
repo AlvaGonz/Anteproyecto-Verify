@@ -23,17 +23,17 @@ public class ResendEmailService : IEmailService
         _logger = logger;
         
         var section = configuration.GetSection("Resend");
-        _fromEmail = section.GetValue<string>("FromEmail") ?? "hola@handymansolutionrd.lat";
+        _fromEmail = section.GetValue<string>("FromEmail") ?? "onboarding@resend.dev";
         _fromName = section.GetValue<string>("FromName") ?? "VeriFinca";
     }
 
-    private async Task SendEmailInternalAsync(string to, string subject, string body, string fromEmail, CancellationToken cancellationToken = default)
+    public async Task SendEmailAsync(string to, string subject, string body, string? fromAddress = null, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Sending email via Resend to {To} with subject '{Subject}'", to, subject);
 
         var message = new EmailMessage
         {
-            From = $"{_fromName} <{fromEmail}>",
+            From = fromAddress ?? $"{_fromName} <{_fromEmail}>",
             Subject = subject,
             HtmlBody = body
         };
@@ -50,47 +50,43 @@ public class ResendEmailService : IEmailService
         }
     }
 
-    public Task SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken = default)
-    {
-        return SendEmailInternalAsync(to, subject, body, _fromEmail, cancellationToken);
-    }
-
     public async Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, string? returnUrl = null, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetAccountVerificationEmail(userName, verificationToken, returnUrl);
-        await SendEmailInternalAsync(toEmail, "Verificación de Cuenta - VeriFinca", html, "mail@handymansolutionrd.lat", ct);
+        await SendEmailAsync(toEmail, "Verificación de Cuenta - VeriFinca", html, "VeriFinca <hola@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetDocumentUploadConfirmationEmail(userName, projectName, documentType);
-        await SendEmailInternalAsync(toEmail, "Confirmación de Recepción de Documento - VeriFinca", html, "notificaciones@handymansolutionrd.lat", ct);
+        await SendEmailAsync(toEmail, "Confirmación de Recepción de Documento - VeriFinca", html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetDocumentStatusUpdateEmail(userName, projectName, documentType, status, rejectionReason);
         string subject = $"Estatus de Documento Actualizado - VeriFinca ({status.ToUpper()})";
-        await SendEmailInternalAsync(toEmail, subject, html, "notificaciones@handymansolutionrd.lat", ct);
+        await SendEmailAsync(toEmail, subject, html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetProjectCreatedEmail(ownerName, projectName, projectId);
-        await SendEmailInternalAsync(toEmail, "¡Tu Proyecto ha sido Creado! - VeriFinca", html, "notificaciones@handymansolutionrd.lat", ct);
+        await SendEmailAsync(toEmail, "¡Tu Proyecto ha sido Creado! - VeriFinca", html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, string interval, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetSubscriptionActivatedEmail(userName, planName, interval);
-        await SendEmailInternalAsync(toEmail, "Suscripción Activada - VeriFinca", html, "suscripciones@handymansolutionrd.lat", ct);
+        await SendEmailAsync(toEmail, "Suscripción Activada - VeriFinca", html, "Suscripciones <suscripciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendProjectStatusUpdateAsync(string toEmail, string userName, string projectName, string newStatus, CancellationToken ct = default)
     {
-        var html = EmailTemplates.GetProjectStatusUpdateEmail(userName, projectName, newStatus);
+        bool isApproved = newStatus.Contains("Aprobado", StringComparison.OrdinalIgnoreCase);
+        var html = EmailTemplates.GetProjectStatusChangeEmail(projectName, "", newStatus, isApproved);
         string subject = $"Actualización de Estado: Proyecto {projectName}";
-        await SendEmailInternalAsync(toEmail, subject, html, "notificaciones@handymansolutionrd.lat", ct);
+        await SendEmailAsync(toEmail, subject, html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 }
 

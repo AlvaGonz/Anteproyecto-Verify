@@ -27,7 +27,7 @@ public class ExternalApiMockingTests : IntegrationTestBase, IAsyncLifetime
     {
     }
 
-    public Task InitializeAsync()
+    public new Task InitializeAsync()
     {
         _wireMockServer = WireMockServer.Start();
         // Override the external API base URL to point to our WireMock server
@@ -35,7 +35,7 @@ public class ExternalApiMockingTests : IntegrationTestBase, IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public new Task DisposeAsync()
     {
         _wireMockServer.Stop();
         _wireMockServer.Dispose();

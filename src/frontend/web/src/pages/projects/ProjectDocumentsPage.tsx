@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { DocumentDto, DocumentType } from "../../features/documents/types";
-import { useDocuments, useUploadDocument, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
-import { useProject } from "../../features/projects/api/useProjects";
-import { getRequirementsForCategory, resolveRequirementStatus } from "../../features/documents/requirementCatalog";
-import { RequirementUploadRow } from "../../features/documents/components/RequirementUploadRow";
+import { useDocuments, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
 import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
+import { RequirementUploadRow } from "../../features/documents/components/RequirementUploadRow";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { m } from "framer-motion";
 import { 
@@ -19,17 +17,19 @@ import {
   HardDrive,
   Search,
   Filter,
-  FileCheck2,
-  ChevronDown
+  FileCheck2
 } from "lucide-react";
 
-const RequiredDocumentsList: React.FC<{ 
-  documents: DocumentDto[]; 
-  categoryId: number;
-  onUpload: (tipoDocumento: DocumentType, observaciones: string, file: File) => Promise<void>;
-}> = ({ documents, categoryId, onUpload }) => {
-  const requirements = getRequirementsForCategory(categoryId);
+// Configuración de documentos obligatorios para el checklist
+const REQUIRED_DOCUMENTS = [
+  { id: "titulo", label: "Título de Propiedad", category: DocumentType.CertificadoTitulo, categoryLabel: "TITULO", description: "Documento notarial original o copia certificada" },
+  { id: "estado_juridico", label: "Estado Jurídico", category: DocumentType.CertificacionEstadoJuridico, categoryLabel: "ESTADO J.", description: "Certificación de estado legal del inmueble" },
+  { id: "mensura", label: "Plano de Mensura", category: DocumentType.PlanoMensuraCatastral, categoryLabel: "MENSURA", description: "Plano catastral aprobado por autoridad competente" },
+  { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.CopiaCedulaIdentidad, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
+  { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
+];
 
+const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDto[] }> = ({ projectId, documents }) => {
   return (
     <div className="vf-card p-6 bg-surface-container-low/30 overflow-hidden relative group">
       <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -43,31 +43,18 @@ const RequiredDocumentsList: React.FC<{
       </div>
 
       <div className="space-y-3 relative z-10">
-        {requirements.map((req) => {
-          const status = resolveRequirementStatus(req, documents);
-          const uploadedDocument = documents.find(d => {
-            if (d.tipoDocumento === DocumentType.Other && req.documentType === DocumentType.Other) {
-              return d.observaciones === req.code && d.activo;
-            }
-            return d.tipoDocumento === req.documentType && d.activo;
-          });
+        {REQUIRED_DOCUMENTS.map((doc) => {
+          const isUploaded = documents.some(u => u.tipoDocumento === doc.category && u.activo);
+          
           return (
             <RequirementUploadRow
-              key={req.code}
-              requirementCode={req.code}
-              title={req.label}
-              description={req.description}
-              status={status}
-              uploadedDocument={uploadedDocument}
-              required={req.required}
-              acceptedTypes={req.acceptedMimeTypes}
-              maxSizeBytes={req.maxSizeBytes}
-              isUploading={false}
-              onUpload={async (file) => {
-                const tipo = req.documentType;
-                const obs = tipo === DocumentType.Other ? req.code : "";
-                await onUpload(tipo, obs, file);
-              }}
+              key={doc.id}
+              projectId={projectId}
+              requirementCode={doc.categoryLabel} // Using categoryLabel as requirementCode for now
+              label={doc.label}
+              description={doc.description}
+              categoryLabel={doc.categoryLabel}
+              isUploaded={isUploaded}
             />
           );
         })}
@@ -83,32 +70,13 @@ export const ProjectDocumentsPage: React.FC = () => {
   
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: rawDocuments = [], isLoading: loadingDocs, error: fetchError } = useDocuments(projectId);
-  const { data: project, isLoading: loadingProject } = useProject(projectId);
-  
-  const loading = loadingDocs || loadingProject;
+  const { data: rawDocuments = [], isLoading: loading, error: fetchError } = useDocuments(projectId);
   const error = fetchError ? (fetchError as Error).message : null;
 
-  const uploadMutation = useUploadDocument(projectId);
   const downloadMutation = useDownloadDocument(projectId);
   const statusMutation = useUpdateDocumentStatus(projectId);
 
   const documents = rawDocuments;
-  const handleUploadRequirement = async (tipoDocumento: DocumentType, observaciones: string, file: File) => {
-    if (!id) return;
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("tipoDocumento", String(tipoDocumento));
-      formData.append("observaciones", observaciones);
-      await uploadMutation.mutateAsync(formData);
-      addToast("Documento adjuntado exitosamente", "success");
-    } catch (err: any) {
-      addToast(err.message || "Error al procesar el documento", "error");
-      throw err;
-    }
-  };
-
 
   const handleDownload = async (documentId: string) => {
     if (!id) return;
@@ -215,40 +183,18 @@ export const ProjectDocumentsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start mb-12">
-        {/* Column Left: Checklist + Upload Form (Main Focus) */}
-        <div className="xl:col-span-8 flex flex-col gap-6 order-1">
-          <RequiredDocumentsList 
-            documents={documents} 
-            categoryId={project?.categoria || 1} 
-            onUpload={handleUploadRequirement} 
-          />
-        </div>
-
-        {/* Column Right: Diagnosis Panel */}
-        <div className="xl:col-span-4 space-y-6 order-2">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        {/* Column Left: Checklist + Upload Form */}
+        <div className="xl:col-span-4 flex flex-col gap-6">
           <ProjectDiagnosisPanel projectId={projectId} />
-        </div>
-      </div>
+          
+          <RequiredDocumentsList projectId={projectId} documents={documents} />
 
-      {/* Document Explorer (Collapsible) */}
-      <details className="group vf-card p-0 overflow-hidden bg-surface-container-low/30 border-2 border-dashed">
-        <summary className="p-6 flex items-center justify-between cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-               <Files className="w-5 h-5" />
-             </div>
-             <div>
-               <h3 className="text-xl font-display font-black text-secondary tracking-tight">Expedientes <span className="text-primary italic">Digitalizados</span></h3>
-               <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mt-1">Explorar todos los archivos del repositorio histórico</p>
-             </div>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center group-open:rotate-180 transition-transform duration-300">
-             <ChevronDown className="w-4 h-4 text-secondary" />
-          </div>
-        </summary>
-        
-        <div className="px-6 pb-6 pt-2 border-t border-outline-variant/10 space-y-6">
+
+        </div>
+
+        {/* Column Right: Document Explorer */}
+        <div className="xl:col-span-8 space-y-6 lg:min-h-[800px]">
           <div className="vf-card !p-3 flex flex-col sm:flex-row items-center gap-3">
              <div className="relative flex-1 group w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
@@ -268,7 +214,7 @@ export const ProjectDocumentsPage: React.FC = () => {
              </button>
           </div>
 
-          <div className="vf-card p-6 min-h-[400px]">
+          <div className="vf-card p-6 lg:min-h-[800px]">
             <ProjectDocumentsList
               documents={filteredDocuments}
               onDownload={handleDownload}
@@ -296,7 +242,7 @@ export const ProjectDocumentsPage: React.FC = () => {
              </div>
           </div>
         </div>
-      </details>
+      </div>
     </div>
   );
 };

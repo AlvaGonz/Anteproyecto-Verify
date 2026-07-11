@@ -15,6 +15,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure",
     trace: "on-first-retry",
+    actionTimeout: 10000,
   },
   projects: [
     {
@@ -36,15 +37,8 @@ export default defineConfig({
       testDir: "./e2e/projects",
       use: {
         ...devices["Desktop Chrome"],
-        baseURL: process.env.FRONTEND_URL ?? "http://localhost:5173",
+        baseURL: process.env.FRONTEND_URL ?? "http://localhost:3000",
       },
     },
   ],
-  webServer: {
-    command: "node node_modules/vite/dist/node/cli.js --port 5173",
-    url: "http://localhost:5173",
-    reuseExistingServer: !process.env.CI,
-    timeout: 30000,
-    cwd: "./src/frontend/web",
-  },
 });

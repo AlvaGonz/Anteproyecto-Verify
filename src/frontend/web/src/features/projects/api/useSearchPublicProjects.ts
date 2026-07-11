@@ -13,10 +13,8 @@ export const useSearchPublicProjects = (query: string) =>
   useQuery({
     queryKey: ["publicProjectsSearch", query],
     queryFn: () => {
-      if (!query) return Promise.resolve([]);
       return apiClient
-        .get<PublicProjectSearchResultDto[]>(`/public/projects/search?q=${encodeURIComponent(query)}`)
+        .get<PublicProjectSearchResultDto[]>(`/public/projects/search?q=${encodeURIComponent(query || "")}`)
         .then((res) => res.data);
     },
-    enabled: !!query,
   });

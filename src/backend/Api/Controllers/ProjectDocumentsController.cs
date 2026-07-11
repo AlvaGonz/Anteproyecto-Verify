@@ -93,6 +93,88 @@ public class ProjectDocumentsController : ControllerBase
         }
     }
 
+    [HttpPost("/api/v1/projects/{projectId}/documents/requirements/{requirementCode}/upload")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UploadRequirementDocument(
+        Guid projectId,
+        string requirementCode,
+        IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("El archivo es requerido y no puede estar vacío.");
+
+        // Validaciones básicas de archivo (reutilizando la lógica existente)
+        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+        var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (Array.IndexOf(allowedExtensions, extension) < 0)
+            return BadRequest("Tipo de archivo no permitido.");
+
+        if (file.Length > 10 * 1024 * 1024) // 10MB limit
+            return BadRequest("El archivo excede el tamaño máximo permitido (10MB).");
+
+        // TODO: Mapear requirementCode a DocumentType de forma segura
+        // Esto requerirá lógica adicional (por ahora usamos un default o lanzamos si es inválido)
+        DocumentType tipoDocumento;
+        if (!Enum.TryParse<DocumentType>(requirementCode, true, out tipoDocumento))
+        {
+            // Mapeo básico manual según requirementCode esperado (ej: TITULO -> CertificadoTitulo)
+            switch (requirementCode.ToUpperInvariant())
+            {
+                case "TITULO":
+                    tipoDocumento = DocumentType.CertificadoTitulo;
+                    break;
+                case "PLANO_MENSURA":
+                    tipoDocumento = DocumentType.PlanoMensuraCatastral;
+                    break;
+                case "IPI":
+                    tipoDocumento = DocumentType.CertificacionIPI;
+                    break;
+                case "ESTATUTOS":
+                    tipoDocumento = DocumentType.ActaConstitutiva;
+                    break;
+                case "RNC":
+                    tipoDocumento = DocumentType.RNC;
+                    break;
+                default:
+                    return BadRequest($"Código de requerimiento no soportado: {requirementCode}");
+            }
+        }
+
+        // TODO: Get user ID from claims
+        var userId = Guid.Empty;
+
+        var dto = new UploadDocumentDto(
+            tipoDocumento,
+            userId,
+            DateTime.UtcNow, // Fecha de emisión default u opcional
+            null,
+            null
+        );
+
+        using var stream = file.OpenReadStream();
+        try
+        {
+            var document = await _documentService.UploadDocumentAsync(
+                projectId,
+                dto,
+                stream,
+                file.FileName,
+                file.ContentType,
+                file.Length
+            );
+
+            // Devolver Created, con ubicación a la lista o descarga
+            return Created($"/api/projects/{projectId}/documents/{document.Id}/download", document);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
     [HttpGet("{documentId}/download")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

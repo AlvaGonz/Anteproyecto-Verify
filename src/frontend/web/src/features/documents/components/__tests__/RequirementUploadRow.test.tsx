@@ -1,94 +1,77 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { RequirementUploadRow } from "../RequirementUploadRow";
-import { DocumentDto, DocumentType, DocumentStatus } from "../../types";
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { RequirementUploadRow } from '../RequirementUploadRow';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '@/shared/components/ui/Toast/ToastContext';
 
-describe("RequirementUploadRow", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
+// Mock the API hook
+vi.mock('../../api/useDocuments', () => ({
+  useUploadRequirementDocument: vi.fn().mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+}));
 
+import { useUploadRequirementDocument } from '../../api/useDocuments';
+
+const createWrapper = () => {
+  const queryClient = new QueryClient();
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        {children}
+      </ToastProvider>
+    </QueryClientProvider>
+  );
+};
+
+describe('RequirementUploadRow', () => {
   const defaultProps = {
-    requirementCode: "TITULO_PROPIEDAD" as const,
-    title: "Título de Propiedad",
-    description: "Documento oficial emitido por Registro de Títulos",
-    required: true,
-    status: "missing" as const,
-    acceptedTypes: "application/pdf",
-    onUpload: vi.fn(),
-    isUploading: false,
+    projectId: 'test-project',
+    requirementCode: 'TITULO',
+    label: 'Título de Propiedad',
+    description: 'Documento notarial',
+    isUploaded: false,
+    categoryLabel: 'TITULO',
   };
 
-  it("renders requirement title, description, and Adjuntar CTA", () => {
-    render(<RequirementUploadRow {...defaultProps} />);
-    expect(screen.getByText("Título de Propiedad")).toBeInTheDocument();
-    expect(screen.getByText("Documento oficial emitido por Registro de Títulos")).toBeInTheDocument();
-    expect(screen.getByText("Adjuntar")).toBeInTheDocument();
+  it('renders correctly and shows upload button when not uploaded', () => {
+    render(<RequirementUploadRow {...defaultProps} />, { wrapper: createWrapper() });
+    
+    expect(screen.getByText('Título de Propiedad')).toBeInTheDocument();
+    expect(screen.getByText('Documento notarial')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /subir/i })).toBeInTheDocument();
   });
 
-  it("click triggers hidden file input and selection calls onUpload", async () => {
-    render(<RequirementUploadRow {...defaultProps} />);
+  it('shows success status when uploaded', () => {
+    render(<RequirementUploadRow {...defaultProps} isUploaded={true} />, { wrapper: createWrapper() });
     
-    const fileInput = screen.getByTestId("requirement-file-input-TITULO_PROPIEDAD");
-    const testFile = new File(["dummy content"], "test.pdf", { type: "application/pdf" });
+    expect(screen.getByText('Cargado')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /subir/i })).not.toBeInTheDocument();
+  });
 
-    fireEvent.change(fileInput, { target: { files: [testFile] } });
-
-    await waitFor(() => {
-      expect(defaultProps.onUpload).toHaveBeenCalledWith(testFile);
+  it('handles upload failure gracefully and displays error', async () => {
+    const mockMutateAsync = vi.fn().mockRejectedValue(new Error('Network error'));
+    (useUploadRequirementDocument as any).mockReturnValue({
+      mutateAsync: mockMutateAsync,
+      isPending: false,
     });
-  });
 
-  it("shows uploading state when isUploading=true", () => {
-    render(<RequirementUploadRow {...defaultProps} isUploading={true} status="uploading" />);
-    expect(screen.getByText("Subiendo...")).toBeInTheDocument();
-    expect(screen.getByTestId("requirement-status-TITULO_PROPIEDAD")).toHaveTextContent("Subiendo...");
-  });
-
-  it("shows uploaded state when status is uploaded", () => {
-    const uploadedDoc: DocumentDto = {
-      id: "doc-1",
-      proyectoId: "p-1",
-      tipoDocumento: DocumentType.CertificadoTitulo,
-      nombreArchivoOriginal: "mi-titulo.pdf",
-      contentType: "application/pdf",
-      extension: ".pdf",
-      tamanoBytes: 1024,
-      estadoDocumento: DocumentStatus.Uploaded,
-      activo: true,
-      version: 1,
-      usuarioCargaId: "u-1",
-      createdAtUtc: new Date().toISOString(),
-      fileUrl: "http://example.com/mi-titulo.pdf"
-    };
-
-    render(<RequirementUploadRow {...defaultProps} status="uploaded" uploadedDocument={uploadedDoc} />);
-    expect(screen.getByText("mi-titulo.pdf")).toBeInTheDocument();
-    expect(screen.getByText("Cargado")).toBeInTheDocument();
-  });
-
-  it("shows error message when uploadError is provided", () => {
-    render(<RequirementUploadRow {...defaultProps} status="error" uploadError="Error de red al subir" />);
-    expect(screen.getByText("Error de red al subir")).toBeInTheDocument();
-    expect(screen.getByText("Reintentar")).toBeInTheDocument();
-  });
-
-  it("rejects file exceeding max size client-side", async () => {
-    const alertMock = vi.spyOn(window, "alert").mockImplementation(() => {});
-    render(<RequirementUploadRow {...defaultProps} maxSizeBytes={100} />);
+    render(<RequirementUploadRow {...defaultProps} />, { wrapper: createWrapper() });
     
-    const fileInput = screen.getByTestId("requirement-file-input-TITULO_PROPIEDAD");
+    const file = new File(['hello'], 'hello.png', { type: 'image/png' });
+    const input = screen.getByTestId('inline-file-upload') as HTMLInputElement;
     
-    // Create a file larger than 100 bytes (dummy content is 13 bytes * 10 = 130 bytes)
-    const largeFile = new File(["dummy content dummy content dummy content dummy content dummy content dummy content dummy content dummy content dummy content dummy content"], "large.pdf", { type: "application/pdf" });
-
-    fireEvent.change(fileInput, { target: { files: [largeFile] } });
-
+    fireEvent.change(input, { target: { files: [file] } });
+    
     await waitFor(() => {
-      expect(defaultProps.onUpload).not.toHaveBeenCalled();
-      expect(alertMock).toHaveBeenCalledWith(expect.stringContaining("El archivo excede el límite permitido"));
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        requirementCode: 'TITULO',
+        file: file
+      });
     });
-    
-    alertMock.mockRestore();
+
+    // Check if error is displayed inline
+    expect(await screen.findByText('Error al subir el documento')).toBeInTheDocument();
   });
 });

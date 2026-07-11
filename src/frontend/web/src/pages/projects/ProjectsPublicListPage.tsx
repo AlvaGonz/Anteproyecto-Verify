@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Filter,
@@ -16,33 +16,19 @@ import { LandingFooter } from "../../features/public/components/LandingFooter";
 import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
 import { VerifySearchForm } from "../../features/public/components/VerifySearchForm";
 
-import { useProjects } from "../../features/projects/api/useProjects";
 import { useSearchPublicProjects } from "../../features/projects/api/useSearchPublicProjects";
 
 export const ProjectsPublicListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialQuery = searchParams.get("q") || "";
-  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const searchQuery = searchParams.get("q") || "";
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const { data: rawProjects = [], isLoading: isLoadingAll } = useProjects();
-  const { data: searchResults = [], isLoading: isLoadingSearch } = useSearchPublicProjects(searchQuery);
-
-  const isLoading = isLoadingAll || isLoadingSearch;
-
-  // Sync search input to URL query param
-  useEffect(() => {
-    if (searchQuery) {
-      setSearchParams({ q: searchQuery });
-    } else {
-      setSearchParams({});
-    }
-  }, [searchQuery, setSearchParams]);
+  const { data: searchResults = [], isLoading } = useSearchPublicProjects(searchQuery);
 
   const mappedProjects = useMemo(() => {
-    // If there is a search query, use the search results, otherwise use the full list
-    const sourceData = searchQuery ? searchResults : rawProjects;
+    // searchResults now returns visible projects if there is no query
+    const sourceData = Array.isArray(searchResults) ? searchResults : [];
     
     return sourceData.map((p: any) => ({
       id: String(p.id),
@@ -56,7 +42,7 @@ export const ProjectsPublicListPage: React.FC = () => {
       description: "", 
       completionPercentage: (p.estadoValidacion === "Verificado" || p.estadoProyecto === 4) ? 100 : 50,
     }));
-  }, [rawProjects, searchResults, searchQuery]);
+  }, [searchResults]);
 
   const filteredProjects = useMemo(() => {
     return mappedProjects.filter((project) => {
@@ -272,7 +258,7 @@ export const ProjectsPublicListPage: React.FC = () => {
               <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
               <p className="text-slate-500 max-w-xs mx-auto font-medium">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
               <button type="button"
-                onClick={() => { setSearchQuery(""); setStatusFilter("ALL"); }}
+                onClick={() => { setSearchParams({}); setStatusFilter("ALL"); }}
                 className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
               >
                 Limpiar filtros
