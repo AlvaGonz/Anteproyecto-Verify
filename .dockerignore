@@ -24,6 +24,7 @@ docker/**
 !docker/api.dev.Dockerfile
 !docker/web.dev.Dockerfile
 !docker/azurite.Dockerfile
+!docker/nginx.conf
 
 # Exclude build artifacts deeply
 **/bin/
