@@ -168,7 +168,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
                   </div>
                 )}
                 {/* Thumbnail pending portada */}
-                {pendingPortrait.map((p, i) => (
+                {pendingPortrait.map((p) => (
                   <div
                     key={`pending-portrait-${p.previewUrl}`}
                     className="relative w-14 h-14 rounded-md overflow-hidden border border-dashed border-amber-400 flex-shrink-0"

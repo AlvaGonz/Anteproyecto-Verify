@@ -178,7 +178,7 @@ export const ValidationExecutionPage: React.FC = () => {
               <Activity size={14} className="text-primary" /> Telemetría del Sistema
             </h3>
             <div className="grid grid-cols-1 gap-3">
-              {systemStats.map((stat, idx) => (
+              {SYSTEM_STATS.map((stat) => (
                 <div key={stat.label} className="bg-white p-5 rounded-2xl border border-border/20 shadow-raised flex items-center justify-between group hover:border-primary/30 transition-all duration-500">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center ${stat.color}`}>
@@ -210,7 +210,7 @@ export const ValidationExecutionPage: React.FC = () => {
                     { node: "CENTRAL_HUB", load: 24, status: "UP" },
                     { node: "REGISTRY_API", load: 67, status: "BUSY" },
                     { node: "GEO_SAT_V4", load: 12, status: "UP" }
-                  ].map((n, i) => (
+                  ].map((n) => (
                     <div key={n.node} className="space-y-2">
                       <div className="flex justify-between items-end">
                         <span className="text-[10px] font-mono text-white/80">{n.node}</span>

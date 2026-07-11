@@ -1,6 +1,6 @@
 import React from "react";
-import { Menu, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Menu } from "lucide-react";
+
 import { NotificationBell } from "../../../features/notifications/components/NotificationBell";
 
 interface HeaderProps {
@@ -9,8 +9,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
-  const navigate = useNavigate();
-
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -23,15 +21,6 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
-
-  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      const value = e.currentTarget.value.trim();
-      if (value) {
-        navigate(`/admin/projects?q=${encodeURIComponent(value)}`);
-      }
-    }
-  };
 
   return (
     <header className="sticky top-0 z-20 w-full h-20 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-8">

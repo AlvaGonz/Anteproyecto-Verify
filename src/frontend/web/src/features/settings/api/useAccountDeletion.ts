@@ -19,10 +19,4 @@ export const useDeleteAccount = () => {
   });
 };
 
-const useRecoverAccount = () =>
-  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
-  useMutation({
-    mutationKey: ["useRecoverAccount"],
-    mutationFn: () =>
-      apiClient.post<{ message: string }>("/account/recover").then((res) => res.data),
-  });
+// ponytail: useRecoverAccount removed — not wired to any UI, resurrect from git if needed

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift } from "lucide-react";
 import { useMySubscription, useSyncSubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
@@ -60,7 +60,6 @@ const NO_PLAN_CONFIG = {
 };
 
 export const SubscriptionSettings: React.FC = () => {
-  const navigate = useNavigate();
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const { data, isLoading, isError, refetch } = useMySubscription();
@@ -297,7 +296,7 @@ export const SubscriptionSettings: React.FC = () => {
       <CancelSubscriptionModal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
-        onConfirm={(feedback) => {
+        onConfirm={(_feedback) => {
           // If we want to send feedback to the backend later, we can attach it to cancelSubscription.
           // For now we just call it.
           cancelSubscription();
