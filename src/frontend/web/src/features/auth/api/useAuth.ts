@@ -10,7 +10,6 @@ interface AuthResponse {
 export const useLogin = () =>
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
-    mutationKey: ['useLogin'],
     mutationFn: (data: LoginFormValues) =>
       apiClient.post<AuthResponse>("/auth/login", data).then(res => res.data),
     onSuccess: (res) => {
@@ -23,7 +22,6 @@ export const useLogin = () =>
 export const useRegister = () =>
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
-    mutationKey: ['useRegister'],
     mutationFn: (data: Omit<RegisterFormValues, "confirmPassword" | "acceptedTerms"> & { returnUrl?: string; pendingPlanCode?: string; pendingBillingCycle?: string }) =>
       apiClient.post<AuthResponse>("/auth/register", data).then(res => res.data),
     onSuccess: (res) => {
@@ -36,7 +34,6 @@ export const useRegister = () =>
 export const useLogout = () =>
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
-    mutationKey: ['useLogout'],
     mutationFn: () => apiClient.post("/auth/logout").then(res => res.data),
     onSuccess: () => setAccessToken(null),
   });
@@ -44,7 +41,6 @@ export const useLogout = () =>
 export const useResendVerificationEmail = () =>
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
-    mutationKey: ['useResendVerificationEmail'],
     mutationFn: (data: { email: string; returnUrl?: string }) =>
       apiClient.post("/auth/resend-verification", data).then(res => res.data),
   });

@@ -13,27 +13,30 @@ export default async function globalSetup(): Promise<void> {
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      // Try /health first, fall back to a known endpoint
+      // Try /health first — 200 or 404 both confirm the server is reachable
       const res = await context.get('/health', { timeout: 5000 });
-      if (res.ok() || res.status() === 404) {
+      if (res.status() === 200 || res.status() === 404) {
         console.log(`\n✅  API server is UP at ${API_BASE}\n`);
         await context.dispose();
         return;
       }
-    } catch {
-      // Any response (even error) means server is alive
+      // Any other status (500, 503…) means server is up but unhealthy
+      console.warn(`⚠️  /health returned ${res.status()} — treating as server down`);
+    } catch (outerErr: unknown) {
+      // Network-level failure: try a known API endpoint as fallback
       try {
-        await context.post('/api/auth/register', {
+        const fallback = await context.post('/api/auth/register', {
           data: { email: 'health-check@probe.internal' },
           timeout: 5000,
         });
-        console.log(`\n✅  API server is UP at ${API_BASE}\n`);
+        // Any HTTP response (even 400) means the server is reachable
+        console.log(`\n✅  API server is UP at ${API_BASE} (fallback ${fallback.status()})\n`);
         await context.dispose();
         return;
       } catch (innerErr: unknown) {
         const msg = innerErr instanceof Error ? innerErr.message : String(innerErr);
-        if (!msg.includes('socket hang up') && !msg.includes('ECONNREFUSED') && !msg.includes('fetch failed')) {
-          // Got a real HTTP error response = server is up
+        // Only ECONNREFUSED / socket hang up / fetch failed mean the server is truly down
+        if (!msg.includes('ECONNREFUSED') && !msg.includes('socket hang up') && !msg.includes('fetch failed')) {
           console.log(`\n✅  API server is UP at ${API_BASE}\n`);
           await context.dispose();
           return;

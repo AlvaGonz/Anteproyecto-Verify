@@ -56,13 +56,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSuccess(result)) {
       setUser(result.data.user);
-      setLoading(false);
-      return result.data.user;
     } else {
       setError(result.error);
-      setLoading(false);
-      throw result.error;
     }
+    setLoading(false);
+    if (!isSuccess(result)) throw result.error;
+    return result.data.user;
   }, []);
 
   const googleLogin = useCallback(async (credential: string): Promise<User> => {
@@ -74,13 +73,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSuccess(result)) {
       setUser(result.data.user);
-      setLoading(false);
-      return result.data.user;
     } else {
       setError(result.error);
-      setLoading(false);
-      throw result.error;
     }
+    setLoading(false);
+    if (!isSuccess(result)) throw result.error;
+    return result.data.user;
   }, []);
 
   const logout = useCallback(() => {
