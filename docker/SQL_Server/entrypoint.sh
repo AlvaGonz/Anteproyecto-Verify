@@ -53,13 +53,8 @@ echo "================================================"
 echo "   Container is Running                         "
 echo "================================================"
 
-# ── 4. Background: wait for EF Core migrations, then seed ───────────────────
+# ── 4. Background: wait for EF Core migrations, then run seed data ───────────────────
 (
-    if [ "$FIRST_BOOT" = false ]; then
-        echo "[Seed] Skipping seed — not first boot."
-        exit 0
-    fi
-
     echo "[Seed] Waiting for EF Core to apply migrations to '$DB_NAME'..."
     for j in $(seq 1 120); do
         # Wait until at least 12 migrations have been applied
@@ -80,12 +75,12 @@ echo "================================================"
         fi
 
         if [ "$MIG_COUNT" -ge 12 ]; then
-            echo "[Seed] $MIG_COUNT migration(s) detected. Running SQL initialisation..."
+            echo "[Seed] $MIG_COUNT migration(s) detected. Running seed data scripts..."
 
-            # Run Build-Database-Sql.sql — the file is fully idempotent (IF NOT EXISTS guards)
-            $SQLCMD $SQLCMD_OPTS -i "$SQL_FILE" \
-                && echo "[Seed] SQL initialisation complete." \
-                || echo "[Seed] SQL initialisation finished with warnings (objects may already exist)."
+            # NOTE: Build-Database-Sql.sql is NO LONGER RUN HERE.
+            # EF Core migrations are the SOLE source of truth for schema (DDL).
+            # Build-Database-Sql.sql has been converted to seed-only data (Provincia, Municipio, PlanSuscripcion, etc.)
+            # and is now maintained separately if needed.
 
             echo "[Seed] Running seed files..."
             for seed_file in /usr/config/seeds/*.sql; do
@@ -96,9 +91,6 @@ echo "================================================"
             done
 
             echo "[Seed] All seeds complete."
-
-            # Mark this volume as initialised so future restarts skip seeding
-            touch "$FIRST_BOOT_FLAG"
             break
         fi
 

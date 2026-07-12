@@ -15,18 +15,46 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/projects/{projectId}/documents")]
-// [Authorize] // TODO: Enable when Auth is fully integrated
+[Authorize]
 public class ProjectDocumentsController : ControllerBase
 {
     private readonly IDocumentService _documentService;
     private readonly GetDocumentDiagnosisQueryHandler _diagnosisHandler;
+    private readonly IConfiguration _configuration;
 
     public ProjectDocumentsController(
         IDocumentService documentService,
-        GetDocumentDiagnosisQueryHandler diagnosisHandler)
+        GetDocumentDiagnosisQueryHandler diagnosisHandler,
+        IConfiguration configuration)
     {
         _documentService = documentService;
         _diagnosisHandler = diagnosisHandler;
+        _configuration = configuration;
+    }
+
+    private Guid GetCurrentUserId()
+    {
+        // Try to get user ID from JWT claims
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                       ?? User.FindFirst("sub")?.Value;
+        
+        if (Guid.TryParse(userIdClaim, out var userId) && userId != Guid.Empty)
+        {
+            return userId;
+        }
+
+        // Development fallback: use a known test user ID
+        // This allows Playwright tests with mocked auth to work against real backend
+        var isDevelopment = _configuration.GetValue<bool>("UseMockData") 
+                         || Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+        
+        if (isDevelopment)
+        {
+            // Known test user GUID seeded in AppDbContextSeeder
+            return Guid.Parse("11111111-1111-1111-1111-111111111111");
+        }
+
+        return Guid.Empty;
     }
 
     [HttpGet]
@@ -62,8 +90,9 @@ public class ProjectDocumentsController : ControllerBase
         if (file.Length > 10 * 1024 * 1024) // 10MB limit
             return BadRequest("El archivo excede el tamaño máximo permitido (10MB).");
 
-        // TODO: Get user ID from claims
-        var userId = Guid.Empty;
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty)
+            return Unauthorized("Usuario no autenticado.");
 
         var dto = new UploadDocumentDto(
             tipoDocumento,
@@ -143,8 +172,9 @@ public class ProjectDocumentsController : ControllerBase
             }
         }
 
-        // TODO: Get user ID from claims
-        var userId = Guid.Empty;
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty)
+            return Unauthorized("Usuario no autenticado.");
 
         var dto = new UploadDocumentDto(
             tipoDocumento,

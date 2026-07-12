@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/mssql/server:2022-latest
+FROM mcr.microsoft.com/mssql/server:2022-CU25-ubuntu-22.04
 
 # nosemgrep
 USER root

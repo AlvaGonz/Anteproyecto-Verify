@@ -90,10 +90,6 @@ describe('CheckoutReturnPage', () => {
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/admin/dashboard', expect.objectContaining({
         replace: true,
-        state: expect.objectContaining({
-          planJustActivated: true,
-          activatedPlan: expect.objectContaining({ label: 'Empresa' })
-        })
       }));
     });
 

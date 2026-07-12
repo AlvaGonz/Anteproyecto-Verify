@@ -1,19 +1,16 @@
 # Ignore most files
 **/*
 
-# Explicitly allow source files needed for build
-!docker/
-!src/
-!Build-Database-Sql.sql
-!.env
-!package.json
-!pnpm-lock.yaml
-!pnpm-workspace.yaml
-!*.sln
-!*.csproj
-!tsconfig.json
-!vite.config.ts
-!playwright.config.ts
+# Exclude build artifacts deeply
+**/bin/
+**/obj/
+**/dist/
+**/dist-ssr/
+**/node_modules/
+**/.git/
+**/.vscode/
+**/.DS_Store/
+**/Thumbs.db
 
 # Ignore nested items
 docker/**
@@ -26,13 +23,19 @@ docker/**
 !docker/azurite.Dockerfile
 !docker/nginx.conf
 
-# Exclude build artifacts deeply
-**/bin/
-**/obj/
-**/dist/
-**/dist-ssr/
-**/node_modules/
-**/.git/
-**/.vscode/
-**/.DS_Store/
-**/Thumbs.db
+# Explicitly allow source files needed for build (must come after exclusions)
+!docker/
+!docker/api-publish/
+!src/
+!src/backend/Api/bin/
+!src/backend/Api/obj/
+!Build-Database-Sql.sql
+!.env
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!*.sln
+!*.csproj
+!tsconfig.json
+!vite.config.ts
+!playwright.config.ts

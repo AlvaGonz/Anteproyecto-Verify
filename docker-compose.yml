@@ -21,7 +21,7 @@ services:
       - ConnectionStrings__DefaultConnection=$ConnectionStrings__DockerConnection
     env_file:
       - .env
-    entrypoint: ["dotnet", "run", "--urls", "http://0.0.0.0:8080"]
+    entrypoint: ["dotnet", "Api.dll", "--urls", "http://0.0.0.0:8080"]
     restart: unless-stopped
     depends_on:
       sqlserver:
@@ -45,8 +45,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/frontend/web:/app/src/frontend/web
-      - /app/src/frontend/web/node_modules
-      - /app/node_modules
     environment:
       - VITE_WATCH_POLLING=true
     env_file:

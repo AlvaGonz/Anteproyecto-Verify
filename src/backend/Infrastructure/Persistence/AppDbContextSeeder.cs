@@ -95,6 +95,27 @@ public static class AppDbContextSeeder
 
             await context.SaveChangesAsync();
 
+            // Create a test user with a known GUID for development/testing
+            var testUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var testUser = await context.Usuarios.FirstOrDefaultAsync(u => u.Id == testUserId);
+            if (testUser == null)
+            {
+                testUser = new Usuario(
+                    "Test",
+                    "User",
+                    "test@verifinca.do",
+                    passwordHasher.HashPassword("TestVerifinca2026!"),
+                    UserRole.User,
+                    "809-555-9999",
+                    "402-9999999-9");
+                testUser.GetType().GetProperty("Id")?.SetValue(testUser, testUserId);
+                context.Usuarios.Add(testUser);
+                context.Entry(testUser).Property("EmailVerificado").CurrentValue = true;
+                context.Entry(testUser).Property("Activo").CurrentValue = true;
+                testUser.AsignarPlan(Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F")); // Profesional plan
+                await context.SaveChangesAsync();
+            }
+
             await SeedLegacyProfilesAndPermissionsAsync(context, logger, adminUser, profesionalUser, freemiumUser);
 
             var proyectos = new[]

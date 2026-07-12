@@ -19,6 +19,18 @@ export default defineConfig({
         },
         headers: {
             'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
-        }
-    }
+        },
+        proxy: {
+            '/api': {
+                target: 'http://localhost:5000',
+                changeOrigin: true,
+                secure: false,
+            },
+            '/v1': {
+                target: 'http://localhost:5000',
+                changeOrigin: true,
+                secure: false,
+            },
+        },
+    },
 });
