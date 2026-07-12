@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
@@ -28,7 +29,14 @@ export const SettingsPage: React.FC = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<TabId>("profile");
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<TabId>((location.state as any)?.tab || "profile");
+
+  useEffect(() => {
+    if ((location.state as any)?.tab) {
+      setActiveTab((location.state as any).tab);
+    }
+  }, [location.state]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);

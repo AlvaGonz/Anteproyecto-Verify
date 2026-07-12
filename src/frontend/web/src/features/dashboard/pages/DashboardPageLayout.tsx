@@ -69,13 +69,22 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
             <p className="text-text-secondary font-medium mt-1">Gestión avanzada de proyectos y usuarios del sistema</p>
           </div>
           <div className="flex gap-3 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            <Link to="/admin/projects" className="vf-btn-secondary h-12">
-              Ver Listado
-            </Link>
-            <Link to="/admin/projects/new" className="vf-btn-primary h-12 shadow-md">
-              <Plus className="w-5 h-5" />
-              Nuevo Proyecto
-            </Link>
+            {activeTab === "projects" ? (
+              <>
+                <Link to="/admin/projects" className="vf-btn-secondary h-12">
+                  Ver Listado
+                </Link>
+                <Link to="/admin/projects/new" className="vf-btn-primary h-12 shadow-md">
+                  <Plus className="w-5 h-5" />
+                  Nuevo Proyecto
+                </Link>
+              </>
+            ) : (
+              <Link to="/admin/settings" state={{ tab: "users" }} className="vf-btn-secondary h-12 mx-auto">
+                <Users className="w-5 h-5 mr-2 inline" />
+                Ver Lista de Usuarios
+              </Link>
+            )}
           </div>
         </div>
 
