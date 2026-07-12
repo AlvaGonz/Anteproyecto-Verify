@@ -133,6 +133,12 @@ public class Usuario : EntityBase
         Rol = rol;
         UpdatedAtUtc = DateTime.UtcNow;
     }
+
+    public void UpdateAccountStatus(UserAccountStatus status)
+    {
+        AccountStatus = status;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
     
     public void UpdateRnc(string? rnc, string? razonSocial = null, string? nombreComercial = null, string? actividadEconomica = null)
     {

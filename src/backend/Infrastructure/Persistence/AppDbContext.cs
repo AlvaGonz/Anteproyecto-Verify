@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<Auditoria> Auditorias => Set<Auditoria>();
     public DbSet<Reporte> Reportes => Set<Reporte>();
     public DbSet<Certificacion> Certificaciones => Set<Certificacion>();
+    public DbSet<Invitacion> Invitaciones => Set<Invitacion>();
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
 
     // Legacy Tables for Admin Settings

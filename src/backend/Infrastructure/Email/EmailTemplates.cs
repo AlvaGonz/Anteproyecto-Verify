@@ -457,6 +457,39 @@ public static class EmailTemplates
             content);
     }
 
+    // ════════════════════════════════════════════════════════════════════════
+    // X. Invitation to join subscription
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetInvitationEmail(string titularName, string inviteeName, string email, string tempPassword)
+    {
+        string loginUrl = $"http://localhost:3000/#/auth/login";
+
+        string infoInner = $@"
+            <div style=""margin-bottom:8px;""><strong>Usuario:</strong> <span style=""color:{NavyDark};"">{email}</span></div>
+            <div><strong>Contraseña Temporal:</strong> <span style=""color:{NavyDark};font-family:monospace;"">{tempPassword}</span></div>
+        ";
+
+        string content = $@"
+            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {inviteeName}! 👋</h2>
+            <p style=""margin:0 0 16px 0;font-size:15px;color:{TextMuted};"">Has sido invitado a formar parte de un equipo</p>
+
+            <p style=""margin:0 0 16px 0;""><strong>{titularName}</strong> te ha invitado a unirte a su suscripción en <strong>VeriFinca</strong>, la plataforma de verificación de expedientes e inmuebles de la República Dominicana.</p>
+
+            <p style=""margin:0 0 16px 0;"">Hemos creado una cuenta para ti. Puedes ingresar usando las siguientes credenciales:</p>
+
+            {InfoCard(infoInner, Orange)}
+
+            <p style=""margin:0 0 24px 0;"">Te recomendamos cambiar esta contraseña inmediatamente después de iniciar sesión por primera vez desde la sección de tu perfil.</p>
+
+            <div style=""text-align:center;"">
+                {CtaButton(loginUrl, "Iniciar Sesión")}
+            </div>";
+
+        return BuildEmailWrapper(
+            $"Has sido invitado a VeriFinca por {titularName}",
+            $"Únete a la suscripción de {titularName} en VeriFinca",
+            content);
+    }
 }
 
 

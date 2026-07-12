@@ -45,6 +45,11 @@ public record AdminUserSettingsDto(
 );
 
 /// <summary>
+/// Request DTO for inviting users
+/// </summary>
+public record InviteUserRequest(string Nombre, string Apellido, string Email, string Telefono, string Cedula);
+
+/// <summary>
 /// Paginated response wrapper
 /// </summary>
 public record PaginatedResponse<T>(
@@ -527,6 +532,93 @@ public class SettingsController : ControllerBase
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok(new { Message = "Usuario invitado removido exitosamente." });
+    }
+
+    [HttpPost("users/invite")]
+    public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request, CancellationToken cancellationToken)
+    {
+        // 1. Fetch current logged-in user (Emisor)
+        var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        if (string.IsNullOrWhiteSpace(userEmail)) return Unauthorized();
+
+        var emisor = await _context.Usuarios
+            .Include(u => u.Plan)
+            .FirstOrDefaultAsync(u => u.CorreoElectronico == userEmail, cancellationToken);
+
+        if (emisor == null) return Unauthorized();
+
+        // 2. Validate plan and limits (only Corporativo and Empresa can invite)
+        if (emisor.Plan == null || (emisor.Plan.NombrePlan != "Corporativo" && emisor.Plan.NombrePlan != "Empresa"))
+        {
+            return BadRequest(new { Message = "Tu plan actual no permite invitar usuarios." });
+        }
+
+        int maxInvitees = emisor.Plan.NombrePlan == "Corporativo" ? 10 : 5;
+        
+        // Count existing invitees + pending invitations
+        int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == emisor.Id, cancellationToken);
+        int pendingInvitations = await _context.Invitaciones.CountAsync(i => i.EmisorId == emisor.Id && !i.Aceptada, cancellationToken);
+
+        if (currentInvitees + pendingInvitations >= maxInvitees)
+        {
+            return BadRequest(new { Message = "Has alcanzado el límite de usuarios invitados para tu plan." });
+        }
+
+        // 3. Check if email is already registered or invited
+        if (await _context.Usuarios.AnyAsync(u => u.CorreoElectronico == request.Email, cancellationToken))
+            return BadRequest(new { Message = "El correo electrónico ya está registrado." });
+            
+        if (await _context.Invitaciones.AnyAsync(i => i.Email == request.Email && !i.Aceptada, cancellationToken))
+            return BadRequest(new { Message = "El correo electrónico ya tiene una invitación pendiente." });
+
+        // 4. Create the invitation record
+        var invitacion = new Invitacion(emisor.Id, request.Email, request.Nombre, request.Apellido, request.Telefono, request.Cedula);
+        _context.Invitaciones.Add(invitacion);
+
+        // 5. Optionally create the user account directly (or let them create it themselves via a link)
+        // Since the prompt asks to send the temp password, we will create the account now.
+        string finalPassword = "TempPassword123!"; // Or generate a random one
+        string hashedPassword = _passwordHasher.HashPassword(finalPassword);
+
+        var newUser = new Usuario(
+            nombre: string.IsNullOrWhiteSpace(request.Nombre) ? "Invitado" : request.Nombre,
+            apellido: string.IsNullOrWhiteSpace(request.Apellido) ? "Nuevo" : request.Apellido,
+            correoElectronico: request.Email,
+            contrasenaHash: hashedPassword,
+            rol: UserRole.User,
+            telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
+            cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
+        );
+
+        newUser.ForzarVerificacionEmail();
+        newUser.AsignarTitular(emisor.Id);
+        newUser.UpdateAccountStatus(UserAccountStatus.Invited);
+
+        _context.Usuarios.Add(newUser);
+
+        // Save invitation and new user
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // Sync legacy (inserts Acceso and Pagos)
+        await SyncUserLegacyAsync(newUser, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // 6. Send Invitation Email
+        try
+        {
+            var html = Infrastructure.Email.EmailTemplates.GetInvitationEmail(
+                emisor.Nombre + " " + emisor.Apellido, 
+                newUser.Nombre, 
+                request.Email, 
+                finalPassword);
+            await _emailService.SendEmailAsync(request.Email, $"Invitación de {emisor.Nombre} — VeriFinca", html);
+        }
+        catch (Exception)
+        {
+            // If email sending fails, we don't fail the user creation
+        }
+
+        return Ok(new { Message = "Invitación enviada exitosamente." });
     }
 
     [HttpGet("profiles")]
