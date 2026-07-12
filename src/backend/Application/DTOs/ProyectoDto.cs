@@ -19,6 +19,7 @@ public record ProyectoDto(
     string? Propietario,
     string? CedulaRncPropietario,
     string? Ipi,
+    EstadoJuridico EstadoJuridico,
     ProjectStatus EstadoProyecto,
     IntegrityStatus EstadoIntegridad,
     Guid UsuarioCreadorId,

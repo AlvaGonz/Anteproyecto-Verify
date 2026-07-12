@@ -10,6 +10,7 @@ export interface ProyectoDto {
   rncDesarrollador?: string;
   designacionCatastral?: string;
   matricula?: string;
+  estadoJuridico: LegalStatus;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
   integrityScore?: number;
@@ -65,6 +66,13 @@ export enum ProjectStatus {
   Observed = 3,
   Validated = 4,
   Rejected = 5,
+}
+
+export enum LegalStatus {
+  Pending = 0,
+  Valid = 1,
+  WithObservations = 2,
+  Invalid = 3,
 }
 
 export enum IntegrityStatus {

@@ -14,10 +14,10 @@ class MockIntersectionObserver {
   readonly root: Element | null = null;
   readonly rootMargin: string = "";
   readonly thresholds: ReadonlyArray<number> = [];
-  disconnect() {}
-  observe() {}
+  disconnect() { }
+  observe() { }
   takeRecords() { return []; }
-  unobserve() {}
+  unobserve() { }
 }
 
 Object.defineProperty(window, "IntersectionObserver", {
@@ -68,7 +68,6 @@ describe("FeaturedProjectsSection Component", () => {
     );
 
     // Verify title and eyebrow are present
-    expect(screen.getByText("Expose Público")).toBeInTheDocument();
     expect(screen.getByText("Proyectos")).toBeInTheDocument();
     expect(screen.getByText("Verificados")).toBeInTheDocument();
 

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
-import type { ProyectoDto, CreateProyectoDto } from "../types";
+import type { ProyectoDto, CreateProyectoDto, LegalStatus } from "../types";
 import { ProjectCategory } from "../types";
 
 export const projectKeys = {
@@ -21,6 +21,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   rncDesarrollador: apiProj.rncDesarrollador,
   designacionCatastral: apiProj.designacionCatastral,
   matricula: apiProj.matricula,
+  estadoJuridico: apiProj.estadoJuridico as LegalStatus,
   estadoProyecto: apiProj.estadoProyecto,
   estadoIntegridad: apiProj.estadoIntegridad,
   usuarioCreadorId: String(apiProj.usuarioCreadorId),

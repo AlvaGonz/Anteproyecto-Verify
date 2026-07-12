@@ -12,6 +12,7 @@ export interface ProyectoDto {
   rncDesarrollador?: string;
   designacionCatastral?: string;
   matricula?: string;
+  estadoJuridico: number;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
   usuarioCreadorId: string;

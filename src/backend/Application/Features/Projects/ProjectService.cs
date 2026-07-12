@@ -160,6 +160,7 @@ public class ProjectService : IProjectService
             proyecto.Propietario,
             proyecto.CedulaRncPropietario,
             proyecto.Ipi,
+            proyecto.EstadoJuridico,
             proyecto.EstadoProyecto,
             proyecto.EstadoIntegridad,
             proyecto.UsuarioCreadorId,
