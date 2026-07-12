@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import { getStripePriceId, PlanId, BillingCycle } from '../utils/stripePriceMap';
@@ -53,12 +53,19 @@ export const CheckoutPage = () => {
   const plan = searchParams.get('plan') as PlanId;
   const billing = searchParams.get('billing') as BillingCycle;
   const source = searchParams.get('source');
-  const getBackLink = (src: string | null) => {
-    if (src === 'settings') return '/admin/settings';
-    if (src === 'portal') return '/admin/dashboard';
-    return '/plans';
+  const navigate = useNavigate();
+
+  const handleBack = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (source === 'settings') {
+      navigate('/admin/settings');
+    } else if (source === 'portal') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/plans');
+    }
   };
-  const backLink = getBackLink(source);
+
   const { user } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState<boolean>(false);
@@ -90,7 +97,7 @@ export const CheckoutPage = () => {
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="text-error text-lg font-medium mb-4">Plan o ciclo de facturación inválido.</p>
-          <Link to={backLink} className="text-primary hover:underline font-medium">Volver a Planes</Link>
+          <button onClick={handleBack} className="text-primary hover:underline font-medium">Volver a Planes</button>
         </div>
       </div>
     );
@@ -100,10 +107,10 @@ export const CheckoutPage = () => {
     <div className="min-h-screen bg-surface flex flex-col lg:flex-row">
       {/* Left Column: Order Summary */}
       <div className="w-full lg:w-2/5 bg-surface-variant/30 border-r border-outline-variant/30 p-8 lg:p-16 flex flex-col pt-24 lg:pt-32">
-        <Link to={backLink} className="flex items-center text-sm font-medium text-on-surface-variant hover:text-primary mb-12 transition-colors w-fit">
+        <button onClick={handleBack} className="flex items-center text-sm font-medium text-on-surface-variant hover:text-primary mb-12 transition-colors w-fit">
           <span className="material-symbols-outlined text-[18px] mr-1">arrow_back</span>
           Volver a planes
-        </Link>
+        </button>
 
         <div className="flex-grow">
           <span className="inline-block text-primary font-label font-bold text-xs tracking-wider uppercase mb-3">

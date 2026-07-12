@@ -35,7 +35,12 @@ export const LoginForm = () => {
       // Soft update for browser state (React Router navigation)
       if (redirectUrl) {
         navigate(redirectUrl);
-      } else if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus)) {
+      } else if (
+        user?.pendingPlanCode && 
+        !isSubscriptionActive(user.subscriptionStatus) && 
+        user?.rol !== 'Administrator' && 
+        user?.role !== 'Administrator'
+      ) {
         // ponytail: user has pending plan but no active sub → resume checkout
         navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
       } else {

@@ -11,7 +11,7 @@ const NAV_LINKS = [
 export const LandingNav: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
   const [prevPath, setPrevPath] = useState(location.pathname);
@@ -74,9 +74,14 @@ export const LandingNav: React.FC = () => {
         {/* Desktop Buttons */}
         <div className="hidden lg:flex items-center gap-3">
           {isAuthenticated ? (
-            <Link to="/admin/dashboard" className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
-              Ir al Portal
-            </Link>
+            <>
+              <Link to="/admin/dashboard" className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+                Ir al Portal
+              </Link>
+              <button onClick={() => logout()} className={clientAccessClassName}>
+                Cerrar Sesión
+              </button>
+            </>
           ) : (
             <>
               <Link to="/login" className={clientAccessClassName}>
@@ -110,9 +115,14 @@ export const LandingNav: React.FC = () => {
             })}
             <div className="h-px w-full bg-outline-variant/30 my-2" />
             {isAuthenticated ? (
-              <Link to="/admin/dashboard" className="bg-primary text-on-primary text-center px-5 py-3 rounded-xl font-semibold text-base hover:bg-primary/90 active:scale-[0.98] transition-all">
-                Ir al Portal
-              </Link>
+              <div className="flex flex-col gap-2">
+                <Link to="/admin/dashboard" className="bg-primary text-on-primary text-center px-5 py-3 rounded-xl font-semibold text-base hover:bg-primary/90 active:scale-[0.98] transition-all">
+                  Ir al Portal
+                </Link>
+                <button onClick={() => logout()} className="text-center text-base font-semibold text-on-surface-variant hover:text-on-surface px-4 py-3 rounded-xl hover:bg-surface-container-low transition-colors">
+                  Cerrar Sesión
+                </button>
+              </div>
             ) : (
               <div className="flex flex-col gap-2">
                 <Link to="/login" className="text-center text-base font-semibold text-on-surface-variant hover:text-on-surface px-4 py-3 rounded-xl hover:bg-surface-container-low transition-colors">

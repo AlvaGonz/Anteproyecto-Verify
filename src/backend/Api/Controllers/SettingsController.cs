@@ -86,7 +86,7 @@ public class SettingsController : ControllerBase
         var query = from u in _context.Usuarios
                     let dgii = _context.DGII.FirstOrDefault(x => x.Rnc == u.Rnc)
                     let inviteesCount = _context.Usuarios.Count(x => x.TitularId == u.Id)
-                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator
+                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator && (u.Plan == null || u.Plan.NombrePlan != "Consultor")
                     select new {
                         u.Id,
                         u.Nombre,
@@ -99,13 +99,13 @@ public class SettingsController : ControllerBase
                         RazonSocial = dgii != null ? dgii.NombreRazonSocial : null,
                         NombreComercial = dgii != null ? dgii.NombreComercial : null,
                         PlanId = u.PlanSuscripcionId,
-                        PlanName = u.Plan != null ? u.Plan.NombrePlan : "Gratuito",
-                        PlanPrice = u.Plan != null ? u.Plan.Precio : 0m,
+                        PlanName = u.TitularId != null ? "Invitado" : (u.Plan != null ? u.Plan.NombrePlan : "Gratuito"),
+                        PlanPrice = u.TitularId != null ? 0m : (u.Plan != null ? u.Plan.Precio : 0m),
                         PlanCreatedAt = u.CreatedAtUtc,
                         PlanExpiresAt = u.CurrentPeriodEnd,
                         UsedProjects = u.ProyectosCreados,
                         UsedQueries = u.ConsultasUsadas,
-                        MaxInvitees = u.Plan != null && u.Plan.NombrePlan == "Corporativo" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0),
+                        MaxInvitees = u.TitularId != null ? 0 : (u.Plan != null && u.Plan.NombrePlan == "Corporativo" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0)),
                         InviteesCount = inviteesCount
                     };
 

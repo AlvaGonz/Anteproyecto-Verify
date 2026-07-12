@@ -29,7 +29,13 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   // ponytail: if user has a pending plan but no active subscription, redirect to checkout
   // skip redirect if already on checkout to avoid redirect loops
-  if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus) && !location.pathname.startsWith('/checkout')) {
+  if (
+    user?.pendingPlanCode && 
+    !isSubscriptionActive(user.subscriptionStatus) && 
+    !location.pathname.startsWith('/checkout') && 
+    user?.rol !== 'Administrator' && 
+    user?.role !== 'Administrator'
+  ) {
     return <Navigate to={`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`} replace />;
   }
 

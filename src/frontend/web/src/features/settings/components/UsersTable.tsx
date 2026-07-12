@@ -37,11 +37,11 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
 
   // Group users by plan categories
   const groupedUsers = {
-    "Administradores": users.filter(u => u.role === "admin" || u.role === "owner"),
     "Corporativo": users.filter(u => u.planName === "Corporativo" && u.role !== "admin" && u.role !== "owner"),
     "Empresa": users.filter(u => u.planName === "Empresa" && u.role !== "admin" && u.role !== "owner"),
     "Profesional": users.filter(u => u.planName === "Profesional" && u.role !== "admin" && u.role !== "owner"),
-    "Gratuito": users.filter(u => (u.planName === "Gratuito" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner")
+    "Gratuito": users.filter(u => (u.planName === "Gratuito" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner"),
+    "Invitado": users.filter(u => u.planName === "Invitado" && u.role !== "admin" && u.role !== "owner")
   };
 
   const [activeTab, setActiveTab] = useState<string>("Corporativo");
@@ -65,10 +65,10 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
 
   const tabs = [
     { id: "Corporativo", label: "Corporativo", count: groupedUsers["Corporativo"].length },
-    { id: "Empresa", label: "Empresa", count: groupedUsers["Empresa"].length },
+    { id: "Empresa", label: "Enterprise", count: groupedUsers["Empresa"].length },
     { id: "Profesional", label: "Profesional", count: groupedUsers["Profesional"].length },
     { id: "Gratuito", label: "Gratuito", count: groupedUsers["Gratuito"].length },
-    { id: "Administradores", label: "Admin/Owner", count: groupedUsers["Administradores"].length }
+    { id: "Invitado", label: "Invitado", count: groupedUsers["Invitado"].length }
   ];
 
   const currentTabUsers = groupedUsers[activeTab as keyof typeof groupedUsers] || [];

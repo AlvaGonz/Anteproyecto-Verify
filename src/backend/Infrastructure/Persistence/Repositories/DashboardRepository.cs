@@ -20,7 +20,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<DashboardStatsDto> GetAdminDashboardStatsAsync(CancellationToken cancellationToken = default)
         {
             var activeUsersQuery = _context.Set<Usuario>()
-                .Where(u => u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active);
+                .Where(u => u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator && (u.Plan == null || u.Plan.NombrePlan != "Consultor"));
 
             var totalUsuarios = await activeUsersQuery.CountAsync(cancellationToken);
             var suscripcionesActivas = await activeUsersQuery.CountAsync(u => u.PlanSuscripcionId != null && u.TitularId == null, cancellationToken);
@@ -65,7 +65,6 @@ namespace Infrastructure.Persistence.Repositories
 
             var usuariosPorPlan = await activeUsersQuery
                 .Include(u => u.Plan)
-                .Where(u => u.Plan == null || u.Plan.NombrePlan != "Consultor")
                 .GroupBy(u => u.TitularId != null ? "Invitado" : (u.Plan != null ? u.Plan.NombrePlan : "Gratuito"))
                 .Select(g => new { Plan = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);

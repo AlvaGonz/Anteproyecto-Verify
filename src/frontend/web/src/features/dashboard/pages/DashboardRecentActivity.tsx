@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Users, Activity, FileCheck, CreditCard, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { m, AnimatePresence } from "framer-motion";
 import type { DashboardStatsDto, SuscripcionRecienteDto } from "../../../infrastructure/api/dashboard.api";
 
 export interface DashboardRecentActivityProps {
@@ -88,15 +89,18 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
                 const idxB = order.indexOf(planB);
                 return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
               })
-              .map(([plan, count]) => (
+              .map(([plan, count]) => {
+                const displayPlan = plan === "Empresa" ? "Enterprise" : plan;
+                return (
               <div key={plan} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#223382]" />
-                  <span className="text-sm font-medium text-text-primary">{plan}</span>
+                  <span className="text-sm font-medium text-text-primary">{displayPlan}</span>
                 </div>
                 <span className="text-sm font-bold bg-surface-raised px-2 py-0.5 rounded-full">{count}</span>
               </div>
-            ))
+                );
+              })
           ) : (
             <div className="text-sm text-text-secondary text-center opacity-70">No hay datos de distribución</div>
           )}
@@ -113,7 +117,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
           </div>
         </div>
 
-        <div className="divide-y divide-border flex-1 min-h-[445px]">
+        <div className="flex-1 min-h-[445px] overflow-hidden relative">
           {loading ? (
             <div className="py-20 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#223382]" /></div>
           ) : recentSubscriptions.length === 0 ? (
@@ -122,28 +126,45 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
               No hay usuarios recientes.
             </div>
           ) : (
-            paginatedSubscriptions.map((s) => (
-              <div key={`${s.correo}-${s.fechaAlta}`} className="flex items-center justify-between px-8 py-5 hover:bg-surface-raised/20 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-surface-raised flex items-center justify-center text-text-primary font-black text-lg">
-                    {s.correo.substring(0, 1).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-bold text-text-primary text-lg leading-tight">{s.correo}</p>
-                    <div className="flex items-center gap-2 mt-1 text-sm text-text-secondary">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(s.fechaAlta).toLocaleDateString()}
+            <AnimatePresence mode="wait">
+              <m.div
+                key={currentPage}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col w-full h-full divide-y divide-border absolute inset-0"
+              >
+                {Array.from({ length: itemsPerPage }).map((_, idx) => {
+                  const s = paginatedSubscriptions[idx];
+                  if (!s) {
+                    return <div key={`empty-${idx}`} className="h-[89px] pointer-events-none" />;
+                  }
+                  return (
+                    <div key={`${s.correo}-${s.fechaAlta}-${idx}`} className="flex items-center justify-between px-8 py-5 hover:bg-surface-raised/20 transition-all h-[89px]">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-surface-raised flex items-center justify-center text-text-primary font-black text-lg">
+                          {s.correo.substring(0, 1).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold text-text-primary text-lg leading-tight">{s.correo}</p>
+                          <div className="flex items-center gap-2 mt-1 text-sm text-text-secondary">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(s.fechaAlta).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-[#223382]">{s.plan === "Empresa" ? "Enterprise" : s.plan}</p>
+                        <span className={`text-xs px-2 py-1 rounded-full ${s.estado === "Active" ? "bg-success/20 text-success" : "bg-surface-raised text-text-secondary"}`}>
+                          {s.estado}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-[#223382]">{s.plan}</p>
-                  <span className={`text-xs px-2 py-1 rounded-full ${s.estado === "Active" ? "bg-success/20 text-success" : "bg-surface-raised text-text-secondary"}`}>
-                    {s.estado}
-                  </span>
-                </div>
-              </div>
-            ))
+                  );
+                })}
+              </m.div>
+            </AnimatePresence>
           )}
         </div>
         {!loading && totalPages > 1 && (

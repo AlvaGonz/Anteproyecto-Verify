@@ -29,9 +29,18 @@ export const CheckoutReturnPage = () => {
   
   // Keep source parameter for returning to previous tab
   const source = searchParams.get('source') ?? rawParams.get('source');
-  const backLink = source === 'settings' ? '/admin/settings' : '/plans';
-
   const navigate = useNavigate()
+
+  const handleBack = () => {
+    if (source === 'settings') {
+      navigate('/admin/settings');
+    } else if (source === 'portal') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/plans');
+    }
+  };
+
   const queryClient = useQueryClient()
   const redirectedRef = useRef(false)
   const { refreshUser, user } = useAuth()
@@ -208,7 +217,7 @@ export const CheckoutReturnPage = () => {
         El pago no pudo confirmarse. Verifica con tu banco o intenta de nuevo.
       </p>
       <button type="button"
-        onClick={() => navigate(backLink)}
+        onClick={handleBack}
         className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-semibold"
       >
         Volver a planes
