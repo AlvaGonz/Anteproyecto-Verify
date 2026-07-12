@@ -53,6 +53,7 @@
 | Fix duplicate EmailTemplate GetAccountCreatedByAdminEmail | N/A | develop | (pending) | 2026-07-12 |
 | Notification Schema Update (CodigoReferencia) & Dynamic Extraction | N/A | develop | (pending) | 2026-07-12 |
 | Notification UI Delete Button Integration & API Hook | N/A | develop | (pending) | 2026-07-12 |
+| Project Management Tabbed Layout (`ProjectManageLayout`) | UI Refactor | develop | (pending) | 2026-07-12 |
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|

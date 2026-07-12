@@ -40,25 +40,28 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
   return (
     <div className="max-w-7xl mx-auto">
 
-      {/* 🏛️ Institutional DNA Header */}
-      <div className="relative mb-12 p-8 rounded-[24px] overflow-hidden bg-secondary shadow-premium group">
-        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-1000">
-           <ShieldCheck size={320} className="text-white" />
-        </div>
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="flex flex-col gap-4">
-            <nav>
-              <Link to={`/admin/projects/${id}/edit`} className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors group/back">
-                <ArrowLeft className="w-4 h-4 group-hover/back:-translate-x-1 transition-transform" /> Volver al Expediente
-              </Link>
-            </nav>
+      {/* Header Premium */}
+      <div className="mb-10 p-8 rounded-[32px] bg-secondary relative overflow-hidden shadow-2xl group">
+        <div className="absolute inset-0 bg-noise opacity-20 mix-blend-overlay pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-black/40 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
+        
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-8">
+          <div className="flex items-center gap-8">
+            <Link 
+              to={`/admin/projects/${id}/edit`}
+              className="w-14 h-14 rounded-2xl bg-white/10 text-white flex items-center justify-center hover:bg-primary transition-all duration-300 hover:shadow-premium hover:-translate-x-1 backdrop-blur-sm border border-white/10 shrink-0"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            
             <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-[20px] bg-primary flex items-center justify-center shadow-premium relative">
-                <ShieldCheck className="w-10 h-10 text-white" />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-primary">
+              <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 items-center justify-center backdrop-blur-md shadow-inner relative">
+                 <ShieldCheck className="w-8 h-8 text-white relative z-10" />
+                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
+                 <div className="absolute top-2 right-2 flex items-center justify-center">
                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                </div>
+                 </div>
               </div>
               <div>
                 <h1 className="display-lg text-white mb-1 leading-none">CENTRO DE VALIDACIÓN</h1>
