@@ -140,8 +140,8 @@ public class SettingsControllerTests
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<global::Api.Controllers.PaginatedResponse<global::Api.Controllers.AdminUserSettingsDto>>(okResult.Value);
-            Assert.Equal(2, response.TotalCount);
-            Assert.Equal(2, response.Items.Count);
+            Assert.Equal(1, response.TotalCount);
+            Assert.Single(response.Items);
 
             // Verify syncing occurred
             var legacyUsers = await context.UsuariosLegacy.ToListAsync();

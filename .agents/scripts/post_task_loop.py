@@ -873,15 +873,6 @@ class TestSuiteRunner:
     Layer 1 - Five-Layer Quality Gate (Kagin007).
     Runs project tests BEFORE any LLM call. Fail-fast if floor breaks.
     """
-    TEST_COMMANDS = [
-        ["docker", "compose", "exec", "-T", "api", "dotnet", "test", "--filter", "Category!=Integration", "--no-build", "-q"],
-        ["npx", "playwright", "test"],
-        ["pytest", "--tb=short", "-q", "--no-header"],
-        ["python", "-m", "pytest", "--tb=short", "-q"],
-        ["npm", "test", "--", "--run"],
-        ["pnpm", "test", "--", "--run"],
-        ["npx", "vitest", "run"],
-    ]
     CHANGED_ONLY_VARIANTS = {
         "pytest":   ["pytest", "--tb=short", "-q", "--no-header", "--lf"],
         "vitest":   ["npx", "vitest", "run", "--changed"],
@@ -891,12 +882,23 @@ class TestSuiteRunner:
     def detect_and_run(self, diff_files: list) -> dict:
         """Auto-detect test runner and execute. Returns structured result."""
         start = time.time()
-        for cmd in self.TEST_COMMANDS:
+        cwd = os.getcwd()
+        test_commands = [
+            ["docker", "run", "--rm", "-v", f"{cwd}:/src", "-w", "/src", "mcr.microsoft.com/dotnet/sdk:8.0", "dotnet", "test", "tests/backend/UnitTests/UnitTests.csproj", "-p:BaseIntermediateOutputPath=/tmp/obj/UnitTests/", "-p:OutputPath=/tmp/bin/UnitTests/", "--filter", "Category!=Integration", "-q"],
+            ["npx", "playwright", "test"],
+            ["pytest", "--tb=short", "-q", "--no-header"],
+            ["python", "-m", "pytest", "--tb=short", "-q"],
+            ["npm", "test", "--", "--run"],
+            ["pnpm", "test", "--", "--run"],
+            ["npx", "vitest", "run"],
+        ]
+        for cmd in test_commands:
             try:
                 is_windows = sys.platform == "win32"
+                run_shell = False if (is_windows and cmd[0] == "docker") else is_windows
                 result = subprocess.run(
                     cmd, capture_output=True, text=True,
-                    timeout=120, cwd=os.getcwd(), shell=is_windows
+                    timeout=120, cwd=cwd, shell=run_shell
                 )
                 duration = round(time.time() - start, 2)
                 passed = result.returncode == 0
