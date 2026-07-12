@@ -236,8 +236,8 @@ def setup_tables():
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CatastroTitulo')
     BEGIN
         CREATE TABLE CatastroTitulo (
-            IdCatastroTitulo INT PRIMARY KEY,
-            IdProyecto INT NULL,
+            IdCatastroTitulo UNIQUEIDENTIFIER PRIMARY KEY,
+            IdProyecto UNIQUEIDENTIFIER NULL,
             NumeroTitulo VARCHAR(50) NULL,
             Rnc VARCHAR(20) NULL,
             Provincia VARCHAR(100) NULL,
@@ -266,8 +266,8 @@ def setup_tables():
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PermisoSuelo')
     BEGIN
         CREATE TABLE PermisoSuelo (
-            IdPSuelo INT PRIMARY KEY,
-            IdProyecto INT NULL,
+            IdPSuelo UNIQUEIDENTIFIER PRIMARY KEY,
+            IdProyecto UNIQUEIDENTIFIER NULL,
             NumeroPermiso VARCHAR(50) NULL,
             FechaEmision DATE NULL,
             Rnc VARCHAR(20) NULL,
