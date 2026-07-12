@@ -81,7 +81,14 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
           {loading ? (
             <div className="flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#223382]" /></div>
           ) : statsData?.usuariosPorPlan && Object.keys(statsData.usuariosPorPlan).length > 0 ? (
-            Object.entries(statsData.usuariosPorPlan).map(([plan, count]) => (
+            Object.entries(statsData.usuariosPorPlan)
+              .sort(([planA], [planB]) => {
+                const order = ["Corporativo", "Empresa", "Profesional", "Gratuito", "Invitado"];
+                const idxA = order.indexOf(planA);
+                const idxB = order.indexOf(planB);
+                return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+              })
+              .map(([plan, count]) => (
               <div key={plan} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#223382]" />
