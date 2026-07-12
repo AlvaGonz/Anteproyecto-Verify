@@ -150,18 +150,35 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
           </div>
 
           {!editingUser && (
-            <div>
-              <label htmlFor="uf-password" className="block text-xs font-bold text-text-secondary uppercase mb-1">Contraseña Temporal (Opcional)</label>
-              <input
-                id="uf-password"
-                type="text"
-                value={formData.password || ""}
-                onChange={e => update({ password: e.target.value })}
-                className="vf-input w-full"
-                placeholder="Dejar en blanco para usar clave por defecto"
-              />
-              <p className="text-[10px] text-text-secondary mt-1">El usuario recibirá una alerta para cambiar esta contraseña al iniciar sesión.</p>
-            </div>
+            <>
+              <div>
+                <label htmlFor="uf-plan" className="block text-xs font-bold text-text-secondary uppercase mb-1">Plan de Suscripción</label>
+                <select
+                  id="uf-plan"
+                  value={formData.planNombre || "Gratuito"}
+                  onChange={e => update({ planNombre: e.target.value })}
+                  className="vf-input w-full bg-white"
+                >
+                  <option value="Gratuito">Gratuito</option>
+                  <option value="Profesional">Profesional</option>
+                  <option value="Empresa">Empresa</option>
+                  <option value="Corporativo">Corporativo</option>
+                </select>
+              </div>
+              
+              <div>
+                <label htmlFor="uf-password" className="block text-xs font-bold text-text-secondary uppercase mb-1">Contraseña Temporal (Opcional)</label>
+                <input
+                  id="uf-password"
+                  type="text"
+                  value={formData.password || ""}
+                  onChange={e => update({ password: e.target.value })}
+                  className="vf-input w-full"
+                  placeholder="Dejar en blanco para usar clave por defecto"
+                />
+                <p className="text-[10px] text-text-secondary mt-1">El usuario recibirá una alerta para cambiar esta contraseña al iniciar sesión.</p>
+              </div>
+            </>
           )}
 
           {/* Role access selection removed */}

@@ -61,11 +61,16 @@ public class SettingsController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly Application.Abstractions.Security.IPasswordHasher _passwordHasher;
+    private readonly Application.Abstractions.Notifications.IEmailService _emailService;
 
-    public SettingsController(AppDbContext context, Application.Abstractions.Security.IPasswordHasher passwordHasher)
+    public SettingsController(
+        AppDbContext context, 
+        Application.Abstractions.Security.IPasswordHasher passwordHasher,
+        Application.Abstractions.Notifications.IEmailService emailService)
     {
         _context = context;
         _passwordHasher = passwordHasher;
+        _emailService = emailService;
     }
 
     [HttpGet("users")]
@@ -184,6 +189,17 @@ public class SettingsController : ControllerBase
             cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
         );
 
+        user.ForzarVerificacionEmail();
+
+        if (!string.IsNullOrWhiteSpace(request.PlanNombre))
+        {
+            var plan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == request.PlanNombre, cancellationToken);
+            if (plan != null)
+            {
+                user.AsignarPlan(plan.Id);
+            }
+        }
+
         _context.Usuarios.Add(user);
 
         // Save the new user first so that its ID exists in the database.
@@ -207,6 +223,16 @@ public class SettingsController : ControllerBase
 
         // Second SaveChangesAsync for notifications and legacy tables
         await _context.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            var html = Infrastructure.Email.EmailTemplates.GetAccountCreatedByAdminEmail(nombre, request.Email, finalPassword);
+            await _emailService.SendEmailAsync(request.Email, "Cuenta Creada — VeriFinca", html);
+        }
+        catch (Exception)
+        {
+            // If email sending fails, we don't fail the user creation
+        }
 
         return Ok(new { Message = "Usuario creado exitosamente.", Id = user.Id });
     }
@@ -618,6 +644,7 @@ public class CreateUserDto
     public string Telefono { get; set; } = "0000000000";
     public string Cedula { get; set; } = "00000000000";
     public string? Password { get; set; }
+    public string? PlanNombre { get; set; }
 }
 
 public class UpdateUserDto

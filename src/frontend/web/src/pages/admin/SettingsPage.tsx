@@ -105,7 +105,7 @@ if (formData.telefono) {
 
   const handleAddNewClick = () => {
     setEditingUser(null);
-    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "" });
+    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Gratuito" });
     setIsModalOpen(true);
   };
 

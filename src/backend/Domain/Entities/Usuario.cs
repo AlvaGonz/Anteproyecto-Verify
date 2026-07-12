@@ -167,6 +167,14 @@ public class Usuario : EntityBase
         return true;
     }
 
+    public void ForzarVerificacionEmail()
+    {
+        EmailVerificado = true;
+        TokenVerificacion = null;
+        TokenVerificacionExpiraUtc = null;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void AsignarPlan(Guid planId)
     {
         PlanSuscripcionId = planId;

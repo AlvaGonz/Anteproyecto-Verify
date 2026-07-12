@@ -49,7 +49,7 @@
 | Stripe Subscription Cancellation, Reactivation & Notification Fixes | RF-8 | feat/Stripe Subscription Cancellation & Reactivation | 248b79a6 | 2026-07-09 |
 | Subscription Cancellation custom modal UI | RF-8 | feat/Stripe Subscription Cancellation & Reactivation | (pending) | 2026-07-09 |
 | Resend Email E2E Playwright API Test Suite (12-resend-email-all-usecases.spec.ts) | N/A | develop | (pending) | 2026-07-10 |
-
+| Admin User Creation with Plan Assignment & Email Notification | RF-8 | develop | (pending) | 2026-07-12 |
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|

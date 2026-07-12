@@ -58,6 +58,7 @@ export interface CreateUserDto {
   telefono?: string;
   cedula?: string;
   password?: string;
+  planNombre?: string;
 }
 
 export interface UpdateUserDto {
