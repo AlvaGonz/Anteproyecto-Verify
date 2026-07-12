@@ -230,8 +230,46 @@ def setup_tables():
     END
     """)
     conn.commit()
+
+    # 2. CatastroTitulo if not exists
+    cursor.execute("""
+    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CatastroTitulo')
+    BEGIN
+        CREATE TABLE CatastroTitulo (
+            IdCatastroTitulo UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+            Rnc VARCHAR(20) NULL,
+            Provincia VARCHAR(100) NULL,
+            Municipio VARCHAR(100) NULL,
+            Latitud DECIMAL(9,6) NULL,
+            Longitud DECIMAL(9,6) NULL,
+            Superficie DECIMAL(18,2) NULL,
+            Matricula VARCHAR(50) NULL
+        );
+    END
+    """)
+    conn.commit()
+
+    # 3. PermisoSuelo if not exists
+    cursor.execute("""
+    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PermisoSuelo')
+    BEGIN
+        CREATE TABLE PermisoSuelo (
+            IdPSuelo UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+            Rnc VARCHAR(20) NULL,
+            Provincia VARCHAR(100) NULL,
+            Municipio VARCHAR(100) NULL,
+            Latitud DECIMAL(9,6) NULL,
+            Longitud DECIMAL(9,6) NULL,
+            Superficie DECIMAL(18,2) NULL,
+            TienePermiso VARCHAR(10) NULL,
+            Documento VARCHAR(250) NULL,
+            FechaEmision DATE NULL
+        );
+    END
+    """)
+    conn.commit()
     
-    # 2. Add columns to CatastroTitulo if they do not exist
+    # 4. Add columns to CatastroTitulo if they do not exist
     alter_queries_catastro = [
         "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Rnc') ALTER TABLE CatastroTitulo ADD Rnc VARCHAR(20) NULL;",
         "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Provincia') ALTER TABLE CatastroTitulo ADD Provincia VARCHAR(100) NULL;",
@@ -245,7 +283,7 @@ def setup_tables():
         cursor.execute(q)
     conn.commit()
     
-    # 3. Add columns to PermisoSuelo if they do not exist
+    # 5. Add columns to PermisoSuelo if they do not exist
     alter_queries_permiso = [
         "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Rnc') ALTER TABLE PermisoSuelo ADD Rnc VARCHAR(20) NULL;",
         "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Provincia') ALTER TABLE PermisoSuelo ADD Provincia VARCHAR(100) NULL;",

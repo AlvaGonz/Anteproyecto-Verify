@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
-import { useProjects } from "../../projects/api/useProjects";
+import { useSearchPublicProjects } from "../../projects/api/useSearchPublicProjects";
 import { ProjectStatus, LegalStatus, IntegrityStatus } from "../../projects/types";
 
 interface Project {
@@ -38,25 +38,26 @@ export const FeaturedProjectsSection: React.FC = () => {
   const scrollLeftValRef = useRef(0);
   const hasDraggedRef = useRef(false);
 
-  const { data: realProjects = [] } = useProjects();
+  const { data: searchResults = [] } = useSearchPublicProjects("");
 
-  // Filter only projects with correct legal, enabled status, and verified integrity
-  const validatedProjects = realProjects.filter(p =>
-    p.estadoJuridico === LegalStatus.Valid &&
-    p.estadoProyecto >= ProjectStatus.Published &&
-    p.estadoProyecto !== ProjectStatus.Rejected &&
-    p.estadoIntegridad === IntegrityStatus.Verified
-  );
+  const publicProjects = Array.isArray(searchResults) ? searchResults : [];
 
-  const formattedProjects: Project[] = validatedProjects.map(p => ({
-    name: p.nombre,
-    location: p.ubicacionTexto,
-    image: p.imagenUrl || "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-    status: "Validado",
-    risk: "Calculando",
-    deliveredDocs: p.completionRate ? Math.round(p.completionRate * 10) : 5,
-    totalDocs: 10,
-  }));
+  const formattedProjects: Project[] = publicProjects
+    .filter(p =>
+      p.estadoJuridico === LegalStatus.Valid &&
+      p.estadoProyecto >= ProjectStatus.Published &&
+      p.estadoProyecto !== ProjectStatus.Rejected &&
+      p.estadoIntegridad === IntegrityStatus.Verified
+    )
+    .map(p => ({
+      name: p.nombreProyecto,
+      location: p.ubicacionTexto || "Ubicación no especificada",
+      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      status: "Validado",
+      risk: "Calculando",
+      deliveredDocs: 8,
+      totalDocs: 10,
+    }));
 
   const projectsToUse = formattedProjects.length > 0 ? formattedProjects : FALLBACK_PROJECTS;
 

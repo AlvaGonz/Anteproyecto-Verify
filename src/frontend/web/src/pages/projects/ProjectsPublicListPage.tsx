@@ -32,15 +32,13 @@ export const ProjectsPublicListPage: React.FC = () => {
     
     return sourceData.map((p: any) => ({
       id: String(p.id),
-      // Handle both DTO formats:
       name: p.nombre || p.nombreProyecto,
       location: p.ubicacionTexto || "Ubicación no especificada",
-      // raw projects use estadoProyecto (int), search results use estadoValidacion (string)
-      status: p.estadoValidacion === "Verificado" || p.estadoProyecto === 4 ? "CERTIFIED" : "PROCESSING",
+      status: p.estadoValidacion === "Verificado" ? "CERTIFIED" : "PROCESSING",
       imageUrl: p.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
       lastVerification: p.createdAtUtc ? p.createdAtUtc.split("T")[0] : new Date().toISOString().split("T")[0],
       description: "", 
-      completionPercentage: (p.estadoValidacion === "Verificado" || p.estadoProyecto === 4) ? 100 : 50,
+      completionPercentage: p.estadoValidacion === "Verificado" ? 100 : 50,
     }));
   }, [searchResults]);
 

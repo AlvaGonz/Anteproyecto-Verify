@@ -49,7 +49,10 @@ public class SearchPublicProjectsQueryHandler
                 CodigoPublico = sello?.CodigoSello,
                 EstadoValidacion = p.EstadoProyecto == ProjectStatus.Verified ? "Verificado" : 
                                    p.EstadoProyecto == ProjectStatus.Rejected ? "NoVerificado" : "ConObservaciones",
-                UbicacionTexto = p.UbicacionTexto
+                UbicacionTexto = p.UbicacionTexto,
+                EstadoJuridico = (int)p.EstadoJuridico,
+                EstadoProyecto = (int)p.EstadoProyecto,
+                EstadoIntegridad = (int)p.EstadoIntegridad
             });
         }
 

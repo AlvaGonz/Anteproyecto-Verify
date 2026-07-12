@@ -23,11 +23,11 @@ public class PublicProjectController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string q, CancellationToken ct)
+    public async Task<IActionResult> Search([FromQuery] string? q, CancellationToken ct)
     {
         var query = new Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQuery
         {
-            Query = q,
+            Query = q ?? "",
             IpOrigen = HttpContext.Connection.RemoteIpAddress?.ToString(),
             UserAgent = Request.Headers["User-Agent"].ToString()
         };
