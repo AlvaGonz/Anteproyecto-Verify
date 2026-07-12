@@ -11,6 +11,7 @@ public class Notificacion : EntityBase
     public bool Leida { get; private set; }
     public DateTime FechaUtc { get; private set; }
     public string? EnlaceRelacionado { get; private set; }
+    public string CodigoReferencia { get; private set; } = null!;
 
     private Notificacion() { } // For EF Core
 
@@ -25,6 +26,11 @@ public class Notificacion : EntityBase
         EnlaceRelacionado = enlaceRelacionado;
         Leida = false;
         FechaUtc = DateTime.UtcNow;
+
+        // Generate CodigoReferencia: Date + Time + Random 5 Alphanumeric chars
+        var randomString = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 5)
+            .Select(s => s[new Random().Next(s.Length)]).ToArray());
+        CodigoReferencia = $"{FechaUtc:yyyyMMddHHmmss}-{randomString}";
     }
 
     public void MarcarComoLeida()

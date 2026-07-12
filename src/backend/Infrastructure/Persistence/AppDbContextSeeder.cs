@@ -425,6 +425,7 @@ public static class AppDbContextSeeder
         string cedula)
     {
         var existing = await context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == correoElectronico);
+        Usuario returnUser;
         if (existing != null)
         {
             context.Entry(existing).Property("Nombre").CurrentValue = nombre;
@@ -437,18 +438,35 @@ public static class AppDbContextSeeder
             context.Entry(existing).Property("Activo").CurrentValue = true;
             
             await context.SaveChangesAsync();
-            return existing;
+            returnUser = existing;
+        }
+        else
+        {
+            var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
+            context.Usuarios.Add(user);
+            
+            // Ensure user is marked as verified and active for seeding purposes
+            context.Entry(user).Property("EmailVerificado").CurrentValue = true;
+            context.Entry(user).Property("Activo").CurrentValue = true;
+            
+            await context.SaveChangesAsync();
+            returnUser = user;
         }
 
-        var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
-        context.Usuarios.Add(user);
-        
-        // Ensure user is marked as verified and active for seeding purposes
-        context.Entry(user).Property("EmailVerificado").CurrentValue = true;
-        context.Entry(user).Property("Activo").CurrentValue = true;
-        
-        await context.SaveChangesAsync();
-        return user;
+        var hasWelcome = await context.Notificaciones.AnyAsync(n => n.UsuarioId == returnUser.Id && n.Mensaje.Contains("¡Bienvenido a VeriFinca"));
+        if (!hasWelcome)
+        {
+            var welcomeNotification = new Notificacion(
+                usuarioId: returnUser.Id,
+                mensaje: $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
+                tipo: "Info",
+                enlaceRelacionado: "/dashboard"
+            );
+            context.Notificaciones.Add(welcomeNotification);
+            await context.SaveChangesAsync();
+        }
+
+        return returnUser;
     }
 
     private static async Task<Proyecto> GetOrCreateProyectoAsync(

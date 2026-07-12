@@ -223,16 +223,13 @@ public class SettingsController : ControllerBase
         // which depend on the user's ID.
         await _context.SaveChangesAsync(cancellationToken);
 
-        if (!string.IsNullOrWhiteSpace(request.Password))
-        {
-            var notification = new Notificacion(
-                usuarioId: user.Id,
-                mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
-                tipo: "Warning",
-                enlaceRelacionado: "/profile"
-            );
-            _context.Notificaciones.Add(notification);
-        }
+        var notification = new Notificacion(
+            usuarioId: user.Id,
+            mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
+            tipo: "Warning",
+            enlaceRelacionado: "/profile"
+        );
+        _context.Notificaciones.Add(notification);
 
         // Sync legacy (inserts Acceso and Pagos)
         await SyncUserLegacyAsync(user, cancellationToken);

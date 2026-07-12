@@ -456,44 +456,7 @@ public static class EmailTemplates
             $"El estado de tu proyecto {projectName} ha cambiado a {statusStr}.",
             content);
     }
-    // ════════════════════════════════════════════════════════════════════════
-    // 7. Account Created by Admin
-    // ════════════════════════════════════════════════════════════════════════
-    public static string GetAccountCreatedByAdminEmail(string userName, string email, string password)
-    {
-        string loginUrl = $"http://localhost:3000/#/login?email={System.Uri.EscapeDataString(email)}";
 
-        string content = $@"
-            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>
-            <p style=""margin:0 0 16px 0;font-size:15px;color:{TextMuted};"">VeriFinca te ha creado una cuenta para que vivas la experiencia de verificación y gestión segura de tus proyectos inmobiliarios.</p>
-
-            <p style=""margin:0 0 16px 0;"">VeriFinca te ha creado un espacio para acceder y utilizar todas nuestras funcionalidades. A través de este portal podrás gestionar, validar y dar seguimiento a tus proyectos y documentos con la máxima seguridad y eficiencia.</p>
-
-            <div style=""text-align:center;"">
-                <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" style=""margin:32px auto 8px auto;"">
-                    <tr>
-                    <td style=""border-radius:6px;background-color:{Orange};"">
-                        <a href=""{loginUrl}"" target=""_blank"" style=""display:inline-block;padding:14px 36px;font-family:'Inter',Arial,sans-serif;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:6px;letter-spacing:0.3px;"">Acceder a Mi cuenta</a>
-                    </td>
-                    </tr>
-                </table>
-            </div>
-
-            <p style=""margin:20px 0 20px 0;font-size:14px;color:{TextBody};text-align:center;"">
-                <strong>Tu contraseña de acceso es:</strong><br>
-                <span style=""font-size:18px;font-family:monospace;color:{Navy};background-color:#F3F4F6;padding:4px 8px;border-radius:4px;"">{password}</span>
-            </p>
-
-            <p style=""margin:28px 0 8px 0;font-size:13px;color:{TextMuted};"">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
-            <p style=""margin:0;font-size:12px;word-break:break-all;""><a href=""{loginUrl}"" style=""color:{Orange};text-decoration:none;"">{loginUrl}</a></p>
-
-            <p style=""margin:28px 0 0 0;font-size:13px;color:{TextMuted};"">Si no solicitaste esta cuenta, por favor contacta a soporte.</p>";
-
-        return BuildEmailWrapper(
-            "Cuenta Creada — VeriFinca",
-            "VeriFinca te ha creado una cuenta para acceder a la plataforma.",
-            content);
-    }
 }
 
 

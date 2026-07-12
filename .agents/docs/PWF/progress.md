@@ -50,6 +50,9 @@
 | Subscription Cancellation custom modal UI | RF-8 | feat/Stripe Subscription Cancellation & Reactivation | (pending) | 2026-07-09 |
 | Resend Email E2E Playwright API Test Suite (12-resend-email-all-usecases.spec.ts) | N/A | develop | (pending) | 2026-07-10 |
 | Admin User Creation with Plan Assignment & Email Notification | RF-8 | develop | (pending) | 2026-07-12 |
+| Fix duplicate EmailTemplate GetAccountCreatedByAdminEmail | N/A | develop | (pending) | 2026-07-12 |
+| Notification Schema Update (CodigoReferencia) & Dynamic Extraction | N/A | develop | (pending) | 2026-07-12 |
+| Notification UI Delete Button Integration & API Hook | N/A | develop | (pending) | 2026-07-12 |
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 |---|---|---|---|

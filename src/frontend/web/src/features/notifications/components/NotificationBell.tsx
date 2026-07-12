@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Bell } from "lucide-react";
+import { Bell, Trash2 } from "lucide-react";
 import { NotificationDto } from "../types";
-import { useNotifications, useMarkAsRead, useMarkAllAsRead } from "../api/useNotifications";
+import { useNotifications, useMarkAsRead, useMarkAllAsRead, useDeleteNotification } from "../api/useNotifications";
 
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: rawNotifications = [] } = useNotifications(true);
+  const { data: rawNotifications = [] } = useNotifications(false);
   const markAsReadMutation = useMarkAsRead();
   const markAllAsReadMutation = useMarkAllAsRead();
+  const deleteMutation = useDeleteNotification();
 
   // Mapping from API model to UI model
   const notifications = React.useMemo(() => {
@@ -20,8 +21,11 @@ export const NotificationBell: React.FC = () => {
       usuarioId: n.idUsuario || n.usuarioId || n.UsuarioId || "",
       fechaUtc: n.fechaCreacionUtc || n.fechaUtc || n.FechaUtc || new Date().toISOString(),
       tipo: n.tipoNotificacion || n.tipo || n.Tipo || "Info",
+      leida: n.leida || n.Leida || false,
     })) as unknown as NotificationDto[];
   }, [rawNotifications]);
+
+  const unreadCount = notifications.filter(n => !n.leida).length;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,6 +54,15 @@ export const NotificationBell: React.FC = () => {
     }
   };
 
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await deleteMutation.mutateAsync(id);
+    } catch (error) {
+      console.error("Error deleting notification", error);
+    }
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button type="button"
@@ -58,7 +71,7 @@ export const NotificationBell: React.FC = () => {
       >
         <span className="sr-only">Ver notificaciones</span>
         <Bell className="h-5 w-5" aria-hidden="true" />
-        {notifications.length > 0 && (
+        {unreadCount > 0 && (
           <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-primary" />
         )}
       </button>
@@ -69,9 +82,9 @@ export const NotificationBell: React.FC = () => {
             <h3 className="text-sm font-bold text-text-primary">Notificaciones</h3>
             <div className="flex items-center gap-3">
               <span className="text-xs text-text-primary opacity-50">
-                {notifications.length} nuevas
+                {unreadCount} nuevas
               </span>
-              {notifications.length > 0 && (
+              {unreadCount > 0 && (
                 <button
                   type="button"
                   onClick={handleMarkAllAsRead}
@@ -91,10 +104,10 @@ export const NotificationBell: React.FC = () => {
             ) : (
               <div className="divide-y divide-border/30">
                 {notifications.map((notification) => (
-                  <div key={notification.id} className="p-3 hover:bg-surface-raised/50 transition-colors">
+                  <div key={notification.id} className={`p-3 hover:bg-surface-raised/50 transition-colors relative group ${!notification.leida ? 'bg-primary/5' : ''}`}>
                     <div className="flex justify-between items-start gap-2">
-                      <div className="flex-1">
-                        <p className="text-xs font-semibold text-primary">
+                      <div className="flex-1 pr-6">
+                        <p className={`text-xs font-semibold ${!notification.leida ? 'text-primary' : 'text-text-primary'}`}>
                           {notification.tipo}
                         </p>
                         <p className="text-sm text-text-primary mt-0.5">
@@ -104,13 +117,24 @@ export const NotificationBell: React.FC = () => {
                           {new Date(notification.fechaUtc).toLocaleString()}
                         </p>
                       </div>
-                      <button type="button"
-                        onClick={() => handleMarkAsRead(notification.id)}
-                        className="text-xs text-primary hover:underline flex-shrink-0"
-                      >
-                        Leida
-                      </button>
+                      {!notification.leida && (
+                        <button type="button"
+                          onClick={() => handleMarkAsRead(notification.id)}
+                          className="text-xs text-primary hover:underline flex-shrink-0"
+                        >
+                          Leída
+                        </button>
+                      )}
                     </div>
+                    {/* Botón de eliminar en la esquina inferior derecha */}
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(notification.id, e)}
+                      className="absolute bottom-2 right-2 p-1 text-text-primary opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity"
+                      title="Eliminar notificación"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
                   </div>
                 ))}
               </div>
