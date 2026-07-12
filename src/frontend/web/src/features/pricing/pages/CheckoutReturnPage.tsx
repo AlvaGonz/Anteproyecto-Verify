@@ -11,23 +11,25 @@ const _processedSessions = new Set<string>()
 
 export const CheckoutReturnPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  // HashRouter does not expose query params from the real URL path.
-  // Stripe appends ?session_id= to the real URL (before the #), so
-  // we must read it from window.location.search directly.
-  const rawSearch = window.location.search;
-  const rawParams = new URLSearchParams(rawSearch);
+  // HashRouter puts query params in the hash, not window.location.search.
+  // URL: http://localhost:3000/#/checkout/return?session_id=xxx
+  // window.location.search = "" (empty)
+  // window.location.hash = "#/checkout/return?session_id=xxx"
+  const rawHash = window.location.hash;
+  const hashSearch = rawHash.includes('?') ? rawHash.split('?')[1] : '';
+  const hashParams = new URLSearchParams(hashSearch);
   
   // Use a ref to store the initial sessionId so it survives URL cleanup
   const initialSessionIdRef = useRef<string | null>(
     searchParams.get('session_id') ??
-    rawParams.get('session_id') ??
+    hashParams.get('session_id') ??
     searchParams.get('sessionId') ??
-    rawParams.get('sessionId')
+    hashParams.get('sessionId')
   );
   const sessionId = initialSessionIdRef.current;
   
   // Keep source parameter for returning to previous tab
-  const source = searchParams.get('source') ?? rawParams.get('source');
+  const source = searchParams.get('source') ?? hashParams.get('source');
   const backLink = source === 'settings' ? '/admin/settings' : '/plans';
 
   const navigate = useNavigate()
@@ -53,13 +55,17 @@ export const CheckoutReturnPage = () => {
       // Immediately remove session_id from browser history to prevent
       // it appearing in Referrer headers or server access logs (OWASP A05)
       try {
-        const newUrl = new URL(window.location.href, window.location.origin !== 'null' ? window.location.origin : 'http://localhost');
-        if (newUrl.searchParams.has('session_id') || newUrl.searchParams.has('sessionId')) {
-          newUrl.searchParams.delete('session_id');
-          newUrl.searchParams.delete('sessionId');
-          // In some test environments newUrl.toString() forces the base URL. 
-          // newUrl.pathname + newUrl.search + newUrl.hash is safer for relative replacements.
-          window.history.replaceState({}, '', newUrl.pathname + newUrl.search + newUrl.hash);
+        // In HashRouter, session_id is in the hash, not search
+        const hash = window.location.hash;
+        const hashPath = hash.includes('?') ? hash.split('?')[0] : hash;
+        const hashSearch = hash.includes('?') ? hash.split('?')[1] : '';
+        const hashParams = new URLSearchParams(hashSearch);
+        
+        if (hashParams.has('session_id') || hashParams.has('sessionId')) {
+          hashParams.delete('session_id');
+          hashParams.delete('sessionId');
+          const newHash = hashPath + (hashParams.toString() ? '?' + hashParams.toString() : '');
+          window.history.replaceState({}, '', newHash);
         }
       } catch (e) {
         // Ignore parsing errors in test environments
@@ -169,6 +175,10 @@ export const CheckoutReturnPage = () => {
             }
           }
 
+          // Guard with mounted FIRST — prevents mount 1's stale verify (StrictMode)
+          // from setting redirectedRef or _processedSessions, which would cause
+          // mount 2 to bail out without navigating (redirectedRef already true)
+          if (!mounted) return
           if (redirectedRef.current) return
           redirectedRef.current = true
 
