@@ -194,7 +194,12 @@
   - **Root Cause:** The frontend `useValidations.ts` was calling an endpoint path that didn't match the backend. The `ProjectValidationController` is mapped to `api/projects/{projectId}/validate` for POST, and `api/projects/{projectId}/validation-result` for GET, while the frontend attempted to call `/validations/run` and `/validations/result`.
   - **Fix:** Aligned the frontend `apiClient` requests in `useValidations.ts` to exactly match the existing backend routing paths (`/validate` and `/validation-result`).
 
--   * * C O M P - 0 0 1 : * *   V e r i f y   c o n s e n t   t e s t   p a s s e s   i n   C I   p i p e l i n e . 
-     -   * * S t a t u s : * *   C o m p l e t e 
-     -   * * D e t a i l s : * *   V e r i f i e d   v i a   l o c a l   D o c k e r   c o n t a i n e r   r u n n i n g   . N E T   8 . 0   S D K   ( P a s s e d :   7 / 7 )   a n d   v i a   G i t H u b   A c t i o n s   C I   p i p e l i n e   ( b a c k e n d   j o b s   s u c c e s s f u l   o n   b r a n c h   ` v e r i f y - c i - c o n s e n t ` ) .
+- **COMP-001:** Verify consent test passes in CI pipeline.
+     - **Status:** Complete
+     - **Details:** Verified via local Docker container running .NET 8.0 SDK (Passed: 7/7) and via GitHub Actions CI pipeline (backend jobs successful on branch `verify-ci-consent`).
+- **BUG-021:** SyntaxError: Unexpected token ':' in `RequirementUploadRow.tsx` at runtime.
+  - **Symptom:** The browser console throws `Uncaught SyntaxError: Unexpected token ':' (at RequirementUploadRow.tsx:7:27)` preventing page execution when importing the requirement upload UI row.
+  - **Root Cause:** A newly added component file `RequirementUploadRow.tsx` was created on the host filesystem after the Docker container started. Vite's file resolution cache in `node_modules/.vite` failed to resolve and transform it correctly, causing the dev server to serve the raw TSX source code to the browser instead of transpiled JavaScript.
+  - **Fix:** Deleted the Vite compilation cache (`node_modules/.vite`) inside the container and restarted the `web` dev server container, forcing a clean rebuild.
+
 
