@@ -1,5 +1,7 @@
 # VeriFinca — Agent Progress Tracker
-> Last updated: 2026-07-05T18:00:00-04:00 by OpenAgent (React Doctor 100/100)
+> Last updated: 2026-07-11T03:34:00-04:00 by Antigravity (E2E Search Spec Fix)
+> **✅ E2E project-search.spec.ts — 6/6 passing (Sello, Suelo, IPI, RNC, Cédula, invalid-query)**
+> **Root cause fixed: Playwright targeted port 5173 (CORS blocked). Now targets port 3000 (Docker frontend, CORS allowed). Also corrected "Proyecto no encontrado" → "Código No Válido" assertion. Commit: c60984ab**
 > **🏥 REACT-DOCTOR-001 — 176→0 warnings, 66→100 score, 267 files, 0 issues**
 > **📝 58 warnings fixed in 3 batches: 15 large components split, 30 a11y fixed, 4 unused exports removed, 4 effect/bugs fixed, 8 Zod migration warnings suppressed vial doctor.config.json**
 > **📝 ORCH-TEST-001 completed — 12 artifacts across 11 tasks, score 78/100**

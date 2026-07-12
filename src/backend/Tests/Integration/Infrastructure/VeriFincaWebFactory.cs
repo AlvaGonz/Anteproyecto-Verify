@@ -81,10 +81,10 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
 /// </summary>
 internal sealed class NullEmailService : Application.Abstractions.Notifications.IEmailService
 {
-    public Task SendEmailAsync(string to, string subject, string body, System.Threading.CancellationToken ct = default)
+    public Task SendEmailAsync(string to, string subject, string body, string? fromAddress = null, System.Threading.CancellationToken ct = default)
         => Task.CompletedTask;
 
-    public Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, System.Threading.CancellationToken ct = default)
+    public Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, string? returnUrl = null, System.Threading.CancellationToken ct = default)
         => Task.CompletedTask;
 
     public Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, System.Threading.CancellationToken ct = default)
@@ -97,7 +97,8 @@ internal sealed class NullEmailService : Application.Abstractions.Notifications.
         => Task.CompletedTask;
 
     public Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, string interval, System.Threading.CancellationToken ct = default)
-    {
-        return Task.CompletedTask;
-    }
+        => Task.CompletedTask;
+
+    public Task SendProjectStatusUpdateAsync(string toEmail, string userName, string projectName, string newStatus, System.Threading.CancellationToken ct = default)
+        => Task.CompletedTask;
 }

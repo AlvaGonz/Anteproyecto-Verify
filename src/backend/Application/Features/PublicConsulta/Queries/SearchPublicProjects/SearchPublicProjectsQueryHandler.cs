@@ -26,12 +26,16 @@ public class SearchPublicProjectsQueryHandler
 
     public async Task<List<PublicProjectSearchResultDto>> Handle(SearchPublicProjectsQuery request, CancellationToken cancellationToken)
     {
+        IEnumerable<Domain.Entities.Proyecto> proyectos;
+
         if (string.IsNullOrWhiteSpace(request.Query))
         {
-            return new List<PublicProjectSearchResultDto>();
+            proyectos = await _proyectoRepository.GetVisibleAsync(cancellationToken);
         }
-
-        var proyectos = await _proyectoRepository.SearchAsync(request.Query, cancellationToken);
+        else
+        {
+            proyectos = await _proyectoRepository.SearchAsync(request.Query, cancellationToken);
+        }
         var results = new List<PublicProjectSearchResultDto>();
 
         foreach (var p in proyectos)

@@ -77,7 +77,7 @@ const SEARCH_TYPES = [
 
 const VALIDATION_PATTERNS = {
   cert: {
-    regex: /^VF-\d{4}-[A-Z0-9]{4}$/,
+    regex: /^VF-\d{4}-[A-Z0-9]{4,10}$/,
     example: "VF-2026-X83L",
     name: "Sello VeriFinca"
   },
