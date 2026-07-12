@@ -231,7 +231,7 @@ public static class EmailTemplates
 
             <p style=""margin:0 0 16px 0;"">Puedes iniciar sesión utilizando las siguientes credenciales:</p>
             
-            <div style=""background-color:{Surface};padding:16px;border-radius:8px;margin-bottom:24px;border:1px solid #E5E7EB;"">
+            <div style=""background-color:#F8FAFC;padding:16px;border-radius:8px;margin-bottom:24px;border:1px solid #E5E7EB;"">
                 <p style=""margin:0 0 8px 0;""><strong>Correo Electrónico:</strong> {email}</p>
                 <p style=""margin:0;""><strong>Contraseña:</strong> <code>{password}</code></p>
             </div>

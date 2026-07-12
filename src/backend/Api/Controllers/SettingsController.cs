@@ -212,7 +212,7 @@ public class SettingsController : ControllerBase
             var plan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == request.PlanNombre, cancellationToken);
             if (plan != null)
             {
-                user.AsignarPlan(plan.Id);
+                user.AsignarPlan(plan.Idsuscripcion);
             }
         }
 
@@ -591,8 +591,26 @@ public class SettingsController : ControllerBase
 
     private async Task SyncUserLegacyAsync(Usuario u, CancellationToken cancellationToken = default)
     {
-        // Don't add to UsuariosLegacy explicitly because it is a VIEW over Usuarios
-        // The record will appear in the view automatically once SaveChanges is called.
+        // Check if user already exists in UsuariosLegacy table to avoid duplicates
+        var legacyUserExists = await _context.UsuariosLegacy.AnyAsync(ul => ul.IdUsuario == u.Id, cancellationToken);
+        if (!legacyUserExists)
+        {
+            _context.UsuariosLegacy.Add(new Domain.Entities.UsuarioLegacy
+            {
+                IdUsuario = u.Id,
+                Nombre = u.Nombre,
+                Apellido = u.Apellido,
+                NombreCompleto = $"{u.Nombre} {u.Apellido}",
+                Email = u.CorreoElectronico,
+                ContrasenaHash = u.ContrasenaHash,
+                Telefono = u.Telefono ?? "0000000000",
+                Cedula = u.Cedula ?? "00000000000"
+            });
+            
+            // We need to save the legacy user first before adding Acceso and Pagos
+            // because they depend on the foreign key to UsuarioLegacy.
+            await _context.SaveChangesAsync(cancellationToken);
+        }
 
         // Ensure profiles are loaded (cached for performance)
         var adminLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "ADMIN", cancellationToken);

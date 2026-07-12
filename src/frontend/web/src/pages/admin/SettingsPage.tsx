@@ -98,7 +98,17 @@ export const SettingsPage: React.FC = () => {
       setIsModalOpen(false);
       setEditingUser(null);
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.message || error?.response?.data?.Message || "Error al guardar el usuario";
+      console.error("API Error Response:", error?.response?.data);
+      let errorMsg = "Error al guardar el usuario";
+      if (error?.response?.data) {
+        const d = error.response.data;
+        if (d.message) errorMsg = d.message;
+        else if (d.Message) errorMsg = d.Message;
+        else if (d.errors && typeof d.errors === 'object') {
+          // Flatten ASP.NET Core validation errors
+          errorMsg = Object.values(d.errors).flat().join(' ');
+        }
+      }
       addToast(errorMsg, "error");
     }
   };
