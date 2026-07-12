@@ -158,6 +158,13 @@ public class SettingsController : ControllerBase
     {
         if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
 
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { Message = "El correo electrónico es obligatorio." });
+        if (string.IsNullOrWhiteSpace(request.Telefono))
+            return BadRequest(new { Message = "El teléfono es obligatorio." });
+        if (string.IsNullOrWhiteSpace(request.Cedula))
+            return BadRequest(new { Message = "La cédula es obligatoria." });
+
         if (request.Nombre != null && request.Nombre.Any(char.IsDigit))
             return BadRequest(new { Message = "El nombre no puede contener números." });
         if (request.Apellido != null && request.Apellido.Any(char.IsDigit))
@@ -165,6 +172,15 @@ public class SettingsController : ControllerBase
 
         if (await _context.Usuarios.AnyAsync(u => u.CorreoElectronico == request.Email, cancellationToken))
             return BadRequest(new { Message = "El correo electrónico ya está en uso." });
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            var p = request.Password;
+            if (p.Length < 8 || !p.Any(char.IsUpper) || !p.Any(char.IsLower) || !p.Any(char.IsDigit) || !p.Any(ch => "!@#$%^&*-".Contains(ch)))
+            {
+                return BadRequest(new { Message = "La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial." });
+            }
+        }
 
         UserRole role = request.Role.ToLower() switch
         {

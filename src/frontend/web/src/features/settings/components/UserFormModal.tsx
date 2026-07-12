@@ -104,6 +104,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               <input
                 id="uf-telefono"
                 type="text"
+                required
                 maxLength={14}
                 inputMode="numeric"
                 value={phone.value}
@@ -123,6 +124,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               <input
                 id="uf-cedula"
                 type="text"
+                required={!editingUser}
                 readOnly={!!editingUser}
                 value={formData.cedula || ""}
                 onChange={editingUser ? undefined : e => {
