@@ -272,21 +272,23 @@ def main():
                     fr.write(f"IF NOT EXISTS (SELECT 1 FROM Recibo WHERE IdPago = '{pago_id}')\n")
                     fr.write(f"INSERT INTO Recibo (IdPago, IdUsuario, Monto, FechaPago, Detalle, Categoria, Desglose) VALUES ('{pago_id}', '{u['id']}', {u['plan']['price']}, GETDATE(), 'Suscripcion {u['plan']['name']}', 'Suscripcion', '{desglose}');\n")
 
-    # FremiunProyectos_Log
+    # LogProyectos (Dummy Projects)
     with open(f"{output_dir}/11_FremiunProyectos_Log.sql", "w") as f:
-        f.write("-- Seed for FremiunProyectos_Log\n")
+        f.write("-- Seed for Dummy Projects and LogProyectos\n")
         f.write("SET NOCOUNT ON;\n")
         f.write("SET QUOTED_IDENTIFIER ON;\n")
+        count = 0
         for u in users:
-            if u["plan"]["name"] == "Gratuito":
+            if not u.get("is_guest", False) and count < 60:
                 proj_id = str(uuid.uuid4()).upper()
                 f.write(f"IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE IdUsuario = '{u['id']}')\n")
                 f.write(f"BEGIN\n")
-                f.write(f"    INSERT INTO ProyectosInmobiliarios (IdProyecto, IdUsuario, NombreProyecto, CodigoInterno, UbicacionTexto, Categoria, Status, EstadoIntegridad, EstadoJuridico, SelladoBloqueado, CreatedAtUtc) VALUES ('{proj_id}', '{u['id']}', 'Dummy Project', 'DUMMY-{u['id'][:5]}', 'N/A', 1, 1, 1, 1, 0, GETUTCDATE());\n")
+                f.write(f"    INSERT INTO ProyectosInmobiliarios (IdProyecto, IdUsuario, NombreProyecto, CodigoInterno, UbicacionTexto, Categoria, Status, EstadoIntegridad, EstadoJuridico, SelladoBloqueado, CreatedAtUtc) VALUES ('{proj_id}', '{u['id']}', 'Dummy Project {count+1}', 'DUMMY-{u['id'][:5]}', 'N/A', 1, 1, 1, 1, 0, GETUTCDATE());\n")
                 
                 log_id = str(uuid.uuid4()).upper()
-                f.write(f"    INSERT INTO FremiunProyectos_Log (IdProyectoLog, IdProyecto, IdUsuario, FechaAcceso) VALUES ('{log_id}', '{proj_id}', '{u['id']}', GETDATE());\n")
+                f.write(f"    INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc) VALUES ('{log_id}', '{proj_id}', '{u['id']}', GETUTCDATE(), 'Proyecto dummy generado por seeder', GETUTCDATE(), GETUTCDATE());\n")
                 f.write(f"END\n")
+                count += 1
 
     # Notificaciones
     with open(f"{output_dir}/12_Notificaciones.sql", "w") as f:

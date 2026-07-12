@@ -207,5 +207,15 @@
   - **Symptom:** The browser console throws `Uncaught SyntaxError: Unexpected token ':' (at RequirementUploadRow.tsx:7:27)` preventing page execution when importing the requirement upload UI row.
   - **Root Cause:** A newly added component file `RequirementUploadRow.tsx` was created on the host filesystem after the Docker container started. Vite's file resolution cache in `node_modules/.vite` failed to resolve and transform it correctly, causing the dev server to serve the raw TSX source code to the browser instead of transpiled JavaScript.
   - **Fix:** Deleted the Vite compilation cache (`node_modules/.vite`) inside the container and restarted the `web` dev server container, forcing a clean rebuild.
-
-
+- **BUG-022:** Missing dummy projects and test users (from Gratuito to Corporativo).
+  - **Symptom:** The user noticed that only one manually created project was showing up in the dashboard, and the dummy users specified in the `Docker_readme.md` were not created. Additionally, the `/api/admin/users` POST endpoint threw a 500 error during user creation.
+  - **Root Cause:** The `AppDbContextSeeder` was crashing halfway through its execution because it tried to add a welcome notification (`Notificacion`) for the newly seeded admin user, but the `Notificacion` table was missing the newly added `CodigoReferencia` column. This missing column exception caused the entire seeder to abort, meaning all subsequent users (Freemium, Consultor, Profesional, Empresa, Corporativo) and their dummy projects were never created.
+  - **Fix:** Applied the pending EF Core migration (`20260712173705_Add_CodigoReferencia_To_Notificaciones`) to add the missing column and restarted the API container. The seeder now runs to completion and successfully creates all test users and dummy projects.
+- **BUG-023:** 500 Error when creating user and emails not being sent.
+  - **Symptom:** The `/api/admin/users` POST endpoint returned a 500 Internal Server Error when creating users, and no emails (for user creation or validation) were being sent.
+  - **Root Cause:** A missing EF Core migration or mapping caused `UsuarioLegacy.NombreCompleto` to be unmapped on inserts, throwing an SQL exception during `SaveChangesAsync()`. Because this failed and aborted the transaction, the subsequent code that successfully dispatches emails via `Resend` was never reached.
+  - **Fix:** Used `sqlcmd` to manually add `NombreCompleto` as a `PERSISTED` computed column to `UsuarioLegacy` on the SQL Server. The user creation now succeeds and the email sending block is triggered correctly via Resend API.
+- **BUG-024:** Dashboard UI issue in user workflow tab.
+  - **Symptom:** On the dashboard's "Flujo de Usuarios" tab, the "Ver Lista de Usuarios" button did not visually substitute the "Ver listado" and "Nuevo Proyecto" buttons in a centered manner.
+  - **Root Cause:** The `DashboardPageLayout.tsx` used `justify-between` and the secondary button was right-aligned without proper container constraints to span the space where the two project buttons used to be.
+  - **Fix:** Wrapped the "Ver Lista de Usuarios" button in a `w-full` flex container and changed its style to primary so it is now visually centered in the 300px space where the project buttons were located.
