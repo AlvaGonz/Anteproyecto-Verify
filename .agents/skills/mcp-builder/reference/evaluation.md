@@ -296,7 +296,7 @@ This question is good because:
 **Example 4: Requires synthesis across multiple data types (CRM MCP)**
 ```xml
 <qa_pair>
-   <question>Find the account that upgraded from the Starter to Enterprise plan in Q4 2023 and had the highest annual contract value. What industry does this account operate in?</question>
+   <question>Find the account that upgraded from the Starter to Corporativo plan in Q4 2023 and had the highest annual contract value. What industry does this account operate in?</question>
    <answer>Healthcare</answer>
 </qa_pair>
 ```

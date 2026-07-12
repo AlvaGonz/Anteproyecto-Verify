@@ -18,9 +18,9 @@ interface PricingPageLayoutProps {
   isRevealed: boolean;
   isAnnual: boolean;
   setIsAnnual: (v: boolean) => void;
-  prices: { profesional: string; empresa: string; enterprise: string };
+  prices: { profesional: string; empresa: string; corporativo: string };
   handleFreePlan: () => void;
-  handlePaidPlan: (plan: "profesional" | "empresa" | "enterprise") => void;
+  handlePaidPlan: (plan: "profesional" | "empresa" | "corporativo") => void;
 }
 
 export const PricingPageLayout: React.FC<PricingPageLayoutProps> = ({

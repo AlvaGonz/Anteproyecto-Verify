@@ -94,7 +94,7 @@ export const SubscriptionSettings: React.FC = () => {
       priceVal = isAnnual ? 48 : 60;
     } else if (planKey === 'empresa') {
       priceVal = isAnnual ? 136 : 170;
-    } else if (planKey === 'enterprise') {
+    } else if (planKey === 'corporativo') {
       priceVal = isAnnual ? 400 : 500;
     }
 

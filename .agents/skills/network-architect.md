@@ -1,6 +1,6 @@
 ---
 name: network-architect
-description: Designs enterprise or multi-site network architecture from requirements, using existing network skills for focused routing, validation, automation, and troubleshooting detail.
+description: Designs corporativo or multi-site network architecture from requirements, using existing network skills for focused routing, validation, automation, and troubleshooting detail.
 tools: ["Read", "Grep"]
 model: sonnet
 ---

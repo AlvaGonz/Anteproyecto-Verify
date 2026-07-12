@@ -113,9 +113,9 @@ Una vez finalizado el Paso 4, puedes iniciar sesión inmediatamente con:
   * **Contraseña:** `EmpresaVerifinca2026!`
   * *(Estado: Verificado y Activo)*
 
-* **Usuario Enterprise (Enterprise)**:
-  * **Usuario:** `enterprise@verifinca.do`
-  * **Contraseña:** `EnterpriseVerifinca2026!`
+* **Usuario Corporativo (Corporativo)**:
+  * **Usuario:** `corporativo@verifinca.do`
+  * **Contraseña:** `CorporativoVerifinca2026!`
   * *(Estado: Verificado y Activo)*
 
 > [!NOTE]

@@ -1,5 +1,5 @@
-import React from "react";
-import { Users, Activity, FileCheck, CreditCard, Calendar } from "lucide-react";
+import React, { useState } from "react";
+import { Users, Activity, FileCheck, CreditCard, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import type { DashboardStatsDto, SuscripcionRecienteDto } from "../../../infrastructure/api/dashboard.api";
 
 export interface DashboardRecentActivityProps {
@@ -8,7 +8,13 @@ export interface DashboardRecentActivityProps {
   recentSubscriptions: SuscripcionRecienteDto[];
 }
 
-export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = ({ loading, statsData, recentSubscriptions }) => (
+export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = ({ loading, statsData, recentSubscriptions }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(recentSubscriptions.length / itemsPerPage);
+  const paginatedSubscriptions = recentSubscriptions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  return (
   <>
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
@@ -69,17 +75,17 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
           <h3 className="text-lg font-display font-black text-[#223382] tracking-tight">
             Flujo de <span className="text-[#F98513]">Usuarios</span>
           </h3>
-          <p className="text-xs text-text-secondary">Distribución por categoría (Roles)</p>
+          <p className="text-xs text-text-secondary">Distribución por categoría (Planes)</p>
         </div>
         <div className="p-6 flex-1 flex flex-col justify-center gap-3">
           {loading ? (
             <div className="flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#223382]" /></div>
-          ) : statsData?.usuariosPorRol && Object.keys(statsData.usuariosPorRol).length > 0 ? (
-            Object.entries(statsData.usuariosPorRol).map(([rol, count]) => (
-              <div key={rol} className="flex items-center justify-between">
+          ) : statsData?.usuariosPorPlan && Object.keys(statsData.usuariosPorPlan).length > 0 ? (
+            Object.entries(statsData.usuariosPorPlan).map(([plan, count]) => (
+              <div key={plan} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#223382]" />
-                  <span className="text-sm font-medium text-text-primary">{rol}</span>
+                  <span className="text-sm font-medium text-text-primary">{plan}</span>
                 </div>
                 <span className="text-sm font-bold bg-surface-raised px-2 py-0.5 rounded-full">{count}</span>
               </div>
@@ -100,7 +106,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
           </div>
         </div>
 
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-border flex-1 min-h-[445px]">
           {loading ? (
             <div className="py-20 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#223382]" /></div>
           ) : recentSubscriptions.length === 0 ? (
@@ -109,7 +115,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
               No hay usuarios recientes.
             </div>
           ) : (
-            recentSubscriptions.map((s) => (
+            paginatedSubscriptions.map((s) => (
               <div key={`${s.correo}-${s.fechaAlta}`} className="flex items-center justify-between px-8 py-5 hover:bg-surface-raised/20 transition-all">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-surface-raised flex items-center justify-center text-text-primary font-black text-lg">
@@ -133,7 +139,45 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
             ))
           )}
         </div>
+        {!loading && totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-border bg-surface-raised/10 flex items-center justify-between">
+            <span className="text-xs text-text-secondary">
+              Mostrando {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, recentSubscriptions.length)} de {recentSubscriptions.length}
+            </span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="p-1 rounded hover:bg-surface-raised disabled:opacity-30 transition-colors"
+              >
+                <ChevronsLeft className="w-4 h-4 text-text-primary" />
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="p-1 rounded hover:bg-surface-raised disabled:opacity-30 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4 text-text-primary" />
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="p-1 rounded hover:bg-surface-raised disabled:opacity-30 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4 text-text-primary" />
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="p-1 rounded hover:bg-surface-raised disabled:opacity-30 transition-colors"
+              >
+                <ChevronsRight className="w-4 h-4 text-text-primary" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   </>
-);
+  );
+};

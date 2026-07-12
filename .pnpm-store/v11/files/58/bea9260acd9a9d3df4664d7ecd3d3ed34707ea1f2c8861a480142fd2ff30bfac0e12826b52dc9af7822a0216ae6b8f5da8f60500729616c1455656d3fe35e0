@@ -6178,7 +6178,7 @@ const A = /* @__PURE__ */ U(J), K = [
   "energy",
   "engineer",
   "engineering",
-  "enterprises",
+  "corporativos",
   "epson",
   "equipment",
   "ericsson",
@@ -9914,7 +9914,7 @@ const A = /* @__PURE__ */ U(J), K = [
   "bss.design",
   "basicserver.io",
   "virtualserver.io",
-  "enterprisecloud.nu"
+  "corporativocloud.nu"
 ], Q = K.reduce(
   (e, s) => {
     const c = s.replace(/^(\*\.|\!)/, ""), o = A.toASCII(c), t = s.charAt(0);

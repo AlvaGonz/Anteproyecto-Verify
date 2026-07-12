@@ -8,9 +8,9 @@ const ICONS = {
 interface PricingCardsProps {
   t: (key: string) => string;
   isRevealed: boolean;
-  prices: { profesional: string; empresa: string; enterprise: string };
+  prices: { profesional: string; empresa: string; corporativo: string };
   handleFreePlan: () => void;
-  handlePaidPlan: (plan: "profesional" | "empresa" | "enterprise") => void;
+  handlePaidPlan: (plan: "profesional" | "empresa" | "corporativo") => void;
   modalMode?: boolean;
   currentPlan?: string | null;
 }
@@ -204,58 +204,58 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
           </button>
         </div>
 
-        {/* Card 4: Enterprise */}
+        {/* Card 4: Corporativo */}
         <div
-          className={getCardClasses("enterprise", false, 4)}
+          className={getCardClasses("corporativo", false, 4)}
         >
-          {renderBadge("enterprise", false)}
+          {renderBadge("corporativo", false)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
-            {t("pricing.cards.enterprise.title")}
+            {t("pricing.cards.corporativo.title")}
           </h3>
           <div className="mb-6 flex items-baseline">
             <span className="text-3xl font-headline font-extrabold text-on-surface whitespace-nowrap">
-              {prices.enterprise}
+              {prices.corporativo}
             </span>
             <span className="text-on-surface-variant font-body text-sm ml-2">
               {t("pricing.cards.period")}
             </span>
           </div>
           <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-            {t("pricing.cards.enterprise.desc")}
+            {t("pricing.cards.corporativo.desc")}
           </p>
           <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-1">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.enterprise.feature1")}
+              {t("pricing.cards.corporativo.feature1")}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-2">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.enterprise.feature2")}
+              {t("pricing.cards.corporativo.feature2")}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-3">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.enterprise.feature3")}
+              {t("pricing.cards.corporativo.feature3")}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-4">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.enterprise.feature4")}
+              {t("pricing.cards.corporativo.feature4")}
             </li>
           </ul>
           <button
             type="button"
-            onClick={() => handlePaidPlan("enterprise")}
+            onClick={() => handlePaidPlan("corporativo")}
             className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-secondary-container"
-            aria-label={t("pricing.cards.enterprise.button")}
+            aria-label={t("pricing.cards.corporativo.button")}
           >
-            {t("pricing.cards.enterprise.button")}
+            {t("pricing.cards.corporativo.button")}
           </button>
         </div>
       </div>

@@ -5,6 +5,7 @@ export const useDashboardStats = () => {
   return useQuery({
     queryKey: ["dashboardStats"],
     queryFn: adminDashboardApi.getStats,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 };

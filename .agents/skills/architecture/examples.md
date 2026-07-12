@@ -65,7 +65,7 @@ Migration Path:
 
 ---
 
-## Example 3: Enterprise (100K+ Users)
+## Example 3: Corporativo (100K+ Users)
 
 ```yaml
 Requirements:
@@ -81,7 +81,7 @@ Architecture Decisions:
   Domain Model: Full DDD
   Consistency: Event-driven (eventual OK)
   Message Bus: Kafka
-  Authentication: OAuth + SAML (enterprise SSO)
+  Authentication: OAuth + SAML (corporativo SSO)
   Database: Polyglot (right tool per job)
   CQRS: Selected services
 

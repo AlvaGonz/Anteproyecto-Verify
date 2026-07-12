@@ -7,7 +7,7 @@ tags:
   - happy-path
   - positive-trigger
 inputs:
-  prompt: "Help me apply the typescript-pro skill: Master TypeScript with advanced types, generics, and strict type safety. Handles complex type systems, decorators, and enterprise-grade patterns."
+  prompt: "Help me apply the typescript-pro skill: Master TypeScript with advanced types, generics, and strict type safety. Handles complex type systems, decorators, and corporativo-grade patterns."
 expected:
   outcomes:
     - type: task_completed

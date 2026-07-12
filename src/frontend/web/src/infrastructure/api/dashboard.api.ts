@@ -10,7 +10,7 @@ export interface DashboardStatsDto {
   proyectosPendientes: number;
   proyectosAprobados: number;
   proyectosRechazados: number;
-  usuariosPorRol: Record<string, number>;
+  usuariosPorPlan: Record<string, number>;
   totalConsultasRealizadas: number;
   totalProyectosRegistrados: number;
 }

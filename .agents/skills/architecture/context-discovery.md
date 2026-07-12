@@ -31,7 +31,7 @@
 ## Project Classification Matrix
 
 ```
-                    MVP              SaaS           Enterprise
+                    MVP              SaaS           Corporativo
 ┌─────────────────────────────────────────────────────────────┐
 │ Scale        │ <1K           │ 1K-100K      │ 100K+        │
 │ Team         │ Solo          │ 2-10         │ 10+          │

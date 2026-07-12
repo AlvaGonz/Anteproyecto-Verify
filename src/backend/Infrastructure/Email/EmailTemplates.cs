@@ -347,7 +347,7 @@ public static class EmailTemplates
         {
             priceDisplay = isAnual ? "$136 USD anual /mes" : "$170 USD /mes";
         }
-        else if (planName.Contains("Enterprise", System.StringComparison.OrdinalIgnoreCase))
+        else if (planName.Contains("Corporativo", System.StringComparison.OrdinalIgnoreCase))
         {
             priceDisplay = isAnual ? "$400 USD anual /mes" : "$500 USD /mes";
         }

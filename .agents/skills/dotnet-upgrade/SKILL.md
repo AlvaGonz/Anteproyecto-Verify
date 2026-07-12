@@ -101,7 +101,7 @@ description: 'Ready-to-use prompts for comprehensive .NET framework upgrade anal
     prompt: "Generate scripts or prompts for analyzing dependency graphs before upgrading. Propose AI-assisted prompts for Copilot to identify upgrade issues automatically."
 
   - name: "Multi-Repository Validation"
-    prompt: "Suggest how to validate automation output across multiple repositories. Create standardized validation workflows for enterprise-scale upgrades."
+    prompt: "Suggest how to validate automation output across multiple repositories. Create standardized validation workflows for corporativo-scale upgrades."
 
   # Final Validation & Delivery
   - name: "Final Solution Validation"

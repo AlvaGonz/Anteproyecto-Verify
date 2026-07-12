@@ -19,7 +19,7 @@ date_added: "2026-02-27"
 | `context-discovery.md` | Questions to ask, project classification | Starting architecture design |
 | `trade-off-analysis.md` | ADR templates, trade-off framework | Documenting decisions |
 | `pattern-selection.md` | Decision trees, anti-patterns | Choosing patterns |
-| `examples.md` | MVP, SaaS, Enterprise examples | Reference implementations |
+| `examples.md` | MVP, SaaS, Corporativo examples | Reference implementations |
 | `patterns-reference.md` | Quick lookup for patterns | Pattern comparison |
 
 ---

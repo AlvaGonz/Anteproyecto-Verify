@@ -3,7 +3,7 @@ name: benchmark-methodology
 description: >-
   Use after competitive-platform-analysis has produced a tiered competitor set.
   Scores each competitor across nine weighted dimensions (positioning, voice,
-  visual craft, offer packaging, evidence, enterprise-readiness, thought
+  visual craft, offer packaging, evidence, corporativo-readiness, thought
   leadership, pricing, client's strategic tension) with explicit 1–5 rubrics
   and a tension-plot. Precedes competitive-report-structure.
 ---
@@ -58,8 +58,8 @@ composite — see Bias controls). Sum = 100%.
    sprints/audits) vs vague. Packaging maturity.
 5. **Evidence & credibility** (12%) — Named clients, quantified outcomes,
    case-study depth. Proof beyond assertion.
-6. **Enterprise-readiness / commercial maturity** (10%) — Signals they can land
-   and hold SaaS/fintech/B2B/enterprise work (process, logos, scale, contracts).
+6. **Corporativo-readiness / commercial maturity** (10%) — Signals they can land
+   and hold SaaS/fintech/B2B/corporativo work (process, logos, scale, contracts).
 7. **Thought leadership / content presence** (8%) — Owned POV: writing, talks,
    newsletters, frameworks. Depth over volume.
 8. **Pricing transparency & engagement model** (5%) — Is pricing/engagement
@@ -94,7 +94,7 @@ brief. Example anchors for a memorability × credibility tension:
 - **Memorability** — 1: forgotten instantly · 3: recognizable in context ·
   5: unforgettable, talked-about, distinctively owned.
 - **Credibility** — 1: feels risky/amateur · 3: safe, competent,
-  unexciting · 5: enterprise-trusted, obvious safe choice.
+  unexciting · 5: corporativo-trusted, obvious safe choice.
 
 Plot competitors on the tension 2×2. The client's target quadrant is named in
 the positioning brief. Who else occupies that quadrant is the single most
@@ -111,7 +111,7 @@ For each competitor, work the dimensions in this order (cheapest signal first):
    Distinguish *asserted* ("we delivered X") from *proven* (metrics, named,
    verifiable).
 3. **Review directories** — corroborate clients, project size, engagement model
-   → credibility & enterprise-readiness (e.g. Clutch.co or the niche equivalent).
+   → credibility & corporativo-readiness (e.g. Clutch.co or the niche equivalent).
 4. **LinkedIn** — team size/model, founder narrative, content cadence →
    thought leadership, model.
 5. **Portfolio / craft platforms** — craft register (use the showcase native to
@@ -159,7 +159,7 @@ from:
 | Visual identity & site craft | | | |
 | Service offer & packaging | | | |
 | Evidence & credibility | | | |
-| Enterprise-readiness / commercial maturity | | | |
+| Corporativo-readiness / commercial maturity | | | |
 | Thought leadership / content presence | | | |
 | Pricing transparency & engagement model | | | |
 

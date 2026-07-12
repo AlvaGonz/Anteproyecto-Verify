@@ -80,7 +80,7 @@ most instructive.
    *generalist* (broad service menu). Tighter overlap with the client's focus =
    more direct.
 3. **Size / model** — *solo / micro* vs *boutique* vs *mid-size* vs
-   *enterprise-scale*. Same-band players are the realistic head-to-head; larger
+   *corporativo-scale*. Same-band players are the realistic head-to-head; larger
    bands are the aspirational/commercial-maturity reference.
 4. **Engagement format** — *productized* (named sprints, audits, fixed packages)
    vs *bespoke* (custom project / retainer). Signals positioning maturity.
@@ -130,7 +130,7 @@ for design, showreel/Vimeo for motion, writing samples/published work for copy):
 - **LinkedIn** — team size/model, founder narrative, post cadence, client logos,
   geography.
 - **Review directories** — reviews, named clients, project sizes, engagement
-  models; strongest signal for commercial credibility and enterprise-readiness
+  models; strongest signal for commercial credibility and corporativo-readiness
   (e.g. Clutch.co or the niche's equivalent).
 - **Open / public work** — process repos, published samples, open creative
   output: depth and craft-transparency evidence.

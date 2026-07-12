@@ -48,8 +48,8 @@ public abstract class IntegrationTestBase : IClassFixture<VeriFincaWebFactory>
         var plan = await db.Set<PlanSuscripcion>().FirstOrDefaultAsync(p => p.NombrePlan == planTier);
         if (plan == null)
         {
-            var maxConsultas = planTier == "Enterprise" ? -1 : (planTier == "Consultor" ? 5 : 1);
-            var maxProyectos = planTier == "Enterprise" ? -1 : (planTier == "Consultor" ? 1 : 0);
+            var maxConsultas = planTier == "Corporativo" ? -1 : (planTier == "Consultor" ? 5 : 1);
+            var maxProyectos = planTier == "Corporativo" ? -1 : (planTier == "Consultor" ? 1 : 0);
             plan = PlanSuscripcion.Create(
                 Guid.NewGuid(), planTier, 100m,
                 maxConsultas, maxProyectos,

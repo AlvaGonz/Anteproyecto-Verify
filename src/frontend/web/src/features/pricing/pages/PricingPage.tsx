@@ -17,7 +17,7 @@ export const PricingPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handlePaidPlan = (plan: 'profesional' | 'empresa' | 'enterprise') => {
+  const handlePaidPlan = (plan: 'profesional' | 'empresa' | 'corporativo') => {
     const billing = isAnnual ? 'yearly' : 'monthly';
     const targetUrl = `/checkout?plan=${plan}&billing=${billing}`;
     if (!isAuthenticated) {
@@ -38,7 +38,7 @@ export const PricingPage: React.FC = () => {
   const prices = {
     profesional: isAnnual ? "$48 USD" : "$60 USD",
     empresa: isAnnual ? "$136 USD" : "$170 USD",
-    enterprise: isAnnual ? "$400 USD" : "$500 USD",
+    corporativo: isAnnual ? "$400 USD" : "$500 USD",
   };
 
   return (

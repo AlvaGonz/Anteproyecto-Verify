@@ -81,12 +81,12 @@ public class SettingsController : ControllerBase
 
         // Validate pagination parameters
         page = Math.Max(1, page);
-        pageSize = Math.Clamp(pageSize, 1, 200);
+        // pageSize = Math.Clamp(pageSize, 1, 200); // Removed to allow loading all users
 
         var query = from u in _context.Usuarios
                     let dgii = _context.DGII.FirstOrDefault(x => x.Rnc == u.Rnc)
                     let inviteesCount = _context.Usuarios.Count(x => x.TitularId == u.Id)
-                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active
+                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator
                     select new {
                         u.Id,
                         u.Nombre,
@@ -105,15 +105,12 @@ public class SettingsController : ControllerBase
                         PlanExpiresAt = u.CurrentPeriodEnd,
                         UsedProjects = u.ProyectosCreados,
                         UsedQueries = u.ConsultasUsadas,
-                        MaxInvitees = u.Plan != null && u.Plan.NombrePlan == "Enterprise" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0),
+                        MaxInvitees = u.Plan != null && u.Plan.NombrePlan == "Corporativo" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0),
                         InviteesCount = inviteesCount
                     };
 
         var totalCount = await query.CountAsync(cancellationToken);
-        var rawItems = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
+        var rawItems = await query.ToListAsync(cancellationToken);
 
         var itemIds = rawItems.Select(x => x.Id).ToList();
         var allInvitees = await _context.Usuarios
@@ -421,7 +418,7 @@ public class SettingsController : ControllerBase
         u.AsignarPlan(plan.Idsuscripcion);
 
         // Enforce team member limit for the new plan
-        int maxInvitees = plan.NombrePlan == "Enterprise" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
+        int maxInvitees = plan.NombrePlan == "Corporativo" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
         var currentInvitees = await _context.Usuarios
             .Where(usr => usr.TitularId == u.Id)
             .ToListAsync(cancellationToken);
@@ -466,7 +463,7 @@ public class SettingsController : ControllerBase
         var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId, cancellationToken);
         if (invitee == null) return NotFound(new { Message = "Usuario a invitar no encontrado." });
 
-        int maxInvitees = titular.Plan != null && titular.Plan.NombrePlan == "Enterprise" ? 10 : (titular.Plan != null && titular.Plan.NombrePlan == "Empresa" ? 5 : 0);
+        int maxInvitees = titular.Plan != null && titular.Plan.NombrePlan == "Corporativo" ? 10 : (titular.Plan != null && titular.Plan.NombrePlan == "Empresa" ? 5 : 0);
         int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == titular.Id, cancellationToken);
 
         if (currentInvitees >= maxInvitees)

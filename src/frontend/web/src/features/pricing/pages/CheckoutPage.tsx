@@ -34,15 +34,15 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
       'pricing.cards.empresa.feature4',
     ]
   },
-  enterprise: {
-    name: 'Enterprise',
+  corporativo: {
+    name: 'Corporativo',
     priceMonthly: '$500 USD',
     priceYearly: '$400 USD',
     features: [
-      'pricing.cards.enterprise.feature1',
-      'pricing.cards.enterprise.feature2',
-      'pricing.cards.enterprise.feature3',
-      'pricing.cards.enterprise.feature4',
+      'pricing.cards.corporativo.feature1',
+      'pricing.cards.corporativo.feature2',
+      'pricing.cards.corporativo.feature3',
+      'pricing.cards.corporativo.feature4',
     ]
   }
 };

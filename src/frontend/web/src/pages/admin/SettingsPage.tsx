@@ -35,7 +35,7 @@ export const SettingsPage: React.FC = () => {
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
-  const isManagementTier = user?.plan === "Enterprise" || user?.plan === "Empresa";
+  const isManagementTier = user?.plan === "Corporativo" || user?.plan === "Empresa";
 
   const { data: users = [], isLoading: isLoadingUsers } = useUsers(1, 50, isAdmin);
 

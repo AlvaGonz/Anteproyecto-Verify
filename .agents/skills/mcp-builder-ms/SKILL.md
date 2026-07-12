@@ -97,7 +97,7 @@ Key pages to review:
 |----------|----------|-----|
 | **TypeScript** (recommended) | General MCP servers, broad compatibility | `@modelcontextprotocol/sdk` |
 | **Python** | Data/ML pipelines, FastAPI integration | `mcp` (FastMCP) |
-| **C#/.NET** | Azure/Microsoft ecosystem, enterprise | `Microsoft.Mcp.Core` |
+| **C#/.NET** | Azure/Microsoft ecosystem, corporativo | `Microsoft.Mcp.Core` |
 
 **Transport Selection:**
 

@@ -29,7 +29,7 @@ repository must serve one of the 7 specific thesis objectives:
 ---
 
 ## 🤖 AGENTIC CONSTITUTION & ORCHESTRATION PROTOCOL (V4.0)
-**Context:** Enterprise-Grade Spec-Driven Development
+**Context:** Corporativo-Grade Spec-Driven Development
 **Enforcement:** ALL AI agents MUST read and obey these directives before executing any 
 task in this repository.
 

@@ -39,7 +39,7 @@ What are you building?
 ├── High Performance API
 │   └── Fastify (2-3x faster than Express)
 │
-├── Enterprise/Team familiarity
+├── Corporativo/Team familiarity
 │   └── NestJS (structured, DI, decorators)
 │
 ├── Legacy/Stable/Maximum ecosystem

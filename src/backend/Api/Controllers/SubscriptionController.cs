@@ -479,7 +479,7 @@ public class SubscriptionController : ControllerBase
                     planName, priceId, user.Id);
 
                 // Enforce team member limit for the new plan
-                int maxInvitees = plan.NombrePlan == "Enterprise" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
+                int maxInvitees = plan.NombrePlan == "Corporativo" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
                 var currentInvitees = await _dbContext.Usuarios
                     .Where(usr => usr.TitularId == user.Id)
                     .ToListAsync();

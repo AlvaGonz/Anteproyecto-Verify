@@ -1107,7 +1107,7 @@ export declare interface BatchJob {
     createTime?: string;
     /** Output only. Time when the Job for the first time entered the `JOB_STATE_RUNNING` state. */
     startTime?: string;
-    /** The time when the BatchJob was completed. This field is for Gemini Enterprise Agent Platform only.
+    /** The time when the BatchJob was completed. This field is for Gemini Corporativo Agent Platform only.
      */
     endTime?: string;
     /** The time when the BatchJob was last updated.
@@ -1116,13 +1116,13 @@ export declare interface BatchJob {
     /** The name of the model that produces the predictions via the BatchJob.
      */
     model?: string;
-    /** Configuration for the input data. This field is for Gemini Enterprise Agent Platform only.
+    /** Configuration for the input data. This field is for Gemini Corporativo Agent Platform only.
      */
     src?: BatchJobSource;
     /** Configuration for the output data.
      */
     dest?: BatchJobDestination;
-    /** Statistics on completed and failed prediction instances. This field is for Gemini Enterprise Agent Platform only.
+    /** Statistics on completed and failed prediction instances. This field is for Gemini Corporativo Agent Platform only.
      */
     completionStats?: CompletionStats;
     /** Information further describing the output of this job. Output only.
@@ -1341,7 +1341,7 @@ export declare class Caches extends BaseModule {
      * @remarks
      * Context caching is only supported for specific models. See [Gemini
      * Developer API reference](https://ai.google.dev/gemini-api/docs/caching?lang=node/context-cac)
-     * and [Gemini Enterprise Agent Platform reference](https://cloud.google.com/vertex-ai/generative-ai/docs/context-cache/context-cache-overview#supported_models)
+     * and [Gemini Corporativo Agent Platform reference](https://cloud.google.com/vertex-ai/generative-ai/docs/context-cache/context-cache-overview#supported_models)
      * for more information.
      *
      * @param params - The parameters for the create request.
@@ -2193,7 +2193,7 @@ export declare interface ContentEmbedding {
     /** A list of floats representing an embedding.
      */
     values?: number[];
-    /** Gemini Enterprise Agent Platform only. Statistics of the input text associated with this
+    /** Gemini Corporativo Agent Platform only. Statistics of the input text associated with this
      embedding.
      */
     statistics?: ContentEmbeddingStatistics;
@@ -2201,11 +2201,11 @@ export declare interface ContentEmbedding {
 
 /** Statistics of the input text associated with the result of content embedding. */
 export declare interface ContentEmbeddingStatistics {
-    /** Gemini Enterprise Agent Platform only. If the input text was truncated due to having
+    /** Gemini Corporativo Agent Platform only. If the input text was truncated due to having
      a length longer than the allowed maximum input.
      */
     truncated?: boolean;
-    /** Gemini Enterprise Agent Platform only. Number of tokens of the input text.
+    /** Gemini Corporativo Agent Platform only. Number of tokens of the input text.
      */
     tokenCount?: number;
 }
@@ -2703,9 +2703,9 @@ export declare interface CreateTuningJobConfig {
     adapterSize?: AdapterSize;
     /** Tuning mode for tuning. */
     tuningMode?: TuningMode;
-    /** Custom base model for tuning. This is only supported for OSS models in Gemini Enterprise Agent Platform. */
+    /** Custom base model for tuning. This is only supported for OSS models in Gemini Corporativo Agent Platform. */
     customBaseModel?: string;
-    /** The batch size hyperparameter for tuning. This is only supported for OSS models in Gemini Enterprise Agent Platform. */
+    /** The batch size hyperparameter for tuning. This is only supported for OSS models in Gemini Corporativo Agent Platform. */
     batchSize?: number;
     /** The learning rate for tuning. OSS models only. Mutually exclusive with learning_rate_multiplier. */
     learningRate?: number;
@@ -3043,7 +3043,7 @@ export declare interface DistillationHyperParameters {
     /** Optional. Multiplier for adjusting the default learning rate. */
     learningRateMultiplier?: number;
     /** The batch size hyperparameter for tuning.
-     This is only supported for OSS models in Gemini Enterprise Agent Platform.
+     This is only supported for OSS models in Gemini Corporativo Agent Platform.
      */
     batchSize?: number;
     /** The learning rate for tuning. OSS models only. */
@@ -3377,27 +3377,27 @@ export declare interface EmbedContentConfig {
      using the earlier model (`models/embedding-001`).
      */
     outputDimensionality?: number;
-    /** Gemini Enterprise Agent Platform only. The MIME type of the input.
+    /** Gemini Corporativo Agent Platform only. The MIME type of the input.
      */
     mimeType?: string;
-    /** Gemini Enterprise Agent Platform only. Whether to silently truncate inputs longer than
+    /** Gemini Corporativo Agent Platform only. Whether to silently truncate inputs longer than
      the max sequence length. If this option is set to false, oversized inputs
      will lead to an INVALID_ARGUMENT error, similar to other text APIs.
      */
     autoTruncate?: boolean;
-    /** Gemini Enterprise Agent Platform only. Whether to enable OCR for document content.
+    /** Gemini Corporativo Agent Platform only. Whether to enable OCR for document content.
      Only applicable to Gemini Embedding 2 models.
      */
     documentOcr?: boolean;
-    /** Gemini Enterprise Agent Platform only. Whether to extract audio from video content.
+    /** Gemini Corporativo Agent Platform only. Whether to extract audio from video content.
      Only applicable to Gemini Embedding 2 models.
      */
     audioTrackExtraction?: boolean;
 }
 
-/** Request-level metadata for the Gemini Enterprise Agent Platform Embed Content API. */
+/** Request-level metadata for the Gemini Corporativo Agent Platform Embed Content API. */
 export declare interface EmbedContentMetadata {
-    /** Gemini Enterprise Agent Platform only. The total number of billable characters included
+    /** Gemini Corporativo Agent Platform only. The total number of billable characters included
      in the request.
      */
     billableCharacterCount?: number;
@@ -3427,7 +3427,7 @@ export declare interface EmbedContentParametersPrivate {
     /** The single content to embed. Only the `parts.text` fields will be counted.
      */
     content?: ContentUnion;
-    /** The Gemini Enterprise Agent Platform embedding API to use.
+    /** The Gemini Corporativo Agent Platform embedding API to use.
      */
     embeddingApiType?: EmbeddingApiType;
     /** Configuration that contains optional parameters.
@@ -3443,12 +3443,12 @@ export declare class EmbedContentResponse {
      the batch request.
      */
     embeddings?: ContentEmbedding[];
-    /** Gemini Enterprise Agent Platform only. Metadata about the request.
+    /** Gemini Corporativo Agent Platform only. Metadata about the request.
      */
     metadata?: EmbedContentMetadata;
 }
 
-/** Enum representing the Gemini Enterprise Agent Platform embedding API to use. */
+/** Enum representing the Gemini Corporativo Agent Platform embedding API to use. */
 export declare enum EmbeddingApiType {
     /**
      * predict API endpoint (default)
@@ -3501,7 +3501,7 @@ export declare enum EndSensitivity {
 }
 
 /** Tool to search public web data, powered by Vertex AI Search and Sec4 compliance. This data type is not supported in Gemini API. */
-export declare interface EnterpriseWebSearch {
+export declare interface CorporativoWebSearch {
     /** Optional. Sites with confidence level chosen & above this value will be blocked from the search results. */
     blockingConfidence?: PhishBlockThreshold;
     /** Optional. List of domains to be excluded from the search results. The default limit is 2000 domains. */
@@ -3799,7 +3799,7 @@ export declare class Files extends BaseModule {
     list: (params?: types.ListFilesParameters) => Promise<Pager<types.File>>;
     /**
      * Uploads a file asynchronously to the Gemini API.
-     * This method is not available in Gemini Enterprise Agent Platform (previously known as Vertex AI).
+     * This method is not available in Gemini Corporativo Agent Platform (previously known as Vertex AI).
      * Supported upload sources:
      * - Node.js: File path (string) or Blob object.
      * - Browser: Blob object (e.g., File).
@@ -3825,7 +3825,7 @@ export declare class Files extends BaseModule {
      *         @see {@link types.UploadFileParameters#config} for the optional
      *         config in the parameters.
      * @return A promise that resolves to a `types.File` object.
-     * @throws An error if called on a Gemini Enterprise Agent Platform (previously known as Vertex AI) client.
+     * @throws An error if called on a Gemini Corporativo Agent Platform (previously known as Vertex AI) client.
      * @throws An error if the `mimeType` is not provided and can not be inferred,
      * the `mimeType` can be provided in the `params.config` parameter.
      * @throws An error occurs if a suitable upload location cannot be established.
@@ -3987,7 +3987,7 @@ declare class FileSearchStores extends BaseModule {
     list: (params?: types.ListFileSearchStoresParameters) => Promise<Pager<types.FileSearchStore>>;
     /**
      * Uploads a file asynchronously to a given File Search Store.
-     * This method is not available in Gemini Enterprise Agent Platform (previously known as Vertex AI).
+     * This method is not available in Gemini Corporativo Agent Platform (previously known as Vertex AI).
      * Supported upload sources:
      * - Node.js: File path (string) or Blob object.
      * - Browser: Blob object (e.g., File).
@@ -4006,7 +4006,7 @@ declare class FileSearchStores extends BaseModule {
      *         @see {@link types.UploadToFileSearchStoreParameters#config} for the optional
      *         config in the parameters.
      * @return A promise that resolves to a long running operation.
-     * @throws An error if called on a Gemini Enterprise Agent Platform (previously known as Vertex AI) client.
+     * @throws An error if called on a Gemini Corporativo Agent Platform (previously known as Vertex AI) client.
      * @throws An error if the `mimeType` is not provided and can not be inferred,
      * the `mimeType` can be provided in the `params.config` parameter.
      * @throws An error occurs if a suitable upload location cannot be established.
@@ -4611,7 +4611,7 @@ export declare interface GenerateContentConfig {
      */
     imageConfig?: ImageConfig;
     /** Enables enhanced civic answers. It may not be available for all
-     models. This field is not supported in Gemini Enterprise Agent Platform.
+     models. This field is not supported in Gemini Corporativo Agent Platform.
      */
     enableEnhancedCivicAnswers?: boolean;
     /** Settings for prompt and response sanitization using the Model Armor
@@ -5421,22 +5421,22 @@ export declare interface GoogleGenAIOptions {
      * Optional. Determines whether to use the Vertex AI or the Gemini API.
      *
      * @remarks
-     * When true, the {@link https://cloud.google.com/vertex-ai/docs/reference/rest | Gemini Enterprise Agent Platform API} will used.
+     * When true, the {@link https://cloud.google.com/vertex-ai/docs/reference/rest | Gemini Corporativo Agent Platform API} will used.
      * When false, the {@link https://ai.google.dev/api | Gemini API} will be used.
-     * When both enterprise and vertexai are set, and they have different values,
+     * When both corporativo and vertexai are set, and they have different values,
      * an Error will be thrown.
      *
      * If unset, default SDK behavior is to use the Gemini API service.
      */
-    enterprise?: boolean;
+    corporativo?: boolean;
     /**
-     * Optional. Determines whether to use the Vertex AI (now Gemini Enterprise Agent Platform) or the Gemini API.
-     * The `enterprise` flag is recommended instead.
+     * Optional. Determines whether to use the Vertex AI (now Gemini Corporativo Agent Platform) or the Gemini API.
+     * The `corporativo` flag is recommended instead.
      *
      * @remarks
      * When true, the {@link https://cloud.google.com/vertex-ai/docs/reference/rest | Vertex AI API} will used.
      * When false, the {@link https://ai.google.dev/api | Gemini API} will be used.
-     * When both enterprise and vertexai are set, and they have different values,
+     * When both corporativo and vertexai are set, and they have different values,
      * an Error will be thrown.
      *
      * If unset, default SDK behavior is to use the Gemini API service.
@@ -5649,7 +5649,7 @@ declare interface GoogleSearchCallContent {
     /**
      * The type of search grounding enabled.
      */
-    search_type?: 'web_search' | 'image_search' | 'enterprise_web_search';
+    search_type?: 'web_search' | 'image_search' | 'corporativo_web_search';
     /**
      * A signature hash for backend validation.
      */
@@ -6104,7 +6104,7 @@ export declare interface HttpOptions {
     timeout?: number;
     /** Extra parameters to add to the request body.
      The structure must match the backend API's request structure.
-     - Gemini Enterprise Agent Platform backend API docs: https://cloud.google.com/vertex-ai/docs/reference/rest
+     - Gemini Corporativo Agent Platform backend API docs: https://cloud.google.com/vertex-ai/docs/reference/rest
      - GeminiAPI backend API docs: https://ai.google.dev/api/rest */
     extraBody?: Record<string, unknown>;
     /** HTTP retry options for the request. */
@@ -8117,7 +8117,7 @@ export declare class Models extends BaseModule {
     /**
      * Makes an API request to generate content with a given model.
      *
-     * For the `model` parameter, supported formats for Gemini Enterprise Agent Platform API include:
+     * For the `model` parameter, supported formats for Gemini Corporativo Agent Platform API include:
      * - The Gemini model ID, for example: 'gemini-2.0-flash'
      * - The full resource name starts with 'projects/', for example:
      *  'projects/my-project-id/locations/us-central1/publishers/google/models/gemini-2.0-flash'
@@ -8165,7 +8165,7 @@ export declare class Models extends BaseModule {
      * Makes an API request to generate content with a given model and yields the
      * response in chunks.
      *
-     * For the `model` parameter, supported formats for Gemini Enterprise Agent Platform API include:
+     * For the `model` parameter, supported formats for Gemini Corporativo Agent Platform API include:
      * - The Gemini model ID, for example: 'gemini-2.0-flash'
      * - The full resource name starts with 'projects/', for example:
      *  'projects/my-project-id/locations/us-central1/publishers/google/models/gemini-2.0-flash'
@@ -8256,7 +8256,7 @@ export declare class Models extends BaseModule {
     editImage: (params: types.EditImageParameters) => Promise<types.EditImageResponse>;
     /**
      * Upscales an image based on an image, upscale factor, and configuration.
-     * Only supported in Gemini Enterprise Agent Platform currently.
+     * Only supported in Gemini Corporativo Agent Platform currently.
      *
      * @param params - The parameters for upscaling an image.
      * @return The response from the API.
@@ -10522,7 +10522,7 @@ export declare interface Tool {
     /** Optional. CodeExecution tool type. Enables the model to execute code as part of generation. */
     codeExecution?: ToolCodeExecution;
     /** Optional. Tool to support searching public web data, powered by Vertex AI Search and Sec4 compliance. This field is not supported in Gemini API. */
-    enterpriseWebSearch?: EnterpriseWebSearch;
+    corporativoWebSearch?: CorporativoWebSearch;
     /** Optional. Function tool type. One or more function declarations to be passed to the model along with the current user query. Model may decide to call a subset of these functions by populating FunctionCall in the response. User should provide a FunctionResponse for each function call in the next turn. Based on the function responses, Model will generate the final response back to the user. Maximum 512 function declarations can be provided. */
     functionDeclarations?: FunctionDeclaration[];
     /** Optional. Specialized retrieval tool that is powered by Google Search. */
@@ -10599,7 +10599,7 @@ declare namespace Tool_2 {
         /**
          * The types of search grounding to enable.
          */
-        search_types?: Array<'web_search' | 'image_search' | 'enterprise_web_search'>;
+        search_types?: Array<'web_search' | 'image_search' | 'corporativo_web_search'>;
     }
     /**
      * A tool that can be used by the model to search files.
@@ -10849,7 +10849,7 @@ export declare interface TunedModelInfo {
 export declare interface TuningDataset {
     /** GCS URI of the file containing training dataset in JSONL format. */
     gcsUri?: string;
-    /** The resource name of the Gemini Enterprise Agent Platform (previously known as Vertex AI) Multimodal Dataset that is used as training dataset. Example: 'projects/my-project-id-or-number/locations/my-location/datasets/my-dataset-id'. */
+    /** The resource name of the Gemini Corporativo Agent Platform (previously known as Vertex AI) Multimodal Dataset that is used as training dataset. Example: 'projects/my-project-id-or-number/locations/my-location/datasets/my-dataset-id'. */
     vertexDatasetResource?: string;
     /** Inline examples with simple input/output text. */
     examples?: TuningExample[];
@@ -11100,7 +11100,7 @@ export declare enum TuningTask {
 export declare interface TuningValidationDataset {
     /** GCS URI of the file containing validation dataset in JSONL format. */
     gcsUri?: string;
-    /** The resource name of the Gemini Enterprise Agent Platform (previously known as Vertex AI) Multimodal Dataset that is used as validation dataset. Example: 'projects/my-project-id-or-number/locations/my-location/datasets/my-dataset-id'. */
+    /** The resource name of the Gemini Corporativo Agent Platform (previously known as Vertex AI) Multimodal Dataset that is used as validation dataset. Example: 'projects/my-project-id-or-number/locations/my-location/datasets/my-dataset-id'. */
     vertexDatasetResource?: string;
 }
 
@@ -11414,7 +11414,7 @@ declare namespace types {
         Interval,
         GoogleSearch,
         ToolCodeExecution,
-        EnterpriseWebSearch,
+        CorporativoWebSearch,
         FunctionDeclaration,
         DynamicRetrievalConfig,
         GoogleSearchRetrieval,

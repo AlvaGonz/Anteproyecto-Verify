@@ -115,11 +115,11 @@ Here is a complete plan showing the level of detail expected:
 # Implementation Plan: Stripe Subscription Billing
 
 ## Overview
-Add subscription billing with free/pro/enterprise tiers. Users upgrade via
+Add subscription billing with free/pro/corporativo tiers. Users upgrade via
 Stripe Checkout, and webhook events keep subscription status in sync.
 
 ## Requirements
-- Three tiers: Free (default), Pro ($29/mo), Enterprise ($99/mo)
+- Three tiers: Free (default), Pro ($29/mo), Corporativo ($99/mo)
 - Stripe Checkout for payment flow
 - Webhook handler for subscription lifecycle events
 - Feature gating based on subscription tier

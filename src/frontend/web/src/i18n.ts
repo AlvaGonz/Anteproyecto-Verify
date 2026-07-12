@@ -258,14 +258,14 @@ const resources = {
             feature4: "Integración CRM",
             button: "Elegir Empresa"
           },
-          enterprise: {
-            title: "Enterprise",
+          corporativo: {
+            title: "Corporativo",
             desc: "Soluciones a medida para bancos, desarrolladoras y gobierno.",
             feature1: "Consultas ilimitadas",
             feature2: "API Full Access",
             feature3: "Validaciones en lote",
             feature4: "SLA garantizado 99.9%",
-            button: "Elegir Enterprise"
+            button: "Elegir Corporativo"
           }
         },
         comparison: {
@@ -566,14 +566,14 @@ const resources = {
             feature4: "CRM integration",
             button: "Choose Company"
           },
-          enterprise: {
-            title: "Enterprise",
+          corporativo: {
+            title: "Corporativo",
             desc: "Custom solutions for banks, developers, and government.",
             feature1: "Unlimited queries",
             feature2: "Full Access API",
             feature3: "Bulk validations",
             feature4: "Guaranteed 99.9% SLA",
-            button: "Choose Enterprise"
+            button: "Choose Corporativo"
           }
         },
         comparison: {

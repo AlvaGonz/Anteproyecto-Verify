@@ -1,7 +1,7 @@
 // Maps plan + billing cycle → Stripe Price ID from env vars
 // NEVER expose secret key here — only publishable key + price IDs
 
-export type PlanId = 'profesional' | 'empresa' | 'enterprise'
+export type PlanId = 'profesional' | 'empresa' | 'corporativo'
 export type BillingCycle = 'monthly' | 'yearly'
 
 export function getStripePriceId(plan: PlanId, billing: BillingCycle): string {
@@ -14,7 +14,7 @@ export function getStripePriceId(plan: PlanId, billing: BillingCycle): string {
       monthly: import.meta.env.VITE_STRIPE_PRICE_EMPRESA_MONTHLY ?? '',
       yearly:  import.meta.env.VITE_STRIPE_PRICE_EMPRESA_YEARLY ?? '',
     },
-    enterprise: {
+    corporativo: {
       monthly: import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE_MONTHLY ?? '',
       yearly:  import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE_YEARLY ?? '',
     },
