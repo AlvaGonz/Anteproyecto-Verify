@@ -63,9 +63,10 @@ describe('SubscriptionSettings', () => {
     const cancelButton = screen.getByRole('button', { name: /Cancelar Suscripción/i });
     expect(cancelButton).toBeInTheDocument();
     
-    // Test cancel flow
-    window.confirm = vi.fn(() => true);
+    // Test cancel flow — button opens a modal, need to confirm in modal
     fireEvent.click(cancelButton);
+    const confirmButton = screen.getByRole('button', { name: /Sí, cancelar suscripción/i });
+    fireEvent.click(confirmButton);
     expect(mockCancel).toHaveBeenCalled();
   });
 

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { registerSchema, type RegisterFormValues } from "../schemas";
 import { useRegister } from "../api/useAuth";
 import { VerificationEmailActions } from "./VerificationEmailActions";
@@ -17,7 +17,6 @@ const blockNonDigits = (e: React.KeyboardEvent<HTMLInputElement>) => {
 };
 
 export const RegisterForm = () => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get('redirect');
   const { mutate: register_, isPending, error } = useRegister();
@@ -46,7 +45,9 @@ const onSubmit = (data: RegisterFormValues) => {
          const url = new URL(redirectUrl, window.location.origin);
          pendingPlanCode = url.searchParams.get('plan') ?? undefined;
          pendingBillingCycle = url.searchParams.get('billing') ?? undefined;
-       } catch { /* ignore malformed redirect URL */ }
+       } catch (err) {
+         console.warn('Invalid redirect URL, plan/billing context lost:', redirectUrl, err);
+       }
      }
      const { acceptedTerms: _, ...submitData } = {
        ...data,

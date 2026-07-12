@@ -4,7 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import { getStripePriceId, PlanId, BillingCycle } from '../utils/stripePriceMap';
 import apiClient from '../../../infrastructure/api/client';
-import { useAuth } from '../../../shared/context/AuthContext';
+
 import { SubscriptionConsentCheckbox } from '../components/SubscriptionConsentCheckbox';
 import { useTranslation } from 'react-i18next';
 
@@ -65,8 +65,8 @@ export const CheckoutPage = () => {
       navigate('/plans');
     }
   };
-
   const { user } = useAuth();
+  const backLink = getBackLink(source);
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState<boolean>(false);
   const [consentData, setConsentData] = useState<{ timestamp: string; userAgent: string } | null>(null);

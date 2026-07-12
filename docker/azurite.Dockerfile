@@ -1,13 +1,24 @@
 FROM node:20-alpine
 
-# Install Azurite globally via npm
-RUN npm install -g azurite@3.30.0
+# Pin Azurite to an exact version for reproducible builds
+RUN npm install -g azurite@3.30.0 --no-fund --no-audit
 
-# Create and set the data directory
+# Create a dedicated non-root user
+RUN addgroup --system azurite && adduser --system --ingroup azurite azurite
+
+# Persistent data directory with correct ownership
+RUN mkdir -p /data && chown azurite:azurite /data
+
 WORKDIR /data
 
-# Expose default Azurite ports
+USER azurite
+
+# Blob / Queue / Table ports
 EXPOSE 10000 10001 10002
 
-# Run Azurite and bind to 0.0.0.0 so it can be accessed from outside the container
-CMD ["azurite", "--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--location", "/data"]
+CMD ["azurite", \
+     "--blobHost",  "0.0.0.0", \
+     "--queueHost", "0.0.0.0", \
+     "--tableHost", "0.0.0.0", \
+     "--location",  "/data", \
+     "--loose"]

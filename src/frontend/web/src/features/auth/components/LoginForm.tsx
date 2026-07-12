@@ -48,6 +48,7 @@ export const LoginForm = () => {
       }
     } catch (err: any) {
       setError(new Error(err?.message || "Error de autenticación. Verifique sus credenciales."));
+    } finally {
       setIsPending(false);
     }
   };

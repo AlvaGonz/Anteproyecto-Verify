@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import apiClient from '../../../infrastructure/api/client'
 import { useAuth } from '../../../shared/context/AuthContext'
 import { resolvePostCheckoutState } from '../utils/postCheckoutResolver'
-import { normalizePlanKey, PLAN_CAPABILITIES } from '../utils/planCapabilities'
 type PageStatus = 'loading' | 'success' | 'error'
 
 // Module-level — never persisted to disk, cleared on full navigation
@@ -12,23 +11,26 @@ const _processedSessions = new Set<string>()
 
 export const CheckoutReturnPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  // HashRouter does not expose query params from the real URL path.
-  // Stripe appends ?session_id= to the real URL (before the #), so
-  // we must read it from window.location.search directly.
-  const rawSearch = window.location.search;
-  const rawParams = new URLSearchParams(rawSearch);
+  // HashRouter puts query params in the hash, not window.location.search.
+  // URL: http://localhost:3000/#/checkout/return?session_id=xxx
+  // window.location.search = "" (empty)
+  // window.location.hash = "#/checkout/return?session_id=xxx"
+  const rawHash = window.location.hash;
+  const hashSearch = rawHash.includes('?') ? rawHash.split('?')[1] : '';
+  const hashParams = new URLSearchParams(hashSearch);
   
   // Use a ref to store the initial sessionId so it survives URL cleanup
   const initialSessionIdRef = useRef<string | null>(
     searchParams.get('session_id') ??
-    rawParams.get('session_id') ??
+    hashParams.get('session_id') ??
     searchParams.get('sessionId') ??
-    rawParams.get('sessionId')
+    hashParams.get('sessionId')
   );
   const sessionId = initialSessionIdRef.current;
   
   // Keep source parameter for returning to previous tab
-  const source = searchParams.get('source') ?? rawParams.get('source');
+  const source = searchParams.get('source') ?? rawParams.get('source') ?? hashParams.get('source');
+  const backLink = source === 'settings' ? '/admin/settings' : '/plans';
   const navigate = useNavigate()
 
   const handleBack = () => {
@@ -47,22 +49,33 @@ export const CheckoutReturnPage = () => {
   const [status, setStatus] = useState<PageStatus>('loading')
 
   useEffect(() => {
+    // ponytail: use local flag (not shared ref) to prevent StrictMode double-mount
+    // race: each effect instance has its OWN `mounted`, so mount 1's cleanup sets
+    // mount 1's flag to false, and mount 2's verify can only see mount 2's flag.
+    let mounted = true;
     let timeoutId: ReturnType<typeof setTimeout>;
     let isPolling = true;
 
+    const safeStatus = (s: PageStatus) => { if (mounted) setStatus(s) }
+    const safeNavigate = (to: string, opts?: any) => { if (mounted) navigate(to, opts) }
+
     if (!sessionId) {
-      setStatus('error');
+      safeStatus('error');
     } else {
       // Immediately remove session_id from browser history to prevent
       // it appearing in Referrer headers or server access logs (OWASP A05)
       try {
-        const newUrl = new URL(window.location.href, window.location.origin !== 'null' ? window.location.origin : 'http://localhost');
-        if (newUrl.searchParams.has('session_id') || newUrl.searchParams.has('sessionId')) {
-          newUrl.searchParams.delete('session_id');
-          newUrl.searchParams.delete('sessionId');
-          // In some test environments newUrl.toString() forces the base URL. 
-          // newUrl.pathname + newUrl.search + newUrl.hash is safer for relative replacements.
-          window.history.replaceState({}, '', newUrl.pathname + newUrl.search + newUrl.hash);
+        // In HashRouter, session_id is in the hash, not search
+        const hash = window.location.hash;
+        const hashPath = hash.includes('?') ? hash.split('?')[0] : hash;
+        const hashSearch = hash.includes('?') ? hash.split('?')[1] : '';
+        const hashParams = new URLSearchParams(hashSearch);
+        
+        if (hashParams.has('session_id') || hashParams.has('sessionId')) {
+          hashParams.delete('session_id');
+          hashParams.delete('sessionId');
+          const newHash = hashPath + (hashParams.toString() ? '?' + hashParams.toString() : '');
+          window.history.replaceState({}, '', newHash);
         }
       } catch (e) {
         // Ignore parsing errors in test environments
@@ -76,16 +89,21 @@ export const CheckoutReturnPage = () => {
 
       const verify = async () => {
         // Idempotency guard — prevents re-processing on hot-reload / StrictMode
+        // race: each effect instance has its OWN `mounted`, so mount 1's cleanup sets
+        // mount 1's flag to false, and mount 2's verify can only see mount 2's flag.
         if (_processedSessions.has(sessionId)) {
           // Already processed — navigate directly without calling API again
-          navigate('/admin/dashboard', { replace: true })
+          console.log('[CheckoutReturn] Session already processed, navigating to dashboard');
+          safeNavigate('/admin/dashboard', { replace: true })
           return
         }
 
         try {
+          console.log('[CheckoutReturn] Verifying session:', sessionId);
           const { data } = await apiClient.get(
             `/v1/subscriptions/session-status?sessionId=${sessionId}`
           )
+          console.log('[CheckoutReturn] Session status response:', data);
 
           let state = resolvePostCheckoutState({
             sessionStatus: data.status,
@@ -93,21 +111,23 @@ export const CheckoutReturnPage = () => {
             sessionPlan: data.plan ?? undefined,
             userPlanName: user?.plan ?? undefined
           });
+          console.log('[CheckoutReturn] Initial state:', state, { sessionStatus: data.status, userSubscriptionStatus: user?.subscriptionStatus, sessionPlan: data.plan, userPlanName: user?.plan });
 
           if (state === 'error') {
-            setStatus('error')
+            safeStatus('error')
             return
           }
 
           if (state === 'checkout') {
-            navigate('/checkout', { replace: true })
+            safeNavigate('/checkout', { replace: true })
             return
           }
 
           // Polling control
           let attempts = 0;
-          while (state === 'pending_confirmation' && attempts < 15 && isPolling) {
+          while (state === 'pending_confirmation' && attempts < 15 && mounted && isPolling) {
             attempts++;
+            console.log('[CheckoutReturn] Polling attempt:', attempts);
             await new Promise(resolve => {
               timeoutId = setTimeout(resolve, 2000);
             });
@@ -122,6 +142,7 @@ export const CheckoutReturnPage = () => {
             const statusRes = await apiClient.get('/v1/subscriptions/my-status');
             const latestStatus = statusRes.data.subscriptionStatus;
             const latestPlan = statusRes.data.plan;
+            console.log('[CheckoutReturn] Polling - latest status:', latestStatus, 'latest plan:', latestPlan);
 
             state = resolvePostCheckoutState({
               sessionStatus: data.status,
@@ -129,6 +150,7 @@ export const CheckoutReturnPage = () => {
               sessionPlan: data.plan ?? undefined,
               userPlanName: latestPlan ?? undefined
             });
+            console.log('[CheckoutReturn] Polling - new state:', state);
           }
 
           if (state !== 'dashboard') {
@@ -158,28 +180,25 @@ export const CheckoutReturnPage = () => {
 
             if (state !== 'dashboard') {
               // Could not verify active subscription after polling and sync fallback
-              setStatus('error');
+              safeStatus('error');
               return;
             }
           }
 
+          // Guard with mounted FIRST — prevents mount 1's stale verify (StrictMode)
+          // from setting redirectedRef or _processedSessions, which would cause
+          // mount 2 to bail out without navigating (redirectedRef already true)
+          if (!mounted) return
           if (redirectedRef.current) return
           redirectedRef.current = true
 
-          const planKey = normalizePlanKey(data.plan ?? data.planName ?? null)
-          const capabilities = PLAN_CAPABILITIES[planKey]
-
-          navigate('/admin/dashboard', {
-            replace: true,
-            state: {
-              planJustActivated: true,
-              activatedPlan: capabilities,
-            },
-          })
+          // Fix: use safeNavigate (react-router navigate) instead of window.location.href
+          // to avoid pathname contamination in HashRouter (#/admin/dashboard not /admin/dashboard#/admin/dashboard)
+          safeNavigate('/admin/dashboard', { replace: true })
           _processedSessions.add(sessionId)
 
         } catch {
-          setStatus('error')
+          safeStatus('error')
         }
       }
 
@@ -187,6 +206,7 @@ export const CheckoutReturnPage = () => {
     }
 
     return () => {
+      mounted = false
       isPolling = false;
       if (timeoutId) clearTimeout(timeoutId);
     }

@@ -27,7 +27,7 @@ export const useMarkAsRead = () => {
       });
       return { previousNotifications };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousNotifications) {
         qc.setQueryData(["notifications", true], context.previousNotifications);
       }
@@ -48,7 +48,7 @@ export const useMarkAllAsRead = () => {
       qc.setQueryData(["notifications", true], []);
       return { previousNotifications };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousNotifications) {
         qc.setQueryData(["notifications", true], context.previousNotifications);
       }

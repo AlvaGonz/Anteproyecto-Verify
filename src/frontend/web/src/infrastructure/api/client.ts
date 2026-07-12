@@ -9,6 +9,7 @@ const instance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
+  timeout: 15000, // 15 second timeout to prevent hanging requests
 });
 
 // Request interceptor — attach JWT from memory (NOT localStorage)

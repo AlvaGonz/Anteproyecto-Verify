@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const API_URL = 'http://localhost:5000/api';
 
 test.describe('01 - Register Flow', () => {
-  const uniqueEmail = `testuser_${Date.now()}@example.com`;
+  const uniqueEmail = `testuser_${Date.now()}_${Math.random().toString(36).slice(2, 9)}@example.com`;
   const validPassword = 'Password123!';
   const validUserData = {
     nombre: 'Test',
@@ -14,7 +14,7 @@ test.describe('01 - Register Flow', () => {
   };
 
   test('Happy Path - Should register a new user successfully', async ({ request }) => {
-    const uniqueEmail = `testuser_${Date.now()}@example.com`;
+    const uniqueEmail = `testuser_${Date.now()}_${Math.random().toString(36).slice(2, 9)}@example.com`;
     const validUserData = {
       nombre: 'Test',
       apellidos: 'User',
@@ -33,7 +33,7 @@ test.describe('01 - Register Flow', () => {
   });
 
   test('Edge Case - Should reject duplicate email', async ({ request }) => {
-    const uniqueEmail = `testuser_${Date.now()}@example.com`;
+    const uniqueEmail = `testuser_${Date.now()}_${Math.random().toString(36).slice(2, 9)}@example.com`;
     const validUserData = {
       nombre: 'Test',
       apellidos: 'User',

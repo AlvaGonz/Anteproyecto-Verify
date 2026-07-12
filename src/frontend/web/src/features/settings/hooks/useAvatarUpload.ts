@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useUploadAvatar } from '../api/useSettings';
 import { useToast } from '../../../shared/components/ui/Toast/ToastContext';
 import { z } from 'zod';

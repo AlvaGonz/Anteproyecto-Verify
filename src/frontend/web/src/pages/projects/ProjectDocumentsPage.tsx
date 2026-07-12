@@ -50,7 +50,7 @@ const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDt
             <RequirementUploadRow
               key={doc.id}
               projectId={projectId}
-              requirementCode={doc.categoryLabel} // Using categoryLabel as requirementCode for now
+              requirementCode={doc.id}
               label={doc.label}
               description={doc.description}
               categoryLabel={doc.categoryLabel}

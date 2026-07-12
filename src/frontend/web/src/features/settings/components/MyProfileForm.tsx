@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateProfileSchema, UpdateProfileDto } from "../../auth/schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
-import { useUpdateMyProfile, useUploadAvatar } from "../api/useSettings";
+import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase } from "lucide-react";
@@ -100,7 +100,7 @@ export const MyProfileForm: React.FC = () => {
     }
   }, [user, reset]);
 
-  const changePassword = watch("changePassword");
+  watch("changePassword");
 
   const togglePasswordSection = () => {
     const next = !showPasswordSection;

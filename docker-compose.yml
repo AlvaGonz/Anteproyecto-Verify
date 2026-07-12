@@ -21,7 +21,7 @@ services:
       - ConnectionStrings__DefaultConnection=$ConnectionStrings__DockerConnection
     env_file:
       - .env
-    entrypoint: ["dotnet", "run", "--urls", "http://0.0.0.0:8080"]
+    entrypoint: ["dotnet", "Api.dll", "--urls", "http://0.0.0.0:8080"]
     restart: unless-stopped
     depends_on:
       sqlserver:
@@ -45,8 +45,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/frontend/web:/app/src/frontend/web
-      - /app/src/frontend/web/node_modules
-      - /app/node_modules
     environment:
       - VITE_WATCH_POLLING=true
     env_file:
@@ -54,10 +52,10 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
           cpus: "1.0"
         reservations:
-          memory: 256M
+          memory: 512M
 
   sqlserver:
     build:
@@ -76,10 +74,10 @@ services:
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "test -f /tmp/db_ready && /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '$DB_PASSWORD' -Q 'SELECT 1' -C" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 45s
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 60s
     deploy:
       resources:
         limits:
