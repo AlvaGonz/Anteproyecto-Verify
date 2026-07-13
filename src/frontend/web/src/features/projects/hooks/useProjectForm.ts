@@ -215,6 +215,36 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   // RI iframe ref (for postMessage targeting)
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Map Search State
+  const [mapSearchText, setMapSearchText] = useState("");
+
+  const handleSearchCoordinates = useCallback(() => {
+    const map = leafletMapRef.current;
+    if (!map || !mapSearchText.trim()) return;
+
+    // Parse lat, lng from mapSearchText (e.g. "18.47186, -69.93988")
+    const match = mapSearchText.match(/([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+)/);
+    if (match) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+
+      map.flyTo([lat, lng], 13, { duration: 1.2 });
+      
+      setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
+
+      const randomParcel = Math.floor(Math.random() * 500) + 1;
+      const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+      const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
+      setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+
+      if (markerRef.current) {
+        markerRef.current.setLatLng([lat, lng]);
+      } else {
+        markerRef.current = L.marker([lat, lng]).addTo(map);
+      }
+    }
+  }, [mapSearchText]);
+
   // Keep a ref to the latest ubicacionTexto so the postMessage listener
   // always has the current province without needing to re-register
   const ubicacionTextoRef = useRef(ubicacionTexto);
@@ -404,6 +434,9 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     onCancel,
     onDelete,
     handleSubmit,
+    mapSearchText,
+    setMapSearchText,
+    handleSearchCoordinates,
     // Grouped field props
     basicFields: {
       provincias: PROVINCIAS,
