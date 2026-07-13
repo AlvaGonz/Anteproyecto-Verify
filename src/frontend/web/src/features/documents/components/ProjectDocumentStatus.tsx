@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
 import { useDocuments } from "../api/useDocuments";
 import { 
@@ -61,7 +61,9 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
   const verifiedDocs = documents.filter(d => d.estadoDocumento === DocumentStatus.Valid && requiredTypes.includes(d.tipoDocumento));
   
   const missingCount = requiredTypes.length - uploadedDocs.length;
-  const progressPercent = Math.round((verifiedDocs.length / requiredTypes.length) * 100);
+  const progressPercent = requiredTypes.length > 0 
+    ? Math.round((uploadedDocs.length / requiredTypes.length) * 100) 
+    : 100;
 
   const renderDocItem = (typeId: number, index: number) => {
     const info = DOCUMENT_INFO[typeId];
