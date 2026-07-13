@@ -87,21 +87,37 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const [ipi, setIpi] = useState(initialData?.ipi ?? "");
   const [estatusIpi, setEstatusIpi] = useState(initialData?.estatusIpi ?? "");
 
+  // ── Image URLs State ───────────────────────────────────────────────────────
+  const [imagenUrl, setImagenUrl] = useState(initialData?.imagenUrl ?? "");
+  const [imagenAdicional1, setImagenAdicional1] = useState(initialData?.imagenAdicional1 ?? "");
+  const [imagenAdicional2, setImagenAdicional2] = useState(initialData?.imagenAdicional2 ?? "");
+  const [imagenAdicional3, setImagenAdicional3] = useState(initialData?.imagenAdicional3 ?? "");
+  const [imagenAdicional4, setImagenAdicional4] = useState(initialData?.imagenAdicional4 ?? "");
+  const [imagenAdicional5, setImagenAdicional5] = useState(initialData?.imagenAdicional5 ?? "");
+
   // ── Constantes de fotos ────────────────────────────────────────────────────
   const MAX_FILE_SIZE_MB = 5;
   const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
   const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   // ── Estado de fotos ────────────────────────────────────────────────────────
-  const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
-  const [gallery, setGallery] = useState<File[]>([]);
-  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [portraitPreview, setPortraitPreview] = useState<string | null>(initialData?.imagenUrl ?? null);
+
+  const initialAdditionalUrls = [
+    initialData?.imagenAdicional1,
+    initialData?.imagenAdicional2,
+    initialData?.imagenAdicional3,
+    initialData?.imagenAdicional4,
+    initialData?.imagenAdicional5
+  ].filter(Boolean) as string[];
+
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>(initialAdditionalUrls);
   const [fotosError, setFotosError] = useState<string | null>(null);
+  const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
 
   const portraitInputRef = useRef<HTMLInputElement>(null);
-  const portraitRef = useRef<File | null>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const existingFotoUrls: string[] = initialData?.fotoUrls ?? (initialData && 'imagenUrl' in initialData && initialData.imagenUrl ? [initialData.imagenUrl as string] : []);
+  const existingFotoUrls: string[] = [];
 
   // ── Estado de superficie ───────────────────────────────────────────────────
   const [superficieM2, setSuperficieM2] = useState<number | "">(initialData?.superficieM2 ?? "");
@@ -138,7 +154,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   }, [rncDesarrollador]);
 
   // ── Photo Handlers ─────────────────────────────────────────────────────────
-  const handlePortraitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePortraitChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setFotosError(null);
     const file = e.target.files?.[0];
     if (!file) return;
@@ -150,23 +166,33 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setFotosError(`La imagen supera ${MAX_FILE_SIZE_MB} MB.`);
       return;
     }
-    if (portraitPreview) URL.revokeObjectURL(portraitPreview);
-    portraitRef.current = file;
-    setPortraitPreview(URL.createObjectURL(file));
-    if (portraitInputRef.current) portraitInputRef.current.value = "";
+
+    setIsUploadingPhotos(true);
+    try {
+      const res = await projectsApi.uploadProjectImage(file);
+      if (res._tag === "Success") {
+        setImagenUrl(res.data);
+        setPortraitPreview(res.data);
+      } else {
+        setFotosError("Error al subir la foto de portada.");
+      }
+    } catch (err) {
+      setFotosError("Error al subir la foto de portada.");
+    } finally {
+      setIsUploadingPhotos(false);
+      if (portraitInputRef.current) portraitInputRef.current.value = "";
+    }
   };
 
   const removePortrait = () => {
-    if (portraitPreview) URL.revokeObjectURL(portraitPreview);
-    portraitRef.current = null;
+    setImagenUrl("");
     setPortraitPreview(null);
   };
 
-  const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setFotosError(null);
     const selected = Array.from(e.target.files ?? []);
-    const existingGalleryCount = existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0;
-    const remaining = 5 - gallery.length - existingGalleryCount;
+    const remaining = 5 - galleryPreviews.length;
 
     if (selected.length > remaining) {
       setFotosError(`Solo puedes agregar ${remaining} foto${remaining !== 1 ? "s" : ""} más.`);
@@ -182,16 +208,59 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setFotosError(`"${oversized.name}" supera ${MAX_FILE_SIZE_MB} MB.`);
       return;
     }
-    const newGallery = [...gallery, ...selected];
-    setGallery(newGallery);
-    setGalleryPreviews([...galleryPreviews, ...selected.map((f) => URL.createObjectURL(f))]);
-    if (galleryInputRef.current) galleryInputRef.current.value = "";
+
+    setIsUploadingPhotos(true);
+    try {
+      const uploadPromises = selected.map(file => projectsApi.uploadProjectImage(file));
+      const results = await Promise.all(uploadPromises);
+
+      const uploadedUrls: string[] = [];
+      results.forEach((res, idx) => {
+        if (res._tag === "Success") {
+          uploadedUrls.push(res.data);
+        } else {
+          console.error("Error uploading gallery image", selected[idx].name);
+        }
+      });
+
+      if (uploadedUrls.length < selected.length) {
+        setFotosError("Algunas fotos no se pudieron subir.");
+      }
+
+      const currentUrls = [imagenAdicional1, imagenAdicional2, imagenAdicional3, imagenAdicional4, imagenAdicional5];
+      let uploadedIdx = 0;
+      for (let i = 0; i < 5; i++) {
+        if (!currentUrls[i] && uploadedIdx < uploadedUrls.length) {
+          currentUrls[i] = uploadedUrls[uploadedIdx++];
+        }
+      }
+
+      setImagenAdicional1(currentUrls[0] || "");
+      setImagenAdicional2(currentUrls[1] || "");
+      setImagenAdicional3(currentUrls[2] || "");
+      setImagenAdicional4(currentUrls[3] || "");
+      setImagenAdicional5(currentUrls[4] || "");
+
+      setGalleryPreviews(currentUrls.filter(Boolean) as string[]);
+    } catch (err) {
+      setFotosError("Error al subir las fotos.");
+    } finally {
+      setIsUploadingPhotos(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
+    }
   };
 
   const removeGalleryPhoto = (idx: number) => {
-    URL.revokeObjectURL(galleryPreviews[idx]);
-    setGallery((prev) => prev.filter((_, i) => i !== idx));
-    setGalleryPreviews((prev) => prev.filter((_, i) => i !== idx));
+    const updatedPreviews = galleryPreviews.filter((_, i) => i !== idx);
+    const padded = [...updatedPreviews, "", "", "", "", ""].slice(0, 5);
+
+    setImagenAdicional1(padded[0]);
+    setImagenAdicional2(padded[1]);
+    setImagenAdicional3(padded[2]);
+    setImagenAdicional4(padded[3]);
+    setImagenAdicional5(padded[4]);
+
+    setGalleryPreviews(updatedPreviews);
   };
 
   // Limpiar object URLs al desmontar
@@ -238,14 +307,19 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
       try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        setDesignacionCatastral(catastroData.designacionCatastral || "");
-        setMatricula(catastroData.matricula || "");
-        setSuperficieM2(catastroData.superficieM2 || "");
-        setPropietario(catastroData.propietario || "");
-        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-        setIpi(catastroData.ipi || "");
-        setEstatusIpi(catastroData.estatusIpi || "");
+        const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
+        if (result._tag === "Success") {
+          const catastroData = result.data;
+          setDesignacionCatastral(catastroData.designacionCatastral || "");
+          setMatricula(catastroData.matricula || "");
+          setSuperficieM2(catastroData.superficieM2 || "");
+          setPropietario(catastroData.propietario || "");
+          setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+          setIpi(catastroData.ipi || "");
+          setEstatusIpi(catastroData.estatusIpi || "");
+        } else {
+          throw new Error("No data found");
+        }
       } catch (error) {
         console.error("No catastro data found:", error);
         // Fallback for demo purposes if no real data is found
@@ -288,14 +362,19 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
       try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        setDesignacionCatastral(catastroData.designacionCatastral || "");
-        setMatricula(catastroData.matricula || "");
-        setSuperficieM2(catastroData.superficieM2 || "");
-        setPropietario(catastroData.propietario || "");
-        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-        setIpi(catastroData.ipi || "");
-        setEstatusIpi(catastroData.estatusIpi || "");
+        const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
+        if (result._tag === "Success") {
+          const catastroData = result.data;
+          setDesignacionCatastral(catastroData.designacionCatastral || "");
+          setMatricula(catastroData.matricula || "");
+          setSuperficieM2(catastroData.superficieM2 || "");
+          setPropietario(catastroData.propietario || "");
+          setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+          setIpi(catastroData.ipi || "");
+          setEstatusIpi(catastroData.estatusIpi || "");
+        } else {
+          throw new Error("No data found");
+        }
       } catch (error) {
         console.error("No catastro data found:", error);
         const randomParcel = Math.floor(Math.random() * 500) + 1;
@@ -411,7 +490,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     setError(null);
     try {
       if (initialData) {
-        const updateData: UpdateProyectoDto & { fotosNuevas?: File[] } = {
+        const updateData: UpdateProyectoDto = {
           nombre,
           ubicacionTexto,
           ubicacionGps: ubicacionGps || undefined,
@@ -426,11 +505,16 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           cedulaRncPropietario: cedulaRncPropietario || undefined,
           ipi: ipi || undefined,
           estatusIpi: estatusIpi || undefined,
-          fotosNuevas: portraitRef.current ? [portraitRef.current, ...gallery] : gallery.length > 0 ? gallery : undefined,
+          imagenUrl: imagenUrl || undefined,
+          imagenAdicional1: imagenAdicional1 || undefined,
+          imagenAdicional2: imagenAdicional2 || undefined,
+          imagenAdicional3: imagenAdicional3 || undefined,
+          imagenAdicional4: imagenAdicional4 || undefined,
+          imagenAdicional5: imagenAdicional5 || undefined,
         };
         await onSubmit(updateData);
       } else {
-        const createData: CreateProyectoDto & { fotosNuevas?: File[] } = {
+        const createData: CreateProyectoDto = {
           nombre,
           ubicacionTexto,
           usuarioCreadorId: user?.id ?? "00000000-0000-0000-0000-000000000000",
@@ -445,7 +529,12 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           cedulaRncPropietario: cedulaRncPropietario || undefined,
           ipi: ipi || undefined,
           estatusIpi: estatusIpi || undefined,
-          fotosNuevas: portraitRef.current ? [portraitRef.current, ...gallery] : gallery.length > 0 ? gallery : undefined,
+          imagenUrl: imagenUrl || undefined,
+          imagenAdicional1: imagenAdicional1 || undefined,
+          imagenAdicional2: imagenAdicional2 || undefined,
+          imagenAdicional3: imagenAdicional3 || undefined,
+          imagenAdicional4: imagenAdicional4 || undefined,
+          imagenAdicional5: imagenAdicional5 || undefined,
         };
         await onSubmit(createData);
       }
@@ -456,7 +545,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     }
   };
 
-  const isSaveDisabled = !nombre.trim() || !ubicacionTexto.trim() || isSubmitting;
+  const isSaveDisabled = !nombre.trim() || !ubicacionTexto.trim() || isSubmitting || isUploadingPhotos;
 
   return {
     // Layout-level props
@@ -495,7 +584,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     documentSection: {
       portraitPreview, handlePortraitChange, removePortrait, portraitInputRef,
       existingFotoUrls,
-      gallery, galleryPreviews, handleGalleryChange, removeGalleryPhoto,
+      gallery: [] as File[], galleryPreviews, handleGalleryChange, removeGalleryPhoto,
       galleryInputRef, fotosError,
     } as const,
   };

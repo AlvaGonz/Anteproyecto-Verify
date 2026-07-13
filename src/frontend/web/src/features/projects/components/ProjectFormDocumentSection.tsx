@@ -137,11 +137,8 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
 
           {/* Previews de galería nuevas */}
           {galleryPreviews.map((preview, idx) => (
-            <div key={`preview-${preview}`} className="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-dashed border-teal-300">
+            <div key={`preview-${preview}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
               <img src={preview} alt={`Nueva foto ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
-              <div className="absolute bottom-0 inset-x-0 bg-teal-500/80 text-white text-[9px] font-black uppercase tracking-wider text-center py-0.5">
-                Por subir
-              </div>
               <button
                 type="button"
                 onClick={() => removeGalleryPhoto(idx)}

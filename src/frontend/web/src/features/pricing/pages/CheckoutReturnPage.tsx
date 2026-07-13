@@ -29,8 +29,7 @@ export const CheckoutReturnPage = () => {
   const sessionId = initialSessionIdRef.current;
   
   // Keep source parameter for returning to previous tab
-  const source = searchParams.get('source') ?? rawParams.get('source') ?? hashParams.get('source');
-  const backLink = source === 'settings' ? '/admin/settings' : '/plans';
+  const source = searchParams.get('source') ?? hashParams.get('source');
   const navigate = useNavigate()
 
   const handleBack = () => {

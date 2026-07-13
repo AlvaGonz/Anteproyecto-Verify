@@ -106,5 +106,18 @@ export const projectsApi = {
     } catch (error: any) {
       return failure(mapError(error));
     }
+  },
+
+  async uploadProjectImage(file: File): Promise<Result<string, ProjectError>> {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await apiClient.post<{ url: string }>("/projects/upload-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      return success(response.data.url);
+    } catch (error: any) {
+      return failure(mapError(error));
+    }
   }
 };

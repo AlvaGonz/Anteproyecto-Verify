@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import { getStripePriceId, PlanId, BillingCycle } from '../utils/stripePriceMap';
@@ -65,8 +65,6 @@ export const CheckoutPage = () => {
       navigate('/plans');
     }
   };
-  const { user } = useAuth();
-  const backLink = getBackLink(source);
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState<boolean>(false);
   const [consentData, setConsentData] = useState<{ timestamp: string; userAgent: string } | null>(null);

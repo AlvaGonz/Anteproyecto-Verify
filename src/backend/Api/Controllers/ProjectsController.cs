@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Common.Exceptions;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Application.Abstractions.Storage;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -22,11 +24,13 @@ public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _projectService;
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IBlobStorageService _blobStorageService;
 
-    public ProjectsController(IProjectService projectService, IUsuarioRepository usuarioRepository)
+    public ProjectsController(IProjectService projectService, IUsuarioRepository usuarioRepository, IBlobStorageService blobStorageService)
     {
         _projectService = projectService;
         _usuarioRepository = usuarioRepository;
+        _blobStorageService = blobStorageService;
     }
 
     [HttpGet]
@@ -136,6 +140,37 @@ public class ProjectsController : ControllerBase
         catch (KeyNotFoundException)
         {
             return NotFound();
+        }
+    }
+
+    [HttpPost("upload-image")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UploadImage(IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("El archivo es requerido y no puede estar vacío.");
+
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+        var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (Array.IndexOf(allowedExtensions, extension) < 0)
+            return BadRequest("Tipo de archivo no permitido (solo JPEG, PNG y WebP).");
+
+        if (file.Length > 5 * 1024 * 1024) // 5MB limit
+            return BadRequest("El archivo excede el tamaño máximo permitido (5MB).");
+
+        using var stream = file.OpenReadStream();
+        var blobName = $"project-images/{Guid.NewGuid()}{extension}";
+        
+        try
+        {
+            var url = await _blobStorageService.UploadAsync(stream, blobName, file.ContentType, cancellationToken);
+            return Ok(new { url });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error al subir la imagen: {ex.Message}");
         }
     }
 }

@@ -17,5 +17,11 @@ public record UpdateProyectoDto(
     string? CedulaRncPropietario,
     string? Ipi,
     string? EstatusIpi,
-    decimal? SuperficieM2
+    decimal? SuperficieM2,
+    string? ImagenUrl = null,
+    string? ImagenAdicional1 = null,
+    string? ImagenAdicional2 = null,
+    string? ImagenAdicional3 = null,
+    string? ImagenAdicional4 = null,
+    string? ImagenAdicional5 = null
 );

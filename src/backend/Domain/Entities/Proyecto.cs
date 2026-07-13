@@ -19,6 +19,11 @@ public class Proyecto : EntityBase
     public string? DesignacionCatastral { get; private set; }
     public string? Ipi { get; private set; }
     public string? ImagenUrl { get; private set; }
+    public string? ImagenAdicional1 { get; private set; }
+    public string? ImagenAdicional2 { get; private set; }
+    public string? ImagenAdicional3 { get; private set; }
+    public string? ImagenAdicional4 { get; private set; }
+    public string? ImagenAdicional5 { get; private set; }
     public string? IdentificacionCatastral => DesignacionCatastral;
     public string? Propietario { get; private set; }
     public string? CedulaRncPropietario { get; private set; }
@@ -46,7 +51,7 @@ public class Proyecto : EntityBase
 
     private Proyecto() { } // For EF Core
 
-    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, ProjectCategory categoria = ProjectCategory.Residencial, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null)
+    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, ProjectCategory categoria = ProjectCategory.Residencial, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -63,13 +68,19 @@ public class Proyecto : EntityBase
         Ipi = ipi;
         EstatusIpi = estatusIpi;
         SuperficieM2 = superficieM2;
+        ImagenUrl = imagenUrl;
+        ImagenAdicional1 = img1;
+        ImagenAdicional2 = img2;
+        ImagenAdicional3 = img3;
+        ImagenAdicional4 = img4;
+        ImagenAdicional5 = img5;
         CodigoInterno = GenerateCode();
         EstadoProyecto = ProjectStatus.Draft;
         EstatusDescripcion = GetEstatusDescripcion(EstadoProyecto);
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
-    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, ProjectCategory categoria, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null)
+    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, ProjectCategory categoria, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -86,6 +97,12 @@ public class Proyecto : EntityBase
         Ipi = ipi;
         EstatusIpi = estatusIpi;
         SuperficieM2 = superficieM2;
+        ImagenUrl = imagenUrl;
+        ImagenAdicional1 = img1;
+        ImagenAdicional2 = img2;
+        ImagenAdicional3 = img3;
+        ImagenAdicional4 = img4;
+        ImagenAdicional5 = img5;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

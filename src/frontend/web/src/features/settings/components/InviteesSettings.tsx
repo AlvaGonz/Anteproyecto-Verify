@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRemoveInvitee } from "../api/useSettings";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
-import { Users, UserPlus, UserMinus, Shield } from "lucide-react";
+import { Users, UserPlus, UserMinus } from "lucide-react";
 import { InviteUserModal } from "./InviteUserModal";
 
 export const InviteesSettings: React.FC = () => {

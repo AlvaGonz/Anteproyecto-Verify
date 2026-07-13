@@ -13,7 +13,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { FileText, ShieldCheck, ClipboardList, ArrowRight } from "lucide-react";
 
 const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
   if (!data) {
@@ -86,22 +85,13 @@ export const ProjectManagePage: React.FC = () => {
           throw new Error("Missing required field: categoria");
         }
         await updateMutation.mutateAsync({ id: id as string, payload: data });
-        if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
-          await Promise.all(data.fotosNuevas.map((file: File) => {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("tipoDocumento", "1");
-            return apiClient.post(`/projects/${id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }));
-          qc.invalidateQueries({ queryKey: ["projects"] });
-        }
         addToast("Proyecto actualizado exitosamente", "success");
         navigate("/admin/projects");
       } else {
         if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
           throw new Error("Missing required field: usuarioCreadorId");
         }
-        const newProj = await createMutation.mutateAsync({
+        await createMutation.mutateAsync({
           nombre: data.nombre,
           ubicacionTexto: data.ubicacionTexto || "",
           categoria: data.categoria,
@@ -109,18 +99,20 @@ export const ProjectManagePage: React.FC = () => {
           datosDesarrollador: data.datosDesarrollador,
           rncDesarrollador: data.rncDesarrollador,
           designacionCatastral: data.designacionCatastral,
-          ubicacionGps: data.ubicacionGps
+          ubicacionGps: data.ubicacionGps,
+          matricula: data.matricula,
+          propietario: data.propietario,
+          cedulaRncPropietario: data.cedulaRncPropietario,
+          ipi: data.ipi,
+          estatusIpi: data.estatusIpi,
+          superficieM2: data.superficieM2,
+          imagenUrl: data.imagenUrl,
+          imagenAdicional1: data.imagenAdicional1,
+          imagenAdicional2: data.imagenAdicional2,
+          imagenAdicional3: data.imagenAdicional3,
+          imagenAdicional4: data.imagenAdicional4,
+          imagenAdicional5: data.imagenAdicional5
         });
-        const fotos = (data as any).fotosNuevas as File[];
-        if (fotos && fotos.length > 0) {
-          await Promise.all(fotos.map((file: File) => {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("tipoDocumento", "1");
-            return apiClient.post(`/projects/${newProj.id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }));
-          qc.invalidateQueries({ queryKey: ["projects"] });
-        }
         addToast("Proyecto creado exitosamente", "success");
         navigate("/admin/projects");
       }

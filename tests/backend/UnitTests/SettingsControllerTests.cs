@@ -54,7 +54,8 @@ public class SettingsControllerTests
         using var context = CreateDbContext("Settings_GetUsers_NoCookie");
         var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
         var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
-        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
+        var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
+        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
         SetupControllerContext(controller, null);
 
         // Act
@@ -81,7 +82,8 @@ public class SettingsControllerTests
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
+            var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
             SetupControllerContext(controller, "juan@verifinca.do", "user");
 
             // Act
@@ -120,8 +122,8 @@ public class SettingsControllerTests
             
             // Add legacy view records manually for InMemory testing
             context.UsuariosLegacy.AddRange(
-                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", NombreCompleto = "A A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
-                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", NombreCompleto = "D D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
+                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
+                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
             );
 
             await context.SaveChangesAsync();
@@ -131,7 +133,8 @@ public class SettingsControllerTests
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
+            var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             // Act
@@ -178,8 +181,8 @@ public class SettingsControllerTests
             );
 
             context.UsuariosLegacy.AddRange(
-                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", NombreCompleto = "A A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
-                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", NombreCompleto = "D D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
+                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
+                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
             );
 
             await context.SaveChangesAsync();
@@ -189,7 +192,8 @@ public class SettingsControllerTests
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
+            var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdateRoleRequest { Role = "user" };
@@ -233,8 +237,8 @@ public class SettingsControllerTests
             context.PlanesSuscripcion.Add(PlanSuscripcion.Create(empresaPlanId, "Empresa", 10000.00m, -1, -1, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true));
 
             context.UsuariosLegacy.AddRange(
-                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", NombreCompleto = "A A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
-                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", NombreCompleto = "D D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
+                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
+                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
             );
 
             await context.SaveChangesAsync();
@@ -244,7 +248,8 @@ public class SettingsControllerTests
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
+            var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdatePlanRequest { PlanId = empresaPlanId };

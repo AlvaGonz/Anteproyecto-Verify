@@ -33,7 +33,9 @@ public class CatastroLookupRepository : ICatastroLookupRepository
                 p.Estatus as EstatusIpi
             FROM CatastroTitulo c
             LEFT JOIN PagoIPI p ON c.Rnc = p.Rnc
-            WHERE ROUND(c.Latitud, 6) = @p0 AND ROUND(c.Longitud, 6) = @p1
+            WHERE c.Latitud BETWEEN @p0 - 0.0015 AND @p0 + 0.0015
+              AND c.Longitud BETWEEN @p1 - 0.0015 AND @p1 + 0.0015
+            ORDER BY (ABS(c.Latitud - @p0) + ABS(c.Longitud - @p1)) ASC
         ";
 
         var p0 = command.CreateParameter();

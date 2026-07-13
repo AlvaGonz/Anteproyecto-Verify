@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Api.Controllers;
 using Application.Abstractions.Persistence;
+using Application.Abstractions.Storage;
 using Application.Contracts.Projects;
 using Application.DTOs;
 using Domain.Common;
@@ -23,14 +24,16 @@ namespace UnitTests.Api.Controllers
     {
         private readonly Mock<IProjectService> _mockProjectService;
         private readonly Mock<IUsuarioRepository> _mockUsuarioRepository;
+        private readonly Mock<IBlobStorageService> _mockBlobStorageService;
         private readonly ProjectsController _controller;
 
         public ProjectsControllerTests()
         {
             _mockProjectService = new Mock<IProjectService>();
             _mockUsuarioRepository = new Mock<IUsuarioRepository>();
+            _mockBlobStorageService = new Mock<IBlobStorageService>();
 
-            _controller = new ProjectsController(_mockProjectService.Object, _mockUsuarioRepository.Object)
+            _controller = new ProjectsController(_mockProjectService.Object, _mockUsuarioRepository.Object, _mockBlobStorageService.Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -46,17 +49,25 @@ namespace UnitTests.Api.Controllers
                 "CODE",
                 "Name",
                 "Ubicacion",
-                null,
-                null,
-                null,
+                null, // UbicacionGps
+                null, // ImagenUrl
+                null, // ImagenAdicional1
+                null, // ImagenAdicional2
+                null, // ImagenAdicional3
+                null, // ImagenAdicional4
+                null, // ImagenAdicional5
+                null, // ValorEstimado
                 ProjectCategory.Residencial,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                null, // DatosDesarrollador
+                null, // RncDesarrollador
+                null, // DesignacionCatastral
+                null, // Matricula
+                null, // Propietario
+                null, // CedulaRncPropietario
+                null, // Ipi
+                null, // EstatusIpi
+                null, // SuperficieM2
+                "Borrador", // EstatusDescripcion
                 ProjectStatus.Draft,
                 IntegrityStatus.Valid,
                 usuarioCreadorId,
