@@ -158,7 +158,9 @@ public class AuthController : ControllerBase
                 avatarUrl = responseData.User.AvatarUrl,
                 subscriptionStatus = responseData.User.SubscriptionStatus,
                 pendingPlanCode = responseData.User.PendingPlanCode,
-                pendingBillingCycle = responseData.User.PendingBillingCycle
+                isGuest = responseData.User.IsGuest,
+                inviterPlan = responseData.User.InviterPlan,
+                inviteesList = responseData.User.InviteesList
             }
         });
     }
@@ -313,7 +315,18 @@ public class AuthController : ControllerBase
             SubscriptionStatus = user.SubscriptionStatus ?? "N/A",
             CurrentPeriodEnd = user.CurrentPeriodEnd,
             PendingPlanCode = user.PendingPlanCode,
-            PendingBillingCycle = user.PendingBillingCycle
+            PendingBillingCycle = user.PendingBillingCycle,
+            IsGuest = user.TitularId.HasValue,
+            InviterPlan = user.Titular?.Plan?.NombrePlan,
+            InviteesList = user.MiembrosEquipo
+                .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
+                .Select(m => new {
+                    id = m.Id,
+                    nombre = m.Nombre,
+                    apellido = m.Apellido,
+                    email = m.CorreoElectronico,
+                    estado = !m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")
+                })
         });
     }
 

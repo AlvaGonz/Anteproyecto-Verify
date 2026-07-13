@@ -537,6 +537,25 @@ public class SettingsController : ControllerBase
         return Ok(new { Message = "Usuario invitado removido exitosamente." });
     }
 
+    [HttpDelete("users/invitees/{inviteeId}")]
+    public async Task<IActionResult> RemoveMyInvitee(Guid inviteeId, CancellationToken cancellationToken)
+    {
+        var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+        if (string.IsNullOrWhiteSpace(userEmail)) return Unauthorized();
+
+        var emisor = await _context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == userEmail, cancellationToken);
+        if (emisor == null) return Unauthorized();
+
+        var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId && user.TitularId == emisor.Id, cancellationToken);
+        if (invitee == null) return NotFound(new { Message = "Usuario invitado no encontrado o no pertenece a tu cuenta." });
+
+        invitee.RemoverTitular();
+        invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { Message = "Usuario invitado removido exitosamente." });
+    }
+
     [HttpPost("users/invite")]
     public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request, CancellationToken cancellationToken)
     {

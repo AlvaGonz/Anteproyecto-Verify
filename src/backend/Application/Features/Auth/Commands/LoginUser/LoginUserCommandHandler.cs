@@ -49,6 +49,15 @@ public class LoginUserCommandHandler
             return new LoginUserResultDto(false, "El correo electrónico o la contraseña son incorrectos.", null);
 
         var roleStr = user.Rol == UserRole.Administrator ? "admin" : "user";
+
+        // ponytail: if user was invited (has Titular), load titular's plan for guest display
+        string? inviterPlan = null;
+        if (user.TitularId.HasValue)
+        {
+            var titular = await _usuarioRepository.GetByIdWithPlanAsync(user.TitularId.Value, cancellationToken);
+            inviterPlan = titular?.Plan?.NombrePlan;
+        }
+
         var userDto = new LoginUserUserDto(
             user.Id,
             user.Email,
@@ -57,7 +66,18 @@ public class LoginUserCommandHandler
             user.AvatarUrl,
             user.SubscriptionStatus,
             user.PendingPlanCode,
-            user.PendingBillingCycle
+            user.PendingBillingCycle,
+            IsGuest: user.TitularId.HasValue,
+            InviterPlan: inviterPlan,
+            InviteesList: user.MiembrosEquipo
+                .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
+                .Select(m => new {
+                    id = m.Id,
+                    nombre = m.Nombre,
+                    apellido = m.Apellido,
+                    email = m.CorreoElectronico,
+                    estado = !m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")
+                })
         );
 
         var token = _jwtTokenGenerator.GenerateToken(user);

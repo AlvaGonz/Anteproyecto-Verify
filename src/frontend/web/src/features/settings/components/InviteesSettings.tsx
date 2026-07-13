@@ -53,7 +53,16 @@ export const InviteesSettings: React.FC = () => {
                 <div key={invitee.id} className="bg-white p-4 rounded-xl border border-border shadow-sm flex items-center justify-between">
                   <div>
                     <h4 className="font-bold text-text-primary">{invitee.nombre} {invitee.apellido}</h4>
-                    <p className="text-xs text-text-secondary">{invitee.email}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-xs text-text-secondary">{invitee.email}</p>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        invitee.estado === 'Activo' ? 'bg-green-100 text-green-700' :
+                        invitee.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {invitee.estado}
+                      </span>
+                    </div>
                   </div>
                   <button
                     type="button"

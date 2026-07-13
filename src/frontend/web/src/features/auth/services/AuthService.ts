@@ -33,7 +33,14 @@ export interface User {
   pendingBillingCycle?: string | null;
   // ponytail: guest/inviter fields for subscription display
   isGuest?: boolean;
-  invitedByPlan?: string;
+  inviterPlan?: string;
+  inviteesList?: Array<{
+    id: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+    estado?: string;
+  }>;
 }
 
 export interface AuthResponse {

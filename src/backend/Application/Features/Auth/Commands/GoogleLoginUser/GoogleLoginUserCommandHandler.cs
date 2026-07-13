@@ -100,7 +100,18 @@ public class GoogleLoginUserCommandHandler
             user.AvatarUrl,
             user.SubscriptionStatus,
             user.PendingPlanCode,
-            user.PendingBillingCycle
+            user.PendingBillingCycle,
+            IsGuest: user.TitularId.HasValue,
+            InviterPlan: user.Titular?.Plan?.NombrePlan,
+            InviteesList: user.MiembrosEquipo
+                .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
+                .Select(m => new {
+                    id = m.Id,
+                    nombre = m.Nombre,
+                    apellido = m.Apellido,
+                    email = m.CorreoElectronico,
+                    estado = !m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")
+                })
         );
 
         var token = _jwtTokenGenerator.GenerateToken(user);

@@ -26,5 +26,8 @@ public record LoginUserUserDto(
     string? AvatarUrl,
     string? SubscriptionStatus = null,
     string? PendingPlanCode = null,
-    string? PendingBillingCycle = null
+    string? PendingBillingCycle = null,
+    bool IsGuest = false,
+    string? InviterPlan = null,
+    object? InviteesList = null
 );
