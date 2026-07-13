@@ -47,7 +47,7 @@ public record AdminUserSettingsDto(
 /// <summary>
 /// Request DTO for inviting users
 /// </summary>
-public record InviteUserRequest(string Nombre, string Apellido, string Email, string Telefono, string Cedula);
+public record InviteUserRequest(string Nombre, string Apellido, string Email, string Telefono, string Cedula, int? MaxProyectosDelegados = null, int? MaxConsultasDelegadas = null);
 
 /// <summary>
 /// Paginated response wrapper
@@ -624,9 +624,10 @@ public class SettingsController : ControllerBase
             cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
         );
 
-        newUser.ForzarVerificacionEmail();
+        // Do not force email verification here, so the user remains 'Pendiente'
         newUser.AsignarTitular(emisor.Id);
         newUser.UpdateAccountStatus(UserAccountStatus.Invited);
+        newUser.SetDelegatedLimits(request.MaxProyectosDelegados, request.MaxConsultasDelegadas);
 
         _context.Usuarios.Add(newUser);
 
@@ -653,6 +654,24 @@ public class SettingsController : ControllerBase
         }
 
         return Ok(new { Message = "Invitación enviada exitosamente." });
+    }
+
+    [HttpPut("users/invitees/{inviteeId}/limits")]
+    public async Task<IActionResult> UpdateInviteeLimits(Guid inviteeId, [FromBody] UpdateInviteeLimitsRequest request, CancellationToken cancellationToken)
+    {
+        var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+        if (string.IsNullOrWhiteSpace(userEmail)) return Unauthorized();
+
+        var titular = await _context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == userEmail, cancellationToken);
+        if (titular == null) return Unauthorized();
+
+        var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId && user.TitularId == titular.Id, cancellationToken);
+        if (invitee == null) return NotFound(new { Message = "Usuario invitado no encontrado o no pertenece a tu cuenta." });
+
+        invitee.SetDelegatedLimits(request.MaxProyectosDelegados, request.MaxConsultasDelegadas);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { Message = "Límites actualizados exitosamente." });
     }
 
     [HttpGet("profiles")]
@@ -789,6 +808,12 @@ public class UpdateRoleRequest
 public class UpdatePlanRequest
 {
     public Guid PlanId { get; set; }
+}
+
+public class UpdateInviteeLimitsRequest
+{
+    public int? MaxProyectosDelegados { get; set; }
+    public int? MaxConsultasDelegadas { get; set; }
 }
 
 public class CreateUserDto

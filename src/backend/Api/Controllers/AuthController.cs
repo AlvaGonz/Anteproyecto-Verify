@@ -326,7 +326,11 @@ public class AuthController : ControllerBase
                     apellido = m.Apellido,
                     email = m.CorreoElectronico,
                     estado = m.AccountStatus == Domain.Enums.UserAccountStatus.Invited ? "Pendiente" : 
-                             (!m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo"))
+                             (!m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")),
+                    maxProyectosDelegados = m.MaxProyectosDelegados,
+                    maxConsultasDelegadas = m.MaxConsultasDelegadas,
+                    proyectosCreados = m.ProyectosCreados,
+                    consultasUsadas = m.ConsultasUsadas
                 })
         });
     }

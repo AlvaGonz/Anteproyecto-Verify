@@ -12,15 +12,18 @@ public class LoginUserCommandHandler
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IUnitOfWork _unitOfWork;
 
     public LoginUserCommandHandler(
         IUsuarioRepository usuarioRepository,
         IPasswordHasher passwordHasher,
-        IJwtTokenGenerator jwtTokenGenerator)
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUnitOfWork unitOfWork)
     {
         _usuarioRepository = usuarioRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<LoginUserResultDto> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -41,12 +44,21 @@ public class LoginUserCommandHandler
         if (user.AccountStatus == Domain.Enums.UserAccountStatus.PendingDeletion)
             return new LoginUserResultDto(false, "La cuenta está pendiente de eliminación.", null);
 
-        if (!user.EmailVerificado)
+        if (!user.EmailVerificado && !user.TitularId.HasValue)
             return new LoginUserResultDto(false, "Debe verificar su correo electrónico antes de iniciar sesión.", null);
 
         var isPasswordValid = _passwordHasher.VerifyPassword(request.Password, user.ContrasenaHash);
         if (!isPasswordValid)
             return new LoginUserResultDto(false, "El correo electrónico o la contraseña son incorrectos.", null);
+
+        // Auto-verify and activate guest users on first successful login
+        if (!user.EmailVerificado && user.TitularId.HasValue)
+        {
+            user.ForzarVerificacionEmail();
+            user.UpdateAccountStatus(Domain.Enums.UserAccountStatus.Active);
+            
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
 
         var roleStr = user.Rol == UserRole.Administrator ? "admin" : "user";
 

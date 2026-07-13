@@ -176,7 +176,7 @@ export const MyProfileForm: React.FC = () => {
                 </p>
               </div>
             </div>
-            {user?.role !== "admin" && (user?.plan || user?.inviterPlan) && (
+            {user?.role !== "admin" && (user?.plan || user?.isGuest) && (
               <div className="flex items-center gap-3">
                 <Award className="w-4 h-4 text-text-secondary shrink-0" />
                 <div>

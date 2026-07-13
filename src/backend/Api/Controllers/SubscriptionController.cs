@@ -133,7 +133,7 @@ public class SubscriptionController : ControllerBase
         var user = await _dbContext.Usuarios
             .Include(u => u.Plan)
             .Include(u => u.Titular)
-                .ThenInclude(t => t.Plan)
+                .ThenInclude(t => t!.Plan)
             .FirstOrDefaultAsync(u => u.Id == userId, ct);
 
         if (user == null)
