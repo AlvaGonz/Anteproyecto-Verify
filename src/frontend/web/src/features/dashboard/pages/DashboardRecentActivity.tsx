@@ -156,8 +156,8 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-[#223382]">{s.plan === "Empresa" ? "Enterprise" : s.plan}</p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${s.estado === "Active" ? "bg-success/20 text-success" : "bg-surface-raised text-text-secondary"}`}>
-                          {s.estado}
+                        <span className={`text-xs px-2 py-1 rounded-full ${s.estado === "Active" || s.estado === "Activo" ? "bg-success/20 text-success" : "bg-surface-raised text-text-secondary"}`}>
+                          {s.estado === "Active" ? "Activo" : s.estado === "Inactive" ? "Inactivo" : s.estado}
                         </span>
                       </div>
                     </div>
