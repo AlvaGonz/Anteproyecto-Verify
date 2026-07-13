@@ -82,16 +82,16 @@ public static class AppDbContextSeeder
                 cedula: "402-0000004-1");
             empresaUser.AsignarPlan(Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"));
 
-            var enterpriseUser = await GetOrCreateUsuarioAsync(
+            var corporativoUser = await GetOrCreateUsuarioAsync(
                 context,
                 nombre: "Usuario",
-                apellido: "Enterprise",
-                correoElectronico: "enterprise@verifinca.do",
-                contrasenaHash: passwordHasher.HashPassword("EnterpriseVerifinca2026!"),
+                apellido: "Corporativo",
+                correoElectronico: "corporativo@verifinca.do",
+                contrasenaHash: passwordHasher.HashPassword("CorporativoVerifinca2026!"),
                 rol: UserRole.User,
                 telefono: "809-555-2005",
                 cedula: "402-0000005-1");
-            enterpriseUser.AsignarPlan(Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"));
+            corporativoUser.AsignarPlan(Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"));
 
             await context.SaveChangesAsync();
 
@@ -315,16 +315,16 @@ public static class AppDbContextSeeder
                 exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: true,
                 soporteTipo: "Prioritario", accesoApi: true);
 
-            // Enterprise
-            var enterprise = PlanSuscripcion.Create(
-                id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Enterprise", precio: 30000.00m,
+            // Corporativo
+            var corporativo = PlanSuscripcion.Create(
+                id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Corporativo", precio: 30000.00m,
                 maxConsultas: -1, maxProyectos: -1, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: 10240,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
                 exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
                 soporteTipo: "Account Manager", accesoApi: true);
 
-            context.PlanesSuscripcion.AddRange(gratuito, consultor, profesional, empresa, enterprise);
+            context.PlanesSuscripcion.AddRange(gratuito, consultor, profesional, empresa, corporativo);
             await context.SaveChangesAsync();
         }
     }
@@ -425,6 +425,7 @@ public static class AppDbContextSeeder
         string cedula)
     {
         var existing = await context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == correoElectronico);
+        Usuario returnUser;
         if (existing != null)
         {
             context.Entry(existing).Property("Nombre").CurrentValue = nombre;
@@ -437,18 +438,35 @@ public static class AppDbContextSeeder
             context.Entry(existing).Property("Activo").CurrentValue = true;
             
             await context.SaveChangesAsync();
-            return existing;
+            returnUser = existing;
+        }
+        else
+        {
+            var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
+            context.Usuarios.Add(user);
+            
+            // Ensure user is marked as verified and active for seeding purposes
+            context.Entry(user).Property("EmailVerificado").CurrentValue = true;
+            context.Entry(user).Property("Activo").CurrentValue = true;
+            
+            await context.SaveChangesAsync();
+            returnUser = user;
         }
 
-        var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
-        context.Usuarios.Add(user);
-        
-        // Ensure user is marked as verified and active for seeding purposes
-        context.Entry(user).Property("EmailVerificado").CurrentValue = true;
-        context.Entry(user).Property("Activo").CurrentValue = true;
-        
-        await context.SaveChangesAsync();
-        return user;
+        var hasWelcome = await context.Notificaciones.AnyAsync(n => n.UsuarioId == returnUser.Id && n.Mensaje.Contains("¡Bienvenido a VeriFinca"));
+        if (!hasWelcome)
+        {
+            var welcomeNotification = new Notificacion(
+                usuarioId: returnUser.Id,
+                mensaje: $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
+                tipo: "Info",
+                enlaceRelacionado: "/dashboard"
+            );
+            context.Notificaciones.Add(welcomeNotification);
+            await context.SaveChangesAsync();
+        }
+
+        return returnUser;
     }
 
     private static async Task<Proyecto> GetOrCreateProyectoAsync(

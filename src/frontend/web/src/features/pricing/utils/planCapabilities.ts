@@ -1,4 +1,4 @@
-export type PlanKey = 'consultor' | 'profesional' | 'empresa' | 'enterprise'
+export type PlanKey = 'consultor' | 'profesional' | 'empresa' | 'corporativo'
 
 export interface PlanCapabilities {
   label: string
@@ -46,8 +46,8 @@ export const PLAN_CAPABILITIES: Record<PlanKey, PlanCapabilities> = {
     color: 'text-secondary',
     bgColor: 'bg-secondary/5 border-secondary/20',
   },
-  enterprise: {
-    label: 'Enterprise',
+  corporativo: {
+    label: 'Corporativo',
     queriesPerMonth: 'unlimited',
     pdfReports: true,
     liensAlerts: true,
@@ -63,7 +63,7 @@ export const PLAN_CAPABILITIES: Record<PlanKey, PlanCapabilities> = {
 export function normalizePlanKey(raw: string | null | undefined): PlanKey {
   if (!raw) return 'consultor'
   const lower = raw.toLowerCase().trim()
-  if (lower.includes('enterprise')) return 'enterprise'
+  if (lower.includes('corporativo')) return 'corporativo'
   if (lower.includes('empresa')) return 'empresa'
   if (lower.includes('profesional') || lower.includes('professional')) return 'profesional'
   return 'consultor'

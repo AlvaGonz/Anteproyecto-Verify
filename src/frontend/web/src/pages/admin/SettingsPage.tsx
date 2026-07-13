@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useUsers, usePlans, useCreateUser, useUpdateUser, useDeleteUser } from "../../features/settings/api/useSettings";
@@ -28,14 +29,21 @@ export const SettingsPage: React.FC = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<TabId>("profile");
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<TabId>((location.state as any)?.tab || "profile");
+
+  useEffect(() => {
+    if ((location.state as any)?.tab) {
+      setActiveTab((location.state as any).tab);
+    }
+  }, [location.state]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
-  const isManagementTier = user?.plan === "Enterprise" || user?.plan === "Empresa";
+  const isManagementTier = user?.plan === "Corporativo" || user?.plan === "Empresa";
 
   const { data: users = [], isLoading: isLoadingUsers } = useUsers(1, 50, isAdmin);
 
@@ -57,14 +65,20 @@ export const SettingsPage: React.FC = () => {
       return;
     }
 
-if (formData.telefono) {
-       const telDigits = formData.telefono.replace(/\D/g, "");
-       if (telDigits.length > 0 && !/^(809|829|849)\d{7}$/.test(telDigits)) {
-         addToast("Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)", "error");
-         return;
-       }
-     }
+    if (!formData.telefono) {
+      addToast("El teléfono es obligatorio", "error");
+      return;
+    }
+    const telDigits = formData.telefono.replace(/\D/g, "");
+    if (telDigits.length > 0 && !/^(809|829|849)\d{7}$/.test(telDigits)) {
+      addToast("Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)", "error");
+      return;
+    }
 
+    if (!editingUser && !formData.cedula) {
+      addToast("La cédula es obligatoria", "error");
+      return;
+    }
     if (formData.cedula) {
       const cedDigits = formData.cedula.replace(/\D/g, "");
       if (cedDigits.length > 0 && !validateCedulaCheckDigit(cedDigits)) {
@@ -92,7 +106,17 @@ if (formData.telefono) {
       setIsModalOpen(false);
       setEditingUser(null);
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.message || error?.response?.data?.Message || "Error al guardar el usuario";
+      console.error("API Error Response:", error?.response?.data);
+      let errorMsg = "Error al guardar el usuario";
+      if (error?.response?.data) {
+        const d = error.response.data;
+        if (d.message) errorMsg = d.message;
+        else if (d.Message) errorMsg = d.Message;
+        else if (d.errors && typeof d.errors === 'object') {
+          // Flatten ASP.NET Core validation errors
+          errorMsg = Object.values(d.errors).flat().join(' ');
+        }
+      }
       addToast(errorMsg, "error");
     }
   };
@@ -105,7 +129,7 @@ if (formData.telefono) {
 
   const handleAddNewClick = () => {
     setEditingUser(null);
-    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "" });
+    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Gratuito" });
     setIsModalOpen(true);
   };
 

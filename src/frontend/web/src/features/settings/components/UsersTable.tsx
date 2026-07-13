@@ -37,14 +37,14 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
 
   // Group users by plan categories
   const groupedUsers = {
-    "Administradores": users.filter(u => u.role === "admin" || u.role === "owner"),
-    "Enterprise": users.filter(u => u.planName === "Enterprise" && u.role !== "admin" && u.role !== "owner"),
+    "Corporativo": users.filter(u => u.planName === "Corporativo" && u.role !== "admin" && u.role !== "owner"),
     "Empresa": users.filter(u => u.planName === "Empresa" && u.role !== "admin" && u.role !== "owner"),
     "Profesional": users.filter(u => u.planName === "Profesional" && u.role !== "admin" && u.role !== "owner"),
-    "Gratuito": users.filter(u => (u.planName === "Gratuito" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner")
+    "Gratuito": users.filter(u => (u.planName === "Gratuito" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner"),
+    "Invitado": users.filter(u => u.planName === "Invitado" && u.role !== "admin" && u.role !== "owner")
   };
 
-  const [activeTab, setActiveTab] = useState<string>("Enterprise");
+  const [activeTab, setActiveTab] = useState<string>("Corporativo");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState("1");
@@ -54,7 +54,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
   React.useEffect(() => {
     setCurrentPage(1);
     setPageInput("1");
-    if (sortField === "availableUsers" && activeTab !== "Enterprise" && activeTab !== "Empresa") {
+    if (sortField === "availableUsers" && activeTab !== "Corporativo" && activeTab !== "Empresa") {
       setSortField("planCreatedAt");
     }
   }, [activeTab, searchQuery]);
@@ -64,11 +64,11 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
   }, [currentPage]);
 
   const tabs = [
-    { id: "Enterprise", label: "Enterprise", count: groupedUsers["Enterprise"].length },
-    { id: "Empresa", label: "Empresa", count: groupedUsers["Empresa"].length },
+    { id: "Corporativo", label: "Corporativo", count: groupedUsers["Corporativo"].length },
+    { id: "Empresa", label: "Enterprise", count: groupedUsers["Empresa"].length },
     { id: "Profesional", label: "Profesional", count: groupedUsers["Profesional"].length },
     { id: "Gratuito", label: "Gratuito", count: groupedUsers["Gratuito"].length },
-    { id: "Administradores", label: "Admin/Owner", count: groupedUsers["Administradores"].length }
+    { id: "Invitado", label: "Invitado", count: groupedUsers["Invitado"].length }
   ];
 
   const currentTabUsers = groupedUsers[activeTab as keyof typeof groupedUsers] || [];
@@ -174,7 +174,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             } else if (plan.includes("profesional") || plan.includes("professional")) {
               maxProjects = 15;
               maxQueries = 25;
-            } else if (plan.includes("enterprise") || u.role === "admin" || u.role === "owner") {
+            } else if (plan.includes("corporativo") || u.role === "admin" || u.role === "owner") {
               maxProjects = "∞";
               maxQueries = "∞";
             }
@@ -278,7 +278,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
               <option value="usedProjects">Proyectos</option>
               <option value="usedQueries">Consultas</option>
               <option value="nombre">Nombre</option>
-              {(activeTab === "Enterprise" || activeTab === "Empresa") && (
+              {(activeTab === "Corporativo" || activeTab === "Empresa") && (
                 <option value="availableUsers">Usuarios</option>
               )}
             </select>

@@ -4,5 +4,6 @@ public enum UserAccountStatus
 {
     Active = 0,
     PendingDeletion = 1,
-    Purged = 2
+    Purged = 2,
+    Invited = 3
 }

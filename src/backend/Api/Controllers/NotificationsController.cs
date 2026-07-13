@@ -15,11 +15,13 @@ using Microsoft.AspNetCore.Mvc;
 public class NotificationsController : ControllerBase
 {
     private readonly INotificacionRepository _notificacionRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public NotificationsController(INotificacionRepository notificacionRepository, IUnitOfWork unitOfWork)
+    public NotificationsController(INotificacionRepository notificacionRepository, IUsuarioRepository usuarioRepository, IUnitOfWork unitOfWork)
     {
         _notificacionRepository = notificacionRepository;
+        _usuarioRepository = usuarioRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -33,15 +35,22 @@ public class NotificationsController : ControllerBase
             return Unauthorized();
         }
 
+        var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
+        var email = user?.Email;
+        var telefono = user?.Telefono;
+
         var notifications = await _notificacionRepository.GetByUsuarioIdAsync(userId, unreadOnly, cancellationToken);
         
         var dtos = notifications.OrderByDescending(n => n.FechaUtc).Select(n => new NotificationDto(
             Id: n.Id,
+            CodigoReferencia: n.CodigoReferencia,
             Mensaje: n.Mensaje,
             Tipo: n.Tipo,
             Leida: n.Leida,
             FechaUtc: n.FechaUtc,
-            EnlaceRelacionado: n.EnlaceRelacionado
+            EnlaceRelacionado: n.EnlaceRelacionado,
+            Email: email,
+            Telefono: telefono
         ));
 
         return Ok(dtos);
@@ -92,6 +101,33 @@ public class NotificationsController : ControllerBase
             await _notificacionRepository.UpdateAsync(notification, cancellationToken);
         }
         
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<IActionResult> DeleteNotification(Guid id, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var notification = await _notificacionRepository.GetByIdAsync(id, cancellationToken);
+        if (notification == null)
+        {
+            return NotFound();
+        }
+
+        if (notification.UsuarioId != userId)
+        {
+            return Forbid();
+        }
+
+        await _notificacionRepository.DeleteAsync(notification, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return NoContent();

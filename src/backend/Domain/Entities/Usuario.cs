@@ -49,7 +49,7 @@ public class Usuario : EntityBase
     public string? GoogleId { get; private set; }
 
     // Post-verify checkout flow: plan selected before registration, completed after verification
-    // ponytail: PendingPlanCode holds the plan key (profesional/empresa/enterprise), PendingBillingCycle holds monthly/yearly
+    // ponytail: PendingPlanCode holds the plan key (profesional/empresa/corporativo), PendingBillingCycle holds monthly/yearly
     public string? PendingPlanCode { get; private set; }
     public string? PendingBillingCycle { get; private set; }
 
@@ -133,6 +133,12 @@ public class Usuario : EntityBase
         Rol = rol;
         UpdatedAtUtc = DateTime.UtcNow;
     }
+
+    public void UpdateAccountStatus(UserAccountStatus status)
+    {
+        AccountStatus = status;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
     
     public void UpdateRnc(string? rnc, string? razonSocial = null, string? nombreComercial = null, string? actividadEconomica = null)
     {
@@ -165,6 +171,14 @@ public class Usuario : EntityBase
         TokenVerificacionExpiraUtc = null;
         UpdatedAtUtc = DateTime.UtcNow;
         return true;
+    }
+
+    public void ForzarVerificacionEmail()
+    {
+        EmailVerificado = true;
+        TokenVerificacion = null;
+        TokenVerificacionExpiraUtc = null;
+        UpdatedAtUtc = DateTime.UtcNow;
     }
 
     public void AsignarPlan(Guid planId)

@@ -73,9 +73,9 @@ public class SubscriptionTierPolicyTests
     }
 
     [Fact]
-    public void CanConsult_EnterprisePlan_UnlimitedSentinel_AlwaysTrue()
+    public void CanConsult_CorporativoPlan_UnlimitedSentinel_AlwaysTrue()
     {
-        var plan = MakePlan(maxConsultas: -1, maxProyectos: 50); // Enterprise
+        var plan = MakePlan(maxConsultas: -1, maxProyectos: 50); // Corporativo
         var user = MakeUser(UserRole.User, plan, consultasUsadas: 999999);
         Assert.True(SubscriptionTierPolicy.CanConsult(user));
     }

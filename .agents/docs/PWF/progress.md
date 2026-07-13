@@ -9,51 +9,72 @@
 > **📝 GROQ_API_KEY set at Machine/User/Process — Consent tests 6/6 ✅**
 
 ## ✅ Completed Features
-| Feature | TRD Section | Branch | Commit SHA | Date |
-|---|---|---|---|---|
-| Account Deletion Lifecycle (GDPR Art.17) — Backend Domain/Application/Infrastructure/Api + Tests (24/24) | RF-9, OE-6 | feat-stripe | (pending) | 2026-07-04 |
-| EF Core Migration: AddAccountLifecycleColumns (5 cols to Usuarios) | RF-9 | feat-stripe | (pending) | 2026-07-04 |
-| Frontend: DeleteAccountSection danger zone + useAccountDeletion hooks | RF-9 | feat-stripe | (pending) | 2026-07-04 |
-|---|---|---|---|---|
-| Fix ERR_PACKAGE_PATH_NOT_EXPORTED & Node20 Deprecation | N/A | feat/agent-infrastructure-hardening | 74651a23 | 2026-06-06 |
-| Fix react-i18next resolution in container | N/A | develop | bd5fc58f | 2026-06-06 |
-| Remove 'remember me' checkbox | N/A | develop | 57ce09b9 | 2026-06-06 |
-| Fix Project Photo Persistence | N/A | feat-codebase-memory-mcp | b64c1f53 | 2026-06-29 |
-| AGENTS.md v5 — codebase-memory-mcp §0 mandatory | N/A | feat-codebase-memory-mcp | 6131fa9a | 2026-06-29 |
-| README.md full rewrite from codebase graph | N/A | feat-codebase-memory-mcp | efcbffa5 | 2026-06-29 |
-| E2E Test Success for Project Photos | N/A | feat-codebase-memory-mcp | 5661d1a6 | 2026-06-29 |
-| ORCH-TEST-001 — Orchestration Proof Test | N/A | feat-voltagent-upgrade | a1b6b5b5 | 2026-06-29 |
-| ORCH-TEST-002 — Subagent Routing Fixed | N/A | develop | (pending) | 2026-07-07 |
-| COMP-001 — Consent Version Gate (Law 172-13) | ADR-007 | feat-voltagent-upgrade | ee48440d | 2026-06-30 |
-| Stripe Legal Compliance UI & Sections | N/A | develop | (pending) | 2026-06-30 |
-| Subscription Consent Checkbox (IP/Timestamp) | N/A | develop | (pending) | 2026-06-30 |
-| Subscription Settings & Redirection Flow | N/A | develop | (pending) | 2026-07-01 |
-| SubscriptionController CS1061 CurrentPeriodEnd Fix | N/A | develop | (pending) | 2026-07-01 |
-| Navbar contrast improvement on /projects page | N/A | develop | (pending) | 2026-07-01 |
-| Fix Checkout Return session_id persistence on hard reset | N/A | develop | (pending) | 2026-07-01 |
-| Security Hardening (OWASP A01-A05, Law 172-13) | N/A | develop | (pending) | 2026-07-01 |
-| Subscription Tier Webhook Notification | N/A | feat-stripe | 11620118 | 2026-07-01 |
-| Dashboard Notification + Post-Payment Redirect | N/A | feat-stripe | (pending) | 2026-07-01 |
-| Resend Verification Email Flow | N/A | feat-stripe | 9f6df91c | 2026-07-02 |
-| Avatar Reactive UI & Consumers | N/A | feat-stripe | 7339a5c0 | 2026-07-02 |
-| Remove User Info from Admin Navbar | N/A | feat-stripe | (pending) | 2026-07-02 |
-| React Doctor 100/100 — 0 warnings across 267 files | N/A | develop | (pending) | 2026-07-05 |
-| Massive Seeding and Mounting of 780,396 Records (DGII, PagoIPI, Catastro, Suelos) | N/A | develop | (pending) | 2026-07-05 |
-| Docker compose integration for automated DB seeding with skip-check | N/A | develop | (pending) | 2026-07-05 |
-| Restrict 'Flujo de Usuarios' Dashboard tab to Admin/Owner only | N/A | develop | (pending) | 2026-07-06 |
-| Implement `/api/public/projects/search` (DB schema/DTOs/Frontend Integration) | RF-3 | develop | (pending) | 2026-07-06 |
-| Create `VerificationMatrix.md` (Project types & compliance rules) | OE-1..7 | develop | (pending) | 2026-07-06 |
-| Checkout E2E verify (Dashboard redirect, Subscription tab, Session status) | N/A | develop | (pending) | 2026-07-06 |
-| React Doctor CI pipeline setup (npx react-doctor@latest install, pinned SHAs) | N/A | develop | (pending) | 2026-07-07 |
+| Feature                                                                                                  | TRD Section | Branch                                               | Commit SHA | Date       |
+| -------------------------------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------- | ---------- | ---------- |
+| Account Deletion Lifecycle (GDPR Art.17) — Backend Domain/Application/Infrastructure/Api + Tests (24/24) | RF-9, OE-6  | feat-stripe                                          | (pending)  | 2026-07-04 |
+| EF Core Migration: AddAccountLifecycleColumns (5 cols to Usuarios)                                       | RF-9        | feat-stripe                                          | (pending)  | 2026-07-04 |
+| Frontend: DeleteAccountSection danger zone + useAccountDeletion hooks                                    | RF-9        | feat-stripe                                          | (pending)  | 2026-07-04 |
+| ---                                                                                                      | ---         | ---                                                  | ---        | ---        |
+| Fix ERR_PACKAGE_PATH_NOT_EXPORTED & Node20 Deprecation                                                   | N/A         | feat/agent-infrastructure-hardening                  | 74651a23   | 2026-06-06 |
+| Fix react-i18next resolution in container                                                                | N/A         | develop                                              | bd5fc58f   | 2026-06-06 |
+| Remove 'remember me' checkbox                                                                            | N/A         | develop                                              | 57ce09b9   | 2026-06-06 |
+| Fix Project Photo Persistence                                                                            | N/A         | feat-codebase-memory-mcp                             | b64c1f53   | 2026-06-29 |
+| AGENTS.md v5 — codebase-memory-mcp §0 mandatory                                                          | N/A         | feat-codebase-memory-mcp                             | 6131fa9a   | 2026-06-29 |
+| README.md full rewrite from codebase graph                                                               | N/A         | feat-codebase-memory-mcp                             | efcbffa5   | 2026-06-29 |
+| E2E Test Success for Project Photos                                                                      | N/A         | feat-codebase-memory-mcp                             | 5661d1a6   | 2026-06-29 |
+| ORCH-TEST-001 — Orchestration Proof Test                                                                 | N/A         | feat-voltagent-upgrade                               | a1b6b5b5   | 2026-06-29 |
+| ORCH-TEST-002 — Subagent Routing Fixed                                                                   | N/A         | develop                                              | (pending)  | 2026-07-07 |
+| COMP-001 — Consent Version Gate (Law 172-13)                                                             | ADR-007     | feat-voltagent-upgrade                               | ee48440d   | 2026-06-30 |
+| Stripe Legal Compliance UI & Sections                                                                    | N/A         | develop                                              | (pending)  | 2026-06-30 |
+| Subscription Consent Checkbox (IP/Timestamp)                                                             | N/A         | develop                                              | (pending)  | 2026-06-30 |
+| Subscription Settings & Redirection Flow                                                                 | N/A         | develop                                              | (pending)  | 2026-07-01 |
+| SubscriptionController CS1061 CurrentPeriodEnd Fix                                                       | N/A         | develop                                              | (pending)  | 2026-07-01 |
+| Navbar contrast improvement on /projects page                                                            | N/A         | develop                                              | (pending)  | 2026-07-01 |
+| Fix Checkout Return session_id persistence on hard reset                                                 | N/A         | develop                                              | (pending)  | 2026-07-01 |
+| Security Hardening (OWASP A01-A05, Law 172-13)                                                           | N/A         | develop                                              | (pending)  | 2026-07-01 |
+| Subscription Tier Webhook Notification                                                                   | N/A         | feat-stripe                                          | 11620118   | 2026-07-01 |
+| Dashboard Notification + Post-Payment Redirect                                                           | N/A         | feat-stripe                                          | (pending)  | 2026-07-01 |
+| Resend Verification Email Flow                                                                           | N/A         | feat-stripe                                          | 9f6df91c   | 2026-07-02 |
+| Avatar Reactive UI & Consumers                                                                           | N/A         | feat-stripe                                          | 7339a5c0   | 2026-07-02 |
+| Remove User Info from Admin Navbar                                                                       | N/A         | feat-stripe                                          | (pending)  | 2026-07-02 |
+| React Doctor 100/100 — 0 warnings across 267 files                                                       | N/A         | develop                                              | (pending)  | 2026-07-05 |
+| Massive Seeding and Mounting of 780,396 Records (DGII, PagoIPI, Catastro, Suelos)                        | N/A         | develop                                              | (pending)  | 2026-07-05 |
+| Docker compose integration for automated DB seeding with skip-check                                      | N/A         | develop                                              | (pending)  | 2026-07-05 |
+| Restrict 'Flujo de Usuarios' Dashboard tab to Admin/Owner only                                           | N/A         | develop                                              | (pending)  | 2026-07-06 |
+| Implement `/api/public/projects/search` (DB schema/DTOs/Frontend Integration)                            | RF-3        | develop                                              | (pending)  | 2026-07-06 |
+| Create `VerificationMatrix.md` (Project types & compliance rules)                                        | OE-1..7     | develop                                              | (pending)  | 2026-07-06 |
+| Checkout E2E verify (Dashboard redirect, Subscription tab, Session status)                               | N/A         | develop                                              | (pending)  | 2026-07-06 |
+| React Doctor CI pipeline setup (npx react-doctor@latest install, pinned SHAs)                            | N/A         | develop                                              | (pending)  | 2026-07-07 |
+| Google Sign-In button redesign + backend access_token verification                                       | N/A         | develop                                              | (pending)  | 2026-07-09 |
+| Stripe Subscription Cancellation, Reactivation & Notification Fixes                                      | RF-8        | feat/Stripe Subscription Cancellation & Reactivation | 248b79a6   | 2026-07-09 |
+| Subscription Cancellation custom modal UI                                                                | RF-8        | feat/Stripe Subscription Cancellation & Reactivation | (pending)  | 2026-07-09 |
+| Resend Email E2E Playwright API Test Suite (12-resend-email-all-usecases.spec.ts)                        | N/A         | develop                                              | (pending)  | 2026-07-10 |
+| Admin User Creation with Plan Assignment & Email Notification                                            | RF-8        | develop                                              | (pending)  | 2026-07-12 |
+| Fix duplicate EmailTemplate GetAccountCreatedByAdminEmail                                                | N/A         | develop                                              | (pending)  | 2026-07-12 |
+| Notification Schema Update (CodigoReferencia) & Dynamic Extraction                                       | N/A         | develop                                              | (pending)  | 2026-07-12 |
+| Notification UI Delete Button Integration & API Hook                                                     | N/A         | develop                                              | (pending)  | 2026-07-12 |
+| Project Management Tabbed Layout (`ProjectManageLayout`)                                                 | UI Refactor | develop                                              | (pending)  | 2026-07-12 |
+## 🔄 In Progress
+| Feature | TRD Section | Status | Blocker |
+| ------- | ----------- | ------ | ------- |
+| None    | N/A         | 100%   | None    |
+
+
 | Google Sign-In button redesign + backend access_token verification | N/A | develop | (pending) | 2026-07-09 |
 | Stripe Subscription Cancellation, Reactivation & Notification Fixes | RF-8 | feat/Stripe Subscription Cancellation & Reactivation | 248b79a6 | 2026-07-09 |
 | Subscription Cancellation custom modal UI | RF-8 | feat/Stripe Subscription Cancellation & Reactivation | (pending) | 2026-07-09 |
 | Resend Email E2E Playwright API Test Suite (12-resend-email-all-usecases.spec.ts) | N/A | develop | (pending) | 2026-07-10 |
-
+| Admin User Creation with Plan Assignment & Email Notification | RF-8 | develop | (pending) | 2026-07-12 |
+| Fix duplicate EmailTemplate GetAccountCreatedByAdminEmail | N/A | develop | (pending) | 2026-07-12 |
+| Notification Schema Update (CodigoReferencia) & Dynamic Extraction | N/A | develop | (pending) | 2026-07-12 |
+| Notification UI Delete Button Integration & API Hook | N/A | develop | (pending) | 2026-07-12 |
+| Project Management Tabbed Layout (`ProjectManageLayout`) | UI Refactor | develop | (pending) | 2026-07-12 |
+| Corporate Invite Users Flow (Invitacion entity, SettingsController, UI Modal) | N/A | develop | (pending) | 2026-07-12 |
+| Fix Admin Dashboard Stats 403 & potential-invitees 404 | N/A | develop | (pending) | 2026-07-12 |
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
-|---|---|---|---|
-| None | N/A | 100% | None |
+| ------- | ----------- | ------ | ------- |
+| None    | N/A         | 100%   | None    |
 
 
 ## 🔜 Next Up (Prioritized)
@@ -68,25 +89,25 @@
 ---
 
 ## 📋 QA Backlog (from To-do.txt)
-| Priority | Count | Items |
-|---|---|---|
-| 🔴 P0 — Critical | 6 | WBS-001..006 — Routes rotas + E2E tests |
-| 🟠 P1 — High | 8 | WBS-007..014 — Security, Compliance, 17 UIs |
-| 🟡 P2 — Medium | 5 | WBS-015..019 — UX mejoras |
-| 🟢 P3 — Tech Debt | 10 | TEC-001..010 — Accesibilidad, rendimiento, CI |
+| Priority         | Count | Items                                         |
+| ---------------- | ----- | --------------------------------------------- |
+| 🔴 P0 — Critical  | 6     | WBS-001..006 — Routes rotas + E2E tests       |
+| 🟠 P1 — High      | 8     | WBS-007..014 — Security, Compliance, 17 UIs   |
+| 🟡 P2 — Medium    | 5     | WBS-015..019 — UX mejoras                     |
+| 🟢 P3 — Tech Debt | 10    | TEC-001..010 — Accesibilidad, rendimiento, CI |
 
 ## 🔄 In Progress (QA Roadmap — ORCH-TEST-001 Proof)
-| WBS | Item | Agent | Status |
-|---|---|---|---|
-| WBS-001 | RegisterPage test | tdd-guide | ✅ 257 lines, 11 tests |
-| WBS-005 | TC-002 coordinates diagnosis | build-error-resolver | ✅ Diagnosis report |
-| WBS-007 | JWT localStorage audit | security-reviewer | ✅ SEC-001 surfaced |
-| WBS-009 | Bundle optimization | refactor-cleaner | ✅ Analysis report |
-| WBS-012 | Password policy xUnit test | tdd-guide | ✅ 6 theory/2 fact tests |
-| WBS-013 | Consent gate audit (Law 172-13) | ley172-13-auditor | ✅ COMP-001 surfaced |
-| WBS-014 | 17 UI screens breakdown | planner | ✅ 17 screens mapped |
-| WBS-020 | RF-10 Integrity Seal ADR | architect | ✅ ADR-005 (357 lines) |
-| TEC-010 | SonarCloud pipeline gate | devops-specialist | ✅ Pipeline config |
+| WBS     | Item                            | Agent                | Status                  |
+| ------- | ------------------------------- | -------------------- | ----------------------- |
+| WBS-001 | RegisterPage test               | tdd-guide            | ✅ 257 lines, 11 tests   |
+| WBS-005 | TC-002 coordinates diagnosis    | build-error-resolver | ✅ Diagnosis report      |
+| WBS-007 | JWT localStorage audit          | security-reviewer    | ✅ SEC-001 surfaced      |
+| WBS-009 | Bundle optimization             | refactor-cleaner     | ✅ Analysis report       |
+| WBS-012 | Password policy xUnit test      | tdd-guide            | ✅ 6 theory/2 fact tests |
+| WBS-013 | Consent gate audit (Law 172-13) | ley172-13-auditor    | ✅ COMP-001 surfaced     |
+| WBS-014 | 17 UI screens breakdown         | planner              | ✅ 17 screens mapped     |
+| WBS-020 | RF-10 Integrity Seal ADR        | architect            | ✅ ADR-005 (357 lines)   |
+| TEC-010 | SonarCloud pipeline gate        | devops-specialist    | ✅ Pipeline config       |
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - [x] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001 (DONE - Security Hardening)
@@ -102,13 +123,13 @@
 - [ ] Public endpoint changes for Precios page (BUG-005)
 
 ## 🔄 Expanded Scope (Post-Audit — 2026-06-29)
-| New ID | Item | Priority | RF | OE |
-|--------|------|----------|----|----|
-| WBS-020 | Sello Digital endpoint + QR (Law 126-02) | P1 | RF-10 | OE-7 |
-| WBS-021 | Documentary Diagnosis UI + Rules Engine | P1 | RF-2 | OE-1 |
-| TEC-011 | DataRetentionPurgeJob (30d/90d/7yr) | P3 | RNF-5 | OE-6 |
-| TEC-012 | Availability monitoring + health checks | P3 | RNF-3 | General |
-| TEC-013 | Load testing target with k6 | P3 | RNF-4 | General |
+| New ID  | Item                                     | Priority | RF    | OE      |
+| ------- | ---------------------------------------- | -------- | ----- | ------- |
+| WBS-020 | Sello Digital endpoint + QR (Law 126-02) | P1       | RF-10 | OE-7    |
+| WBS-021 | Documentary Diagnosis UI + Rules Engine  | P1       | RF-2  | OE-1    |
+| TEC-011 | DataRetentionPurgeJob (30d/90d/7yr)      | P3       | RNF-5 | OE-6    |
+| TEC-012 | Availability monitoring + health checks  | P3       | RNF-3 | General |
+| TEC-013 | Load testing target with k6              | P3       | RNF-4 | General |
 
 **Audit findings resolved:** RF-2 gap, RF-10 gap, RNF-3/4/5 gaps, PERF-001 reclassified P1, OE traceability corrected, "47 requisitos" source clarified.
 
@@ -196,7 +217,22 @@
   - **Root Cause:** The frontend `useValidations.ts` was calling an endpoint path that didn't match the backend. The `ProjectValidationController` is mapped to `api/projects/{projectId}/validate` for POST, and `api/projects/{projectId}/validation-result` for GET, while the frontend attempted to call `/validations/run` and `/validations/result`.
   - **Fix:** Aligned the frontend `apiClient` requests in `useValidations.ts` to exactly match the existing backend routing paths (`/validate` and `/validation-result`).
 
--   * * C O M P - 0 0 1 : * *   V e r i f y   c o n s e n t   t e s t   p a s s e s   i n   C I   p i p e l i n e . 
-     -   * * S t a t u s : * *   C o m p l e t e 
-     -   * * D e t a i l s : * *   V e r i f i e d   v i a   l o c a l   D o c k e r   c o n t a i n e r   r u n n i n g   . N E T   8 . 0   S D K   ( P a s s e d :   7 / 7 )   a n d   v i a   G i t H u b   A c t i o n s   C I   p i p e l i n e   ( b a c k e n d   j o b s   s u c c e s s f u l   o n   b r a n c h   ` v e r i f y - c i - c o n s e n t ` ) .
-
+- **COMP-001:** Verify consent test passes in CI pipeline.
+     - **Status:** Complete
+     - **Details:** Verified via local Docker container running .NET 8.0 SDK (Passed: 7/7) and via GitHub Actions CI pipeline (backend jobs successful on branch `verify-ci-consent`).
+- **BUG-021:** SyntaxError: Unexpected token ':' in `RequirementUploadRow.tsx` at runtime.
+  - **Symptom:** The browser console throws `Uncaught SyntaxError: Unexpected token ':' (at RequirementUploadRow.tsx:7:27)` preventing page execution when importing the requirement upload UI row.
+  - **Root Cause:** A newly added component file `RequirementUploadRow.tsx` was created on the host filesystem after the Docker container started. Vite's file resolution cache in `node_modules/.vite` failed to resolve and transform it correctly, causing the dev server to serve the raw TSX source code to the browser instead of transpiled JavaScript.
+  - **Fix:** Deleted the Vite compilation cache (`node_modules/.vite`) inside the container and restarted the `web` dev server container, forcing a clean rebuild.
+- **BUG-022:** Missing dummy projects and test users (from Gratuito to Corporativo).
+  - **Symptom:** The user noticed that only one manually created project was showing up in the dashboard, and the dummy users specified in the `Docker_readme.md` were not created. Additionally, the `/api/admin/users` POST endpoint threw a 500 error during user creation.
+  - **Root Cause:** The `AppDbContextSeeder` was crashing halfway through its execution because it tried to add a welcome notification (`Notificacion`) for the newly seeded admin user, but the `Notificacion` table was missing the newly added `CodigoReferencia` column. This missing column exception caused the entire seeder to abort, meaning all subsequent users (Freemium, Consultor, Profesional, Empresa, Corporativo) and their dummy projects were never created.
+  - **Fix:** Applied the pending EF Core migration (`20260712173705_Add_CodigoReferencia_To_Notificaciones`) to add the missing column and restarted the API container. The seeder now runs to completion and successfully creates all test users and dummy projects.
+- **BUG-023:** 500 Error when creating user and emails not being sent.
+  - **Symptom:** The `/api/admin/users` POST endpoint returned a 500 Internal Server Error when creating users, and no emails (for user creation or validation) were being sent.
+  - **Root Cause:** A missing EF Core migration or mapping caused `UsuarioLegacy.NombreCompleto` to be unmapped on inserts, throwing an SQL exception during `SaveChangesAsync()`. Because this failed and aborted the transaction, the subsequent code that successfully dispatches emails via `Resend` was never reached.
+  - **Fix:** Used `sqlcmd` to manually add `NombreCompleto` as a `PERSISTED` computed column to `UsuarioLegacy` on the SQL Server. The user creation now succeeds and the email sending block is triggered correctly via Resend API.
+- **BUG-024:** Dashboard UI issue in user workflow tab.
+  - **Symptom:** On the dashboard's "Flujo de Usuarios" tab, the "Ver Lista de Usuarios" button did not visually substitute the "Ver listado" and "Nuevo Proyecto" buttons in a centered manner.
+  - **Root Cause:** The `DashboardPageLayout.tsx` used `justify-between` and the secondary button was right-aligned without proper container constraints to span the space where the two project buttons used to be.
+  - **Fix:** Wrapped the "Ver Lista de Usuarios" button in a `w-full` flex container and changed its style to primary so it is now visually centered in the 300px space where the project buttons were located.

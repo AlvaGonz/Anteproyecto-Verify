@@ -39,7 +39,7 @@ Social Proof:
 - Testimonial cards with photos and quotes
 
 Pricing:
-- 3-tier pricing table (Free, Pro, Enterprise)
+- 3-tier pricing table (Free, Pro, Corporativo)
 - Feature comparison
 - Annual/Monthly toggle
 
@@ -370,7 +370,7 @@ Platform: Responsive web, mobile-optimized
 ### Login Page
 
 ```
-Login page for enterprise software
+Login page for corporativo software
 
 Left Panel (Desktop):
 - Brand logo
@@ -393,7 +393,7 @@ Security Indicators:
 - SSL badge
 - "Your data is secure" message
 
-Style: Professional, trustworthy, enterprise-grade
+Style: Professional, trustworthy, corporativo-grade
 Colors: Corporate blue, white, subtle grays
 Typography: Professional sans-serif
 Platform: Responsive (left panel hidden on mobile)

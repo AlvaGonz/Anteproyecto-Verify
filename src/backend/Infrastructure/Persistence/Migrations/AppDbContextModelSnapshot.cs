@@ -512,6 +512,55 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Hallazgos");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Invitacion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Aceptada")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Cedula")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("EmisorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("FechaInvitacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmisorId");
+
+                    b.ToTable("Invitaciones", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.LogConsulta", b =>
                 {
                     b.Property<Guid>("Id")
@@ -587,6 +636,10 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodigoReferencia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
@@ -1604,6 +1657,17 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Proyecto");
 
                     b.Navigation("Validacion");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Invitacion", b =>
+                {
+                    b.HasOne("Domain.Entities.Usuario", "Emisor")
+                        .WithMany()
+                        .HasForeignKey("EmisorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Emisor");
                 });
 
             modelBuilder.Entity("Domain.Entities.LogConsulta", b =>

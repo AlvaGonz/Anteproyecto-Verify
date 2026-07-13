@@ -222,7 +222,7 @@ mcp__ace-tool__search_context({
    - Identify potential conflicts or side effects
 
 3. **Refactor and Clean**:
-   - Refactor "dirty prototype" to **highly readable, maintainable, enterprise-grade code**
+   - Refactor "dirty prototype" to **highly readable, maintainable, corporativo-grade code**
    - Remove redundant code
    - Ensure compliance with project's existing code standards
    - **Do not generate comments/docs unless necessary**, code should be self-explanatory

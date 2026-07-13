@@ -1365,7 +1365,7 @@ var FeatureSelectionPreference;
     FeatureSelectionPreference["BALANCED"] = "BALANCED";
     FeatureSelectionPreference["PRIORITIZE_COST"] = "PRIORITIZE_COST";
 })(FeatureSelectionPreference || (FeatureSelectionPreference = {}));
-/** Enum representing the Gemini Enterprise Agent Platform embedding API to use. */
+/** Enum representing the Gemini Corporativo Agent Platform embedding API to use. */
 var EmbeddingApiType;
 (function (EmbeddingApiType) {
     /**

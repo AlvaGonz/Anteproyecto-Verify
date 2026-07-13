@@ -17,7 +17,7 @@ export interface UserSettings {
   nombre: string;
   apellido: string;
   email: string;
-  role: "admin" | "dev" | "validator" | "user" | "owner" | "enterprise" | "business" | "professional" | "consultation";
+  role: "admin" | "dev" | "validator" | "user" | "owner" | "corporativo" | "business" | "professional" | "consultation";
   telefono: string;
   cedula: string;
   rnc?: string;
@@ -58,6 +58,7 @@ export interface CreateUserDto {
   telefono?: string;
   cedula?: string;
   password?: string;
+  planNombre?: string;
 }
 
 export interface UpdateUserDto {

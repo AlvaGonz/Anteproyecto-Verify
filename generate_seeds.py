@@ -93,7 +93,7 @@ def main():
         {"id": "5F1F3417-402F-4CAC-AE39-F9802A5E72D2", "name": "Gratuito", "price": 0.0},
         {"id": "66AFDABF-632E-434C-86F4-6F9060D2656F", "name": "Profesional", "price": 3500.0},
         {"id": "41037268-58B6-40A3-A8AE-C18EFE00C7D3", "name": "Empresa", "price": 10000.0},
-        {"id": "F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4", "name": "Enterprise", "price": 30000.0}
+        {"id": "F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4", "name": "Corporativo", "price": 30000.0}
     ]
 
     # Roles / Perfiles
@@ -102,7 +102,7 @@ def main():
         {"id": perfil_ids[0], "name": "Freemium User"},
         {"id": perfil_ids[1], "name": "Intermediate User"},
         {"id": perfil_ids[2], "name": "Company Admin"},
-        {"id": perfil_ids[3], "name": "Enterprise Admin"},
+        {"id": perfil_ids[3], "name": "Corporativo Admin"},
         {"id": perfil_ids[4], "name": "Invitee"}
     ]
     with open(f"{output_dir}/02_Perfiles.sql", "w") as f:
@@ -136,7 +136,7 @@ def main():
         f.write("SET QUOTED_IDENTIFIER ON;\n")
         for perfil in perfiles:
             for perm in permisos:
-                # Basic logic: Enterprise/Company get everything, Freemium only READ/CREATE
+                # Basic logic: Corporativo/Company get everything, Freemium only READ/CREATE
                 if "Freemium" in perfil["name"] and perm["name"] in ["INVITE_USER", "API_ACCESS"]:
                     continue
                 f.write(f"IF NOT EXISTS (SELECT 1 FROM PerfilPermiso WHERE IdPerfil = '{perfil['id']}' AND IdPermiso = '{perm['id']}')\n")
@@ -148,7 +148,7 @@ def main():
     # Users
     users = []
     company_titulars = []
-    enterprise_titulars = []
+    corporativo_titulars = []
     # 25 Freemium
     for i in range(25):
         users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[0], "role": perfiles[0]})
@@ -168,7 +168,7 @@ def main():
             "comercial_name": comp["comercial"]
         })
         company_titulars.append(u_id)
-    # 25 Enterprise
+    # 25 Corporativo
     for i in range(25):
         u_id = str(uuid.uuid4()).upper()
         comp = real_companies[25 + i]
@@ -180,13 +180,13 @@ def main():
             "company_name": comp["name"],
             "comercial_name": comp["comercial"]
         })
-        enterprise_titulars.append(u_id)
+        corporativo_titulars.append(u_id)
     
-    # 35 Guests divided into Company and Enterprise
+    # 35 Guests divided into Company and Corporativo
     for i in range(17):
         users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[2], "role": perfiles[4], "is_guest": True, "titular": random.choice(company_titulars)})
     for i in range(18):
-        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[3], "role": perfiles[4], "is_guest": True, "titular": random.choice(enterprise_titulars)})
+        users.append({"id": str(uuid.uuid4()).upper(), "plan": plans[3], "role": perfiles[4], "is_guest": True, "titular": random.choice(corporativo_titulars)})
     
     # Names for random generation
     first_names = ["Juan", "Maria", "Carlos", "Ana", "Luis", "Elena", "Pedro", "Laura", "Jose", "Carmen", "Miguel", "Isabel", "Francisco", "Sofia", "Antonio"]
@@ -272,21 +272,23 @@ def main():
                     fr.write(f"IF NOT EXISTS (SELECT 1 FROM Recibo WHERE IdPago = '{pago_id}')\n")
                     fr.write(f"INSERT INTO Recibo (IdPago, IdUsuario, Monto, FechaPago, Detalle, Categoria, Desglose) VALUES ('{pago_id}', '{u['id']}', {u['plan']['price']}, GETDATE(), 'Suscripcion {u['plan']['name']}', 'Suscripcion', '{desglose}');\n")
 
-    # FremiunProyectos_Log
+    # LogProyectos (Dummy Projects)
     with open(f"{output_dir}/11_FremiunProyectos_Log.sql", "w") as f:
-        f.write("-- Seed for FremiunProyectos_Log\n")
+        f.write("-- Seed for Dummy Projects and LogProyectos\n")
         f.write("SET NOCOUNT ON;\n")
         f.write("SET QUOTED_IDENTIFIER ON;\n")
+        count = 0
         for u in users:
-            if u["plan"]["name"] == "Gratuito":
+            if not u.get("is_guest", False) and count < 60:
                 proj_id = str(uuid.uuid4()).upper()
                 f.write(f"IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE IdUsuario = '{u['id']}')\n")
                 f.write(f"BEGIN\n")
-                f.write(f"    INSERT INTO ProyectosInmobiliarios (IdProyecto, IdUsuario, NombreProyecto, CodigoInterno, UbicacionTexto, Categoria, Status, EstadoIntegridad, EstadoJuridico, SelladoBloqueado, CreatedAtUtc) VALUES ('{proj_id}', '{u['id']}', 'Dummy Project', 'DUMMY-{u['id'][:5]}', 'N/A', 1, 1, 1, 1, 0, GETUTCDATE());\n")
+                f.write(f"    INSERT INTO ProyectosInmobiliarios (IdProyecto, IdUsuario, NombreProyecto, CodigoInterno, UbicacionTexto, Categoria, Status, EstadoIntegridad, EstadoJuridico, SelladoBloqueado, CreatedAtUtc) VALUES ('{proj_id}', '{u['id']}', 'Dummy Project {count+1}', 'DUMMY-{u['id'][:5]}', 'N/A', 1, 1, 1, 1, 0, GETUTCDATE());\n")
                 
                 log_id = str(uuid.uuid4()).upper()
-                f.write(f"    INSERT INTO FremiunProyectos_Log (IdProyectoLog, IdProyecto, IdUsuario, FechaAcceso) VALUES ('{log_id}', '{proj_id}', '{u['id']}', GETDATE());\n")
+                f.write(f"    INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc) VALUES ('{log_id}', '{proj_id}', '{u['id']}', GETUTCDATE(), 'Proyecto dummy generado por seeder', GETUTCDATE(), GETUTCDATE());\n")
                 f.write(f"END\n")
+                count += 1
 
     # Notificaciones
     with open(f"{output_dir}/12_Notificaciones.sql", "w") as f:

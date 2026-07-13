@@ -215,6 +215,40 @@ public static class EmailTemplates
     }
 
     // ════════════════════════════════════════════════════════════════════════
+    // 1.5 Account Created by Admin
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetAccountCreatedByAdminEmail(string userName, string email, string password)
+    {
+        string loginUrl = $"http://localhost:3000/#/login?email={System.Uri.EscapeDataString(email)}";
+
+        string content = $@"
+            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>
+            <p style=""margin:0 0 16px 0;font-size:15px;color:#B91C1C;"">VeriFinca te ha creado una cuenta para que vivas la experiencia de validación documental.</p>
+
+            <div style=""background-color:#FEF9C3;padding:16px;border-radius:8px;margin-bottom:16px;color:#854D0E;border-left:4px solid #EAB308;"">
+                <p style=""margin:0;""><strong>VeriFinca</strong>, te ha creado un espacio para acceder y utilizar las funcionalidades de la plataforma. Tu usuario y contraseña han sido generados exitosamente.</p>
+            </div>
+
+            <p style=""margin:0 0 16px 0;"">Puedes iniciar sesión utilizando las siguientes credenciales:</p>
+            
+            <div style=""background-color:#F8FAFC;padding:16px;border-radius:8px;margin-bottom:24px;border:1px solid #E5E7EB;"">
+                <p style=""margin:0 0 8px 0;""><strong>Correo Electrónico:</strong> {email}</p>
+                <p style=""margin:0;""><strong>Contraseña:</strong> <code>{password}</code></p>
+            </div>
+
+            <div style=""text-align:center;"">
+                {CtaButton(loginUrl, "Acceder a Mi cuenta")}
+            </div>
+
+            <p style=""margin:28px 0 0 0;font-size:13px;color:{TextMuted};"">Te recomendamos cambiar esta contraseña al iniciar sesión por primera vez.</p>";
+
+        return BuildEmailWrapper(
+            "Cuenta Creada — VeriFinca",
+            "Tu cuenta ha sido creada exitosamente en VeriFinca.",
+            content);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
     // 2. Document Upload Confirmation
     // ════════════════════════════════════════════════════════════════════════
     public static string GetDocumentUploadConfirmationEmail(string userName, string projectName, string documentType)
@@ -347,7 +381,7 @@ public static class EmailTemplates
         {
             priceDisplay = isAnual ? "$136 USD anual /mes" : "$170 USD /mes";
         }
-        else if (planName.Contains("Enterprise", System.StringComparison.OrdinalIgnoreCase))
+        else if (planName.Contains("Corporativo", System.StringComparison.OrdinalIgnoreCase))
         {
             priceDisplay = isAnual ? "$400 USD anual /mes" : "$500 USD /mes";
         }
@@ -420,6 +454,40 @@ public static class EmailTemplates
         return BuildEmailWrapper(
             $"Actualización de Estado: Proyecto {projectName} — VeriFinca",
             $"El estado de tu proyecto {projectName} ha cambiado a {statusStr}.",
+            content);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // X. Invitation to join subscription
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetInvitationEmail(string titularName, string inviteeName, string email, string tempPassword)
+    {
+        string loginUrl = $"http://localhost:3000/#/auth/login";
+
+        string infoInner = $@"
+            <div style=""margin-bottom:8px;""><strong>Usuario:</strong> <span style=""color:{NavyDark};"">{email}</span></div>
+            <div><strong>Contraseña Temporal:</strong> <span style=""color:{NavyDark};font-family:monospace;"">{tempPassword}</span></div>
+        ";
+
+        string content = $@"
+            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {inviteeName}! 👋</h2>
+            <p style=""margin:0 0 16px 0;font-size:15px;color:{TextMuted};"">Has sido invitado a formar parte de un equipo</p>
+
+            <p style=""margin:0 0 16px 0;""><strong>{titularName}</strong> te ha invitado a unirte a su suscripción en <strong>VeriFinca</strong>, la plataforma de verificación de expedientes e inmuebles de la República Dominicana.</p>
+
+            <p style=""margin:0 0 16px 0;"">Hemos creado una cuenta para ti. Puedes ingresar usando las siguientes credenciales:</p>
+
+            {InfoCard(infoInner, Orange)}
+
+            <p style=""margin:0 0 24px 0;"">Te recomendamos cambiar esta contraseña inmediatamente después de iniciar sesión por primera vez desde la sección de tu perfil.</p>
+
+            <div style=""text-align:center;"">
+                {CtaButton(loginUrl, "Iniciar Sesión")}
+            </div>";
+
+        return BuildEmailWrapper(
+            $"Has sido invitado a VeriFinca por {titularName}",
+            $"Únete a la suscripción de {titularName} en VeriFinca",
             content);
     }
 }

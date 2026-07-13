@@ -208,15 +208,7 @@ export const ProjectManagePage: React.FC = () => {
         </div>
       </dialog>
 
-      <div className="mb-8 text-center animate-fade-in">
-        <h1 className="text-4xl font-extrabold text-[var(--color-text-strong)] tracking-tight">
-          {isEditing ? "Editar Proyecto" : "Crear Nuevo Proyecto"}
-        </h1>
-        <p className="text-base mt-2 text-[var(--color-text-strong)] opacity-70">
-          {isEditing ? "Modifica los datos del proyecto existente." : "Ingresa los datos básicos para registrar un nuevo proyecto."}
-        </p>
-      </div>
-
+      {/* Title moved to layout */}
       <ProjectForm
         key={project?.id || 'new'}
         initialData={project}
@@ -248,46 +240,6 @@ export const ProjectManagePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick nav cards */}
-          {[{
-            icon: FileText,
-            title: "Expediente Documental",
-            desc: "Gestiona los documentos asociados a este proyecto.",
-            href: `/admin/projects/${id}/documents`,
-            label: "Gestionar Documentos",
-          },
-          {
-            icon: ShieldCheck,
-            title: "Validacion Integral",
-            desc: "Revisa el estado de validacion del expediente.",
-            href: `/admin/projects/${id}/validations`,
-            label: "Ver Validacion",
-          },
-          {
-            icon: ClipboardList,
-            title: "Reportes y Auditoria",
-            desc: "Consulta el historial operativo y reportes.",
-            href: `/admin/projects/${id}/reports`,
-            label: "Ver Reportes",
-          }].map((item) => (
-            <button
-              type="button"
-              key={item.href}
-              className="bg-[var(--color-surface-primary)] p-5 rounded-lg flex items-center justify-between gap-4 cursor-pointer hover:-translate-y-0.5 transition-transform w-full text-left"
-              onClick={() => navigate(item.href)}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-primary)]/10 flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-5 h-5 text-[var(--color-brand-primary)]" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[var(--color-text-strong)]">{item.title}</h3>
-                  <p className="text-xs text-[var(--color-text-strong)] opacity-50">{item.desc}</p>
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 text-[var(--color-surface-muted)]" />
-            </button>
-          ))}
         </div>
       )}
     </div>

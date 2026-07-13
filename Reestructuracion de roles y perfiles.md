@@ -2,7 +2,7 @@
 
 ## Bloque 0: Introducción y Conceptos Generales
 
-El sistema opera bajo un modelo de suscripciones con cuatro niveles: **Consulta (Free)**, **Profesional**, **Empresa** y **Enterprise**.  
+El sistema opera bajo un modelo de suscripciones con cuatro niveles: **Consulta (Free)**, **Profesional**, **Empresa** y **Corporativo**.  
 Todos los usuarios comparten una base funcional común (gestión de perfil, carga de documentos, dashboards personalizados).  
 Los límites de uso, la complejidad de las herramientas y el acceso a módulos avanzados varían según el plan contratado.
 
@@ -46,7 +46,7 @@ El superadmin puede editar su información personal de manera idéntica a cualqu
 
 El administrador visualiza y gestiona todos los usuarios del sistema, agrupados por tipo de suscripción.
 
-- **Vista de nivel superior**: Cuatro bloques colapsables: **Enterprise, Empresa, Profesional, Consulta**.
+- **Vista de nivel superior**: Cuatro bloques colapsables: **Corporativo, Empresa, Profesional, Consulta**.
   - Cada bloque muestra:
     - Resumen con el número total de usuarios en ese plan.
     - Botón “Agregar usuario” que abre un modal específico para ese plan.
@@ -61,7 +61,7 @@ El administrador visualiza y gestiona todos los usuarios del sistema, agrupados 
         - `Usuarios en su grupo: 2/5` (si el plan permite multiusuario; si no, muestra `1/1`).
       - **Rol del sistema**: dropdown con etiqueta de color (Admin, Usuario normal, Consultor, según lo permitido).
       - **Plan actual**: dropdown para cambiar manualmente la suscripción (recalcula límites).
-      - **Contratante**: si el usuario pertenece a un plan multiusuario (Empresa/Enterprise), se muestra nombre y correo del titular de la cuenta.
+      - **Contratante**: si el usuario pertenece a un plan multiusuario (Empresa/Corporativo), se muestra nombre y correo del titular de la cuenta.
       - **Botones de acción**: Editar, Eliminar, Reenviar invitación.
 - **Agregar usuario**: formulario donde el admin define nombre, correo, contraseña temporal, plan, y (si es multiusuario) lo asocia a un “grupo” bajo un titular existente. Se envían credenciales por correo.
 
@@ -110,7 +110,7 @@ Control absoluto sobre cualquier expediente.
      - Si el tipo es obligatorio y ya existe uno para ese expediente, se sobrescribe o se bloquea (regla configurable).
      - Almacenar en `storage/documentos/{expediente_id}/` con nombre único.
      - Insertar registro en tabla `documentos`.
-  5. Si el plan del usuario incluye modelo LM (Enterprise/Empresa), se encola un trabajo de análisis automático (ver sección 3.5).
+  5. Si el plan del usuario incluye modelo LM (Corporativo/Empresa), se encola un trabajo de análisis automático (ver sección 3.5).
 - **Modelo LM jurídico**: el admin activa/desactiva el servicio, entrena o ajusta el modelo pequeño basado en datos jurídicos de tierra. Ve los resultados de validación de todos los expedientes.
 
 ### 1.4 Capacidad de Búsqueda
@@ -124,7 +124,7 @@ Control absoluto sobre cualquier expediente.
 
 ## Bloque 2: Tabla Comparativa de Cuotas y Funcionalidades por Plan
 
-| Funcionalidad / Límite               | Consulta (Free)          | Profesional (RD$3,500)        | Empresa (RD$10,000)              | Enterprise (RD$30,000)                       |
+| Funcionalidad / Límite               | Consulta (Free)          | Profesional (RD$3,500)        | Empresa (RD$10,000)              | Corporativo (RD$30,000)                       |
 |--------------------------------------|--------------------------|-------------------------------|----------------------------------|----------------------------------------------|
 | **Consultas/mes**                    | 1                        | 25                            | 100                              | Ilimitadas                                   |
 | **Proyectos activos simultáneos**    | 0 (no permitido)         | 5                             | 20                               | Ilimitados                                   |
@@ -144,7 +144,7 @@ Control absoluto sobre cualquier expediente.
 
 ---
 
-## Bloque 3: Usuario Enterprise (Plan Superior)
+## Bloque 3: Usuario Corporativo (Plan Superior)
 
 ### 3.1 Perfil y Configuración Personal
 
@@ -155,7 +155,7 @@ No tiene acceso a las pestañas de “Usuarios y Accesos” ni “Perfiles y Per
 
 - Ruta: **Configuración → Mi equipo**.
 - Puede agregar usuarios (hasta ilimitado), editarlos y desactivarlos.
-- Los nuevos usuarios heredan el plan Enterprise; sus consultas y proyectos se descuentan del pool común del titular (o se definen sublímites configurables por el admin).
+- Los nuevos usuarios heredan el plan Corporativo; sus consultas y proyectos se descuentan del pool común del titular (o se definen sublímites configurables por el admin).
 - Cada miembro ve sus propias consultas/proyectos restantes según reparto.
 - La vista del titular es una lista similar a la del admin pero filtrada solo a su grupo, con etiquetas de consumo.
 
@@ -231,11 +231,11 @@ No tiene acceso a las pestañas de “Usuarios y Accesos” ni “Perfiles y Per
 ### 4.5 Expedientes y Documentos
 
 - Límite: **20 proyectos activos** simultáneos.
-- Flujo de estados igual que Enterprise (envío a revisión posible).
+- Flujo de estados igual que Corporativo (envío a revisión posible).
 - Carga de documentos con tipos obligatorios y 10 MB por archivo.
 - **Modelo LM** disponible solo para análisis individual por proyecto (sin validación en lote). Puede tener menor prioridad en la cola de procesamiento.
 - Almacenamiento total: **1 GB**.
-- Reporte de conformidad documental idéntico al de Enterprise.
+- Reporte de conformidad documental idéntico al de Corporativo.
 
 ### 4.6 API y CRM
 
@@ -359,7 +359,7 @@ CREATE TABLE documentos (
 7.3 Modelo LM y Validación Documental
 Implementado como job asíncrono.
 
-Al subir un documento (planes Enterprise/Empresa) se dispara el evento DocumentUploaded.
+Al subir un documento (planes Corporativo/Empresa) se dispara el evento DocumentUploaded.
 
 Se encola ProcessDocumentJob que:
 
@@ -384,7 +384,7 @@ Tabla planes:
 sql
 CREATE TABLE planes (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    clave VARCHAR(50) UNIQUE NOT NULL, -- 'consulta', 'profesional', 'empresa', 'enterprise'
+    clave VARCHAR(50) UNIQUE NOT NULL, -- 'consulta', 'profesional', 'empresa', 'corporativo'
     nombre VARCHAR(100),
     consultas_max INT,
     proyectos_max INT,
@@ -418,6 +418,6 @@ Verifica contadores en Redis o base de datos para peticiones en tiempo real.
 
 Bloquea acciones que excedan los límites (retorna 403 con mensaje descriptivo).
 
-Las rutas de API están protegidas por middlewares de autenticación y, opcionalmente, de alcance (scope: enterprise, empresa, profesional).
+Las rutas de API están protegidas por middlewares de autenticación y, opcionalmente, de alcance (scope: corporativo, empresa, profesional).
 
 Las claves de API se generan por usuario con un límite de tasa configurable por plan.

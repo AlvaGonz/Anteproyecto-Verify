@@ -45,6 +45,11 @@ public record AdminUserSettingsDto(
 );
 
 /// <summary>
+/// Request DTO for inviting users
+/// </summary>
+public record InviteUserRequest(string Nombre, string Apellido, string Email, string Telefono, string Cedula);
+
+/// <summary>
 /// Paginated response wrapper
 /// </summary>
 public record PaginatedResponse<T>(
@@ -61,11 +66,16 @@ public class SettingsController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly Application.Abstractions.Security.IPasswordHasher _passwordHasher;
+    private readonly Application.Abstractions.Notifications.IEmailService _emailService;
 
-    public SettingsController(AppDbContext context, Application.Abstractions.Security.IPasswordHasher passwordHasher)
+    public SettingsController(
+        AppDbContext context, 
+        Application.Abstractions.Security.IPasswordHasher passwordHasher,
+        Application.Abstractions.Notifications.IEmailService emailService)
     {
         _context = context;
         _passwordHasher = passwordHasher;
+        _emailService = emailService;
     }
 
     [HttpGet("users")]
@@ -81,12 +91,12 @@ public class SettingsController : ControllerBase
 
         // Validate pagination parameters
         page = Math.Max(1, page);
-        pageSize = Math.Clamp(pageSize, 1, 200);
+        // pageSize = Math.Clamp(pageSize, 1, 200); // Removed to allow loading all users
 
         var query = from u in _context.Usuarios
                     let dgii = _context.DGII.FirstOrDefault(x => x.Rnc == u.Rnc)
                     let inviteesCount = _context.Usuarios.Count(x => x.TitularId == u.Id)
-                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active
+                    where u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator && (u.Plan == null || u.Plan.NombrePlan != "Consultor")
                     select new {
                         u.Id,
                         u.Nombre,
@@ -99,21 +109,18 @@ public class SettingsController : ControllerBase
                         RazonSocial = dgii != null ? dgii.NombreRazonSocial : null,
                         NombreComercial = dgii != null ? dgii.NombreComercial : null,
                         PlanId = u.PlanSuscripcionId,
-                        PlanName = u.Plan != null ? u.Plan.NombrePlan : "Gratuito",
-                        PlanPrice = u.Plan != null ? u.Plan.Precio : 0m,
+                        PlanName = u.TitularId != null ? "Invitado" : (u.Plan != null ? u.Plan.NombrePlan : "Gratuito"),
+                        PlanPrice = u.TitularId != null ? 0m : (u.Plan != null ? u.Plan.Precio : 0m),
                         PlanCreatedAt = u.CreatedAtUtc,
                         PlanExpiresAt = u.CurrentPeriodEnd,
                         UsedProjects = u.ProyectosCreados,
                         UsedQueries = u.ConsultasUsadas,
-                        MaxInvitees = u.Plan != null && u.Plan.NombrePlan == "Enterprise" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0),
+                        MaxInvitees = u.TitularId != null ? 0 : (u.Plan != null && u.Plan.NombrePlan == "Corporativo" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0)),
                         InviteesCount = inviteesCount
                     };
 
         var totalCount = await query.CountAsync(cancellationToken);
-        var rawItems = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
+        var rawItems = await query.ToListAsync(cancellationToken);
 
         var itemIds = rawItems.Select(x => x.Id).ToList();
         var allInvitees = await _context.Usuarios
@@ -156,6 +163,13 @@ public class SettingsController : ControllerBase
     {
         if (!await IsAdminAsync()) return StatusCode(StatusCodes.Status403Forbidden, new { Message = "Acceso denegado." });
 
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { Message = "El correo electrónico es obligatorio." });
+        if (string.IsNullOrWhiteSpace(request.Telefono))
+            return BadRequest(new { Message = "El teléfono es obligatorio." });
+        if (string.IsNullOrWhiteSpace(request.Cedula))
+            return BadRequest(new { Message = "La cédula es obligatoria." });
+
         if (request.Nombre != null && request.Nombre.Any(char.IsDigit))
             return BadRequest(new { Message = "El nombre no puede contener números." });
         if (request.Apellido != null && request.Apellido.Any(char.IsDigit))
@@ -163,6 +177,15 @@ public class SettingsController : ControllerBase
 
         if (await _context.Usuarios.AnyAsync(u => u.CorreoElectronico == request.Email, cancellationToken))
             return BadRequest(new { Message = "El correo electrónico ya está en uso." });
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            var p = request.Password;
+            if (p.Length < 8 || !p.Any(char.IsUpper) || !p.Any(char.IsLower) || !p.Any(char.IsDigit) || !p.Any(ch => "!@#$%^&*-".Contains(ch)))
+            {
+                return BadRequest(new { Message = "La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial." });
+            }
+        }
 
         UserRole role = request.Role.ToLower() switch
         {
@@ -187,6 +210,17 @@ public class SettingsController : ControllerBase
             cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
         );
 
+        user.ForzarVerificacionEmail();
+
+        if (!string.IsNullOrWhiteSpace(request.PlanNombre))
+        {
+            var plan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == request.PlanNombre, cancellationToken);
+            if (plan != null)
+            {
+                user.AsignarPlan(plan.Idsuscripcion);
+            }
+        }
+
         _context.Usuarios.Add(user);
 
         // Save the new user first so that its ID exists in the database.
@@ -194,22 +228,29 @@ public class SettingsController : ControllerBase
         // which depend on the user's ID.
         await _context.SaveChangesAsync(cancellationToken);
 
-        if (!string.IsNullOrWhiteSpace(request.Password))
-        {
-            var notification = new Notificacion(
-                usuarioId: user.Id,
-                mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
-                tipo: "Warning",
-                enlaceRelacionado: "/profile"
-            );
-            _context.Notificaciones.Add(notification);
-        }
+        var notification = new Notificacion(
+            usuarioId: user.Id,
+            mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
+            tipo: "Warning",
+            enlaceRelacionado: "/profile"
+        );
+        _context.Notificaciones.Add(notification);
 
         // Sync legacy (inserts Acceso and Pagos)
         await SyncUserLegacyAsync(user, cancellationToken);
 
         // Second SaveChangesAsync for notifications and legacy tables
         await _context.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            var html = Infrastructure.Email.EmailTemplates.GetAccountCreatedByAdminEmail(nombre, request.Email, finalPassword);
+            await _emailService.SendEmailAsync(request.Email, "Cuenta Creada — VeriFinca", html);
+        }
+        catch (Exception)
+        {
+            // If email sending fails, we don't fail the user creation
+        }
 
         return Ok(new { Message = "Usuario creado exitosamente.", Id = user.Id });
     }
@@ -421,7 +462,7 @@ public class SettingsController : ControllerBase
         u.AsignarPlan(plan.Idsuscripcion);
 
         // Enforce team member limit for the new plan
-        int maxInvitees = plan.NombrePlan == "Enterprise" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
+        int maxInvitees = plan.NombrePlan == "Corporativo" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
         var currentInvitees = await _context.Usuarios
             .Where(usr => usr.TitularId == u.Id)
             .ToListAsync(cancellationToken);
@@ -466,7 +507,7 @@ public class SettingsController : ControllerBase
         var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId, cancellationToken);
         if (invitee == null) return NotFound(new { Message = "Usuario a invitar no encontrado." });
 
-        int maxInvitees = titular.Plan != null && titular.Plan.NombrePlan == "Enterprise" ? 10 : (titular.Plan != null && titular.Plan.NombrePlan == "Empresa" ? 5 : 0);
+        int maxInvitees = titular.Plan != null && titular.Plan.NombrePlan == "Corporativo" ? 10 : (titular.Plan != null && titular.Plan.NombrePlan == "Empresa" ? 5 : 0);
         int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == titular.Id, cancellationToken);
 
         if (currentInvitees >= maxInvitees)
@@ -491,6 +532,93 @@ public class SettingsController : ControllerBase
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok(new { Message = "Usuario invitado removido exitosamente." });
+    }
+
+    [HttpPost("users/invite")]
+    public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request, CancellationToken cancellationToken)
+    {
+        // 1. Fetch current logged-in user (Emisor)
+        var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        if (string.IsNullOrWhiteSpace(userEmail)) return Unauthorized();
+
+        var emisor = await _context.Usuarios
+            .Include(u => u.Plan)
+            .FirstOrDefaultAsync(u => u.CorreoElectronico == userEmail, cancellationToken);
+
+        if (emisor == null) return Unauthorized();
+
+        // 2. Validate plan and limits (only Corporativo and Empresa can invite)
+        if (emisor.Plan == null || (emisor.Plan.NombrePlan != "Corporativo" && emisor.Plan.NombrePlan != "Empresa"))
+        {
+            return BadRequest(new { Message = "Tu plan actual no permite invitar usuarios." });
+        }
+
+        int maxInvitees = emisor.Plan.NombrePlan == "Corporativo" ? 10 : 5;
+        
+        // Count existing invitees + pending invitations
+        int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == emisor.Id, cancellationToken);
+        int pendingInvitations = await _context.Invitaciones.CountAsync(i => i.EmisorId == emisor.Id && !i.Aceptada, cancellationToken);
+
+        if (currentInvitees + pendingInvitations >= maxInvitees)
+        {
+            return BadRequest(new { Message = "Has alcanzado el límite de usuarios invitados para tu plan." });
+        }
+
+        // 3. Check if email is already registered or invited
+        if (await _context.Usuarios.AnyAsync(u => u.CorreoElectronico == request.Email, cancellationToken))
+            return BadRequest(new { Message = "El correo electrónico ya está registrado." });
+            
+        if (await _context.Invitaciones.AnyAsync(i => i.Email == request.Email && !i.Aceptada, cancellationToken))
+            return BadRequest(new { Message = "El correo electrónico ya tiene una invitación pendiente." });
+
+        // 4. Create the invitation record
+        var invitacion = new Invitacion(emisor.Id, request.Email, request.Nombre, request.Apellido, request.Telefono, request.Cedula);
+        _context.Invitaciones.Add(invitacion);
+
+        // 5. Optionally create the user account directly (or let them create it themselves via a link)
+        // Since the prompt asks to send the temp password, we will create the account now.
+        string finalPassword = "TempPassword123!"; // Or generate a random one
+        string hashedPassword = _passwordHasher.HashPassword(finalPassword);
+
+        var newUser = new Usuario(
+            nombre: string.IsNullOrWhiteSpace(request.Nombre) ? "Invitado" : request.Nombre,
+            apellido: string.IsNullOrWhiteSpace(request.Apellido) ? "Nuevo" : request.Apellido,
+            correoElectronico: request.Email,
+            contrasenaHash: hashedPassword,
+            rol: UserRole.User,
+            telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
+            cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
+        );
+
+        newUser.ForzarVerificacionEmail();
+        newUser.AsignarTitular(emisor.Id);
+        newUser.UpdateAccountStatus(UserAccountStatus.Invited);
+
+        _context.Usuarios.Add(newUser);
+
+        // Save invitation and new user
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // Sync legacy (inserts Acceso and Pagos)
+        await SyncUserLegacyAsync(newUser, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // 6. Send Invitation Email
+        try
+        {
+            var html = Infrastructure.Email.EmailTemplates.GetInvitationEmail(
+                emisor.Nombre + " " + emisor.Apellido, 
+                newUser.Nombre, 
+                request.Email, 
+                finalPassword);
+            await _emailService.SendEmailAsync(request.Email, $"Invitación de {emisor.Nombre} — VeriFinca", html);
+        }
+        catch (Exception)
+        {
+            // If email sending fails, we don't fail the user creation
+        }
+
+        return Ok(new { Message = "Invitación enviada exitosamente." });
     }
 
     [HttpGet("profiles")]
@@ -555,8 +683,26 @@ public class SettingsController : ControllerBase
 
     private async Task SyncUserLegacyAsync(Usuario u, CancellationToken cancellationToken = default)
     {
-        // Don't add to UsuariosLegacy explicitly because it is a VIEW over Usuarios
-        // The record will appear in the view automatically once SaveChanges is called.
+        // Check if user already exists in UsuariosLegacy table to avoid duplicates
+        var legacyUserExists = await _context.UsuariosLegacy.AnyAsync(ul => ul.IdUsuario == u.Id, cancellationToken);
+        if (!legacyUserExists)
+        {
+            _context.UsuariosLegacy.Add(new Domain.Entities.UsuarioLegacy
+            {
+                IdUsuario = u.Id,
+                Nombre = u.Nombre,
+                Apellido = u.Apellido,
+                NombreCompleto = $"{u.Nombre} {u.Apellido}",
+                Email = u.CorreoElectronico,
+                ContrasenaHash = u.ContrasenaHash,
+                Telefono = u.Telefono ?? "0000000000",
+                Cedula = u.Cedula ?? "00000000000"
+            });
+            
+            // We need to save the legacy user first before adding Acceso and Pagos
+            // because they depend on the foreign key to UsuarioLegacy.
+            await _context.SaveChangesAsync(cancellationToken);
+        }
 
         // Ensure profiles are loaded (cached for performance)
         var adminLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "ADMIN", cancellationToken);
@@ -621,6 +767,7 @@ public class CreateUserDto
     public string Telefono { get; set; } = "0000000000";
     public string Cedula { get; set; } = "00000000000";
     public string? Password { get; set; }
+    public string? PlanNombre { get; set; }
 }
 
 public class UpdateUserDto

@@ -139,12 +139,12 @@
 
 | Domain | Tactic | Technique ID | Technique Name | Test Reference |
 |---|---|---|---|---|
-| Enterprise | Initial Access | T1566.001 | Spearphishing Attachment | ART: T1566.001 |
-| Enterprise | Execution | T1059.001 | PowerShell | ART: T1059.001 |
-| Enterprise | Persistence | T1053.005 | Scheduled Task | ART: T1053.005 |
-| Enterprise | Credential Access | T1003.001 | LSASS Memory Dumping | ART: T1003.001 |
-| Enterprise | Lateral Movement | T1021.002 | SMB/Windows Admin Shares | ART: T1021.002 |
-| Enterprise | Exfiltration | T1041 | Exfiltration Over C2 Channel | ART: T1041 |
+| Corporativo | Initial Access | T1566.001 | Spearphishing Attachment | ART: T1566.001 |
+| Corporativo | Execution | T1059.001 | PowerShell | ART: T1059.001 |
+| Corporativo | Persistence | T1053.005 | Scheduled Task | ART: T1053.005 |
+| Corporativo | Credential Access | T1003.001 | LSASS Memory Dumping | ART: T1003.001 |
+| Corporativo | Lateral Movement | T1021.002 | SMB/Windows Admin Shares | ART: T1021.002 |
+| Corporativo | Exfiltration | T1041 | Exfiltration Over C2 Channel | ART: T1041 |
 
 *Add rows as needed for each technique used during the engagement.*
 

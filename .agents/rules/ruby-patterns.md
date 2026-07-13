@@ -25,7 +25,7 @@ paths:
 ## Background Jobs And Runtime Services
 
 - Use **Solid Queue** for greenfield Rails 8 apps with modest throughput and simple deployment needs.
-- Use **Sidekiq** when the app needs mature observability, high throughput, existing Redis infrastructure, or Pro/Enterprise features.
+- Use **Sidekiq** when the app needs mature observability, high throughput, existing Redis infrastructure, or Pro/Corporativo features.
 - Use **Solid Cache** and **Solid Cable** when their deployment model matches the app; use Redis when shared cross-service behavior, high fanout, or advanced data structures matter.
 
 ## Frontend

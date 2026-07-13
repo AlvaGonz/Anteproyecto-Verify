@@ -41,7 +41,7 @@ export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({
                 {t("pricing.cards.empresa.title")}
               </th>
               <th className="py-4 px-6 font-label font-semibold text-center text-on-surface w-1/5 border-b border-outline-variant">
-                {t("pricing.cards.enterprise.title")}
+                {t("pricing.cards.corporativo.title")}
               </th>
             </tr>
           </thead>

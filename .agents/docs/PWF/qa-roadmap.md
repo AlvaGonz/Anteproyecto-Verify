@@ -184,7 +184,7 @@ Mejoras de UX, herramientas de administración y mecanismos de feedback. No bloq
 
 ## 🟢 P3 — Tech Debt
 
-Mejoras no funcionales, accesibilidad, rendimiento y fortalecimiento de CI/CD. No bloqueantes pero necesarias para producción enterprise.
+Mejoras no funcionales, accesibilidad, rendimiento y fortalecimiento de CI/CD. No bloqueantes pero necesarias para producción corporativo.
 
 | ID | Item | RF | OE | Layer | Agente | Dependencia |
 |----|------|----|----|-------|--------|-------------|

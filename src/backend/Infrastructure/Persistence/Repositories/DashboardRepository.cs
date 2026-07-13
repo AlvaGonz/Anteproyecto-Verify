@@ -19,13 +19,16 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<DashboardStatsDto> GetAdminDashboardStatsAsync(CancellationToken cancellationToken = default)
         {
-            var totalUsuarios = await _context.Set<Usuario>().CountAsync(cancellationToken);
-            var suscripcionesActivas = await _context.Set<Usuario>().CountAsync(u => u.PlanSuscripcionId != null, cancellationToken);
+            var activeUsersQuery = _context.Set<Usuario>()
+                .Where(u => u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator && (u.Plan == null || u.Plan.NombrePlan != "Consultor"));
+
+            var totalUsuarios = await activeUsersQuery.CountAsync(cancellationToken);
+            var suscripcionesActivas = await activeUsersQuery.CountAsync(u => u.PlanSuscripcionId != null && u.TitularId == null, cancellationToken);
             
-            // Just an estimation logic (if you add price to Plan it would be a join)
-            var ingresosMensualesEstimados = await _context.Set<Usuario>()
+            // Just an estimation logic
+            var ingresosMensualesEstimados = await activeUsersQuery
                 .Include(u => u.Plan)
-                .Where(u => u.PlanSuscripcionId != null && u.Plan != null)
+                .Where(u => u.PlanSuscripcionId != null && u.Plan != null && u.TitularId == null)
                 .SumAsync(u => u.Plan!.Precio, cancellationToken);
 
             var totalProyectos = await _context.Set<Proyecto>().CountAsync(cancellationToken);
@@ -33,15 +36,15 @@ namespace Infrastructure.Persistence.Repositories
             var proyectosAprobados = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Validated || p.EstadoProyecto == Domain.Enums.ProjectStatus.Published, cancellationToken);
             var proyectosRechazados = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Rejected || p.EstadoProyecto == Domain.Enums.ProjectStatus.Observed, cancellationToken);
 
-            var suscripcionesRecientes = await _context.Set<Usuario>()
+            var suscripcionesRecientes = await activeUsersQuery
                 .Include(u => u.Plan)
                 .Where(u => u.PlanSuscripcionId != null)
                 .OrderByDescending(u => u.UpdatedAtUtc ?? u.CreatedAtUtc)
-                .Take(10)
+                .Take(50)
                 .Select(u => new SuscripcionRecienteDto
                 {
                     FechaAlta = u.UpdatedAtUtc ?? u.CreatedAtUtc,
-                    Plan = u.Plan != null ? u.Plan.NombrePlan : "N/A",
+                    Plan = u.TitularId != null ? "Invitado" : (u.Plan != null ? u.Plan.NombrePlan : "N/A"),
                     Correo = u.CorreoElectronico,
                     Estado = u.Activo ? "Activa" : "Inactiva"
                 })
@@ -50,7 +53,7 @@ namespace Infrastructure.Persistence.Repositories
             var proyectosRecientes = await _context.Set<Proyecto>()
                 .Include(p => p.UsuarioCreador)
                 .OrderByDescending(p => p.CreatedAtUtc)
-                .Take(10)
+                .Take(50)
                 .Select(p => new ProyectoRecienteDto
                 {
                     FechaRegistro = p.CreatedAtUtc,
@@ -60,13 +63,14 @@ namespace Infrastructure.Persistence.Repositories
                 })
                 .ToListAsync(cancellationToken);
 
-            var usuariosPorRol = await _context.Set<Usuario>()
-                .GroupBy(u => u.Rol)
-                .Select(g => new { Rol = g.Key.ToString(), Count = g.Count() })
-                .ToDictionaryAsync(x => x.Rol, x => x.Count, cancellationToken);
+            var usuariosPorPlan = await activeUsersQuery
+                .Include(u => u.Plan)
+                .GroupBy(u => u.TitularId != null ? "Invitado" : (u.Plan != null ? u.Plan.NombrePlan : "Gratuito"))
+                .Select(g => new { Plan = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);
                 
-            var totalConsultas = await _context.Set<Usuario>().SumAsync(u => u.ConsultasUsadas, cancellationToken);
-            var totalProyectosRegistrados = await _context.Set<Usuario>().SumAsync(u => u.ProyectosCreados, cancellationToken);
+            var totalConsultas = await activeUsersQuery.SumAsync(u => u.ConsultasUsadas, cancellationToken);
+            var totalProyectosRegistrados = await activeUsersQuery.SumAsync(u => u.ProyectosCreados, cancellationToken);
 
             return new DashboardStatsDto
             {
@@ -79,7 +83,7 @@ namespace Infrastructure.Persistence.Repositories
                 ProyectosRechazados = proyectosRechazados,
                 SuscripcionesRecientes = suscripcionesRecientes,
                 ProyectosRecientes = proyectosRecientes,
-                UsuariosPorRol = usuariosPorRol,
+                UsuariosPorPlan = usuariosPorPlan,
                 TotalConsultasRealizadas = totalConsultas,
                 TotalProyectosRegistrados = totalProyectosRegistrados
             };

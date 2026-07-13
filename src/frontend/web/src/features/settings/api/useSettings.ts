@@ -177,29 +177,6 @@ export const useReactivateSubscription = () => {
 };
 
 
-export const usePotentialInvitees = () =>
-  useQuery({
-    queryKey: ["settings", "potential-invitees"],
-    queryFn: () =>
-      apiClient
-        .get<{id: string, nombre: string, apellido: string, email: string}[]>("/admin/potential-invitees")
-        .then(res => res.data),
-  });
-
-export const useAddInvitee = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationKey: ["useAddInvitee"],
-    mutationFn: (inviteeId: string) =>
-      apiClient.post<{message: string}>(`/admin/invitees/${inviteeId}`).then(res => res.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["settings", "potential-invitees"] });
-      qc.invalidateQueries({ queryKey: ["auth", "me"] });
-      qc.invalidateQueries({ queryKey: ["settings", "users"] });
-    },
-  });
-};
-
 export const useRemoveInvitee = () => {
   const qc = useQueryClient();
   return useMutation({
@@ -207,7 +184,19 @@ export const useRemoveInvitee = () => {
     mutationFn: (inviteeId: string) =>
       apiClient.delete<{message: string}>(`/admin/invitees/${inviteeId}`).then(res => res.data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["settings", "potential-invitees"] });
+      qc.invalidateQueries({ queryKey: ["auth", "me"] });
+      qc.invalidateQueries({ queryKey: ["settings", "users"] });
+    },
+  });
+};
+
+export const useInviteUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["useInviteUser"],
+    mutationFn: (data: { nombre: string; apellido: string; email: string; telefono: string; cedula: string }) =>
+      apiClient.post<{message: string}>(`/admin/users/invite`, data).then(res => res.data),
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["auth", "me"] });
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
     },

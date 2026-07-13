@@ -31,7 +31,7 @@ export const PlansModal: React.FC<PlansModalProps> = ({ isOpen, onClose, source,
     }
   }, [isOpen]);
 
-  const handlePaidPlan = (plan: 'profesional' | 'empresa' | 'enterprise') => {
+  const handlePaidPlan = (plan: 'profesional' | 'empresa' | 'corporativo') => {
     const billing = isAnnual ? 'yearly' : 'monthly';
     const activeSource = source || 'settings';
     const targetUrl = `/checkout?plan=${plan}&billing=${billing}&source=${activeSource}`;
@@ -49,7 +49,7 @@ export const PlansModal: React.FC<PlansModalProps> = ({ isOpen, onClose, source,
   const prices = {
     profesional: isAnnual ? "$48 USD" : "$60 USD",
     empresa: isAnnual ? "$136 USD" : "$170 USD",
-    enterprise: isAnnual ? "$400 USD" : "$500 USD",
+    corporativo: isAnnual ? "$400 USD" : "$500 USD",
   };
 
   return createPortal(

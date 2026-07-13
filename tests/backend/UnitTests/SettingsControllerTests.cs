@@ -53,7 +53,8 @@ public class SettingsControllerTests
         // Arrange
         using var context = CreateDbContext("Settings_GetUsers_NoCookie");
         var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
-        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+        var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
+        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
         SetupControllerContext(controller, null);
 
         // Act
@@ -79,7 +80,8 @@ public class SettingsControllerTests
         using (var context = CreateDbContext(dbName))
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
             SetupControllerContext(controller, "juan@verifinca.do", "user");
 
             // Act
@@ -128,7 +130,8 @@ public class SettingsControllerTests
         using (var context = CreateDbContext(dbName))
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             // Act
@@ -137,8 +140,8 @@ public class SettingsControllerTests
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<global::Api.Controllers.PaginatedResponse<global::Api.Controllers.AdminUserSettingsDto>>(okResult.Value);
-            Assert.Equal(2, response.TotalCount);
-            Assert.Equal(2, response.Items.Count);
+            Assert.Equal(1, response.TotalCount);
+            Assert.Single(response.Items);
 
             // Verify syncing occurred
             var legacyUsers = await context.UsuariosLegacy.ToListAsync();
@@ -185,7 +188,8 @@ public class SettingsControllerTests
         using (var context = CreateDbContext(dbName))
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdateRoleRequest { Role = "user" };
@@ -239,7 +243,8 @@ public class SettingsControllerTests
         using (var context = CreateDbContext(dbName))
         {
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object);
+            var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdatePlanRequest { PlanId = empresaPlanId };

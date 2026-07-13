@@ -10,6 +10,7 @@ const CheckoutReturnPage = lazy(() => import("../features/pricing/pages/Checkout
 import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage";
 import { ProjectPublicDetailPage } from "../pages/projects/ProjectPublicDetailPage";
 import { ProjectManagePage } from "../pages/projects/ProjectManagePage";
+import { ProjectManageLayout } from "../pages/projects/ProjectManageLayout";
 import { ProjectDocumentsPage } from "../pages/projects/ProjectDocumentsPage";
 import { ProjectValidationPage } from "../pages/projects/ProjectValidationPage";
 import { ProjectAuditPage } from "../pages/admin/ProjectAuditPage";
@@ -230,32 +231,13 @@ export const router = createHashRouter([
         element: (
           <AuthGuard>
             <AdminLayout>
-              <ProjectManagePage />
+              <ProjectManageLayout />
             </AdminLayout>
           </AuthGuard>
         ),
-      },
-      {
-        path: "/admin/projects/:id/edit",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ProjectManagePage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/projects/:id/documents",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ProjectDocumentsPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
+        children: [
+          { index: true, element: <ProjectManagePage /> }
+        ]
       },
       {
         path: "/admin/projects/:id/upload",
@@ -263,17 +245,6 @@ export const router = createHashRouter([
         element: (
           <AuthGuard>
             <ProjectDocumentUploadPage />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/projects/:id/validations",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ProjectValidationPage />
-            </AdminLayout>
           </AuthGuard>
         ),
       },
@@ -289,26 +260,23 @@ export const router = createHashRouter([
         ),
       },
       {
-        path: "/admin/projects/:id/audit",
+        path: "/admin/projects/:id",
         errorElement: <AdminErrorFallback />,
         element: (
           <AuthGuard>
             <AdminLayout>
-              <ProjectAuditPage />
+              <ProjectManageLayout />
             </AdminLayout>
           </AuthGuard>
         ),
-      },
-      {
-        path: "/admin/projects/:id/reports",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ProjectReportsPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
+        children: [
+          { index: true, element: <Navigate to="edit" replace /> },
+          { path: "edit", element: <ProjectManagePage /> },
+          { path: "documents", element: <ProjectDocumentsPage /> },
+          { path: "validations", element: <ProjectValidationPage /> },
+          { path: "reports", element: <ProjectReportsPage /> },
+          { path: "audit", element: <ProjectAuditPage /> }
+        ]
       },
       {
         path: "/admin/findings/:projectId",

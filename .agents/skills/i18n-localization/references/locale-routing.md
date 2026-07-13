@@ -13,7 +13,7 @@
 | Strategy | URL Example | Best For |
 |----------|-------------|----------|
 | **Sub-path routing** | `example.com/en/page`, `example.com/ar/page` | Most apps, SEO with `hreflang`, simple setup |
-| **Domain routing** | `en.example.com`, `example.es` | Country-specific TLDs, enterprise, brand per market |
+| **Domain routing** | `en.example.com`, `example.es` | Country-specific TLDs, corporativo, brand per market |
 
 ---
 

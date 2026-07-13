@@ -12,4 +12,5 @@ public interface INotificacionRepository
     Task<Notificacion?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task AddAsync(Notificacion notificacion, CancellationToken cancellationToken = default);
     Task UpdateAsync(Notificacion notificacion, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Notificacion notificacion, CancellationToken cancellationToken = default);
 }

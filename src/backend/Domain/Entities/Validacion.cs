@@ -23,7 +23,7 @@ public class Validacion : EntityBase
     public string? Detalle { get; private set; }
     public string? CamposValidadosJson { get; private set; }
 
-    // Enterprise Fields (RF-11 to RF-15)
+    // Corporativo Fields (RF-11 to RF-15)
     private readonly List<DatoValidado> _datosValidados = new();
     public IReadOnlyCollection<DatoValidado> DatosValidados => _datosValidados.AsReadOnly();
 

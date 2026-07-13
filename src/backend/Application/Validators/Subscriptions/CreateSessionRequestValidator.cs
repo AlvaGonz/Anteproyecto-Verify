@@ -34,8 +34,8 @@ public class CreateSessionRequestValidator : AbstractValidator<CreateSessionRequ
             config["Stripe:Prices:ProfesionalAnual"],
             config["Stripe:Prices:EmpresaMonthly"],
             config["Stripe:Prices:EmpresaAnual"],
-            config["Stripe:Prices:EnterpriseMonthly"],
-            config["Stripe:Prices:EnterpriseAnual"]
+            config["Stripe:Prices:CorporativoMonthly"],
+            config["Stripe:Prices:CorporativoAnual"]
         };
 
         return validPrices.Contains(priceId) && !string.IsNullOrEmpty(priceId);

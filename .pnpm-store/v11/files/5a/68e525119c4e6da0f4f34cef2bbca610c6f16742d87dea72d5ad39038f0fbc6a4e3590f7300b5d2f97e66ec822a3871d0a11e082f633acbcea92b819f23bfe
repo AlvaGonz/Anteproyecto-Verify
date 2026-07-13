@@ -29588,7 +29588,7 @@ async function launchApp(browserType, options2) {
     if (channel) {
       error = rewriteErrorMessage(error, [
         `Failed to launch "${channel}" channel.`,
-        "Using custom channels could lead to unexpected behavior due to Enterprise policies (chrome://policy).",
+        "Using custom channels could lead to unexpected behavior due to Corporativo policies (chrome://policy).",
         "Install the default browser instead:",
         wrapInASCIIBox(`${buildPlaywrightCLICommand(options2.sdkLanguage, "install")}`, 2)
       ].join("\n"));

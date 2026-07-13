@@ -1,25 +1,16 @@
-import React from "react";
-import { usePotentialInvitees, useAddInvitee, useRemoveInvitee } from "../api/useSettings";
+import React, { useState } from "react";
+import { useRemoveInvitee } from "../api/useSettings";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
-import { Users, UserPlus, UserMinus, Loader2, Shield } from "lucide-react";
+import { Users, UserPlus, UserMinus, Shield } from "lucide-react";
+import { InviteUserModal } from "./InviteUserModal";
 
 export const InviteesSettings: React.FC = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: potentialInvitees = [], isLoading: isLoadingPotential } = usePotentialInvitees();
-  const addInviteeMutation = useAddInvitee();
   const removeInviteeMutation = useRemoveInvitee();
-
-  const handleAddInvitee = async (inviteeId: string) => {
-    try {
-      await addInviteeMutation.mutateAsync(inviteeId);
-      addToast("Usuario invitado agregado exitosamente.", "success");
-    } catch (error: any) {
-      addToast(error?.response?.data?.Message || "Error al agregar usuario.", "error");
-    }
-  };
 
   const handleRemoveInvitee = async (inviteeId: string) => {
     try {
@@ -30,31 +21,28 @@ export const InviteesSettings: React.FC = () => {
     }
   };
 
-  if (isLoadingPotential) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <Loader2 className="w-10 h-10 animate-spin text-[#223382]" />
-        <p className="mt-4 text-sm font-medium text-text-secondary">Cargando usuarios potenciales...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full max-w-4xl space-y-6 animate-in fade-in zoom-in-95 duration-300">
       <div className="bg-white rounded-3xl shadow-premium border border-border p-8">
-        <h2 className="text-2xl font-display font-bold text-[#223382] mb-2 flex items-center gap-3">
-          <Users className="w-6 h-6 text-primary" />
-          Gestión de Usuarios Invitados
-        </h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-2xl font-display font-bold text-[#223382] flex items-center gap-3">
+            <Users className="w-6 h-6 text-primary" />
+            Gestión de Usuarios Invitados
+          </h2>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-sm transition-colors"
+          >
+            <UserPlus className="w-4 h-4" />
+            Invitar Usuarios
+          </button>
+        </div>
         <p className="text-text-secondary text-sm mb-6">
           Invita a usuarios a unirse a tu cuenta para compartir acceso a tus proyectos.
         </p>
 
         {/* Invited users section */}
-        <div className="mb-8">
-          <h3 className="font-bold text-lg text-text-primary mb-4 flex items-center gap-2">
-            <Shield className="w-5 h-5" /> Usuarios Actualmente Invitados
-          </h3>
+        <div className="mb-4">
           {(!(user as any)?.inviteesList || (user as any).inviteesList.length === 0) ? (
             <div className="p-6 bg-surface-raised/50 rounded-xl border border-dashed border-border text-center text-text-secondary">
               No tienes usuarios invitados en tu cuenta actualmente.
@@ -81,40 +69,9 @@ export const InviteesSettings: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* Potential users section */}
-        <div>
-          <h3 className="font-bold text-lg text-text-primary mb-4 flex items-center gap-2">
-            <UserPlus className="w-5 h-5" /> Usuarios Disponibles para Invitar
-          </h3>
-          {potentialInvitees.length === 0 ? (
-            <div className="p-6 bg-surface-raised/50 rounded-xl border border-dashed border-border text-center text-text-secondary">
-              No hay usuarios disponibles para invitar en este momento. (Deben tener cuenta sin plan).
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {potentialInvitees.map((pUser) => (
-                <div key={pUser.id} className="bg-white p-4 rounded-xl border border-border shadow-sm flex items-center justify-between hover:border-primary/30 transition-colors">
-                  <div>
-                    <h4 className="font-bold text-text-primary">{pUser.nombre} {pUser.apellido}</h4>
-                    <p className="text-xs text-text-secondary">{pUser.email}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleAddInvitee(pUser.id)}
-                    disabled={addInviteeMutation.isPending}
-                    className="p-2 text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors disabled:opacity-50"
-                    title="Invitar usuario"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
       </div>
+      
+      <InviteUserModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };

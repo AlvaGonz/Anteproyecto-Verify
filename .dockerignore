@@ -7,6 +7,8 @@
 **/dist/
 **/dist-ssr/
 **/node_modules/
+node_modules/
+node_modules
 **/.git/
 **/.vscode/
 **/.DS_Store/
@@ -26,7 +28,13 @@ docker/**
 # Explicitly allow source files needed for build (must come after exclusions)
 !docker/
 !docker/api-publish/
-!src/
+!src/backend/
+!src/frontend/web/src/
+!src/frontend/web/public/
+!src/frontend/web/index.html
+!src/frontend/web/package.json
+!src/frontend/web/tsconfig*
+!src/frontend/web/vite.config.ts
 !src/backend/Api/bin/
 !src/backend/Api/obj/
 !Build-Database-Sql.sql

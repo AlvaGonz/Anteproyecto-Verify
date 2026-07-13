@@ -32,7 +32,7 @@ public static class ApplicationBuilderExtensions
 
             return Results.Ok(new 
             {
-                ServiceName = "Enterprise API",
+                ServiceName = "Corporativo API",
                 Environment = app.Environment.EnvironmentName,
                 Version = "1.0.0",
                 Timestamp = System.DateTime.UtcNow,

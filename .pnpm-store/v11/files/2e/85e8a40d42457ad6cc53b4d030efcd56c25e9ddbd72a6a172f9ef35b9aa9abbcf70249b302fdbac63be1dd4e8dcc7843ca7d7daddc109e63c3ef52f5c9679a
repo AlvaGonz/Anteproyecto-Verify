@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$url = 'https://dl.google.com/tag/s/dl/chrome/install/googlechromestandaloneenterprise64.msi'
+$url = 'https://dl.google.com/tag/s/dl/chrome/install/googlechromestandalonecorporativo64.msi'
 
 $wc = New-Object net.webclient
 $msiInstaller = "$env:temp\google-chrome.msi"

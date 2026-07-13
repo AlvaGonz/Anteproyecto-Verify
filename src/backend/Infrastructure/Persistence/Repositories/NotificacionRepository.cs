@@ -48,4 +48,10 @@ public class NotificacionRepository : INotificacionRepository
         _context.Notificaciones.Update(notificacion);
         return Task.CompletedTask;
     }
+
+    public Task DeleteAsync(Notificacion notificacion, CancellationToken cancellationToken = default)
+    {
+        _context.Notificaciones.Remove(notificacion);
+        return Task.CompletedTask;
+    }
 }

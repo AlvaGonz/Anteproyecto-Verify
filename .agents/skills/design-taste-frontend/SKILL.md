@@ -86,9 +86,9 @@ Once you have the design read (Section 0) and dials (Section 1), pick the right 
 ### 2.A When to reach for a real design system (use official packages)
 | Brief reads as… | Reach for | Why |
 |---|---|---|
-| Microsoft / enterprise SaaS / dashboards | `@fluentui/react-components` or `@fluentui/web-components` | Official Fluent UI, Microsoft tokens, accessibility done |
+| Microsoft / corporativo SaaS / dashboards | `@fluentui/react-components` or `@fluentui/web-components` | Official Fluent UI, Microsoft tokens, accessibility done |
 | Google-ish UI, Material-flavored product | `@material/web` + Material 3 tokens | Official, theme-able via Material Theming |
-| IBM-style B2B / enterprise analytics | `@carbon/react` + `@carbon/styles` | Official Carbon, mature data-density patterns |
+| IBM-style B2B / corporativo analytics | `@carbon/react` + `@carbon/styles` | Official Carbon, mature data-density patterns |
 | Shopify app surfaces | `polaris.js` web components / Polaris React | Required for Shopify admin UI |
 | Atlassian / Jira-style product | `@atlaskit/*` + `@atlaskit/tokens` | Official Atlassian DS |
 | GitHub-style devtool / community page | `@primer/css` or `@primer/react-brand` | Official Primer; Brand variant for marketing |

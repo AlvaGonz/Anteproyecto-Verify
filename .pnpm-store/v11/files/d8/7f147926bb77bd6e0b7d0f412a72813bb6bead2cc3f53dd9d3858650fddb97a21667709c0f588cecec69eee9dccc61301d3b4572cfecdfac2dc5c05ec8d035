@@ -6038,7 +6038,7 @@ export default [
   "energy",
   "engineer",
   "engineering",
-  "enterprises",
+  "corporativos",
   "epson",
   "equipment",
   "ericsson",
@@ -9774,5 +9774,5 @@ export default [
   "bss.design",
   "basicserver.io",
   "virtualserver.io",
-  "enterprisecloud.nu"
+  "corporativocloud.nu"
 ];

@@ -230,13 +230,15 @@ def setup_tables():
     END
     """)
     conn.commit()
-
-    # 2. CatastroTitulo if not exists
+    
+    # 2. CatastroTitulo
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CatastroTitulo')
     BEGIN
         CREATE TABLE CatastroTitulo (
-            IdCatastroTitulo UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+            IdCatastroTitulo UNIQUEIDENTIFIER PRIMARY KEY,
+            IdProyecto UNIQUEIDENTIFIER NULL,
+            NumeroTitulo VARCHAR(50) NULL,
             Rnc VARCHAR(20) NULL,
             Provincia VARCHAR(100) NULL,
             Municipio VARCHAR(100) NULL,
@@ -246,15 +248,28 @@ def setup_tables():
             Matricula VARCHAR(50) NULL
         );
     END
+    ELSE
+    BEGIN
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Rnc') ALTER TABLE CatastroTitulo ADD Rnc VARCHAR(20) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Provincia') ALTER TABLE CatastroTitulo ADD Provincia VARCHAR(100) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Municipio') ALTER TABLE CatastroTitulo ADD Municipio VARCHAR(100) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Latitud') ALTER TABLE CatastroTitulo ADD Latitud DECIMAL(9,6) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Longitud') ALTER TABLE CatastroTitulo ADD Longitud DECIMAL(9,6) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Superficie') ALTER TABLE CatastroTitulo ADD Superficie DECIMAL(18,2) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Matricula') ALTER TABLE CatastroTitulo ADD Matricula VARCHAR(50) NULL;
+    END
     """)
     conn.commit()
-
-    # 3. PermisoSuelo if not exists
+    
+    # 3. PermisoSuelo
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PermisoSuelo')
     BEGIN
         CREATE TABLE PermisoSuelo (
-            IdPSuelo UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+            IdPSuelo UNIQUEIDENTIFIER PRIMARY KEY,
+            IdProyecto UNIQUEIDENTIFIER NULL,
+            NumeroPermiso VARCHAR(50) NULL,
+            FechaEmision DATE NULL,
             Rnc VARCHAR(20) NULL,
             Provincia VARCHAR(100) NULL,
             Municipio VARCHAR(100) NULL,
@@ -262,41 +277,22 @@ def setup_tables():
             Longitud DECIMAL(9,6) NULL,
             Superficie DECIMAL(18,2) NULL,
             TienePermiso VARCHAR(10) NULL,
-            Documento VARCHAR(250) NULL,
-            FechaEmision DATE NULL
+            Documento VARCHAR(250) NULL
         );
     END
+    ELSE
+    BEGIN
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Rnc') ALTER TABLE PermisoSuelo ADD Rnc VARCHAR(20) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Provincia') ALTER TABLE PermisoSuelo ADD Provincia VARCHAR(100) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Municipio') ALTER TABLE PermisoSuelo ADD Municipio VARCHAR(100) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Latitud') ALTER TABLE PermisoSuelo ADD Latitud DECIMAL(9,6) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Longitud') ALTER TABLE PermisoSuelo ADD Longitud DECIMAL(9,6) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Superficie') ALTER TABLE PermisoSuelo ADD Superficie DECIMAL(18,2) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'TienePermiso') ALTER TABLE PermisoSuelo ADD TienePermiso VARCHAR(10) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Documento') ALTER TABLE PermisoSuelo ADD Documento VARCHAR(250) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'FechaEmision') ALTER TABLE PermisoSuelo ADD FechaEmision DATE NULL;
+    END
     """)
-    conn.commit()
-    
-    # 4. Add columns to CatastroTitulo if they do not exist
-    alter_queries_catastro = [
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Rnc') ALTER TABLE CatastroTitulo ADD Rnc VARCHAR(20) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Provincia') ALTER TABLE CatastroTitulo ADD Provincia VARCHAR(100) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Municipio') ALTER TABLE CatastroTitulo ADD Municipio VARCHAR(100) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Latitud') ALTER TABLE CatastroTitulo ADD Latitud DECIMAL(9,6) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Longitud') ALTER TABLE CatastroTitulo ADD Longitud DECIMAL(9,6) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Superficie') ALTER TABLE CatastroTitulo ADD Superficie DECIMAL(18,2) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Matricula') ALTER TABLE CatastroTitulo ADD Matricula VARCHAR(50) NULL;"
-    ]
-    for q in alter_queries_catastro:
-        cursor.execute(q)
-    conn.commit()
-    
-    # 5. Add columns to PermisoSuelo if they do not exist
-    alter_queries_permiso = [
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Rnc') ALTER TABLE PermisoSuelo ADD Rnc VARCHAR(20) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Provincia') ALTER TABLE PermisoSuelo ADD Provincia VARCHAR(100) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Municipio') ALTER TABLE PermisoSuelo ADD Municipio VARCHAR(100) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Latitud') ALTER TABLE PermisoSuelo ADD Latitud DECIMAL(9,6) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Longitud') ALTER TABLE PermisoSuelo ADD Longitud DECIMAL(9,6) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Superficie') ALTER TABLE PermisoSuelo ADD Superficie DECIMAL(18,2) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'TienePermiso') ALTER TABLE PermisoSuelo ADD TienePermiso VARCHAR(10) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Documento') ALTER TABLE PermisoSuelo ADD Documento VARCHAR(250) NULL;",
-        "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'FechaEmision') ALTER TABLE PermisoSuelo ADD FechaEmision DATE NULL;"
-    ]
-    for q in alter_queries_permiso:
-        cursor.execute(q)
     conn.commit()
     
     # Clear existing seeds to prevent primary key conflicts and duplicate seeds

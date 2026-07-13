@@ -28,7 +28,7 @@ export function HealthPage() {
       <div className="max-w-3xl mx-auto space-y-6">
         <header className="bg-white shadow rounded-lg p-6 border-l-4 border-blue-500">
           <h1 className="text-2xl font-bold">
-            Enterprise Web App - System Status
+            Corporativo Web App - System Status
           </h1>
           <p className="text-gray-500 mt-2">
             Frontend is running successfully.

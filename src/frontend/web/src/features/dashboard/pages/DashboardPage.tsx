@@ -5,6 +5,9 @@ import { useDashboardStats } from "../api/useDashboardStats";
 import { useProjects } from "../../projects/api/useProjects";
 import { PlanCapabilities } from "../../pricing/utils/planCapabilities";
 import { DashboardPageLayout, DashboardTab } from "./DashboardPageLayout";
+import { useAuth } from "../../../shared/context/AuthContext";
+import { ProjectStatus } from "../../projects/types";
+import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
 
 export const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>("projects");
@@ -12,6 +15,8 @@ export const DashboardPage: React.FC = () => {
   const [showBanner, setShowBanner] = useState<boolean>(!!(location.state as any)?.planJustActivated);
   const activatedPlan = (location.state as any)?.activatedPlan as PlanCapabilities | undefined;
   const handleDismissBanner = useCallback(() => setShowBanner(false), []);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
 
   useEffect(() => {
     if ((location.state as any)?.planJustActivated) {
@@ -19,14 +24,38 @@ export const DashboardPage: React.FC = () => {
     }
   }, [location.state]);
 
-  useProjects();
+  const { data: projectsData, isLoading: loadingProjects } = useProjects();
+  const { data: statsData, isLoading: loadingStats } = useDashboardStats();
 
-  const { data: statsData, isLoading: loading } = useDashboardStats();
+  const loading = isAdmin ? loadingStats : loadingProjects;
 
-  const totalProjects = statsData?.totalProyectos || 0;
-  const inReview = statsData?.proyectosPendientes || 0;
-  const observed = statsData?.proyectosRechazados || 0;
-  const verified = statsData?.proyectosAprobados || 0;
+  let totalProjects = 0;
+  let inReview = 0;
+  let observed = 0;
+  let verified = 0;
+  let recentProjects: ProyectoRecienteDto[] = [];
+
+  if (isAdmin && statsData) {
+    totalProjects = statsData.totalProyectos || 0;
+    inReview = statsData.proyectosPendientes || 0;
+    observed = statsData.proyectosRechazados || 0;
+    verified = statsData.proyectosAprobados || 0;
+    recentProjects = statsData.proyectosRecientes || [];
+  } else if (!isAdmin && projectsData) {
+    totalProjects = projectsData.length;
+    inReview = projectsData.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
+    observed = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Observed).length;
+    verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
+    recentProjects = [...projectsData]
+      .sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime())
+      .slice(0, 5)
+      .map(p => ({
+        fechaRegistro: p.createdAtUtc,
+        nombre: p.nombre,
+        desarrollador: p.rncDesarrollador || "",
+        estado: p.estadoProyecto === ProjectStatus.Validated ? "Aprobado" : p.estadoProyecto === ProjectStatus.Observed ? "Rechazado" : "En Revisión"
+      }));
+  }
 
   const stats = [
     {
@@ -55,7 +84,6 @@ export const DashboardPage: React.FC = () => {
     },
   ];
 
-  const recentProjects = statsData?.proyectosRecientes || [];
   const recentSubscriptions = statsData?.suscripcionesRecientes || [];
 
   return (
