@@ -1,8 +1,8 @@
 services:
   api:
     build:
-      context: .
-      dockerfile: docker/api.dev.Dockerfile
+      context: ./src/backend
+      dockerfile: ../../docker/api.dev.Dockerfile
     ports:
       - "5000:8080"
     volumes:
