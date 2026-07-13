@@ -7,5 +7,6 @@ public record CatastroLookupDto(
     string? Propietario,
     string? CedulaRncPropietario,
     string? Ipi,
-    string? EstatusIpi
+    string? EstatusIpi,
+    string? Provincia
 );

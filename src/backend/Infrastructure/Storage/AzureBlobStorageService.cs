@@ -24,8 +24,9 @@ public class AzureBlobStorageService : IBlobStorageService
             Directory.CreateDirectory(wwwrootPath);
         }
 
-        var safeFileName = fileName.Replace("/", "\\");
-        var filePath = Path.Combine(wwwrootPath, safeFileName);
+        // Use Path.Combine and ensure directory separators match OS, or just split by /
+        var parts = fileName.Split(new[] { '/', '\\' });
+        var filePath = Path.Combine(wwwrootPath, Path.Combine(parts));
         
         var directoryPath = Path.GetDirectoryName(filePath);
         if (directoryPath != null && !Directory.Exists(directoryPath))
@@ -38,13 +39,13 @@ public class AzureBlobStorageService : IBlobStorageService
             await stream.CopyToAsync(fileStream, cancellationToken);
         }
 
-        return $"http://localhost:5000/uploads/{fileName.Replace("\\", "/")}";
+        return $"http://localhost:5000/uploads/{string.Join("/", parts)}";
     }
 
     public Task<(Stream Stream, string ContentType)> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
     {
-        var safeFileName = blobName.Replace("/", "\\");
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", safeFileName);
+        var parts = blobName.Split(new[] { '/', '\\' });
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", Path.Combine(parts));
         
         if (File.Exists(filePath))
         {

@@ -30,7 +30,8 @@ public class CatastroLookupRepository : ICatastroLookupRepository
                 c.Rnc as Propietario,
                 c.Rnc as CedulaRncPropietario,
                 c.Rnc as Ipi,
-                p.Estatus as EstatusIpi
+                p.Estatus as EstatusIpi,
+                c.Provincia
             FROM CatastroTitulo c
             LEFT JOIN PagoIPI p ON c.Rnc = p.Rnc
             WHERE c.Latitud BETWEEN @p0 - 0.0015 AND @p0 + 0.0015
@@ -60,10 +61,11 @@ public class CatastroLookupRepository : ICatastroLookupRepository
                     reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
                     reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
                     reader.IsDBNull(2) ? 0 : reader.GetDecimal(2),
-                    reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                    reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                    reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
-                    reader.IsDBNull(6) ? string.Empty : reader.GetString(6)
+                    reader.IsDBNull(3) ? null : reader.GetString(3),
+                    reader.IsDBNull(4) ? null : reader.GetString(4),
+                    reader.IsDBNull(5) ? null : reader.GetString(5),
+                    reader.IsDBNull(6) ? null : reader.GetString(6),
+                    reader.IsDBNull(7) ? null : reader.GetString(7)
                 );
             }
             return null;

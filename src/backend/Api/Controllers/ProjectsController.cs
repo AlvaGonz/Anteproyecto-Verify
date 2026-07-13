@@ -7,8 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
 using Application.Contracts.Projects;
-
 using Application.DTOs;
+using Application.DTOs.Projects;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -72,6 +72,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> CreateProject([FromBody] CreateProyectoDto dto, CancellationToken cancellationToken)
     {

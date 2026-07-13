@@ -172,4 +172,5 @@ export interface CatastroLookupDto {
   cedulaRncPropietario?: string;
   ipi?: string;
   estatusIpi?: string;
+  provincia?: string;
 }

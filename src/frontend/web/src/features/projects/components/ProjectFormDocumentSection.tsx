@@ -39,7 +39,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
       </div>
     )}
 
-    <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8 md:gap-10">
+    <div className="grid grid-cols-1 md:grid-cols-[140px_1fr] gap-4 md:gap-3">
       {/* ── PORTADA ── */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 mb-1">
@@ -50,7 +50,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
 
         {/* Slot portada */}
         {portraitPreview ? (
-          <div className="relative w-full max-w-[280px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
             <img
               src={portraitPreview}
               alt="Vista previa de portada"
@@ -70,7 +70,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
             </button>
           </div>
         ) : existingFotoUrls[0] ? (
-          <div className="relative w-full max-w-[280px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
             <img
               src={existingFotoUrls[0]}
               alt="Portada actual"
@@ -95,7 +95,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
             id="btn-agregar-portada"
             onClick={() => portraitInputRef.current?.click()}
             aria-label="Subir foto de portada"
-            className="w-full max-w-[280px] aspect-square rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center justify-center gap-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+            className="w-full max-w-[140px] aspect-square rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center justify-center gap-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
           >
             <ImagePlus className="w-8 h-8 text-amber-400" />
             <span className="text-xs font-bold text-amber-500 uppercase tracking-wide">
@@ -127,7 +127,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
           </span>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {/* Fotos de galería existentes (edit mode) */}
           {existingFotoUrls.slice(1).map((url, idx) => (
             <div key={`existing-${url}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">

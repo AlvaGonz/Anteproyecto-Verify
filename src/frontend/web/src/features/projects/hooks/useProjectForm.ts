@@ -317,6 +317,14 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
           setIpi(catastroData.ipi || "");
           setEstatusIpi(catastroData.estatusIpi || "");
+          if (catastroData.provincia) {
+            const matchedProv = PROVINCIAS.find(p => p.nombre.toLowerCase() === catastroData.provincia!.toLowerCase());
+            if (matchedProv) {
+              setUbicacionTexto(matchedProv.nombre);
+            } else {
+              setUbicacionTexto(catastroData.provincia);
+            }
+          }
         } else {
           throw new Error("No data found");
         }
@@ -372,6 +380,9 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
           setIpi(catastroData.ipi || "");
           setEstatusIpi(catastroData.estatusIpi || "");
+          if (catastroData.provincia) {
+            setUbicacionTexto(catastroData.provincia);
+          }
         } else {
           throw new Error("No data found");
         }
