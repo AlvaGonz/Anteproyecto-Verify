@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.ExternalValidation;
 using Application.DTOs.ExternalValidation;
-using Infrastructure.ExternalValidation.Configuration;
+using ExternalValidation.Configuration;
 using Microsoft.Extensions.Options;
 
 public abstract class MockProviderBase : IExternalValidationProvider

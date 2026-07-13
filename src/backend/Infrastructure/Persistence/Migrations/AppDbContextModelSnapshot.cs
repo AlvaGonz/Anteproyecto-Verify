@@ -889,6 +889,14 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Status");
 
+                    b.Property<string>("EstatusDescripcion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("EstatusIpi")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ImagenUrl")
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
@@ -915,6 +923,9 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("SelladoBloqueado")
                         .HasColumnType("bit");
+
+                    b.Property<decimal?>("SuperficieM2")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UbicacionGps")
                         .HasMaxLength(100)
@@ -1275,6 +1286,12 @@ namespace Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("nvarchar(max)")
                         .HasComputedColumnSql("[Nombre] + ' ' + [Apellido]", true);
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiraUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PendingBillingCycle")
                         .HasColumnType("nvarchar(max)");

@@ -71,10 +71,10 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
       <input
         id="matricula"
         type="text"
+        disabled={true}
         value={matricula}
-        onChange={(e) => setMatricula(e.target.value)}
-        className="vf-input font-mono"
-        placeholder="Ej: 0100234567"
+        className="vf-input font-mono bg-gray-50 border-gray-200 cursor-not-allowed"
+        placeholder="Se obtiene desde Catastro"
       />
     </div>
 
@@ -101,12 +101,10 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
       <input
         id="superficieM2"
         type="number"
-        min={0}
-        step={0.01}
+        disabled={true}
         value={superficieM2}
-        onChange={(e) => setSuperficieM2(e.target.value ? Number(e.target.value) : "")}
-        className="vf-input font-mono"
-        placeholder="Ej: 250.00"
+        className="vf-input font-mono bg-gray-50 border-gray-200 cursor-not-allowed"
+        placeholder="Se obtiene desde Catastro"
       />
     </div>
   </div>

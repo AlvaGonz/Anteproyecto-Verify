@@ -8,7 +8,7 @@ using System.Text;
 using Application.Abstractions.Security;
 using Domain.Entities;
 using Domain.Enums;
-using Infrastructure.Configuration;
+using Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 

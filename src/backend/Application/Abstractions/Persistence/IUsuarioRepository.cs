@@ -15,5 +15,6 @@ public interface IUsuarioRepository
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<bool> ExistsByCedulaAsync(string cedula, CancellationToken cancellationToken = default);
     Task<Usuario?> GetByVerificationTokenAsync(string token, CancellationToken cancellationToken = default);
+    Task<Usuario?> GetByPasswordResetTokenAsync(string token, CancellationToken cancellationToken = default);
     Task<List<Usuario>> GetPendingPurgeAsync(CancellationToken cancellationToken = default);
 }

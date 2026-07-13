@@ -34,6 +34,10 @@ public class Usuario : EntityBase
     public string? TokenVerificacion { get; private set; }
     public DateTime? TokenVerificacionExpiraUtc { get; private set; }
     
+    // Recuperación de Contraseña
+    public string? PasswordResetToken { get; private set; }
+    public DateTime? PasswordResetTokenExpiraUtc { get; private set; }
+    
     public string? AvatarUrl { get; private set; }
 
     // Stripe Billing Integration
@@ -182,6 +186,27 @@ public class Usuario : EntityBase
         TokenVerificacion = null;
         TokenVerificacionExpiraUtc = null;
         UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void GenerarTokenRecuperacion()
+    {
+        PasswordResetToken = Guid.NewGuid().ToString("N");
+        PasswordResetTokenExpiraUtc = DateTime.UtcNow.AddHours(1); // Expiración en 1 hora
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void ClearPasswordResetToken()
+    {
+        PasswordResetToken = null;
+        PasswordResetTokenExpiraUtc = null;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public bool IsPasswordResetTokenValid()
+    {
+        return !string.IsNullOrWhiteSpace(PasswordResetToken) &&
+               PasswordResetTokenExpiraUtc.HasValue &&
+               DateTime.UtcNow <= PasswordResetTokenExpiraUtc.Value;
     }
 
     public void AsignarPlan(Guid planId)

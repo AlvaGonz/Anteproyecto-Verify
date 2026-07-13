@@ -25,6 +25,8 @@ public class AuthController : ControllerBase
     private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
     private readonly Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler _uploadAvatarHandler;
     private readonly Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler _resendVerificationHandler;
+    private readonly Application.Features.Auth.Commands.ForgotPassword.ForgotPasswordCommandHandler _forgotPasswordHandler;
+    private readonly Application.Features.Auth.Commands.ResetPassword.ResetPasswordCommandHandler _resetPasswordHandler;
     private static readonly ConcurrentDictionary<string, string> _refreshTokens = new();
     private readonly IMemoryCache _cache;
     private readonly AppDbContext _context;
@@ -36,6 +38,8 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
         Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler uploadAvatarHandler,
         Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler resendVerificationHandler,
+        Application.Features.Auth.Commands.ForgotPassword.ForgotPasswordCommandHandler forgotPasswordHandler,
+        Application.Features.Auth.Commands.ResetPassword.ResetPasswordCommandHandler resetPasswordHandler,
         Application.Abstractions.Persistence.IUsuarioRepository usuarioRepository,
         IConfiguration configuration,
         Application.Abstractions.Security.IJwtTokenGenerator jwtTokenGenerator,
@@ -48,6 +52,8 @@ public class AuthController : ControllerBase
         _updateProfileHandler = updateProfileHandler;
         _uploadAvatarHandler = uploadAvatarHandler;
         _resendVerificationHandler = resendVerificationHandler;
+        _forgotPasswordHandler = forgotPasswordHandler;
+        _resetPasswordHandler = resetPasswordHandler;
         _usuarioRepository = usuarioRepository;
         _configuration = configuration;
         _jwtTokenGenerator = jwtTokenGenerator;
@@ -90,6 +96,32 @@ public class AuthController : ControllerBase
         }
 
         return Ok(new { Message = "Correo de verificación reenviado exitosamente." });
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] Application.Features.Auth.Commands.ForgotPassword.ForgotPasswordCommand request, CancellationToken cancellationToken)
+    {
+        var result = await _forgotPasswordHandler.Handle(request, cancellationToken);
+        
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
+
+        return Ok(new { Message = "Si el correo está registrado, se han enviado las instrucciones para restablecer la contraseña." });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] Application.Features.Auth.Commands.ResetPassword.ResetPasswordCommand request, CancellationToken cancellationToken)
+    {
+        var result = await _resetPasswordHandler.Handle(request, cancellationToken);
+        
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
+
+        return Ok(new { Message = "Contraseña restablecida exitosamente." });
     }
 
     [HttpPost("login")]

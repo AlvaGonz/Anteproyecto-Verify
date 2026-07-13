@@ -3,7 +3,7 @@ namespace Infrastructure.ExternalValidation.Mocks;
 using System;
 using System.Collections.Generic;
 using Application.DTOs.ExternalValidation;
-using Infrastructure.ExternalValidation.Configuration;
+using ExternalValidation.Configuration;
 using Microsoft.Extensions.Options;
 
 public class MockDgriValidationProvider : MockProviderBase

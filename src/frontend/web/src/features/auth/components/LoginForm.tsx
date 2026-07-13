@@ -117,12 +117,12 @@ export const LoginForm = () => {
         </div>
 
         <div className="flex items-center justify-end pt-1">
-          <button
-            type="button"
+          <Link
+            to="/forgot-password"
             className="text-[13px] text-primary font-bold hover:underline"
           >
             ¿Olvidaste tu contraseña?
-          </button>
+          </Link>
         </div>
 
         <button

@@ -22,6 +22,8 @@ public class ProyectoConfiguration : IEntityTypeConfiguration<Proyecto>
         builder.Property(p => p.Ipi).HasMaxLength(50);
         builder.Property(p => p.ValorEstimado).HasColumnType("decimal(18,2)");
         builder.Property(p => p.EstadoProyecto).HasColumnName("Status").IsRequired();
+        builder.Property(p => p.EstatusDescripcion).HasMaxLength(50).IsRequired();
+        builder.Property(p => p.SuperficieM2).HasColumnType("decimal(18,2)");
         builder.Property(p => p.EstadoIntegridad).IsRequired();
 
         builder.HasOne(p => p.UsuarioCreador)

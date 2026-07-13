@@ -490,6 +490,38 @@ public static class EmailTemplates
             $"Únete a la suscripción de {titularName} en VeriFinca",
             content);
     }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // 7. Password Reset
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetPasswordResetEmail(string userName, string resetToken, string? returnUrl = null)
+    {
+        string resetUrl = $"http://localhost:3000/#/reset-password?token={resetToken}";
+        if (!string.IsNullOrEmpty(returnUrl))
+        {
+            resetUrl += $"&returnUrl={System.Uri.EscapeDataString(returnUrl)}";
+        }
+
+        string content = $@"
+            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>
+            <p style=""margin:0 0 16px 0;font-size:15px;color:{TextMuted};"">Recuperación de contraseña</p>
+
+            <p style=""margin:0 0 16px 0;"">Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en <strong>VeriFinca</strong>.</p>
+
+            <div style=""text-align:center;"">
+                {CtaButton(resetUrl, "Restablecer Contraseña")}
+            </div>
+
+            <p style=""margin:28px 0 8px 0;font-size:13px;color:{TextMuted};"">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+            <p style=""margin:0;font-size:12px;word-break:break-all;""><a href=""{resetUrl}"" style=""color:{Orange};text-decoration:none;"">{resetUrl}</a></p>
+
+            <p style=""margin:28px 0 0 0;font-size:13px;color:{TextMuted};"">Si no solicitaste este cambio, puedes ignorar este correo de forma segura. Tu contraseña no cambiará hasta que accedas al enlace anterior y crees una nueva.</p>";
+
+        return BuildEmailWrapper(
+            "Recuperación de Contraseña — VeriFinca",
+            "Instrucciones para restablecer tu contraseña en VeriFinca.",
+            content);
+    }
 }
 
 

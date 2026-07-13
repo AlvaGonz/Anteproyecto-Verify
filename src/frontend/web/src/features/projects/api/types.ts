@@ -13,6 +13,7 @@ export interface ProyectoDto {
   designacionCatastral?: string;
   matricula?: string;
   estadoJuridico: number;
+  estatusDescripcion: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
   usuarioCreadorId: string;

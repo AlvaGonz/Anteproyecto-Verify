@@ -21,6 +21,8 @@ import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
 import { EmailVerifiedPage } from "../pages/auth/EmailVerifiedPage";
+import { ForgotPasswordPage } from "../pages/auth/ForgotPasswordPage";
+import { ResetPasswordPage } from "../pages/auth/ResetPasswordPage";
 import { ProjectDocumentUploadPage } from "../pages/projects/ProjectDocumentUploadPage";
 import { AuditLogPage } from "../features/audit/pages/AuditLogPage";
 import { ValidationExecutionPage } from "../features/validations/pages/ValidationExecutionPage";
@@ -97,6 +99,22 @@ export const router = createHashRouter([
         element: (
           <GuestGuard>
             <RegisterPage />
+          </GuestGuard>
+        ),
+      },
+      {
+        path: "/forgot-password",
+        element: (
+          <GuestGuard>
+            <ForgotPasswordPage />
+          </GuestGuard>
+        ),
+      },
+      {
+        path: "/reset-password",
+        element: (
+          <GuestGuard>
+            <ResetPasswordPage />
           </GuestGuard>
         ),
       },

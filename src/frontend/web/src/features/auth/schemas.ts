@@ -147,3 +147,28 @@ const inviteTeamMemberSchema = z.object({
      }, "Teléfono inválido. Solo códigos 809, 829 o 849"),
 });
 export type InviteTeamMemberValues = z.infer<typeof inviteTeamMemberSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, "El correo es requerido")
+    .email("Formato de correo inválido"),
+});
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  newPassword: z
+    .string()
+    .min(8, "La contraseña debe tener mínimo 8 caracteres")
+    .regex(/[A-Z]/, "Debe contener al menos una mayúscula")
+    .regex(/[a-z]/, "Debe contener al menos una minúscula")
+    .regex(/[0-9]/, "Debe contener al menos un número")
+    .regex(/[!@#$%^&*\-]/, "Debe contener al menos un carácter especial (!@#$%^&*-)"),
+  confirmPassword: z
+    .string()
+    .min(1, "Debe confirmar la contraseña"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmPassword"],
+});
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

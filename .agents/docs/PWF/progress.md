@@ -239,3 +239,7 @@
   - **Symptom:** On the dashboard's "Flujo de Usuarios" tab, the "Ver Lista de Usuarios" button did not visually substitute the "Ver listado" and "Nuevo Proyecto" buttons in a centered manner.
   - **Root Cause:** The `DashboardPageLayout.tsx` used `justify-between` and the secondary button was right-aligned without proper container constraints to span the space where the two project buttons used to be.
   - **Fix:** Wrapped the "Ver Lista de Usuarios" button in a `w-full` flex container and changed its style to primary so it is now visually centered in the 300px space where the project buttons were located.
+- **TASK-1787:** Modificación de tabla `CatastroTitulo` y seeder.
+  - **Symptom:** Eliminar `IdProyecto` de `CatastroTitulo` y actualizar el script `generador_entidades_gubernamentales.py` para generar 1.6 millones de registros de títulos con los datos de designación catastral.
+  - **Status:** Complete (Background script finished in 926.42 seconds generating 1.6M rows).
+  - **Fix:** Script Python actualizado y ejecutado con éxito. Eliminado IdProyecto y añadido CodigoDesignacionCatastral con coordenadas GPS únicas.

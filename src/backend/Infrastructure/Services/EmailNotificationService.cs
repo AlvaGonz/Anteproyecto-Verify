@@ -43,7 +43,7 @@ public class EmailNotificationService : IEmailNotificationService
 
         bool isApproved = proyecto.Status == ProjectStatus.Approved;
         
-        string body = Infrastructure.Email.EmailTemplates.GetProjectStatusChangeEmail(
+        string body = Email.EmailTemplates.GetProjectStatusChangeEmail(
             proyecto.Nombre,
             proyecto.Id.ToString(),
             statusStr,

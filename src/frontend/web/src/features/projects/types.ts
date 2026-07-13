@@ -11,6 +11,11 @@ export interface ProyectoDto {
   designacionCatastral?: string;
   matricula?: string;
   estadoJuridico: LegalStatus;
+  propietario?: string;
+  cedulaRncPropietario?: string;
+  ipi?: string;
+  estatusIpi?: string;
+  estatusDescripcion: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
   integrityScore?: number;
@@ -34,6 +39,10 @@ export interface CreateProyectoDto {
   designacionCatastral?: string;
   ubicacionGps?: string;
   matricula?: string;
+  propietario?: string;
+  cedulaRncPropietario?: string;
+  ipi?: string;
+  estatusIpi?: string;
   superficieM2?: number;
 }
 
@@ -47,6 +56,10 @@ export interface UpdateProyectoDto {
   rncDesarrollador?: string;
   designacionCatastral?: string;
   matricula?: string;
+  propietario?: string;
+  cedulaRncPropietario?: string;
+  ipi?: string;
+  estatusIpi?: string;
   superficieM2?: number;
   fotosNuevas?: File[];
 }
@@ -114,7 +127,7 @@ export interface ValidationProjectData {
   timeline: ValidationTimelineEvent[];
 }
 
-export type ProjectError = 
+export type ProjectError =
   | { _tag: "NotFound"; id: string }
   | { _tag: "Unauthorized" }
   | { _tag: "ValidationError"; errors: string[] }
@@ -140,4 +153,14 @@ export interface DocumentDiagnosisDto {
   recommendations: string[];
   provider: string;
   generatedAt: string;
+}
+
+export interface CatastroLookupDto {
+  designacionCatastral?: string;
+  matricula?: string;
+  superficieM2?: number;
+  propietario?: string;
+  cedulaRncPropietario?: string;
+  ipi?: string;
+  estatusIpi?: string;
 }

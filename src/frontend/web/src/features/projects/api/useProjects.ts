@@ -21,6 +21,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   rncDesarrollador: apiProj.rncDesarrollador,
   designacionCatastral: apiProj.designacionCatastral,
   matricula: apiProj.matricula,
+  estatusDescripcion: apiProj.estatusDescripcion,
   estadoJuridico: apiProj.estadoJuridico as LegalStatus,
   estadoProyecto: apiProj.estadoProyecto,
   estadoIntegridad: apiProj.estadoIntegridad,
@@ -66,7 +67,7 @@ export const useUpdateProjectStatus = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: ['updateProjectStatus'],
-    mutationFn: ({ id, status }: { id: string; status: number }) => 
+    mutationFn: ({ id, status }: { id: string; status: number }) =>
       apiClient.patch<ApiProyectoDto>(`/projects/${id}/status`, status, {
         headers: { 'Content-Type': 'application/json' }
       }).then(res => mapApiProject(res.data)),

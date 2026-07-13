@@ -20,6 +20,9 @@ public record ProyectoDto(
     string? CedulaRncPropietario,
     string? Ipi,
     EstadoJuridico EstadoJuridico,
+    string? EstatusIpi,
+    decimal? SuperficieM2,
+    string EstatusDescripcion,
     ProjectStatus EstadoProyecto,
     IntegrityStatus EstadoIntegridad,
     Guid UsuarioCreadorId,
@@ -39,5 +42,7 @@ public record CreateProyectoDto(
     string? Matricula = null,
     string? Propietario = null,
     string? CedulaRncPropietario = null,
-    string? Ipi = null
+    string? Ipi = null,
+    string? EstatusIpi = null,
+    decimal? SuperficieM2 = null
 );

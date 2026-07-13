@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigation, Globe } from "lucide-react";
+import { Navigation, Globe, Search } from "lucide-react";
 import { ProyectoDto } from "../types";
 import { ProjectFormBasicFields } from "./ProjectFormBasicFields";
 import { ProjectFormDetailsFields } from "./ProjectFormDetailsFields";
@@ -18,6 +18,9 @@ interface ProjectFormLayoutProps {
   onCancel: () => void;
   onDelete?: () => void;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
+  mapSearchText: string;
+  setMapSearchText: (val: string) => void;
+  handleSearchCoordinates: () => void;
   // ponytail: grouped to keep interface slim, spread into sub-components
   basicFields: React.ComponentProps<typeof ProjectFormBasicFields>;
   detailsFields: React.ComponentProps<typeof ProjectFormDetailsFields>;
@@ -37,6 +40,9 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
   onCancel,
   onDelete,
   handleSubmit,
+  mapSearchText,
+  setMapSearchText,
+  handleSearchCoordinates,
   basicFields,
   detailsFields,
   documentSection,
@@ -90,12 +96,34 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
         </p>
 
         {/* ── Leaflet Interactive Map ── */}
-        <div className={activeMapTab === "leaflet" ? "block" : "hidden"}>
+        <div className={activeMapTab === "leaflet" ? "block relative" : "hidden"}>
           <div
             ref={mapContainerRef}
             className="w-full h-[400px] md:h-[500px] rounded-2xl border border-[var(--color-border)]/30 shadow-inner overflow-hidden"
             style={{ zIndex: 1 }}
           />
+          <div className="absolute top-4 right-4 z-[1000] flex items-center bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-[var(--color-border)]/20 p-1">
+            <input
+              type="text"
+              placeholder="Lat, Lng..."
+              value={mapSearchText}
+              onChange={(e) => setMapSearchText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSearchCoordinates();
+                }
+              }}
+              className="px-3 py-1.5 text-sm bg-transparent outline-none w-48 text-[var(--color-text-primary)]"
+            />
+            <button
+              type="button"
+              onClick={handleSearchCoordinates}
+              className="p-1.5 rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-primary transition-colors"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* ── Official RI Cadastral Iframe ── */}
