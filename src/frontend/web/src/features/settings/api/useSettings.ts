@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import { PaginatedResponse, UserSettings, ProfilePermissions, SubscriptionPlan, CreateUserDto, UpdateUserDto } from "../types/settings.types";
+import { useAuth } from "../../../shared/context/AuthContext";
 
 export const useUsers = (page = 1, pageSize = 50, enabled = true) =>
   useQuery({
@@ -182,19 +183,22 @@ export const useReactivateSubscription = () => {
 
 export const useRemoveInvitee = () => {
   const qc = useQueryClient();
+  const { refreshUser } = useAuth();
   return useMutation({
     mutationKey: ["useRemoveInvitee"],
     mutationFn: (inviteeId: string) =>
-      apiClient.delete<{message: string}>(`/admin/invitees/${inviteeId}`).then(res => res.data),
+      apiClient.delete<{message: string}>(`/admin/users/invitees/${inviteeId}`).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["auth", "me"] });
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
+      refreshUser();
     },
   });
 };
 
 export const useInviteUser = () => {
   const qc = useQueryClient();
+  const { refreshUser } = useAuth();
   return useMutation({
     mutationKey: ["useInviteUser"],
     mutationFn: (data: { nombre: string; apellido: string; email: string; telefono: string; cedula: string }) =>
@@ -202,6 +206,7 @@ export const useInviteUser = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["auth", "me"] });
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
+      refreshUser();
     },
   });
 };

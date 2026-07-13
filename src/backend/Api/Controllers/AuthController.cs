@@ -325,7 +325,8 @@ public class AuthController : ControllerBase
                     nombre = m.Nombre,
                     apellido = m.Apellido,
                     email = m.CorreoElectronico,
-                    estado = !m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")
+                    estado = m.AccountStatus == Domain.Enums.UserAccountStatus.Invited ? "Pendiente" : 
+                             (!m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo"))
                 })
         });
     }
