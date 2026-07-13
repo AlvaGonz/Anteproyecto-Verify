@@ -14,7 +14,7 @@ public class UsuarioLegacyConfiguration : IEntityTypeConfiguration<UsuarioLegacy
         builder.Property(u => u.IdUsuario).HasColumnName("IdUsuario").ValueGeneratedOnAdd();
         builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Apellido).IsRequired().HasMaxLength(100);
-        builder.Property(u => u.NombreCompleto).HasComputedColumnSql("[Nombre] + ' ' + [Apellido]", stored: true);
+        builder.Ignore(u => u.NombreCompleto);
         builder.Property(u => u.Email).IsRequired().HasMaxLength(100);
         builder.Property(u => u.ContrasenaHash).IsRequired().HasMaxLength(255);
         builder.Property(u => u.Telefono).IsRequired().HasMaxLength(15);
