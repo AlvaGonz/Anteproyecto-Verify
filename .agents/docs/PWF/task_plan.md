@@ -1,12 +1,10 @@
-# Resend Email Integration E2E Tests
-
-## PLAN
-1. **Extend Test Controller**: Add endpoints to `EmailTestController.cs` for:
-   - `UC-05` (Subscription Activated)
-   - `UC-06` (Project Status Change)
-2. **Create E2E API Tests**: Implement a Playwright test file `e2e/api/12-resend-email-all-usecases.spec.ts` that triggers all 7 endpoints to confirm API and Email dispatch logic.
-3. **Execute & Verify**: Run `npx playwright test` to ensure all endpoints return 200 OK and correctly dispatch emails through the Resend API.
-
-- [x] Extend Test Controller
-- [x] Create E2E API Tests
-- [x] Execute & Verify
+# debug-session
+## Symptom
+Migration failure on startup: `Error Number:2705 Column name 'PasswordResetToken' in table 'Usuario' is specified more than once.`
+## Steps
+- [x] Initialize PWF.
+- [x] Consult ADRs/brain for previous bugs (read from `progress.md`).
+- [x] Analyze stack trace: Error 2705 on `PasswordResetToken` column in `Usuario`.
+- [x] Fix specific code: Removed duplicated `AddColumn` from `20260713164614_AddEstatusIpiToProjects.cs`.
+- [x] Rebuild API container and verify it starts without crashing.
+- [x] Update `progress.md` with BUG resolution.

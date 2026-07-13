@@ -243,3 +243,17 @@
   - **Symptom:** Eliminar `IdProyecto` de `CatastroTitulo` y actualizar el script `generador_entidades_gubernamentales.py` para generar 1.6 millones de registros de títulos con los datos de designación catastral.
   - **Status:** Complete (Background script finished in 926.42 seconds generating 1.6M rows).
   - **Fix:** Script Python actualizado y ejecutado con éxito. Eliminado IdProyecto y añadido CodigoDesignacionCatastral con coordenadas GPS únicas.
+
+### Debug Session: Migration Error
+- **Symptom**: Migration failure on startup: `ALTER TABLE DROP COLUMN failed because column 'NombreCompleto' does not exist in table 'UsuarioLegacy'.` 
+- **Root Cause**: Migration `20260713164614_AddEstatusIpiToProjects.cs` attempted to drop `NombreCompleto` from `UsuarioLegacy`, but the column didn't exist.
+- **Fix**: Removed `DropColumn` and `AddColumn` for `NombreCompleto` inside the migration.
+
+- **BUG-025:** EF Core Migration Crash at startup with Error 2705 Column 'PasswordResetToken' already exists.
+  - **Symptom:** Backend API crashes on startup during MigrateAsync with `Error Number:2705` "Column names in each table must be unique. Column name 'PasswordResetToken' in table 'Usuario' is specified more than once."
+  - **Root Cause:** The `20260713164614_AddEstatusIpiToProjects.cs` migration erroneously included `AddColumn` for `PasswordResetToken` and `PasswordResetTokenExpiraUtc`, which were already added by a previous migration (`20260713115949_AddPasswordResetToken.cs`).
+  - **Fix:** Used TDD/Surgical fix to remove the duplicate `AddColumn` and `DropColumn` from the `Up` and `Down` methods of `20260713164614_AddEstatusIpiToProjects.cs` and rebuilt the API Docker container so the changes took effect on the compiled DLLs. The API now starts successfully.
+- **BUG-026:** 500 Error when creating projects (Invalid column name 'EstatusDescripcion').
+  - **Symptom:** `POST /api/projects` returns 500 Internal Server Error.
+  - **Root Cause:** EF Core attempted to insert `EstatusDescripcion` into the database because it was mapped in `ProyectoConfiguration.cs`, but the database column did not exist and its migration file was empty.
+  - **Fix:** Changed `EstatusDescripcion` in `Proyecto.cs` to be a computed property `=> GetEstatusDescripcion(EstadoProyecto)` instead of a persisted column. Removed the mapping from `ProyectoConfiguration.cs` and `AppDbContextModelSnapshot.cs`. Deleted the empty migration files and rebuilt the API container.
