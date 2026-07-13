@@ -15,6 +15,7 @@ services:
       - /src/src/backend/Infrastructure/obj
       - /src/src/backend/Api/bin
       - /src/src/backend/Api/obj
+      - api-uploads:/app/wwwroot/uploads
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - UseMockData=false
@@ -119,3 +120,4 @@ services:
 
 volumes:
   mssql-data:
+  api-uploads:

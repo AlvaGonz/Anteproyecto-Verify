@@ -132,14 +132,15 @@ public class ProjectService : IProjectService
 
     public async Task DeleteProjectAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var proyecto = await _proyectoRepository.GetByIdAsync(id, cancellationToken);
-        if (proyecto == null)
+        try
         {
-            throw new KeyNotFoundException($"Project with id {id} not found.");
+            await _proyectoRepository.DeleteWithRelatedDataAsync(id, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
-
-        _proyectoRepository.Delete(proyecto);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
     }
 
     private static ProyectoDto MapToDto(Proyecto proyecto)

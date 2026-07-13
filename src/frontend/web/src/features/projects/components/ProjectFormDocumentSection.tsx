@@ -50,41 +50,41 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
 
         {/* Slot portada */}
         {portraitPreview ? (
-          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md group">
             <img
               src={portraitPreview}
               alt="Vista previa de portada"
               className="w-full h-full object-cover"
-              loading="lazy"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
-            <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[10px] font-black uppercase tracking-wider text-center py-1">
-              Portada
+            <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
+              PORTADA
             </div>
             <button
               type="button"
               onClick={removePortrait}
               aria-label="Quitar foto de portada"
-              className="absolute top-2 right-2 w-7 h-7 bg-black/50 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors"
+              className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
             >
-              <X className="w-3.5 h-3.5 text-white" />
+              <X className="w-3 h-3 text-white" />
             </button>
           </div>
         ) : existingFotoUrls[0] ? (
-          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md group">
             <img
               src={existingFotoUrls[0]}
               alt="Portada actual"
               className="w-full h-full object-cover"
               loading="lazy"
             />
-            <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[10px] font-black uppercase tracking-wider text-center py-1">
-              Portada activa
+            <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
+              PORTADA
             </div>
             <button
               type="button"
               onClick={() => portraitInputRef.current?.click()}
               aria-label="Cambiar foto de portada"
-              className="absolute top-2 left-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold rounded-lg hover:bg-black/80 transition-colors"
+              className="absolute top-2 right-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold rounded-lg hover:bg-black/80 transition-colors opacity-0 group-hover:opacity-100 whitespace-nowrap"
             >
               Cambiar
             </button>
@@ -114,6 +114,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
           onChange={handlePortraitChange}
         />
       </div>
+
 
       {/* ── GALERÍA ── */}
       <div className="space-y-3">

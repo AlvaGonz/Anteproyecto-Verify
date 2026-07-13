@@ -16,4 +16,6 @@ public interface IProyectoRepository
     Task AddAsync(Proyecto proyecto, CancellationToken cancellationToken = default);
     void Update(Proyecto proyecto);
     void Delete(Proyecto proyecto);
+    Task DeleteWithRelatedDataAsync(Guid proyectoId, CancellationToken cancellationToken = default);
 }
+

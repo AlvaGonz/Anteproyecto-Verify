@@ -87,15 +87,16 @@ public class ProjectsController : ControllerBase
         }
         catch (QuotaExceededException ex)
         {
-            return StatusCode(402, new { 
-                error = "QUOTA_EXCEEDED", 
-                tier = ex.TierName, 
-                message = ex.Message 
+            return StatusCode(402, new {
+                error = "QUOTA_EXCEEDED",
+                tier = ex.TierName,
+                message = ex.Message
             });
         }
     }
 
     [HttpPut("{id:guid}")]
+    [AllowAnonymous]
     // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> UpdateProject(Guid id, [FromBody] UpdateProyectoDto dto, CancellationToken cancellationToken)
     {
@@ -115,6 +116,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/status")]
+    [AllowAnonymous]
     // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] ProjectStatus status, CancellationToken cancellationToken)
     {
@@ -130,6 +132,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [AllowAnonymous]
     // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<IActionResult> DeleteProject(Guid id, CancellationToken cancellationToken)
     {
@@ -145,6 +148,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost("upload-image")]
+    [AllowAnonymous]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -163,7 +167,7 @@ public class ProjectsController : ControllerBase
 
         using var stream = file.OpenReadStream();
         var blobName = $"project-images/{Guid.NewGuid()}{extension}";
-        
+
         try
         {
             var url = await _blobStorageService.UploadAsync(stream, blobName, file.ContentType, cancellationToken);
