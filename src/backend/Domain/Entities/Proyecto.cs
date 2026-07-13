@@ -29,7 +29,7 @@ public class Proyecto : EntityBase
     public string? CedulaRncPropietario { get; private set; }
     public string? EstatusIpi { get; private set; }
     public decimal? SuperficieM2 { get; private set; }
-    public string EstatusDescripcion { get; private set; } = null!;
+    public string EstatusDescripcion => GetEstatusDescripcion(EstadoProyecto);
     public Guid PromotorId => UsuarioCreadorId;
     public string? RncPromotor => RncDesarrollador;
     public EstadoJuridico EstadoJuridico { get; private set; } = EstadoJuridico.Pendiente;
@@ -76,7 +76,6 @@ public class Proyecto : EntityBase
         ImagenAdicional5 = img5;
         CodigoInterno = GenerateCode();
         EstadoProyecto = ProjectStatus.Draft;
-        EstatusDescripcion = GetEstatusDescripcion(EstadoProyecto);
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
@@ -109,7 +108,6 @@ public class Proyecto : EntityBase
     public void UpdateStatus(ProjectStatus newStatus)
     {
         EstadoProyecto = newStatus;
-        EstatusDescripcion = GetEstatusDescripcion(newStatus);
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

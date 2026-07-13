@@ -26,6 +26,7 @@ export interface ProyectoRecienteDto {
   nombre: string;
   desarrollador: string;
   estado: string;
+  imagenUrl?: string | null;
 }
 
 export const adminDashboardApi = {

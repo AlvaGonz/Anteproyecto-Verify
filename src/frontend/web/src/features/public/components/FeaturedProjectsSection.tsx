@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
-import { useProjects } from "../../projects/api/useProjects";
-import { ProjectStatus } from "../../projects/types";
+import { useSearchPublicProjects } from "../../projects/api/useSearchPublicProjects";
+import { ProjectStatus, LegalStatus, IntegrityStatus } from "../../projects/types";
 
 interface Project {
   name: string;
@@ -38,20 +38,26 @@ export const FeaturedProjectsSection: React.FC = () => {
   const scrollLeftValRef = useRef(0);
   const hasDraggedRef = useRef(false);
 
-  const { data: realProjects = [] } = useProjects();
-  
-  // Filter only validated projects (estadoProyecto === ProjectStatus.Validated)
-  const validatedProjects = realProjects.filter(p => p.estadoProyecto === ProjectStatus.Validated);
-  
-  const formattedProjects: Project[] = validatedProjects.map(p => ({
-    name: p.nombre,
-    location: p.ubicacionTexto,
-    image: p.imagenUrl || "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-    status: "Validado",
-    risk: "Calculando",
-    deliveredDocs: p.completionRate ? Math.round(p.completionRate * 10) : 5,
-    totalDocs: 10,
-  }));
+  const { data: searchResults = [] } = useSearchPublicProjects("");
+
+  const publicProjects = Array.isArray(searchResults) ? searchResults : [];
+
+  const formattedProjects: Project[] = publicProjects
+    .filter(p =>
+      p.estadoJuridico === LegalStatus.Valid &&
+      p.estadoProyecto >= ProjectStatus.Published &&
+      p.estadoProyecto !== ProjectStatus.Rejected &&
+      p.estadoIntegridad === IntegrityStatus.Verified
+    )
+    .map(p => ({
+      name: p.nombreProyecto,
+      location: p.ubicacionTexto || "Ubicación no especificada",
+      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      status: "Validado",
+      risk: "Calculando",
+      deliveredDocs: 8,
+      totalDocs: 10,
+    }));
 
   const projectsToUse = formattedProjects.length > 0 ? formattedProjects : FALLBACK_PROJECTS;
 
@@ -106,14 +112,14 @@ export const FeaturedProjectsSection: React.FC = () => {
     const el = containerRef.current;
     if (el) {
       el.addEventListener("scroll", handleScroll, { passive: true });
-      
+
       const initScroll = () => {
         const singleSetWidth = el.scrollWidth / 3;
         if (singleSetWidth > 0) {
           el.scrollLeft = singleSetWidth;
         }
       };
-      
+
       const timer = setTimeout(initScroll, 50);
       return () => {
         el.removeEventListener("scroll", handleScroll);
@@ -190,26 +196,25 @@ export const FeaturedProjectsSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 mb-20 space-y-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div className="space-y-4">
-            <span className="text-primary font-black text-xs uppercase tracking-[0.3em]">Expose Público</span>
             <h2 className="text-4xl md:text-6xl font-display font-black text-secondary tracking-tight">
               Proyectos <span className="italic text-primary">Verificados</span>
             </h2>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row sm:items-center gap-6 md:gap-8">
             <Link to="/projects" className="flex items-center gap-2 text-secondary font-black group whitespace-nowrap">
               Ver todos los proyectos <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            
+
             <div className="flex items-center gap-3">
-              <button type="button" 
+              <button type="button"
                 onClick={() => scroll("left")}
                 className="w-14 h-14 bg-white text-secondary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md rounded-2xl flex items-center justify-center border border-gray-200/60 shadow-sm transition-all duration-300 active:scale-95 cursor-pointer"
                 aria-label="Proyectos anteriores"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <button type="button" 
+              <button type="button"
                 onClick={() => scroll("right")}
                 className="w-14 h-14 bg-white text-secondary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md rounded-2xl flex items-center justify-center border border-gray-200/60 shadow-sm transition-all duration-300 active:scale-95 cursor-pointer"
                 aria-label="Siguientes proyectos"
@@ -221,12 +226,12 @@ export const FeaturedProjectsSection: React.FC = () => {
         </div>
       </div>
 
-      <div 
+      <div
         className="relative"
         onMouseEnter={() => { isHoveredRef.current = true; }}
         onMouseLeave={() => { isHoveredRef.current = false; }}
       >
-        <div 
+        <div
           ref={containerRef}
           role="region"
           aria-label="Proyectos destacados"
@@ -238,7 +243,7 @@ export const FeaturedProjectsSection: React.FC = () => {
         >
           {carouselItems.map((project, i) => {
             const deliveryPercentage = Math.round((project.deliveredDocs / project.totalDocs) * 100);
-            
+
             return (
               <div
                 key={`${project.name}-${i}`}
@@ -253,10 +258,10 @@ export const FeaturedProjectsSection: React.FC = () => {
                   />
                   <div className="absolute top-6 left-6 flex gap-2">
                     <span className="bg-white/90 backdrop-blur shadow-lg px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-secondary tracking-widest">
-                       {project.status}
-                     </span>
-                   </div>
-                 </div>
+                      {project.status}
+                    </span>
+                  </div>
+                </div>
 
                 <div className="p-8 space-y-6">
                   <div className="space-y-2">
@@ -266,40 +271,40 @@ export const FeaturedProjectsSection: React.FC = () => {
                       {project.location}
                     </p>
                   </div>
-                  
+
                   <div className="pt-6 border-t border-gray-100 space-y-4">
-                     <div className="flex items-center justify-between">
-                       <div className="space-y-1">
-                         <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Documentación</p>
-                         <div className="flex items-center gap-2">
-                           <p className="text-secondary font-black">{deliveryPercentage}%</p>
-                           <CheckCircle2 className="w-4 h-4 text-green-500" />
-                         </div>
-                       </div>
-                       <Link 
-                         to="/projects" 
-                          onClick={(e) => {
-                            if (hasDraggedRef.current) {
-                              e.preventDefault();
-                            }
-                          }}
-                         className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm"
-                       >
-                         <ChevronRight className="w-6 h-6" />
-                       </Link>
-                     </div>
-                     
-                     <div className="space-y-2">
-                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                         <m.div 
-                           initial={{ width: 0 }}
-                           whileInView={{ width: `${deliveryPercentage}%` }}
-                           transition={{ duration: 1, delay: 0.2 }}
-                           className="h-full bg-primary"
-                         />
-                       </div>
-                     </div>
-                   </div>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Documentación</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-secondary font-black">{deliveryPercentage}%</p>
+                          <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        </div>
+                      </div>
+                      <Link
+                        to="/projects"
+                        onClick={(e) => {
+                          if (hasDraggedRef.current) {
+                            e.preventDefault();
+                          }
+                        }}
+                        className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm"
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </Link>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <m.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${deliveryPercentage}%` }}
+                          transition={{ duration: 1, delay: 0.2 }}
+                          className="h-full bg-primary"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             );

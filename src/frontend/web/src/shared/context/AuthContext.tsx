@@ -7,12 +7,12 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   updateUser: (data: Partial<User>) => void;
   error: AuthError | null;
-  googleLogin: (credential: string) => Promise<User>;
+  googleLogin: (credential: string) => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('auth:force-logout', handler);
   }, []);
 
-  const login = useCallback(async (email: string, password: string): Promise<User> => {
+  const login = useCallback(async (email: string, password: string): Promise<User | null> => {
     setLoading(true);
     setError(null);
     queryClient.clear();
@@ -56,15 +56,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSuccess(result)) {
       setUser(result.data.user);
-    } else {
-      setError(result.error);
+      setLoading(false);
+      return result.data.user;
     }
+    setError(result.error);
     setLoading(false);
-    if (!isSuccess(result)) throw result.error;
-    return result.data.user;
+    return null;
   }, []);
 
-  const googleLogin = useCallback(async (credential: string): Promise<User> => {
+  const googleLogin = useCallback(async (credential: string): Promise<User | null> => {
     setLoading(true);
     setError(null);
     queryClient.clear();
@@ -73,12 +73,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isSuccess(result)) {
       setUser(result.data.user);
-    } else {
-      setError(result.error);
+      setLoading(false);
+      return result.data.user;
     }
+    setError(result.error);
     setLoading(false);
-    if (!isSuccess(result)) throw result.error;
-    return result.data.user;
+    return null;
   }, []);
 
   const logout = useCallback(() => {

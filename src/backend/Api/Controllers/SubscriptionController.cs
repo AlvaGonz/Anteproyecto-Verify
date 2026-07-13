@@ -132,6 +132,8 @@ public class SubscriptionController : ControllerBase
 
         var user = await _dbContext.Usuarios
             .Include(u => u.Plan)
+            .Include(u => u.Titular)
+                .ThenInclude(t => t!.Plan)
             .FirstOrDefaultAsync(u => u.Id == userId, ct);
 
         if (user == null)
@@ -193,7 +195,10 @@ public class SubscriptionController : ControllerBase
             cancelAt = user.CancelAt,
             stripeSubscriptionId = user.StripeSubscriptionId,
             isManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId),
-            billingCycle = !string.IsNullOrEmpty(user.PendingBillingCycle) ? user.PendingBillingCycle : billingCycle
+            billingCycle = !string.IsNullOrEmpty(user.PendingBillingCycle) ? user.PendingBillingCycle : billingCycle,
+            isGuest = user.TitularId != null,
+            inviterPlan = user.Titular?.Plan?.NombrePlan,
+            inviterName = user.Titular?.NombreCompleto
         });
     }
 

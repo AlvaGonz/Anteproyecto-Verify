@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
-import type { ProyectoDto, CreateProyectoDto } from "../types";
+import type { ProyectoDto, CreateProyectoDto, LegalStatus } from "../types";
 import { ProjectCategory } from "../types";
 
 export const projectKeys = {
@@ -22,6 +22,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   designacionCatastral: apiProj.designacionCatastral,
   matricula: apiProj.matricula,
   estatusDescripcion: apiProj.estatusDescripcion,
+  estadoJuridico: apiProj.estadoJuridico as LegalStatus,
   estadoProyecto: apiProj.estadoProyecto,
   estadoIntegridad: apiProj.estadoIntegridad,
   usuarioCreadorId: String(apiProj.usuarioCreadorId),
@@ -59,7 +60,7 @@ export const useUpdateProjectStatus = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: ['updateProjectStatus'],
-    mutationFn: ({ id, status }: { id: string; status: number }) => 
+    mutationFn: ({ id, status }: { id: string; status: number }) =>
       apiClient.patch<ApiProyectoDto>(`/projects/${id}/status`, status, {
         headers: { 'Content-Type': 'application/json' }
       }).then(res => mapApiProject(res.data)),

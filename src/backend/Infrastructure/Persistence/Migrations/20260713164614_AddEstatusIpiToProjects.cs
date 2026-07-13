@@ -21,9 +21,6 @@ namespace Infrastructure.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "EstatusIpi",
-                table: "ProyectosInmobiliarios");
         }
     }
 }

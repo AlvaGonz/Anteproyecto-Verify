@@ -1,14 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY src/backend/Domain/Domain.csproj src/backend/Domain/
-COPY src/backend/Application/Application.csproj src/backend/Application/
-COPY src/backend/Infrastructure/Infrastructure.csproj src/backend/Infrastructure/
-COPY src/backend/Api/Api.csproj src/backend/Api/
-COPY *.sln ./
-RUN dotnet restore src/backend/Api/Api.csproj
+COPY Domain/Domain.csproj Domain/
+COPY Application/Application.csproj Application/
+COPY Infrastructure/Infrastructure.csproj Infrastructure/
+COPY Api/Api.csproj Api/
+RUN dotnet restore Api/Api.csproj
 
-COPY src/backend ./src/backend
-RUN dotnet publish src/backend/Api/Api.csproj -c Release -o /app/publish
+COPY . .
+RUN dotnet publish Api/Api.csproj -c Release -o /app/publish
 
 FROM mcr.azure.cn/dotnet/aspnet:8.0
 WORKDIR /app

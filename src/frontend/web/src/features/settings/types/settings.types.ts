@@ -10,6 +10,7 @@ export interface BasicUserDto {
   nombre: string;
   apellido: string;
   email: string;
+  estado?: string;
 }
 
 export interface UserSettings {

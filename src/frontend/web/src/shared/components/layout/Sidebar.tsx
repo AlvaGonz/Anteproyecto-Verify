@@ -9,7 +9,8 @@ import {
   Plus,
   Compass,
   History,
-  LogOut
+  LogOut,
+  Award
 } from "lucide-react";
 import { useProjects } from "../../../features/projects/api/useProjects";
 import { useAuth } from "../../context/AuthContext";
@@ -168,6 +169,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           <div className="flex flex-col min-w-0">
             <p className="text-sm font-bold text-white leading-tight truncate">{firstName}</p>
             <p className="text-[9px] text-white/30 font-black uppercase tracking-widest mt-0.5">{roleLabel}</p>
+            {user?.isGuest && user?.inviterPlan && (
+              <div data-testid="sidebar-plan-badge" className="flex items-center gap-1.5 mt-1.5 px-2 py-0.5 bg-primary/20 rounded-full w-fit">
+                <Award className="w-3 h-3 text-primary" />
+                <span data-testid="plan-name" className="text-[9px] font-bold text-primary">{user.inviterPlan}</span>
+              </div>
+            )}
           </div>
         </Link>
         <button type="button"

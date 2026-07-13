@@ -41,6 +41,9 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.ConsultasUsadas).IsRequired().HasDefaultValue(0);
         builder.Property(u => u.ProyectosCreados).IsRequired().HasDefaultValue(0);
 
+        builder.Property(u => u.MaxProyectosDelegados).IsRequired(false);
+        builder.Property(u => u.MaxConsultasDelegadas).IsRequired(false);
+
         builder.HasOne(u => u.Plan)
             .WithMany()
             .HasForeignKey(u => u.PlanSuscripcionId)

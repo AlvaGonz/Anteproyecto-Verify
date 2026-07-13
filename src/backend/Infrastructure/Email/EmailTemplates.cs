@@ -462,7 +462,7 @@ public static class EmailTemplates
     // ════════════════════════════════════════════════════════════════════════
     public static string GetInvitationEmail(string titularName, string inviteeName, string email, string tempPassword)
     {
-        string loginUrl = $"http://localhost:3000/#/auth/login";
+        string loginUrl = $"http://localhost:3000/#/login";
 
         string infoInner = $@"
             <div style=""margin-bottom:8px;""><strong>Usuario:</strong> <span style=""color:{NavyDark};"">{email}</span></div>

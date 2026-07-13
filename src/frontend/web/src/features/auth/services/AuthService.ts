@@ -31,6 +31,16 @@ export interface User {
   // ponytail: pendingPlanCode/billingCycle drive the post-registration checkout redirect
   pendingPlanCode?: string | null;
   pendingBillingCycle?: string | null;
+  // ponytail: guest/inviter fields for subscription display
+  isGuest?: boolean;
+  inviterPlan?: string;
+  inviteesList?: Array<{
+    id: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+    estado?: string;
+  }>;
 }
 
 export interface AuthResponse {

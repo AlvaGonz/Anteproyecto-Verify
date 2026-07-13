@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FolderKanban, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
+import { ProjectCoverImage } from "../../projects/components/ProjectCoverImage";
 
 export interface DashboardProjectListProps {
   loading: boolean;
@@ -67,8 +68,13 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
               return (
                 <div key={`${p.nombre}-${idx}`} className="flex items-center justify-between px-8 py-5 hover:bg-surface-raised/20 transition-all group h-[89px]">
                   <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-surface-raised flex items-center justify-center text-text-primary font-black text-xs group-hover:bg-[#9BACD8]/20 transition-colors">
-                        {p.nombre.substring(0, 2).toUpperCase()}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-inner">
+                        <ProjectCoverImage
+                          coverUrl={p.imagenUrl}
+                          projectName={p.nombre}
+                          size="sm"
+                          className="grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
+                        />
                       </div>
                       <div>
                         <p className="font-bold text-text-primary text-lg group-hover:text-[#223382] transition-colors leading-tight">{p.nombre}</p>

@@ -24,6 +24,7 @@ public record ProyectoDto(
     string? Propietario,
     string? CedulaRncPropietario,
     string? Ipi,
+    EstadoJuridico EstadoJuridico,
     string? EstatusIpi,
     decimal? SuperficieM2,
     string EstatusDescripcion,

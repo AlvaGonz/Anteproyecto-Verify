@@ -66,6 +66,9 @@ public class Usuario : EntityBase
     public int ConsultasUsadas { get; private set; }
     public int ProyectosCreados { get; private set; }
 
+    public int? MaxProyectosDelegados { get; private set; }
+    public int? MaxConsultasDelegadas { get; private set; }
+
     public Guid? TitularId { get; private set; }
     public Usuario? Titular { get; private set; }
     public ICollection<Usuario> MiembrosEquipo { get; private set; } = new List<Usuario>();
@@ -258,6 +261,13 @@ public class Usuario : EntityBase
     public void AsignarTitular(Guid titularId)
     {
         TitularId = titularId;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void SetDelegatedLimits(int? maxProyectos, int? maxConsultas)
+    {
+        MaxProyectosDelegados = maxProyectos;
+        MaxConsultasDelegadas = maxConsultas;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

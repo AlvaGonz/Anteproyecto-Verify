@@ -7,6 +7,7 @@ import apiClient from '../../../infrastructure/api/client';
 
 import { SubscriptionConsentCheckbox } from '../components/SubscriptionConsentCheckbox';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../../shared/context/AuthContext';
 
 // Load Stripe outside component to avoid recreating it
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
@@ -65,6 +66,7 @@ export const CheckoutPage = () => {
       navigate('/plans');
     }
   };
+  const { user } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState<boolean>(false);
   const [consentData, setConsentData] = useState<{ timestamp: string; userAgent: string } | null>(null);

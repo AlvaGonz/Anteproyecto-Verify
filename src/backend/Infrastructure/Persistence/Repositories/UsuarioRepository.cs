@@ -27,12 +27,14 @@ public class UsuarioRepository : IUsuarioRepository
             .Include(u => u.Plan)
             .Include(u => u.Titular)
                 .ThenInclude(t => t!.Plan)
+            .Include(u => u.MiembrosEquipo)
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 
     public async Task<Usuario?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _context.Usuarios
+            .Include(u => u.MiembrosEquipo)
             .FirstOrDefaultAsync(u => u.CorreoElectronico.ToLower() == email.ToLower(), cancellationToken);
     }
 

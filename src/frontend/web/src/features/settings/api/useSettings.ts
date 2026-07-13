@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import { PaginatedResponse, UserSettings, ProfilePermissions, SubscriptionPlan, CreateUserDto, UpdateUserDto } from "../types/settings.types";
+import { useAuth } from "../../../shared/context/AuthContext";
 
 export const useUsers = (page = 1, pageSize = 50, enabled = true) =>
   useQuery({
@@ -126,6 +127,9 @@ export interface MySubscriptionStatus {
   stripeSubscriptionId: string | null;
   isManagedByStripe: boolean;
   billingCycle?: string | null;
+  isGuest?: boolean;
+  inviterPlan?: string;
+  inviterName?: string;
 }
 
 export const useMySubscription = (options?: { refetchInterval?: number }) =>
@@ -177,28 +181,47 @@ export const useReactivateSubscription = () => {
 };
 
 
-export const useRemoveInvitee = () => {
+export const useUpdateInviteeLimits = () => {
   const qc = useQueryClient();
+  const { refreshUser } = useAuth();
   return useMutation({
-    mutationKey: ["useRemoveInvitee"],
-    mutationFn: (inviteeId: string) =>
-      apiClient.delete<{message: string}>(`/admin/invitees/${inviteeId}`).then(res => res.data),
+    mutationKey: ["useUpdateInviteeLimits"],
+    mutationFn: ({ inviteeId, maxProyectosDelegados, maxConsultasDelegadas }: { inviteeId: string; maxProyectosDelegados: number | null; maxConsultasDelegadas: number | null }) =>
+      apiClient.put<{message: string}>(`/admin/users/invitees/${inviteeId}/limits`, { maxProyectosDelegados, maxConsultasDelegadas }).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["auth", "me"] });
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
+      refreshUser();
+    },
+  });
+};
+
+export const useRemoveInvitee = () => {
+  const qc = useQueryClient();
+  const { refreshUser } = useAuth();
+  return useMutation({
+    mutationKey: ["useRemoveInvitee"],
+    mutationFn: (inviteeId: string) =>
+      apiClient.delete<{message: string}>(`/admin/users/invitees/${inviteeId}`).then(res => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["auth", "me"] });
+      qc.invalidateQueries({ queryKey: ["settings", "users"] });
+      refreshUser();
     },
   });
 };
 
 export const useInviteUser = () => {
   const qc = useQueryClient();
+  const { refreshUser } = useAuth();
   return useMutation({
     mutationKey: ["useInviteUser"],
-    mutationFn: (data: { nombre: string; apellido: string; email: string; telefono: string; cedula: string }) =>
+    mutationFn: (data: { nombre: string; apellido: string; email: string; telefono: string; cedula: string; maxProyectosDelegados?: number | null; maxConsultasDelegadas?: number | null }) =>
       apiClient.post<{message: string}>(`/admin/users/invite`, data).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["auth", "me"] });
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
+      refreshUser();
     },
   });
 };

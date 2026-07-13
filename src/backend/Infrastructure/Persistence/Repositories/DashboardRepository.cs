@@ -59,7 +59,8 @@ namespace Infrastructure.Persistence.Repositories
                     FechaRegistro = p.CreatedAtUtc,
                     Nombre = p.Nombre,
                     Desarrollador = p.UsuarioCreador != null ? p.UsuarioCreador.NombreCompleto : "Desconocido",
-                    Estado = p.EstadoProyecto.ToString()
+                    Estado = p.EstadoProyecto.ToString(),
+                    ImagenUrl = p.ImagenUrl
                 })
                 .ToListAsync(cancellationToken);
 

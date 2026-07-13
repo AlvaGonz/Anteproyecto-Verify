@@ -59,6 +59,18 @@ public static class ApplicationBuilderExtensions
             RequestPath = "/avatars"
         });
 
+        var uploadsDirectory = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        if (!System.IO.Directory.Exists(uploadsDirectory))
+        {
+            System.IO.Directory.CreateDirectory(uploadsDirectory);
+        }
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsDirectory),
+            RequestPath = "/uploads"
+        });
+
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();

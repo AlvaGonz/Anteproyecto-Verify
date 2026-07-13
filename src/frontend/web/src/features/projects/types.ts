@@ -10,6 +10,7 @@ export interface ProyectoDto {
   rncDesarrollador?: string;
   designacionCatastral?: string;
   matricula?: string;
+  estadoJuridico: LegalStatus;
   propietario?: string;
   cedulaRncPropietario?: string;
   ipi?: string;
@@ -103,6 +104,13 @@ export interface StatusEligibility {
   currentStatus: ProjectStatus;
 }
 
+export enum LegalStatus {
+  Pending = 0,
+  Valid = 1,
+  WithObservations = 2,
+  Invalid = 3,
+}
+
 export enum IntegrityStatus {
   Pending = 0,
   Verified = 1,
@@ -142,7 +150,7 @@ export interface ValidationProjectData {
   timeline: ValidationTimelineEvent[];
 }
 
-export type ProjectError = 
+export type ProjectError =
   | { _tag: "NotFound"; id: string }
   | { _tag: "Unauthorized" }
   | { _tag: "ValidationError"; errors: string[] }
