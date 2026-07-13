@@ -7,6 +7,7 @@ import {
   IntegrityStatus,
   ProjectError,
   DocumentDiagnosisDto,
+  CatastroLookupDto,
 } from "../types";
 import { success, failure, Result } from "../../../shared/utils/functional";
 
@@ -121,6 +122,15 @@ async updateProject(id: string, data: UpdateProyectoDto): Promise<Result<Proyect
       return success(response.data);
     } catch (error: any) {
       return failure(mapError(error, id));
+    }
+  },
+
+  async lookupCatastroByGps(lat: string, lon: string): Promise<Result<CatastroLookupDto, ProjectError>> {
+    try {
+      const response = await apiClient.get<CatastroLookupDto>(`/projects/catastro-lookup?latitud=${lat}&longitud=${lon}`);
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error));
     }
   }
 };

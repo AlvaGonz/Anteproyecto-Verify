@@ -15,5 +15,7 @@ public record UpdateProyectoDto(
     string? Matricula,
     string? Propietario,
     string? CedulaRncPropietario,
-    string? Ipi
+    string? Ipi,
+    string? EstatusIpi,
+    decimal? SuperficieM2
 );

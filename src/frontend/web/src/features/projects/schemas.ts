@@ -17,7 +17,7 @@ export const createProjectSchema = z.object({
   rncDesarrollador: z.string().optional(),
   designacionCatastral: z
     .string()
-    .regex(/^[A-Z0-9\-]{3,30}$/, "Formato catastral inválido (ej: ABC-123)")
+    .max(100, "Designación catastral demasiado larga")
     .optional()
     .or(z.literal("")),
   valorEstimado: z
@@ -28,7 +28,6 @@ export const createProjectSchema = z.object({
   superficieM2: z
     .number({ error: () => "Debe ser un número" })
     .positive({ error: "Debe ser mayor a 0" })
-    .max(999_999, { error: "Valor fuera de rango" })
     .optional(),
   fotos: z
     .custom<FileList>()
@@ -43,6 +42,10 @@ export const createProjectSchema = z.object({
         Array.from(files).every((f) => f.type.startsWith("image/")),
       "Solo se permiten archivos de imagen"
     ),
+  propietario: z.string().optional(),
+  cedulaRncPropietario: z.string().optional(),
+  ipi: z.string().optional(),
+  estatusIpi: z.string().optional(),
 });
 export type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
 

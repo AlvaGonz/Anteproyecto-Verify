@@ -22,6 +22,8 @@ public class Proyecto : EntityBase
     public string? IdentificacionCatastral => DesignacionCatastral;
     public string? Propietario { get; private set; }
     public string? CedulaRncPropietario { get; private set; }
+    public string? EstatusIpi { get; private set; }
+    public decimal? SuperficieM2 { get; private set; }
     public Guid PromotorId => UsuarioCreadorId;
     public string? RncPromotor => RncDesarrollador;
     public EstadoJuridico EstadoJuridico { get; private set; } = EstadoJuridico.Pendiente;
@@ -43,7 +45,7 @@ public class Proyecto : EntityBase
 
     private Proyecto() { } // For EF Core
 
-    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, ProjectCategory categoria = ProjectCategory.Residencial, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null)
+    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, ProjectCategory categoria = ProjectCategory.Residencial, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -58,12 +60,14 @@ public class Proyecto : EntityBase
         Propietario = propietario;
         CedulaRncPropietario = cedulaRncPropietario;
         Ipi = ipi;
+        EstatusIpi = estatusIpi;
+        SuperficieM2 = superficieM2;
         CodigoInterno = GenerateCode();
         EstadoProyecto = ProjectStatus.Draft;
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
-    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, ProjectCategory categoria, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null)
+    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, ProjectCategory categoria, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -78,6 +82,8 @@ public class Proyecto : EntityBase
         Propietario = propietario;
         CedulaRncPropietario = cedulaRncPropietario;
         Ipi = ipi;
+        EstatusIpi = estatusIpi;
+        SuperficieM2 = superficieM2;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

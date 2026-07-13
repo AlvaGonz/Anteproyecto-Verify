@@ -1,7 +1,7 @@
 namespace Infrastructure.Storage;
 
 using Application.Abstractions.Storage;
-using Infrastructure.Configuration;
+using Configuration;
 using Microsoft.Extensions.Options;
 using System.IO;
 using System.Threading;

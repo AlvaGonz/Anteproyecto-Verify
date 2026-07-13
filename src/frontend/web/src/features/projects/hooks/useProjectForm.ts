@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } from "../types";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { apiClient } from "../../../infrastructure/api/client";
+import { projectsApi } from "../api/projectsApi";
 
 // Fix Leaflet default marker icon paths broken by Vite's asset bundler
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -81,6 +82,10 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const [rncDesarrollador, setRncDesarrollador] = useState(initialData?.rncDesarrollador ?? "");
   const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");
   const [matricula, setMatricula] = useState(initialData?.matricula ?? "");
+  const [propietario, setPropietario] = useState(initialData?.propietario ?? "");
+  const [cedulaRncPropietario, setCedulaRncPropietario] = useState(initialData?.cedulaRncPropietario ?? "");
+  const [ipi, setIpi] = useState(initialData?.ipi ?? "");
+  const [estatusIpi, setEstatusIpi] = useState(initialData?.estatusIpi ?? "");
 
   // ── Constantes de fotos ────────────────────────────────────────────────────
   const MAX_FILE_SIZE_MB = 5;
@@ -218,7 +223,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   // Map Search State
   const [mapSearchText, setMapSearchText] = useState("");
 
-  const handleSearchCoordinates = useCallback(() => {
+  const handleSearchCoordinates = useCallback(async () => {
     const map = leafletMapRef.current;
     if (!map || !mapSearchText.trim()) return;
 
@@ -232,10 +237,23 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
-      const randomParcel = Math.floor(Math.random() * 500) + 1;
-      const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
-      const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
-      setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+      try {
+        const catastroData = await projectsApi.lookupCatastroByGps(lat, lng);
+        setDesignacionCatastral(catastroData.designacionCatastral || "");
+        setMatricula(catastroData.matricula || "");
+        setSuperficieM2(catastroData.superficieM2 || "");
+        setPropietario(catastroData.propietario || "");
+        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+        setIpi(catastroData.ipi || "");
+        setEstatusIpi(catastroData.estatusIpi || "");
+      } catch (error) {
+        console.error("No catastro data found:", error);
+        // Fallback for demo purposes if no real data is found
+        const randomParcel = Math.floor(Math.random() * 500) + 1;
+        const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+        const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
+        setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+      }
 
       if (markerRef.current) {
         markerRef.current.setLatLng([lat, lng]);
@@ -265,14 +283,26 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     leafletMapRef.current = map;
 
     // Click to drop marker + capture GPS + generate catastral code
-    map.on("click", (e: L.LeafletMouseEvent) => {
+    map.on("click", async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
-      const randomParcel = Math.floor(Math.random() * 500) + 1;
-      const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
-      const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
-      setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+      try {
+        const catastroData = await projectsApi.lookupCatastroByGps(lat, lng);
+        setDesignacionCatastral(catastroData.designacionCatastral || "");
+        setMatricula(catastroData.matricula || "");
+        setSuperficieM2(catastroData.superficieM2 || "");
+        setPropietario(catastroData.propietario || "");
+        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+        setIpi(catastroData.ipi || "");
+        setEstatusIpi(catastroData.estatusIpi || "");
+      } catch (error) {
+        console.error("No catastro data found:", error);
+        const randomParcel = Math.floor(Math.random() * 500) + 1;
+        const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+        const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
+        setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+      }
 
       if (markerRef.current) {
         markerRef.current.setLatLng([lat, lng]);
@@ -392,6 +422,10 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           designacionCatastral: designacionCatastral || undefined,
           matricula: matricula || undefined,
           superficieM2: superficieM2 === "" ? undefined : Number(superficieM2),
+          propietario: propietario || undefined,
+          cedulaRncPropietario: cedulaRncPropietario || undefined,
+          ipi: ipi || undefined,
+          estatusIpi: estatusIpi || undefined,
           fotosNuevas: portraitRef.current ? [portraitRef.current, ...gallery] : gallery.length > 0 ? gallery : undefined,
         };
         await onSubmit(updateData);
@@ -407,6 +441,10 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           ubicacionGps: ubicacionGps || undefined,
           matricula: matricula || undefined,
           superficieM2: superficieM2 === "" ? undefined : Number(superficieM2),
+          propietario: propietario || undefined,
+          cedulaRncPropietario: cedulaRncPropietario || undefined,
+          ipi: ipi || undefined,
+          estatusIpi: estatusIpi || undefined,
           fotosNuevas: portraitRef.current ? [portraitRef.current, ...gallery] : gallery.length > 0 ? gallery : undefined,
         };
         await onSubmit(createData);
