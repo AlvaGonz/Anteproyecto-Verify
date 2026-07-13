@@ -241,3 +241,7 @@
   - **Symptom:** Eliminar `IdProyecto` de `CatastroTitulo` y actualizar el script `generador_entidades_gubernamentales.py` para generar 1.6 millones de registros de títulos con los datos de designación catastral.
   - **Status:** Complete (Background script finished in 926.42 seconds generating 1.6M rows).
   - **Fix:** Script Python actualizado y ejecutado con éxito. Eliminado IdProyecto y añadido CodigoDesignacionCatastral con coordenadas GPS únicas.
+-   * * T A S K - 1 7 8 8 : * *   R e s i z e   U I   E l e m e n t s   ( P r o j e c t P h o t o s S e c t i o n )  
+     -   * * S t a t u s : * *   C o m p l e t e .  
+     -   * * F i x : * *   M o d i f i c a d o s   l o s   t a m a � o s   d e   m i n i a t u r a s   d e   p o r t a d a   ( c u a d r o   n a r a n j a )   y   a d i c i o n a l e s   ( c u a d r o   a z u l ) ,   y   r e d u c i d o   e l   e s p a c i o   e n t r e   e l l o s   a   u n   t e r c i o .  
+ 

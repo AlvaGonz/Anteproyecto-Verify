@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
 using Application.Contracts.Projects;
+using Application.Contracts.Documents;
 using Application.DTOs;
 using Application.DTOs.Projects;
 using Domain.Enums;
@@ -17,6 +18,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Application.Abstractions.Storage;
 
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -25,12 +27,18 @@ public class ProjectsController : ControllerBase
     private readonly IProjectService _projectService;
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IBlobStorageService _blobStorageService;
+    private readonly IDocumentService _documentService;
 
-    public ProjectsController(IProjectService projectService, IUsuarioRepository usuarioRepository, IBlobStorageService blobStorageService)
+    public ProjectsController(
+        IProjectService projectService,
+        IUsuarioRepository usuarioRepository,
+        IBlobStorageService blobStorageService,
+        IDocumentService documentService)
     {
         _projectService = projectService;
         _usuarioRepository = usuarioRepository;
         _blobStorageService = blobStorageService;
+        _documentService = documentService;
     }
 
     [HttpGet]
@@ -69,6 +77,27 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
         return Ok(project);
+    }
+
+    [HttpGet("{id:guid}/status-eligibility")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetStatusEligibility(Guid id, CancellationToken cancellationToken)
+    {
+        var project = await _projectService.GetProjectByIdAsync(id, cancellationToken);
+        if (project == null) return NotFound();
+
+        // Count documents and check for observaciones via the document service
+        // We query the document table directly through the document service
+        var documents = await _documentService.GetProjectDocumentsAsync(id, cancellationToken);
+        var docList = documents.ToList();
+        var hasObservaciones = docList.Any(d => !string.IsNullOrEmpty(d.Observaciones));
+
+        return Ok(new
+        {
+            documentCount = docList.Count,
+            hasObservaciones,
+            currentStatus = (int)project.EstadoProyecto
+        });
     }
 
     [HttpPost]

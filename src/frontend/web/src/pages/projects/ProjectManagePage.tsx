@@ -12,6 +12,7 @@ import { useProject, useCreateProject, useDeleteProject } from "../../features/p
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
+import { ProjectStatusBar } from "../../features/projects/components/ProjectStatusBar";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 
 const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
@@ -44,16 +45,6 @@ export const ProjectManagePage: React.FC = () => {
   const updateMutation = useMutation({
     mutationFn: (data: { id: string; payload: any }) => 
       apiClient.put<ProyectoDto>(`/projects/${data.id}`, data.payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["projects"] });
-    }
-  });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: (data: { id: string; status: ProjectStatus }) => 
-      apiClient.patch<ProyectoDto>(`/projects/${data.id}/status`, data.status, {
-        headers: { 'Content-Type': 'application/json' }
-      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
     }
@@ -118,17 +109,6 @@ export const ProjectManagePage: React.FC = () => {
       }
     } catch (error) {
       addToast("Error al guardar el proyecto", "error");
-    }
-  };
-
-  const handleStatusChange = async (status: ProjectStatus) => {
-    if (!id) return;
-    try {
-      sanitizeStatus(status);
-      await updateStatusMutation.mutateAsync({ id: id as string, status });
-      addToast("Estado actualizado exitosamente", "success");
-    } catch {
-      addToast("Error al actualizar el estado", "error");
     }
   };
 
@@ -200,6 +180,10 @@ export const ProjectManagePage: React.FC = () => {
         </div>
       </dialog>
 
+      {isEditing && project && (
+        <ProjectStatusBar projectId={project.id} currentStatus={project.estadoProyecto} />
+      )}
+
       {/* Title moved to layout */}
       <ProjectForm
         key={project?.id || 'new'}
@@ -208,32 +192,6 @@ export const ProjectManagePage: React.FC = () => {
         onCancel={() => navigate("/admin/projects")}
         onDelete={handleDelete}
       />
-
-      {isEditing && project && (
-        <div className="mt-8 space-y-4">
-          {/* Status management */}
-          <div className="bg-[var(--color-surface-primary)] p-5 rounded-lg">
-            <h2 className="text-base font-bold text-[var(--color-text-strong)] mb-3">
-              Gestion de Estado
-            </h2>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {[ProjectStatus.Draft, ProjectStatus.InReview, ProjectStatus.Published, ProjectStatus.Observed].map((status) => (
-                <button type="button"
-                  key={status}
-                  onClick={() => handleStatusChange(status)}
-                  className="bg-[var(--color-brand-primary)]/10 hover:bg-[var(--color-brand-primary)]/20 text-[var(--color-text-strong)] py-2 px-4 rounded-lg"
-                >
-                  {getStatusLabel(status, t)}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-[var(--color-text-strong)] opacity-50">
-              Estado actual: <strong>{getStatusLabel(project.estadoProyecto, t)}</strong>
-            </p>
-          </div>
-
-        </div>
-      )}
     </div>
   );
 };

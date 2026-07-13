@@ -8,6 +8,7 @@ import {
   ProjectError,
   DocumentDiagnosisDto,
   CatastroLookupDto,
+  StatusEligibility,
 } from "../types";
 import { success, failure, Result } from "../../../shared/utils/functional";
 
@@ -118,6 +119,15 @@ export const projectsApi = {
       return success(response.data.url);
     } catch (error: any) {
       return failure(mapError(error));
+    }
+  },
+
+  async getProjectStatusEligibility(id: string): Promise<Result<StatusEligibility, ProjectError>> {
+    try {
+      const response = await apiClient.get<StatusEligibility>(`/projects/${id}/status-eligibility`);
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error, id));
     }
   }
 };

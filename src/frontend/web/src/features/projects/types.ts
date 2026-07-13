@@ -97,6 +97,12 @@ export enum ProjectStatus {
   Rejected = 5,
 }
 
+export interface StatusEligibility {
+  documentCount: number;
+  hasObservaciones: boolean;
+  currentStatus: ProjectStatus;
+}
+
 export enum IntegrityStatus {
   Pending = 0,
   Verified = 1,
