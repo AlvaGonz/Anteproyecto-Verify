@@ -26,7 +26,7 @@ const mockProject = {
 test.describe('Project Public Page > Registrant Info Card', () => {
 
   test.beforeEach(async ({ page }) => {
-    await page.route(`**/api/projects/public/${MOCK_PROJECT_SLUG}`, route =>
+    await page.route(`**/api/projects/${MOCK_PROJECT_SLUG}`, route =>
       route.fulfill({ json: mockProject })
     );
     await page.goto(`http://localhost:3000/#/p/${MOCK_PROJECT_SLUG}`);
@@ -121,7 +121,7 @@ test.describe('Project Public Page > Registrant Info Card', () => {
 // ── Scenario: unverified registrant ────────────────────────────────────────
 test.describe('Project Public Page > Registrant unverified', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route(`**/api/projects/public/${MOCK_PROJECT_SLUG}`, route =>
+    await page.route(`**/api/projects/${MOCK_PROJECT_SLUG}`, route =>
       route.fulfill({
         json: {
           ...mockProject,

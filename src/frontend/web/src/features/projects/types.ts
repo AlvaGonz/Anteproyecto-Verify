@@ -1,3 +1,15 @@
+export interface ProjectRegistrant {
+  id: string;
+  nombreCompleto: string;
+  razonSocial?: string | null;
+  rol: string;
+  email: string;
+  telefono?: string | null;
+  avatarUrl?: string | null;
+  fechaRegistro: string;
+  verificado: boolean;
+}
+
 export interface ProyectoDto {
   id: string;
   codigoInterno: string;
@@ -27,6 +39,7 @@ export interface ProyectoDto {
   completionRate?: number;
   superficieM2?: number;
   fotoUrls?: string[];
+  registradoPor?: ProjectRegistrant | null;
 }
 
 export interface CreateProyectoDto {

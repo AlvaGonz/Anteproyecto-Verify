@@ -1,4 +1,4 @@
-import { ProjectCategory, ProjectStatus, IntegrityStatus } from "../types";
+import { ProjectCategory, ProjectStatus, IntegrityStatus, ProjectRegistrant } from "../types";
 
 export interface ProyectoDto {
   id: string;
@@ -20,4 +20,5 @@ export interface ProyectoDto {
   createdAtUtc: string;
   updatedAtUtc?: string;
   imagenUrl?: string;
+  registradoPor?: ProjectRegistrant | null;
 }

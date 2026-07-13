@@ -57,10 +57,15 @@ namespace UnitTests.Api.Controllers
                 null,
                 null,
                 null,
+                EstadoJuridico.Pendiente,
+                null,
+                null,
+                "Borrador",
                 ProjectStatus.Draft,
                 IntegrityStatus.Valid,
                 usuarioCreadorId,
                 DateTime.UtcNow,
+                null,
                 null
             );
         }

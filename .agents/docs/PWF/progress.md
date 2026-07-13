@@ -261,3 +261,7 @@
   - **Symptom:** Images uploaded as project cover return 404 Not Found.
   - **Root Cause:** `AzureBlobStorageService.cs` erroneously used `fileName.Replace("/", "\\")`. On the Linux-based Docker container, `\` is treated as part of the filename instead of a directory separator, resulting in a single flat file being created and causing the `UseStaticFiles` middleware to fail resolution. Additionally, `/app/wwwroot/uploads` was not mapped to a persistent volume, causing all images to be wiped out on container restarts.
   - **Fix:** Fixed path substitution to use `Path.DirectorySeparatorChar`. Updated `docker-compose.yml` to map `api_uploads:/app/wwwroot/uploads` so future images persist across container rebuilds.
+- **BUG-028:** `usePublicReport` returns 404 on unvalidated projects but fails silently or triggers React Query error states.
+  - **Symptom:** `useReports.ts:46 GET http://localhost:5000/api/projects/ID/reports/public 404 (Not Found)`
+  - **Root Cause:** The `GetPublicProjectReportQueryHandler` returns `null` when no report is found, leading to a 404 status. React Query automatically retried this 404 three times, flooding the console and network.
+  - **Fix:** Configured React Query `retry` function in `usePublicReport` to return `false` on a 404 response, allowing the UI to gracefully handle the "no report" state. Also added UI modal to show registrant information on "CONTACTAR DESARROLLADOR" button click.
