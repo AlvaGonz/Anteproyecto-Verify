@@ -19,11 +19,11 @@ export interface DocumentDto {
 }
 
 export enum DocumentType {
-  CertificadoTitulo = 1,
-  CertificacionEstadoJuridico = 2,
-  PlanosArquitectonicos = 3,
-  PlanoMensuraCatastral = 4,
-  PermisoConstruccion = 5,
+  TITLE = 1,
+  LEGAL_STATUS = 2,
+  SURVEY = 3,
+  ID = 4,
+  NOTARIAL_POWER = 5,
   CertificadoUsoSuelo = 6,
   FormularioFIDVB009 = 7,
   CertificacionIPI = 8,
@@ -39,8 +39,12 @@ export enum DocumentType {
   NoObjecionINAPACAASD = 18,
   DocumentosNotariales = 19,
   DocumentosSupletorios = 20,
-  ActodeVenta = 21,
-  CopiaCedulaIdentidad = 22,
+  CertificadoTitulo = 21,
+  CertificacionEstadoJuridico = 22,
+  PlanosArquitectonicos = 23,
+  PlanoMensuraCatastral = 24,
+  PermisoConstruccion = 25,
+  CopiaCedulaIdentidad = 26, // Adding this to match frontend needs if missing in backend
   Other = 99,
 }
 

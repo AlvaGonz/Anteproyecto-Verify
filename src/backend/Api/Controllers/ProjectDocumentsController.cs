@@ -149,14 +149,24 @@ public class ProjectDocumentsController : ControllerBase
         DocumentType tipoDocumento;
         if (!Enum.TryParse<DocumentType>(requirementCode, true, out tipoDocumento))
         {
-            // Mapeo básico manual según requirementCode esperado (ej: TITULO -> CertificadoTitulo)
+            // Mapeo básico manual según requirementCode esperado
             switch (requirementCode.ToUpperInvariant())
             {
                 case "TITULO":
                     tipoDocumento = DocumentType.CertificadoTitulo;
                     break;
+                case "ESTADO_JURIDICO":
+                    tipoDocumento = DocumentType.CertificacionEstadoJuridico;
+                    break;
+                case "MENSURA":
                 case "PLANO_MENSURA":
                     tipoDocumento = DocumentType.PlanoMensuraCatastral;
+                    break;
+                case "CEDULA":
+                    tipoDocumento = DocumentType.ID;
+                    break;
+                case "PODER":
+                    tipoDocumento = DocumentType.PoderNotarial;
                     break;
                 case "IPI":
                     tipoDocumento = DocumentType.CertificacionIPI;

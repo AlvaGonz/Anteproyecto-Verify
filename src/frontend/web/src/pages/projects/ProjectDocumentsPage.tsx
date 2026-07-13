@@ -25,7 +25,7 @@ const REQUIRED_DOCUMENTS = [
   { id: "titulo", label: "Título de Propiedad", category: DocumentType.CertificadoTitulo, categoryLabel: "TITULO", description: "Documento notarial original o copia certificada" },
   { id: "estado_juridico", label: "Estado Jurídico", category: DocumentType.CertificacionEstadoJuridico, categoryLabel: "ESTADO J.", description: "Certificación de estado legal del inmueble" },
   { id: "mensura", label: "Plano de Mensura", category: DocumentType.PlanoMensuraCatastral, categoryLabel: "MENSURA", description: "Plano catastral aprobado por autoridad competente" },
-  { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.CopiaCedulaIdentidad, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
+  { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.ID, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
   { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
 ];
 
