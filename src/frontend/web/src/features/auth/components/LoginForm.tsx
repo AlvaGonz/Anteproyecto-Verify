@@ -16,9 +16,8 @@ export const LoginForm = () => {
   const verificationError = searchParams.get("error");
   const redirectUrl = searchParams.get("redirect");
   
-  const { login } = useAuth();
+  const { login, error: authError } = useAuth();
   const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -28,28 +27,25 @@ export const LoginForm = () => {
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = async (data: LoginFormValues) => {
-    try {
-      setIsPending(true);
-      setError(null);
-      const user = await login(data.email, data.password);
-      // Soft update for browser state (React Router navigation)
-      if (redirectUrl) {
-        navigate(redirectUrl);
-      } else if (
-        user?.pendingPlanCode && 
-        !isSubscriptionActive(user.subscriptionStatus) && 
-        user?.rol !== 'Administrator' && 
-        user?.role !== 'Administrator'
-      ) {
-        // ponytail: user has pending plan but no active sub → resume checkout
-        navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
-      } else {
-        navigate("/admin/dashboard");
-      }
-    } catch (err: any) {
-      setError(new Error(err?.message || "Error de autenticación. Verifique sus credenciales."));
-    } finally {
+    setIsPending(true);
+    const user = await login(data.email, data.password);
+    if (!user) {
       setIsPending(false);
+      return; // authError is set by AuthContext, shows on next render
+    }
+    // Soft update for browser state (React Router navigation)
+    if (redirectUrl) {
+      navigate(redirectUrl);
+    } else if (
+      user?.pendingPlanCode && 
+      !isSubscriptionActive(user.subscriptionStatus) && 
+      user?.rol !== 'Administrator' && 
+      user?.role !== 'Administrator'
+    ) {
+      // ponytail: user has pending plan but no active sub → resume checkout
+      navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
+    } else {
+      navigate("/admin/dashboard");
     }
   };
 
@@ -60,9 +56,9 @@ export const LoginForm = () => {
         <p className="text-text-secondary mt-1">Ingresa tus credenciales profesionales para acceder</p>
       </div>
 
-      {error && (
+      {authError && (
         <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
-          {(error as Error).message || "Error de autenticación. Verifique sus credenciales."}
+          {(authError as any)?.message || "No encontramos una cuenta con este correo. ¿Desea registrarse?"}
         </div>
       )}
 

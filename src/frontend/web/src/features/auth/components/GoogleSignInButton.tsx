@@ -6,7 +6,7 @@ import { isSubscriptionActive } from "../../pricing/utils/planPermissions";
 import { Loader2 } from "lucide-react";
 
 export const GoogleSignInButton = () => {
-  const { googleLogin } = useAuth();
+  const { googleLogin, error: authError } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
@@ -16,22 +16,21 @@ export const GoogleSignInButton = () => {
 
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      try {
-        setIsPending(true);
-        setError(null);
-        // Enviamos el access_token al backend
-        const user = await googleLogin(tokenResponse.access_token);
-        
-        if (redirectUrl) {
-          navigate(redirectUrl);
-        } else if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus)) {
-          navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
-        } else {
-          navigate("/admin/dashboard");
-        }
-      } catch (err: any) {
-        setError(err?.message || "Error de autenticación con Google.");
+      setIsPending(true);
+      setError(null);
+      // Enviamos el access_token al backend
+      const user = await googleLogin(tokenResponse.access_token);
+      if (!user) {
         setIsPending(false);
+        return; // authError is set by AuthContext, shows on next render
+      }
+      
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus)) {
+        navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
+      } else {
+        navigate("/admin/dashboard");
       }
     },
     onError: () => {
@@ -42,9 +41,9 @@ export const GoogleSignInButton = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      {error && (
+      {(error || authError) && (
         <div className="w-full mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded text-sm font-medium animate-in fade-in duration-200">
-          {error}
+          {error || (authError as any)?.message || "Error de autenticación con Google."}
         </div>
       )}
       

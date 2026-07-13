@@ -33,7 +33,7 @@ public class LoginUserCommandHandler
 
         var user = await _usuarioRepository.GetByEmailAsync(request.Email.Trim().ToLower(), cancellationToken);
         if (user == null)
-            return new LoginUserResultDto(false, "El correo electrónico o la contraseña son incorrectos.", null);
+            return new LoginUserResultDto(false, "No encontramos una cuenta con este correo. ¿Desea registrarse?", null);
 
         if (!user.Activo)
             return new LoginUserResultDto(false, "La cuenta de usuario está inactiva.", null);
