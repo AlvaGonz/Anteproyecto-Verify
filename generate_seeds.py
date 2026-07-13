@@ -283,7 +283,7 @@ def main():
                 proj_id = str(uuid.uuid4()).upper()
                 f.write(f"IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE IdUsuario = '{u['id']}')\n")
                 f.write(f"BEGIN\n")
-                f.write(f"    INSERT INTO ProyectosInmobiliarios (IdProyecto, IdUsuario, NombreProyecto, CodigoInterno, UbicacionTexto, Categoria, Status, EstadoIntegridad, EstadoJuridico, SelladoBloqueado, CreatedAtUtc) VALUES ('{proj_id}', '{u['id']}', 'Dummy Project {count+1}', 'DUMMY-{u['id'][:5]}', 'N/A', 1, 1, 1, 1, 0, GETUTCDATE());\n")
+                f.write(f"    INSERT INTO ProyectosInmobiliarios (IdProyecto, IdUsuario, NombreProyecto, CodigoInterno, UbicacionTexto, Categoria, Status, EstadoIntegridad, EstadoJuridico, SelladoBloqueado, EstatusDescripcion, CreatedAtUtc) VALUES ('{proj_id}', '{u['id']}', 'Dummy Project {count+1}', 'DUMMY-{u['id'][:5]}', 'N/A', 1, 1, 1, 1, 0, 'Borrador', GETUTCDATE());\n")
                 
                 log_id = str(uuid.uuid4()).upper()
                 f.write(f"    INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc) VALUES ('{log_id}', '{proj_id}', '{u['id']}', GETUTCDATE(), 'Proyecto dummy generado por seeder', GETUTCDATE(), GETUTCDATE());\n")
@@ -299,7 +299,7 @@ def main():
             notif_id = str(uuid.uuid4()).upper()
             msg = f"Se te ha asignado el perfil {u['role']['id']}"
             f.write(f"IF NOT EXISTS (SELECT 1 FROM Notificaciones WHERE UsuarioId = '{u['id']}' AND Mensaje = '{msg}')\n")
-            f.write(f"INSERT INTO Notificaciones (Id, UsuarioId, Mensaje, Tipo, Leida, FechaUtc, CreatedAtUtc) VALUES ('{notif_id}', '{u['id']}', '{msg}', 'INFO', 0, GETUTCDATE(), GETUTCDATE());\n")
+            f.write(f"INSERT INTO Notificaciones (Id, UsuarioId, Mensaje, Tipo, Leida, FechaUtc, CreatedAtUtc) VALUES ('{notif_id}', '{u['id']}', '{msg}', 'INFO', 0, 'Borrador', GETUTCDATE(), GETUTCDATE());\n")
             
             if random.random() > 0.5:
                 notif2_id = str(uuid.uuid4()).upper()
@@ -325,3 +325,4 @@ if __name__ == "__main__":
     
     main()
     print("Seed scripts generated successfully in " + output_dir)
+

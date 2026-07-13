@@ -24,6 +24,7 @@ public class Proyecto : EntityBase
     public string? CedulaRncPropietario { get; private set; }
     public string? EstatusIpi { get; private set; }
     public decimal? SuperficieM2 { get; private set; }
+    public string EstatusDescripcion { get; private set; } = null!;
     public Guid PromotorId => UsuarioCreadorId;
     public string? RncPromotor => RncDesarrollador;
     public EstadoJuridico EstadoJuridico { get; private set; } = EstadoJuridico.Pendiente;
@@ -64,6 +65,7 @@ public class Proyecto : EntityBase
         SuperficieM2 = superficieM2;
         CodigoInterno = GenerateCode();
         EstadoProyecto = ProjectStatus.Draft;
+        EstatusDescripcion = GetEstatusDescripcion(EstadoProyecto);
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
@@ -90,6 +92,7 @@ public class Proyecto : EntityBase
     public void UpdateStatus(ProjectStatus newStatus)
     {
         EstadoProyecto = newStatus;
+        EstatusDescripcion = GetEstatusDescripcion(newStatus);
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
@@ -121,5 +124,19 @@ public class Proyecto : EntityBase
     private string GenerateCode()
     {
         return $"PRJ-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";
+    }
+
+    private static string GetEstatusDescripcion(ProjectStatus status)
+    {
+        return status switch
+        {
+            ProjectStatus.Draft => "Borrador",
+            ProjectStatus.Published => "Publicado",
+            ProjectStatus.InReview => "En Revisión",
+            ProjectStatus.Observed => "Observado",
+            ProjectStatus.Validated => "Validado",
+            ProjectStatus.Rejected => "Rechazado",
+            _ => "Desconocido"
+        };
     }
 }

@@ -238,7 +238,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
       try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat, lng);
+        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
         setDesignacionCatastral(catastroData.designacionCatastral || "");
         setMatricula(catastroData.matricula || "");
         setSuperficieM2(catastroData.superficieM2 || "");
@@ -288,7 +288,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
       try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat, lng);
+        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
         setDesignacionCatastral(catastroData.designacionCatastral || "");
         setMatricula(catastroData.matricula || "");
         setSuperficieM2(catastroData.superficieM2 || "");

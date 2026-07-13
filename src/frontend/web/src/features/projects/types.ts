@@ -14,6 +14,7 @@ export interface ProyectoDto {
   cedulaRncPropietario?: string;
   ipi?: string;
   estatusIpi?: string;
+  estatusDescripcion: string;
   estadoProyecto: ProjectStatus;
   estadoIntegridad: IntegrityStatus;
   integrityScore?: number;

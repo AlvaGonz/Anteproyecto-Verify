@@ -21,6 +21,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   rncDesarrollador: apiProj.rncDesarrollador,
   designacionCatastral: apiProj.designacionCatastral,
   matricula: apiProj.matricula,
+  estatusDescripcion: apiProj.estatusDescripcion,
   estadoProyecto: apiProj.estadoProyecto,
   estadoIntegridad: apiProj.estadoIntegridad,
   usuarioCreadorId: String(apiProj.usuarioCreadorId),

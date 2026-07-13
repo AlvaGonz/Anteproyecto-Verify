@@ -162,6 +162,7 @@ public class ProjectService : IProjectService
             proyecto.Ipi,
             proyecto.EstatusIpi,
             proyecto.SuperficieM2,
+            proyecto.EstatusDescripcion,
             proyecto.EstadoProyecto,
             proyecto.EstadoIntegridad,
             proyecto.UsuarioCreadorId,
