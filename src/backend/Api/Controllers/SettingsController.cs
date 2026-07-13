@@ -669,6 +669,14 @@ public class SettingsController : ControllerBase
         if (invitee == null) return NotFound(new { Message = "Usuario invitado no encontrado o no pertenece a tu cuenta." });
 
         invitee.SetDelegatedLimits(request.MaxProyectosDelegados, request.MaxConsultasDelegadas);
+
+        var limiteProyectos = request.MaxProyectosDelegados.HasValue ? request.MaxProyectosDelegados.Value.ToString() : "Sin límite";
+        var limiteConsultas = request.MaxConsultasDelegadas.HasValue ? request.MaxConsultasDelegadas.Value.ToString() : "Sin límite";
+        var mensajeNotificacion = $"El titular {titular.NombreCompleto} ha actualizado tus límites de uso. Proyectos: {limiteProyectos} | Consultas: {limiteConsultas}.";
+        
+        var notificacion = new Notificacion(invitee.Id, mensajeNotificacion, "Info", "/settings");
+        _context.Notificaciones.Add(notificacion);
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok(new { Message = "Límites actualizados exitosamente." });
