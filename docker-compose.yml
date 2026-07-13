@@ -7,6 +7,7 @@ services:
       - "5000:8080"
     volumes:
       - .:/src
+      - api_uploads:/app/wwwroot/uploads
       - /src/src/backend/Domain/bin
       - /src/src/backend/Domain/obj
       - /src/src/backend/Application/bin
@@ -119,3 +120,4 @@ services:
 
 volumes:
   mssql-data:
+  api_uploads:

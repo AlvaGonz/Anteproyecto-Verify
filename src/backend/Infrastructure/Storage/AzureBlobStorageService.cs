@@ -24,7 +24,7 @@ public class AzureBlobStorageService : IBlobStorageService
             Directory.CreateDirectory(wwwrootPath);
         }
 
-        var safeFileName = fileName.Replace("/", "\\");
+        var safeFileName = fileName.Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString());
         var filePath = Path.Combine(wwwrootPath, safeFileName);
         
         var directoryPath = Path.GetDirectoryName(filePath);
@@ -43,7 +43,7 @@ public class AzureBlobStorageService : IBlobStorageService
 
     public Task<(Stream Stream, string ContentType)> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
     {
-        var safeFileName = blobName.Replace("/", "\\");
+        var safeFileName = blobName.Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString());
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", safeFileName);
         
         if (File.Exists(filePath))

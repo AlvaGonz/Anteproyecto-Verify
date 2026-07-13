@@ -35,5 +35,6 @@ namespace Application.DTOs.Admin
         public string Nombre { get; init; } = string.Empty;
         public string Desarrollador { get; init; } = string.Empty;
         public string Estado { get; init; } = string.Empty;
+        public string? ImagenUrl { get; init; }
     }
 }

@@ -257,3 +257,7 @@
   - **Symptom:** `POST /api/projects` returns 500 Internal Server Error.
   - **Root Cause:** EF Core attempted to insert `EstatusDescripcion` into the database because it was mapped in `ProyectoConfiguration.cs`, but the database column did not exist and its migration file was empty.
   - **Fix:** Changed `EstatusDescripcion` in `Proyecto.cs` to be a computed property `=> GetEstatusDescripcion(EstadoProyecto)` instead of a persisted column. Removed the mapping from `ProyectoConfiguration.cs` and `AppDbContextModelSnapshot.cs`. Deleted the empty migration files and rebuilt the API container.
+- **BUG-027:** Project images return 404 in project lists despite static file mapping.
+  - **Symptom:** Images uploaded as project cover return 404 Not Found.
+  - **Root Cause:** `AzureBlobStorageService.cs` erroneously used `fileName.Replace("/", "\\")`. On the Linux-based Docker container, `\` is treated as part of the filename instead of a directory separator, resulting in a single flat file being created and causing the `UseStaticFiles` middleware to fail resolution. Additionally, `/app/wwwroot/uploads` was not mapped to a persistent volume, causing all images to be wiped out on container restarts.
+  - **Fix:** Fixed path substitution to use `Path.DirectorySeparatorChar`. Updated `docker-compose.yml` to map `api_uploads:/app/wwwroot/uploads` so future images persist across container rebuilds.
