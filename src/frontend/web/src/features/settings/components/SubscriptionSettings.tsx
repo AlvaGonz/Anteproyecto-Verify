@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift } from "lucide-react";
+import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift, Award } from "lucide-react";
 import { useMySubscription, useSyncSubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
 import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 import { PlansModal } from "./PlansModal";
@@ -65,7 +65,7 @@ export const SubscriptionSettings: React.FC = () => {
   const { data, isLoading, isError, refetch } = useMySubscription();
 
   const status = data?.subscriptionStatus ?? null;
-  const planName = data?.plan ?? (data as any)?.planName ?? null;
+  const planName = data?.plan ?? (data as any)?.planName ?? (data?.isGuest ? data?.inviterPlan : null) ?? null;
   const planKey = normalizePlanKey(planName);
   const planCapabilities = planName ? PLAN_CAPABILITIES[planKey as keyof typeof PLAN_CAPABILITIES] : null;
   const currentPeriodEnd = data?.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
@@ -191,7 +191,10 @@ export const SubscriptionSettings: React.FC = () => {
           {/* Info Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Plan Card */}
-            <div className="bg-surface-raised rounded-2xl p-6 border border-border/60 shadow-sm">
+            <div
+              data-testid="subscription-plan-card"
+              className={`bg-surface-raised rounded-2xl p-6 border border-border/60 shadow-sm${data?.isGuest ? ' guest-plan-badge' : ''}`}
+            >
               <div className="text-text-secondary text-sm font-medium mb-2 uppercase tracking-wider text-[11px]">
                 Plan Actual
               </div>
@@ -202,10 +205,18 @@ export const SubscriptionSettings: React.FC = () => {
                 </>
               ) : (
                 <>
+                  {data?.isGuest && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-3">
+                      <Award className="w-3.5 h-3.5" />
+                      Invitado
+                    </div>
+                  )}
                   <div className="text-xl font-bold text-[#223382] capitalize mb-1">
-                    {hasPlan
-                      ? <span className={planCapabilities?.color ?? ''}>{planCapabilities?.label ?? planName}</span>
-                      : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>
+                    {data?.isGuest && data?.inviterPlan
+                      ? <span>{data.inviterPlan}</span>
+                      : hasPlan
+                        ? <span className={planCapabilities?.color ?? ''}>{planCapabilities?.label ?? planName}</span>
+                        : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>
                     }
                   </div>
                   {formattedPrice && (
@@ -247,8 +258,9 @@ export const SubscriptionSettings: React.FC = () => {
           {/* CTA Footer */}
           <div className="pt-8 border-t border-border flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="text-sm text-text-secondary font-medium">
-              ¿Deseas cambiar tu plan o explorar otras opciones?
+              {data?.isGuest ? 'Tu suscripción es gestionada por el propietario de tu cuenta.' : '¿Deseas cambiar tu plan o explorar otras opciones?'}
             </div>
+            {!data?.isGuest && (
             <div className="flex gap-2">
               {status === 'active' && data?.isManagedByStripe && (
                 <button type="button"
@@ -283,6 +295,7 @@ export const SubscriptionSettings: React.FC = () => {
                 </span>
               </button>
             </div>
+            )}
           </div>
         </div>
       </div>
