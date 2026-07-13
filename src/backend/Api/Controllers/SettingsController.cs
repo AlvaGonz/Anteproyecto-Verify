@@ -67,15 +67,18 @@ public class SettingsController : ControllerBase
     private readonly AppDbContext _context;
     private readonly Application.Abstractions.Security.IPasswordHasher _passwordHasher;
     private readonly Application.Abstractions.Notifications.IEmailService _emailService;
+    private readonly ILogger<SettingsController> _logger;
 
     public SettingsController(
         AppDbContext context, 
         Application.Abstractions.Security.IPasswordHasher passwordHasher,
-        Application.Abstractions.Notifications.IEmailService emailService)
+        Application.Abstractions.Notifications.IEmailService emailService,
+        ILogger<SettingsController> logger)
     {
         _context = context;
         _passwordHasher = passwordHasher;
         _emailService = emailService;
+        _logger = logger;
     }
 
     [HttpGet("users")]
@@ -537,23 +540,35 @@ public class SettingsController : ControllerBase
     [HttpPost("users/invite")]
     public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("InviteUser called. Claims: {claims}", string.Join(", ", User.Claims.Select(c => $"{c.Type}={c.Value}")));
+
         // 1. Fetch current logged-in user (Emisor)
-        var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        if (string.IsNullOrWhiteSpace(userEmail)) return Unauthorized();
+        var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+        if (string.IsNullOrWhiteSpace(userEmail)) 
+        {
+            _logger.LogWarning("userEmail is null or whitespace");
+            return Unauthorized();
+        }
 
         var emisor = await _context.Usuarios
             .Include(u => u.Plan)
             .FirstOrDefaultAsync(u => u.CorreoElectronico == userEmail, cancellationToken);
 
-        if (emisor == null) return Unauthorized();
+        if (emisor == null) 
+        {
+            _logger.LogWarning("emisor not found in DB for email {email}", userEmail);
+            return Unauthorized();
+        }
 
-        // 2. Validate plan and limits (only Corporativo and Empresa can invite)
-        if (emisor.Plan == null || (emisor.Plan.NombrePlan != "Corporativo" && emisor.Plan.NombrePlan != "Empresa"))
+        bool isAdmin = emisor.Rol == Domain.Enums.UserRole.Administrator;
+
+        // 2. Validate plan and limits (only Corporativo and Empresa can invite, plus ADMIN)
+        if (!isAdmin && (emisor.Plan == null || (emisor.Plan.NombrePlan != "Corporativo" && emisor.Plan.NombrePlan != "Empresa")))
         {
             return BadRequest(new { Message = "Tu plan actual no permite invitar usuarios." });
         }
 
-        int maxInvitees = emisor.Plan.NombrePlan == "Corporativo" ? 10 : 5;
+        int maxInvitees = isAdmin ? 100 : (emisor.Plan?.NombrePlan == "Corporativo" ? 10 : 5);
         
         // Count existing invitees + pending invitations
         int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == emisor.Id, cancellationToken);
@@ -683,8 +698,8 @@ public class SettingsController : ControllerBase
 
     private async Task SyncUserLegacyAsync(Usuario u, CancellationToken cancellationToken = default)
     {
-        // Check if user already exists in UsuariosLegacy table to avoid duplicates
-        var legacyUserExists = await _context.UsuariosLegacy.AnyAsync(ul => ul.IdUsuario == u.Id, cancellationToken);
+        // Check if user already exists in UsuariosLegacy table to avoid duplicates by Id or Email
+        var legacyUserExists = await _context.UsuariosLegacy.AnyAsync(ul => ul.IdUsuario == u.Id || ul.Email == u.CorreoElectronico, cancellationToken);
         if (!legacyUserExists)
         {
             _context.UsuariosLegacy.Add(new Domain.Entities.UsuarioLegacy
@@ -692,7 +707,6 @@ public class SettingsController : ControllerBase
                 IdUsuario = u.Id,
                 Nombre = u.Nombre,
                 Apellido = u.Apellido,
-                NombreCompleto = $"{u.Nombre} {u.Apellido}",
                 Email = u.CorreoElectronico,
                 ContrasenaHash = u.ContrasenaHash,
                 Telefono = u.Telefono ?? "0000000000",

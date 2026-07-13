@@ -27,19 +27,17 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Step 2: Create User
-create_url = f"{base_url}/api/admin/users"
+# Step 2: Invite User with the email they mentioned (see_black@hotmail.com)
+create_url = f"{base_url}/api/admin/users/invite"
 create_payload = {
-    "Nombre": "TSRTestFive",
-    "Apellido": "VenturaTestFive",
-    "Email": "see_black2@hotmail.com",
-    "Role": "user",
-    "Telefono": "8095554325",
-    "Cedula": "40200000055",
-    "Password": "Password123!"
+    "Nombre": "TSRTestFour",
+    "Apellido": "VenturaTestFour",
+    "Email": "see_black@hotmail.com",
+    "Telefono": "8095554324",
+    "Cedula": "40200000054"
 }
 
-print("\nAttempting to create user (see_black2@hotmail.com)...")
+print("\nAttempting to invite user (see_black@hotmail.com)...")
 try:
     r_create = requests.post(create_url, json=create_payload, headers=headers)
     print("Create status:", r_create.status_code)

@@ -54,7 +54,8 @@ export const InviteUserModal: React.FC<InviteUserModalProps> = ({ isOpen, onClos
       reset();
       onClose();
     } catch (error: any) {
-      addToast(error?.response?.data?.Message || "Error al invitar usuario.", "error");
+      const errorMessage = error?.response?.data?.message || error?.response?.data?.Message || "Error al invitar usuario.";
+      addToast(errorMessage, "error");
     }
   };
 
