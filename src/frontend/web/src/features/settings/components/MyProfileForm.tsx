@@ -176,13 +176,13 @@ export const MyProfileForm: React.FC = () => {
                 </p>
               </div>
             </div>
-            {user?.role !== "admin" && user?.plan && (
+            {user?.role !== "admin" && (user?.plan || user?.inviterPlan) && (
               <div className="flex items-center gap-3">
                 <Award className="w-4 h-4 text-text-secondary shrink-0" />
                 <div>
                   <p className="text-[10px] text-text-secondary uppercase font-bold">Plan de Suscripción</p>
                   <p className="text-sm font-bold text-primary">
-                    {user.plan}
+                    {user.isGuest ? `${user.inviterPlan || "N/A"} (Invitado)` : user.plan}
                   </p>
                 </div>
               </div>

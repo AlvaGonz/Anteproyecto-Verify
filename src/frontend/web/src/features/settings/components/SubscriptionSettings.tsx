@@ -258,7 +258,13 @@ export const SubscriptionSettings: React.FC = () => {
           {/* CTA Footer */}
           <div className="pt-8 border-t border-border flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="text-sm text-text-secondary font-medium">
-              {data?.isGuest ? 'Tu suscripción es gestionada por el propietario de tu cuenta.' : '¿Deseas cambiar tu plan o explorar otras opciones?'}
+              {data?.isGuest ? (
+                <>
+                  Tu suscripción es gestionada por el propietario de tu cuenta{data?.inviterName ? ` (${data.inviterName})` : ''}.
+                </>
+              ) : (
+                '¿Deseas cambiar tu plan o explorar otras opciones?'
+              )}
             </div>
             {!data?.isGuest && (
             <div className="flex gap-2">

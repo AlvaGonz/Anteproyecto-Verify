@@ -127,9 +127,9 @@ export interface MySubscriptionStatus {
   stripeSubscriptionId: string | null;
   isManagedByStripe: boolean;
   billingCycle?: string | null;
-  // ponytail: guest subscription display
   isGuest?: boolean;
   inviterPlan?: string;
+  inviterName?: string;
 }
 
 export const useMySubscription = (options?: { refetchInterval?: number }) =>
