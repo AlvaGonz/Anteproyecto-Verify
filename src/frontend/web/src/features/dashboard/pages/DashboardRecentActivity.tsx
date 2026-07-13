@@ -90,7 +90,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
                 return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
               })
               .map(([plan, count]) => {
-                const displayPlan = plan === "Empresa" ? "Enterprise" : plan;
+                const displayPlan = plan;
                 return (
               <div key={plan} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-[#223382]">{s.plan === "Empresa" ? "Enterprise" : s.plan}</p>
+                        <p className="font-bold text-[#223382]">{s.plan === "Empresa" ? "Corporativo" : s.plan}</p>
                         <span className={`text-xs px-2 py-1 rounded-full ${s.estado === "Active" ? "bg-success/20 text-success" : "bg-surface-raised text-text-secondary"}`}>
                           {s.estado}
                         </span>

@@ -65,7 +65,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
 
   const tabs = [
     { id: "Corporativo", label: "Corporativo", count: groupedUsers["Corporativo"].length },
-    { id: "Empresa", label: "Enterprise", count: groupedUsers["Empresa"].length },
+    { id: "Empresa", label: "Empresa", count: groupedUsers["Empresa"].length },
     { id: "Profesional", label: "Profesional", count: groupedUsers["Profesional"].length },
     { id: "Gratuito", label: "Gratuito", count: groupedUsers["Gratuito"].length },
     { id: "Invitado", label: "Invitado", count: groupedUsers["Invitado"].length }
@@ -210,7 +210,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             <option value="" disabled>Seleccionar Plan...</option>
             {sortedPlans.map(p => (
               <option key={p.planId} value={p.planId}>
-                {p.name === "Gratuito" ? "Gratuito (Free)" : p.name} {p.price > 0 ? `($${p.price} USD)` : ""}
+                {p.name}
               </option>
             ))}
           </select>
