@@ -88,6 +88,12 @@ public class ResendEmailService : IEmailService
         string subject = $"Actualización de Estado: Proyecto {projectName}";
         await SendEmailAsync(toEmail, subject, html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
+
+    public async Task SendPasswordResetAsync(string toEmail, string userName, string resetToken, string? returnUrl = null, CancellationToken ct = default)
+    {
+        var html = EmailTemplates.GetPasswordResetEmail(userName, resetToken, returnUrl);
+        await SendEmailAsync(toEmail, "Recuperación de Contraseña - VeriFinca", html, "VeriFinca <hola@handymansolutionrd.lat>", ct);
+    }
 }
 
 

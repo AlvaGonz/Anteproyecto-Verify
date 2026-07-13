@@ -199,6 +199,13 @@ public class Usuario : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public bool IsPasswordResetTokenValid()
+    {
+        return !string.IsNullOrWhiteSpace(PasswordResetToken) &&
+               PasswordResetTokenExpiraUtc.HasValue &&
+               DateTime.UtcNow <= PasswordResetTokenExpiraUtc.Value;
+    }
+
     public void AsignarPlan(Guid planId)
     {
         PlanSuscripcionId = planId;

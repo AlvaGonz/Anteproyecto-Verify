@@ -65,6 +65,12 @@ public class UsuarioRepository : IUsuarioRepository
             .FirstOrDefaultAsync(u => u.TokenVerificacion == token, cancellationToken);
     }
 
+    public async Task<Usuario?> GetByPasswordResetTokenAsync(string token, CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .FirstOrDefaultAsync(u => u.PasswordResetToken == token, cancellationToken);
+    }
+
     public async Task<List<Usuario>> GetPendingPurgeAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
