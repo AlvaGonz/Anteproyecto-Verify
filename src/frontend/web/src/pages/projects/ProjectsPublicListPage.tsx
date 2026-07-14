@@ -8,7 +8,8 @@ import {
   LayoutGrid,
   List,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  X
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
@@ -23,6 +24,12 @@ export const ProjectsPublicListPage: React.FC = () => {
   const searchQuery = searchParams.get("q") || "";
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    provincia: "",
+    constructora: "",
+    registrante: ""
+  });
 
   const { data: searchResults = [], isLoading } = useSearchPublicProjects(searchQuery);
 
@@ -39,16 +46,20 @@ export const ProjectsPublicListPage: React.FC = () => {
       lastVerification: p.createdAtUtc ? p.createdAtUtc.split("T")[0] : new Date().toISOString().split("T")[0],
       description: "", 
       completionPercentage: p.estadoValidacion === "Verificado" ? 100 : 50,
+      constructora: p.constructora || "",
+      registrante: p.registrante || "",
     }));
   }, [searchResults]);
 
   const filteredProjects = useMemo(() => {
     return mappedProjects.filter((project) => {
-      // Name and location filter is removed since the backend search handles all fields
       const matchesStatus = statusFilter === "ALL" || project.status === statusFilter;
-      return matchesStatus;
+      const matchesProvincia = !advancedFilters.provincia || project.location.toLowerCase().includes(advancedFilters.provincia.toLowerCase());
+      const matchesConstructora = !advancedFilters.constructora || project.constructora.toLowerCase().includes(advancedFilters.constructora.toLowerCase());
+      const matchesRegistrante = !advancedFilters.registrante || project.registrante.toLowerCase().includes(advancedFilters.registrante.toLowerCase());
+      return matchesStatus && matchesProvincia && matchesConstructora && matchesRegistrante;
     });
-  }, [mappedProjects, statusFilter]);
+  }, [mappedProjects, statusFilter, advancedFilters]);
 
   if (isLoading) {
     return (
@@ -172,9 +183,70 @@ export const ProjectsPublicListPage: React.FC = () => {
                   <option value="CERTIFIED">CERTIFICADOS</option>
                   <option value="PROCESSING">EN PROCESO</option>
                 </select>
+                
+                <button
+                  type="button"
+                  onClick={() => setIsAdvancedFiltersOpen(!isAdvancedFiltersOpen)}
+                  className={`ml-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${isAdvancedFiltersOpen ? 'bg-primary text-white border-primary' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                >
+                  Búsqueda Avanzada
+                </button>
               </div>
             </div>
           </div>
+
+          <AnimatePresence>
+            {isAdvancedFiltersOpen && (
+              <m.div
+                initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+                animate={{ height: "auto", opacity: 1, marginBottom: 48 }}
+                exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6">
+                  <div className="flex-1">
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Provincia / Ubicación</label>
+                    <input
+                      type="text"
+                      placeholder="Ej. Santo Domingo"
+                      value={advancedFilters.provincia}
+                      onChange={e => setAdvancedFilters(prev => ({ ...prev, provincia: e.target.value }))}
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Constructora / Desarrollador</label>
+                    <input
+                      type="text"
+                      placeholder="Ej. Constructora Bisonó"
+                      value={advancedFilters.constructora}
+                      onChange={e => setAdvancedFilters(prev => ({ ...prev, constructora: e.target.value }))}
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Persona que registra</label>
+                    <input
+                      type="text"
+                      placeholder="Nombre de la persona"
+                      value={advancedFilters.registrante}
+                      onChange={e => setAdvancedFilters(prev => ({ ...prev, registrante: e.target.value }))}
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+                  <div className="flex items-end pb-1">
+                    <button
+                      type="button"
+                      onClick={() => setAdvancedFilters({ provincia: "", constructora: "", registrante: "" })}
+                      className="px-4 py-3 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest"
+                    >
+                      Limpiar
+                    </button>
+                  </div>
+                </div>
+              </m.div>
+            )}
+          </AnimatePresence>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="popLayout">

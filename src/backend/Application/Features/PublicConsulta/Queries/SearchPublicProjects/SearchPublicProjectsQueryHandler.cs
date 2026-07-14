@@ -52,7 +52,10 @@ public class SearchPublicProjectsQueryHandler
                 UbicacionTexto = p.UbicacionTexto,
                 EstadoJuridico = (int)p.EstadoJuridico,
                 EstadoProyecto = (int)p.EstadoProyecto,
-                EstadoIntegridad = (int)p.EstadoIntegridad
+                EstadoIntegridad = (int)p.EstadoIntegridad,
+                Constructora = p.DatosDesarrollador ?? p.Propietario,
+                Registrante = p.UsuarioCreador?.NombreCompleto,
+                ImagenUrl = p.ImagenUrl
             });
         }
 
