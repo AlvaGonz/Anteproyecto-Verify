@@ -85,7 +85,7 @@ export const useDownloadDocument = (projectId: string) => {
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "document"); // Could extract filename from headers
+      link.setAttribute("download", "documento.pdf"); // Forced to PDF as requested
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

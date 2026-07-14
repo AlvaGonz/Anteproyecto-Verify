@@ -1,6 +1,6 @@
 import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
-import { useDocuments } from "../api/useDocuments";
+import { useDocuments, useDownloadDocument } from "../api/useDocuments";
 import {
   AlertTriangle,
   Clock,
@@ -8,7 +8,8 @@ import {
   FileCheck2,
   Lock,
   Building2,
-  Gavel
+  Gavel,
+  Download
 } from "lucide-react";
 import { ProjectCategory } from "../../projects/types";
 import { m, AnimatePresence } from "framer-motion";
@@ -43,6 +44,7 @@ const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, projectCategory = ProjectCategory.Residencial }) => {
   const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
+  const { mutate: downloadDoc, isPending: isDownloading } = useDownloadDocument(projectId || "");
 
   if (loading) return (
     <div className="py-20 flex flex-col items-center gap-4 text-secondary/20">
@@ -123,6 +125,16 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             <div className="px-3 py-1 rounded-full bg-on-surface-variant/5 text-on-surface-variant/40 text-[10px] font-black uppercase tracking-widest border border-on-surface-variant/5 italic">
               NO SUMINISTRADO
             </div>
+          )}
+          {(isValid || isPending) && doc?.id && (
+            <button
+              onClick={() => downloadDoc(doc.id)}
+              disabled={isDownloading}
+              className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
+              title="Descargar Documento"
+            >
+              <Download className="w-4 h-4" />
+            </button>
           )}
         </div>
       </m.div>
