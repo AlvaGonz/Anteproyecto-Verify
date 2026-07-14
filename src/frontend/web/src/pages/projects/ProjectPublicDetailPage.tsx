@@ -8,6 +8,7 @@ import { useProject } from "../../features/projects/api/useProjects";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
+import { toUtcDate } from "../../shared/utils/dates";
 import {
   ArrowLeft,
   MapPin,
@@ -243,7 +244,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     <span className="text-[10px] font-black uppercase tracking-widest text-[#223382]">Cronología de Registro</span>
                   </div>
                   <p className="text-xl md:text-2xl font-black text-secondary leading-none tracking-tight font-display italic">
-                    {new Date(project.createdAtUtc).toLocaleDateString("es-ES", { year: "numeric", month: "long" }).toUpperCase()}
+                    {toUtcDate(project.createdAtUtc)?.toLocaleDateString("es-ES", { year: "numeric", month: "long" }).toUpperCase() ?? ''}
                   </p>
                 </div>
 

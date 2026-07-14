@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Users, Activity, FileCheck, CreditCard, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import type { DashboardStatsDto, SuscripcionRecienteDto } from "../../../infrastructure/api/dashboard.api";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 export interface DashboardRecentActivityProps {
   loading: boolean;
@@ -150,7 +151,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
                           <p className="font-bold text-text-primary text-lg leading-tight">{s.correo}</p>
                           <div className="flex items-center gap-2 mt-1 text-sm text-text-secondary">
                             <Calendar className="w-3 h-3" />
-                            {new Date(s.fechaAlta).toLocaleDateString()}
+                            {toUtcDate(s.fechaAlta)?.toLocaleDateString() ?? ''}
                           </div>
                         </div>
                       </div>

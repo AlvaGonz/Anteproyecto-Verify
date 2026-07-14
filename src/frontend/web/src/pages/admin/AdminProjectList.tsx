@@ -5,6 +5,7 @@ import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { ProjectCoverImage } from "../../features/projects/components/ProjectCoverImage";
 import { AdminProjectContextMenu } from "./AdminProjectContextMenu";
 import { FolderKanban, ArrowRight, CheckCircle2, AlertTriangle, Timer, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { toUtcDate } from "../../shared/utils/dates";
 
 const getStatusBadge = (status: ProjectStatus, t: any) => {
   const label = getStatusLabel(status, t);
@@ -186,7 +187,7 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
                       )}
                       <span className="flex items-center gap-1.5">
                         <Timer className="w-3.5 h-3.5" />
-                        Act: {new Date(project.updatedAtUtc || project.createdAtUtc).toLocaleDateString()}
+                        Act: {toUtcDate(project.updatedAtUtc || project.createdAtUtc)?.toLocaleDateString() ?? ''}
                       </span>
                     </div>
                   </div>

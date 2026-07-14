@@ -1,4 +1,5 @@
 import { DocumentDto, DocumentType } from "../types";
+import { toUtcDate } from "../../../shared/utils/dates";
 import { 
   FileText, 
   Download, 
@@ -112,7 +113,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                   </h5>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
                     <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1.5">
-                      <History className="w-3 h-3" /> {new Date(doc.createdAtUtc).toLocaleDateString()}
+                      <History className="w-3 h-3" /> {toUtcDate(doc.createdAtUtc)?.toLocaleDateString() ?? ''}
                     </span>
                     <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1.5 uppercase">
                       <Info className="w-3 h-3" /> {(doc.tamanoBytes / 1024).toFixed(2)} KB

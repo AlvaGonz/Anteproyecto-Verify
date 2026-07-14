@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { FindingDto, FindingSeverity } from "../../types";
+import { toUtcDate } from "../../../../shared/utils/dates";
 import { 
   AlertCircle, 
   AlertTriangle, 
@@ -143,7 +144,7 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
               <div className="px-6 py-3 border-t border-black/5 bg-black/2 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-on-surface-variant/60">
                    <Clock className="w-3.5 h-3.5" />
-                   <span className="text-[10px] font-bold">DETECTADO: {new Date(finding.createdAtUtc).toLocaleDateString()}</span>
+                   <span className="text-[10px] font-bold">DETECTADO: {toUtcDate(finding.createdAtUtc)?.toLocaleDateString() ?? ''}</span>
                 </div>
                 <button type="button" className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest flex items-center gap-1 transition-all hover:gap-2">
                    Ver Evidencia Asociada <ArrowRight className="w-3 h-3" />

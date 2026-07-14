@@ -1,6 +1,7 @@
 import React from "react";
 import { ProjectReportDto } from "../types";
 import { useReports } from "../api/useReports";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 interface ReportsListProps {
   projectId: string;
@@ -85,7 +86,7 @@ export const ReportsList: React.FC<ReportsListProps> = ({ projectId }) => {
                       {report.resumen || "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(report.createdAtUtc).toLocaleString()}
+                      {toUtcDate(report.createdAtUtc)?.toLocaleString() ?? ''}
                     </td>
                   </tr>
                 ))}

@@ -3,6 +3,7 @@ import { CertificationDto } from "../types";
 import { useCertification, useIssueSeal } from "../api/useCertifications";
 import { CertificationQr } from "./CertificationQr";
 import { CertificationStatusBadge } from "./CertificationStatusBadge";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 const handleDownload = () => {
   window.print();
@@ -131,7 +132,7 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
                   Fecha de Emisión
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {new Date(certification.fechaEmisionUtc).toLocaleDateString()}
+                  {toUtcDate(certification.fechaEmisionUtc)?.toLocaleDateString() ?? ''}
                 </dd>
               </div>
               <div className="sm:col-span-1">

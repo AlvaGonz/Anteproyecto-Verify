@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Bell, Trash2 } from "lucide-react";
 import { NotificationDto } from "../types";
 import { useNotifications, useMarkAsRead, useMarkAllAsRead, useDeleteNotification } from "../api/useNotifications";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -115,8 +116,7 @@ export const NotificationBell: React.FC = () => {
                           {notification.mensaje}
                         </p>
                         <p className="text-xs text-text-primary opacity-40 mt-1">
-                          {/* ponytail: SQL datetime2 strips Kind → JSON has no Z → JS treats as local. Force Z. */}
-                          {new Date(notification.fechaUtc + (notification.fechaUtc.endsWith('Z') ? '' : 'Z')).toLocaleString()}
+                          {toUtcDate(notification.fechaUtc)?.toLocaleString() ?? ''}
                         </p>
                       </div>
                       {!notification.leida && (

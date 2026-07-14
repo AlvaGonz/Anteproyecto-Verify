@@ -7,6 +7,7 @@ import { ProjectDiagnosisPanel } from "../../features/projects/components/Projec
 import { RequirementUploadRow } from "../../features/documents/components/RequirementUploadRow";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { m } from "framer-motion";
+import { toUtcDate } from "../../shared/utils/dates";
 import { 
   ArrowLeft, 
   ShieldCheck, 
@@ -149,7 +150,7 @@ export const ProjectDocumentsPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {[
           { label: 'Total Archivos', value: documents.length, icon: Files, color: 'text-primary' },
-          { label: 'Sellados Hoy', value: documents.filter(d => new Date(d.createdAtUtc).toDateString() === new Date().toDateString()).length, icon: ShieldCheck, color: 'text-success' },
+          { label: 'Sellados Hoy', value: documents.filter(d => toUtcDate(d.createdAtUtc)?.toDateString() === new Date().toDateString()).length, icon: ShieldCheck, color: 'text-success' },
           { label: 'Archivados', value: documents.filter(d => !d.activo).length, icon: Clock, color: 'text-warning' },
           { label: 'Storage', value: `${(documents.reduce((acc, d) => acc + d.tamanoBytes, 0) / (1024 * 1024)).toFixed(2)} MB`, icon: HardDrive, color: 'text-secondary' },
         ].map((stat, i) => (

@@ -8,6 +8,7 @@ import { DashboardPageLayout, DashboardTab } from "./DashboardPageLayout";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { ProjectStatus } from "../../projects/types";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 export const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>("projects");
@@ -47,7 +48,7 @@ export const DashboardPage: React.FC = () => {
     observed = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Observed).length;
     verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
     recentProjects = [...projectsData]
-      .sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime())
+      .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
       .slice(0, 5)
       .map(p => ({
         fechaRegistro: p.createdAtUtc,
