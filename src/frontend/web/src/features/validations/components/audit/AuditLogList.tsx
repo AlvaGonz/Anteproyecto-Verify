@@ -78,7 +78,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
         {sortedLogs.map((log) => {
           const config = ACTION_CONFIG[log.accion] || ACTION_CONFIG[AuditActionType.StatusChange];
           const Icon = config.icon;
-          const date = new Date(log.fechaUtc);
+          const date = new Date(log.fechaUtc + (log.fechaUtc.endsWith('Z') ? '' : 'Z'));
 
           return (
             <div key={log.id} className="flex gap-6 group animate-fade-in-up">

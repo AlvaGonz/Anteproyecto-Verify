@@ -4,6 +4,6 @@ export interface NotificacionDto {
   titulo: string;
   mensaje: string;
   leida: boolean;
-  fechaCreacion: string;
+  fechaUtc: string; // ponytail: matches backend NotificationDto.FechaUtc
   tipo: "Info" | "Alerta" | "Error" | "Exito";
 }

@@ -21,10 +21,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    if (location.pathname.startsWith('/checkout')) {
-      return <Navigate to={`/register?redirect=${encodeURIComponent(location.pathname + location.search)}`} replace />;
-    }
-    return <Navigate to="/login" replace />;
+    // ponytail: always preserve intended destination so login/register can redirect back
+    const redirectTarget = location.pathname + location.search;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(redirectTarget)}`} replace />;
   }
 
   // ponytail: if user has a pending plan but no active subscription, redirect to checkout

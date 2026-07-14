@@ -36,7 +36,7 @@ export const ProjectsPublicListPage: React.FC = () => {
   const mappedProjects = useMemo(() => {
     // searchResults now returns visible projects if there is no query
     const sourceData = Array.isArray(searchResults) ? searchResults : [];
-    
+
     return sourceData.map((p: any) => ({
       id: String(p.id),
       name: p.nombre || p.nombreProyecto,
@@ -44,7 +44,7 @@ export const ProjectsPublicListPage: React.FC = () => {
       status: p.estadoValidacion === "Verificado" ? "CERTIFIED" : "PROCESSING",
       imageUrl: p.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
       lastVerification: p.createdAtUtc ? p.createdAtUtc.split("T")[0] : new Date().toISOString().split("T")[0],
-      description: "", 
+      description: "",
       completionPercentage: p.estadoValidacion === "Verificado" ? 100 : 50,
       constructora: p.constructora || "",
       registrante: p.registrante || "",
@@ -112,7 +112,7 @@ export const ProjectsPublicListPage: React.FC = () => {
 
       <main className="flex-1">
         {/* Unified Portal Hero */}
-        <section className="relative pt-28 pb-20 px-6 bg-slate-900 overflow-hidden">
+        <section className="relative pt-28 pb-20 px-3 bg-slate-900 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(249,133,19,0.1),transparent)]" />
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')" }} />
 
@@ -183,7 +183,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                   <option value="CERTIFIED">CERTIFICADOS</option>
                   <option value="PROCESSING">EN PROCESO</option>
                 </select>
-                
+
                 <button
                   type="button"
                   onClick={() => setIsAdvancedFiltersOpen(!isAdvancedFiltersOpen)}
@@ -260,7 +260,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                   transition={{ duration: 0.4, delay: idx * 0.05 }}
                   className="group bg-white rounded-[32px] overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col"
                 >
-                  <div className="relative aspect-[16/10] overflow-hidden">
+                  <div className="relative aspect-video overflow-hidden">
                     <img
                       src={project.imageUrl}
                       alt={project.name}

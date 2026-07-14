@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { m, AnimatePresence } from "framer-motion";
-import { 
-  Search, 
-  QrCode, 
-  Lock, 
-  ShieldCheck, 
-  Globe, 
-  Clock, 
-  ChevronDown, 
-  MapPin, 
-  FileText, 
-  Building2, 
+import {
+  Search,
+  QrCode,
+  Lock,
+  ShieldCheck,
+  Globe,
+  Clock,
+  ChevronDown,
+  MapPin,
+  FileText,
+  Building2,
   User,
   Check
 } from "lucide-react";
@@ -28,46 +28,46 @@ interface VerifySearchFormProps {
 }
 
 const SEARCH_TYPES = [
-  { 
-    id: "cert", 
-    label: "Sello VeriFinca", 
-    icon: QrCode, 
+  {
+    id: "cert",
+    label: "Sello VeriFinca",
+    icon: QrCode,
     placeholder: "Ej: VF-2026-X83L",
     title: "Validar Certificado",
     subtitle: "Ingrese el identificador único del sello VeriFinca",
     example: "VF-2026-X83L"
   },
-  { 
-    id: "suelo", 
-    label: "Número Suelo", 
-    icon: MapPin, 
+  {
+    id: "suelo",
+    label: "Número Suelo",
+    icon: MapPin,
     placeholder: "Ej: 001-02-003",
     title: "Catastro Nacional",
     subtitle: "Búsqueda por número de registro de suelo",
     example: "001-02-003"
   },
-  { 
-    id: "ipi", 
-    label: "IPI", 
-    icon: FileText, 
+  {
+    id: "ipi",
+    label: "IPI",
+    icon: FileText,
     placeholder: "Ej: 1-01-99999-9",
     title: "Consulta IPI",
     subtitle: "Búsqueda por Impuesto al Patrimonio Inmobiliario",
     example: "1-01-999999-9"
   },
-  { 
-    id: "rnc", 
-    label: "RNC", 
-    icon: Building2, 
+  {
+    id: "rnc",
+    label: "RNC",
+    icon: Building2,
     placeholder: "Ej: 1-01-23456-7",
     title: "Registro RNC",
     subtitle: "Búsqueda por Registro Nacional de Contribuyentes",
     example: "1-01-23456-7"
   },
-  { 
-    id: "cedula", 
-    label: "Cédula", 
-    icon: User, 
+  {
+    id: "cedula",
+    label: "Cédula",
+    icon: User,
     placeholder: "Ej: 402-1234567-8",
     title: "Documento Cédula",
     subtitle: "Búsqueda por número de identidad personal",
@@ -105,16 +105,16 @@ const VALIDATION_PATTERNS = {
 
 const validateInput = (value: string, typeId: string): string | null => {
   if (!value.trim()) return "Por favor, ingrese un valor";
-  
+
   const pattern = VALIDATION_PATTERNS[typeId as keyof typeof VALIDATION_PATTERNS];
   if (pattern && !pattern.regex.test(value)) {
     return `Formato de ${pattern.name} inválido (Ej: ${pattern.example})`;
   }
-  
+
   return null;
 };
 
-export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({ 
+export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
   className,
   variant = "light"
 }) => {
@@ -140,7 +140,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const validationError = validateInput(code.trim(), searchType.id);
-    
+
     if (validationError) {
       setError(validationError);
       return;
@@ -158,13 +158,13 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
   const handleTypeSelect = (type: typeof SEARCH_TYPES[0]) => {
     setSearchType(type);
     setIsDropdownOpen(false);
-    setCode(""); 
+    setCode("");
     setError(null); // Limpiar error al cambiar tipo
   };
 
   return (
     <div className={cn(
-      "max-w-xl mx-auto rounded-3xl p-8 md:p-10 shadow-premium border transition-all duration-500",
+      "max-w-xl mx-auto rounded-3xl p-1 md:p-8 shadow-premium border transition-all duration-500",
       isDark ? "bg-slate-900/50 border-white/10 backdrop-blur-xl" : "bg-white border-slate-100",
       className
     )}>
@@ -194,8 +194,8 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all text-[10px] font-black uppercase tracking-widest",
-              isDark 
-                ? "bg-white/5 border-white/5 text-white/60 hover:text-white hover:border-white/10" 
+              isDark
+                ? "bg-white/5 border-white/5 text-white/60 hover:text-white hover:border-white/10"
                 : "bg-slate-50 border-slate-100 text-slate-400 hover:text-secondary hover:border-slate-200"
             )}
           >
@@ -205,7 +205,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
 
           <AnimatePresence>
             {isDropdownOpen && (
-              <m.div 
+              <m.div
                 initial={{ opacity: 0, y: -10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -222,7 +222,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
                       onClick={() => handleTypeSelect(type)}
                       className={cn(
                         "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all text-left group",
-                        searchType.id === type.id 
+                        searchType.id === type.id
                           ? (isDark ? "bg-white/10 text-white" : "bg-slate-50 text-secondary")
                           : (isDark ? "text-white/40 hover:bg-white/5 hover:text-white" : "text-slate-400 hover:bg-slate-50/50 hover:text-secondary")
                       )}
@@ -252,16 +252,16 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             className={cn(
               "w-full h-18 px-8 rounded-2xl border-2 transition-all text-2xl font-mono font-black text-center placeholder:opacity-20 flex items-center justify-center",
-              isDark 
-                ? "bg-white/5 border-white/5 text-white focus:border-primary focus:ring-4 focus:ring-primary/10" 
+              isDark
+                ? "bg-white/5 border-white/5 text-white focus:border-primary focus:ring-4 focus:ring-primary/10"
                 : "bg-slate-50 border-slate-100 text-secondary focus:border-primary focus:ring-4 focus:ring-primary/10"
             )}
-            style={{ height: '4.5rem' }}
+            style={{ height: '3.5rem' }}
           />
           <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none opacity-20 group-focus-within:opacity-50 transition-opacity">
             <Lock className={cn("w-5 h-5", isDark ? "text-white" : "text-secondary")} />
           </div>
-          
+
           <AnimatePresence>
             {error && (
               <m.div

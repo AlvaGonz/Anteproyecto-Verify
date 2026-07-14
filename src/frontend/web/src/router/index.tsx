@@ -144,7 +144,11 @@ export const router = createHashRouter([
       },
       {
         path: "/p/:slug",
-        element: <ProjectPublicDetailPage />,
+        element: (
+          <AuthGuard>
+            <ProjectPublicDetailPage />
+          </AuthGuard>
+        ),
       },
       {
         path: "/checkout",

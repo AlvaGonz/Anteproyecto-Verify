@@ -19,7 +19,8 @@ export const NotificationBell: React.FC = () => {
       ...n,
       id: n.idNotificacion || n.id || n.Id || n.ID || "",
       usuarioId: n.idUsuario || n.usuarioId || n.UsuarioId || "",
-      fechaUtc: n.fechaCreacionUtc || n.fechaUtc || n.FechaUtc || new Date().toISOString(),
+      // ponytail: backend DTO field is FechaUtc → serialized as fechaUtc
+      fechaUtc: n.fechaUtc || n.FechaUtc || new Date().toISOString(),
       tipo: n.tipoNotificacion || n.tipo || n.Tipo || "Info",
       leida: n.leida || n.Leida || false,
     })) as unknown as NotificationDto[];
@@ -114,7 +115,8 @@ export const NotificationBell: React.FC = () => {
                           {notification.mensaje}
                         </p>
                         <p className="text-xs text-text-primary opacity-40 mt-1">
-                          {new Date(notification.fechaUtc).toLocaleString()}
+                          {/* ponytail: SQL datetime2 strips Kind → JSON has no Z → JS treats as local. Force Z. */}
+                          {new Date(notification.fechaUtc + (notification.fechaUtc.endsWith('Z') ? '' : 'Z')).toLocaleString()}
                         </p>
                       </div>
                       {!notification.leida && (
