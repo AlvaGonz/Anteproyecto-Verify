@@ -31,6 +31,7 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
       'pricing.cards.empresa.feature1',
       'pricing.cards.empresa.feature2',
       'pricing.cards.empresa.feature3',
+      'pricing.cards.empresa.feature4',
     ]
   },
   corporativo: {

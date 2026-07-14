@@ -245,7 +245,7 @@ const resources = {
             desc: "Herramientas completas para agentes independientes y pequeñas agencias.",
             feature1: "25 consultas /mes",
             feature2: "5 proyectos registrables",
-            feature3: "Soporte prioritario email",
+            feature3: "Consultas de proyectos por QR",
             button: "Elegir Profesional"
           },
           empresa: {
@@ -254,6 +254,7 @@ const resources = {
             feature1: "100 consultas /mes",
             feature2: "30 proyectos registrables",
             feature3: "Multiusuario (hasta 5)",
+            feature4: "Consultas de proyectos por QR",
             button: "Elegir Empresa"
           },
           corporativo: {
@@ -262,23 +263,17 @@ const resources = {
             feature1: "Consultas ilimitadas",
             feature2: "50 proyectos registrables",
             feature3: "Multiusuario (hasta 30)",
-            feature4: "Soporte 24/7",
+            feature4: "Consultas de proyectos por QR",
             button: "Elegir Corporativo"
           }
         },
         comparison: {
           title: "Comparativa detallada",
           charHeader: "Características",
-          capHeader: "Capacidad de Búsqueda",
           limit: "Límite mensual",
           unlimited: "Ilimitado",
           projects: "Proyectos registrables",
-          supportHeader: "Soporte",
-          supportLevel: "Nivel de asistencia",
-          community: "Comunidad",
-          email: "Email (24h)",
-          priority: "Prioritario",
-          manager: "24/7"
+          qrProjects: "Consultas de proyectos por QR"
         },
         trust: {
           encrypted: "Datos encriptados",
@@ -555,6 +550,7 @@ const resources = {
             feature1: "100 queries /month",
             feature2: "Multi-user (up to 5)",
             feature3: "Basic API",
+            feature4: "CRM integration",
             button: "Choose Company"
           },
           corporativo: {
@@ -570,16 +566,10 @@ const resources = {
         comparison: {
           title: "Detailed comparison",
           charHeader: "Features",
-          capHeader: "Search Capacity",
           limit: "Monthly limit",
           unlimited: "Unlimited",
           projects: "Registerable projects",
-          supportHeader: "Support",
-          supportLevel: "Support level",
-          community: "Community",
-          email: "Email (24h)",
-          priority: "Priority",
-          manager: "24/7 Account Manager"
+          qrProjects: "QR project queries"
         },
         trust: {
           encrypted: "Encrypted data",
