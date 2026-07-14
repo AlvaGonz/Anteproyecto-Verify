@@ -24,7 +24,7 @@ public sealed class UtcDateTimeConverter : JsonConverter<DateTime>
             return default;
 
         // If it already has timezone info, parse normally
-        if (str.EndsWith('Z') || str.Contains('+') || str.Contains('-', 10))
+        if (str.EndsWith('Z') || str.Contains('+') || str.IndexOf('-', 10) >= 0)
         {
             if (DateTime.TryParse(str, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var result))
                 return result;
