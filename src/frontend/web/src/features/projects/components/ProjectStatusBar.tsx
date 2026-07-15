@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProjectStatus } from '../types';
 import { useProjectStatusBar } from '../hooks/useProjectStatusBar';
-import { useAuth } from '@/features/auth/api/useAuth';
+import { useAuth } from '@/shared/context/AuthContext';
 import { PLAN_CAPABILITIES, normalizePlanKey } from '@/features/pricing/utils/planCapabilities';
 
 interface ProjectStatusBarProps {
