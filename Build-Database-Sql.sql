@@ -191,6 +191,7 @@ CREATE TABLE ProyectosInmobiliarios (
     EstadoIntegridad    INT NOT NULL,
     EstadoJuridico      INT NOT NULL DEFAULT 0,
     SelladoBloqueado    BIT NOT NULL DEFAULT 0,
+    EstatusDescripcion  VARCHAR(100) NULL,
     CreatedAtUtc        DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
     UpdatedAtUtc        DATETIME2 NULL,
     RowVersion          TIMESTAMP,
@@ -266,19 +267,18 @@ GO
 
 IF OBJECT_ID(N'[PermisoSuelo]', 'U') IS NULL
 CREATE TABLE PermisoSuelo (
-    IdPSuelo      UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    IdProyecto    UNIQUEIDENTIFIER NULL,
-    NumeroPermiso VARCHAR(50)  NULL,
-    FechaEmision  DATE         NULL,
-    Rnc           VARCHAR(20)  NULL,
-    Provincia     VARCHAR(100) NULL,
-    Municipio     VARCHAR(100) NULL,
-    Latitud       DECIMAL(9,6) NULL,
-    Longitud      DECIMAL(9,6) NULL,
-    Superficie    DECIMAL(18,2) NULL,
-    TienePermiso  VARCHAR(10)  NULL,
-    Documento     VARCHAR(250) NULL,
-    FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmobiliarios(IdProyecto)
+    IdPSuelo         UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+    NumeroPermiso    VARCHAR(50)  NULL,
+    NumeroExpediente VARCHAR(50)  NULL,
+    FechaEmision     DATE         NULL,
+    Rnc              VARCHAR(20)  NULL,
+    Provincia        VARCHAR(100) NULL,
+    Municipio        VARCHAR(100) NULL,
+    Latitud          DECIMAL(9,6) NULL,
+    Longitud         DECIMAL(9,6) NULL,
+    Superficie       DECIMAL(18,2) NULL,
+    TienePermiso     VARCHAR(10)  NULL,
+    Documento        VARCHAR(250) NULL
 );
 GO
 
@@ -294,7 +294,7 @@ GO
 IF OBJECT_ID(N'[CatastroTitulo]', 'U') IS NULL
 CREATE TABLE CatastroTitulo (
     IdCatastroTitulo UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    IdProyecto       UNIQUEIDENTIFIER NULL,
+    CodigoDesignacionCatastral VARCHAR(20) NULL,
     NumeroTitulo     VARCHAR(50)  NULL,
     Rnc              VARCHAR(20)  NULL,
     Provincia        VARCHAR(100) NULL,
@@ -302,8 +302,7 @@ CREATE TABLE CatastroTitulo (
     Latitud          DECIMAL(9,6) NULL,
     Longitud         DECIMAL(9,6) NULL,
     Superficie       DECIMAL(18,2) NULL,
-    Matricula        VARCHAR(50)  NULL,
-    FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmobiliarios(IdProyecto)
+    Matricula        VARCHAR(50)  NULL
 );
 GO
 

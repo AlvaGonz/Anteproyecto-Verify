@@ -243,13 +243,14 @@ def insert_chunk(chunk_id, chunk_records):
                 params.extend(r)
                 
             cursor.execute(sql, tuple(params))
-            conn.commit()
             count += len(batch)
             if count % 10000 == 0 or count == len(chunk_records):
+                conn.commit()
                 elapsed = time.time() - t0
                 speed = count / elapsed if elapsed > 0 else 0
                 print(f"[Thread {chunk_id}] Inserted {count}/{len(chunk_records)} records. Speed: {speed:.1f} rec/sec")
                 
+        conn.commit()
         print(f"[Thread {chunk_id}] Completed chunk insertion successfully in {time.time() - t0:.2f} seconds!")
         return len(chunk_records)
     except Exception as e:

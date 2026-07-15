@@ -344,7 +344,9 @@ def insert_ipi_chunk(chunk_id, chunk_records):
             params_ipi = []
             for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"]])
             cursor.execute(sql_ipi, tuple(params_ipi))
-            conn.commit()
+            if (i + batch_size) % 15000 == 0:
+                conn.commit()
+        conn.commit()
         return len(chunk_records)
     except Exception as e:
         if conn:
@@ -370,7 +372,9 @@ def insert_catastro_chunk(chunk_id, chunk_records):
             for r in batch: 
                 params_cat.extend([r["id"], r["dc"], r["titulo"], r["rnc"], r["provincia"], r["municipio"], r["lat"], r["lon"], r["superficie"], r["matricula"]])
             cursor.execute(sql_cat, tuple(params_cat))
-            conn.commit()
+            if (i + batch_size) % 10000 == 0:
+                conn.commit()
+        conn.commit()
         return len(chunk_records)
     except Exception as e:
         if conn:
@@ -397,7 +401,9 @@ def insert_ps_chunk(chunk_id, chunk_records):
             for p in batch:
                 params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"]])
             cursor.execute(sql_ps, tuple(params_ps))
-            conn.commit()
+            if (i + batch_size) % 10000 == 0:
+                conn.commit()
+        conn.commit()
         return len(chunk_records)
     except Exception as e:
         if conn:
@@ -462,15 +468,15 @@ def main():
                 
     t_ipi_end = time.time()
             
-    print("Submitting CatastroTitulo and PermisoSuelo tasks (decoupled)...")
+    print("Submitting CatastroTitulo and PermisoSuelo tasks simultaneously...")
     catastro_chunk = []
     ps_chunk = []
     c_count = 0
-    t_cat_start = time.time()
+    p_count = 0
+    t_cat_ps_start = time.time()
     
-    with ThreadPoolExecutor(max_workers=15) as executor:
-        futures_cat = []
-        futures_ps = []
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        futures_cat_ps = []
         for cat_r, ps_r in generate_catastro_ps_records(rncs_list):
             catastro_chunk.append(cat_r)
             if ps_r is not None:
@@ -478,37 +484,40 @@ def main():
                 
             if len(catastro_chunk) >= chunk_size:
                 c_count += 1
-                futures_cat.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
+                futures_cat_ps.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
                 catastro_chunk = []
                 
             if len(ps_chunk) >= chunk_size:
-                futures_ps.append(executor.submit(insert_ps_chunk, f"PS_{c_count}", ps_chunk))
+                p_count += 1
+                futures_cat_ps.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
                 ps_chunk = []
                 
         if catastro_chunk:
             c_count += 1
-            futures_cat.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
+            futures_cat_ps.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
+            
         if ps_chunk:
-            futures_ps.append(executor.submit(insert_ps_chunk, f"PS_{c_count}", ps_chunk))
+            p_count += 1
+            futures_cat_ps.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
             
         print("Waiting for Catastro and PermisoSuelo completion...")
-        for fut in as_completed(futures_cat + futures_ps):
+        for fut in as_completed(futures_cat_ps):
             try:
                 fut.result()
             except Exception as e:
-                print(f"Worker error CAT_PS: {e}")
+                print(f"Worker error CAT/PS: {e}")
                 
-    t_cat_end = time.time()
+    t_cat_ps_end = time.time()
             
     t_total = time.time() - t_start
     m_ipi, s_ipi = divmod(t_ipi_end - t_ipi_start, 60)
-    m_cat, s_cat = divmod(t_cat_end - t_cat_start, 60)
+    m_cat_ps, s_cat_ps = divmod(t_cat_ps_end - t_cat_ps_start, 60)
     m_tot, s_tot = divmod(t_total, 60)
     
     print("\n" + "="*50)
     print("--- Resumen Final de Generación ---")
     print(f"IPI: {int(m_ipi)} minutos {int(s_ipi)} segundos")
-    print(f"Catastro y PermisoSuelo: {int(m_cat)} minutos {int(s_cat)} segundos")
+    print(f"Catastro y PermisoSuelo (Simultáneo): {int(m_cat_ps)} minutos {int(s_cat_ps)} segundos")
     print(f"Tiempo Total: {int(m_tot)} minutos {int(s_tot)} segundos")
     print("="*50 + "\n")
 
