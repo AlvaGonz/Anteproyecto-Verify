@@ -158,6 +158,14 @@ public class ProjectsController : ControllerBase
         {
             return NotFound();
         }
+        catch (QuotaExceededException ex)
+        {
+            return StatusCode(402, new {
+                error = "QUOTA_EXCEEDED",
+                tier = ex.TierName,
+                message = ex.Message
+            });
+        }
     }
 
     [HttpDelete("{id:guid}")]

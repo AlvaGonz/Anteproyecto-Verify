@@ -37,6 +37,7 @@ public static class AppDbContextSeeder
                 rol: UserRole.Administrator,
                 telefono: "809-555-1000",
                 cedula: "001-1234567-8");
+            adminUser.AsignarPlan(Guid.Parse("99999999-9999-9999-9999-999999999999"));
 
             var freemiumUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -279,18 +280,27 @@ public static class AppDbContextSeeder
         {
             logger.LogInformation("Seeding modern subscription plans (Block 2)...");
             
-            // Gratuito (Free)
-            var gratuito = PlanSuscripcion.Create(
-                id: Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"), nombrePlan: "Gratuito", precio: 0.00m,
+            // Administrador (Admin Footprint)
+            var administrador = PlanSuscripcion.Create(
+                id: Guid.Parse("99999999-9999-9999-9999-999999999999"), nombrePlan: "Administrador", precio: 0.00m,
+                maxConsultas: -1, maxProyectos: -1, presentacionPublica: true,
+                qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: -1,
+                alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
+                exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
+                soporteTipo: "Dedicado", accesoApi: true);
+
+            // Consultor (Formerly Gratuito)
+            var consultorNuevo = PlanSuscripcion.Create(
+                id: Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"), nombrePlan: "Consultor", precio: 0.00m,
                 maxConsultas: 1, maxProyectos: 1, presentacionPublica: false,
                 qrIncluido: false, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 0,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
                 soporteTipo: "Comunidad", accesoApi: false);
 
-            // Consultor (Legacy Free for tests)
-            var consultor = PlanSuscripcion.Create(
-                id: Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"), nombrePlan: "Consultor", precio: 0.00m,
+            // ConsultorLegacy (Legacy Free for tests)
+            var consultorLegacy = PlanSuscripcion.Create(
+                id: Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"), nombrePlan: "ConsultorLegacy", precio: 0.00m,
                 maxConsultas: 5, maxProyectos: 5, presentacionPublica: false,
                 qrIncluido: false, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 0,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
@@ -309,7 +319,7 @@ public static class AppDbContextSeeder
             // Empresa
             var empresa = PlanSuscripcion.Create(
                 id: Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"), nombrePlan: "Empresa", precio: 10000.00m,
-                maxConsultas: 100, maxProyectos: 20, presentacionPublica: true,
+                maxConsultas: 100, maxProyectos: 30, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 1024,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: true, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: true,
@@ -318,13 +328,13 @@ public static class AppDbContextSeeder
             // Corporativo
             var corporativo = PlanSuscripcion.Create(
                 id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Corporativo", precio: 30000.00m,
-                maxConsultas: -1, maxProyectos: -1, presentacionPublica: true,
+                maxConsultas: -1, maxProyectos: 50, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: 10240,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
                 exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
                 soporteTipo: "Account Manager", accesoApi: true);
 
-            context.PlanesSuscripcion.AddRange(gratuito, consultor, profesional, empresa, corporativo);
+            context.PlanesSuscripcion.AddRange(administrador, consultorNuevo, consultorLegacy, profesional, empresa, corporativo);
             await context.SaveChangesAsync();
         }
     }

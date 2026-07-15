@@ -8,6 +8,7 @@ export interface PlanCapabilities {
   multiUser: boolean
   apiAccess: boolean | 'basic' | 'full'
   prioritySupport: boolean
+  publicPresentation: boolean
   color: string          // Tailwind text color class for dashboard badge
   bgColor: string        // Tailwind bg color class for dashboard banner
 }
@@ -21,6 +22,7 @@ export const PLAN_CAPABILITIES: Record<PlanKey, PlanCapabilities> = {
     multiUser: false,
     apiAccess: false,
     prioritySupport: false,
+    publicPresentation: false,
     color: 'text-violet-700',
     bgColor: 'bg-violet-50 border-violet-200',
   },
@@ -32,6 +34,7 @@ export const PLAN_CAPABILITIES: Record<PlanKey, PlanCapabilities> = {
     multiUser: false,
     apiAccess: false,
     prioritySupport: true,
+    publicPresentation: true,
     color: 'text-primary',
     bgColor: 'bg-primary/5 border-primary/20',
   },
@@ -43,6 +46,7 @@ export const PLAN_CAPABILITIES: Record<PlanKey, PlanCapabilities> = {
     multiUser: true,
     apiAccess: 'basic',
     prioritySupport: true,
+    publicPresentation: true,
     color: 'text-secondary',
     bgColor: 'bg-secondary/5 border-secondary/20',
   },
@@ -54,6 +58,7 @@ export const PLAN_CAPABILITIES: Record<PlanKey, PlanCapabilities> = {
     multiUser: true,
     apiAccess: 'full',
     prioritySupport: true,
+    publicPresentation: true,
     color: 'text-on-surface',
     bgColor: 'bg-surface-variant border-outline-variant',
   },

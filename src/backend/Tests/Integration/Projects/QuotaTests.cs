@@ -21,17 +21,16 @@ public class QuotaTests : IntegrationTestBase
     };
 
     [Fact]
-    public async Task POST_CreateProject_Gratuito_Allows1_Returns402OnSecond()
+    public async Task POST_CreateProject_Consultor_Allows1_Returns402OnSecond()
     {
-        // Register new user (gets Consultor plan by default)
         var token = await RegisterAndGetTokenAsync(
-            "gratuito.test@test.com", "Test123!");
+            "consultor.test@test.com", "Test123!");
         SetBearerToken(token);
 
         var userId = GetUserIdFromToken(token);
         
-        // Downgrade to Gratuito
-        await AssignPlanToUserAsync(userId, "Gratuito");
+        // Downgrade to Consultor (if not already)
+        await AssignPlanToUserAsync(userId, "Consultor");
 
         // First project — should succeed
         var first = await Client.PostAsJsonAsync(
@@ -47,30 +46,29 @@ public class QuotaTests : IntegrationTestBase
         var error = await second.Content
             .ReadFromJsonAsync<ErrorDto>();
         error!.Error.Should().Be("QUOTA_EXCEEDED");
-        error.Tier.Should().Be("Gratuito");
+        error.Tier.Should().Be("Consultor");
     }
 
     [Fact]
-    public async Task POST_CreateProject_ConsultorPlan_AllowsUpTo5()
+    public async Task POST_CreateProject_ProfesionalPlan_AllowsUpTo5()
     {
         var token = await RegisterAndGetTokenAsync(
-            "consultor.test@test.com", "Test123!");
+            "profesional.test@test.com", "Test123!");
         SetBearerToken(token);
 
-        // Get userId from JWT claims
         var userId = GetUserIdFromToken(token);
 
-        // Default plan is Consultor. No need to assign.
+        await AssignPlanToUserAsync(userId, "Profesional");
 
         // Create 5 projects — all should succeed
         for (int i = 1; i <= 5; i++)
         {
             var resp = await Client.PostAsJsonAsync(
                 "/api/projects",
-                ValidProjectPayload($"Proyecto Consultor {i}", userId));
+                ValidProjectPayload($"Proyecto Profesional {i}", userId));
             resp.StatusCode.Should()
                 .Be(HttpStatusCode.Created,
-                    because: $"project {i} should be within Consultor quota");
+                    because: $"project {i} should be within Profesional quota");
         }
 
         // 6th should fail
@@ -81,7 +79,7 @@ public class QuotaTests : IntegrationTestBase
         
         var error = await sixth.Content.ReadFromJsonAsync<ErrorDto>();
         error!.Error.Should().Be("QUOTA_EXCEEDED");
-        error.Tier.Should().Be("Consultor");
+        error.Tier.Should().Be("Profesional");
     }
 
     private Guid GetUserIdFromToken(string jwt)

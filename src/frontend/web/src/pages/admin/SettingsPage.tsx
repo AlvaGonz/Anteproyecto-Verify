@@ -129,7 +129,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleAddNewClick = () => {
     setEditingUser(null);
-    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Gratuito" });
+    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Consultor" });
     setIsModalOpen(true);
   };
 

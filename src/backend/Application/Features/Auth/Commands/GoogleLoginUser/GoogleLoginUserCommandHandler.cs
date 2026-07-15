@@ -66,7 +66,7 @@ public class GoogleLoginUserCommandHandler
                 user.UpdateAvatarUrl(profile.Picture);
             }
 
-            var consultorPlan = await _planRepository.GetByNameAsync("Gratuito", cancellationToken);
+            var consultorPlan = await _planRepository.GetByNameAsync("Consultor", cancellationToken);
             if (consultorPlan != null)
             {
                 user.AsignarPlan(consultorPlan.Idsuscripcion);

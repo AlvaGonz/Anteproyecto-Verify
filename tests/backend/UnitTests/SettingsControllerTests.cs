@@ -116,7 +116,7 @@ public class SettingsControllerTests
                 new Perfil { IdPerfil = devProfileId, NombrePerfil = "DEVELOPER" }
             );
             context.PlanesSuscripcion.AddRange(
-                PlanSuscripcion.Create(freePlanId, "Gratuito", 0.00m, 5, 1, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false),
+                PlanSuscripcion.Create(freePlanId, "Consultor", 0.00m, 5, 1, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false),
                 PlanSuscripcion.Create(proPlanId, "Profesional", 3500.00m, -1, 5, true, true, 0, 200, false, false, false, false, true, false, "Email", false)
             );
             

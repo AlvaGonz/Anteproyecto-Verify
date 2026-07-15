@@ -148,7 +148,7 @@ const resources = {
           prorationTitle: "Cambio de Plan (Prorratio)",
           prorationDesc: "Si cambias de plan durante el ciclo activo, el ajuste se calcula de forma proporcional (prorratio) sobre los días restantes. Los créditos se aplican automáticamente en la siguiente factura.",
           trialTitle: "Período de Prueba",
-          trialDesc: "Si aplica un período de prueba gratuito, su duración se indica al momento de la suscripción. Al vencer, inicia automáticamente el cobro del plan seleccionado. No se requiere acción adicional.",
+          trialDesc: "Si aplica un período de prueba consultor, su duración se indica al momento de la suscripción. Al vencer, inicia automáticamente el cobro del plan seleccionado. No se requiere acción adicional.",
         },
         refunds: {
           title: "Política de Reembolsos y Cancelaciones",
@@ -159,7 +159,7 @@ const resources = {
           cancelTitle: "Cancelación",
           cancelDesc: "Puedes cancelar tu suscripción en cualquier momento desde Configuración → Suscripción → Cancelar. No se aplican penalizaciones ni cargos adicionales por cancelación.",
           postCancelTitle: "Acceso Post-Cancelación",
-          postCancelDesc: "El servicio permanece activo hasta el fin del período ya pagado. Al vencer, el acceso se revierte automáticamente al plan gratuito.",
+          postCancelDesc: "El servicio permanece activo hasta el fin del período ya pagado. Al vencer, el acceso se revierte automáticamente al plan consultor.",
           annualPenaltyTitle: "Penalización por Cancelación Anticipada — Plan Anual",
           annualPenaltyDesc: "Si cancelas un plan de suscripción anual antes de completar los 12 meses del período contratado, se aplicará una penalización equivalente al 20% del valor total anual del plan. Este monto será deducido del reembolso proporcional correspondiente a los meses no consumidos, o cobrado al método de pago registrado si no hay saldo a favor.",
           annualPenaltyExample: "Ejemplo: si el plan anual cuesta $1,200 USD y cancelas tras 4 meses, el reembolso proporcional de los 8 meses restantes ($800 USD) se reduce en un 20% ($240 USD), resultando en un reembolso neto de $560 USD.",

@@ -111,6 +111,23 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
+        if (status == ProjectStatus.Published)
+        {
+            var usuario = await _usuarioRepository.GetByIdWithPlanAsync(proyecto.UsuarioCreadorId, cancellationToken);
+            if (usuario == null)
+            {
+                throw new KeyNotFoundException($"User with id {proyecto.UsuarioCreadorId} not found.");
+            }
+
+            if (!SubscriptionTierPolicy.IsProjectPublic(usuario))
+            {
+                throw new QuotaExceededException(
+                    SubscriptionTierPolicy.GetTierName(usuario), 
+                    "PresentacionPublica", 
+                    "Su plan actual (Consultor) no permite la publicación de proyectos.");
+            }
+        }
+
         var oldStatus = proyecto.Status;
         proyecto.UpdateStatus(status);
         

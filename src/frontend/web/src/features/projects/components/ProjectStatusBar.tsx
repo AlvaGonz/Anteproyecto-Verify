@@ -1,6 +1,8 @@
 import React from 'react';
 import { ProjectStatus } from '../types';
 import { useProjectStatusBar } from '../hooks/useProjectStatusBar';
+import { useAuth } from '@/features/auth/api/useAuth';
+import { PLAN_CAPABILITIES, normalizePlanKey } from '@/features/pricing/utils/planCapabilities';
 
 interface ProjectStatusBarProps {
   projectId: string;
@@ -9,6 +11,7 @@ interface ProjectStatusBarProps {
 
 export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, currentStatus }) => {
   const { eligibility, isLoading, isUpdating, handleStatusChange } = useProjectStatusBar(projectId);
+  const { user } = useAuth();
 
   if (isLoading) {
     return (
@@ -24,10 +27,15 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
   // If the backend says the status is different (e.g., auto-updated), prefer that
   const actualStatus = eligibility?.currentStatus !== undefined ? eligibility.currentStatus : currentStatus;
 
+  // Plan capability check
+  const planKey = normalizePlanKey(user?.plan?.nombrePlan);
+  const capabilities = PLAN_CAPABILITIES[planKey];
+  const canPublishPlan = capabilities.publicPresentation;
+
   // Determine enabled states
   const canDraft = true; // Always can be draft (or stay draft)
   const canReview = docCount >= 1;
-  const canPublish = docCount >= 3;
+  const canPublish = docCount >= 3 && canPublishPlan;
   // Observation is auto-triggered, user cannot click it. It becomes the active state if hasObservaciones.
 
   // If system sets hasObservaciones, it technically forces "Con Observaciones".
@@ -61,7 +69,11 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
       activeColor: 'bg-green-500',
       textColor: 'text-green-500',
       borderColor: 'border-green-500',
-      tooltip: canPublish ? 'Listo para publicar' : 'Requiere al menos 3 documentos',
+      tooltip: !canPublishPlan 
+        ? 'Su plan (Consultor) no permite presentar el proyecto públicamente' 
+        : canPublish 
+          ? 'Listo para publicar' 
+          : 'Requiere al menos 3 documentos',
     },
     {
       status: ProjectStatus.Observed,

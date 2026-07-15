@@ -85,7 +85,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
           ) : statsData?.usuariosPorPlan && Object.keys(statsData.usuariosPorPlan).length > 0 ? (
             Object.entries(statsData.usuariosPorPlan)
               .sort(([planA], [planB]) => {
-                const order = ["Corporativo", "Empresa", "Profesional", "Gratuito", "Invitado"];
+                const order = ["Corporativo", "Empresa", "Profesional", "Consultor", "Invitado"];
                 const idxA = order.indexOf(planA);
                 const idxB = order.indexOf(planB);
                 return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
