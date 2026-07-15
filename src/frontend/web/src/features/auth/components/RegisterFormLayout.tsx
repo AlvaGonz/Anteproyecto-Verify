@@ -1,5 +1,20 @@
 ﻿import React from "react";
 import { m } from "framer-motion";
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1, y: 0,
+    transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+  },
+};
 import {
   User,
   Mail,
@@ -53,14 +68,14 @@ export const RegisterFormLayout: React.FC<RegisterFormLayoutProps> = ({
   isValid,
   modalType,
 }) => (
-  <div className="w-full">
+  <m.div variants={containerVariants} initial="hidden" animate="visible" className="w-full">
     {error && (
-      <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
+      <m.div variants={itemVariants} className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium" role="alert">
         {(error as Error).message || "Ocurrió un error al crear la cuenta. Intente de nuevo."}
-      </div>
+      </m.div>
     )}
 
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <m.form variants={itemVariants} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Nombre y Apellido Grid */}
       <div className="grid grid-cols-2 gap-4">
         <div className="relative">
@@ -200,14 +215,16 @@ export const RegisterFormLayout: React.FC<RegisterFormLayoutProps> = ({
           </span>
         )}
       </m.button>
-    </form>
+    </m.form>
 
-    <SocialLoginSection />
+    <m.div variants={itemVariants}>
+      <SocialLoginSection />
+    </m.div>
 
     <TermsModal
       modalType={modalType}
       closeModal={closeModal}
       acceptAndCloseModal={acceptAndCloseModal}
     />
-  </div>
+  </m.div>
 );

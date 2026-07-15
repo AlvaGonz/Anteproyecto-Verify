@@ -2,12 +2,28 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { m } from "framer-motion";
 import { loginSchema, type LoginFormValues } from "../schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 import { isSubscriptionActive } from "../../pricing/utils/planCapabilities";
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1, y: 0,
+    transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+  },
+};
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -50,31 +66,31 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="w-full">
-      <div className="mb-10 text-center md:text-left">
+    <m.div variants={containerVariants} initial="hidden" animate="visible" className="w-full">
+      <m.div variants={itemVariants} className="mb-10 text-center md:text-left">
         <h3 className="text-2xl font-display font-extrabold text-[#223382] tracking-tight">Iniciar Sesión</h3>
         <p className="text-text-secondary mt-1">Ingresa tus credenciales profesionales para acceder</p>
-      </div>
+      </m.div>
 
       {authError && (
-        <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
+        <m.div variants={itemVariants} className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium" role="alert">
           {authError?.message || "No encontramos una cuenta con este correo. ¿Desea registrarse?"}
-        </div>
+        </m.div>
       )}
 
       {verified && (
-        <div className="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
+        <m.div variants={itemVariants} className="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 rounded-r-xl text-sm font-medium" role="alert">
           ¡Correo electrónico verificado con éxito! Ya puede iniciar sesión.
-        </div>
+        </m.div>
       )}
 
       {verificationError && (
-        <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
+        <m.div variants={itemVariants} className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium" role="alert">
           {verificationError}
-        </div>
+        </m.div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <m.form variants={itemVariants} onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="relative">
           <label htmlFor="email" className="sr-only">Correo electrónico</label>
           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
@@ -125,9 +141,11 @@ export const LoginForm = () => {
           </Link>
         </div>
 
-        <button
+        <m.button
           type="submit"
           disabled={isPending}
+          whileHover={!isPending ? { scale: 1.01 } : {}}
+          whileTap={!isPending ? { scale: 0.98 } : {}}
           className="vf-btn-primary w-full h-[56px] text-base font-bold shadow-floating disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 mt-4"
         >
           {isPending ? (
@@ -140,10 +158,10 @@ export const LoginForm = () => {
               Iniciar sesión <ArrowRight className="w-5 h-5" />
             </span>
           )}
-        </button>
-      </form>
+        </m.button>
+      </m.form>
 
-      <div className="mt-8">
+      <m.div variants={itemVariants} className="mt-8">
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-border/50"></div>
@@ -156,16 +174,16 @@ export const LoginForm = () => {
         </div>
 
         <GoogleSignInButton />
-      </div>
+      </m.div>
 
-      <div className="mt-8 pt-6 border-t border-border/50 text-center">
+      <m.div variants={itemVariants} className="mt-8 pt-6 border-t border-border/50 text-center">
         <p className="text-sm text-text-secondary font-medium">
           ¿No tienes una cuenta?{" "}
           <Link to="/register" className="text-primary font-bold hover:underline">
             Regístrate aquí
           </Link>
         </p>
-      </div>
-    </div>
+      </m.div>
+    </m.div>
   );
 };
