@@ -70,10 +70,10 @@ public class ProjectService : IProjectService
                 "Límite de proyectos alcanzado para su plan actual. Considere mejorar su plan.");
         }
 
-        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2);
+        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {
-            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2);
+            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
         }
         if (!string.IsNullOrEmpty(dto.RncDesarrollador) || !string.IsNullOrEmpty(dto.Matricula))
         {
@@ -94,7 +94,7 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
-        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2);
+        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
         proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
         
         _proyectoRepository.Update(proyecto);
@@ -109,6 +109,23 @@ public class ProjectService : IProjectService
         if (proyecto == null)
         {
             throw new KeyNotFoundException($"Project with id {id} not found.");
+        }
+
+        if (status == ProjectStatus.Published)
+        {
+            var usuario = await _usuarioRepository.GetByIdWithPlanAsync(proyecto.UsuarioCreadorId, cancellationToken);
+            if (usuario == null)
+            {
+                throw new KeyNotFoundException($"User with id {proyecto.UsuarioCreadorId} not found.");
+            }
+
+            if (!SubscriptionTierPolicy.IsProjectPublic(usuario))
+            {
+                throw new QuotaExceededException(
+                    SubscriptionTierPolicy.GetTierName(usuario), 
+                    "PresentacionPublica", 
+                    "Su plan actual (Consultor) no permite la publicación de proyectos.");
+            }
         }
 
         var oldStatus = proyecto.Status;
@@ -132,14 +149,15 @@ public class ProjectService : IProjectService
 
     public async Task DeleteProjectAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var proyecto = await _proyectoRepository.GetByIdAsync(id, cancellationToken);
-        if (proyecto == null)
+        try
         {
-            throw new KeyNotFoundException($"Project with id {id} not found.");
+            await _proyectoRepository.DeleteWithRelatedDataAsync(id, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
-
-        _proyectoRepository.Delete(proyecto);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
     }
 
     private static ProyectoDto MapToDto(Proyecto proyecto)
@@ -167,6 +185,11 @@ public class ProjectService : IProjectService
             proyecto.UbicacionTexto,
             proyecto.UbicacionGps,
             proyecto.ImagenUrl,
+            proyecto.ImagenAdicional1,
+            proyecto.ImagenAdicional2,
+            proyecto.ImagenAdicional3,
+            proyecto.ImagenAdicional4,
+            proyecto.ImagenAdicional5,
             proyecto.ValorEstimado,
             proyecto.Categoria,
             proyecto.DatosDesarrollador,

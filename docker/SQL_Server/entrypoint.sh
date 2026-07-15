@@ -77,10 +77,10 @@ echo "================================================"
         if [ "$MIG_COUNT" -ge 12 ]; then
             echo "[Seed] $MIG_COUNT migration(s) detected. Running seed data scripts..."
 
-            # NOTE: Build-Database-Sql.sql is NO LONGER RUN HERE.
-            # EF Core migrations are the SOLE source of truth for schema (DDL).
-            # Build-Database-Sql.sql has been converted to seed-only data (Provincia, Municipio, PlanSuscripcion, etc.)
-            # and is now maintained separately if needed.
+            # NOTE: The user requested Build-Database-Sql.sql to be run as an SOS fallback
+            # to ensure any missing legacy or utility tables (like Provincia, ApiGobernanza) are present.
+            echo "[Seed] Running SOS Schema fallback (Build-Database-Sql.sql)..."
+            $SQLCMD $SQLCMD_OPTS -d "$DB_NAME" -i "$SQL_FILE" || echo "[Seed] Warning: Build-Database-Sql.sql had errors."
 
             echo "[Seed] Running seed files..."
             for seed_file in /usr/config/seeds/*.sql; do

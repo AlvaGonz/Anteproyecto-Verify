@@ -146,7 +146,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
         <div className="space-y-4">
 
           {/* ── PORTADA + GALERÍA en una sola fila de acciones ── */}
-          <div className="flex flex-wrap items-start gap-4">
+          <div className="flex flex-wrap items-start gap-1.5">
 
             {/* — Portada — */}
             <div className="flex flex-col gap-2 min-w-0">
@@ -158,7 +158,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
               <div className="flex items-center gap-2">
                 {/* Thumbnail existing portada */}
                 {portraitDoc && (
-                  <div className="relative w-14 h-14 rounded-md overflow-hidden border border-amber-300 flex-shrink-0">
+                  <div className="relative w-24 h-24 rounded-md overflow-hidden border border-amber-300 flex-shrink-0">
                     <img
                       src={portraitDoc.fileUrl}
                       alt="Portada actual"
@@ -171,7 +171,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
                 {pendingPortrait.map((p) => (
                   <div
                     key={`pending-portrait-${p.previewUrl}`}
-                    className="relative w-14 h-14 rounded-md overflow-hidden border border-dashed border-amber-400 flex-shrink-0"
+                    className="relative w-24 h-24 rounded-md overflow-hidden border border-dashed border-amber-400 flex-shrink-0"
                   >
                     <img src={p.previewUrl} alt="Portada pendiente" className="w-full h-full object-cover" />
                     <button
@@ -200,7 +200,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
             </div>
 
             {/* Divider vertical */}
-            <div className="hidden sm:block w-px self-stretch bg-gray-100 mt-5" />
+            <div className="hidden sm:block w-px self-stretch bg-gray-100 mt-5 mx-1" />
 
             {/* — Galería — */}
             <div className="flex flex-col gap-2 min-w-0 flex-1">
@@ -213,7 +213,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
                 {galleryDocs.map((doc) => (
                   <div
                     key={doc.id}
-                    className="relative w-14 h-14 rounded-md overflow-hidden border border-gray-200 flex-shrink-0"
+                    className="relative w-16 h-16 rounded-md overflow-hidden border border-gray-200 flex-shrink-0"
                   >
                     <img
                       src={doc.fileUrl}
@@ -230,7 +230,7 @@ export const ProjectPhotosSection: React.FC<ProjectPhotosSectionProps> = ({ proj
                   return (
                     <div
                       key={`pending-gallery-${realIdx}`}
-                      className="relative w-14 h-14 rounded-md overflow-hidden border border-dashed border-teal-300 flex-shrink-0"
+                      className="relative w-16 h-16 rounded-md overflow-hidden border border-dashed border-teal-300 flex-shrink-0"
                     >
                       <img src={p.previewUrl} alt="Nueva foto" className="w-full h-full object-cover" />
                       <button

@@ -31,7 +31,13 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
 
   const sortedPlans = useMemo(() => {
     return [...plans]
-      .filter(p => p.name !== "Consultation" && p.name !== "Consultor")
+      .filter(p => {
+        const lowerName = p.name.toLowerCase();
+        return !lowerName.includes("consultation") && 
+               !lowerName.includes("consultor") && 
+               !lowerName.includes("gratuito") && 
+               !lowerName.includes("admin");
+      })
       .sort((a, b) => b.price - a.price);
   }, [plans]);
 
@@ -40,7 +46,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
     "Corporativo": users.filter(u => u.planName === "Corporativo" && u.role !== "admin" && u.role !== "owner"),
     "Empresa": users.filter(u => u.planName === "Empresa" && u.role !== "admin" && u.role !== "owner"),
     "Profesional": users.filter(u => u.planName === "Profesional" && u.role !== "admin" && u.role !== "owner"),
-    "Gratuito": users.filter(u => (u.planName === "Gratuito" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner"),
+    "Consultor": users.filter(u => (u.planName === "Consultor" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner"),
     "Invitado": users.filter(u => u.planName === "Invitado" && u.role !== "admin" && u.role !== "owner")
   };
 
@@ -74,7 +80,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
     { id: "Corporativo", label: "Corporativo", count: groupedUsers["Corporativo"].length },
     { id: "Empresa", label: "Empresa", count: groupedUsers["Empresa"].length },
     { id: "Profesional", label: "Profesional", count: groupedUsers["Profesional"].length },
-    { id: "Gratuito", label: "Gratuito", count: groupedUsers["Gratuito"].length },
+    { id: "Consultor", label: "Consultor", count: groupedUsers["Consultor"].length },
     { id: "Invitado", label: "Invitado", count: groupedUsers["Invitado"].length }
   ];
 
@@ -176,12 +182,15 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             let maxQueries: number | string = 1;
 
             if (plan.includes("empresa") || plan.includes("business")) {
-              maxProjects = 50;
+              maxProjects = 30;
               maxQueries = 100;
             } else if (plan.includes("profesional") || plan.includes("professional")) {
               maxProjects = 15;
               maxQueries = 25;
-            } else if (plan.includes("corporativo") || u.role === "admin" || u.role === "owner") {
+            } else if (plan.includes("corporativo")) {
+              maxProjects = 50;
+              maxQueries = "∞";
+            } else if (u.role === "admin" || u.role === "owner") {
               maxProjects = "∞";
               maxQueries = "∞";
             }

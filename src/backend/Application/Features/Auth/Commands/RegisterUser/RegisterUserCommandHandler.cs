@@ -65,8 +65,8 @@ public class RegisterUserCommandHandler
             request.Cedula!.Trim()
         );
 
-        // Assign default Gratuito plan
-        var consultorPlan = await _planSuscripcionRepository.GetByNameAsync("Gratuito", cancellationToken);
+        // Assign default Consultor plan
+        var consultorPlan = await _planSuscripcionRepository.GetByNameAsync("Consultor", cancellationToken);
         if (consultorPlan != null)
         {
             user.AsignarPlan(consultorPlan.Idsuscripcion);

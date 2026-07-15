@@ -53,7 +53,7 @@ public class GoogleLoginUserCommandHandlerTests
             .Returns(Task.CompletedTask);
         
         var plan = TestPlanFactory.Consultor();
-        _planRepo.Setup(r => r.GetByNameAsync("Gratuito", default)).ReturnsAsync(plan);
+        _planRepo.Setup(r => r.GetByNameAsync("Consultor", default)).ReturnsAsync(plan);
 
         var cmd = new GoogleLoginUserCommand("valid_token");
         var sut = CreateSut();

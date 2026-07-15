@@ -22,7 +22,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; icon: Re
     icon: <Clock className="w-4 h-4" />,
   },
   free: {
-    label: "Plan Gratuito",
+    label: "Plan Consultor",
     className: "bg-violet-50 text-violet-700 border-violet-200",
     icon: <Gift className="w-4 h-4" />,
   },

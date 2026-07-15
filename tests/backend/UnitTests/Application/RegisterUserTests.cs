@@ -30,7 +30,7 @@ public class RegisterUserTests
     public async Task RegisterUser_SelfRegistered_GetsUserRoleNotAdmin()
     {
         var plan = TestPlanFactory.Consultor();
-        _planRepo.Setup(r => r.GetByNameAsync("Gratuito", default))
+        _planRepo.Setup(r => r.GetByNameAsync("Consultor", default))
             .ReturnsAsync(plan);
 
         Usuario? capturedUser = null;
@@ -54,10 +54,10 @@ public class RegisterUserTests
     }
 
     [Fact]
-    public async Task RegisterUser_PlanGratuitoExists_AssignedToPlan()
+    public async Task RegisterUser_PlanConsultorExists_AssignedToPlan()
     {
         var plan = TestPlanFactory.Consultor();
-        _planRepo.Setup(r => r.GetByNameAsync("Gratuito", default))
+        _planRepo.Setup(r => r.GetByNameAsync("Consultor", default))
             .ReturnsAsync(plan);
 
         Usuario? capturedUser = null;
@@ -82,7 +82,7 @@ public class RegisterUserTests
     [Fact]
     public async Task RegisterUser_NoPlanInDb_UserCreatedWithoutPlan()
     {
-        _planRepo.Setup(r => r.GetByNameAsync("Gratuito", default))
+        _planRepo.Setup(r => r.GetByNameAsync("Consultor", default))
             .ReturnsAsync((PlanSuscripcion?)null);
 
         Usuario? capturedUser = null;

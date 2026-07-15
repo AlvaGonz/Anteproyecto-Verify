@@ -1,10 +1,10 @@
 import React, { useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { 
-  ProyectoDto, 
-  ProjectStatus, 
-  CreateProyectoDto, 
+import {
+  ProyectoDto,
+  ProjectStatus,
+  CreateProyectoDto,
   UpdateProyectoDto
 } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
@@ -12,10 +12,8 @@ import { useProject, useCreateProject, useDeleteProject } from "../../features/p
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
+import { ProjectStatusBar } from "../../features/projects/components/ProjectStatusBar";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { FileText, ShieldCheck, ClipboardList, ArrowRight } from "lucide-react";
-// @ts-expect-error - Used in JSX but TypeScript doesn't recognize JSX usage
-const _useLucideIcons = () => ({ FileText, ShieldCheck, ClipboardList, ArrowRight });
 
 const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
   if (!data) {
@@ -39,24 +37,14 @@ export const ProjectManagePage: React.FC = () => {
 
   const { data: rawProject, isLoading: loading } = useProject(id || "");
   const project = rawProject;
-  
+
   const createMutation = useCreateProject();
   const deleteMutation = useDeleteProject();
-  
+
   const qc = useQueryClient();
   const updateMutation = useMutation({
-    mutationFn: (data: { id: string; payload: any }) => 
+    mutationFn: (data: { id: string; payload: any }) =>
       apiClient.put<ProyectoDto>(`/projects/${data.id}`, data.payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["projects"] });
-    }
-  });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: (data: { id: string; status: ProjectStatus }) => 
-      apiClient.patch<ProyectoDto>(`/projects/${data.id}/status`, data.status, {
-        headers: { 'Content-Type': 'application/json' }
-      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
     }
@@ -88,22 +76,13 @@ export const ProjectManagePage: React.FC = () => {
           throw new Error("Missing required field: categoria");
         }
         await updateMutation.mutateAsync({ id: id as string, payload: data });
-        if ("fotosNuevas" in data && data.fotosNuevas && data.fotosNuevas.length > 0) {
-          await Promise.all(data.fotosNuevas.map((file: File) => {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("tipoDocumento", "1");
-            return apiClient.post(`/projects/${id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }));
-          qc.invalidateQueries({ queryKey: ["projects"] });
-        }
         addToast("Proyecto actualizado exitosamente", "success");
         navigate("/admin/projects");
       } else {
         if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
           throw new Error("Missing required field: usuarioCreadorId");
         }
-        const newProj = await createMutation.mutateAsync({
+        await createMutation.mutateAsync({
           nombre: data.nombre,
           ubicacionTexto: data.ubicacionTexto || "",
           categoria: data.categoria,
@@ -111,34 +90,25 @@ export const ProjectManagePage: React.FC = () => {
           datosDesarrollador: data.datosDesarrollador,
           rncDesarrollador: data.rncDesarrollador,
           designacionCatastral: data.designacionCatastral,
-          ubicacionGps: data.ubicacionGps
+          ubicacionGps: data.ubicacionGps,
+          matricula: data.matricula,
+          propietario: data.propietario,
+          cedulaRncPropietario: data.cedulaRncPropietario,
+          ipi: data.ipi,
+          estatusIpi: data.estatusIpi,
+          superficieM2: data.superficieM2,
+          imagenUrl: data.imagenUrl,
+          imagenAdicional1: data.imagenAdicional1,
+          imagenAdicional2: data.imagenAdicional2,
+          imagenAdicional3: data.imagenAdicional3,
+          imagenAdicional4: data.imagenAdicional4,
+          imagenAdicional5: data.imagenAdicional5
         });
-        const fotos = (data as any).fotosNuevas as File[];
-        if (fotos && fotos.length > 0) {
-          await Promise.all(fotos.map((file: File) => {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("tipoDocumento", "1");
-            return apiClient.post(`/projects/${newProj.id}/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-          }));
-          qc.invalidateQueries({ queryKey: ["projects"] });
-        }
         addToast("Proyecto creado exitosamente", "success");
         navigate("/admin/projects");
       }
     } catch (error) {
       addToast("Error al guardar el proyecto", "error");
-    }
-  };
-
-  const handleStatusChange = async (status: ProjectStatus) => {
-    if (!id) return;
-    try {
-      sanitizeStatus(status);
-      await updateStatusMutation.mutateAsync({ id: id as string, status });
-      addToast("Estado actualizado exitosamente", "success");
-    } catch {
-      addToast("Error al actualizar el estado", "error");
     }
   };
 
@@ -210,6 +180,10 @@ export const ProjectManagePage: React.FC = () => {
         </div>
       </dialog>
 
+      {isEditing && project && (
+        <ProjectStatusBar projectId={project.id} currentStatus={project.estadoProyecto} />
+      )}
+
       {/* Title moved to layout */}
       <ProjectForm
         key={project?.id || 'new'}
@@ -218,32 +192,6 @@ export const ProjectManagePage: React.FC = () => {
         onCancel={() => navigate("/admin/projects")}
         onDelete={handleDelete}
       />
-
-      {isEditing && project && (
-        <div className="mt-8 space-y-4">
-          {/* Status management */}
-          <div className="bg-[var(--color-surface-primary)] p-5 rounded-lg">
-            <h2 className="text-base font-bold text-[var(--color-text-strong)] mb-3">
-              Gestion de Estado
-            </h2>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {[ProjectStatus.Draft, ProjectStatus.InReview, ProjectStatus.Published, ProjectStatus.Observed].map((status) => (
-                <button type="button"
-                  key={status}
-                  onClick={() => handleStatusChange(status)}
-                  className="bg-[var(--color-brand-primary)]/10 hover:bg-[var(--color-brand-primary)]/20 text-[var(--color-text-strong)] py-2 px-4 rounded-lg"
-                >
-                  {getStatusLabel(status, t)}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-[var(--color-text-strong)] opacity-50">
-              Estado actual: <strong>{getStatusLabel(project.estadoProyecto, t)}</strong>
-            </p>
-          </div>
-
-        </div>
-      )}
     </div>
   );
 };

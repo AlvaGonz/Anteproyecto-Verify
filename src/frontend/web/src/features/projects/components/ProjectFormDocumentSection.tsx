@@ -39,7 +39,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
       </div>
     )}
 
-    <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8 md:gap-10">
+    <div className="grid grid-cols-1 md:grid-cols-[140px_1fr] gap-4 md:gap-3">
       {/* ── PORTADA ── */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 mb-1">
@@ -50,41 +50,41 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
 
         {/* Slot portada */}
         {portraitPreview ? (
-          <div className="relative w-full max-w-[280px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md group">
             <img
               src={portraitPreview}
               alt="Vista previa de portada"
               className="w-full h-full object-cover"
-              loading="lazy"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
-            <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[10px] font-black uppercase tracking-wider text-center py-1">
-              Portada
+            <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
+              PORTADA
             </div>
             <button
               type="button"
               onClick={removePortrait}
               aria-label="Quitar foto de portada"
-              className="absolute top-2 right-2 w-7 h-7 bg-black/50 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors"
+              className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
             >
-              <X className="w-3.5 h-3.5 text-white" />
+              <X className="w-3 h-3 text-white" />
             </button>
           </div>
         ) : existingFotoUrls[0] ? (
-          <div className="relative w-full max-w-[280px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md">
+          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md group">
             <img
               src={existingFotoUrls[0]}
               alt="Portada actual"
               className="w-full h-full object-cover"
               loading="lazy"
             />
-            <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[10px] font-black uppercase tracking-wider text-center py-1">
-              Portada activa
+            <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
+              PORTADA
             </div>
             <button
               type="button"
               onClick={() => portraitInputRef.current?.click()}
               aria-label="Cambiar foto de portada"
-              className="absolute top-2 left-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold rounded-lg hover:bg-black/80 transition-colors"
+              className="absolute top-2 right-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold rounded-lg hover:bg-black/80 transition-colors opacity-0 group-hover:opacity-100 whitespace-nowrap"
             >
               Cambiar
             </button>
@@ -95,7 +95,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
             id="btn-agregar-portada"
             onClick={() => portraitInputRef.current?.click()}
             aria-label="Subir foto de portada"
-            className="w-full max-w-[280px] aspect-square rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center justify-center gap-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+            className="w-full max-w-[140px] aspect-square rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center justify-center gap-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
           >
             <ImagePlus className="w-8 h-8 text-amber-400" />
             <span className="text-xs font-bold text-amber-500 uppercase tracking-wide">
@@ -115,6 +115,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
         />
       </div>
 
+
       {/* ── GALERÍA ── */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -127,7 +128,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
           </span>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {/* Fotos de galería existentes (edit mode) */}
           {existingFotoUrls.slice(1).map((url, idx) => (
             <div key={`existing-${url}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
@@ -137,11 +138,8 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
 
           {/* Previews de galería nuevas */}
           {galleryPreviews.map((preview, idx) => (
-            <div key={`preview-${preview}`} className="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-dashed border-teal-300">
+            <div key={`preview-${preview}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
               <img src={preview} alt={`Nueva foto ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
-              <div className="absolute bottom-0 inset-x-0 bg-teal-500/80 text-white text-[9px] font-black uppercase tracking-wider text-center py-0.5">
-                Por subir
-              </div>
               <button
                 type="button"
                 onClick={() => removeGalleryPhoto(idx)}

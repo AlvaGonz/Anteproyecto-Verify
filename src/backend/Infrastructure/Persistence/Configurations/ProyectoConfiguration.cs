@@ -17,6 +17,11 @@ public class ProyectoConfiguration : IEntityTypeConfiguration<Proyecto>
         builder.Property(p => p.UbicacionTexto).IsRequired().HasMaxLength(500);
         builder.Property(p => p.UbicacionGps).HasMaxLength(100);
         builder.Property(p => p.ImagenUrl).HasMaxLength(2048);
+        builder.Property(p => p.ImagenAdicional1).HasMaxLength(2048);
+        builder.Property(p => p.ImagenAdicional2).HasMaxLength(2048);
+        builder.Property(p => p.ImagenAdicional3).HasMaxLength(2048);
+        builder.Property(p => p.ImagenAdicional4).HasMaxLength(2048);
+        builder.Property(p => p.ImagenAdicional5).HasMaxLength(2048);
         builder.Property(p => p.Propietario).HasMaxLength(200);
         builder.Property(p => p.CedulaRncPropietario).HasMaxLength(50);
         builder.Property(p => p.Ipi).HasMaxLength(50);

@@ -16,6 +16,17 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
   const totalPages = Math.ceil(recentProjects.length / itemsPerPage);
   const paginatedProjects = recentProjects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  const translateStatus = (status: string) => {
+    const map: Record<string, string> = {
+      Draft: "Borrador",
+      InReview: "En revisión",
+      Published: "Publicado",
+      Observed: "Observado",
+      Verified: "Verificado",
+    };
+    return map[status] || status;
+  };
+
   return (
   <m.div
     initial={{ opacity: 0, x: -20 }}
@@ -81,8 +92,8 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
 
                     <div className="flex items-center gap-6">
                       <div className="hidden sm:block text-right">
-                        <span className={`vf-badge ${p.estado === "Verified" ? "vf-badge-success" : p.estado === "InReview" ? "vf-badge-warning" : "vf-badge-default"}`}>
-                          {p.estado}
+                        <span className={`vf-badge ${p.estado === "Verified" || p.estado === "Published" ? "vf-badge-success" : p.estado === "InReview" ? "vf-badge-warning" : "vf-badge-default"}`}>
+                          {translateStatus(p.estado)}
                         </span>
                       </div>
                     </div>

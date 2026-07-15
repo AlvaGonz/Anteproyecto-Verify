@@ -11,10 +11,6 @@ namespace Infrastructure.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
-
-
-
             migrationBuilder.AddColumn<string>(
                 name: "EstatusIpi",
                 table: "ProyectosInmobiliarios",
@@ -25,13 +21,6 @@ namespace Infrastructure.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
-
-            migrationBuilder.DropColumn(
-                name: "EstatusIpi",
-                table: "ProyectosInmobiliarios");
-
-
         }
     }
 }

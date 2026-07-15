@@ -36,6 +36,11 @@ export interface ProyectoDto {
   createdAtUtc: string;
   updatedAtUtc?: string;
   imagenUrl?: string;
+  imagenAdicional1?: string;
+  imagenAdicional2?: string;
+  imagenAdicional3?: string;
+  imagenAdicional4?: string;
+  imagenAdicional5?: string;
   completionRate?: number;
   superficieM2?: number;
   fotoUrls?: string[];
@@ -57,6 +62,12 @@ export interface CreateProyectoDto {
   ipi?: string;
   estatusIpi?: string;
   superficieM2?: number;
+  imagenUrl?: string;
+  imagenAdicional1?: string;
+  imagenAdicional2?: string;
+  imagenAdicional3?: string;
+  imagenAdicional4?: string;
+  imagenAdicional5?: string;
 }
 
 export interface UpdateProyectoDto {
@@ -75,6 +86,12 @@ export interface UpdateProyectoDto {
   estatusIpi?: string;
   superficieM2?: number;
   fotosNuevas?: File[];
+  imagenUrl?: string;
+  imagenAdicional1?: string;
+  imagenAdicional2?: string;
+  imagenAdicional3?: string;
+  imagenAdicional4?: string;
+  imagenAdicional5?: string;
 }
 
 export enum ProjectCategory {
@@ -92,6 +109,12 @@ export enum ProjectStatus {
   Observed = 3,
   Validated = 4,
   Rejected = 5,
+}
+
+export interface StatusEligibility {
+  documentCount: number;
+  hasObservaciones: boolean;
+  currentStatus: ProjectStatus;
 }
 
 export enum LegalStatus {
@@ -176,4 +199,5 @@ export interface CatastroLookupDto {
   cedulaRncPropietario?: string;
   ipi?: string;
   estatusIpi?: string;
+  provincia?: string;
 }

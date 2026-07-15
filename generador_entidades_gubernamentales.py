@@ -111,7 +111,7 @@ def wait_for_database():
         time.sleep(2)
     return False
 
-wait_for_database()
+# wait_for_database() called in main()
 
 def get_db_connection():
     hosts_to_try = [conn_params["server"], "localhost", "127.0.0.1", "sqlserver"]
@@ -344,7 +344,9 @@ def insert_ipi_chunk(chunk_id, chunk_records):
             params_ipi = []
             for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"]])
             cursor.execute(sql_ipi, tuple(params_ipi))
-            conn.commit()
+            if (i + batch_size) % 15000 == 0:
+                conn.commit()
+        conn.commit()
         return len(chunk_records)
     except Exception as e:
         if conn:
@@ -354,32 +356,54 @@ def insert_ipi_chunk(chunk_id, chunk_records):
     finally:
         if conn: conn.close()
 
-def insert_catastro_ps_chunk(chunk_id, chunk_records):
-    print(f"[Catastro/PS Worker {chunk_id}] Inserting {len(chunk_records)} records...")
+def insert_catastro_chunk(chunk_id, chunk_records):
+    print(f"[Catastro Worker {chunk_id}] Inserting {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         ph = "%s" if db_lib == "pymssql" else "?"
-        batch_size = 100
+        batch_size = 200 # Incrementado a 200 para menos llamadas (límite 2100 params)
         for i in range(0, len(chunk_records), batch_size):
             batch = chunk_records[i:i+batch_size]
             
             sql_cat = f"INSERT INTO CatastroTitulo (IdCatastroTitulo, CodigoDesignacionCatastral, NumeroTitulo, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, Matricula) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
             params_cat = []
-            for cat_r, ps_r in batch: 
-                params_cat.extend([cat_r["id"], cat_r["dc"], cat_r["titulo"], cat_r["rnc"], cat_r["provincia"], cat_r["municipio"], cat_r["lat"], cat_r["lon"], cat_r["superficie"], cat_r["matricula"]])
+            for r in batch: 
+                params_cat.extend([r["id"], r["dc"], r["titulo"], r["rnc"], r["provincia"], r["municipio"], r["lat"], r["lon"], r["superficie"], r["matricula"]])
             cursor.execute(sql_cat, tuple(params_cat))
+            if (i + batch_size) % 10000 == 0:
+                conn.commit()
+        conn.commit()
+        return len(chunk_records)
+    except Exception as e:
+        if conn:
+            try: conn.rollback()
+            except: pass
+        raise e
+    finally:
+        if conn: conn.close()
+
+def insert_ps_chunk(chunk_id, chunk_records):
+    if not chunk_records: return 0
+    print(f"[PermisoSuelo Worker {chunk_id}] Inserting {len(chunk_records)} records...")
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        ph = "%s" if db_lib == "pymssql" else "?"
+        batch_size = 180 # Incrementado a 180 para menos llamadas
+        for i in range(0, len(chunk_records), batch_size):
+            batch = chunk_records[i:i+batch_size]
             
-            ps_batch = [ps_r for cat_r, ps_r in batch if ps_r is not None]
-            if ps_batch:
-                sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL)"] * len(ps_batch))
-                params_ps = []
-                for p in ps_batch:
-                    params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"]])
-                cursor.execute(sql_ps, tuple(params_ps))
-                
-            conn.commit()
+            sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL)"] * len(batch))
+            params_ps = []
+            for p in batch:
+                params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"]])
+            cursor.execute(sql_ps, tuple(params_ps))
+            if (i + batch_size) % 10000 == 0:
+                conn.commit()
+        conn.commit()
         return len(chunk_records)
     except Exception as e:
         if conn:
@@ -390,6 +414,7 @@ def insert_catastro_ps_chunk(chunk_id, chunk_records):
         if conn: conn.close()
 
 def main():
+    wait_for_database()
     file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Bots", "DGII", "src", "DGII_RNC.TXT"))
     if not os.path.exists(file_path):
         print(f"Error: DGII source file not found at {file_path}")
@@ -414,45 +439,87 @@ def main():
     print(f"Loaded {len(rncs_list)} unique RNCs.")
     
     t_start = time.time()
-    futures = []
     
     # Generate IPI
     print("Submitting IPI tasks...")
-    chunk_size = 50000
+    chunk_size = 150000
     current_chunk = []
     chunk_count = 0
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    t_ipi_start = time.time()
+    
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        futures_ipi = []
         for rec in generate_ipi_records(rncs_list):
             current_chunk.append(rec)
             if len(current_chunk) >= chunk_size:
                 chunk_count += 1
-                futures.append(executor.submit(insert_ipi_chunk, f"IPI_{chunk_count}", current_chunk))
+                futures_ipi.append(executor.submit(insert_ipi_chunk, f"IPI_{chunk_count}", current_chunk))
                 current_chunk = []
         if current_chunk:
             chunk_count += 1
-            futures.append(executor.submit(insert_ipi_chunk, f"IPI_{chunk_count}", current_chunk))
+            futures_ipi.append(executor.submit(insert_ipi_chunk, f"IPI_{chunk_count}", current_chunk))
             
-        print("Submitting CatastroTitulo and PermisoSuelo tasks...")
-        catastro_chunk = []
-        c_count = 0
-        for rec in generate_catastro_ps_records(rncs_list):
-            catastro_chunk.append(rec)
+        print("Waiting for IPI completion...")
+        for fut in as_completed(futures_ipi):
+            try:
+                fut.result()
+            except Exception as e:
+                print(f"Worker error IPI: {e}")
+                
+    t_ipi_end = time.time()
+            
+    print("Submitting CatastroTitulo and PermisoSuelo tasks simultaneously...")
+    catastro_chunk = []
+    ps_chunk = []
+    c_count = 0
+    p_count = 0
+    t_cat_ps_start = time.time()
+    
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        futures_cat_ps = []
+        for cat_r, ps_r in generate_catastro_ps_records(rncs_list):
+            catastro_chunk.append(cat_r)
+            if ps_r is not None:
+                ps_chunk.append(ps_r)
+                
             if len(catastro_chunk) >= chunk_size:
                 c_count += 1
-                futures.append(executor.submit(insert_catastro_ps_chunk, f"CAT_PS_{c_count}", catastro_chunk))
+                futures_cat_ps.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
                 catastro_chunk = []
+                
+            if len(ps_chunk) >= chunk_size:
+                p_count += 1
+                futures_cat_ps.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
+                ps_chunk = []
+                
         if catastro_chunk:
             c_count += 1
-            futures.append(executor.submit(insert_catastro_ps_chunk, f"CAT_PS_{c_count}", catastro_chunk))
+            futures_cat_ps.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
             
-    print("Waiting for completion...")
-    for fut in as_completed(futures):
-        try:
-            fut.result()
-        except Exception as e:
-            print(f"Worker error: {e}")
+        if ps_chunk:
+            p_count += 1
+            futures_cat_ps.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
             
-    print(f"Generation completed in {time.time() - t_start:.2f} seconds.")
+        print("Waiting for Catastro and PermisoSuelo completion...")
+        for fut in as_completed(futures_cat_ps):
+            try:
+                fut.result()
+            except Exception as e:
+                print(f"Worker error CAT/PS: {e}")
+                
+    t_cat_ps_end = time.time()
+            
+    t_total = time.time() - t_start
+    m_ipi, s_ipi = divmod(t_ipi_end - t_ipi_start, 60)
+    m_cat_ps, s_cat_ps = divmod(t_cat_ps_end - t_cat_ps_start, 60)
+    m_tot, s_tot = divmod(t_total, 60)
+    
+    print("\n" + "="*50)
+    print("--- Resumen Final de Generación ---")
+    print(f"IPI: {int(m_ipi)} minutos {int(s_ipi)} segundos")
+    print(f"Catastro y PermisoSuelo (Simultáneo): {int(m_cat_ps)} minutos {int(s_cat_ps)} segundos")
+    print(f"Tiempo Total: {int(m_tot)} minutos {int(s_tot)} segundos")
+    print("="*50 + "\n")
 
 if __name__ == "__main__":
     main()

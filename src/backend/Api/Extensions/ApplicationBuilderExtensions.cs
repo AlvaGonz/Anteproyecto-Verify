@@ -18,6 +18,12 @@ public static class ApplicationBuilderExtensions
 
         app.UseCors("ViteDev");
 
+        var wwwrootPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        if (!System.IO.Directory.Exists(wwwrootPath))
+        {
+            System.IO.Directory.CreateDirectory(wwwrootPath);
+        }
+
         app.UseStaticFiles();
         
         app.MapHealthChecks("/health", new HealthCheckOptions

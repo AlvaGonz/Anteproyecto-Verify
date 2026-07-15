@@ -74,4 +74,43 @@ public class ProyectoRepository : IProyectoRepository
     {
         _context.Proyectos.Remove(proyecto);
     }
+
+    /// <summary>
+    /// Deletes all related records with Restrict FK constraints before removing the project itself.
+    /// Necessary because SellosIntegridad, ResultadosCrediticios, LogProyectos, and Auditorias
+    /// use DeleteBehavior.Restrict — EF cannot cascade them automatically.
+    /// </summary>
+    public async Task DeleteWithRelatedDataAsync(Guid proyectoId, CancellationToken cancellationToken = default)
+    {
+        // 1. SellosIntegridad — Restrict on ProyectoId
+        var sellos = await _context.SellosIntegridad
+            .Where(s => s.ProyectoId == proyectoId)
+            .ToListAsync(cancellationToken);
+        _context.SellosIntegridad.RemoveRange(sellos);
+
+        // 2. ResultadosCrediticios — Restrict on ProyectoId
+        var resultadosCrediticios = await _context.ResultadosCrediticios
+            .Where(r => r.ProyectoId == proyectoId)
+            .ToListAsync(cancellationToken);
+        _context.ResultadosCrediticios.RemoveRange(resultadosCrediticios);
+
+        // 3. LogProyectos — Restrict on ProyectoId
+        var logs = await _context.LogProyectos
+            .Where(l => l.ProyectoId == proyectoId)
+            .ToListAsync(cancellationToken);
+        _context.LogProyectos.RemoveRange(logs);
+
+        // 4. Auditorias — Restrict on ProyectoId
+        var auditorias = await _context.Auditorias
+            .Where(a => a.ProyectoId == proyectoId)
+            .ToListAsync(cancellationToken);
+        _context.Auditorias.RemoveRange(auditorias);
+
+        // 5. Remove the project (Documentos, Validaciones, Hallazgos, Reportes cascade automatically)
+        var proyecto = await _context.Proyectos.FindAsync(new object[] { proyectoId }, cancellationToken);
+        if (proyecto == null)
+            throw new KeyNotFoundException($"Project with id {proyectoId} not found.");
+
+        _context.Proyectos.Remove(proyecto);
+    }
 }

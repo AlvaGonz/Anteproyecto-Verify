@@ -50,15 +50,8 @@ export const useCreateProject = () => {
     mutationKey: ['projectKeys'],
     mutationFn: (data: CreateProyectoDto) =>
       apiClient.post<ApiProyectoDto>("/projects", {
-        nombre: data.nombre,
-        ubicacionTexto: data.ubicacionTexto,
+        ...data,
         categoria: data.categoria ?? ProjectCategory.Residencial,
-        usuarioCreadorId: data.usuarioCreadorId,
-        datosDesarrollador: data.datosDesarrollador,
-        rncDesarrollador: data.rncDesarrollador,
-        designacionCatastral: data.designacionCatastral,
-        ubicacionGps: data.ubicacionGps,
-        matricula: data.matricula
       }).then(res => mapApiProject(res.data)),
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
   });

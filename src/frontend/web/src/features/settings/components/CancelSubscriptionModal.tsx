@@ -60,7 +60,7 @@ export const CancelSubscriptionModal: React.FC<CancelSubscriptionModalProps> = (
             {/* Content Area */}
             <div className="p-6 md:p-8 flex flex-col">
               <p className="text-text-secondary mb-6 text-sm leading-relaxed">
-                ¿Estás seguro de que deseas cancelar tu suscripción? Tu plan actual y sus beneficios se mantendrán activos hasta el <strong>final del período facturado</strong>. Después de eso, tu cuenta pasará automáticamente al plan gratuito.
+                ¿Estás seguro de que deseas cancelar tu suscripción? Tu plan actual y sus beneficios se mantendrán activos hasta el <strong>final del período facturado</strong>. Después de eso, tu cuenta pasará automáticamente al plan consultor.
               </p>
 
               <div className="space-y-2 mb-2">

@@ -16,9 +16,11 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
   ubicacionGps,
   designacionCatastral,
   matricula,
+  setMatricula: _setMatricula,
   valorEstimado,
   setValorEstimado,
   superficieM2,
+  setSuperficieM2: _setSuperficieM2,
 }) => (
   <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
     <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">

@@ -157,11 +157,11 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                 <label htmlFor="uf-plan" className="block text-xs font-bold text-text-secondary uppercase mb-1">Plan de Suscripción</label>
                 <select
                   id="uf-plan"
-                  value={formData.planNombre || "Gratuito"}
+                  value={formData.planNombre || "Consultor"}
                   onChange={e => update({ planNombre: e.target.value })}
                   className="vf-input w-full bg-white"
                 >
-                  <option value="Gratuito">Gratuito</option>
+                  <option value="Consultor">Consultor</option>
                   <option value="Profesional">Profesional</option>
                   <option value="Empresa">Empresa</option>
                   <option value="Corporativo">Corporativo</option>

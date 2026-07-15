@@ -10,6 +10,11 @@ public record ProyectoDto(
     string UbicacionTexto,
     string? UbicacionGps,
     string? ImagenUrl,
+    string? ImagenAdicional1,
+    string? ImagenAdicional2,
+    string? ImagenAdicional3,
+    string? ImagenAdicional4,
+    string? ImagenAdicional5,
     decimal? ValorEstimado,
     ProjectCategory Categoria,
     string? DatosDesarrollador,
@@ -57,5 +62,11 @@ public record CreateProyectoDto(
     string? CedulaRncPropietario = null,
     string? Ipi = null,
     string? EstatusIpi = null,
-    decimal? SuperficieM2 = null
+    decimal? SuperficieM2 = null,
+    string? ImagenUrl = null,
+    string? ImagenAdicional1 = null,
+    string? ImagenAdicional2 = null,
+    string? ImagenAdicional3 = null,
+    string? ImagenAdicional4 = null,
+    string? ImagenAdicional5 = null
 );

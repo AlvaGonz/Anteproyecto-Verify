@@ -14,6 +14,8 @@ using Domain.Entities;
 using Domain.Enums;
 using Application.Features.Auth.Commands.UploadAvatar;
 using Application.Features.Auth.Commands.ResendVerificationEmail;
+using Application.Features.Auth.Commands.ForgotPassword;
+using Application.Features.Auth.Commands.ResetPassword;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +58,10 @@ public class AuthControllerTests
         var uploadAvatarHandler = new UploadAvatarCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
         var mockValidatorResend = new Mock<FluentValidation.IValidator<ResendVerificationEmailCommand>>();
         var resendEmailHandler = new ResendVerificationEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object, mockValidatorResend.Object, mockEmailService.Object);
+        var mockValidatorForgotPassword = new Mock<FluentValidation.IValidator<ForgotPasswordCommand>>();
+        var forgotPasswordHandler = new ForgotPasswordCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object, mockValidatorForgotPassword.Object, mockEmailService.Object);
+        var mockValidatorResetPassword = new Mock<FluentValidation.IValidator<ResetPasswordCommand>>();
+        var resetPasswordHandler = new ResetPasswordCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object, mockValidatorResetPassword.Object);
         var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
 
         _controller = new AuthController(
@@ -65,8 +71,8 @@ public class AuthControllerTests
             updateProfileHandler,
             uploadAvatarHandler,
             resendEmailHandler,
-            null!, // forgotPasswordHandler
-            null!, // resetPasswordHandler
+            forgotPasswordHandler,
+            resetPasswordHandler,
             _usuarioRepositoryMock.Object, 
             mockConfig.Object,
             mockJwtTokenGenerator.Object,

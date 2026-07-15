@@ -20,6 +20,7 @@ public class CatastroController : ControllerBase
     }
 
     [HttpGet("lookup")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LookupCatastroByGps([FromQuery] string latitud, [FromQuery] string longitud)
