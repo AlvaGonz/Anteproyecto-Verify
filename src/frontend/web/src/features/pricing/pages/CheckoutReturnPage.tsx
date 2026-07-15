@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import apiClient from '../../../infrastructure/api/client'
 import { useAuth } from '../../../shared/context/AuthContext'
 import { resolvePostCheckoutState } from '../utils/postCheckoutResolver'
+import { normalizePlanKey, PLAN_CAPABILITIES } from '../utils/planCapabilities'
 type PageStatus = 'loading' | 'success' | 'error'
 
 // Module-level — never persisted to disk, cleared on full navigation
@@ -193,7 +194,12 @@ export const CheckoutReturnPage = () => {
 
           // Fix: use safeNavigate (react-router navigate) instead of window.location.href
           // to avoid pathname contamination in HashRouter (#/admin/dashboard not /admin/dashboard#/admin/dashboard)
-          safeNavigate('/admin/dashboard', { replace: true })
+          const currentPlan = user?.plan ?? data.plan;
+          const capabilities = PLAN_CAPABILITIES[normalizePlanKey(currentPlan)];
+          safeNavigate('/admin/dashboard', {
+            replace: true,
+            state: { planJustActivated: true, activatedPlan: capabilities }
+          })
           _processedSessions.add(sessionId)
 
         } catch {

@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
-import { CheckCircle2, X } from 'lucide-react'
+import { useEffect, useCallback, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { CheckCircle2 } from 'lucide-react'
 import { PlanCapabilities } from '../utils/planCapabilities'
 
 interface Props {
@@ -8,67 +9,95 @@ interface Props {
 }
 
 /*
-  Renders a top-of-dashboard dismissible banner celebrating plan activation.
+  Renders a centered modal popup celebrating plan activation.
   Shows unlocked capabilities specific to the plan.
-  Auto-dismisses after 12 seconds.
+  Dismiss on: button click, Escape key, backdrop click.
 */
 export const PlanActivatedBanner: React.FC<Props> = ({ plan, onDismiss }) => {
+  const navigate = useNavigate()
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // ponytail: Escape key dismisses the modal — simplest keyboard support
   useEffect(() => {
-    const t = setTimeout(onDismiss, 12_000)
-    return () => clearTimeout(t)
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onDismiss() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
   }, [onDismiss])
 
   const capabilities = [
     plan.queriesPerMonth === 'unlimited'
       ? 'Consultas ilimitadas'
       : `${plan.queriesPerMonth} consultas/mes`,
-    plan.pdfReports && 'Reportes PDF',
+    plan.pdfReports && 'Reportes PDF descargables',
     plan.liensAlerts && 'Alertas de gravámenes',
     plan.multiUser && 'Multiusuario habilitado',
-    plan.apiAccess === 'full' && 'Multiusuarios (hasta 35)',
-    plan.apiAccess === 'basic' && 'API básica habilitada',
-    plan.prioritySupport && '5 proyectos registrables',
+    plan.apiAccess === 'full' && 'Acceso API completo',
+    plan.apiAccess === 'basic' && 'Acceso API básico',
+    plan.prioritySupport && 'Soporte prioritario',
   ].filter(Boolean) as string[]
 
   return (
     <div
-      role="status"
-      aria-live="polite"
-      className={`
-        relative flex items-start gap-4 rounded-2xl border p-5 shadow-sm
-        animate-in slide-in-from-top-2 fade-in duration-500
-        ${plan.bgColor}
-      `}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
+      onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Plan ${plan.label} activado`}
     >
-      <CheckCircle2 className={`w-6 h-6 mt-0.5 flex-shrink-0 ${plan.color}`} />
-      <div className="flex-1 min-w-0">
-        <p className={`font-bold text-base ${plan.color}`}>
-          ¡Plan {plan.label} activado! 🎉
+      <div
+        ref={panelRef}
+        className={`
+          relative mx-4 w-full max-w-md rounded-3xl border-2 p-8 shadow-2xl
+          animate-in zoom-in-95 fade-in slide-in-from-bottom-4 duration-500
+          ${plan.bgColor}
+        `}
+      >
+        {/* Close button */}
+        <button type="button"
+          onClick={onDismiss}
+          aria-label="Cerrar"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-text-secondary hover:text-text-primary hover:bg-black/5 transition-colors"
+        >
+          <span className="material-symbols-outlined text-xl">close</span>
+        </button>
+
+        {/* Icon */}
+        <div className="flex justify-center mb-6">
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${plan.color.replace('text-', 'bg-').replace('700', '100')} bg-opacity-20`}>
+            <span className={`material-symbols-outlined text-4xl ${plan.color}`}>verified</span>
+          </div>
+        </div>
+
+        {/* Title */}
+        <p className={`text-center font-bold text-xl mb-1 ${plan.color}`}>
+          ¡Plan {plan.label} activado!
         </p>
-        <p className="text-sm text-text-secondary mt-0.5">
-          Ahora tienes acceso a:
+        <p className="text-center text-sm text-text-secondary mb-6">
+          Tu suscripción ya está activa. Estos son tus nuevos beneficios:
         </p>
-        <ul className="mt-2 flex flex-wrap gap-2">
+
+        {/* Capabilities */}
+        <ul className="space-y-3 mb-8">
           {capabilities.map((cap) => (
-            <li
-              key={cap}
-              className={`
-                text-xs font-semibold px-2.5 py-1 rounded-full border
-                ${plan.bgColor} ${plan.color}
-              `}
-            >
-              ✓ {cap}
+            <li key={cap} className="flex items-center gap-3 text-sm font-medium text-text-primary">
+              <span className={`material-symbols-outlined text-lg ${plan.color}`}>check_circle</span>
+              {cap}
             </li>
           ))}
         </ul>
+
+        {/* CTA */}
+        <button type="button"
+          onClick={onDismiss}
+          className={`w-full py-3 rounded-xl font-bold text-sm transition-all shadow-lg
+            ${plan.color.includes('primary') ? 'bg-primary text-on-primary hover:bg-primary/90' :
+              plan.color.includes('secondary') ? 'bg-secondary text-on-secondary hover:bg-secondary/90' :
+              'bg-surface text-on-surface hover:bg-surface-variant border border-outline-variant'}
+          `}
+        >
+          Ir al Dashboard
+        </button>
       </div>
-      <button type="button"
-        onClick={onDismiss}
-        aria-label="Cerrar notificación"
-        className="flex-shrink-0 text-text-secondary hover:text-text-primary transition-colors"
-      >
-        <X className="w-4 h-4" />
-      </button>
     </div>
   )
 }

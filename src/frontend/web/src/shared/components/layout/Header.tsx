@@ -23,7 +23,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 w-full h-20 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-8">
+    <header className="sticky top-0 z-20 w-full h-16 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-8">
       <div className="flex items-center gap-4">
         {onMenuClick && (
           <button type="button"
@@ -33,25 +33,8 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
             <Menu className="w-5 h-5 text-gray-500" />
           </button>
         )}
-        <div className="flex flex-col">
-          <h1 className="text-xl font-display font-black text-gray-900 tracking-tight">
-            {title}
-          </h1>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              SISTEMA ACTIVO
-            </span>
-          </div>
-        </div>
       </div>
-
-      <div className="hidden md:flex flex-1 max-w-md mx-12">
-      </div>
-
       <div className="flex items-center gap-3">
-        {/* VeriFinca AI Status */}
-
         <NotificationBell />
       </div>
     </header>

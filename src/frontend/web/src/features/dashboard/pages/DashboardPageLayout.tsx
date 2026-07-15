@@ -56,9 +56,7 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
   return (
     <div className="animate-fade-in">
       {showBanner && activatedPlan && (
-        <div className="max-w-4xl mx-auto px-4 pt-4 mb-4">
-          <PlanActivatedBanner plan={activatedPlan} onDismiss={handleDismissBanner} />
-        </div>
+        <PlanActivatedBanner plan={activatedPlan} onDismiss={handleDismissBanner} />
       )}
       <div className="animate-fade-in space-y-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
