@@ -125,7 +125,7 @@ def wait_for_database():
     print(f"[WaitDB] Database '{target_db}' not found after 60 attempts. Proceeding anyway (will fail gracefully).")
     return False
 
-wait_for_database()
+# wait_for_database() is called in main()
 
 def get_db_connection():
     hosts_to_try = [conn_params["server"], "localhost", "127.0.0.1", "sqlserver"]
@@ -262,6 +262,7 @@ def insert_chunk(chunk_id, chunk_records):
         if conn: conn.close()
 
 def main():
+    wait_for_database()
     base_dir = os.path.dirname(__file__)
     file_path = os.path.abspath(os.path.join(base_dir, "..", "src", "DGII_RNC.TXT"))
     
@@ -298,13 +299,13 @@ def main():
 
     records_generator = parse_dgii_file(file_path)
     
-    chunk_size = 100000
+    chunk_size = 150000
     current_chunk = []
     chunk_count = 0
     futures = []
     t_start = time.time()
     
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    with ThreadPoolExecutor(max_workers=12) as executor:
         for record in records_generator:
             current_chunk.append(record)
             if len(current_chunk) >= chunk_size:
@@ -327,7 +328,14 @@ def main():
                 print(f"A thread worker encountered an error: {e}")
                 
     t_end = time.time()
-    print(f"Mounting completed! Total rows inserted: {total_rows} in {t_end - t_start:.2f} seconds.")
+    t_total = t_end - t_start
+    m, s = divmod(t_total, 60)
+    
+    print("\n" + "="*50)
+    print("--- Resumen Final DGII ---")
+    print(f"Total de registros insertados: {total_rows}")
+    print(f"Tiempo Total: {int(m)} minutos {int(s)} segundos")
+    print("="*50 + "\n")
 
 if __name__ == "__main__":
     main()

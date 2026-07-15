@@ -38,7 +38,7 @@ public class AzureBlobStorageService : IBlobStorageService
             await stream.CopyToAsync(fileStream, cancellationToken);
         }
 
-        return $"http://localhost:5000/uploads/{string.Join("/", parts)}";
+        return $"http://localhost:5000/uploads/{fileName.Replace("\\", "/")}";
     }
 
     public Task<(Stream Stream, string ContentType)> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
