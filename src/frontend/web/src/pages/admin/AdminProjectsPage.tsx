@@ -5,6 +5,7 @@ import { ProjectStatus } from "../../features/projects/types";
 import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
 import { Building, FileCheck, Activity } from "lucide-react";
 import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
+import { toUtcDate } from "../../shared/utils/dates";
 
 export const AdminProjectsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -53,7 +54,7 @@ export const AdminProjectsPage: React.FC = () => {
       (p.ubicacionGps && p.ubicacionGps.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (p.datosDesarrollador && p.datosDesarrollador.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (p.rncDesarrollador && p.rncDesarrollador.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.createdAtUtc && new Date(p.createdAtUtc).toLocaleDateString().includes(searchTerm)) ||
+      (p.createdAtUtc && toUtcDate(p.createdAtUtc)?.toLocaleDateString().includes(searchTerm)) ||
       (p.valorEstimado && String(p.valorEstimado).includes(searchTerm));
 
     if (selectedStatuses.length > 0) {

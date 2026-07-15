@@ -32,7 +32,20 @@ public record ProyectoDto(
     IntegrityStatus EstadoIntegridad,
     Guid UsuarioCreadorId,
     DateTime CreatedAtUtc,
-    DateTime? UpdatedAtUtc
+    DateTime? UpdatedAtUtc,
+    ProjectRegistrantDto? RegistradoPor = null
+);
+
+public record ProjectRegistrantDto(
+    Guid Id,
+    string NombreCompleto,
+    string? RazonSocial,
+    string Rol,
+    string Email,
+    string? Telefono,
+    string? AvatarUrl,
+    DateTime FechaRegistro,
+    bool Verificado
 );
 
 public record CreateProyectoDto(

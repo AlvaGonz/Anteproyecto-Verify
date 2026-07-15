@@ -20,4 +20,7 @@ public class PublicProjectSearchResultDto
     public int EstadoJuridico { get; set; }
     public int EstadoProyecto { get; set; }
     public int EstadoIntegridad { get; set; }
+    public string? Constructora { get; set; }
+    public string? Registrante { get; set; }
+    public string? ImagenUrl { get; set; }
 }

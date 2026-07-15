@@ -44,7 +44,7 @@ public class AuthControllerTests
         var mockJwtTokenGenerator = new Mock<global::Application.Abstractions.Security.IJwtTokenGenerator>();
         mockJwtTokenGenerator.Setup(j => j.GenerateToken(It.IsAny<Usuario>())).Returns("test-jwt-token");
         var verifyHandler = new VerifyEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
-        var loginHandler = new LoginUserCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, mockJwtTokenGenerator.Object);
+        var loginHandler = new LoginUserCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, mockJwtTokenGenerator.Object, uowMock.Object);
         var updateProfileHandler = new UpdateProfileCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object);
 
         var registerHandler = new RegisterUserCommandHandler(

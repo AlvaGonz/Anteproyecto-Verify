@@ -25,9 +25,9 @@ export const PlanActivatedBanner: React.FC<Props> = ({ plan, onDismiss }) => {
     plan.pdfReports && 'Reportes PDF',
     plan.liensAlerts && 'Alertas de gravámenes',
     plan.multiUser && 'Multiusuario habilitado',
-    plan.apiAccess === 'full' && 'API Full Access',
+    plan.apiAccess === 'full' && 'Multiusuarios (hasta 35)',
     plan.apiAccess === 'basic' && 'API básica habilitada',
-    plan.prioritySupport && 'Soporte prioritario',
+    plan.prioritySupport && '5 proyectos registrables',
   ].filter(Boolean) as string[]
 
   return (

@@ -46,15 +46,6 @@ export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({
             </tr>
           </thead>
           <tbody className="font-body text-sm">
-            {/* Group: Capacidad */}
-            <tr className="bg-surface-variant">
-              <td
-                className="py-2 px-6 font-bold text-on-surface-variant uppercase text-xs tracking-wider"
-                colSpan={5}
-              >
-                {t("pricing.comparison.capHeader")}
-              </td>
-            </tr>
             <tr className="bg-surface border-b border-outline-variant/30">
               <td className="py-3 px-6 text-on-surface">
                 {t("pricing.comparison.limit")}
@@ -74,108 +65,44 @@ export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({
             </tr>
             <tr className="bg-surface-variant border-b border-outline-variant/30">
               <td className="py-3 px-6 text-on-surface">
-                {t("pricing.comparison.history")}
+                {t("pricing.comparison.projects")}
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-outline text-sm">
-                  {ICONS.close}
-                </span>
+                1
               </td>
-              <td className="py-3 px-6 text-center text-primary bg-primary/5">
-                <span className="material-symbols-outlined text-sm">
-                  {ICONS.check}
-                </span>
-              </td>
-              <td className="py-3 px-6 text-center text-secondary">
-                <span className="material-symbols-outlined text-sm">
-                  {ICONS.check}
-                </span>
+              <td className="py-3 px-6 text-center font-bold text-primary bg-primary/5">
+                5
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-sm">
-                  {ICONS.check}
-                </span>
-              </td>
-            </tr>
-            {/* Group: Integración */}
-            <tr className="bg-surface-variant">
-              <td
-                className="py-2 px-6 font-bold text-on-surface-variant uppercase text-xs tracking-wider mt-4"
-                colSpan={5}
-              >
-                {t("pricing.comparison.intHeader")}
-              </td>
-            </tr>
-            <tr className="bg-surface border-b border-outline-variant/30">
-              <td className="py-3 px-6 text-on-surface">
-                {t("pricing.comparison.pdf")}
+                30
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-outline text-sm">
-                  {ICONS.close}
-                </span>
-              </td>
-              <td className="py-3 px-6 text-center text-primary bg-primary/5">
-                <span className="material-symbols-outlined text-sm">
-                  {ICONS.check}
-                </span>
-              </td>
-              <td className="py-3 px-6 text-center text-secondary">
-                <span className="material-symbols-outlined text-sm">
-                  {ICONS.check}
-                </span>
-              </td>
-              <td className="py-3 px-6 text-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-sm">
-                  {ICONS.check}
-                </span>
-              </td>
-            </tr>
-            <tr className="bg-surface-variant border-b border-outline-variant/30">
-              <td className="py-3 px-6 text-on-surface">
-                {t("pricing.comparison.api")}
-              </td>
-              <td className="py-3 px-6 text-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-outline text-sm">
-                  {ICONS.close}
-                </span>
-              </td>
-              <td className="py-3 px-6 text-center text-primary bg-primary/5">
-                <span className="material-symbols-outlined text-outline text-sm">
-                  {ICONS.close}
-                </span>
-              </td>
-              <td className="py-3 px-6 text-center text-secondary">
-                {t("pricing.comparison.basic")}
-              </td>
-              <td className="py-3 px-6 text-center text-on-surface-variant">
-                {t("pricing.comparison.complete")}
-              </td>
-            </tr>
-            {/* Group: Soporte */}
-            <tr className="bg-surface-variant">
-              <td
-                className="py-2 px-6 font-bold text-on-surface-variant uppercase text-xs tracking-wider mt-4"
-                colSpan={5}
-              >
-                {t("pricing.comparison.supportHeader")}
+                50
               </td>
             </tr>
             <tr className="bg-surface">
               <td className="py-3 px-6 text-on-surface">
-                {t("pricing.comparison.supportLevel")}
+                {t("pricing.comparison.qrProjects")}
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
-                {t("pricing.comparison.community")}
+                <span className="material-symbols-outlined text-outline text-sm">
+                  {ICONS.close}
+                </span>
               </td>
               <td className="py-3 px-6 text-center text-primary bg-primary/5">
-                {t("pricing.comparison.email")}
+                <span className="material-symbols-outlined text-sm">
+                  {ICONS.check}
+                </span>
               </td>
               <td className="py-3 px-6 text-center text-secondary">
-                {t("pricing.comparison.priority")}
+                <span className="material-symbols-outlined text-sm">
+                  {ICONS.check}
+                </span>
               </td>
-              <td className="py-3 px-6 text-center font-semibold text-on-surface">
-                {t("pricing.comparison.manager")}
+              <td className="py-3 px-6 text-center text-on-surface-variant">
+                <span className="material-symbols-outlined text-sm">
+                  {ICONS.check}
+                </span>
               </td>
             </tr>
           </tbody>

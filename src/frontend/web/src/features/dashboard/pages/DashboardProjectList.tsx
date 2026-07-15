@@ -3,6 +3,7 @@ import { FolderKanban, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } 
 import { m, AnimatePresence } from "framer-motion";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
 import { ProjectCoverImage } from "../../projects/components/ProjectCoverImage";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 export interface DashboardProjectListProps {
   loading: boolean;
@@ -83,7 +84,7 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
                             {p.desarrollador}
                           </span>
                           <span className="text-[10px] text-text-secondary opacity-60">
-                            {new Date(p.fechaRegistro).toLocaleDateString()}
+                            {toUtcDate(p.fechaRegistro)?.toLocaleDateString() ?? ''}
                           </span>
                         </div>
                       </div>

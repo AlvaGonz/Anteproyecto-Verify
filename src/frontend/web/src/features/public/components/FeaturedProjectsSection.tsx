@@ -249,7 +249,7 @@ export const FeaturedProjectsSection: React.FC = () => {
                 key={`${project.name}-${i}`}
                 className="flex-shrink-0 w-[400px] group bg-white rounded-[40px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-secondary/10 transition-all duration-500"
               >
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative aspect-video overflow-hidden">
                   <img
                     src={project.image}
                     alt={project.name}

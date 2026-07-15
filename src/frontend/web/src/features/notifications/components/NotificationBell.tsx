@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Bell, Trash2 } from "lucide-react";
 import { NotificationDto } from "../types";
 import { useNotifications, useMarkAsRead, useMarkAllAsRead, useDeleteNotification } from "../api/useNotifications";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +20,8 @@ export const NotificationBell: React.FC = () => {
       ...n,
       id: n.idNotificacion || n.id || n.Id || n.ID || "",
       usuarioId: n.idUsuario || n.usuarioId || n.UsuarioId || "",
-      fechaUtc: n.fechaCreacionUtc || n.fechaUtc || n.FechaUtc || new Date().toISOString(),
+      // ponytail: backend DTO field is FechaUtc → serialized as fechaUtc
+      fechaUtc: n.fechaUtc || n.FechaUtc || new Date().toISOString(),
       tipo: n.tipoNotificacion || n.tipo || n.Tipo || "Info",
       leida: n.leida || n.Leida || false,
     })) as unknown as NotificationDto[];
@@ -114,7 +116,7 @@ export const NotificationBell: React.FC = () => {
                           {notification.mensaje}
                         </p>
                         <p className="text-xs text-text-primary opacity-40 mt-1">
-                          {new Date(notification.fechaUtc).toLocaleString()}
+                          {toUtcDate(notification.fechaUtc)?.toLocaleString() ?? ''}
                         </p>
                       </div>
                       {!notification.leida && (

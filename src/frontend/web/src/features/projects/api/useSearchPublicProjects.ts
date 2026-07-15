@@ -10,6 +10,9 @@ export interface PublicProjectSearchResultDto {
   estadoJuridico: number;
   estadoProyecto: number;
   estadoIntegridad: number;
+  constructora?: string;
+  registrante?: string;
+  imagenUrl?: string;
 }
 
 export const useSearchPublicProjects = (query: string) =>

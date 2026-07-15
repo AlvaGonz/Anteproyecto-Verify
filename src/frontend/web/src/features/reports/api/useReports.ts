@@ -45,4 +45,8 @@ export const usePublicReport = (projectId: string | number) =>
     queryKey: ["publicReport", projectId],
     queryFn: () => apiClient.get<PublicProjectReportDto>(`/projects/${projectId}/reports/public`).then(res => res.data),
     enabled: !!projectId,
+    retry: (failureCount: number, error: any) => {
+      if (error?.response?.status === 404) return false;
+      return failureCount < 3;
+    }
   });

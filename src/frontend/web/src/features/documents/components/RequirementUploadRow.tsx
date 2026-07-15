@@ -76,7 +76,7 @@ export const RequirementUploadRow: React.FC<RequirementUploadRowProps> = ({
               ref={fileInputRef}
               onChange={handleFileChange}
               data-testid="inline-file-upload"
-              accept=".pdf,.jpg,.jpeg,.png"
+              accept=".pdf,application/pdf"
             />
             <button
               type="button"

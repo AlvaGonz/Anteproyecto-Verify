@@ -58,20 +58,22 @@ namespace UnitTests.Api.Controllers
                 null, // ImagenAdicional5
                 null, // ValorEstimado
                 ProjectCategory.Residencial,
-                null, // DatosDesarrollador
-                null, // RncDesarrollador
-                null, // DesignacionCatastral
-                null, // Matricula
-                null, // Propietario
-                null, // CedulaRncPropietario
-                null, // Ipi
-                null, // EstatusIpi
-                null, // SuperficieM2
-                "Borrador", // EstatusDescripcion
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                EstadoJuridico.Pendiente,
+                null,
+                null,
+                "Borrador",
                 ProjectStatus.Draft,
                 IntegrityStatus.Valid,
                 usuarioCreadorId,
                 DateTime.UtcNow,
+                null,
                 null
             );
         }

@@ -1,14 +1,15 @@
-﻿import React from "react";
+import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
-import { useDocuments } from "../api/useDocuments";
-import { 
-  AlertTriangle, 
-  Clock, 
-  ShieldCheck, 
+import { useDocuments, useDownloadDocument } from "../api/useDocuments";
+import {
+  AlertTriangle,
+  Clock,
+  ShieldCheck,
   FileCheck2,
   Lock,
   Building2,
-  Gavel
+  Gavel,
+  Download
 } from "lucide-react";
 import { ProjectCategory } from "../../projects/types";
 import { m, AnimatePresence } from "framer-motion";
@@ -43,6 +44,7 @@ const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, projectCategory = ProjectCategory.Residencial }) => {
   const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
+  const { mutate: downloadDoc, isPending: isDownloading } = useDownloadDocument(projectId || "");
 
   if (loading) return (
     <div className="py-20 flex flex-col items-center gap-4 text-secondary/20">
@@ -59,71 +61,81 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
 
   const uploadedDocs = documents.filter(d => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
   const verifiedDocs = documents.filter(d => d.estadoDocumento === DocumentStatus.Valid && requiredTypes.includes(d.tipoDocumento));
-  
+
   const missingCount = requiredTypes.length - uploadedDocs.length;
-  const progressPercent = Math.round((verifiedDocs.length / requiredTypes.length) * 100);
+  const progressPercent = requiredTypes.length > 0
+    ? Math.round((uploadedDocs.length / requiredTypes.length) * 100)
+    : 100;
 
   const renderDocItem = (typeId: number, index: number) => {
     const info = DOCUMENT_INFO[typeId];
     if (!info) return null;
-    
+
     const doc = documents.find(d => d.tipoDocumento === typeId);
     const isValid = doc?.estadoDocumento === DocumentStatus.Valid;
     const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isValid;
 
     return (
-      <m.div 
+      <m.div
         key={typeId}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
-        className={`group relative flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-[2rem] transition-all border ${
-          isValid 
-            ? "bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30" 
-            : isPending 
+        className={`group relative flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-[2rem] transition-all border ${isValid
+            ? "bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30"
+            : isPending
               ? "bg-amber-500/[0.03] border-amber-500/10 hover:border-amber-500/30"
               : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
-        }`}
+          }`}
       >
         <div className="flex items-start gap-4">
-          <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${
-            isValid 
-              ? "bg-emerald-500/10 text-emerald-500" 
-              : isPending 
+          <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${isValid
+              ? "bg-emerald-500/10 text-emerald-500"
+              : isPending
                 ? "bg-amber-500/10 text-amber-500"
                 : "bg-on-surface-variant/10 text-on-surface-variant"
-          }`}>
+            }`}>
             {isValid ? <ShieldCheck className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
           </div>
-          
+
           <div className="space-y-1">
             <h4 className={`text-sm font-black uppercase tracking-tight ${isValid ? "text-secondary" : "text-on-surface-variant"}`}>
               {info.name}
             </h4>
             <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
-               <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                  <Building2 className="w-3 h-3" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">{info.entity}</span>
-               </div>
-               <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                  <Gavel className="w-3 h-3" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">{info.norm}</span>
-               </div>
+              <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                <Building2 className="w-3 h-3" />
+                <span className="text-[10px] font-black uppercase tracking-widest">{info.entity}</span>
+              </div>
+              <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                <Gavel className="w-3 h-3" />
+                <span className="text-[10px] font-black uppercase tracking-widest">{info.norm}</span>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="mt-4 sm:mt-0 flex items-center gap-4">
-           {isValid && (
-              <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-                 INTEGRIDAD OK
-              </div>
-           )}
-           {!isValid && !isPending && (
-              <div className="px-3 py-1 rounded-full bg-on-surface-variant/5 text-on-surface-variant/40 text-[10px] font-black uppercase tracking-widest border border-on-surface-variant/5 italic">
-                 NO SUMINISTRADO
-              </div>
-           )}
+          {isValid && (
+            <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
+              INTEGRIDAD OK
+            </div>
+          )}
+          {!isValid && !isPending && (
+            <div className="px-3 py-1 rounded-full bg-on-surface-variant/5 text-on-surface-variant/40 text-[10px] font-black uppercase tracking-widest border border-on-surface-variant/5 italic">
+              NO SUMINISTRADO
+            </div>
+          )}
+          {(isValid || isPending) && doc?.id && (
+            <button
+              onClick={() => downloadDoc(doc.id)}
+              disabled={isDownloading}
+              className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
+              title="Descargar Documento"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </m.div>
     );
@@ -132,57 +144,57 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
   return (
     <section className="space-y-10">
       <div className="vf-card !bg-secondary !text-white !p-12 !rounded-[3.5rem] relative overflow-hidden shadow-2xl">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
-         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
-            <div className="space-y-6">
-               <div className="flex items-center gap-3">
-                  <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-                  <h2 className="text-xs font-black uppercase tracking-[0.4em] text-white/40">Compliance Tracking</h2>
-               </div>
-               <p className="text-4xl font-display font-black tracking-trough uppercase italic leading-none max-w-sm">
-                  Protocolo de Auditoría <span className="text-primary italic">Documental</span>
-               </p>
-               <div className="flex items-center gap-2 text-xs font-medium text-white/60 bg-white/5 py-3 px-6 rounded-2xl border border-white/5 inline-flex">
-                  <FileCheck2 className="w-4 h-4 text-primary" />
-                  Criterio de Validación: <strong className="text-white ml-2">ESTÁNDAR REID</strong>
-               </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-primary rounded-full"></div>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-white/40">Compliance Tracking</h2>
             </div>
+            <p className="text-4xl font-display font-black tracking-trough uppercase italic leading-none max-w-sm">
+              Protocolo de Auditoría <span className="text-primary italic">Documental</span>
+            </p>
+            <div className="flex items-center gap-2 text-xs font-medium text-white/60 bg-white/5 py-3 px-6 rounded-2xl border border-white/5 inline-flex">
+              <FileCheck2 className="w-4 h-4 text-primary" />
+              Criterio de Validación: <strong className="text-white ml-2">ESTÁNDAR REID</strong>
+            </div>
+          </div>
 
-            <div className="flex flex-col items-center gap-4">
-               <div className="relative w-32 h-32 flex items-center justify-center">
-                  <svg className="w-full h-full -rotate-90">
-                     <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
-                     <circle 
-                        cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" 
-                        strokeDasharray={364.4} strokeDashoffset={364.4 - (364.4 * progressPercent) / 100}
-                        strokeLinecap="round" className="text-primary transition-all duration-1000" 
-                     />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center font-display">
-                     <span className="text-4xl font-black">{progressPercent}</span>
-                     <span className="text-[10px] font-black uppercase opacity-40">%</span>
-                  </div>
-               </div>
-               <span className="text-[10px] font-black uppercase tracking-widest text-primary">Nivel de Confianza</span>
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative w-32 h-32 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90">
+                <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
+                <circle
+                  cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent"
+                  strokeDasharray={364.4} strokeDashoffset={364.4 - (364.4 * progressPercent) / 100}
+                  strokeLinecap="round" className="text-primary transition-all duration-1000"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center font-display">
+                <span className="text-4xl font-black">{progressPercent}</span>
+                <span className="text-[10px] font-black uppercase opacity-40">%</span>
+              </div>
             </div>
-         </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Nivel de Confianza</span>
+          </div>
+        </div>
       </div>
 
       <AnimatePresence>
         {missingCount > 0 && (
-          <m.div 
+          <m.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="p-8 rounded-[2.5rem] bg-amber-500/10 border border-amber-500/20 flex gap-6"
           >
             <div className="w-12 h-12 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 flex-shrink-0">
-               <AlertTriangle className="w-6 h-6" />
+              <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
               <h4 className="text-sm font-black uppercase tracking-wider text-amber-600 mb-1 italic">Advertencia de Integridad</h4>
               <p className="text-secondary/70 text-sm leading-relaxed font-medium">
-                Se detectaron <strong>{missingCount} documentos esenciales</strong> ausentes o fuera de norma. 
+                Se detectaron <strong>{missingCount} documentos esenciales</strong> ausentes o fuera de norma.
                 Este expediente requiere atención inmediata para alcanzar el Sello de Integridad Suprema.
               </p>
             </div>
@@ -195,12 +207,12 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
       </div>
 
       <div className="pt-10 border-t border-surface-container-high/50 flex flex-col items-center gap-4">
-         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant/40 italic">
-            <Lock className="w-3 h-3" /> Reporte de integridad encriptado con protocolo SHA-512
-         </div>
-         <p className="text-[10px] font-black uppercase tracking-widest text-secondary/20 max-w-lg text-center leading-relaxed">
-            Antigravity / VeriFinca Institutional Audit System - Ref: {projectId.split("-")[0].toUpperCase()}
-         </p>
+        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant/40 italic">
+          <Lock className="w-3 h-3" /> Reporte de integridad encriptado con protocolo SHA-512
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-widest text-secondary/20 max-w-lg text-center leading-relaxed">
+          Antigravity / VeriFinca Institutional Audit System - Ref: {projectId.split("-")[0].toUpperCase()}
+        </p>
       </div>
     </section>
   );

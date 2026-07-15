@@ -244,48 +244,36 @@ const resources = {
             title: "Profesional",
             desc: "Herramientas completas para agentes independientes y pequeñas agencias.",
             feature1: "25 consultas /mes",
-            feature2: "Reportes detallados PDF",
-            feature3: "Alertas de gravámenes",
-            feature4: "Soporte prioritario email",
+            feature2: "5 proyectos registrables",
+            feature3: "Consultas de proyectos por QR",
             button: "Elegir Profesional"
           },
           empresa: {
             title: "Empresa",
             desc: "Volumen alto para inmobiliarias y equipos de analistas.",
             feature1: "100 consultas /mes",
-            feature2: "Multiusuario (hasta 5)",
-            feature3: "API básica",
-            feature4: "Integración CRM",
+            feature2: "30 proyectos registrables",
+            feature3: "Multiusuario (hasta 5)",
+            feature4: "Consultas de proyectos por QR",
             button: "Elegir Empresa"
           },
           corporativo: {
             title: "Corporativo",
             desc: "Soluciones a medida para bancos, desarrolladoras y gobierno.",
             feature1: "Consultas ilimitadas",
-            feature2: "API Full Access",
-            feature3: "Validaciones en lote",
-            feature4: "SLA garantizado 99.9%",
+            feature2: "50 proyectos registrables",
+            feature3: "Multiusuario (hasta 30)",
+            feature4: "Consultas de proyectos por QR",
             button: "Elegir Corporativo"
           }
         },
         comparison: {
           title: "Comparativa detallada",
           charHeader: "Características",
-          capHeader: "Capacidad de Búsqueda",
           limit: "Límite mensual",
           unlimited: "Ilimitado",
-          history: "Histórico de títulos",
-          intHeader: "Integración & Datos",
-          pdf: "Exportación PDF",
-          api: "Acceso API",
-          basic: "Básico",
-          complete: "Completo",
-          supportHeader: "Soporte",
-          supportLevel: "Nivel de asistencia",
-          community: "Comunidad",
-          email: "Email (24h)",
-          priority: "Prioritario",
-          manager: "Account Manager 24/7"
+          projects: "Proyectos registrables",
+          qrProjects: "Consultas de proyectos por QR"
         },
         trust: {
           encrypted: "Datos encriptados",
@@ -554,7 +542,6 @@ const resources = {
             feature1: "25 queries /month",
             feature2: "Detailed PDF reports",
             feature3: "Liens & encumbrances alerts",
-            feature4: "Priority email support",
             button: "Choose Professional"
           },
           empresa: {
@@ -579,21 +566,10 @@ const resources = {
         comparison: {
           title: "Detailed comparison",
           charHeader: "Features",
-          capHeader: "Search Capacity",
           limit: "Monthly limit",
           unlimited: "Unlimited",
-          history: "Title history",
-          intHeader: "Integration & Data",
-          pdf: "PDF export",
-          api: "API Access",
-          basic: "Basic",
-          complete: "Complete",
-          supportHeader: "Support",
-          supportLevel: "Support level",
-          community: "Community",
-          email: "Email (24h)",
-          priority: "Priority",
-          manager: "24/7 Account Manager"
+          projects: "Registerable projects",
+          qrProjects: "QR project queries"
         },
         trust: {
           encrypted: "Encrypted data",

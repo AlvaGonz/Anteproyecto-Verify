@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useGlobalAuditTrail, useExportGlobalAudit } from "../api/useAudit";
 import { AuditDto, AuditFilters } from "../types";
+import { toUtcDate } from "../../../shared/utils/dates";
 
 const getStatusBadge = (tipoEvento: string) => {
   switch (tipoEvento) {
@@ -196,8 +197,8 @@ export const AuditLogPage: React.FC = () => {
                   <tr key={log.id} className="hover:bg-surface-raised/30 transition-colors group">
                     <td className="px-8 py-5 whitespace-nowrap">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-secondary">{new Date(log.fechaEventoUtc).toLocaleDateString()}</span>
-                        <span className="text-[10px] font-medium text-text-secondary uppercase tracking-tighter">{new Date(log.fechaEventoUtc).toLocaleTimeString()}</span>
+                        <span className="text-sm font-bold text-secondary">{toUtcDate(log.fechaEventoUtc)?.toLocaleDateString() ?? ''}</span>
+                        <span className="text-[10px] font-medium text-text-secondary uppercase tracking-tighter">{toUtcDate(log.fechaEventoUtc)?.toLocaleTimeString() ?? ''}</span>
                       </div>
                     </td>
                     <td className="px-8 py-5">

@@ -145,6 +145,22 @@ public class ProjectService : IProjectService
 
     private static ProyectoDto MapToDto(Proyecto proyecto)
     {
+        ProjectRegistrantDto? registradoPor = null;
+        if (proyecto.UsuarioCreador != null)
+        {
+            registradoPor = new ProjectRegistrantDto(
+                proyecto.UsuarioCreador.Id,
+                proyecto.UsuarioCreador.NombreCompleto,
+                proyecto.UsuarioCreador.RazonSocial,
+                proyecto.UsuarioCreador.Rol.ToString(),
+                proyecto.UsuarioCreador.Email,
+                proyecto.UsuarioCreador.Telefono,
+                proyecto.UsuarioCreador.AvatarUrl,
+                proyecto.UsuarioCreador.CreatedAtUtc,
+                proyecto.UsuarioCreador.EmailVerificado
+            );
+        }
+
         return new ProyectoDto(
             proyecto.Id,
             proyecto.CodigoInterno,
@@ -174,7 +190,8 @@ public class ProjectService : IProjectService
             proyecto.EstadoIntegridad,
             proyecto.UsuarioCreadorId,
             proyecto.CreatedAtUtc,
-            proyecto.UpdatedAtUtc
+            proyecto.UpdatedAtUtc,
+            registradoPor
         );
     }
 }

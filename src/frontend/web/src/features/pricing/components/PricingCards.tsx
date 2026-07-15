@@ -132,12 +132,6 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
               </span>
               {t("pricing.cards.pro.feature3")}
             </li>
-            <li className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-4">
-                {ICONS.checkCircle}
-              </span>
-              {t("pricing.cards.pro.feature4")}
-            </li>
           </ul>
           <button
             type="button"
