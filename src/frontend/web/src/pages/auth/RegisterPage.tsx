@@ -1,38 +1,12 @@
 ﻿import React from "react";
 import { Link } from "react-router-dom";
-import { m } from "framer-motion";
 import { ShieldCheck, Zap } from "lucide-react";
 import { RegisterForm } from "../../features/auth/components/RegisterForm";
 
 export const RegisterPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F4F1EC] flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
-      {/* Background Decor */}
-      <m.div
-        animate={{
-          scale: [1, 1.2, 1],
-          rotate: [0, 90, 0],
-          x: [0, 50, 0]
-        }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"
-      />
-      <m.div
-        animate={{
-          scale: [1, 1.1, 1],
-          x: [0, -30, 0],
-          y: [0, 40, 0]
-        }}
-        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none"
-      />
-
-      <m.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-5xl bg-white border border-border rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative z-10"
-      >
+      <div className="w-full max-w-5xl bg-white border border-border rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative">
         {/* Left Side: Info */}
         <div className="w-full md:w-[400px] bg-[#223382] p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
           {/* Subtle geometric pattern */}
@@ -105,7 +79,7 @@ export const RegisterPage: React.FC = () => {
         <div className="flex-1 p-12 flex items-center justify-center">
           <RegisterForm />
         </div>
-      </m.div>
+      </div>
     </div>
   );
 };
