@@ -27,7 +27,7 @@ describe('Avatar Consumers - Sidebar', () => {
       refreshUser: vi.fn(),
       updateUser: vi.fn(),
       error: null
-    } as any)
+    })
 
     // Act
     render(

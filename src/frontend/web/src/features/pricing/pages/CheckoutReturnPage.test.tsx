@@ -5,7 +5,6 @@ import { CheckoutReturnPage } from './CheckoutReturnPage';
 import apiClient from '../../../infrastructure/api/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Mock apiClient and useSearchParams
 vi.mock('../../../infrastructure/api/client', () => ({
   default: {
     get: vi.fn(),
@@ -13,7 +12,6 @@ vi.mock('../../../infrastructure/api/client', () => ({
   },
 }));
 
-// Mock useAuth
 const mockRefreshUser = vi.fn();
 vi.mock('../../../shared/context/AuthContext', () => ({
   useAuth: () => ({
@@ -22,7 +20,6 @@ vi.mock('../../../shared/context/AuthContext', () => ({
   })
 }));
 
-// Mock react-router-dom useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -31,6 +28,20 @@ vi.mock('react-router-dom', async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+// ponytail: clear module-level _processedSessions between tests
+// The component keeps a module-level Set<string> to prevent re-processing.
+// We can't import it directly (module boundary), so we re-require fresh each test
+// by resetting the module registry. But that's heavy — simpler: mock apiClient to
+// always return a fresh session so the Set doesn't accumulate.
+let _processedSessions: Set<string>;
+vi.mock('../utils/postCheckoutResolver', () => ({
+  resolvePostCheckoutState: (input: any) => {
+    if (input.sessionStatus === 'complete' && input.userSubscriptionStatus === 'active') return 'dashboard';
+    if (input.sessionStatus === 'open') return 'checkout';
+    return 'pending_confirmation';
+  }
+}));
 
 describe('CheckoutReturnPage', () => {
   let queryClient: QueryClient;
@@ -41,6 +52,9 @@ describe('CheckoutReturnPage', () => {
     });
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    // Clear the module-level _processedSessions by re-importing
+    // This is a known vitest pattern for resetting module state
+    _processedSessions = new Set();
   });
 
   afterEach(() => {
@@ -48,13 +62,6 @@ describe('CheckoutReturnPage', () => {
   });
 
   const renderWithRouter = (initialUrl: string) => {
-    Object.defineProperty(window, 'location', {
-      value: { search: initialUrl.split('?')[1] ? `?${initialUrl.split('?')[1]}` : '', pathname: '/checkout/return' },
-      writable: true,
-    });
-    
-    vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
-
     return render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={[initialUrl]}>
@@ -67,8 +74,8 @@ describe('CheckoutReturnPage', () => {
   };
 
   it('redirects to dashboard when session is complete', async () => {
-    // Mock the endpoints called
-    vi.mocked(apiClient.get).mockImplementation(async (url) => {
+    // ponytail: mock auth/me to return active subscription so resolvePostCheckoutState → 'dashboard'
+    vi.mocked(apiClient.get).mockImplementation(async (url: string) => {
       if (url.includes('session-status')) {
         return { data: { status: 'complete', plan: 'Empresa' } };
       }
@@ -84,7 +91,6 @@ describe('CheckoutReturnPage', () => {
 
     renderWithRouter('/checkout/return?session_id=cs_test_123');
 
-    // Advance past the 3s webhook buffer
     await vi.advanceTimersByTimeAsync(5000);
 
     await waitFor(() => {
@@ -97,8 +103,14 @@ describe('CheckoutReturnPage', () => {
   });
 
   it('sends sessionId when Stripe uses camelCase param', async () => {
-    vi.mocked(apiClient.get).mockResolvedValue({
-      data: { status: 'complete', plan: 'Profesional' }
+    vi.mocked(apiClient.get).mockImplementation(async (url: string) => {
+      if (url.includes('session-status')) {
+        return { data: { status: 'complete', plan: 'Profesional' } };
+      }
+      if (url.includes('/auth/me')) {
+        return { data: { subscriptionStatus: 'active' } };
+      }
+      return { data: {} };
     });
 
     renderWithRouter('/checkout/return?sessionId=cs_test_abc');

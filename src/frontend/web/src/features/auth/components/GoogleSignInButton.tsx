@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { isSubscriptionActive } from "../../pricing/utils/planPermissions";
+import { isSubscriptionActive } from "../../pricing/utils/planCapabilities";
 import { Loader2 } from "lucide-react";
 
 export const GoogleSignInButton = () => {
@@ -43,7 +43,7 @@ export const GoogleSignInButton = () => {
     <div className="w-full flex flex-col items-center">
       {(error || authError) && (
         <div className="w-full mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded text-sm font-medium animate-in fade-in duration-200">
-          {error || (authError as any)?.message || "Error de autenticación con Google."}
+          {error || authError?.message || "Error de autenticación con Google."}
         </div>
       )}
       

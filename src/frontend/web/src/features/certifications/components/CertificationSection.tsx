@@ -51,7 +51,7 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
 
     try {
       await issueSealMutation.mutateAsync();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error al emitir la certificación.", err);
     }
   };

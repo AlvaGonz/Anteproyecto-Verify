@@ -40,9 +40,12 @@ describe("EmailVerifiedPage", () => {
     window.localStorage.clear();
   });
 
-  it("shows error state when no token is present", () => {
+  it("shows error state when no token is present", async () => {
     renderPage("/verify-email");
-    expect(screen.getByText(/Error de verificación/i)).toBeInTheDocument();
+    // ponytail: component uses setTimeout(..., 0) to set error status, so wait for it
+    await waitFor(() => {
+      expect(screen.getByText(/Error de verificación/i)).toBeInTheDocument();
+    });
   });
 
   it("verifies token, calls refreshUser, and redirects to sessionStorage redirect url", async () => {

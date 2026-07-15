@@ -8,8 +8,7 @@ import {
   LayoutGrid,
   List,
   CheckCircle2,
-  AlertCircle,
-  X
+  AlertCircle
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";

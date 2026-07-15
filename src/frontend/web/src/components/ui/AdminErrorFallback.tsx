@@ -3,7 +3,7 @@ import { useRouteError, isRouteErrorResponse, useNavigate } from "react-router-d
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-export const AdminErrorFallback: React.FC<{ error?: any }> = ({ error: propError }) => {
+export const AdminErrorFallback: React.FC<{ error?: unknown }> = ({ error: propError }) => {
   const routeError = useRouteError();
   const error = propError || routeError;
   const navigate = useNavigate();

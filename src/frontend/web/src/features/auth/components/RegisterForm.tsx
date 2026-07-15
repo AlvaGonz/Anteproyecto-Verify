@@ -64,7 +64,7 @@ const onSubmit = (data: RegisterFormValues) => {
      } });
    };
 
-const password = watch("password") || "";
+const password = (watch("password") as string) || "";
    const checks = [
     { label: "Mínimo 8 caracteres", passed: password.length >= 8 },
     { label: "Al menos 1 Mayúscula", passed: /[A-Z]/.test(password) },
@@ -74,7 +74,7 @@ const password = watch("password") || "";
    ];
 
 // Phone input hook
-   const phoneValueRaw = watch("telefono") ? watch("telefono").replace(/\D/g, '') : "";
+   const phoneValueRaw = (watch("telefono") as string) ? (watch("telefono") as string).replace(/\D/g, '') : "";
    const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
      const digits = formattedValue.replace(/\D/g, '');
      setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });

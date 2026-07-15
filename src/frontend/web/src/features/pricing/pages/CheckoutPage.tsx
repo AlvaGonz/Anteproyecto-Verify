@@ -1,16 +1,38 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
-import { getStripePriceId, PlanId, BillingCycle } from '../utils/stripePriceMap';
 import apiClient from '../../../infrastructure/api/client';
 
 import { SubscriptionConsentCheckbox } from '../components/SubscriptionConsentCheckbox';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../../shared/context/AuthContext';
 
 // Load Stripe outside component to avoid recreating it
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+
+// Inline stripe price map (was in stripePriceMap.ts)
+type PlanId = 'profesional' | 'empresa' | 'corporativo';
+type BillingCycle = 'monthly' | 'yearly';
+
+function getStripePriceId(plan: PlanId, billing: BillingCycle): string {
+  const map: Record<PlanId, Record<BillingCycle, string>> = {
+    profesional: {
+      monthly: import.meta.env.VITE_STRIPE_PRICE_PROFESIONAL_MONTHLY ?? '',
+      yearly:  import.meta.env.VITE_STRIPE_PRICE_PROFESIONAL_YEARLY ?? '',
+    },
+    empresa: {
+      monthly: import.meta.env.VITE_STRIPE_PRICE_EMPRESA_MONTHLY ?? '',
+      yearly:  import.meta.env.VITE_STRIPE_PRICE_EMPRESA_YEARLY ?? '',
+    },
+    corporativo: {
+      monthly: import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE_MONTHLY ?? '',
+      yearly:  import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE_YEARLY ?? '',
+    },
+  };
+  const priceId = map[plan]?.[billing];
+  if (!priceId) throw new Error(`Unknown plan/billing: ${plan}/${billing}`);
+  return priceId;
+}
 
 const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYearly: string, features: string[] }> = {
   profesional: {
@@ -65,7 +87,6 @@ export const CheckoutPage = () => {
       navigate('/plans');
     }
   };
-  const { user } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState<boolean>(false);
   const [consentData, setConsentData] = useState<{ timestamp: string; userAgent: string } | null>(null);

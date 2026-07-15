@@ -7,7 +7,7 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
-import { isSubscriptionActive } from "../../pricing/utils/planPermissions";
+import { isSubscriptionActive } from "../../pricing/utils/planCapabilities";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ export const LoginForm = () => {
 
       {authError && (
         <div className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium animate-in fade-in duration-200" role="alert">
-          {(authError as any)?.message || "No encontramos una cuenta con este correo. ¿Desea registrarse?"}
+          {authError?.message || "No encontramos una cuenta con este correo. ¿Desea registrarse?"}
         </div>
       )}
 

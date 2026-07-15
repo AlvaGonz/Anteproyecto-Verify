@@ -21,7 +21,9 @@ export const CancelSubscriptionModal: React.FC<CancelSubscriptionModalProps> = (
   // Clear feedback when modal closes
   useEffect(() => {
     if (!isOpen) {
-      setFeedback("");
+      // Use setTimeout to avoid setting state during render
+      const timer = setTimeout(() => setFeedback(""), 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

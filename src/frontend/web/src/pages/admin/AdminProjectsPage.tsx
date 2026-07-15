@@ -17,10 +17,13 @@ export const AdminProjectsPage: React.FC = () => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
-    const q = searchParams.get('q');
-    if (q !== null) {
-      setSearchTerm(q);
-    }
+    const timer = setTimeout(() => {
+      const q = searchParams.get('q');
+      if (q !== null) {
+        setSearchTerm(q);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [searchParams]);
 
   const { data: rawProjects = [], isLoading } = useProjects();

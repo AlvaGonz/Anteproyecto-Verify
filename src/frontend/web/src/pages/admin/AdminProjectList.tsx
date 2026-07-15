@@ -69,7 +69,10 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
   const itemsPerPage = 10;
   
   useEffect(() => {
-    setCurrentPage(1);
+    const timer = setTimeout(() => {
+      setCurrentPage(1);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [filtered]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;

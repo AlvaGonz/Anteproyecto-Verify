@@ -26,11 +26,11 @@ describe('UserAvatarUpload - Reactive Upload', () => {
         logout: vi.fn(),
         refreshUser: vi.fn(),
         error: null
-      } as any)
+      })
     })
     
-    vi.mocked(useAuth).mockReturnValue({ 
-      user: mockUser, 
+    vi.mocked(useAuth).mockReturnValue({
+      user: mockUser,
       updateUser: mockUpdateUser,
       isAuthenticated: true,
       loading: false,
@@ -38,13 +38,13 @@ describe('UserAvatarUpload - Reactive Upload', () => {
       logout: vi.fn(),
       refreshUser: vi.fn(),
       error: null
-    } as any)
+    })
 
     const mockMutateAsync = vi.fn().mockResolvedValue({ url: '/new-avatar.jpg' })
     vi.mocked(useUploadAvatar).mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false
-    } as any)
+    })
 
     vi.mocked(useToast).mockReturnValue({
       addToast: vi.fn(),

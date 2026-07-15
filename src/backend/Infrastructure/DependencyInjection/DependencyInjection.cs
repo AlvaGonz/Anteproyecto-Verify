@@ -84,8 +84,6 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Credit.Commands.ConsultarCredito.ConsultarCreditoCommandHandler>();
         
         // Sello
-        services.AddScoped<Application.Abstractions.Services.Crypto.IFirmaDigitalService, Services.Crypto.MockFirmaDigitalService>();
-        services.AddScoped<Application.Abstractions.Services.Crypto.IQrGeneratorService, Services.Crypto.MockQrGeneratorService>();
         services.AddScoped<Application.Features.Sello.Commands.EmitirSello.EmitirSelloCommandHandler>();
 
         // Certifications

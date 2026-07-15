@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Sidebar } from '../shared/components/layout/Sidebar';
 import { AuthProvider } from '../shared/context/AuthContext';
 import { AuthService } from '../features/auth/services/AuthService';
-import { some } from '../shared/utils/functional';
 
 // Mock AuthService
 vi.mock('../features/auth/services/AuthService', () => ({
@@ -33,7 +32,7 @@ describe('Sidebar', () => {
     };
 
     // Mock getCurrentUser to return the user
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(some(mockUser));
+    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(mockUser);
 
     render(
       <BrowserRouter>

@@ -1,6 +1,5 @@
 import { createContext, use, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
-import { isSome, isSuccess } from "../utils/functional";
 import { queryClient } from "../../infrastructure/api/queryClient";
 
 interface AuthContextType {
@@ -24,10 +23,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const currentUserOption = await AuthService.getCurrentUser();
+      const currentUser = await AuthService.getCurrentUser();
       
-      if (isSome(currentUserOption)) {
-        setUser(currentUserOption.value);
+      if (currentUser) {
+        setUser(currentUser);
       }
       
       setLoading(false);
@@ -54,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     const result = await AuthService.login(email, password);
     
-    if (isSuccess(result)) {
+    if ('data' in result) {
       setUser(result.data.user);
       setLoading(false);
       return result.data.user;
@@ -71,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     const result = await AuthService.googleLogin(credential);
     
-    if (isSuccess(result)) {
+    if ('data' in result) {
       setUser(result.data.user);
       setLoading(false);
       return result.data.user;
@@ -89,8 +88,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUser = useCallback(async () => {
     const result = await AuthService.getCurrentUser();
-    if (isSome(result)) {
-      setUser(result.value);
+    if (result) {
+      setUser(result);
     } else {
       setUser(null);
     }

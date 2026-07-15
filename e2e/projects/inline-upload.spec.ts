@@ -102,7 +102,7 @@ test.describe('Project Documents Inline Upload', () => {
         body: JSON.stringify({
           id: 'new-doc-id',
           proyectoId: projectId,
-          tipoDocumento: 1, // CertificadoTitulo
+          tipoDocumento: 21, // CertificadoTitulo
           nombreArchivoOriginal: 'titulo.pdf',
           activo: true
         })
@@ -120,7 +120,7 @@ test.describe('Project Documents Inline Upload', () => {
               {
                 id: 'new-doc-id',
                 proyectoId: projectId,
-                tipoDocumento: 1, // CertificadoTitulo
+                tipoDocumento: 21, // CertificadoTitulo
                 nombreArchivoOriginal: 'titulo.pdf',
                 activo: true,
                 estadoDocumento: 1

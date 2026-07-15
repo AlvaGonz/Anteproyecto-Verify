@@ -3,14 +3,13 @@ import { AuthProvider, useAuth } from '../AuthContext';
 import { AuthService } from '../../../features/auth/services/AuthService';
 import { queryClient } from '../../../infrastructure/api/queryClient';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { success } from '../../utils/functional';
 
 // Mock dependencies
 vi.mock('../../../features/auth/services/AuthService', () => ({
   AuthService: {
     login: vi.fn(),
     logout: vi.fn(),
-    getCurrentUser: vi.fn().mockResolvedValue({ _tag: 'None' }),
+    getCurrentUser: vi.fn().mockResolvedValue(null),
   }
 }));
 
@@ -26,10 +25,10 @@ describe('AuthContext', () => {
   });
 
   it('should clear queryClient cache on login to prevent session crossover', async () => {
-    vi.mocked(AuthService.login).mockResolvedValue(success({
+    vi.mocked(AuthService.login).mockResolvedValue({ data: {
       user: { id: '1', email: 'test@test.com', nombre: 'Test', apellido: 'User', role: 'User' },
       token: 'fake-token'
-    }));
+    }});
 
     const { result } = renderHook(() => useAuth(), {
       wrapper: AuthProvider

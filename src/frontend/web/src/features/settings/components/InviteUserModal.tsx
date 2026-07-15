@@ -12,8 +12,8 @@ const inviteSchema = z.object({
   cedula: z.string().min(1, "La cédula es requerida"),
   telefono: z.string().optional(),
   email: z.string().email("Correo electrónico inválido").min(1, "El correo es requerido"),
-  maxProyectosDelegados: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)),
-  maxConsultasDelegadas: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)),
+  maxProyectosDelegados: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)).pipe(z.number().nullable()),
+  maxConsultasDelegadas: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)).pipe(z.number().nullable()),
 });
 
 type InviteFormData = z.infer<typeof inviteSchema>;
@@ -41,8 +41,8 @@ export const InviteUserModal: React.FC<InviteUserModalProps> = ({ isOpen, onClos
       cedula: "",
       telefono: "",
       email: "",
-      maxProyectosDelegados: "",
-      maxConsultasDelegadas: "",
+      maxProyectosDelegados: null,
+      maxConsultasDelegadas: null,
     },
   });
 

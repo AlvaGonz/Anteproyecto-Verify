@@ -6,7 +6,6 @@ import { projectsApi } from "../../../features/projects/api/projectsApi";
 import { useProject, useCreateProject, useDeleteProject } from "../../../features/projects/api/useProjects";
 import { apiClient } from "../../../infrastructure/api/client";
 import { ProjectStatus, IntegrityStatus, ProyectoDto } from "../../../features/projects/types";
-import { success, failure } from "../../../shared/utils/functional";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
 
@@ -171,9 +170,11 @@ describe("ProjectManagePage", () => {
       } as any);
     });
 
-    it("renders 'Crear Nuevo Proyecto' heading", () => {
+    it("renders the ProjectForm in CREATE mode", () => {
       renderPage();
-      expect(screen.getByRole("heading", { name: /Crear Nuevo Proyecto/i })).toBeInTheDocument();
+      // ponytail: ProjectManagePage delegates to ProjectForm — no heading rendered by the page itself
+      expect(screen.getByTestId("project-form")).toBeInTheDocument();
+      expect(screen.getByTestId("initial-data-value").textContent).toBe("no-initial-data");
     });
 
     it("renders the ProjectForm with no initialData", () => {
@@ -195,7 +196,7 @@ describe("ProjectManagePage", () => {
         createdAtUtc: "2026-06-13T00:00:00Z",
       };
 
-      vi.mocked(projectsApi.createProject).mockResolvedValue(success(mockCreated));
+      vi.mocked(projectsApi.createProject).mockResolvedValue({ data: mockCreated });
 
       renderPage();
       fireEvent.click(screen.getByTestId("submit-btn-valid"));
@@ -211,7 +212,7 @@ describe("ProjectManagePage", () => {
       });
     });
 
-    it("navigates to /projects/:newId after successful create", async () => {
+    it("navigates to /admin/projects after successful create", async () => {
       const mockCreated: ProyectoDto = {
         id: "new-id-456",
         codigoInterno: "PRJ-new",
@@ -224,7 +225,7 @@ describe("ProjectManagePage", () => {
         createdAtUtc: "2026-06-13T00:00:00Z",
       };
 
-      vi.mocked(projectsApi.createProject).mockResolvedValue(success(mockCreated));
+      vi.mocked(projectsApi.createProject).mockResolvedValue({ _tag: "Success", data: mockCreated });
 
       renderPage();
       fireEvent.click(screen.getByTestId("submit-btn-valid"));
@@ -237,7 +238,7 @@ describe("ProjectManagePage", () => {
 
     it("shows error toast when createProject returns failure", async () => {
       vi.mocked(projectsApi.createProject).mockResolvedValue(
-        failure({ _tag: "ServerError", message: "Failed to create" })
+        { error: { _tag: "ServerError", message: "Failed to create" } }
       );
 
       renderPage();
@@ -346,7 +347,7 @@ describe("ProjectManagePage", () => {
 
     it("calls updateProject on valid form submit", async () => {
       vi.mocked(useProject).mockReturnValue({ data: mockExisting, isLoading: false } as any);
-      vi.mocked(projectsApi.updateProject).mockResolvedValue(success(mockExisting));
+      vi.mocked(projectsApi.updateProject).mockResolvedValue({ _tag: "Success", data: mockExisting });
 
       renderPage();
       fireEvent.click(screen.getByTestId("submit-btn-valid"));
@@ -362,9 +363,9 @@ describe("ProjectManagePage", () => {
       });
     });
 
-    it("navigates to /projects/:id after successful update", async () => {
+    it("navigates to /admin/projects after successful update", async () => {
       vi.mocked(useProject).mockReturnValue({ data: mockExisting, isLoading: false } as any);
-      vi.mocked(projectsApi.updateProject).mockResolvedValue(success(mockExisting));
+      vi.mocked(projectsApi.updateProject).mockResolvedValue({ _tag: "Success", data: mockExisting });
 
       renderPage();
       fireEvent.click(screen.getByTestId("submit-btn-valid"));
@@ -378,7 +379,7 @@ describe("ProjectManagePage", () => {
     it("shows error toast when updateProject returns failure", async () => {
       vi.mocked(useProject).mockReturnValue({ data: mockExisting, isLoading: false } as any);
       vi.mocked(projectsApi.updateProject).mockResolvedValue(
-        failure({ _tag: "ServerError", message: "Failed to update" })
+        { error: { _tag: "ServerError", message: "Failed to update" } }
       );
 
       renderPage();
@@ -426,7 +427,7 @@ describe("ProjectManagePage", () => {
 
     it("calls updateProjectStatus with correct status on button click", async () => {
       const mockUpdated = { ...mockExisting, estadoProyecto: ProjectStatus.Published };
-      vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue(success(mockUpdated));
+      vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue({ _tag: "Success", data: mockUpdated });
 
       renderPage();
       fireEvent.click(screen.getByRole("button", { name: "status.published" }));
@@ -441,7 +442,7 @@ describe("ProjectManagePage", () => {
 
     it("updates project state after successful status change", async () => {
       const mockUpdated = { ...mockExisting, estadoProyecto: ProjectStatus.InReview };
-      vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue(success(mockUpdated));
+      vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue({ _tag: "Success", data: mockUpdated });
 
       renderPage();
       fireEvent.click(screen.getByRole("button", { name: "status.inReview" }));
@@ -453,7 +454,7 @@ describe("ProjectManagePage", () => {
 
     it("shows error toast when updateProjectStatus fails", async () => {
       vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue(
-        failure({ _tag: "ServerError", message: "Failed" })
+        { error: { _tag: "ServerError", message: "Failed" } }
       );
 
       renderPage();

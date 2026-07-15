@@ -27,7 +27,9 @@ export const PlansModal: React.FC<PlansModalProps> = ({ isOpen, onClose, source,
       const timer = setTimeout(() => setIsRevealed(true), 50);
       return () => clearTimeout(timer);
     } else {
-      setIsRevealed(false);
+      // Use setTimeout to avoid setting state during render
+      const timer = setTimeout(() => setIsRevealed(false), 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

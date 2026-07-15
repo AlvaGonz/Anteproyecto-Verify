@@ -33,9 +33,12 @@ export const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>((location.state as any)?.tab || "profile");
 
   useEffect(() => {
-    if ((location.state as any)?.tab) {
-      setActiveTab((location.state as any).tab);
-    }
+    const timer = setTimeout(() => {
+      if ((location.state as any)?.tab) {
+        setActiveTab((location.state as any).tab);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [location.state]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);

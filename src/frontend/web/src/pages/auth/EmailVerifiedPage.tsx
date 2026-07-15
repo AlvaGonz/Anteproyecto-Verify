@@ -19,8 +19,10 @@ export const EmailVerifiedPage = () => {
 
   useEffect(() => {
     if (!token) {
-      setStatus("error");
-      return;
+      const timer = setTimeout(() => {
+        setStatus("error");
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     if (hasAttempted.current) return;
@@ -39,7 +41,10 @@ export const EmailVerifiedPage = () => {
         setStatus("success");
       })
       .catch(() => {
-        setStatus("error");
+        const timer = setTimeout(() => {
+          setStatus("error");
+        }, 0);
+        return () => clearTimeout(timer);
       });
   }, [token, refreshUser]);
 

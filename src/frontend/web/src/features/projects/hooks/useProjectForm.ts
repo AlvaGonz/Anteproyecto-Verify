@@ -104,7 +104,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const existingFotoUrls: string[] = initialData?.fotoUrls ?? (initialData && 'imagenUrl' in initialData && initialData.imagenUrl ? [initialData.imagenUrl as string] : []);
 
   // ── Estado de superficie ───────────────────────────────────────────────────
-  const [superficieM2, setSuperficieM2] = useState<number | "">(initialData?.superficieM2 ?? "");
+  const [superficieM2, setSuperficieM2] = useState<number | string>(initialData?.superficieM2 ?? "");
 
   // RNC Lookup States
   const [isSearchingRnc, setIsSearchingRnc] = useState(false);
@@ -133,7 +133,10 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   useEffect(() => {
     const cleaned = rncDesarrollador.replace(/[- ]/g, "").trim();
     if (cleaned.length === 11 || cleaned.length === 9) {
-      handleRncSearch(rncDesarrollador);
+      const timer = setTimeout(() => {
+        handleRncSearch(rncDesarrollador);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [rncDesarrollador]);
 
@@ -233,20 +236,23 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       const lat = parseFloat(match[1]);
       const lng = parseFloat(match[2]);
 
-      map.flyTo([lat, lng], 13, { duration: 1.2 });
-      
-      setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
+map.flyTo([lat, lng], 13, { duration: 1.2 });
+       
+       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
-      try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        setDesignacionCatastral(catastroData.designacionCatastral || "");
-        setMatricula(catastroData.matricula || "");
-        setSuperficieM2(catastroData.superficieM2 || "");
-        setPropietario(catastroData.propietario || "");
-        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-        setIpi(catastroData.ipi || "");
-        setEstatusIpi(catastroData.estatusIpi || "");
-      } catch (error) {
+       try {
+         const catastroResult = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
+         if (catastroResult._tag === "Success") {
+           const catastroData = catastroResult.data;
+           setDesignacionCatastral(catastroData.designacionCatastral || "");
+           setMatricula(catastroData.matricula || "");
+           setSuperficieM2(catastroData.superficieM2?.toString() || "");
+           setPropietario(catastroData.propietario || "");
+           setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+           setIpi(catastroData.ipi || "");
+           setEstatusIpi(catastroData.estatusIpi || "");
+         }
+       } catch (error) {
         console.error("No catastro data found:", error);
         // Fallback for demo purposes if no real data is found
         const randomParcel = Math.floor(Math.random() * 500) + 1;
@@ -288,14 +294,17 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
       try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        setDesignacionCatastral(catastroData.designacionCatastral || "");
-        setMatricula(catastroData.matricula || "");
-        setSuperficieM2(catastroData.superficieM2 || "");
-        setPropietario(catastroData.propietario || "");
-        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-        setIpi(catastroData.ipi || "");
-        setEstatusIpi(catastroData.estatusIpi || "");
+        const catastroResult = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
+        if (catastroResult._tag === "Success") {
+          const catastroData = catastroResult.data;
+          setDesignacionCatastral(catastroData.designacionCatastral || "");
+          setMatricula(catastroData.matricula || "");
+          setSuperficieM2(catastroData.superficieM2?.toString() || "");
+          setPropietario(catastroData.propietario || "");
+          setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+          setIpi(catastroData.ipi || "");
+          setEstatusIpi(catastroData.estatusIpi || "");
+        }
       } catch (error) {
         console.error("No catastro data found:", error);
         const randomParcel = Math.floor(Math.random() * 500) + 1;

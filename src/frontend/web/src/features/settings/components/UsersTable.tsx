@@ -52,15 +52,22 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   React.useEffect(() => {
-    setCurrentPage(1);
-    setPageInput("1");
-    if (sortField === "availableUsers" && activeTab !== "Corporativo" && activeTab !== "Empresa") {
-      setSortField("planCreatedAt");
-    }
+    // Use setTimeout to avoid setting state during render
+    const timer = setTimeout(() => {
+      setCurrentPage(1);
+      setPageInput("1");
+      if (sortField === "availableUsers" && activeTab !== "Corporativo" && activeTab !== "Empresa") {
+        setSortField("planCreatedAt");
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [activeTab, searchQuery]);
 
   React.useEffect(() => {
-    setPageInput(currentPage.toString());
+    const timer = setTimeout(() => {
+      setPageInput(currentPage.toString());
+    }, 0);
+    return () => clearTimeout(timer);
   }, [currentPage]);
 
   const tabs = [

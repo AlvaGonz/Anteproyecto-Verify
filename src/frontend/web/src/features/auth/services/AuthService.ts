@@ -1,11 +1,3 @@
-import { 
-  Option, 
-  Result, 
-  some, 
-  none, 
-  success, 
-  failure 
-} from "../../../shared/utils/functional";
 import { apiClient, setAccessToken } from "../../../infrastructure/api/client";
 
 export interface User {
@@ -49,60 +41,62 @@ export interface AuthResponse {
 }
 
 export type AuthError = 
-  | { _tag: "InvalidCredentials" }
+  | { _tag: "InvalidCredentials"; message: string }
   | { _tag: "NetworkError"; message: string }
-  | { _tag: "UnknownError"; original: unknown };
+  | { _tag: "UnknownError"; message: string; original: unknown };
 
 
 export const AuthService = {
-  async login(email: string, password: string): Promise<Result<AuthResponse, AuthError>> {
+  async login(email: string, password: string): Promise<{ data: AuthResponse } | { error: AuthError }> {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
       
       const token = response.data.accessToken ?? null;
       if (!token) {
         // Backend must return accessToken. If missing, treat as auth failure.
-        return failure({ _tag: "NetworkError", message: "Token de acceso no recibido del servidor." });
+        return { error: { _tag: "NetworkError", message: "Token de acceso no recibido del servidor." } };
       }
       setAccessToken(token);
 
-      return success({
+      return { data: {
         user: response.data.user,
         token: token
-      });
-    } catch (e: any) {
-      if (e.response?.status === 401) {
-        return failure({ _tag: "InvalidCredentials" });
+      }};
+    } catch (e: unknown) {
+      const err = e as { response?: { status?: number; data?: { message?: string } } };
+      if (err.response?.status === 401) {
+        return { error: { _tag: "InvalidCredentials", message: "Credenciales inválidas" } };
       }
-      return failure({ 
+      return { error: { 
         _tag: "NetworkError", 
-        message: e.response?.data?.message || "Error al iniciar sesión" 
-      });
+        message: err.response?.data?.message || "Error al iniciar sesión" 
+      }};
     }
   },
 
-  async googleLogin(credential: string): Promise<Result<AuthResponse, AuthError>> {
+  async googleLogin(credential: string): Promise<{ data: AuthResponse } | { error: AuthError }> {
     try {
       const response = await apiClient.post('/auth/google', { credential });
       
       const token = response.data.accessToken ?? null;
       if (!token) {
-        return failure({ _tag: "NetworkError", message: "Token de acceso no recibido del servidor." });
+        return { error: { _tag: "NetworkError", message: "Token de acceso no recibido del servidor." } };
       }
       setAccessToken(token);
 
-      return success({
+      return { data: {
         user: response.data.user,
         token: token
-      });
-    } catch (e: any) {
-      if (e.response?.status === 401 || e.response?.status === 400) {
-        return failure({ _tag: "InvalidCredentials" });
+      }};
+    } catch (e: unknown) {
+      const err = e as { response?: { status?: number; data?: { message?: string } } };
+      if (err.response?.status === 401 || err.response?.status === 400) {
+        return { error: { _tag: "InvalidCredentials", message: "Credenciales inválidas" } };
       }
-      return failure({ 
+      return { error: { 
         _tag: "NetworkError", 
-        message: e.response?.data?.message || "Error al iniciar sesión con Google" 
-      });
+        message: err.response?.data?.message || "Error al iniciar sesión con Google" 
+      }};
     }
   },
 
@@ -113,7 +107,7 @@ export const AuthService = {
     password: string,
     telefono?: string,
     cedula?: string
-  ): Promise<Result<{ message: string; usuarioId?: string }, AuthError>> {
+  ): Promise<{ data: { message: string; usuarioId?: string } } | { error: AuthError }> {
     try {
       const response = await apiClient.post('/auth/register', {
         Nombre: nombre,
@@ -123,12 +117,13 @@ export const AuthService = {
         Telefono: telefono ?? "",
         Cedula: cedula ?? ""
       });
-      return success(response.data);
-    } catch (e: any) {
-      return failure({ 
+      return { data: response.data };
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } };
+      return { error: { 
         _tag: "NetworkError", 
-        message: e.response?.data?.message || "Error al registrar el usuario" 
-      });
+        message: err.response?.data?.message || "Error al registrar el usuario" 
+      }};
     }
   },
 
@@ -142,12 +137,12 @@ export const AuthService = {
     }
   },
 
-  async getCurrentUser(): Promise<Option<User>> {
+  async getCurrentUser(): Promise<User | null> {
     try {
       const response = await apiClient.get('/auth/me');
-      return some(response.data);
+      return response.data;
     } catch {
-      return none();
+      return null;
     }
   }
 };

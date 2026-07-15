@@ -7,8 +7,8 @@ import { useUpdateInviteeLimits } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 
 const editLimitsSchema = z.object({
-  maxProyectosDelegados: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)),
-  maxConsultasDelegadas: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)),
+  maxProyectosDelegados: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)).pipe(z.number().nullable()),
+  maxConsultasDelegadas: z.string().optional().transform(val => (val === "" || val === undefined) ? null : Number(val)).pipe(z.number().nullable()),
 });
 
 type EditLimitsFormData = z.infer<typeof editLimitsSchema>;
@@ -32,16 +32,16 @@ export const EditInviteeLimitsModal: React.FC<EditInviteeLimitsModalProps> = ({ 
   } = useForm<EditLimitsFormData>({
     resolver: zodResolver(editLimitsSchema),
     defaultValues: {
-      maxProyectosDelegados: "",
-      maxConsultasDelegadas: "",
+      maxProyectosDelegados: null,
+      maxConsultasDelegadas: null,
     },
   });
 
   useEffect(() => {
     if (invitee && isOpen) {
       reset({
-        maxProyectosDelegados: invitee.maxProyectosDelegados?.toString() || "",
-        maxConsultasDelegadas: invitee.maxConsultasDelegadas?.toString() || "",
+        maxProyectosDelegados: invitee.maxProyectosDelegados ?? null,
+        maxConsultasDelegadas: invitee.maxConsultasDelegadas ?? null,
       });
     }
   }, [invitee, isOpen, reset]);

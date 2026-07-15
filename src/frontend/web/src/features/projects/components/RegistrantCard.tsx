@@ -1,7 +1,6 @@
 import React from "react";
 import { ProjectRegistrant } from "../types";
-import { Mail, Phone, ShieldCheck, Building2, CalendarDays, ExternalLink, UserCircle2 } from "lucide-react";
-import { m } from "framer-motion";
+import { Mail, Phone, ShieldCheck, Building2, CalendarDays, UserCircle2 } from "lucide-react";
 
 interface RegistrantCardProps {
   registrant: ProjectRegistrant;
@@ -9,19 +8,23 @@ interface RegistrantCardProps {
 
 export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) => {
   const {
-    nombre,
-    apellido,
-    empresa,
-    telefono,
+    nombreCompleto,
+    razonSocial,
+    rol,
     email,
+    telefono,
     avatarUrl,
     verificado,
-    rol,
-    miembroDesde,
+    fechaRegistro,
   } = registrant;
 
-  const fullName = `${nombre} ${apellido}`.trim();
-  const initials = `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
+  const fullName = nombreCompleto || razonSocial || 'Sin nombre';
+  const initials = fullName
+    .split(' ')
+    .map(n => n.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div data-testid="registrant-card" className="bg-surface-container-lowest p-8 rounded-[2.5rem] border border-surface-container-high/50 shadow-sm relative overflow-hidden group">
@@ -63,11 +66,11 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
               {fullName}
             </h3>
             
-            {empresa && (
+            {razonSocial && (
               <div className="flex items-center gap-1.5 mt-1.5 text-on-surface-variant/80">
                 <Building2 className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-sm font-medium truncate" data-testid="registrant-company">
-                  {empresa}
+                  {razonSocial}
                 </span>
               </div>
             )}
@@ -115,7 +118,7 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
             </div>
           )}
 
-          {miembroDesde && (
+          {fechaRegistro && (
             <div className="flex items-start gap-3 sm:col-span-2">
               <div className="w-8 h-8 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary shrink-0 mt-0.5">
                 <CalendarDays className="w-4 h-4" />
@@ -123,7 +126,7 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-on-surface-variant/50 block mb-0.5">Antigüedad en Plataforma</span>
                 <span className="text-sm font-medium text-secondary" data-testid="registrant-since">
-                  Miembro desde {miembroDesde}
+                  Miembro desde {fechaRegistro}
                 </span>
               </div>
             </div>

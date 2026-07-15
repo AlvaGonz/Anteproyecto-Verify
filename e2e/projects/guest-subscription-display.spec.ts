@@ -14,6 +14,7 @@ async function stubSettingsApis(page: import('@playwright/test').Page, overrides
       role: 'user',
       plan: null,
       invitedByPlan: 'Corporativo',
+      inviterPlan: 'Corporativo',
       isGuest: true,
       ...overrides?.auth,
     }})

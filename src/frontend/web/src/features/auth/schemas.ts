@@ -1,4 +1,4 @@
-import { z } from "zod";
+﻿import { z } from "zod";
 
 // Dominican Cédula check-digit validation algorithm (Luhn mod-10 variant)
 export const validateCedulaCheckDigit = (cedula: string): boolean => {
@@ -45,13 +45,13 @@ export const registerSchema = z.object({
     .string()
     .min(1, "El correo es requerido")
     .email("Formato de correo inválido"),
-telefono: z
-     .string()
-     .min(1, "El teléfono es requerido")
-     .refine((val) => {
-       const digits = val.replace(/\D/g, "");
-       return /^(809|829|849)\d{7}$/.test(digits);
-     }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
+  telefono: z
+    .string()
+    .min(1, "El teléfono es requerido")
+    .refine((val) => {
+      const digits = val.replace(/\D/g, "");
+      return /^(809|829|849)\d{7}$/.test(digits);
+    }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
   cedula: z
     .string()
     .min(1, "La cédula es requerida")
@@ -69,7 +69,7 @@ telefono: z
     .regex(/[A-Z]/, "Debe contener al menos una mayúscula")
     .regex(/[a-z]/, "Debe contener al menos una minúscula")
     .regex(/[0-9]/, "Debe contener al menos un número")
-    .regex(/[!@#$%^&*\-]/, "Debe contener al menos un carácter especial (!@#$%^&*-)"),
+    .regex(/[!@#$%^&*-]/, "Debe contener al menos un carácter especial (!@#$%^&*-)"),
   acceptedTerms: z
     .boolean()
     .refine((val) => val === true, "Debe aceptar los términos de uso y políticas de privacidad"),
@@ -85,17 +85,17 @@ export const UpdateProfileSchema = z.object({
     .string()
     .min(2, "Mínimo 2 caracteres")
     .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Solo letras y espacios"),
-telefono: z
-     .string()
-     .optional()
-     .transform((val) => {
-       if (!val) return val;
-       return val.replace(/\D/g, '');
-     })
-     .refine((val) => {
-       if (val === undefined || val === "") return true;
-       return /^(809|829|849)\d{7}$/.test(val);
-     }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
+  telefono: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return val;
+      return val.replace(/\D/g, '');
+    })
+    .refine((val) => {
+      if (val === undefined || val === "") return true;
+      return /^(809|829|849)\d{7}$/.test(val);
+    }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
   rnc: z.string().optional(),
   razonSocial: z.string().optional(),
   nombreComercial: z.string().optional(),
@@ -112,7 +112,7 @@ telefono: z
   }
   if (!data.newPassword || data.newPassword.length < 8) {
     ctx.addIssue({ code: "custom", path: ["newPassword"], message: "Mínimo 8 caracteres" });
-  } else if (!/[A-Z]/.test(data.newPassword) || !/[a-z]/.test(data.newPassword) || !/[0-9]/.test(data.newPassword) || !/[!@#$%^&*\-]/.test(data.newPassword)) {
+  } else if (!/[A-Z]/.test(data.newPassword) || !/[a-z]/.test(data.newPassword) || !/[0-9]/.test(data.newPassword) || !/[!@#$%^&*-]/.test(data.newPassword)) {
     ctx.addIssue({ code: "custom", path: ["newPassword"], message: "Requiere mayúscula, minúscula, número y carácter especial (!@#$%^&*-)" });
   }
   if (data.newPassword !== data.confirmPassword) {
@@ -163,7 +163,7 @@ export const resetPasswordSchema = z.object({
     .regex(/[A-Z]/, "Debe contener al menos una mayúscula")
     .regex(/[a-z]/, "Debe contener al menos una minúscula")
     .regex(/[0-9]/, "Debe contener al menos un número")
-    .regex(/[!@#$%^&*\-]/, "Debe contener al menos un carácter especial (!@#$%^&*-)"),
+    .regex(/[!@#$%^&*-]/, "Debe contener al menos un carácter especial (!@#$%^&*-)"),
   confirmPassword: z
     .string()
     .min(1, "Debe confirmar la contraseña"),

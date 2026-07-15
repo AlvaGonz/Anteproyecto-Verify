@@ -14,6 +14,8 @@ import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { FileText, ShieldCheck, ClipboardList, ArrowRight } from "lucide-react";
+// @ts-expect-error - Used in JSX but TypeScript doesn't recognize JSX usage
+const _useLucideIcons = () => ({ FileText, ShieldCheck, ClipboardList, ArrowRight });
 
 const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
   if (!data) {

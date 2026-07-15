@@ -26,7 +26,10 @@ export const ResetPasswordPage: React.FC = () => {
 
   useEffect(() => {
     if (!token) {
-      setError(new Error("Token de restablecimiento inválido o ausente."));
+      const timer = setTimeout(() => {
+        setError(new Error("Token de restablecimiento inválido o ausente."));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [token]);
 

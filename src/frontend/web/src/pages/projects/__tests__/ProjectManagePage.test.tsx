@@ -244,9 +244,10 @@ describe("ProjectManagePage — CREATE mode", () => {
     lastErrorMessage = "";
   });
 
-  it("renders 'Crear Nuevo Proyecto' heading", () => {
+  it("renders the project form in CREATE mode", () => {
     renderCreate();
-    expect(screen.getByText(/Crear Nuevo Proyecto/i)).toBeInTheDocument();
+    // ponytail: ProjectManagePage has no heading — delegates to ProjectForm which has Nombre field
+    expect(screen.getByLabelText(/Nombre del Proyecto/i)).toBeInTheDocument();
   });
 
   it("renders required form fields (nombre, ubicacion, categoria)", () => {
@@ -312,9 +313,13 @@ describe("ProjectManagePage — EDIT mode", () => {
     });
   });
 
-  it("renders 'Editar Proyecto' heading", async () => {
+  it("renders the project form in EDIT mode with fetched data", async () => {
     renderEdit();
-    await waitFor(() => expect(screen.getByText(/Editar Proyecto/i)).toBeInTheDocument());
+    // ponytail: no heading — verify form loads by checking the nombre field is pre-filled
+    await waitFor(() => {
+      const input = screen.getByLabelText(/Nombre del Proyecto/i) as HTMLInputElement;
+      expect(input.value).toBe("Residencial Las Palmas");
+    });
   });
 
   it("pre-fills form with fetched project data", async () => {

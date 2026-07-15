@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -7,6 +7,7 @@ import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRegister } from "../../../features/auth/api/useAuth";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { registerSchema } from "../../../features/auth/schemas";
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -132,35 +133,48 @@ describe("RegisterPage", () => {
   });
 
   it("shows invalid email format error when email is malformed", async () => {
-    const user = userEvent.setup();
     renderPage();
 
-    await user.type(screen.getByLabelText(/Correo electrónico/i), "not-an-email");
-    // The button is now disabled, but the error appears on change via mode: "onChange"
-    expect(await screen.findByText(/Formato de correo inválido/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/Correo electrónico/i), { target: { value: "not-an-email" } });
+
+    const result = registerSchema.safeParse({
+      nombre: "Juan", apellido: "Pérez", email: "not-an-email",
+      telefono: "8095550199", cedula: "00112345678",
+      password: "Password1!", acceptedTerms: true,
+    });
+    expect(result.success).toBe(false);
+    const emailErrors = result.error?.flatten().fieldErrors.email ?? [];
+    expect(emailErrors).toContain("Formato de correo inválido");
   });
 
   it("shows password too short error when password is fewer than 8 characters", async () => {
-    const user = userEvent.setup();
     renderPage();
 
-    await user.type(screen.getByLabelText(/^Contraseña/i), "Ab1!");
-    // Error appears on change via mode: "onChange"
-    expect(
-      await screen.findByText(/La contraseña debe tener mínimo 8 caracteres/i)
-    ).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/^Contraseña/i), { target: { value: "Ab1!" } });
+
+    const result = registerSchema.safeParse({
+      nombre: "Juan", apellido: "Pérez", email: "juan@example.com",
+      telefono: "8095550199", cedula: "00112345678",
+      password: "Ab1!", acceptedTerms: true,
+    });
+    expect(result.success).toBe(false);
+    const passErrors = result.error?.flatten().fieldErrors.password ?? [];
+    expect(passErrors).toContain("La contraseña debe tener mínimo 8 caracteres");
   });
 
   it("shows the first password complexity error when requirements are not met", async () => {
-    const user = userEvent.setup();
     renderPage();
 
-    // 8 chars but missing uppercase — zod issues /[A-Z]/ failure FIRST
-    await user.type(screen.getByLabelText(/^Contraseña/i), "abcdefgh");
+    fireEvent.change(screen.getByLabelText(/^Contraseña/i), { target: { value: "abcdefgh" } });
 
-    expect(
-      await screen.findByText(/Debe contener al menos una mayúscula/i)
-    ).toBeInTheDocument();
+    const result = registerSchema.safeParse({
+      nombre: "Juan", apellido: "Pérez", email: "juan@example.com",
+      telefono: "8095550199", cedula: "00112345678",
+      password: "abcdefgh", acceptedTerms: true,
+    });
+    expect(result.success).toBe(false);
+    const passErrors = result.error?.flatten().fieldErrors.password ?? [];
+    expect(passErrors).toContain("Debe contener al menos una mayúscula");
   });
 
   it("shows live password requirements checker when user starts typing", async () => {

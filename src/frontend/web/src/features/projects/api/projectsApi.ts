@@ -9,7 +9,6 @@ import {
   DocumentDiagnosisDto,
   CatastroLookupDto,
 } from "../types";
-import { success, failure, Result } from "../../../shared/utils/functional";
 
 const mapError = (error: any, id?: string): ProjectError => {
   if (error?.response) {
@@ -29,53 +28,57 @@ const mapError = (error: any, id?: string): ProjectError => {
   return { _tag: "UnknownError", original: error };
 };
 
+type ApiResult<T> = 
+  | { _tag: "Success"; data: T }
+  | { _tag: "Failure"; error: ProjectError };
+
 export const projectsApi = {
-  async getProjects(): Promise<Result<ProyectoDto[], ProjectError>> {
+  async getProjects(): Promise<ApiResult<ProyectoDto[]>> {
     try {
       const response = await apiClient.get<ProyectoDto[]>("/projects");
-      return success(response.data);
+      return { _tag: "Success", data: response.data };
     } catch (error: any) {
       const mapped = mapError(error);
       if (mapped._tag === "UnknownError") {
-        return failure(mapped);
+        return { _tag: "Failure", error: mapped };
       }
-      return failure({ _tag: "ServerError", message: error.message || "Server Error" });
+      return { _tag: "Failure", error: { _tag: "ServerError", message: error.message || "Server Error" } };
     }
   },
 
-  async getProjectById(id: string): Promise<Result<ProyectoDto, ProjectError>> {
+  async getProjectById(id: string): Promise<ApiResult<ProyectoDto>> {
     try {
       const response = await apiClient.get<ProyectoDto>(`/projects/${id}`);
-      return success(response.data);
+      return { _tag: "Success", data: response.data };
     } catch (error: any) {
-      return failure(mapError(error, id));
+      return { _tag: "Failure", error: mapError(error, id) };
     }
   },
 
-  async createProject(data: CreateProyectoDto & { fotosNuevas?: File[] }): Promise<Result<ProyectoDto, ProjectError>> {
+  async createProject(data: CreateProyectoDto & { fotosNuevas?: File[] }): Promise<ApiResult<ProyectoDto>> {
     try {
       const { fotosNuevas: _, ...payload } = data as any;
       const enriched = { ...payload, estadoProyecto: ProjectStatus.Draft, estadoIntegridad: IntegrityStatus.Pending };
       const response = await apiClient.post<ProyectoDto>("/projects", enriched);
-      return success(response.data);
+      return { _tag: "Success", data: response.data };
     } catch (error: any) {
       const mapped = mapError(error);
-      if (mapped._tag === "ServerError") return failure(mapped);
-      return failure({ _tag: "ServerError", message: error.message || "Server Error" });
+      if (mapped._tag === "ServerError") return { _tag: "Failure", error: mapped };
+      return { _tag: "Failure", error: { _tag: "ServerError", message: error.message || "Server Error" } };
     }
   },
 
-  async updateProject(id: string, data: UpdateProyectoDto & { fotosNuevas?: File[] }): Promise<Result<ProyectoDto, ProjectError>> {
-     try {
-       const { fotosNuevas: _, ...payload } = data;
-       const response = await apiClient.put<ProyectoDto>(`/projects/${id}`, payload);
-       return success(response.data);
-     } catch (error: any) {
-       return failure(mapError(error, id));
-     }
-   },
+  async updateProject(id: string, data: UpdateProyectoDto & { fotosNuevas?: File[] }): Promise<ApiResult<ProyectoDto>> {
+    try {
+      const { fotosNuevas: _, ...payload } = data;
+      const response = await apiClient.put<ProyectoDto>(`/projects/${id}`, payload);
+      return { _tag: "Success", data: response.data };
+    } catch (error: any) {
+      return { _tag: "Failure", error: mapError(error, id) };
+    }
+  },
 
-  async updateProjectStatus(id: string, status: ProjectStatus): Promise<Result<ProyectoDto, ProjectError>> {
+  async updateProjectStatus(id: string, status: ProjectStatus): Promise<ApiResult<ProyectoDto>> {
     if (!Object.values(ProjectStatus).includes(status) || typeof status !== "number") {
       throw new Error("Invalid project status");
     }
@@ -83,28 +86,27 @@ export const projectsApi = {
       const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, status, {
         headers: { 'Content-Type': 'application/json' }
       });
-      return success(response.data);
+      return { _tag: "Success", data: response.data };
     } catch (error: any) {
-      return failure(mapError(error, id));
+      return { _tag: "Failure", error: mapError(error, id) };
     }
   },
 
-  async getProjectDiagnosis(id: string): Promise<Result<DocumentDiagnosisDto, ProjectError>> {
+  async getProjectDiagnosis(id: string): Promise<ApiResult<DocumentDiagnosisDto>> {
     try {
-      // The backend route is /api/projects/{projectId}/documents/diagnosis
       const response = await apiClient.get<DocumentDiagnosisDto>(`/projects/${id}/documents/diagnosis`);
-      return success(response.data);
+      return { _tag: "Success", data: response.data };
     } catch (error: any) {
-      return failure(mapError(error, id));
+      return { _tag: "Failure", error: mapError(error, id) };
     }
   },
 
-  async lookupCatastroByGps(lat: string, lon: string): Promise<Result<CatastroLookupDto, ProjectError>> {
+  async lookupCatastroByGps(lat: string, lon: string): Promise<ApiResult<CatastroLookupDto>> {
     try {
       const response = await apiClient.get<CatastroLookupDto>(`/projects/catastro/lookup?latitud=${lat}&longitud=${lon}`);
-      return success(response.data);
+      return { _tag: "Success", data: response.data };
     } catch (error: any) {
-      return failure(mapError(error));
+      return { _tag: "Failure", error: mapError(error) };
     }
   }
 };
