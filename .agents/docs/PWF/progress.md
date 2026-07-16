@@ -41,6 +41,7 @@
 | WBS-014 | 17 UI screens breakdown         | planner              | ✅ 17 screens mapped     |
 | WBS-020 | RF-10 Integrity Seal ADR        | architect            | ✅ ADR-005 (357 lines)   |
 | TEC-010 | SonarCloud pipeline gate        | devops-specialist    | ✅ Pipeline config       |
+| WBS-022 | Invitation Limits E2E Tests     | playwright-skill     | ✅ 08-invitation-limits  |
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - [x] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001 (DONE - Security Hardening)
