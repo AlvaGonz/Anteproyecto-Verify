@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { projectsApi } from "../api/projectsApi";
 import { ProjectStatus } from "../types";
 import { isSuccess } from "@/shared/utils/functional";
+import { getProjectErrorMessage } from "../types";
 import { useToast } from "@/shared/components/ui/Toast/ToastContext";
 
 export const useProjectStatusBar = (projectId: string) => {
@@ -17,7 +18,7 @@ export const useProjectStatusBar = (projectId: string) => {
       if (isSuccess(result)) {
         return result.value;
       }
-      throw new Error(result.error.message || "Failed to fetch status eligibility");
+      throw new Error(getProjectErrorMessage(result.error) || "Failed to fetch status eligibility");
     },
     enabled: !!projectId,
   });
@@ -26,7 +27,7 @@ export const useProjectStatusBar = (projectId: string) => {
     mutationFn: async (status: ProjectStatus) => {
       const result = await projectsApi.updateProjectStatus(projectId, status);
       if (!isSuccess(result)) {
-        throw new Error(result.error.message || "Failed to update status");
+        throw new Error(getProjectErrorMessage(result.error) || "Failed to update status");
       }
       return result.value;
     },

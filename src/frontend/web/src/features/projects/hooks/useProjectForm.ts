@@ -5,6 +5,8 @@ import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } fr
 import { useAuth } from "../../../shared/context/AuthContext";
 import { apiClient } from "../../../infrastructure/api/client";
 import { projectsApi } from "../api/projectsApi";
+import { isSuccess } from "@/shared/utils/functional";
+import { getProjectErrorMessage } from "../types";
 
 // Fix Leaflet default marker icon paths broken by Vite's asset bundler
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -173,9 +175,9 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     setIsUploadingPhotos(true);
     try {
       const res = await projectsApi.uploadProjectImage(file);
-      if (res._tag === "Success") {
-        setImagenUrl(res.data);
-        setPortraitPreview(res.data);
+      if (isSuccess(res)) {
+        setImagenUrl(res.value);
+        setPortraitPreview(res.value);
       } else {
         setFotosError("Error al subir la foto de portada.");
       }
@@ -219,8 +221,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
       const uploadedUrls: string[] = [];
       results.forEach((res, idx) => {
-        if (res._tag === "Success") {
-          uploadedUrls.push(res.data);
+        if (isSuccess(res)) {
+          uploadedUrls.push(res.value);
         } else {
           console.error("Error uploading gallery image", selected[idx].name);
         }
@@ -310,14 +312,19 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
       try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        setDesignacionCatastral(catastroData.designacionCatastral || "");
-        setMatricula(catastroData.matricula || "");
-        setSuperficieM2(catastroData.superficieM2 || "");
-        setPropietario(catastroData.propietario || "");
-        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-        setIpi(catastroData.ipi || "");
-        setEstatusIpi(catastroData.estatusIpi || "");
+        const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
+        if (isSuccess(result)) {
+          const catastroData = result.value;
+          setDesignacionCatastral(catastroData.designacionCatastral || "");
+          setMatricula(catastroData.matricula || "");
+          setSuperficieM2(catastroData.superficieM2 || "");
+          setPropietario(catastroData.propietario || "");
+          setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+          setIpi(catastroData.ipi || "");
+          setEstatusIpi(catastroData.estatusIpi || "");
+        } else {
+          throw new Error(getProjectErrorMessage(result.error));
+        }
       } catch (error) {
         console.error("No catastro data found:", error);
         // Fallback for demo purposes if no real data is found
@@ -360,14 +367,19 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
       try {
-        const catastroData = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        setDesignacionCatastral(catastroData.designacionCatastral || "");
-        setMatricula(catastroData.matricula || "");
-        setSuperficieM2(catastroData.superficieM2 || "");
-        setPropietario(catastroData.propietario || "");
-        setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-        setIpi(catastroData.ipi || "");
-        setEstatusIpi(catastroData.estatusIpi || "");
+        const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
+        if (isSuccess(result)) {
+          const catastroData = result.value;
+          setDesignacionCatastral(catastroData.designacionCatastral || "");
+          setMatricula(catastroData.matricula || "");
+          setSuperficieM2(catastroData.superficieM2 || "");
+          setPropietario(catastroData.propietario || "");
+          setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
+          setIpi(catastroData.ipi || "");
+          setEstatusIpi(catastroData.estatusIpi || "");
+        } else {
+          throw new Error(getProjectErrorMessage(result.error));
+        }
       } catch (error) {
         console.error("No catastro data found:", error);
         const randomParcel = Math.floor(Math.random() * 500) + 1;

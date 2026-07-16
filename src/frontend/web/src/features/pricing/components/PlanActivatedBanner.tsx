@@ -24,21 +24,48 @@ export const PlanActivatedBanner: React.FC<Props> = ({ plan, onDismiss }) => {
     return () => window.removeEventListener('keydown', onKey)
   }, [onDismiss])
 
-  const capabilities = [
-    plan.queriesPerMonth === 'unlimited'
-      ? 'Consultas ilimitadas'
-      : `${plan.queriesPerMonth} consultas/mes`,
-    plan.pdfReports && 'Reportes PDF descargables',
-    plan.liensAlerts && 'Alertas de gravámenes',
-    plan.multiUser && 'Multiusuario habilitado',
-    plan.apiAccess === 'full' && 'Acceso API completo',
-    plan.apiAccess === 'basic' && 'Acceso API básico',
-    plan.prioritySupport && 'Soporte prioritario',
-  ].filter(Boolean) as string[]
+  let capabilities: string[] = []
+
+  if (plan.label === 'Profesional') {
+    capabilities = [
+      'Hasta 25 consultas',
+      '5 Proyectos registrables',
+      'Presentación al público de los proyectos',
+      'QR incluido'
+    ]
+  } else if (plan.label === 'Empresa') {
+    capabilities = [
+      'Hasta 100 consultas',
+      '10 Proyectos registrables',
+      'Presentación al público de los proyectos',
+      'QR incluido',
+      'Multi-usuario (5)'
+    ]
+  } else if (plan.label === 'Corporativo') {
+    capabilities = [
+      'Consultas ilimitadas',
+      '50 Proyectos registrables',
+      'Presentación al público de los proyectos',
+      'QR incluido',
+      'Multi-usuario (30)'
+    ]
+  } else {
+    capabilities = [
+      plan.queriesPerMonth === 'unlimited'
+        ? 'Consultas ilimitadas'
+        : `${plan.queriesPerMonth} consultas/mes`,
+      plan.pdfReports && 'Reportes PDF descargables',
+      plan.liensAlerts && 'Alertas de gravámenes',
+      plan.multiUser && 'Multiusuario habilitado',
+      plan.apiAccess === 'full' && 'Acceso API completo',
+      plan.apiAccess === 'basic' && 'Acceso API básico',
+      plan.prioritySupport && 'Soporte prioritario',
+    ].filter(Boolean) as string[]
+  }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 animate-in fade-in duration-300"
       onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
       role="dialog"
       aria-modal="true"
@@ -49,7 +76,7 @@ export const PlanActivatedBanner: React.FC<Props> = ({ plan, onDismiss }) => {
         className={`
           relative mx-4 w-full max-w-md rounded-3xl border-2 p-8 shadow-2xl
           animate-in zoom-in-95 fade-in slide-in-from-bottom-4 duration-500
-          ${plan.bgColor}
+          bg-surface ${plan.bgColor.replace(/bg-[a-zA-Z0-9-/]+/g, '').trim()}
         `}
       >
         {/* Close button */}
@@ -92,10 +119,10 @@ export const PlanActivatedBanner: React.FC<Props> = ({ plan, onDismiss }) => {
           className={`w-full py-3 rounded-xl font-bold text-sm transition-all shadow-lg
             ${plan.color.includes('primary') ? 'bg-primary text-on-primary hover:bg-primary/90' :
               plan.color.includes('secondary') ? 'bg-secondary text-on-secondary hover:bg-secondary/90' :
-              'bg-surface text-on-surface hover:bg-surface-variant border border-outline-variant'}
+                'bg-surface text-on-surface hover:bg-surface-variant border border-outline-variant'}
           `}
         >
-          Ir al Dashboard
+          Aceptar
         </button>
       </div>
     </div>

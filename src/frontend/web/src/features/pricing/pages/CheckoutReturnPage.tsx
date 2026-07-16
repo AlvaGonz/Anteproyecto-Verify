@@ -111,6 +111,7 @@ export const CheckoutReturnPage = () => {
             sessionPlan: data.plan ?? undefined,
             userPlanName: user?.plan ?? undefined
           });
+          let resolvedPlan = data.plan || user?.plan;
           console.log('[CheckoutReturn] Initial state:', state, { sessionStatus: data.status, userSubscriptionStatus: user?.subscriptionStatus, sessionPlan: data.plan, userPlanName: user?.plan });
 
           if (state === 'error') {
@@ -142,6 +143,7 @@ export const CheckoutReturnPage = () => {
             const statusRes = await apiClient.get('/v1/subscriptions/my-status');
             const latestStatus = statusRes.data.subscriptionStatus;
             const latestPlan = statusRes.data.plan;
+            resolvedPlan = latestPlan || resolvedPlan;
             console.log('[CheckoutReturn] Polling - latest status:', latestStatus, 'latest plan:', latestPlan);
 
             state = resolvePostCheckoutState({
@@ -167,6 +169,7 @@ export const CheckoutReturnPage = () => {
               const statusRes = await apiClient.get('/v1/subscriptions/my-status');
               const finalStatus = statusRes.data.subscriptionStatus;
               const finalPlan = statusRes.data.plan;
+              resolvedPlan = finalPlan || resolvedPlan;
               
               state = resolvePostCheckoutState({
                 sessionStatus: data.status,
@@ -194,7 +197,7 @@ export const CheckoutReturnPage = () => {
 
           // Fix: use safeNavigate (react-router navigate) instead of window.location.href
           // to avoid pathname contamination in HashRouter (#/admin/dashboard not /admin/dashboard#/admin/dashboard)
-          const currentPlan = user?.plan ?? data.plan;
+          const currentPlan = resolvedPlan;
           const capabilities = PLAN_CAPABILITIES[normalizePlanKey(currentPlan)];
           safeNavigate('/admin/dashboard', {
             replace: true,
