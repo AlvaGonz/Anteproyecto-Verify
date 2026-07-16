@@ -26,6 +26,7 @@ export interface User {
   // ponytail: guest/inviter fields for subscription display
   isGuest?: boolean;
   inviterPlan?: string;
+  maxUsuariosSecundarios?: number;
   inviteesList?: Array<{
     id: string;
     nombre: string;

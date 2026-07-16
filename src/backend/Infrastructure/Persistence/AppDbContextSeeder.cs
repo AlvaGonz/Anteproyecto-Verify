@@ -311,7 +311,7 @@ public static class AppDbContextSeeder
             var profesional = PlanSuscripcion.Create(
                 id: Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"), nombrePlan: "Profesional", precio: 3500.00m,
                 maxConsultas: 25, maxProyectos: 5, presentacionPublica: true,
-                qrIncluido: true, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 200,
+                qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 200,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: false,
                 soporteTipo: "Email", accesoApi: false);
@@ -319,7 +319,7 @@ public static class AppDbContextSeeder
             // Empresa
             var empresa = PlanSuscripcion.Create(
                 id: Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"), nombrePlan: "Empresa", precio: 10000.00m,
-                maxConsultas: 100, maxProyectos: 30, presentacionPublica: true,
+                maxConsultas: 100, maxProyectos: 10, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 1024,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: true, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: true,
@@ -329,7 +329,7 @@ public static class AppDbContextSeeder
             var corporativo = PlanSuscripcion.Create(
                 id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Corporativo", precio: 30000.00m,
                 maxConsultas: -1, maxProyectos: 50, presentacionPublica: true,
-                qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: 10240,
+                qrIncluido: true, maxUsuariosSecundarios: 30, maxAlmacenamientoMb: 10240,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
                 exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
                 soporteTipo: "Account Manager", accesoApi: true);

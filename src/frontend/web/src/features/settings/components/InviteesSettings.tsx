@@ -9,9 +9,9 @@ import { EditInviteeLimitsModal } from "./EditInviteeLimitsModal";
 export const InviteesSettings: React.FC = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedInvitee, setSelectedInvitee] = useState<any>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [userToRemove, setUserToRemove] = useState<any>(null);
 
   const removeInviteeMutation = useRemoveInvitee();
@@ -54,55 +54,86 @@ export const InviteesSettings: React.FC = () => {
 
         {/* Invited users section */}
         <div className="mb-4">
-          {(!(user as any)?.inviteesList || (user as any).inviteesList.length === 0) ? (
+          {(!(user as any)?.inviteesList || (user as any).inviteesList.length === 0) && (!(user as any)?.maxUsuariosSecundarios) ? (
             <div className="p-6 bg-surface-raised/50 rounded-xl border border-dashed border-border text-center text-text-secondary">
               No tienes usuarios invitados en tu cuenta actualmente.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(user as any).inviteesList.map((invitee: any) => (
-                <div key={invitee.id} className="bg-white p-4 rounded-xl border border-border shadow-sm flex items-center justify-between">
-                  <div>
-                    <h4 className="font-bold text-text-primary">{invitee.nombre} {invitee.apellido}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-xs text-text-secondary">{invitee.email}</p>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                        invitee.estado === 'Activo' ? 'bg-green-100 text-green-700' :
-                        invitee.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {invitee.estado}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-2">
-                      <p className="text-xs text-text-secondary">
-                        <span className="font-semibold text-navy">Proyectos:</span> {invitee.proyectosCreados} / {invitee.maxProyectosDelegados === null ? '∞' : invitee.maxProyectosDelegados}
-                      </p>
-                      <p className="text-xs text-text-secondary">
-                        <span className="font-semibold text-navy">Consultas:</span> {invitee.consultasUsadas} / {invitee.maxConsultasDelegadas === null ? '∞' : invitee.maxConsultasDelegadas}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleEditLimits(invitee)}
-                      className="p-2 text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
-                      title="Editar límites"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setUserToRemove(invitee)}
-                      className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-                      title="Remover invitado"
-                    >
-                      <UserMinus className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+              {(() => {
+                // Determine the maximum limit to display (use DB limit or fallback to 5 for Profesional as requested)
+                let limit = (user as any)?.maxUsuariosSecundarios || 0;
+                // If limit is 0 or undefined, but user says they have limit of 5, we enforce visual 5 if plan is Profesional
+                if (limit <= 0 && (user as any)?.plan === "Profesional") {
+                  limit = 5;
+                } else if (limit <= 0) {
+                  // Fallback to the length of current invitees if no limit is set
+                  limit = Math.max((user as any)?.inviteesList?.length || 0, 5);
+                }
+
+                const invitees = (user as any)?.inviteesList || [];
+                const slots = [];
+
+                for (let i = 0; i < limit; i++) {
+                  const invitee = invitees[i];
+                  if (invitee) {
+                    slots.push(
+                      <div key={invitee.id} className="bg-white p-4 rounded-xl border border-border shadow-sm flex items-center justify-between">
+                        <div>
+                          <h4 className="font-bold text-text-primary">{invitee.nombre} {invitee.apellido}</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-text-secondary">{invitee.email}</p>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                              invitee.estado === 'Activo' ? 'bg-green-100 text-green-700' :
+                              invitee.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {invitee.estado}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 mt-2">
+                            <p className="text-xs text-text-secondary">
+                              <span className="font-semibold text-navy">Proyectos:</span> {invitee.proyectosCreados} / {invitee.maxProyectosDelegados === null ? '∞' : invitee.maxProyectosDelegados}
+                            </p>
+                            <p className="text-xs text-text-secondary">
+                              <span className="font-semibold text-navy">Consultas:</span> {invitee.consultasUsadas} / {invitee.maxConsultasDelegadas === null ? '∞' : invitee.maxConsultasDelegadas}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEditLimits(invitee)}
+                            className="p-2 text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
+                            title="Editar límites"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setUserToRemove(invitee)}
+                            className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                            title="Remover invitado"
+                          >
+                            <UserMinus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    slots.push(
+                      <div key={`empty-${i}`} className="bg-surface-raised/30 p-4 rounded-xl border border-dashed border-border shadow-sm flex flex-col items-center justify-center text-center min-h-[120px] transition-colors hover:bg-surface-raised/50">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                          <UserPlus className="w-5 h-5 text-primary" />
+                        </div>
+                        <p className="text-sm font-medium text-navy">Espacio Disponible</p>
+                        <p className="text-xs text-text-secondary mt-1">Click en "Invitar Usuarios" para asignar</p>
+                      </div>
+                    );
+                  }
+                }
+                return slots;
+              })()}
             </div>
           )}
         </div>

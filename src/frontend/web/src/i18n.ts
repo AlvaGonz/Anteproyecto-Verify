@@ -252,7 +252,7 @@ const resources = {
             title: "Empresa",
             desc: "Volumen alto para inmobiliarias y equipos de analistas.",
             feature1: "100 consultas /mes",
-            feature2: "30 proyectos registrables",
+            feature2: "10 proyectos registrables",
             feature3: "Multiusuario (hasta 5)",
             feature4: "Consultas de proyectos por QR",
             button: "Elegir Empresa"

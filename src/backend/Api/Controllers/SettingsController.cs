@@ -118,7 +118,7 @@ public class SettingsController : ControllerBase
                         PlanExpiresAt = u.CurrentPeriodEnd,
                         UsedProjects = u.ProyectosCreados,
                         UsedQueries = u.ConsultasUsadas,
-                        MaxInvitees = u.TitularId != null ? 0 : (u.Plan != null && u.Plan.NombrePlan == "Corporativo" ? 10 : (u.Plan != null && u.Plan.NombrePlan == "Empresa" ? 5 : 0)),
+                        MaxInvitees = u.TitularId != null ? 0 : (u.Plan != null ? u.Plan.MaxUsuariosSecundarios : 0),
                         InviteesCount = inviteesCount
                     };
 
@@ -465,7 +465,7 @@ public class SettingsController : ControllerBase
         u.AsignarPlan(plan.Idsuscripcion);
 
         // Enforce team member limit for the new plan
-        int maxInvitees = plan.NombrePlan == "Corporativo" ? 10 : (plan.NombrePlan == "Empresa" ? 5 : 0);
+        int maxInvitees = plan.MaxUsuariosSecundarios;
         var currentInvitees = await _context.Usuarios
             .Where(usr => usr.TitularId == u.Id)
             .ToListAsync(cancellationToken);
@@ -510,7 +510,7 @@ public class SettingsController : ControllerBase
         var invitee = await _context.Usuarios.FirstOrDefaultAsync(user => user.Id == inviteeId, cancellationToken);
         if (invitee == null) return NotFound(new { Message = "Usuario a invitar no encontrado." });
 
-        int maxInvitees = titular.Plan != null && titular.Plan.NombrePlan == "Corporativo" ? 10 : (titular.Plan != null && titular.Plan.NombrePlan == "Empresa" ? 5 : 0);
+        int maxInvitees = titular.Plan?.MaxUsuariosSecundarios ?? 0;
         int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == titular.Id, cancellationToken);
 
         if (currentInvitees >= maxInvitees)
@@ -587,11 +587,11 @@ public class SettingsController : ControllerBase
             return BadRequest(new { Message = "Tu plan actual no permite invitar usuarios." });
         }
 
-        int maxInvitees = isAdmin ? 100 : (emisor.Plan?.NombrePlan == "Corporativo" ? 10 : 5);
+        int maxInvitees = isAdmin ? 100 : (emisor.Plan?.MaxUsuariosSecundarios ?? 0);
         
         // Count existing invitees + pending invitations
         int currentInvitees = await _context.Usuarios.CountAsync(user => user.TitularId == emisor.Id, cancellationToken);
-        int pendingInvitations = await _context.Invitaciones.CountAsync(i => i.EmisorId == emisor.Id && !i.Aceptada, cancellationToken);
+        int pendingInvitations = await _context.Invitaciones.CountAsync(i => i.EmisorId == emisor.Id && !i.Aceptada && !_context.Usuarios.Any(u => u.CorreoElectronico == i.Email && u.TitularId == emisor.Id), cancellationToken);
 
         if (currentInvitees + pendingInvitations >= maxInvitees)
         {
