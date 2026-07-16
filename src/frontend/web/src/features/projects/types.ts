@@ -103,12 +103,13 @@ export enum ProjectCategory {
 }
 
 export enum ProjectStatus {
-  Draft = 0,
-  Published = 1,
-  InReview = 2,
-  Observed = 3,
-  Validated = 4,
-  Rejected = 5,
+  Draft = 'CREADO',
+  Edited = 'EDITADO',
+  InReview = 'REVISION',
+  Observed = 'OBSERVACION',
+  Published = 'PUBLICADO',
+  Validated = 'PUBLICADO', // Mapping old Validated to Publicado for compatibility if needed
+  Rejected = 'RECHAZADO' // Keep old just in case
 }
 
 export interface StatusEligibility {

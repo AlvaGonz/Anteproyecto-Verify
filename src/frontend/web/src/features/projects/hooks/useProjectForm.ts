@@ -69,6 +69,24 @@ const PROVINCIAS: ProvinciaInfo[] = [
   { nombre: "Valverde", lat: 19.58000, lng: -71.07000, dcPrefix: "DC-32" },
 ];
 
+export const getClosestProvincia = (lat: number, lng: number): string => {
+  let closestProvince = "Distrito Nacional";
+  let minDistance = Infinity;
+
+  PROVINCIAS.forEach(p => {
+    const dLat = p.lat - lat;
+    const dLng = p.lng - lng;
+    const distance = Math.sqrt(dLat * dLat + dLng * dLng);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestProvince = p.nombre;
+    }
+  });
+
+  return closestProvince;
+};
+
 export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: ProjectFormProps) {
   // useAuth must be called unconditionally at the top level (React rules).
   // In unit tests the component is wrapped in a test AuthProvider, so this is safe.
@@ -311,17 +329,20 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
+      const closestProvName = getClosestProvincia(lat, lng);
+      setUbicacionTexto(closestProvName);
+
       try {
         const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        if (isSuccess(result)) {
-          const catastroData = result.value;
-          setDesignacionCatastral(catastroData.designacionCatastral || "");
-          setMatricula(catastroData.matricula || "");
-          setSuperficieM2(catastroData.superficieM2 || "");
-          setPropietario(catastroData.propietario || "");
-          setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-          setIpi(catastroData.ipi || "");
-          setEstatusIpi(catastroData.estatusIpi || "");
+        if (result._tag === "Success") {
+          const catastroData = result.data;
+          if (catastroData.designacionCatastral) setDesignacionCatastral(catastroData.designacionCatastral);
+          if (catastroData.matricula) setMatricula(catastroData.matricula);
+          if (catastroData.superficieM2) setSuperficieM2(catastroData.superficieM2);
+          if (catastroData.propietario) setPropietario(catastroData.propietario);
+          if (catastroData.cedulaRncPropietario) setCedulaRncPropietario(catastroData.cedulaRncPropietario);
+          if (catastroData.ipi) setIpi(catastroData.ipi);
+          if (catastroData.estatusIpi) setEstatusIpi(catastroData.estatusIpi);
         } else {
           throw new Error(getProjectErrorMessage(result.error));
         }
@@ -329,7 +350,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         console.error("No catastro data found:", error);
         // Fallback for demo purposes if no real data is found
         const randomParcel = Math.floor(Math.random() * 500) + 1;
-        const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+        const matchedProv = PROVINCIAS.find(p => p.nombre === closestProvName);
         const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
         setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
       }
@@ -366,6 +387,9 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       const { lat, lng } = e.latlng;
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
+      const closestProvName = getClosestProvincia(lat, lng);
+      setUbicacionTexto(closestProvName);
+
       try {
         const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
         if (isSuccess(result)) {
@@ -377,13 +401,17 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
           setIpi(catastroData.ipi || "");
           setEstatusIpi(catastroData.estatusIpi || "");
+          const closestProvName = getClosestProvincia(lat, lng);
+          setUbicacionTexto(closestProvName);
         } else {
           throw new Error(getProjectErrorMessage(result.error));
         }
       } catch (error) {
         console.error("No catastro data found:", error);
+        const closestProvName = getClosestProvincia(lat, lng);
+        setUbicacionTexto(closestProvName);
         const randomParcel = Math.floor(Math.random() * 500) + 1;
-        const matchedProv = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+        const matchedProv = PROVINCIAS.find(p => p.nombre === closestProvName);
         const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
         setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
       }

@@ -41,14 +41,7 @@ public class GetPublicProjectVerificationQueryHandler
             _ => "Pendiente"
         };
 
-        string projectStatusStr = cert.Proyecto.Status switch
-        {
-            ProjectStatus.Draft => "Borrador",
-            ProjectStatus.InReview => "En Revisión",
-            ProjectStatus.Approved => "Aprobado",
-            ProjectStatus.Rejected => "Rechazado",
-            _ => "Desconocido"
-        };
+        string projectStatusStr = cert.Proyecto.Estado?.Nombre ?? "Desconocido";
 
         return new PublicProjectVerificationDto(
             PublicCode: cert.CodigoVerificacion,

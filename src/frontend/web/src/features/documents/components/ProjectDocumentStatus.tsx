@@ -81,18 +81,18 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
         className={`group relative flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-[2rem] transition-all border ${isValid
-            ? "bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30"
-            : isPending
-              ? "bg-amber-500/[0.03] border-amber-500/10 hover:border-amber-500/30"
-              : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
+          ? "bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30"
+          : isPending
+            ? "bg-amber-500/[0.03] border-amber-500/10 hover:border-amber-500/30"
+            : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
           }`}
       >
         <div className="flex items-start gap-4">
           <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${isValid
-              ? "bg-emerald-500/10 text-emerald-500"
-              : isPending
-                ? "bg-amber-500/10 text-amber-500"
-                : "bg-on-surface-variant/10 text-on-surface-variant"
+            ? "bg-emerald-500/10 text-emerald-500"
+            : isPending
+              ? "bg-amber-500/10 text-amber-500"
+              : "bg-on-surface-variant/10 text-on-surface-variant"
             }`}>
             {isValid ? <ShieldCheck className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
           </div>

@@ -29,14 +29,7 @@ public class GetPublicProjectReportQueryHandler
 
         if (ultimoReporte == null) return null;
 
-        string projectStatusStr = proyecto.Status switch
-        {
-            ProjectStatus.Draft => "Borrador",
-            ProjectStatus.InReview => "En Revisión",
-            ProjectStatus.Approved => "Aprobado",
-            ProjectStatus.Rejected => "Rechazado",
-            _ => "Desconocido"
-        };
+        string projectStatusStr = proyecto.Estado?.Nombre ?? "Desconocido";
 
         return new PublicProjectReportDto(
             Id: ultimoReporte.Id,

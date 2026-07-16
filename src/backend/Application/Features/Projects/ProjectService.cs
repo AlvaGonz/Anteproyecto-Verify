@@ -111,7 +111,7 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
-        if (status == ProjectStatus.Published)
+        if (status == ProjectStatus.Publicado)
         {
             var usuario = await _usuarioRepository.GetByIdWithPlanAsync(proyecto.UsuarioCreadorId, cancellationToken);
             if (usuario == null)
@@ -128,13 +128,17 @@ public class ProjectService : IProjectService
             }
         }
 
-        var oldStatus = proyecto.Status;
-        proyecto.UpdateStatus(status);
+        var oldStatus = proyecto.Estado?.CodigoUnico;
+        var estado = await _proyectoRepository.GetEstadoByStatusAsync(status, cancellationToken);
+        if (estado == null)
+            throw new InvalidOperationException($"Estado {status} no encontrado.");
+            
+        proyecto.UpdateEstado(estado.Id);
         
         _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if (oldStatus != status && (status == ProjectStatus.Approved || status == ProjectStatus.Rejected))
+        if (oldStatus != status.ToString() && (status == ProjectStatus.Publicado || status == ProjectStatus.ConObservacion))
         {
             var usuario = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
             if (usuario != null && !string.IsNullOrWhiteSpace(usuario.Email))
@@ -203,7 +207,7 @@ public class ProjectService : IProjectService
             proyecto.EstatusIpi,
             proyecto.SuperficieM2,
             proyecto.EstatusDescripcion,
-            proyecto.EstadoProyecto,
+            proyecto.Estado?.CodigoUnico ?? "Desconocido",
             proyecto.EstadoIntegridad,
             proyecto.UsuarioCreadorId,
             proyecto.CreatedAtUtc,

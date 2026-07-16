@@ -193,8 +193,12 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
         await _reporteRepository.AddAsync(reporte, cancellationToken);
 
         // Actualizar estado del proyecto si es necesario
-        proyecto.UpdateStatus(ProjectStatus.InReview);
-        _proyectoRepository.Update(proyecto);
+        var estadoEnRevision = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Revision, cancellationToken);
+        if (estadoEnRevision != null)
+        {
+            proyecto.UpdateEstado(estadoEnRevision.Id);
+            _proyectoRepository.Update(proyecto);
+        }
 
         // 6. Registrar auditoría final y guardar
         await LogAuditAsync(projectId, userId, "ValidacionCompletada", $"Validación finalizada. Score: {integridadScore}%. Sello: {sello?.Nombre ?? "Ninguno"}", cancellationToken);
