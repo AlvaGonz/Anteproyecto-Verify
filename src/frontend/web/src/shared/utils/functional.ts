@@ -4,7 +4,9 @@
  */
 
 export type Result<T, E = Error> =
-  | { _tag: "Success"; value: T }
+  | {
+    data: any; _tag: "Success"; value: T
+  }
   | { _tag: "Failure"; error: E };
 
 export function isSuccess<T, E>(result: Result<T, E>): result is { _tag: "Success"; value: T } {

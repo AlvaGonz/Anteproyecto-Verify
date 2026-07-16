@@ -406,6 +406,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         } else {
           throw new Error(getProjectErrorMessage(result.error));
         }
+
       } catch (error) {
         console.error("No catastro data found:", error);
         const closestProvName = getClosestProvincia(lat, lng);
