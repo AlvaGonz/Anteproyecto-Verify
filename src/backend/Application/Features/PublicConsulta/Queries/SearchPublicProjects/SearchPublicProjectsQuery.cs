@@ -18,7 +18,7 @@ public class PublicProjectSearchResultDto
     public string EstadoValidacion { get; set; } = string.Empty;
     public string? UbicacionTexto { get; set; }
     public int EstadoJuridico { get; set; }
-    public int EstadoProyecto { get; set; }
+    public string EstadoProyecto { get; set; } = string.Empty;
     public int EstadoIntegridad { get; set; }
     public string? Constructora { get; set; }
     public string? Registrante { get; set; }

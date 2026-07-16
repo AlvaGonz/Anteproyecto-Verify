@@ -47,11 +47,11 @@ public class SearchPublicProjectsQueryHandler
                 Id = p.Id,
                 NombreProyecto = p.Nombre,
                 CodigoPublico = sello?.CodigoSello,
-                EstadoValidacion = p.EstadoProyecto == ProjectStatus.Verified ? "Verificado" : 
-                                   p.EstadoProyecto == ProjectStatus.Rejected ? "NoVerificado" : "ConObservaciones",
+                EstadoValidacion = p.Estado?.CodigoUnico == ProjectStatus.Publicado.ToString() ? "Verificado" : 
+                                   p.Estado?.CodigoUnico == ProjectStatus.ConObservacion.ToString() ? "NoVerificado" : "ConObservaciones",
                 UbicacionTexto = p.UbicacionTexto,
                 EstadoJuridico = (int)p.EstadoJuridico,
-                EstadoProyecto = (int)p.EstadoProyecto,
+                EstadoProyecto = p.Estado?.CodigoUnico ?? "Desconocido",
                 EstadoIntegridad = (int)p.EstadoIntegridad,
                 Constructora = p.DatosDesarrollador ?? p.Propietario,
                 Registrante = p.UsuarioCreador?.NombreCompleto,

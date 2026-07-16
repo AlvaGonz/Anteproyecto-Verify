@@ -34,14 +34,9 @@ public class EmailNotificationService : IEmailNotificationService
     public async Task SendProjectStatusChangeAsync(string recipientEmail, Proyecto proyecto, CancellationToken ct = default)
     {
         string subject = $"Actualización de Estado: Proyecto {proyecto.Nombre}";
-        string statusStr = proyecto.Status switch
-        {
-            ProjectStatus.Approved => "Aprobado (Verificado)",
-            ProjectStatus.Rejected => "Rechazado",
-            _ => proyecto.Status.ToString()
-        };
-
-        bool isApproved = proyecto.Status == ProjectStatus.Approved;
+        string statusStr = proyecto.Estado != null ? proyecto.Estado.Nombre : "Desconocido";
+        
+        bool isApproved = proyecto.Estado != null && proyecto.Estado.CodigoUnico == "PUBLICADO";
         
         string body = Email.EmailTemplates.GetProjectStatusChangeEmail(
             proyecto.Nombre,

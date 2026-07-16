@@ -1,7 +1,6 @@
 import React from "react";
 import { ProjectRegistrant } from "../types";
-import { Mail, Phone, ShieldCheck, Building2, CalendarDays, ExternalLink, UserCircle2 } from "lucide-react";
-import { m } from "framer-motion";
+import { Mail, Phone, ShieldCheck, Building2, CalendarDays, UserCircle2 } from "lucide-react";
 
 interface RegistrantCardProps {
   registrant: ProjectRegistrant;
@@ -9,19 +8,18 @@ interface RegistrantCardProps {
 
 export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) => {
   const {
-    nombre,
-    apellido,
-    empresa,
+    nombreCompleto,
+    razonSocial: empresa,
     telefono,
     email,
     avatarUrl,
     verificado,
     rol,
-    miembroDesde,
+    fechaRegistro,
   } = registrant;
 
-  const fullName = `${nombre} ${apellido}`.trim();
-  const initials = `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
+  const fullName = nombreCompleto?.trim() || "";
+  const initials = fullName ? fullName.substring(0, 2).toUpperCase() : "";
 
   return (
     <div data-testid="registrant-card" className="bg-surface-container-lowest p-8 rounded-[2.5rem] border border-surface-container-high/50 shadow-sm relative overflow-hidden group">
@@ -115,7 +113,7 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
             </div>
           )}
 
-          {miembroDesde && (
+          {fechaRegistro && (
             <div className="flex items-start gap-3 sm:col-span-2">
               <div className="w-8 h-8 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary shrink-0 mt-0.5">
                 <CalendarDays className="w-4 h-4" />
@@ -123,7 +121,7 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-on-surface-variant/50 block mb-0.5">Antigüedad en Plataforma</span>
                 <span className="text-sm font-medium text-secondary" data-testid="registrant-since">
-                  Miembro desde {miembroDesde}
+                  Miembro desde {new Date(fechaRegistro).toLocaleDateString()}
                 </span>
               </div>
             </div>

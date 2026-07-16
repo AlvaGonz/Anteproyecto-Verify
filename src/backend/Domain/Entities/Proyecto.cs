@@ -29,13 +29,12 @@ public class Proyecto : EntityBase
     public string? CedulaRncPropietario { get; private set; }
     public string? EstatusIpi { get; private set; }
     public decimal? SuperficieM2 { get; private set; }
-    public string EstatusDescripcion => GetEstatusDescripcion(EstadoProyecto);
+    public string EstatusDescripcion => Estado?.Nombre ?? "Desconocido";
     public Guid PromotorId => UsuarioCreadorId;
     public string? RncPromotor => RncDesarrollador;
     public EstadoJuridico EstadoJuridico { get; private set; } = EstadoJuridico.Pendiente;
-    public ProjectStatus EstadoProyecto { get; private set; }
-    public ProjectStatus Status => EstadoProyecto;
-    public ProjectStatus Estado => EstadoProyecto;
+    public Guid EstadoId { get; private set; }
+    public ProyectoEstado Estado { get; private set; } = null!;
     public IntegrityStatus EstadoIntegridad { get; private set; }
     public bool SelladoBloqueado { get; private set; }
     
@@ -75,7 +74,6 @@ public class Proyecto : EntityBase
         ImagenAdicional4 = img4;
         ImagenAdicional5 = img5;
         CodigoInterno = GenerateCode();
-        EstadoProyecto = ProjectStatus.Draft;
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
@@ -105,9 +103,9 @@ public class Proyecto : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
-    public void UpdateStatus(ProjectStatus newStatus)
+    public void UpdateEstado(Guid nuevoEstadoId)
     {
-        EstadoProyecto = newStatus;
+        EstadoId = nuevoEstadoId;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
@@ -141,17 +139,5 @@ public class Proyecto : EntityBase
         return $"PRJ-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";
     }
 
-    private static string GetEstatusDescripcion(ProjectStatus status)
-    {
-        return status switch
-        {
-            ProjectStatus.Draft => "Borrador",
-            ProjectStatus.Published => "Publicado",
-            ProjectStatus.InReview => "En Revisión",
-            ProjectStatus.Observed => "Observado",
-            ProjectStatus.Validated => "Validado",
-            ProjectStatus.Rejected => "Rechazado",
-            _ => "Desconocido"
-        };
-    }
+
 }

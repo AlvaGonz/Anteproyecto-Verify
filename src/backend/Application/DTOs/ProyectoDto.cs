@@ -28,7 +28,7 @@ public record ProyectoDto(
     string? EstatusIpi,
     decimal? SuperficieM2,
     string EstatusDescripcion,
-    ProjectStatus EstadoProyecto,
+    string EstadoProyecto,
     IntegrityStatus EstadoIntegridad,
     Guid UsuarioCreadorId,
     DateTime CreatedAtUtc,

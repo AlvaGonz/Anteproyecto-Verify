@@ -22,6 +22,7 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
+            .Include(p => p.Estado)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -29,21 +30,32 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
+            .Include(p => p.Estado)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Proyecto>> GetVisibleAsync(CancellationToken cancellationToken = default)
     {
+        var draftCode = ProjectStatus.Creado.ToString();
+
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
-            .Where(p => p.EstadoProyecto != ProjectStatus.Draft && p.EstadoProyecto != ProjectStatus.Rejected)
+            .Include(p => p.Estado)
+            .Where(p => p.Estado.CodigoUnico != draftCode)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ProyectoEstado?> GetEstadoByStatusAsync(ProjectStatus status, CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectoEstados
+            .FirstOrDefaultAsync(e => e.CodigoUnico == status.ToString(), cancellationToken);
     }
 
     public async Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default)
     {
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
+            .Include(p => p.Estado)
             .Where(p => 
                 p.CedulaRncPropietario == query ||
                 p.Ipi == query ||
