@@ -29,7 +29,13 @@ instance.interceptors.request.use((config) => {
   
   if (config.data instanceof FormData) {
     // Let the browser set the Content-Type with the correct boundary
-    delete config.headers['Content-Type'];
+    if (config.headers && typeof config.headers.delete === 'function') {
+      config.headers.delete('Content-Type');
+      config.headers.delete('content-type');
+    } else {
+      delete config.headers['Content-Type'];
+      delete config.headers['content-type'];
+    }
   }
 
   return config;

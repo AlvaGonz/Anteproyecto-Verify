@@ -169,7 +169,8 @@ export type ProjectError =
   | { _tag: "Unauthorized" }
   | { _tag: "ValidationError"; errors: string[] }
   | { _tag: "ServerError"; message: string }
-  | { _tag: "UnknownError"; original: unknown };
+  | { _tag: "UnknownError"; original: unknown }
+  | { _tag: "LimitReached"; message: string };
 
 export const getProjectErrorMessage = (error: ProjectError): string => {
   switch (error._tag) {
@@ -177,6 +178,7 @@ export const getProjectErrorMessage = (error: ProjectError): string => {
     case "Unauthorized": return "No tiene permisos para realizar esta acción";
     case "ValidationError": return `Error de validación: ${error.errors.join(", ")}`;
     case "ServerError": return error.message;
+    case "LimitReached": return error.message || "Has alcanzado el límite permitido de proyectos para tu plan.";
     case "UnknownError": return "Ocurrió un error inesperado";
     default: return "Error desconocido";
   }

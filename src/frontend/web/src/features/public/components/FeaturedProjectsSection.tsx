@@ -51,7 +51,7 @@ export const FeaturedProjectsSection: React.FC = () => {
     .map(p => ({
       name: p.nombreProyecto,
       location: p.ubicacionTexto || "Ubicación no especificada",
-      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      image: p.imagenUrl || "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
       status: "Validado",
       risk: "Calculando",
       deliveredDocs: 8,

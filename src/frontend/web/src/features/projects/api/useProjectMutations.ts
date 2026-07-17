@@ -5,13 +5,25 @@ import { getProjectErrorMessage } from "../types";
 import { projectKeys } from "./useProjects";
 import { isSuccess } from "@/shared/utils/functional";
 
+export class LimitReachedError extends Error {
+  constructor(message?: string) {
+    super(message || "Has alcanzado el límite permitido");
+    this.name = "LimitReachedError";
+  }
+}
+
 export const useCreateProject = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: ['useCreateProject'],
     mutationFn: async (data: CreateProyectoDto & { fotosNuevas?: File[] }) => {
       const result = await projectsApi.createProject(data);
-      if (!isSuccess(result)) throw new Error(getProjectErrorMessage(result.error));
+      if (!isSuccess(result)) {
+        if (result.error._tag === "LimitReached") {
+          throw new LimitReachedError(getProjectErrorMessage(result.error));
+        }
+        throw new Error(getProjectErrorMessage(result.error));
+      }
       return result.value;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),

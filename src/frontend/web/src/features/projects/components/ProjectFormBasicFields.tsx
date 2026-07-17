@@ -23,6 +23,8 @@ interface ProjectFormBasicFieldsProps {
   handleRncSearch: (v: string) => Promise<void>;
   datosDesarrollador: string;
   setDatosDesarrollador: (v: string) => void;
+  desarrolladorTouched: boolean;
+  setDesarrolladorTouched: (v: boolean) => void;
 }
 
 export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
@@ -47,6 +49,8 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
   handleRncSearch,
   datosDesarrollador,
   setDatosDesarrollador,
+  desarrolladorTouched,
+  setDesarrolladorTouched,
 }) => (
   <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
     <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
@@ -168,16 +172,23 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
     {/* Desarrollador */}
     <div>
       <label htmlFor="desarrollador" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-        Desarrollador / Constructora
+        Desarrollador / Constructora *
       </label>
       <input
         id="desarrollador"
         type="text"
+        required
         value={datosDesarrollador}
-        onChange={(e) => setDatosDesarrollador(e.target.value)}
-        className="vf-input"
+        onChange={(e) => { setDatosDesarrollador(e.target.value); setDesarrolladorTouched(true); }}
+        onBlur={() => setDesarrolladorTouched(true)}
+        className={`vf-input ${desarrolladorTouched && !datosDesarrollador.trim() ? "border-red-400 focus:ring-red-200 focus:border-red-500" : ""}`}
         placeholder="Nombre de la constructora encargada"
       />
+      {desarrolladorTouched && !datosDesarrollador.trim() && (
+        <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
+          Campo Desarrollador / Constructora necesario
+        </p>
+      )}
     </div>
   </div>
 );

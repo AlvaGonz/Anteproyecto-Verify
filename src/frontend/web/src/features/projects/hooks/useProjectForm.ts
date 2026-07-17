@@ -298,6 +298,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   // ── Validation State ──────────────────────────────────────────────────────
   const [nombreTouched, setNombreTouched] = useState(false);
   const [ubicacionTouched, setUbicacionTouched] = useState(false);
+  const [desarrolladorTouched, setDesarrolladorTouched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -513,10 +514,16 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     e.preventDefault();
     if (isSubmitting) return;
 
-    if (!nombre.trim() || !ubicacionTexto.trim()) {
+    const missingFields: string[] = [];
+    if (!nombre.trim()) missingFields.push("Nombre del proyecto");
+    if (!ubicacionTexto.trim()) missingFields.push("Ubicación (Provincia)");
+    if (!datosDesarrollador.trim()) missingFields.push("Desarrollador/Constructora");
+
+    if (missingFields.length > 0) {
       setNombreTouched(true);
       setUbicacionTouched(true);
-      setError("Por favor complete los campos obligatorios (*).");
+      setDesarrolladorTouched(true);
+      setError(`Por favor complete los campos obligatorios: ${missingFields.join(", ")}`);
       return;
     }
 
@@ -579,7 +586,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     }
   };
 
-  const isSaveDisabled = !nombre.trim() || !ubicacionTexto.trim() || isSubmitting || isUploadingPhotos;
+  const isSaveDisabled = isSubmitting || isUploadingPhotos;
 
   return {
     // Layout-level props
@@ -608,6 +615,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       rncDesarrollador, setRncDesarrollador, rncError, setRncError,
       isSearchingRnc, handleRncSearch,
       datosDesarrollador, setDatosDesarrollador,
+      desarrolladorTouched, setDesarrolladorTouched,
     } as const,
     detailsFields: {
       ubicacionGps, designacionCatastral,

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -9,6 +9,9 @@ import {
 } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { useProject, useCreateProject, useDeleteProject } from "../../features/projects/api/useProjects";
+import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
+import { PlansModal } from "../../features/settings/components/PlansModal";
+import { useAuth } from "../../shared/context/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
@@ -40,6 +43,10 @@ export const ProjectManagePage: React.FC = () => {
 
   const createMutation = useCreateProject();
   const deleteMutation = useDeleteProject();
+  
+  const { user } = useAuth();
+  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
+  const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
 
   const qc = useQueryClient();
   const updateMutation = useMutation({
@@ -109,8 +116,13 @@ export const ProjectManagePage: React.FC = () => {
         addToast("Proyecto creado exitosamente", "success");
         navigate("/admin/projects");
       }
-    } catch (error) {
-      addToast("Error al guardar el proyecto", "error");
+    } catch (error: any) {
+      if (error?.response?.data?.code === "LIMIT_REACHED" || error.name === "LimitReachedError") {
+        setIsLimitModalOpen(true);
+      } else {
+        addToast(error.message || "Error al guardar el proyecto", "error");
+      }
+      throw error;
     }
   };
 
@@ -193,6 +205,19 @@ export const ProjectManagePage: React.FC = () => {
         onSubmit={handleSubmit}
         onCancel={() => navigate("/admin/projects")}
         onDelete={handleDelete}
+      />
+
+      <LimitReachedModal 
+        isOpen={isLimitModalOpen}
+        onClose={() => setIsLimitModalOpen(false)}
+        onViewPlans={() => setIsPlansModalOpen(true)}
+      />
+
+      <PlansModal 
+        isOpen={isPlansModalOpen}
+        onClose={() => setIsPlansModalOpen(false)}
+        source="project_limit_reached"
+        currentPlan={user?.plan}
       />
     </div>
   );

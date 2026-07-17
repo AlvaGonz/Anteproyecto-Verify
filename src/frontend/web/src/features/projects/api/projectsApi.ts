@@ -25,6 +25,9 @@ const mapError = (error: any, id?: string): ProjectError => {
     if (status === 400) {
       return { _tag: "ValidationError", errors: error.response.data?.errors || [message] };
     }
+    if (status === 402) {
+      return { _tag: "LimitReached", message };
+    }
     return { _tag: "ServerError", message };
   }
   return { _tag: "UnknownError", original: error };
