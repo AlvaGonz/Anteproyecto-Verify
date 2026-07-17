@@ -21,4 +21,5 @@ CMD ["azurite", \
      "--queueHost", "0.0.0.0", \
      "--tableHost", "0.0.0.0", \
      "--location",  "/data", \
-     "--loose"]
+     "--loose", \
+     "--skipApiVersionCheck"]

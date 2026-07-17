@@ -31,8 +31,15 @@ public class AzureBlobStorageService : IBlobStorageService
         };
 
         await blobClient.UploadAsync(stream, options, cancellationToken);
+        var uriString = blobClient.Uri.ToString();
+        // Hack for local development in docker: replace azurite container name with localhost
+        // so the browser can fetch the image directly.
+        if (uriString.Contains("azurite:10000"))
+        {
+            uriString = uriString.Replace("azurite:10000", "localhost:10000");
+        }
         
-        return new UploadResult(fileName, blobClient.Uri.ToString());
+        return new UploadResult(fileName, uriString);
     }
 
     public async Task<(Stream Stream, string ContentType)> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
