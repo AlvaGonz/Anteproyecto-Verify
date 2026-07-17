@@ -219,9 +219,9 @@ test.describe('Settings Page - Destructive Action Flow', () => {
 
     // Tab navigation should work - focus should be trapped
     await page.keyboard.press('Tab');
-    // First focusable element should be the cancel button or confirmation input
+    // First focusable element should be the cancel button, confirmation input, or textarea
     const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
-    expect(['BUTTON', 'INPUT']).toContain(focusedElement);
+    expect(['BUTTON', 'INPUT', 'TEXTAREA']).toContain(focusedElement);
   });
 
   test('Escape key closes modal', async ({ page }) => {

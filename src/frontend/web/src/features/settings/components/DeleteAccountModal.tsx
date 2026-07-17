@@ -215,6 +215,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                 <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4 border-t border-neutral-200">
                   <button
                     type="button"
+                    ref={cancelButtonRef}
                     className="vf-btn-secondary w-full sm:w-auto"
                     onClick={onClose}
                     disabled={isProcessing}

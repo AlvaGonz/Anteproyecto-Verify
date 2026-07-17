@@ -250,6 +250,13 @@ export const SettingsPage: React.FC = () => {
               transition={{ duration: 0.2 }}
             >
               <MyProfileForm />
+              <section className="bg-red-50 border border-red-200 rounded-lg p-6 mt-6">
+                <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
+                <p className="text-sm text-red-600 mb-4">
+                  Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
+                </p>
+                <DeleteAccountSection />
+              </section>
             </m.div>
           )}
 
@@ -303,7 +310,7 @@ export const SettingsPage: React.FC = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <DeleteAccountSection />
+              {/* Security tab content will go here */}
             </m.div>
           )}
 
