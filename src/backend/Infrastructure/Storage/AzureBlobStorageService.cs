@@ -6,65 +6,62 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using System;
 
 public class AzureBlobStorageService : IBlobStorageService
 {
-    private readonly AzureBlobOptions _options;
+    private readonly BlobContainerClient _containerClient;
 
     public AzureBlobStorageService(IOptions<AzureBlobOptions> options)
     {
-        _options = options.Value;
+        var blobServiceClient = new BlobServiceClient(options.Value.ConnectionString);
+        _containerClient = blobServiceClient.GetBlobContainerClient(options.Value.ContainerName);
     }
 
-    public async Task<string> UploadAsync(Stream stream, string fileName, string contentType, CancellationToken cancellationToken = default)
+    public async Task<UploadResult> UploadAsync(Stream stream, string fileName, string contentType, CancellationToken cancellationToken = default)
     {
-        var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-        if (!Directory.Exists(wwwrootPath))
-        {
-            Directory.CreateDirectory(wwwrootPath);
-        }
-
-        var safeFileName = fileName.Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString());
-        var filePath = Path.Combine(wwwrootPath, safeFileName);
+        await _containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
         
-        var directoryPath = Path.GetDirectoryName(filePath);
-        if (directoryPath != null && !Directory.Exists(directoryPath))
+        var blobClient = _containerClient.GetBlobClient(fileName);
+        var options = new BlobUploadOptions
         {
-            Directory.CreateDirectory(directoryPath);
-        }
+            HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+        };
 
-        using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-        {
-            await stream.CopyToAsync(fileStream, cancellationToken);
-        }
-
-        return $"http://localhost:5000/uploads/{fileName.Replace("\\", "/")}";
-    }
-
-    public Task<(Stream Stream, string ContentType)> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
-    {
-        var safeFileName = blobName.Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString());
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", safeFileName);
+        await blobClient.UploadAsync(stream, options, cancellationToken);
         
-        if (File.Exists(filePath))
+        return new UploadResult(fileName, blobClient.Uri.ToString());
+    }
+
+    public async Task<(Stream Stream, string ContentType)> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
+    {
+        var blobClient = _containerClient.GetBlobClient(blobName);
+        var response = await blobClient.DownloadAsync(cancellationToken);
+        return (response.Value.Content, response.Value.ContentType);
+    }
+
+    public async Task<bool> ExistsAsync(string blobName, CancellationToken cancellationToken = default)
+    {
+        var blobClient = _containerClient.GetBlobClient(blobName);
+        var response = await blobClient.ExistsAsync(cancellationToken);
+        return response.Value;
+    }
+
+    public async Task DeleteAsync(string fileUrl, CancellationToken cancellationToken = default)
+    {
+        try 
         {
-            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return Task.FromResult(((Stream)stream, "application/octet-stream"));
+            var uri = new Uri(fileUrl);
+            var blobClient = new BlobClient(uri);
+            await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
         }
-
-        var memoryStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("File not found"));
-        return Task.FromResult(((Stream)memoryStream, "application/octet-stream"));
-    }
-
-    public Task<bool> ExistsAsync(string blobName, CancellationToken cancellationToken = default)
-    {
-        // Implementation for Azure Blob Storage
-        return Task.FromResult(true);
-    }
-
-    public Task DeleteAsync(string fileUrl, CancellationToken cancellationToken = default)
-    {
-        // Implementation for Azure Blob Storage
-        return Task.CompletedTask;
+        catch (UriFormatException)
+        {
+            // Fallback for simple file names
+            var blobClient = _containerClient.GetBlobClient(fileUrl);
+            await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+        }
     }
 }

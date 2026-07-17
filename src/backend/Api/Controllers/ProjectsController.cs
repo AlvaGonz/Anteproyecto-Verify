@@ -207,8 +207,8 @@ public class ProjectsController : ControllerBase
 
         try
         {
-            var url = await _blobStorageService.UploadAsync(stream, blobName, file.ContentType, cancellationToken);
-            return Ok(new { url });
+            var uploadResult = await _blobStorageService.UploadAsync(stream, blobName, file.ContentType, cancellationToken);
+            return Ok(new { url = uploadResult.Url });
         }
         catch (Exception ex)
         {

@@ -25,7 +25,8 @@ public class Documento : EntityBase
     public string? InstitucionEmisora { get; private set; }
     public Guid UsuarioCargaId { get; private set; }
     public string? Observaciones { get; private set; }
-
+    public string? HashSHA256 { get; private set; }
+    public string? ResultadoOcrJson { get; private set; }
     // RF-9 Formal validation fields
     public DocumentFormalStatus? FormalStatus { get; private set; }
     public DateTime? FechaVencimiento { get; private set; }
@@ -107,6 +108,26 @@ public class Documento : EntityBase
         FechaVencimiento = fechaVencimiento;
         VersionReglaAplicada = versionReglaAplicada;
         FechaEvaluacion = DateTime.UtcNow;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void SetHash(string sha256Hash)
+    {
+        if (string.IsNullOrWhiteSpace(sha256Hash)) throw new ArgumentException("Hash es requerido", nameof(sha256Hash));
+        HashSHA256 = sha256Hash;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void SetOcrResult(string ocrResultJson, DocumentStatus newStatus)
+    {
+        if (string.IsNullOrWhiteSpace(ocrResultJson)) throw new ArgumentException("JSON de OCR es requerido", nameof(ocrResultJson));
+        if (EstadoDocumento == DocumentStatus.Valid || EstadoDocumento == DocumentStatus.Invalid) 
+        {
+            throw new InvalidOperationException($"No se puede actualizar el resultado OCR si el documento ya está en estado {EstadoDocumento}");
+        }
+
+        ResultadoOcrJson = ocrResultJson;
+        EstadoDocumento = newStatus;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 }

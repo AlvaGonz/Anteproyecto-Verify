@@ -24,6 +24,8 @@ public class DocumentServiceTests
     private readonly Mock<IDocumentValidationService> _documentValidationServiceMock;
     private readonly Mock<IValidacionRepository> _validacionRepositoryMock;
     private readonly Mock<IAuditoriaRepository> _auditoriaRepositoryMock;
+    private readonly Mock<global::Application.Abstractions.Ocr.IOcrProvider> _ocrProviderMock;
+    private readonly Mock<global::Application.Services.DocumentProcessing.IDocumentStateEngine> _documentStateEngineMock;
     private readonly DocumentService _documentService;
 
     public DocumentServiceTests()
@@ -36,6 +38,8 @@ public class DocumentServiceTests
         _documentValidationServiceMock = new Mock<IDocumentValidationService>();
         _validacionRepositoryMock = new Mock<IValidacionRepository>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
+        _ocrProviderMock = new Mock<global::Application.Abstractions.Ocr.IOcrProvider>();
+        _documentStateEngineMock = new Mock<global::Application.Services.DocumentProcessing.IDocumentStateEngine>();
 
         _documentService = new DocumentService(
             _documentoRepositoryMock.Object,
@@ -45,7 +49,9 @@ public class DocumentServiceTests
             _unitOfWorkMock.Object,
             _documentValidationServiceMock.Object,
             _validacionRepositoryMock.Object,
-            _auditoriaRepositoryMock.Object
+            _auditoriaRepositoryMock.Object,
+            _ocrProviderMock.Object,
+            _documentStateEngineMock.Object
         );
     }
 

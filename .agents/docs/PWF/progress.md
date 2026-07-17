@@ -7,7 +7,7 @@
 ## 🔄 In Progress
 | Feature | TRD Section | Status | Blocker |
 | ------- | ----------- | ------ | ------- |
-| None    | N/A         | 100%   | None    |
+| Document Ingestion Foundation (Azurite, OCR Stub, State Engine) | N/A | 100% | None |
 
 
 ## 🔜 Next Up (Prioritized)

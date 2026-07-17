@@ -10,6 +10,7 @@ public static class DependencyInjection
         // Register MediatR, FluentValidation, AutoMapper, etc.
         services.AddScoped<Application.Contracts.Projects.IProjectService, Application.Features.Projects.ProjectService>();
         services.AddScoped<Application.Contracts.Documents.IDocumentService, Application.Features.Documents.DocumentService>();
+        services.AddScoped<Application.Services.DocumentProcessing.IDocumentStateEngine, Application.Services.DocumentProcessing.DocumentStateEngine>();
 
         // Validation Engine
         services.AddValidatorsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());

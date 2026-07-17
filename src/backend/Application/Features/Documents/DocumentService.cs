@@ -25,6 +25,8 @@ public class DocumentService : IDocumentService
     private readonly Application.Abstractions.DocumentIntelligence.IDocumentValidationService _documentValidationService;
     private readonly Application.Abstractions.Persistence.IValidacionRepository _validacionRepository;
     private readonly Application.Abstractions.Persistence.IAuditoriaRepository _auditoriaRepository;
+    private readonly Application.Abstractions.Ocr.IOcrProvider _ocrProvider;
+    private readonly Application.Services.DocumentProcessing.IDocumentStateEngine _documentStateEngine;
 
     public DocumentService(
         IDocumentoRepository documentoRepository,
@@ -34,7 +36,9 @@ public class DocumentService : IDocumentService
         IUnitOfWork unitOfWork,
         Application.Abstractions.DocumentIntelligence.IDocumentValidationService documentValidationService,
         Application.Abstractions.Persistence.IValidacionRepository validacionRepository,
-        Application.Abstractions.Persistence.IAuditoriaRepository auditoriaRepository)
+        Application.Abstractions.Persistence.IAuditoriaRepository auditoriaRepository,
+        Application.Abstractions.Ocr.IOcrProvider ocrProvider,
+        Application.Services.DocumentProcessing.IDocumentStateEngine documentStateEngine)
     {
         _documentoRepository = documentoRepository;
         _proyectoRepository = proyectoRepository;
@@ -44,6 +48,8 @@ public class DocumentService : IDocumentService
         _documentValidationService = documentValidationService;
         _validacionRepository = validacionRepository;
         _auditoriaRepository = auditoriaRepository;
+        _ocrProvider = ocrProvider;
+        _documentStateEngine = documentStateEngine;
     }
 
     public async Task<DocumentDto> UploadDocumentAsync(Guid projectId, UploadDocumentDto dto, Stream fileStream, string fileName, string contentType, long length, CancellationToken cancellationToken = default)
@@ -107,11 +113,19 @@ public class DocumentService : IDocumentService
         // Reset stream position after validation
         fileStream.Position = 0;
 
+        // Compute SHA-256 Hash
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var hashBytes = await sha256.ComputeHashAsync(fileStream, cancellationToken);
+        var hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+
+        // Reset stream position before upload
+        fileStream.Position = 0;
+
         var extension = Path.GetExtension(fileName);
         var blobName = $"{projectId}/{Guid.NewGuid()}{extension}";
         
-        var blobUrl = await _blobStorageService.UploadAsync(fileStream, blobName, contentType, cancellationToken);
-
+        var uploadResult = await _blobStorageService.UploadAsync(fileStream, blobName, contentType, cancellationToken);
+        var blobUrl = uploadResult.Url;
         // Calculate version (simple approach: count existing documents of same type)
         var existingDocs = await _documentoRepository.GetByProyectoIdAsync(projectId, cancellationToken);
         var version = existingDocs.Count(d => d.TipoDocumento == dto.TipoDocumento) + 1;
@@ -132,6 +146,7 @@ public class DocumentService : IDocumentService
             dto.Observaciones
         );
 
+        document.SetHash(hashString);
         await _documentoRepository.AddAsync(document, cancellationToken);
 
         if (contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
@@ -152,6 +167,16 @@ public class DocumentService : IDocumentService
         );
         await _validacionRepository.AddAsync(validacion, cancellationToken);
 
+        // OCR Processing (Simulated background/sync)
+        document.UpdateStatus(DocumentStatus.Processing);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Reset stream position for OCR
+        fileStream.Position = 0;
+        var ocrResult = await _ocrProvider.ProcessDocumentAsync(fileStream, fileName, cancellationToken);
+        _documentStateEngine.ApplyOcrResult(document, ocrResult);
+        
+        _documentoRepository.Update(document);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToDto(document);
