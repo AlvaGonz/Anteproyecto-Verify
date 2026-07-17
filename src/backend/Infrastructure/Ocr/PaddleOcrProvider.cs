@@ -1,35 +1,91 @@
 namespace Infrastructure.Ocr;
 
 using System.IO;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Ocr;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 public class PaddleOcrProvider : IOcrProvider
 {
+    private readonly HttpClient _httpClient;
     private readonly ILogger<PaddleOcrProvider> _logger;
+    private readonly string _baseUrl;
 
-    public PaddleOcrProvider(ILogger<PaddleOcrProvider> logger)
+    public PaddleOcrProvider(HttpClient httpClient, IConfiguration configuration, ILogger<PaddleOcrProvider> logger)
     {
+        _httpClient = httpClient;
         _logger = logger;
+        _baseUrl = configuration["Ocr:PaddleOcrBaseUrl"] ?? "http://paddleocr-api:8000";
     }
 
     public async Task<OcrResult> ProcessDocumentAsync(Stream documentStream, string fileName, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Simulating OCR processing for {FileName}", fileName);
+        _logger.LogInformation("Processing document via PaddleOCR {FileName}", fileName);
         
-        // Simulating processing delay
-        await Task.Delay(100, cancellationToken);
-
-        var result = new OcrResult
+        using var content = new MultipartFormDataContent();
+        
+        // Ensure stream is at beginning
+        if (documentStream.CanSeek)
         {
-            Success = true,
-            ExtractedText = "Simulated text from PaddleOCR stub.",
-            RawJson = JsonSerializer.Serialize(new { Result = "Simulated", Text = "Simulated text from PaddleOCR stub." })
+            documentStream.Position = 0;
+        }
+
+        var fileContent = new StreamContent(documentStream);
+        content.Add(fileContent, "file", fileName);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/v1/ocr/extract")
+        {
+            Content = content
         };
 
-        return result;
+        try
+        {
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+            var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = JsonSerializer.Deserialize<JsonElement>(responseString);
+                var success = result.TryGetProperty("Success", out var successProp) && successProp.GetBoolean();
+                var text = result.TryGetProperty("ExtractedText", out var textProp) ? textProp.GetString() : string.Empty;
+                var rawJson = result.TryGetProperty("RawJson", out var rawProp) ? rawProp.GetString() : responseString;
+                
+                return new OcrResult
+                {
+                    Success = success,
+                    ExtractedText = text ?? string.Empty,
+                    RawJson = rawJson ?? string.Empty,
+                    Confidence = 0.9 // PaddleOCR returns confidence per line, we can average it later
+                };
+            }
+            
+            _logger.LogError("PaddleOCR API failed with status code {StatusCode}: {Response}", response.StatusCode, responseString);
+            return new OcrResult { Success = false, ExtractedText = string.Empty, RawJson = responseString };
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Error communicating with PaddleOCR API");
+            return new OcrResult { Success = false, ExtractedText = string.Empty, RawJson = ex.Message };
+        }
+    }
+    
+    public async Task<OcrResult> ExtractAsync(Stream fileStream, string contentType, CancellationToken cancellationToken = default)
+    {
+        return await ProcessDocumentAsync(fileStream, "document.pdf", cancellationToken);
+    }
+
+    public Task<IReadOnlyDictionary<string, OcrField>> GetStructuredFieldsAsync(OcrResult result)
+    {
+        IReadOnlyDictionary<string, OcrField> fields = new System.Collections.Generic.Dictionary<string, OcrField>();
+        return Task.FromResult(fields);
+    }
+
+    public double GetConfidenceScore(OcrResult result)
+    {
+        return result.Confidence;
     }
 }

@@ -1,6 +1,6 @@
 namespace Tests.Unit.Domain;
 
-using Domain.Enums;
+using global::Domain.Enums;
 using Xunit;
 
 public class ProjectStatusCodesTests

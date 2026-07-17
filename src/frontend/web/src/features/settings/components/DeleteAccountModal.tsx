@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { m, AnimatePresence } from "framer-motion";
-import { AlertTriangle, Trash2, X } from "lucide-react";
+import { AlertTriangle, Trash2, X, Eye, EyeOff } from "lucide-react";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => Promise<void>;
+  onConfirm: (data: { confirmation: string; password: string; deletionReason?: string }) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -16,15 +16,21 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   isProcessing,
 }) => {
   const [confirmText, setConfirmText] = useState("");
+  const [password, setPassword] = useState("");
+  const [deletionReason, setDeletionReason] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [prevIsOpen, setPrevIsOpen] = useState(false);
   const confirmInputRef = useRef<HTMLInputElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Reset confirmation text when modal opens/closes
+  // Reset form when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
       setConfirmText("");
+      setPassword("");
+      setDeletionReason("");
+      setShowPassword(false);
     }
     setPrevIsOpen(isOpen);
   }, [isOpen]);
@@ -68,11 +74,15 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     }
   }, [isOpen, onClose]);
 
-  const canSubmit = confirmText === "ELIMINAR" && !isProcessing;
+  const canSubmit = confirmText === "ELIMINAR" && password.length > 0 && !isProcessing;
 
   const handleConfirm = async () => {
     if (!canSubmit) return;
-    await onConfirm();
+    await onConfirm({
+      confirmation: confirmText,
+      password,
+      deletionReason: deletionReason.trim() || undefined,
+    });
     onClose();
   };
 
@@ -151,7 +161,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
             </div>
 
             {/* Confirmation input */}
-            <div className="text-left mb-6">
+            <div className="text-left mb-4">
               <label
                 htmlFor="del-modal-confirm"
                 className="block text-xs font-bold text-text-secondary uppercase mb-1"
@@ -168,6 +178,46 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                 placeholder="ELIMINAR"
                 autoComplete="off"
                 aria-describedby="delete-account-modal-description"
+              />
+            </div>
+
+            {/* Password input */}
+            <div className="text-left mb-4">
+              <label htmlFor="del-password" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                Contraseña Actual
+              </label>
+              <div className="relative">
+                <input
+                  id="del-password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="vf-input w-full pr-9"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((p) => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Optional reason */}
+            <div className="text-left mb-6">
+              <label htmlFor="del-reason" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                Motivo (opcional)
+              </label>
+              <textarea
+                id="del-reason"
+                value={deletionReason}
+                onChange={(e) => setDeletionReason(e.target.value)}
+                className="vf-input w-full min-h-[60px] resize-none"
+                placeholder="¿Por qué decides irte? (opcional)"
+                rows={2}
               />
             </div>
 

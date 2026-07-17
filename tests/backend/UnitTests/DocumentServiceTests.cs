@@ -115,6 +115,8 @@ public class DocumentServiceTests
         var userId = Guid.NewGuid();
         var project = new Proyecto("Test", "Loc", userId, ProjectCategory.Residencial);
         var usuario = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Profesional, "123", "456");
+        var plan = PlanSuscripcion.Create(Guid.NewGuid(), "Profesional", 0m, -1, -1, true, true, 2, 1024, true, true, true, true, true, true, "Comunidad", true);
+        typeof(Usuario).GetProperty("Plan")!.SetValue(usuario, plan);
         
         var dto = new global::Application.DTOs.Documents.UploadDocumentDto(
             DocumentType.CertificadoTitulo,
@@ -124,7 +126,7 @@ public class DocumentServiceTests
             null
         );
         
-        var fileContent = "dummy pdf content";
+        var fileContent = "%PDF-1.4 dummy pdf content";
         var fileBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
         using var stream = new System.IO.MemoryStream(fileBytes);
         

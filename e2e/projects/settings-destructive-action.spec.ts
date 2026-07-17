@@ -43,8 +43,8 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     });
 
     // Mock delete account
-    await page.route('**/api/v1/users/me/account', async route => {
-      if (route.request().method() === 'DELETE') {
+    await page.route('**/account/delete', async route => {
+      if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -159,11 +159,16 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await confirmInput.fill('ELIMINA');
     await expect(modalConfirmButton).toBeDisabled();
 
-    // Type full confirmation - should be enabled
+    // Type full confirmation - should still be disabled (password not filled)
     await confirmInput.fill('ELIMINAR');
+    await expect(modalConfirmButton).toBeDisabled();
+
+    // Fill password - should now be enabled
+    const passwordInput = page.locator('input[type="password"]').first();
+    await passwordInput.fill('testpassword123');
     await expect(modalConfirmButton).toBeEnabled();
 
-    // Clear input - should be disabled again
+    // Clear confirmation - should be disabled again
     await confirmInput.fill('');
     await expect(modalConfirmButton).toBeDisabled();
   });
@@ -251,11 +256,15 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     const confirmInput = page.locator('input[placeholder="ELIMINAR"]');
     await confirmInput.fill('ELIMINAR');
 
+    // Fill password
+    const passwordInput = page.locator('input[type="password"]').first();
+    await passwordInput.fill('testpassword123');
+
     // Click confirm button in modal
     const modalConfirmButton = page.locator('[aria-labelledby="delete-account-modal-title"] button:has-text("Eliminar cuenta")');
     await modalConfirmButton.click();
 
-    // Should show success toast and redirect to login
-    await expect(page.locator('text=Cuenta marcada para eliminación')).toBeVisible({ timeout: 5000 });
+    // Should redirect to login page (logout is called after successful deletion)
+    await expect(page).toHaveURL(/.*#\/login/, { timeout: 10000 });
   });
 });

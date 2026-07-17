@@ -22,7 +22,7 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IBlobStorageService, AzureBlobStorageService>();
-        services.AddScoped<Application.Abstractions.Ocr.IOcrProvider, Ocr.PaddleOcrProvider>();
+        services.AddHttpClient<Application.Abstractions.Ocr.IOcrProvider, Ocr.PaddleOcrProvider>();
 
         services.AddScoped<Application.Abstractions.Persistence.IProyectoRepository, Persistence.Repositories.ProyectoRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IDocumentoRepository, Persistence.Repositories.DocumentoRepository>();

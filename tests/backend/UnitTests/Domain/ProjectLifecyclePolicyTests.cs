@@ -1,7 +1,7 @@
 namespace Tests.Unit.Domain;
 
-using Domain.Enums;
-using Domain.Policies;
+using global::Domain.Enums;
+using global::Domain.Policies;
 using Xunit;
 
 public class ProjectLifecyclePolicyTests

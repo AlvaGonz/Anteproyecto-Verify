@@ -118,6 +118,21 @@ services:
         condition: service_healthy
     command: sh -c "pip install pymssql && python -u Bots/DGII/code/up_DGII.py && python -u generador_entidades_gubernamentales.py"
 
+  paddleocr-api:
+    build:
+      context: ./src/microservices/paddleocr-api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+
 volumes:
   mssql-data:
   api_uploads:

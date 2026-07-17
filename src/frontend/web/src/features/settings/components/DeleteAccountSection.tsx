@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AlertTriangle, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useDeleteAccount } from "../api/useAccountDeletion";
 import { useToast } from "@/shared/components/ui/Toast/ToastContext";
 import { useAuth } from "@/shared/context/AuthContext";
@@ -12,12 +12,12 @@ export const DeleteAccountSection: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDelete = async () => {
+  const handleDelete = async (data: { confirmation: string; password: string; deletionReason?: string }) => {
     try {
       await deleteAccount.mutateAsync({
-        confirmation: "ELIMINAR",
-        password: "",
-        deletionReason: undefined,
+        confirmation: data.confirmation,
+        password: data.password,
+        deletionReason: data.deletionReason,
       });
       addToast("Cuenta marcada para eliminación. Tiene 14 días para recuperarla.", "success");
       // Server already cleared jwt + refreshToken cookies via Set-Cookie
