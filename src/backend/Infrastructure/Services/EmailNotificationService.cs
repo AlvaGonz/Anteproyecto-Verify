@@ -36,7 +36,7 @@ public class EmailNotificationService : IEmailNotificationService
         string subject = $"Actualización de Estado: Proyecto {proyecto.Nombre}";
         string statusStr = proyecto.Estado != null ? proyecto.Estado.Nombre : "Desconocido";
         
-        bool isApproved = proyecto.Estado != null && proyecto.Estado.CodigoUnico == "PUBLICADO";
+        bool isApproved = proyecto.Estado != null && proyecto.Estado.CodigoUnico == ProjectStatusCodes.Publicado;
         
         string body = Email.EmailTemplates.GetProjectStatusChangeEmail(
             proyecto.Nombre,

@@ -147,8 +147,13 @@ public class ProjectsController : ControllerBase
     [HttpPatch("{id:guid}/status")]
     [AllowAnonymous]
     // [Authorize] // TODO: Enable when auth is fully implemented
-    public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] ProjectStatus status, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] string statusCode, CancellationToken cancellationToken)
     {
+        if (!ProjectStatusCodes.TryParseCodigoUnico(statusCode, out var status))
+        {
+            return BadRequest(new { message = $"Estado inválido: '{statusCode}'. Use CREADO, EDITADO, REVISION, OBSERVACION o PUBLICADO." });
+        }
+
         try
         {
             var project = await _projectService.UpdateProjectStatusAsync(id, status, cancellationToken);
@@ -157,6 +162,10 @@ public class ProjectsController : ControllerBase
         catch (KeyNotFoundException)
         {
             return NotFound();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
         catch (QuotaExceededException ex)
         {

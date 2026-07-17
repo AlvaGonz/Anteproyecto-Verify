@@ -62,10 +62,14 @@ export const useUpdateProjectStatus = () => {
   return useMutation({
     mutationKey: ['updateProjectStatus'],
     mutationFn: ({ id, status }: { id: string; status: string }) =>
-      apiClient.patch<ApiProyectoDto>(`/projects/${id}/status`, `"${status}"`, {
+      apiClient.patch<ApiProyectoDto>(`/projects/${id}/status`, JSON.stringify(status), {
         headers: { 'Content-Type': 'application/json' }
       }).then(res => mapApiProject(res.data)),
-    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: projectKeys.all });
+      qc.invalidateQueries({ queryKey: projectKeys.detail(variables.id) });
+      qc.invalidateQueries({ queryKey: ["projectStatusEligibility", variables.id] });
+    },
   });
 };
 

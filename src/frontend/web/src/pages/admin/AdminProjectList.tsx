@@ -11,6 +11,7 @@ const getStatusBadge = (status: ProjectStatus, t: any) => {
   const label = getStatusLabel(status, t);
   switch (status) {
     case ProjectStatus.Draft: return { label, cls: "bg-gray-100 text-gray-600 border-gray-200" };
+    case ProjectStatus.Edited: return { label, cls: "bg-indigo-50 text-indigo-600 border-indigo-100" };
     case ProjectStatus.Published: return { label, cls: "bg-blue-50 text-blue-600 border-blue-100" };
     case ProjectStatus.InReview: return { label, cls: "bg-indigo-50 text-indigo-600 border-indigo-100" };
     case ProjectStatus.Observed: return { label, cls: "bg-amber-50 text-amber-600 border-amber-100" };

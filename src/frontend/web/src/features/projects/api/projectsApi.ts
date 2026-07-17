@@ -77,11 +77,11 @@ export const projectsApi = {
   },
 
   async updateProjectStatus(id: string, status: ProjectStatus): Promise<Result<ProyectoDto, ProjectError>> {
-    if (!Object.values(ProjectStatus).includes(status) || typeof status !== "number") {
+    if (!Object.values(ProjectStatus).includes(status)) {
       throw new Error("Invalid project status");
     }
     try {
-      const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, status, {
+      const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, JSON.stringify(status), {
         headers: { 'Content-Type': 'application/json' }
       });
       return success(response.data);

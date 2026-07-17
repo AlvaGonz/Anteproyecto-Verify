@@ -36,7 +36,7 @@ public class ProyectoRepository : IProyectoRepository
 
     public async Task<IEnumerable<Proyecto>> GetVisibleAsync(CancellationToken cancellationToken = default)
     {
-        var draftCode = ProjectStatus.Creado.ToString();
+        var draftCode = ProjectStatus.Creado.ToCodigoUnico();
 
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
@@ -47,8 +47,9 @@ public class ProyectoRepository : IProyectoRepository
 
     public async Task<ProyectoEstado?> GetEstadoByStatusAsync(ProjectStatus status, CancellationToken cancellationToken = default)
     {
+        var codigo = status.ToCodigoUnico();
         return await _context.ProyectoEstados
-            .FirstOrDefaultAsync(e => e.CodigoUnico == status.ToString(), cancellationToken);
+            .FirstOrDefaultAsync(e => e.CodigoUnico == codigo, cancellationToken);
     }
 
     public async Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default)
