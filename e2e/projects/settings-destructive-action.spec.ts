@@ -81,6 +81,9 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     const saveButton = page.locator('button[type="submit"]:has-text("Guardar Cambios")');
     await expect(saveButton).toBeVisible();
 
+    // Navigate to security tab to check danger zone
+    await page.locator('button:has-text("Seguridad")').click();
+
     // The save button should NOT be inside the danger zone
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
     await expect(dangerZone).toBeVisible();
@@ -94,6 +97,7 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await page.goto('/#/admin/settings');
 
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await page.locator('button:has-text("Seguridad")').click();
 
     // Find the danger zone section
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
@@ -112,6 +116,7 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await page.goto('/#/admin/settings');
 
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await page.locator('button:has-text("Seguridad")').click();
 
     // Click the delete account trigger in the danger zone
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
@@ -143,6 +148,7 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await page.goto('/#/admin/settings');
 
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await page.locator('button:has-text("Seguridad")').click();
 
     // Open the modal
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
@@ -177,6 +183,7 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await page.goto('/#/admin/settings');
 
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await page.locator('button:has-text("Seguridad")').click();
 
     // Open the modal
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
@@ -192,13 +199,14 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await expect(page.locator('h2:has-text("¿Eliminar cuenta?")')).not.toBeVisible();
 
     // Page should still be functional
-    await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await expect(page.locator('button:has-text("Seguridad")')).toBeVisible();
   });
 
   test('Keyboard accessibility works for the modal', async ({ page }) => {
     await page.goto('/#/admin/settings');
 
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await page.locator('button:has-text("Seguridad")').click();
 
     // Open the modal
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
@@ -228,6 +236,7 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await page.goto('/#/admin/settings');
 
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await page.locator('button:has-text("Seguridad")').click();
 
     // Open the modal
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
@@ -247,6 +256,7 @@ test.describe('Settings Page - Destructive Action Flow', () => {
     await page.goto('/#/admin/settings');
 
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
+    await page.locator('button:has-text("Seguridad")').click();
 
     // Open the modal
     const dangerZone = page.locator('section:has(h2:has-text("Zona de Peligro"))');
