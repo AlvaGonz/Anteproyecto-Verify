@@ -85,11 +85,14 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
       </label>
       <input
         id="valorEstimado"
-        type="number"
-        value={valorEstimado}
-        onChange={(e) => setValorEstimado(e.target.value ? Number(e.target.value) : "")}
+        type="text"
+        value={valorEstimado ? `RD$ ${valorEstimado.toLocaleString("en-US")}` : ""}
+        onChange={(e) => {
+          const raw = e.target.value.replace(/[^\d]/g, "");
+          setValorEstimado(raw ? Number(raw) : "");
+        }}
         className="vf-input font-mono"
-        placeholder="Ej: 15000000"
+        placeholder="Ej: RD$ 15,000,000"
       />
     </div>
 
