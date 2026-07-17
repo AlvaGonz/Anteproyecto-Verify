@@ -53,7 +53,10 @@ export const useCreateProject = () => {
         ...data,
         categoria: data.categoria ?? ProjectCategory.Residencial,
       }).then(res => mapApiProject(res.data)),
-    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: projectKeys.all });
+      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
+    },
   });
 };
 
@@ -67,6 +70,7 @@ export const useUpdateProjectStatus = () => {
       }).then(res => mapApiProject(res.data)),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
+      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
       qc.invalidateQueries({ queryKey: projectKeys.detail(variables.id) });
       qc.invalidateQueries({ queryKey: ["projectStatusEligibility", variables.id] });
     },
@@ -90,6 +94,9 @@ export const useDeleteProject = () => {
   return useMutation({
     mutationKey: ['deleteProject'],
     mutationFn: (id: string) => apiClient.delete(`/projects/${id}`).then(res => res.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: projectKeys.all });
+      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
+    },
   });
 };

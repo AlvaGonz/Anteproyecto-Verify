@@ -192,6 +192,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
     setIsUploadingPhotos(true);
     try {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       const res = await projectsApi.uploadProjectImage(file);
       if (isSuccess(res)) {
         setImagenUrl(res.value);

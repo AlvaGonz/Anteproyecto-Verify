@@ -156,9 +156,12 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
     await page.goto("/#/admin/projects/new");
 
     // Intentar submit sin llenar nada
-    // Los campos required del HTML5 deben bloquear el submit o desactivar el botón
     const submitBtn = page.getByRole("button", { name: /Guardar/i });
-    await expect(submitBtn).toBeDisabled();
+    await submitBtn.click();
+    
+    // Should show the validation error summary
+    await expect(page.getByText(/Por favor complete los campos obligatorios/i)).toBeVisible();
+
     // El formulario no debe navegar
     await expect(page).toHaveURL(/\/admin\/projects\/new/);
   });

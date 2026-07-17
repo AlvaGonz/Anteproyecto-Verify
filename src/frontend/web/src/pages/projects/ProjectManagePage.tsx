@@ -54,6 +54,7 @@ export const ProjectManagePage: React.FC = () => {
       apiClient.put<ProyectoDto>(`/projects/${data.id}`, data.payload),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ["projects"] });
+      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
       qc.invalidateQueries({ queryKey: ["projects", variables.id] });
       qc.invalidateQueries({ queryKey: ["projectStatusEligibility", variables.id] });
     }

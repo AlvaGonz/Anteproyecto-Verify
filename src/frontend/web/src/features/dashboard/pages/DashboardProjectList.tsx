@@ -70,7 +70,7 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
               return (
                 <div key={`${p.nombre}-${idx}`} className="flex items-center justify-between px-8 py-5 hover:bg-surface-raised/20 transition-all group h-[89px]">
                   <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-inner">
+                      <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-inner">
                         <ProjectCoverImage
                           coverUrl={p.imagenUrl}
                           projectName={p.nombre}
