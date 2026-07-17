@@ -45,8 +45,10 @@ export const ProjectManagePage: React.FC = () => {
   const updateMutation = useMutation({
     mutationFn: (data: { id: string; payload: any }) =>
       apiClient.put<ProyectoDto>(`/projects/${data.id}`, data.payload),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ["projects"] });
+      qc.invalidateQueries({ queryKey: ["projects", variables.id] });
+      qc.invalidateQueries({ queryKey: ["projectStatusEligibility", variables.id] });
     }
   });
 

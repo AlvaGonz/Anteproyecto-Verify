@@ -109,6 +109,14 @@ public class Proyecto : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void UpdateEstado(ProyectoEstado nuevoEstado)
+    {
+        if (nuevoEstado == null) throw new ArgumentNullException(nameof(nuevoEstado));
+        EstadoId = nuevoEstado.Id;
+        Estado = nuevoEstado;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void UpdateEstadoJuridico(EstadoJuridico newStatus)
     {
         EstadoJuridico = newStatus;

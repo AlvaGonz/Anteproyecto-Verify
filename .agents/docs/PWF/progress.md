@@ -107,6 +107,14 @@
   - **Symptom:** Backend API crashes on startup during `MigrateAsync` with `Error Number:2705` "Column already exists".
   - **Root Cause:** A duplicated migration `20260630195243_AddStripeFieldsToUsuario.cs` attempted to add Stripe fields that were already added by `20260630163528_Add_Stripe_Fields_To_Usuario.cs`.
   - **Fix:** Emptied the `Up` and `Down` methods of the duplicate migration `20260630195243_AddStripeFieldsToUsuario.cs` so EF Core treats it as a no-op, preserving the migration chain without throwing.
+- **BUG-014:** POST `/api/projects` 500 — FK violation on `EstadoId`.
+  - **Symptom:** Creating a project from ProjectManagePage fails with `500 Internal Server Error` (`useProjects.ts` → `POST /api/projects`).
+  - **Root Cause:** After migration `AddProyectoEstadosAndMigrateData`, `CreateProjectAsync` created `Proyecto` without assigning `EstadoId` (defaulted to `Guid.Empty`), violating `FK_ProyectosInmobiliarios_ProyectosEstados_EstadoId`. Lookup also used enum `.ToString()` (`Creado`) while DB stores uppercase codes (`CREADO`).
+  - **Fix:** Assign `Estado` CREADO before save; add `ProjectStatusCodes.ToCodigoUnico()` and use it in repository/seeder/public handlers.
+- **BUG-015:** Expedientes list stays on CREADO after editing a project.
+  - **Symptom:** Inside Editar Proyecto the status bar can show/enable Editado, but the Expedientes list badge remains CREADO after saving changes.
+  - **Root Cause:** `UpdateProjectAsync` updated fields but never promoted `EstadoId` from CREADO→EDITADO. List also lacked `Edited` badge/label mapping; PATCH `/status` rejected frontend string codes (`EDITADO`).
+  - **Fix:** Auto-promote CREADO→EDITADO on update; accept CodigoUnico on PATCH; show EDITADO in AdminProjectList + statusUtils.
 - **BUG-014:** Application crash ("Error en la aplicacion") after successful Stripe checkout.
   - **Symptom:** After a successful Stripe checkout, the application redirects to `/#/dashboard` but shows an ErrorBoundary screen instead of the dashboard.
   - **Root Cause:** The `CheckoutReturnPage` and `PricingPage` components were navigating to the non-existent `/dashboard` route instead of the correct `/admin/dashboard` route. This caused the router to hit the `*` wildcard route which renders the `ErrorBoundary` directly.

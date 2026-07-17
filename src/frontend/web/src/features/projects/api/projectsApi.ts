@@ -81,7 +81,7 @@ export const projectsApi = {
       throw new Error("Invalid project status");
     }
     try {
-      const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, status, {
+      const response = await apiClient.patch<ProyectoDto>(`/projects/${id}/status`, JSON.stringify(status), {
         headers: { 'Content-Type': 'application/json' }
       });
       return success(response.data);

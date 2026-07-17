@@ -11,6 +11,7 @@ using Application.Contracts.Documents;
 using Application.DTOs;
 using Application.DTOs.Projects;
 using Domain.Enums;
+using Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Common.Exceptions;
@@ -92,11 +93,20 @@ public class ProjectsController : ControllerBase
         var docList = documents.ToList();
         var hasObservaciones = docList.Any(d => !string.IsNullOrEmpty(d.Observaciones));
 
+        // Sync: projects that already have documents but stayed on CREADO/EDITADO
+        // (e.g. docs uploaded before auto-promotion existed) enter REVISION here.
+        var currentStatus = project.EstadoProyecto;
+        if (ProjectLifecyclePolicy.ShouldEnterReview(currentStatus, docList.Count))
+        {
+            project = await _projectService.UpdateProjectStatusAsync(id, ProjectStatus.Revision, cancellationToken);
+            currentStatus = project.EstadoProyecto;
+        }
+
         return Ok(new
         {
             documentCount = docList.Count,
             hasObservaciones,
-            currentStatus = project.EstadoProyecto
+            currentStatus
         });
     }
 
@@ -147,8 +157,13 @@ public class ProjectsController : ControllerBase
     [HttpPatch("{id:guid}/status")]
     [AllowAnonymous]
     // [Authorize] // TODO: Enable when auth is fully implemented
-    public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] ProjectStatus status, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] string statusCode, CancellationToken cancellationToken)
     {
+        if (!ProjectStatusCodes.TryParseCodigoUnico(statusCode, out var status))
+        {
+            return BadRequest(new { message = $"Estado inválido: '{statusCode}'. Use CREADO, EDITADO, REVISION, OBSERVACION o PUBLICADO." });
+        }
+
         try
         {
             var project = await _projectService.UpdateProjectStatusAsync(id, status, cancellationToken);
@@ -157,6 +172,10 @@ public class ProjectsController : ControllerBase
         catch (KeyNotFoundException)
         {
             return NotFound();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
         catch (QuotaExceededException ex)
         {

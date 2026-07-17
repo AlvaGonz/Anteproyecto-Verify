@@ -196,7 +196,7 @@ public class ProjectValidationOrchestrator : IProjectValidationOrchestrator
         var estadoEnRevision = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Revision, cancellationToken);
         if (estadoEnRevision != null)
         {
-            proyecto.UpdateEstado(estadoEnRevision.Id);
+            proyecto.UpdateEstado(estadoEnRevision);
             _proyectoRepository.Update(proyecto);
         }
 

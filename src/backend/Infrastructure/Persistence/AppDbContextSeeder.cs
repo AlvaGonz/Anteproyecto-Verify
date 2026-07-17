@@ -393,31 +393,31 @@ public static class AppDbContextSeeder
             var estados = new List<ProyectoEstado>
             {
                 new ProyectoEstado(
-                    ProjectStatus.Creado.ToString(),
+                    ProjectStatusCodes.Creado,
                     "Creado",
                     "Estado por defecto al crear un proyecto.",
                     "El proyecto acaba de ser registrado. Requiere completar información y subir documentos obligatorios.",
                     "#9BACD8"), // Soft blue
                 new ProyectoEstado(
-                    ProjectStatus.Editado.ToString(),
+                    ProjectStatusCodes.Editado,
                     "Editado",
                     "El proyecto ha sido modificado.",
                     "Se ha actualizado información o documentos. Requiere validación de los cambios.",
                     "#F98513"), // Orange/Warning
                 new ProyectoEstado(
-                    ProjectStatus.Revision.ToString(),
+                    ProjectStatusCodes.Revision,
                     "En Revisión",
                     "Proyecto en proceso de revisión por los asesores.",
                     "Se están verificando los documentos y la información proporcionada. No se pueden realizar cambios.",
                     "#EAB308"), // Yellow/Gold
                 new ProyectoEstado(
-                    ProjectStatus.ConObservacion.ToString(),
+                    ProjectStatusCodes.Observacion,
                     "Con Observación",
                     "El proyecto tiene observaciones que deben ser corregidas.",
                     "Se han encontrado inconsistencias o faltan documentos. El desarrollador debe subsanar las observaciones.",
                     "#EF4444"), // Red/Error
                 new ProyectoEstado(
-                    ProjectStatus.Publicado.ToString(),
+                    ProjectStatusCodes.Publicado,
                     "Publicado",
                     "Proyecto verificado y publicado exitosamente.",
                     "El proyecto ha pasado todas las validaciones y cuenta con el sello de integridad. Visible para el público.",
@@ -582,11 +582,11 @@ public static class AppDbContextSeeder
         var existing = await context.Proyectos.FirstOrDefaultAsync(p => p.Nombre == nombre && p.UsuarioCreadorId == usuarioCreadorId);
         if (existing != null) return existing;
 
-        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == status.ToString());
+        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == status.ToCodigoUnico());
         if (estado == null) throw new InvalidOperationException($"Estado {status} no encontrado. Asegúrate de ejecutar SeedProyectoEstadosAsync primero.");
 
         var proyecto = new Proyecto(nombre, ubicacionTexto, usuarioCreadorId, categoria, datosDesarrollador, designacionCatastral);
-        proyecto.UpdateEstado(estado.Id);
+        proyecto.UpdateEstado(estado);
         context.Proyectos.Add(proyecto);
         await context.SaveChangesAsync();
         return proyecto;

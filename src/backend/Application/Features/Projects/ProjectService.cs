@@ -70,7 +70,15 @@ public class ProjectService : IProjectService
                 "Límite de proyectos alcanzado para su plan actual. Considere mejorar su plan.");
         }
 
+        var estadoCreado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Creado, cancellationToken);
+        if (estadoCreado == null)
+        {
+            throw new InvalidOperationException(
+                "Estado 'CREADO' no encontrado en ProyectosEstados. Ejecute el seeder o la migración de estados.");
+        }
+
         var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        proyecto.UpdateEstado(estadoCreado);
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {
             proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
@@ -96,6 +104,19 @@ public class ProjectService : IProjectService
 
         proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
         proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
+
+        // Auto-promote CREADO → EDITADO when the expediente is modified
+        var currentCodigo = proyecto.Estado?.CodigoUnico;
+        if (string.IsNullOrEmpty(currentCodigo) || currentCodigo == ProjectStatusCodes.Creado)
+        {
+            var estadoEditado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Editado, cancellationToken);
+            if (estadoEditado == null)
+            {
+                throw new InvalidOperationException(
+                    "Estado 'EDITADO' no encontrado en ProyectosEstados. Ejecute el seeder o la migración de estados.");
+            }
+            proyecto.UpdateEstado(estadoEditado);
+        }
         
         _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -133,12 +154,12 @@ public class ProjectService : IProjectService
         if (estado == null)
             throw new InvalidOperationException($"Estado {status} no encontrado.");
             
-        proyecto.UpdateEstado(estado.Id);
+        proyecto.UpdateEstado(estado);
         
         _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if (oldStatus != status.ToString() && (status == ProjectStatus.Publicado || status == ProjectStatus.ConObservacion))
+        if (oldStatus != status.ToCodigoUnico() && (status == ProjectStatus.Publicado || status == ProjectStatus.ConObservacion))
         {
             var usuario = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
             if (usuario != null && !string.IsNullOrWhiteSpace(usuario.Email))

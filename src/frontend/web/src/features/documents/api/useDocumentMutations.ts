@@ -18,6 +18,7 @@ export const useUploadDocument = (projectId: string) => {
       qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+      qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] });
     },
   });
 };

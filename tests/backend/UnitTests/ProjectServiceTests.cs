@@ -50,6 +50,9 @@ public class ProjectServiceTests
         user.UpdateStripeSubscription("mock_sub", "active", DateTime.UtcNow.AddMonths(1));
         
         _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        var estadoCreado = new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8");
+        _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(estadoCreado);
         _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
@@ -63,7 +66,7 @@ public class ProjectServiceTests
         Assert.Equal(ProjectCategory.Comercial, result.Categoria);
         Assert.Equal("DevData", result.DatosDesarrollador);
         Assert.Equal("DC-123", result.DesignacionCatastral);
-        Assert.Equal("Desconocido", result.EstatusDescripcion);
+        Assert.Equal(ProjectStatusCodes.Creado, result.EstadoProyecto);
     }
 
     [Fact]
@@ -71,10 +74,15 @@ public class ProjectServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
+        var estadoCreado = new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8");
+        var estadoEditado = new ProyectoEstado(ProjectStatusCodes.Editado, "Editado", "desc", "cond", "#F98513");
         var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
+        proyecto.UpdateEstado(estadoCreado);
         var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null, null, null, null, null, null);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
+        _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Editado, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(estadoEditado);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         // Act
@@ -88,6 +96,28 @@ public class ProjectServiceTests
         Assert.Equal(ProjectCategory.Turistico, result.Categoria);
         Assert.Equal("NewDev", result.DatosDesarrollador);
         Assert.Equal("NewDC", result.DesignacionCatastral);
+        Assert.Equal(ProjectStatusCodes.Editado, result.EstadoProyecto);
+        Assert.Equal(estadoEditado.Id, proyecto.EstadoId);
+    }
+
+    [Fact]
+    public async Task UpdateProject_DoesNotDowngrade_WhenAlreadyInRevision()
+    {
+        var id = Guid.NewGuid();
+        var estadoRevision = new ProyectoEstado(ProjectStatusCodes.Revision, "En Revisión", "desc", "cond", "#EAB308");
+        var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
+        proyecto.UpdateEstado(estadoRevision);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null, null, null, null, null, null);
+
+        _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        var result = await _projectService.UpdateProjectAsync(id, dto);
+
+        Assert.Equal(ProjectStatusCodes.Revision, result.EstadoProyecto);
+        _proyectoRepositoryMock.Verify(
+            r => r.GetEstadoByStatusAsync(ProjectStatus.Editado, It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 
     [Fact]

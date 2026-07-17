@@ -47,8 +47,8 @@ public class SearchPublicProjectsQueryHandler
                 Id = p.Id,
                 NombreProyecto = p.Nombre,
                 CodigoPublico = sello?.CodigoSello,
-                EstadoValidacion = p.Estado?.CodigoUnico == ProjectStatus.Publicado.ToString() ? "Verificado" : 
-                                   p.Estado?.CodigoUnico == ProjectStatus.ConObservacion.ToString() ? "NoVerificado" : "ConObservaciones",
+                EstadoValidacion = p.Estado?.CodigoUnico == ProjectStatus.Publicado.ToCodigoUnico() ? "Verificado" : 
+                                   p.Estado?.CodigoUnico == ProjectStatus.ConObservacion.ToCodigoUnico() ? "NoVerificado" : "ConObservaciones",
                 UbicacionTexto = p.UbicacionTexto,
                 EstadoJuridico = (int)p.EstadoJuridico,
                 EstadoProyecto = p.Estado?.CodigoUnico ?? "Desconocido",
