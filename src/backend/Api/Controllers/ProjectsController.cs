@@ -11,6 +11,7 @@ using Application.Contracts.Documents;
 using Application.DTOs;
 using Application.DTOs.Projects;
 using Domain.Enums;
+using Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Common.Exceptions;
@@ -92,11 +93,20 @@ public class ProjectsController : ControllerBase
         var docList = documents.ToList();
         var hasObservaciones = docList.Any(d => !string.IsNullOrEmpty(d.Observaciones));
 
+        // Sync: projects that already have documents but stayed on CREADO/EDITADO
+        // (e.g. docs uploaded before auto-promotion existed) enter REVISION here.
+        var currentStatus = project.EstadoProyecto;
+        if (ProjectLifecyclePolicy.ShouldEnterReview(currentStatus, docList.Count))
+        {
+            project = await _projectService.UpdateProjectStatusAsync(id, ProjectStatus.Revision, cancellationToken);
+            currentStatus = project.EstadoProyecto;
+        }
+
         return Ok(new
         {
             documentCount = docList.Count,
             hasObservaciones,
-            currentStatus = project.EstadoProyecto
+            currentStatus
         });
     }
 

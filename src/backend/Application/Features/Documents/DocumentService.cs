@@ -152,9 +152,25 @@ public class DocumentService : IDocumentService
         );
         await _validacionRepository.AddAsync(validacion, cancellationToken);
 
+        // Auto-promote CREADO/EDITADO → REVISION once the expediente has documents
+        await PromoteToRevisionIfEligibleAsync(project, existingDocs.Count() + 1, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToDto(document);
+    }
+
+    private async Task PromoteToRevisionIfEligibleAsync(Proyecto project, int documentCount, CancellationToken cancellationToken)
+    {
+        if (!Domain.Policies.ProjectLifecyclePolicy.ShouldEnterReview(project.Estado?.CodigoUnico, documentCount))
+            return;
+
+        var estadoRevision = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Revision, cancellationToken);
+        if (estadoRevision == null)
+            return;
+
+        project.UpdateEstado(estadoRevision);
+        _proyectoRepository.Update(project);
     }
 
     public async Task<IEnumerable<DocumentDto>> GetProjectDocumentsAsync(Guid projectId, CancellationToken cancellationToken = default)
