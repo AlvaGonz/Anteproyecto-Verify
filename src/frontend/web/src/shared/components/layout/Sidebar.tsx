@@ -65,7 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full -mr-32 -mt-32"></div>
       
       {/* Logo Section */}
-      <div className="relative z-10 flex flex-col px-8 pt-10 pb-8">
+      <div className="relative flex flex-col px-8 pt-10 pb-8">
         <Link to="/admin/dashboard" className="flex items-center gap-3 group">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-premium-sm group-hover:scale-110 transition-transform">
             <img
@@ -87,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* Navigation Section */}
-      <div className="relative z-10 flex-1 flex flex-col px-4 py-6">
+      <div className="relative flex-1 flex flex-col px-4 py-6">
         <div className="px-4 mb-4">
            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Principal</p>
         </div>
@@ -148,7 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* User Section */}
-      <div className="relative z-10 p-6 bg-white/[0.03] border-t border-white/5">
+      <div className="relative p-6 bg-white/[0.03] border-t border-white/5">
         <Link to="/admin/settings" className="flex items-center gap-3 hover:bg-white/5 p-2 -m-2 rounded-xl transition-colors cursor-pointer">
           <div className="relative">
              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-sm font-black text-white shadow-lg overflow-hidden border border-white/10">

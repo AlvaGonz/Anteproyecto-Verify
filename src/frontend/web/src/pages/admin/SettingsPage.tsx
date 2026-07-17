@@ -10,18 +10,20 @@ import { DeleteModal } from "../../features/settings/components/DeleteModal";
 import { MyProfileForm } from "../../features/settings/components/MyProfileForm";
 import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
 import { InviteesSettings } from "../../features/settings/components/InviteesSettings";
+import { DeleteAccountSection } from "../../features/settings/components/DeleteAccountSection";
 import {
   Settings,
   Users,
   Loader2,
   User,
   CreditCard,
-  UserPlus
+  UserPlus,
+  Shield
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
-type TabId = "profile" | "subscription" | "users" | "invitees";
+type TabId = "profile" | "subscription" | "users" | "invitees" | "security";
 
 
 
@@ -221,6 +223,19 @@ export const SettingsPage: React.FC = () => {
             Usuarios Invitados
           </button>
         )}
+
+        {/* Security tab - available for all authenticated users */}
+        <button
+          type="button"
+          onClick={() => setActiveTab("security")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "security"
+            ? "border-[#223382] text-[#223382]"
+            : "border-transparent text-text-secondary hover:text-text-primary"
+            }`}
+        >
+          <Shield className="w-4 h-4" />
+          Seguridad
+        </button>
       </div>
 
       {/* Tab Contents */}
@@ -277,6 +292,18 @@ export const SettingsPage: React.FC = () => {
               transition={{ duration: 0.2 }}
             >
               <InviteesSettings />
+            </m.div>
+          )}
+
+          {activeTab === "security" && (
+            <m.div
+              key="security"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <DeleteAccountSection />
             </m.div>
           )}
 

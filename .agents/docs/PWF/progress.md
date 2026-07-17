@@ -204,3 +204,7 @@
   - **Symptom:** `useReports.ts:46 GET http://localhost:5000/api/projects/ID/reports/public 404 (Not Found)`
   - **Root Cause:** The `GetPublicProjectReportQueryHandler` returns `null` when no report is found, leading to a 404 status. React Query automatically retried this 404 three times, flooding the console and network.
   - **Fix:** Configured React Query `retry` function in `usePublicReport` to return `false` on a 404 response, allowing the UI to gracefully handle the "no report" state. Also added UI modal to show registrant information on "CONTACTAR DESARROLLADOR" button click.
+- **BUG-029:** Unit tests in `DocumentServiceTests` fail with `QuotaExceededException`.
+  - **Symptom:** Tests executing document uploads mock `PlanSuscripcion` but the `GetEffectivePlan` logic treats empty prices or unmapped states as invalid for storage quota.
+  - **Root Cause:** A test factory used `new PlanSuscripcion(...)` with a private/missing constructor and lacked the proper setup to trigger the `SubscriptionTierPolicy.CanStoreDocument` bypass (which allows Free plans with 0 price).
+  - **Fix:** Switched to using `PlanSuscripcion.Create(...)` factory method and mapped the mocked plan to 0m price and unlimited storage for testing purposes.

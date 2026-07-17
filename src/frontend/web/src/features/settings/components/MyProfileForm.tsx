@@ -6,9 +6,8 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase, AlertTriangle } from "lucide-react";
+import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
-import { DeleteAccountSection } from "./DeleteAccountSection";
 import { useDgiiLookup, DgiiData } from "../../../shared/hooks/useDgiiLookup";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -379,23 +378,6 @@ export const MyProfileForm: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* ═══ ZONA DE PELIGRO - Separated from main form ═══ */}
-      <section className="mt-10 pt-8 border-t border-border" aria-labelledby="danger-zone-title">
-        <div className="bg-red-50 border border-red-100 rounded-2xl p-5 shrink-0">
-          <h2
-            id="danger-zone-title"
-            className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2"
-          >
-            <AlertTriangle className="w-4 h-4" />
-            Zona de Peligro
-          </h2>
-          <p className="text-sm text-red-700 mb-4">
-            Eliminar tu cuenta es permanente y no se puede deshacer.
-          </p>
-          <DeleteAccountSection />
-        </div>
-      </section>
     </form>
   );
 };

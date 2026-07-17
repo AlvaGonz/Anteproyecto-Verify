@@ -20,7 +20,6 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   const [deletionReason, setDeletionReason] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [prevIsOpen, setPrevIsOpen] = useState(false);
-  const confirmInputRef = useRef<HTMLInputElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -106,140 +105,131 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center"
+            className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex"
           >
-            {/* Close button */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute top-4 right-4 text-text-secondary hover:text-text-primary transition-colors"
-              aria-label="Cerrar modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Icon */}
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trash2 className="w-8 h-8 text-red-600" />
-            </div>
-
-            {/* Title */}
-            <h2
-              id="delete-account-modal-title"
-              className="text-xl font-black text-text-primary mb-2"
-            >
-              ¿Eliminar cuenta?
-            </h2>
-
-            {/* Description */}
-            <p
-              id="delete-account-modal-description"
-              className="text-sm text-text-secondary mb-6"
-            >
-              Esta acción es permanente y no se puede deshacer.
-            </p>
-
-            {/* Warning bullets */}
-            <div className="text-left mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-xl mb-3">
-                <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                <div className="text-xs text-red-800 space-y-1">
-                  <p className="font-bold">Esta acción es irreversible después de 14 días.</p>
-                  <p>
-                    Al confirmar, su suscripción será cancelada al final del período vigente,
-                    perderá acceso a todos los proyectos y su información personal será
-                    anonimizada irreversiblemente después de 30 días.
-                  </p>
+            {/* Left Column - Information & Warning */}
+            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-red-50 to-red-100 p-8 flex-col justify-between border-r border-red-100">
+              <div>
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Trash2 className="w-8 h-8 text-red-600" aria-hidden="true" />
                 </div>
+                <h2 id="delete-account-modal-title" className="text-2xl font-black text-text-primary mb-3 text-center">
+                  ¿Eliminar cuenta?
+                </h2>
+                <p id="delete-account-modal-description" className="text-sm text-text-secondary mb-6 text-center">
+                  Esta acción es permanente y no se puede deshacer.
+                </p>
               </div>
 
-              <ul className="text-xs text-red-800 space-y-1 list-disc list-inside">
-                <li>Perderás acceso a tu cuenta.</li>
-                <li>Esta acción no se puede deshacer.</li>
-                <li>Tu información asociada dejará de estar disponible según las reglas del sistema.</li>
-              </ul>
-            </div>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
+                  <div className="text-xs text-red-800 space-y-1">
+                    <p className="font-bold">Esta acción es irreversible después de 14 días.</p>
+                    <p>
+                      Al confirmar, su suscripción será cancelada al final del período vigente,
+                      perderá acceso a todos los proyectos y su información personal será
+                      anonimizada irreversiblemente después de 30 días.
+                    </p>
+                  </div>
+                </div>
 
-            {/* Confirmation input */}
-            <div className="text-left mb-4">
-              <label
-                htmlFor="del-modal-confirm"
-                className="block text-xs font-bold text-text-secondary uppercase mb-1"
-              >
-                Escribe <span className="font-black">ELIMINAR</span> para confirmar
-              </label>
-              <input
-                ref={confirmInputRef}
-                id="del-modal-confirm"
-                type="text"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                className="vf-input w-full"
-                placeholder="ELIMINAR"
-                autoComplete="off"
-                aria-describedby="delete-account-modal-description"
-              />
-            </div>
+                <ul className="text-xs text-red-800 space-y-1 list-disc list-inside">
+                  <li>Perderás acceso a tu cuenta.</li>
+                  <li>Esta acción no se puede deshacer.</li>
+                  <li>Tu información asociada dejará de estar disponible según las reglas del sistema.</li>
+                </ul>
+              </div>
 
-            {/* Password input */}
-            <div className="text-left mb-4">
-              <label htmlFor="del-password" className="block text-xs font-bold text-text-secondary uppercase mb-1">
-                Contraseña Actual
-              </label>
-              <div className="relative">
-                <input
-                  id="del-password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="vf-input w-full pr-9"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
+              <div className="pt-4 border-t border-red-200">
+                <label htmlFor="del-reason" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                  Motivo (opcional)
+                </label>
+                <textarea
+                  id="del-reason"
+                  className="vf-input w-full min-h-[80px] resize-none"
+                  placeholder="¿Por qué decides irte? (opcional)"
+                  rows={3}
+                  value={deletionReason}
+                  onChange={(e) => setDeletionReason(e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Right Column - Form & Actions */}
+            <div className="w-full lg:w-1/2 p-6 lg:p-8 flex flex-col">
+              {/* Close button - only visible on mobile or as backup */}
+              <div className="lg:hidden flex justify-end mb-4">
                 <button
                   type="button"
-                  onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary"
+                  className="text-text-secondary hover:text-text-primary transition-colors p-1"
+                  aria-label="Cerrar modal"
+                  onClick={onClose}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <X className="w-5 h-5" aria-hidden="true" />
                 </button>
               </div>
-            </div>
 
-            {/* Optional reason */}
-            <div className="text-left mb-6">
-              <label htmlFor="del-reason" className="block text-xs font-bold text-text-secondary uppercase mb-1">
-                Motivo (opcional)
-              </label>
-              <textarea
-                id="del-reason"
-                value={deletionReason}
-                onChange={(e) => setDeletionReason(e.target.value)}
-                className="vf-input w-full min-h-[60px] resize-none"
-                placeholder="¿Por qué decides irte? (opcional)"
-                rows={2}
-              />
-            </div>
+              <form onSubmit={(e) => { e.preventDefault(); handleConfirm(); }} className="flex-1 flex flex-col justify-center space-y-6">
+                <div>
+                  <label htmlFor="del-modal-confirm" className="block text-xs font-bold text-text-secondary uppercase mb-2">
+                    Escribe <span className="font-black">ELIMINAR</span> para confirmar
+                  </label>
+                  <input
+                    id="del-modal-confirm"
+                    className="vf-input w-full"
+                    placeholder="ELIMINAR"
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                  />
+                </div>
 
-            {/* Action buttons */}
-            <div className="flex gap-3 justify-center">
-              <button
-                ref={cancelButtonRef}
-                type="button"
-                onClick={onClose}
-                disabled={isProcessing}
-                className="vf-btn-secondary w-full sm:w-auto"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirm}
-                disabled={!canSubmit}
-                className="vf-btn-danger w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessing ? "Eliminando..." : "Eliminar cuenta"}
-              </button>
+                <div>
+                  <label htmlFor="del-password" className="block text-xs font-bold text-text-secondary uppercase mb-2">
+                    Contraseña Actual
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="del-password"
+                      className="vf-input w-full pr-12"
+                      placeholder="••••••••"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" aria-hidden="true" />
+                      ) : (
+                        <Eye className="w-4 h-4" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4 border-t border-neutral-200">
+                  <button
+                    type="button"
+                    className="vf-btn-secondary w-full sm:w-auto"
+                    onClick={onClose}
+                    disabled={isProcessing}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="vf-btn-danger w-full sm:w-auto"
+                    disabled={!canSubmit}
+                  >
+                    {isProcessing ? 'Eliminando...' : 'Eliminar cuenta'}
+                  </button>
+                </div>
+              </form>
             </div>
           </m.div>
         </div>
