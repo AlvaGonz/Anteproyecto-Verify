@@ -7,7 +7,6 @@ if (BASE_URL && !BASE_URL.endsWith("/api") && !BASE_URL.endsWith("/api/")) {
 
 const instance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  headers: { "Content-Type": "application/json" },
   withCredentials: true,
   timeout: 15000, // 15 second timeout to prevent hanging requests
 });
@@ -27,6 +26,12 @@ instance.interceptors.request.use((config) => {
   if (_accessToken && !config.headers['Authorization']) {
     config.headers['Authorization'] = `Bearer ${_accessToken}`;
   }
+  
+  if (config.data instanceof FormData) {
+    // Let the browser set the Content-Type with the correct boundary
+    delete config.headers['Content-Type'];
+  }
+
   return config;
 });
 

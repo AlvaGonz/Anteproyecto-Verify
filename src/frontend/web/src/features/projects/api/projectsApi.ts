@@ -112,9 +112,7 @@ export const projectsApi = {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await apiClient.post<{ url: string }>("/projects/upload-image", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const response = await apiClient.post<{ url: string }>("/projects/upload-image", formData);
       return success(response.data.url);
     } catch (error: any) {
       return failure(mapError(error));

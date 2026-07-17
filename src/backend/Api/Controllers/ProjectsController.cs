@@ -208,7 +208,7 @@ public class ProjectsController : ControllerBase
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UploadImage(IFormFile file, CancellationToken cancellationToken)
+    public async Task<IActionResult> UploadImage([FromForm] IFormFile file, CancellationToken cancellationToken)
     {
         if (file == null || file.Length == 0)
             return BadRequest("El archivo es requerido y no puede estar vacío.");

@@ -11,8 +11,7 @@ export const useUploadDocument = (projectId: string) => {
     mutationFn: (formData: FormData) =>
       apiClient.post<DocumentoDto>(
         `/projects/${projectId}/documents`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        formData
       ).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });

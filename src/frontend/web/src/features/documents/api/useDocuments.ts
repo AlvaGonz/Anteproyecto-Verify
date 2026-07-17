@@ -41,9 +41,7 @@ export const useUploadDocument = (projectId: string) => {
   return useMutation({
     mutationKey: ['documentKeys'],
     mutationFn: (formData: FormData) =>
-      apiClient.post<ApiDocumentoDto>(`/projects/${projectId}/documents`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      }).then(res => mapApiDocument(res.data)),
+      apiClient.post<ApiDocumentoDto>(`/projects/${projectId}/documents`, formData).then(res => mapApiDocument(res.data)),
     onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
   });
 };
@@ -56,9 +54,7 @@ export const useUploadRequirementDocument = (projectId: string) => {
       const formData = new FormData();
       formData.append('file', file);
       // Ensure we hit the v1 endpoint explicitly
-      return apiClient.post<ApiDocumentoDto>(`/v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      }).then(res => mapApiDocument(res.data));
+      return apiClient.post<ApiDocumentoDto>(`/v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData).then(res => mapApiDocument(res.data));
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
   });
