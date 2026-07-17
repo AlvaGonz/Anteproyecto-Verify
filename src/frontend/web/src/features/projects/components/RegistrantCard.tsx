@@ -9,18 +9,24 @@ interface RegistrantCardProps {
 export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) => {
   const {
     nombreCompleto,
-    razonSocial,
-    rol,
     razonSocial: empresa,
+    rol,
+    email,
     telefono,
     email,
+    telefono,
     avatarUrl,
     verificado,
     fechaRegistro,
   } = registrant;
 
-  const fullName = nombreCompleto?.trim() || "";
-  const initials = fullName ? fullName.substring(0, 2).toUpperCase() : "";
+  const fullName = (nombreCompleto || empresa)?.trim() || 'Sin nombre';
+  const initials = fullName
+    .split(' ')
+    .map(n => n.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div data-testid="registrant-card" className="bg-surface-container-lowest p-8 rounded-[2.5rem] border border-surface-container-high/50 shadow-sm relative overflow-hidden group">

@@ -18,10 +18,11 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
 
   const translateStatus = (status: string) => {
     const map: Record<string, string> = {
-      Draft: "Borrador",
+      Draft: "Creado",
+      Edited: "Editado",
       InReview: "En revisión",
       Published: "Publicado",
-      Observed: "Observado",
+      Observed: "Con Observaciones",
       Verified: "Verificado",
     };
     return map[status] || status;

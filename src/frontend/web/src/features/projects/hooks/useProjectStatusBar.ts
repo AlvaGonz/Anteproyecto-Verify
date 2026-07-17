@@ -18,7 +18,7 @@ export const useProjectStatusBar = (projectId: string) => {
       if (isSuccess(result)) {
         return result.data;
       }
-      throw new Error(String(result.error) || "Failed to fetch status eligibility");
+      throw new Error(getProjectErrorMessage(result.error) || "Failed to fetch status eligibility");
     },
     enabled: !!projectId,
   });
@@ -27,7 +27,7 @@ export const useProjectStatusBar = (projectId: string) => {
     mutationFn: async (status: ProjectStatus) => {
       const result = await projectsApi.updateProjectStatus(projectId, status);
       if (!isSuccess(result)) {
-        throw new Error(String(result.error) || "Failed to update status");
+        throw new Error(getProjectErrorMessage(result.error) || "Failed to update status");
       }
       return result.data;
     },

@@ -334,8 +334,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
       try {
         const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        if (result._tag === "Success") {
-          const catastroData = result.data;
+        if (isSuccess(result)) {
+          const catastroData = result.value;
           if (catastroData.designacionCatastral) setDesignacionCatastral(catastroData.designacionCatastral);
           if (catastroData.matricula) setMatricula(catastroData.matricula);
           if (catastroData.superficieM2) setSuperficieM2(catastroData.superficieM2);
@@ -343,6 +343,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           if (catastroData.cedulaRncPropietario) setCedulaRncPropietario(catastroData.cedulaRncPropietario);
           if (catastroData.ipi) setIpi(catastroData.ipi);
           if (catastroData.estatusIpi) setEstatusIpi(catastroData.estatusIpi);
+          const closestProvName = getClosestProvincia(lat, lng);
+          setUbicacionTexto(closestProvName);
         } else {
           throw new Error(getProjectErrorMessage(result.error));
         }
@@ -401,8 +403,6 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
           setIpi(catastroData.ipi || "");
           setEstatusIpi(catastroData.estatusIpi || "");
-          const closestProvName = getClosestProvincia(lat, lng);
-          setUbicacionTexto(closestProvName);
         } else {
           throw new Error(getProjectErrorMessage(result.error));
         }

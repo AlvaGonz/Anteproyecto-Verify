@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { 
   CheckCircle2, 
@@ -244,7 +244,7 @@ export const ProjectDocumentUploadPage: React.FC = () => {
           </button>
           <div className="flex gap-4">
             <button type="button" className="px-8 py-4 bg-[#DAD1C8] text-[#5C5C5C] rounded-2xl font-black text-sm cursor-not-allowed">
-              Guardar Borrador
+              Guardar Proyecto
             </button>
             <button type="button" className="flex items-center gap-3 px-10 py-4 bg-[#F98513] text-white rounded-2xl font-black text-sm shadow-premium-sm hover:bg-[#E07610] transition-all transform hover:scale-[1.02] active:scale-95 group">
               Siguiente Paso
