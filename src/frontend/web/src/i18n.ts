@@ -288,7 +288,8 @@ const resources = {
         }
       },
       status: {
-        draft: "Borrador",
+        draft: "Creado",
+        edited: "Editado",
         published: "Publicado",
         inReview: "En Revisión",
         observed: "Con Observaciones",
@@ -584,7 +585,8 @@ const resources = {
         }
       },
       status: {
-        draft: "Draft",
+        draft: "Created",
+        edited: "Edited",
         published: "Published",
         inReview: "In Review",
         observed: "With Observations",
