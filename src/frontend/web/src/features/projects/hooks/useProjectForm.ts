@@ -121,7 +121,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   // ── Estado de fotos ────────────────────────────────────────────────────────
-  const [portraitPreview, setPortraitPreview] = useState<string | null>(initialData?.imagenUrl ?? null);
+  const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
 
   const initialAdditionalUrls = [
     initialData?.imagenAdicional1,
@@ -131,13 +131,13 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     initialData?.imagenAdicional5
   ].filter(Boolean) as string[];
 
-  const [galleryPreviews, setGalleryPreviews] = useState<string[]>(initialAdditionalUrls);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [fotosError, setFotosError] = useState<string | null>(null);
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
 
   const portraitInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const existingFotoUrls: string[] = [];
+  const existingFotoUrls: string[] = [initialData?.imagenUrl, ...initialAdditionalUrls].filter(Boolean) as string[];
 
   // ── Estado de superficie ───────────────────────────────────────────────────
   const [superficieM2, setSuperficieM2] = useState<number | string>(initialData?.superficieM2 ?? "");

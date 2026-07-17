@@ -8,7 +8,7 @@ let projectDb = {
   nombre: "Proyecto Fotos E2E",
   ubicacionTexto: "Santo Domingo, RD",
   categoria: 1, // Residencial
-  estadoProyecto: 0, // Draft
+  estadoProyecto: "CREADO", // Draft
   estadoIntegridad: 0, // Pending
   usuarioCreadorId: "user-001",
   createdAtUtc: "2026-01-01T00:00:00Z"
@@ -90,13 +90,25 @@ test.describe("Subida y Persistencia de Fotos de Proyecto — E2E con Mock state
 
     // 3. Mock GET /api/projects/:id/documents para cargar la persistencia actual
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents`, async (route) => {
-      if (route.request().method() === "GET") {
+      const method = route.request().method();
+      const url = route.request().url();
+      if (method === "GET") {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify(documentsDb)
         });
-      } else if (route.request().method() === "POST") {
+      } else if (method === "PATCH") {
+        const payload = route.request().postDataJSON();
+        if (url.endsWith("/status")) {
+          projectDb.estadoProyecto = payload;
+        }
+        await route.fulfill({ status: 200 });
+      }
+    });
+
+    await page.route("**/api/projects/upload-image", async (route) => {
+      if (route.request().method() === "POST") {
         // Mock POST: simular éxito en la subida
         const formData = await route.request().postData(); // en form-data raw
         
@@ -120,7 +132,7 @@ test.describe("Subida y Persistencia de Fotos de Proyecto — E2E con Mock state
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify(newDoc)
+          body: JSON.stringify({ url: newDoc.fileUrl })
         });
       }
     });
@@ -152,8 +164,11 @@ test.describe("Subida y Persistencia de Fotos de Proyecto — E2E con Mock state
     const titleFotos = page.getByText("Fotos del Proyecto");
     await expect(titleFotos).toBeVisible();
 
-    // Crear un archivo falso para subir
-    const fileBuffer = Buffer.from("fake-image-content");
+    // Crear un archivo falso válido para subir
+    const fileBuffer = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "base64"
+    );
 
     // Subir la imagen simulando el input de tipo file oculto de la portada
     // La sección de portada tiene un botón "Agregar portada" que clica un input.

@@ -13,6 +13,7 @@ using Moq;
 using Xunit;
 using global::Application.Abstractions.Storage;
 using global::Application.Abstractions.DocumentIntelligence;
+using global::Application.Contracts.Documents;
 
 public class DocumentServiceTests
 {
@@ -105,5 +106,55 @@ public class DocumentServiceTests
         var estadoJuridicoDiagnostic = result.Documentos.First(d => d.TipoDocumento == DocumentType.CertificacionEstadoJuridico);
         Assert.Equal("Incompleto", estadoJuridicoDiagnostic.Estado);
     }
-}
 
+    [Fact]
+    public async Task DocumentService_Upload_Computes_SHA256_And_Stores_Hash_In_Entity()
+    {
+        // Arrange
+        var projectId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var project = new Proyecto("Test", "Loc", userId, ProjectCategory.Residencial);
+        var usuario = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Profesional, "123", "456");
+        
+        var dto = new global::Application.DTOs.Documents.UploadDocumentDto(
+            DocumentType.CertificadoTitulo,
+            userId,
+            DateTime.UtcNow,
+            "Institucion",
+            null
+        );
+        
+        var fileContent = "dummy pdf content";
+        var fileBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
+        using var stream = new System.IO.MemoryStream(fileBytes);
+        
+        // Expected hash for "dummy pdf content"
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var expectedHash = BitConverter.ToString(sha256.ComputeHash(fileBytes)).Replace("-", "").ToLowerInvariant();
+
+        _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(usuario);
+        
+        _documentValidationServiceMock.Setup(s => s.ValidateDocumentAsync(It.IsAny<System.IO.Stream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new DocumentValidationResult { IsValid = true, ValidatedFieldsJson = "{}" });
+
+        _blobStorageServiceMock.Setup(s => s.UploadAsync(It.IsAny<System.IO.Stream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UploadResult("blobName", "http://test/blob"));
+
+        _ocrProviderMock.Setup(p => p.ProcessDocumentAsync(It.IsAny<System.IO.Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new global::Application.Abstractions.Ocr.OcrResult { Success = true, RawJson = "{}" });
+
+        Documento? savedDoc = null;
+        _documentoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Documento>(), It.IsAny<CancellationToken>()))
+            .Callback<Documento, CancellationToken>((d, c) => savedDoc = d);
+
+        // Act
+        var result = await _documentService.UploadDocumentAsync(projectId, dto, stream, "test.pdf", "application/pdf", fileBytes.Length);
+
+        // Assert
+        Assert.NotNull(savedDoc);
+        Assert.Equal(expectedHash, savedDoc.HashSHA256);
+        
+        _documentStateEngineMock.Verify(e => e.ApplyOcrResult(savedDoc, It.IsAny<global::Application.Abstractions.Ocr.OcrResult>()), Times.Once);
+    }
+}

@@ -16,7 +16,7 @@ export const useProjectStatusBar = (projectId: string) => {
     queryFn: async () => {
       const result = await projectsApi.getProjectStatusEligibility(projectId);
       if (isSuccess(result)) {
-        return result.data;
+        return result.value;
       }
       throw new Error(getProjectErrorMessage(result.error) || "Failed to fetch status eligibility");
     },
@@ -29,7 +29,7 @@ export const useProjectStatusBar = (projectId: string) => {
       if (!isSuccess(result)) {
         throw new Error(getProjectErrorMessage(result.error) || "Failed to update status");
       }
-      return result.data;
+      return result.value;
     },
     onSuccess: () => {
       // Invalidate project and eligibility queries

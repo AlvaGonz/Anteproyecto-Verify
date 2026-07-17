@@ -11,7 +11,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
     nombre: "Residencial Las Palmas",
     ubicacionTexto: "La Romana, RD",
     categoria: 1, // Residencial
-    estadoProyecto: 0, // Draft
+    estadoProyecto: "CREADO", // Draft
     estadoIntegridad: 0, // Pending
     usuarioCreadorId: "user-001",
     createdAtUtc: "2026-01-01T00:00:00Z"
@@ -60,6 +60,8 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
       });
     });
 
+
+
     // 2. Default projects mock list and creation POST route
     await page.route("**/api/projects", async (route) => {
       if (route.request().method() === "GET") {
@@ -73,7 +75,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
         const created = {
           id: "proj-new-123",
           codigoInterno: "VF-new-2026",
-          estadoProyecto: 0,
+          estadoProyecto: "CREADO",
           estadoIntegridad: 0,
           ...payload
         };
@@ -102,13 +104,22 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
         const payload = route.request().postDataJSON();
         console.log(`MOCK API PATCH payload:`, payload);
         if (url.endsWith("/status")) {
-          const apiStatus = payload.status;
-          projectDb.estadoProyecto = apiStatus === "Activo" ? 1 : 2; // Published vs InReview
+          projectDb.estadoProyecto = payload;
         }
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify(projectDb)
+        });
+      } else if (url.endsWith("/status-eligibility")) {
+        console.log("-> MATCHED status-eligibility, returning mock eligibility data");
+        await route.fulfill({
+          status: 200,
+          json: {
+            documentCount: 3,
+            hasObservaciones: false,
+            currentStatus: projectDb.estadoProyecto
+          }
         });
       } else {
         await route.fulfill({
@@ -204,7 +215,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
 
     await expect(page.getByRole("button", { name: /En Revisión/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /Publicado/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Borrador/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Creado/i })).toBeVisible();
   });
 
   test("STATUS — cambiar estado muestra toast de éxito", async ({ page }) => {

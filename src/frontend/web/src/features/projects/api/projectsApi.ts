@@ -77,7 +77,7 @@ export const projectsApi = {
   },
 
   async updateProjectStatus(id: string, status: ProjectStatus): Promise<Result<ProyectoDto, ProjectError>> {
-    if (!Object.values(ProjectStatus).includes(status) || typeof status !== "number") {
+    if (!Object.values(ProjectStatus).includes(status)) {
       throw new Error("Invalid project status");
     }
     try {
