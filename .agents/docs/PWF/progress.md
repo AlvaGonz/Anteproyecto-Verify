@@ -208,3 +208,11 @@
   - **Symptom:** Tests executing document uploads mock `PlanSuscripcion` but the `GetEffectivePlan` logic treats empty prices or unmapped states as invalid for storage quota.
   - **Root Cause:** A test factory used `new PlanSuscripcion(...)` with a private/missing constructor and lacked the proper setup to trigger the `SubscriptionTierPolicy.CanStoreDocument` bypass (which allows Free plans with 0 price).
   - **Fix:** Switched to using `PlanSuscripcion.Create(...)` factory method and mapped the mocked plan to 0m price and unlimited storage for testing purposes.
+- **TASK-1788:** PaddleOCR Integration and E2E Tests.
+  - **Symptom:** PaddleOCR microservice was crashing inside Docker due to missing \libgomp1\ library. E2E tests related to destructive actions were failing because of layout locators and accessibility regressions with TEXTAREA components.
+  - **Status:** Complete.
+  - **Fix:** Added \libgomp1\ to \paddleocr-api/Dockerfile\. Wrapped \SettingsPage.tsx\ destructive actions in a semantic \<section>\. Updated \DeleteAccountModal.tsx\ to allow \TEXTAREA\ in focus traps. Verified 82/82 Playwright tests pass successfully.
+- **BUG-030:** "Zona de Peligro" was in the "Mi Perfil" tab instead of "Seguridad".
+  - **Symptom:** User observed the account deletion section appearing in the "Mi Perfil" settings tab, leaving the "Seguridad" tab completely empty.
+  - **Root Cause:** In SettingsPage.tsx, the <DeleteAccountSection /> and its surrounding <section> were placed inside the ctiveTab === "profile" conditional block instead of ctiveTab === "security".
+  - **Fix:** Moved the "Zona de Peligro" section into the ctiveTab === "security" block. Updated the E2E test settings-destructive-action.spec.ts to navigate to the "Seguridad" tab before interacting with the danger zone, and confirmed 8/8 tests pass.
