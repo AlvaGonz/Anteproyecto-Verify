@@ -338,13 +338,13 @@ def insert_ipi_chunk(chunk_id, chunk_records):
         cursor = conn.cursor()
         ph = "%s" if db_lib == "pymssql" else "?"
         batch_size = 300
-        for i in range(0, len(chunk_records), batch_size):
+        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
             sql_ipi = f"INSERT INTO PagoIPI (Rnc, Cuota_ipi, Estatus) VALUES " + ", ".join([f"({ph}, {ph}, {ph})"] * len(batch))
             params_ipi = []
             for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"]])
             cursor.execute(sql_ipi, tuple(params_ipi))
-            if (i + batch_size) % 15000 == 0:
+            if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
         conn.commit()
         return len(chunk_records)
@@ -364,7 +364,7 @@ def insert_catastro_chunk(chunk_id, chunk_records):
         cursor = conn.cursor()
         ph = "%s" if db_lib == "pymssql" else "?"
         batch_size = 200 # Incrementado a 200 para menos llamadas (límite 2100 params)
-        for i in range(0, len(chunk_records), batch_size):
+        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
             
             sql_cat = f"INSERT INTO CatastroTitulo (IdCatastroTitulo, CodigoDesignacionCatastral, NumeroTitulo, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, Matricula) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
@@ -372,7 +372,7 @@ def insert_catastro_chunk(chunk_id, chunk_records):
             for r in batch: 
                 params_cat.extend([r["id"], r["dc"], r["titulo"], r["rnc"], r["provincia"], r["municipio"], r["lat"], r["lon"], r["superficie"], r["matricula"]])
             cursor.execute(sql_cat, tuple(params_cat))
-            if (i + batch_size) % 10000 == 0:
+            if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
         conn.commit()
         return len(chunk_records)
@@ -393,7 +393,7 @@ def insert_ps_chunk(chunk_id, chunk_records):
         cursor = conn.cursor()
         ph = "%s" if db_lib == "pymssql" else "?"
         batch_size = 180 # Incrementado a 180 para menos llamadas
-        for i in range(0, len(chunk_records), batch_size):
+        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
             
             sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL)"] * len(batch))
@@ -401,7 +401,7 @@ def insert_ps_chunk(chunk_id, chunk_records):
             for p in batch:
                 params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"]])
             cursor.execute(sql_ps, tuple(params_ps))
-            if (i + batch_size) % 10000 == 0:
+            if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
         conn.commit()
         return len(chunk_records)
@@ -427,7 +427,7 @@ def main():
         cursor.execute("SELECT COUNT(*) FROM CatastroTitulo")
         count = cursor.fetchone()[0]
         conn.close()
-        if count >= 1500000:
+        if count >= 1590000:
             print(f"CatastroTitulo seeds are already fully loaded ({count} records). Skipping.")
             return
     except Exception as e:

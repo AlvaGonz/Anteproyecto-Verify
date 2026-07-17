@@ -9,8 +9,10 @@ interface RegistrantCardProps {
 export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) => {
   const {
     nombreCompleto,
-    razonSocial,
+    razonSocial: empresa,
     rol,
+    email,
+    telefono,
     email,
     telefono,
     avatarUrl,
@@ -18,7 +20,7 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
     fechaRegistro,
   } = registrant;
 
-  const fullName = nombreCompleto || razonSocial || 'Sin nombre';
+  const fullName = (nombreCompleto || empresa)?.trim() || 'Sin nombre';
   const initials = fullName
     .split(' ')
     .map(n => n.charAt(0))
@@ -126,7 +128,7 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-on-surface-variant/50 block mb-0.5">Antigüedad en Plataforma</span>
                 <span className="text-sm font-medium text-secondary" data-testid="registrant-since">
-                  Miembro desde {fechaRegistro}
+                  Miembro desde {new Date(fechaRegistro).toLocaleDateString()}
                 </span>
               </div>
             </div>

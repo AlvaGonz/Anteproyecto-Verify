@@ -3,10 +3,11 @@ import { ProjectStatus } from "../../features/projects/types";
 import { Search, Filter } from "lucide-react";
 
 const ALL_STATUSES = [
-  { value: ProjectStatus.Draft, label: "Borrador" },
-  { value: ProjectStatus.Published, label: "Publicado" },
+  { value: ProjectStatus.Draft, label: "Creado" },
+  { value: ProjectStatus.Edited, label: "Editado" },
   { value: ProjectStatus.InReview, label: "En Revisión" },
-  { value: ProjectStatus.Observed, label: "Observado" },
+  { value: ProjectStatus.Observed, label: "Con Observaciones" },
+  { value: ProjectStatus.Published, label: "Publicado" },
   { value: ProjectStatus.Validated, label: "Validado" },
   { value: ProjectStatus.Rejected, label: "Rechazado" },
 ];

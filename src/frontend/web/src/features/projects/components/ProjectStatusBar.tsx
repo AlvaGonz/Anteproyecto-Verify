@@ -28,7 +28,7 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
   const actualStatus = eligibility?.currentStatus !== undefined ? eligibility.currentStatus : currentStatus;
 
   // Plan capability check
-  const planKey = normalizePlanKey(user?.plan?.nombrePlan);
+  const planKey = normalizePlanKey(user?.plan as string);
   const capabilities = PLAN_CAPABILITIES[planKey];
   const canPublishPlan = capabilities.publicPresentation;
 
@@ -46,12 +46,21 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
   const steps = [
     {
       status: ProjectStatus.Draft,
-      label: 'Borrador',
+      label: 'Creado',
       enabled: canDraft,
       activeColor: 'bg-gray-500',
       textColor: 'text-gray-500',
       borderColor: 'border-gray-500',
-      tooltip: 'Estado inicial',
+      tooltip: 'Estado inicial del proyecto',
+    },
+    {
+      status: ProjectStatus.Edited,
+      label: 'Editado',
+      enabled: canDraft, // As long as it is created, it can be edited
+      activeColor: 'bg-indigo-500',
+      textColor: 'text-indigo-500',
+      borderColor: 'border-indigo-500',
+      tooltip: 'El proyecto tiene datos guardados',
     },
     {
       status: ProjectStatus.InReview,
@@ -93,7 +102,7 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
         {/* Background connecting line */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
 
-        {steps.map((step, index) => {
+        {steps.map((step) => {
           const isActive = displayStatus === step.status;
           
           // Styling logic

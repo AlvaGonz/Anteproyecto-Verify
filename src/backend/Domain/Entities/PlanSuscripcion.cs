@@ -65,4 +65,30 @@ public class PlanSuscripcion
     {
         return MaxProyectos == -1 || proyectosActuales < MaxProyectos;
     }
+
+    public void UpdatePlan(
+        string nombrePlan, decimal precio,
+        int maxConsultas, int maxProyectos, bool presentacionPublica,
+        bool qrIncluido, int maxUsuariosSecundarios, int maxAlmacenamientoMb,
+        bool alertasTiempoRealDisponible, bool modeloLmDisponible, bool validacionLoteDisponible,
+        bool exportacionExcelDisponible, bool exportacionPdfDisponible, bool integracionCrmDisponible,
+        string soporteTipo, bool accesoApi)
+    {
+        NombrePlan = nombrePlan;
+        Precio = precio;
+        MaxConsultas = maxConsultas;
+        MaxProyectos = maxProyectos;
+        PresentacionPublica = presentacionPublica;
+        QrIncluido = qrIncluido;
+        MaxUsuariosSecundarios = maxUsuariosSecundarios;
+        MaxAlmacenamientoMb = maxAlmacenamientoMb;
+        AlertasTiempoRealDisponible = alertasTiempoRealDisponible;
+        ModeloLmDisponible = modeloLmDisponible;
+        ValidacionLoteDisponible = validacionLoteDisponible;
+        ExportacionExcelDisponible = exportacionExcelDisponible;
+        ExportacionPdfDisponible = exportacionPdfDisponible;
+        IntegracionCrmDisponible = integracionCrmDisponible;
+        SoporteTipo = soporteTipo;
+        AccesoApi = accesoApi;
+    }
 }

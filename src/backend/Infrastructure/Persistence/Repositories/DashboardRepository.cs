@@ -32,9 +32,9 @@ namespace Infrastructure.Persistence.Repositories
                 .SumAsync(u => u.Plan!.Precio, cancellationToken);
 
             var totalProyectos = await _context.Set<Proyecto>().CountAsync(cancellationToken);
-            var proyectosPendientes = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Draft || p.EstadoProyecto == Domain.Enums.ProjectStatus.InReview, cancellationToken);
-            var proyectosAprobados = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Validated || p.EstadoProyecto == Domain.Enums.ProjectStatus.Published, cancellationToken);
-            var proyectosRechazados = await _context.Set<Proyecto>().CountAsync(p => p.EstadoProyecto == Domain.Enums.ProjectStatus.Rejected || p.EstadoProyecto == Domain.Enums.ProjectStatus.Observed, cancellationToken);
+            var proyectosPendientes = await _context.Set<Proyecto>().CountAsync(p => p.Estado != null && (p.Estado.CodigoUnico == "CREADO" || p.Estado.CodigoUnico == "REVISION"), cancellationToken);
+            var proyectosAprobados = await _context.Set<Proyecto>().CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "PUBLICADO", cancellationToken);
+            var proyectosRechazados = await _context.Set<Proyecto>().CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "OBSERVACION", cancellationToken);
 
             var suscripcionesRecientes = await activeUsersQuery
                 .Include(u => u.Plan)
@@ -52,6 +52,7 @@ namespace Infrastructure.Persistence.Repositories
 
             var proyectosRecientes = await _context.Set<Proyecto>()
                 .Include(p => p.UsuarioCreador)
+                .Include(p => p.Estado)
                 .OrderByDescending(p => p.CreatedAtUtc)
                 .Take(50)
                 .Select(p => new ProyectoRecienteDto
@@ -59,7 +60,7 @@ namespace Infrastructure.Persistence.Repositories
                     FechaRegistro = p.CreatedAtUtc,
                     Nombre = p.Nombre,
                     Desarrollador = p.UsuarioCreador != null ? p.UsuarioCreador.NombreCompleto : "Desconocido",
-                    Estado = p.EstadoProyecto.ToString(),
+                    Estado = p.Estado != null ? p.Estado.Nombre : "Desconocido",
                     ImagenUrl = p.ImagenUrl
                 })
                 .ToListAsync(cancellationToken);

@@ -96,7 +96,7 @@ public class ProjectsController : ControllerBase
         {
             documentCount = docList.Count,
             hasObservaciones,
-            currentStatus = (int)project.EstadoProyecto
+            currentStatus = project.EstadoProyecto
         });
     }
 

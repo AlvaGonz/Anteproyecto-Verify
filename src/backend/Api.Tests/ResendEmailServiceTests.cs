@@ -89,7 +89,7 @@ public class ResendEmailServiceTests
         // Assert
         Assert.NotNull(capturedMsg);
         Assert.Contains(capturedMsg!.To, addr => addr.Email == to);
-        Assert.Equal("mail@handymansolutionrd.lat", capturedMsg.From.Email);
+        Assert.Equal("hola@handymansolutionrd.lat", capturedMsg.From.Email);
         Assert.Contains("Verificación de Cuenta", capturedMsg.Subject);
         Assert.Contains("John Doe", capturedMsg.HtmlBody);
         Assert.Contains("token123", capturedMsg.HtmlBody);

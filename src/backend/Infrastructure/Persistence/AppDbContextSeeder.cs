@@ -27,6 +27,7 @@ public static class AppDbContextSeeder
             logger.LogInformation("Seeding prototype demo data...");
 
             await SeedPlanesSuscripcionAsync(context, logger);
+            await SeedProyectoEstadosAsync(context, logger);
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -59,7 +60,7 @@ public static class AppDbContextSeeder
                 rol: UserRole.User,
                 telefono: "809-555-2002",
                 cedula: "402-0000002-1");
-            consultorUser.AsignarPlan(Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"));
+            consultorUser.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2")); // Consultor plan
 
             var profesionalUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -121,9 +122,9 @@ public static class AppDbContextSeeder
 
             var proyectos = new[]
             {
-                new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Validated },
-                new { Nombre = "Residencial Los Cacicazgos", Ubicacion = "Los Cacicazgos, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Desarrollos Inmobiliarios XYZ", Cat = "DC-67890", Status = ProjectStatus.Draft },
-                new { Nombre = "Proyecto Costero La Romana", Ubicacion = "La Romana, RD", Categoria = ProjectCategory.Turistico, Dev = "Grupo Turístico del Este", Cat = "DC-11223", Status = ProjectStatus.InReview },
+                new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Publicado },
+                new { Nombre = "Residencial Los Cacicazgos", Ubicacion = "Los Cacicazgos, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Desarrollos Inmobiliarios XYZ", Cat = "DC-67890", Status = ProjectStatus.Creado },
+                new { Nombre = "Proyecto Costero La Romana", Ubicacion = "La Romana, RD", Categoria = ProjectCategory.Turistico, Dev = "Grupo Turístico del Este", Cat = "DC-11223", Status = ProjectStatus.Revision },
             };
 
             var proyectoEntities = new List<Proyecto>();
@@ -298,15 +299,6 @@ public static class AppDbContextSeeder
                 exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
                 soporteTipo: "Comunidad", accesoApi: false);
 
-            // ConsultorLegacy (Legacy Free for tests)
-            var consultorLegacy = PlanSuscripcion.Create(
-                id: Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"), nombrePlan: "ConsultorLegacy", precio: 0.00m,
-                maxConsultas: 5, maxProyectos: 5, presentacionPublica: false,
-                qrIncluido: false, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 0,
-                alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
-                exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
-                soporteTipo: "Comunidad", accesoApi: false);
-
             // Profesional
             var profesional = PlanSuscripcion.Create(
                 id: Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"), nombrePlan: "Profesional", precio: 3500.00m,
@@ -334,7 +326,105 @@ public static class AppDbContextSeeder
                 exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
                 soporteTipo: "Account Manager", accesoApi: true);
 
-            context.PlanesSuscripcion.AddRange(administrador, consultorNuevo, consultorLegacy, profesional, empresa, corporativo);
+            context.PlanesSuscripcion.AddRange(administrador, consultorNuevo, profesional, empresa, corporativo);
+            await context.SaveChangesAsync();
+        }
+        else
+        {
+            var planes = await context.PlanesSuscripcion.ToListAsync();
+            bool hasChanges = false;
+
+            var administrador = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("99999999-9999-9999-9999-999999999999"));
+            if (administrador != null && (administrador.NombrePlan != "Administrador" || administrador.MaxProyectos != -1))
+            {
+                administrador.UpdatePlan("Administrador", 0.00m, -1, -1, true, true, -1, -1, true, true, true, true, true, true, "Dedicado", true);
+                hasChanges = true;
+            }
+
+            var consultorNuevo = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+            if (consultorNuevo != null && consultorNuevo.NombrePlan == "Gratuito")
+            {
+                consultorNuevo.UpdatePlan("Consultor", 0.00m, 1, 1, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false);
+                hasChanges = true;
+            }
+
+            var empresa = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"));
+            if (empresa != null && empresa.MaxProyectos == 20)
+            {
+                empresa.UpdatePlan("Empresa", 10000.00m, 100, 30, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true);
+                hasChanges = true;
+            }
+
+            var corporativo = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"));
+            if (corporativo != null && corporativo.MaxProyectos == -1)
+            {
+                corporativo.UpdatePlan("Corporativo", 30000.00m, -1, 50, true, true, -1, 10240, true, true, true, true, true, true, "Account Manager", true);
+                hasChanges = true;
+            }
+
+            var consultorLegacy = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"));
+            if (consultorLegacy != null)
+            {
+                // Reassign any users who had ConsultorLegacy to the new Consultor plan
+                var usersWithLegacy = await context.Usuarios.Where(u => u.PlanSuscripcionId == consultorLegacy.Idsuscripcion).ToListAsync();
+                foreach (var u in usersWithLegacy)
+                {
+                    u.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+                }
+                
+                context.PlanesSuscripcion.Remove(consultorLegacy);
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+            {
+                logger.LogInformation("Updating existing plans in database to match new configurations...");
+                await context.SaveChangesAsync();
+            }
+        }
+    }
+
+    private static async Task SeedProyectoEstadosAsync(AppDbContext context, ILogger logger)
+    {
+        if (!await context.ProyectoEstados.AnyAsync())
+        {
+            logger.LogInformation("Seeding ProyectoEstados...");
+
+            var estados = new List<ProyectoEstado>
+            {
+                new ProyectoEstado(
+                    ProjectStatus.Creado.ToString(),
+                    "Creado",
+                    "Estado por defecto al crear un proyecto.",
+                    "El proyecto acaba de ser registrado. Requiere completar información y subir documentos obligatorios.",
+                    "#9BACD8"), // Soft blue
+                new ProyectoEstado(
+                    ProjectStatus.Editado.ToString(),
+                    "Editado",
+                    "El proyecto ha sido modificado.",
+                    "Se ha actualizado información o documentos. Requiere validación de los cambios.",
+                    "#F98513"), // Orange/Warning
+                new ProyectoEstado(
+                    ProjectStatus.Revision.ToString(),
+                    "En Revisión",
+                    "Proyecto en proceso de revisión por los asesores.",
+                    "Se están verificando los documentos y la información proporcionada. No se pueden realizar cambios.",
+                    "#EAB308"), // Yellow/Gold
+                new ProyectoEstado(
+                    ProjectStatus.ConObservacion.ToString(),
+                    "Con Observación",
+                    "El proyecto tiene observaciones que deben ser corregidas.",
+                    "Se han encontrado inconsistencias o faltan documentos. El desarrollador debe subsanar las observaciones.",
+                    "#EF4444"), // Red/Error
+                new ProyectoEstado(
+                    ProjectStatus.Publicado.ToString(),
+                    "Publicado",
+                    "Proyecto verificado y publicado exitosamente.",
+                    "El proyecto ha pasado todas las validaciones y cuenta con el sello de integridad. Visible para el público.",
+                    "#10B981")  // Green/Success
+            };
+
+            context.ProyectoEstados.AddRange(estados);
             await context.SaveChangesAsync();
         }
     }
@@ -492,8 +582,11 @@ public static class AppDbContextSeeder
         var existing = await context.Proyectos.FirstOrDefaultAsync(p => p.Nombre == nombre && p.UsuarioCreadorId == usuarioCreadorId);
         if (existing != null) return existing;
 
+        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == status.ToString());
+        if (estado == null) throw new InvalidOperationException($"Estado {status} no encontrado. Asegúrate de ejecutar SeedProyectoEstadosAsync primero.");
+
         var proyecto = new Proyecto(nombre, ubicacionTexto, usuarioCreadorId, categoria, datosDesarrollador, designacionCatastral);
-        proyecto.UpdateStatus(status);
+        proyecto.UpdateEstado(estado.Id);
         context.Proyectos.Add(proyecto);
         await context.SaveChangesAsync();
         return proyecto;

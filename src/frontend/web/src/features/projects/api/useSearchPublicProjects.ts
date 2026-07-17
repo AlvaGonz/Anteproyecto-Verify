@@ -8,7 +8,7 @@ export interface PublicProjectSearchResultDto {
   estadoValidacion: string;
   ubicacionTexto?: string;
   estadoJuridico: number;
-  estadoProyecto: number;
+  estadoProyecto: string;
   estadoIntegridad: number;
   constructora?: string;
   registrante?: string;

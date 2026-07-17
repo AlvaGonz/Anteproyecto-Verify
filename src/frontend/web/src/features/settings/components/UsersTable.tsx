@@ -33,10 +33,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
     return [...plans]
       .filter(p => {
         const lowerName = p.name.toLowerCase();
-        return !lowerName.includes("consultation") && 
-               !lowerName.includes("consultor") && 
-               !lowerName.includes("gratuito") && 
-               !lowerName.includes("admin");
+        return !lowerName.includes("gratuito") && 
+               !lowerName.includes("admin") &&
+               !lowerName.includes("legacy");
       })
       .sort((a, b) => b.price - a.price);
   }, [plans]);

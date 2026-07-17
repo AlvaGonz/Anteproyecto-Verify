@@ -1,4 +1,4 @@
-﻿import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
@@ -45,8 +45,7 @@ export const FeaturedProjectsSection: React.FC = () => {
   const formattedProjects: Project[] = publicProjects
     .filter(p =>
       p.estadoJuridico === LegalStatus.Valid &&
-      p.estadoProyecto >= ProjectStatus.Published &&
-      p.estadoProyecto !== ProjectStatus.Rejected &&
+      (p.estadoProyecto === ProjectStatus.Published || p.estadoProyecto === ProjectStatus.Validated) &&
       p.estadoIntegridad === IntegrityStatus.Verified
     )
     .map(p => ({

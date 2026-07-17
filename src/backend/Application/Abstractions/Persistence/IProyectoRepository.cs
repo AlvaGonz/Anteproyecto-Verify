@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.Enums;
 
 public interface IProyectoRepository
 {
     Task<Proyecto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> GetVisibleAsync(CancellationToken cancellationToken = default);
+    Task<ProyectoEstado?> GetEstadoByStatusAsync(ProjectStatus status, CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default);
     Task<int> CountByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task AddAsync(Proyecto proyecto, CancellationToken cancellationToken = default);
