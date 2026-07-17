@@ -157,3 +157,4 @@ public class AuthControllerTests
         var unauthorizedResult = Assert.IsType<BadRequestObjectResult>(result);
     }
 }
+

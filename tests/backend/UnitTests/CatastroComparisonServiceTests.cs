@@ -85,3 +85,4 @@ public class CatastroComparisonServiceTests
         Assert.NotNull(result.LimitsDiscrepancy);
     }
 }
+

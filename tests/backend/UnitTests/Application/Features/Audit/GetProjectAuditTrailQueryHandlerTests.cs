@@ -67,3 +67,4 @@ public class GetProjectAuditTrailQueryHandlerTests
         Assert.Equal("Type1", result.First().TipoEvento);
     }
 }
+

@@ -108,3 +108,4 @@ public class ConsultarCreditoCommandHandlerTests
         _hallazgoRepositoryMock.Verify(x => x.AddAsync(It.IsAny<Hallazgo>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+

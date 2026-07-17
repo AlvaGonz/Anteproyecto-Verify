@@ -45,7 +45,7 @@ public class DomainTests
         Assert.Equal(nombre, proyecto.Nombre);
         Assert.Equal(ubicacion, proyecto.UbicacionTexto);
         Assert.Equal(usuarioId, proyecto.UsuarioCreadorId);
-        Assert.Equal(ProjectStatus.Draft, proyecto.EstadoProyecto);
+        Assert.Equal("Desconocido", proyecto.EstatusDescripcion);
         Assert.Equal(IntegrityStatus.Pending, proyecto.EstadoIntegridad);
         Assert.StartsWith("PRJ-", proyecto.CodigoInterno);
     }
@@ -70,3 +70,6 @@ public class DomainTests
         Assert.Equal(DocumentStatus.Uploaded, documento.EstadoDocumento);
     }
 }
+
+
+

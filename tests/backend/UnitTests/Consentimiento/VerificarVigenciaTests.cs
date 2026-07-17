@@ -57,3 +57,4 @@ public class VerificarVigenciaTests
         Assert.False(result.TieneConsentimientoVigente);
     }
 }
+

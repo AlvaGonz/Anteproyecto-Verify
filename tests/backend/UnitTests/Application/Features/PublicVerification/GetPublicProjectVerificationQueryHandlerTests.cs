@@ -29,8 +29,7 @@ public class GetPublicProjectVerificationQueryHandlerTests
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var proyecto = new Proyecto("Test Project", "Test Location", userId);
-        proyecto.UpdateStatus(ProjectStatus.Approved);
-        
+
         var cert = new Certificacion(projectId, Guid.NewGuid(), code, "http://test.com", 100, IntegrityStatus.Valid, userId);
         
         // Use reflection to set the navigation property for testing
@@ -47,7 +46,7 @@ public class GetPublicProjectVerificationQueryHandlerTests
         Assert.Equal(code, result.PublicCode);
         Assert.Equal("Test Project", result.ProjectName);
         Assert.Equal("Test Location", result.PublicLocation);
-        Assert.Equal("Aprobado", result.PublicProjectStatus);
+        Assert.Equal("Desconocido", result.PublicProjectStatus);
         Assert.Equal("Consistente", result.IntegrityStatus);
         Assert.True(result.IsVerifiable);
     }
@@ -92,3 +91,5 @@ public class GetPublicProjectVerificationQueryHandlerTests
         Assert.Contains("revocada", result.VerificationMessage);
     }
 }
+
+

@@ -71,3 +71,4 @@ public class CreateSessionRequestValidatorTests
         result.ShouldHaveValidationErrorFor(x => x.Consent.UserAgent);
     }
 }
+

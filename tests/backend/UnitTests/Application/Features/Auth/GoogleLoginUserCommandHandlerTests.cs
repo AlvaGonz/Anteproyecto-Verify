@@ -93,3 +93,4 @@ public class GoogleLoginUserCommandHandlerTests
         _usuarioRepo.Verify(r => r.AddAsync(It.IsAny<Usuario>(), default), Times.Never);
     }
 }
+

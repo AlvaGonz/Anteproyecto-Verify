@@ -31,7 +31,6 @@ public class GetPublicProjectReportQueryHandlerTests
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var proyecto = new Proyecto("Test Project", "Loc", userId);
-        proyecto.UpdateStatus(ProjectStatus.Approved);
 
         var reporte = new Reporte(projectId, userId);
         reporte.MarkAsGenerated("Resumen test");
@@ -45,7 +44,7 @@ public class GetPublicProjectReportQueryHandlerTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(projectId, result.ProyectoId);
-        Assert.Equal("Aprobado", result.EstadoProyectoVisible);
+        Assert.Equal("Desconocido", result.EstadoProyectoVisible);
         Assert.Equal("Resumen test", result.ResumenPublico);
         Assert.True(result.EsPublico);
     }
@@ -70,3 +69,8 @@ public class GetPublicProjectReportQueryHandlerTests
         Assert.Null(result);
     }
 }
+
+
+
+
+

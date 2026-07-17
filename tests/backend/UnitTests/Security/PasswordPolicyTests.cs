@@ -86,3 +86,4 @@ public class PasswordPolicyTests
         return true;
     }
 }
+

@@ -122,3 +122,4 @@ public class MockProvidersTests
         Assert.Throws<KeyNotFoundException>(() => resolver.Resolve(ExternalProviderType.DGII));
     }
 }
+

@@ -100,3 +100,4 @@ public class DocumentServiceTests
         Assert.Equal("Incompleto", estadoJuridicoDiagnostic.Estado);
     }
 }
+

@@ -104,3 +104,4 @@ public class RegisterUserTests
         Assert.Null(capturedUser!.PlanSuscripcionId);
     }
 }
+

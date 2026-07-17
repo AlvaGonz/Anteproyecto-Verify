@@ -51,7 +51,7 @@ public class IssueCertificationCommandHandlerTests
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var proyecto = new Proyecto("Test", "Loc", userId);
-        proyecto.UpdateStatus(ProjectStatus.InReview);
+
         // Simulate setting IntegrityStatus (since it's private set, we might need reflection or just assume it's Pending/Valid for the test)
         
         _mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
@@ -87,3 +87,4 @@ public class IssueCertificationCommandHandlerTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => _handler.HandleAsync(projectId, userId));
     }
 }
+

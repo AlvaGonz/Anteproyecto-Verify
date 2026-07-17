@@ -169,3 +169,4 @@ public class AccountLifecycleTests
         Assert.NotEqual(user1.CorreoElectronico, user2.CorreoElectronico);
     }
 }
+

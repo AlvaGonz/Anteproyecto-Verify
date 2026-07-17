@@ -137,3 +137,4 @@ public class SubscriptionTierPolicyTests
         Assert.True(SubscriptionTierPolicy.IsProjectPublic(admin));
     }
 }
+

@@ -34,3 +34,4 @@ public class CertificationCodeGeneratorTests
         Assert.NotEqual(code1, code2);
     }
 }
+

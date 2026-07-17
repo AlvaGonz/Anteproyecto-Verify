@@ -60,3 +60,4 @@ public class RegistrarConsentimientoCommandHandlerTests
         _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+

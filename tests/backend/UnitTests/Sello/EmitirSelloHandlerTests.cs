@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using global::Application.Abstractions.Persistence;
 using global::Application.Abstractions.Reports;
-using global::Application.Abstractions.Services.Crypto;
 using global::Application.Features.Sello.Commands.EmitirSello;
 using Domain.Entities;
 using Moq;
@@ -16,8 +15,6 @@ public class EmitirSelloCommandHandlerTests
     private readonly Mock<IProyectoRepository> _proyectoRepositoryMock;
     private readonly Mock<ISelloIntegridadRepository> _selloRepositoryMock;
     private readonly Mock<IReporteBuilder> _reporteBuilderMock;
-    private readonly Mock<IFirmaDigitalService> _firmaDigitalServiceMock;
-    private readonly Mock<IQrGeneratorService> _qrGeneratorServiceMock;
     private readonly Mock<IAuditoriaRepository> _auditoriaRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly EmitirSelloCommandHandler _handler;
@@ -27,8 +24,6 @@ public class EmitirSelloCommandHandlerTests
         _proyectoRepositoryMock = new Mock<IProyectoRepository>();
         _selloRepositoryMock = new Mock<ISelloIntegridadRepository>();
         _reporteBuilderMock = new Mock<IReporteBuilder>();
-        _firmaDigitalServiceMock = new Mock<IFirmaDigitalService>();
-        _qrGeneratorServiceMock = new Mock<IQrGeneratorService>();
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
@@ -36,8 +31,6 @@ public class EmitirSelloCommandHandlerTests
             _proyectoRepositoryMock.Object,
             _selloRepositoryMock.Object,
             _reporteBuilderMock.Object,
-            _firmaDigitalServiceMock.Object,
-            _qrGeneratorServiceMock.Object,
             _auditoriaRepositoryMock.Object,
             _unitOfWorkMock.Object);
     }
@@ -82,10 +75,6 @@ public class EmitirSelloCommandHandlerTests
             .ReturnsAsync((SelloIntegridad?)null);
         _reporteBuilderMock.Setup(x => x.BuildReporteAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ReporteHallazgosDto { EsAptoParaSello = true });
-        _firmaDigitalServiceMock.Setup(x => x.FirmarDatosAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("mock_signature");
-        _qrGeneratorServiceMock.Setup(x => x.GenerarQrUrlAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("mock_qr_url");
 
         var command = new EmitirSelloCommand { ProyectoId = projectId, UsuarioId = userId };
 
@@ -100,3 +89,4 @@ public class EmitirSelloCommandHandlerTests
         _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+

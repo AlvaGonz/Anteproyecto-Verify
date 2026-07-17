@@ -62,3 +62,4 @@ public class EvaluateDocumentFormalityCommandHandlerTests
         _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+

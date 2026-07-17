@@ -219,3 +219,4 @@ public class AccountDeletionHandlerTests
         _auditLogger.Verify(a => a.AppendAsync(It.IsAny<AuditEntryDto>(), default), Times.Never);
     }
 }
+

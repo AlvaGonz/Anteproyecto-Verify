@@ -46,3 +46,4 @@ public class GetActiveAlertsByProjectQueryHandlerTests
         Assert.Equal("T1", results.First().Titulo);
     }
 }
+

@@ -54,3 +54,4 @@ public class ConsultaSecurityTests
             () => guard.AssertAndIncrementAsync(Guid.NewGuid()));
     }
 }
+

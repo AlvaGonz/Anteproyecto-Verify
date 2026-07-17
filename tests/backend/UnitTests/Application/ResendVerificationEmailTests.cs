@@ -102,3 +102,4 @@ public class ResendVerificationEmailTests
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+

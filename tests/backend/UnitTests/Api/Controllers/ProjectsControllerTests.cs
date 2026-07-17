@@ -33,7 +33,7 @@ namespace UnitTests.Api.Controllers
             _mockUsuarioRepository = new Mock<IUsuarioRepository>();
             _mockBlobStorageService = new Mock<IBlobStorageService>();
 
-            _controller = new ProjectsController(_mockProjectService.Object, _mockUsuarioRepository.Object, _mockBlobStorageService.Object)
+            _controller = new ProjectsController(_mockProjectService.Object, _mockUsuarioRepository.Object, _mockBlobStorageService.Object, new Moq.Mock<global::Application.Contracts.Documents.IDocumentService>().Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -69,7 +69,7 @@ namespace UnitTests.Api.Controllers
                 null,
                 null,
                 "Borrador",
-                ProjectStatus.Draft,
+                "Creado",
                 IntegrityStatus.Valid,
                 usuarioCreadorId,
                 DateTime.UtcNow,
@@ -127,3 +127,6 @@ namespace UnitTests.Api.Controllers
         }
     }
 }
+
+
+

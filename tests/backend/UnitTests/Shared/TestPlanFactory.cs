@@ -25,3 +25,4 @@ public static class TestPlanFactory
         Guid.Parse("99999999-9999-9999-9999-999999999999"), "Administrador", 0.00m,
         -1, -1, true, true, -1, -1, true, true, true, true, true, true, "Account Manager", true);
 }
+

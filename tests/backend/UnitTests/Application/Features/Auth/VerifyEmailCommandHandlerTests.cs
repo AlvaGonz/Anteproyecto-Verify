@@ -114,3 +114,4 @@ public class VerifyEmailCommandHandlerTests
         Assert.Equal("dashboard", result.NextStep);
     }
 }
+

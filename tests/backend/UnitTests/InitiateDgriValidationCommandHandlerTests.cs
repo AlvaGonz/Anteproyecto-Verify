@@ -103,3 +103,4 @@ public class InitiateDgriValidationCommandHandlerTests
         _validacionRepositoryMock.Verify(r => r.AddAsync(It.Is<Validacion>(v => v.EsLegitimo == false), It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+

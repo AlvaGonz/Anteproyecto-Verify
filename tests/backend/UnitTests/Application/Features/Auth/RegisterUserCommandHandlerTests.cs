@@ -85,3 +85,4 @@ public class RegisterUserCommandHandlerTests
         Assert.Null(capturedUser.PendingBillingCycle);
     }
 }
+

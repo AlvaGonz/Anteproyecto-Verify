@@ -87,3 +87,4 @@ public class GenerarReporteHallazgosQueryHandlerTests
         Assert.Equal(1, result.HallazgosAltos);
     }
 }
+

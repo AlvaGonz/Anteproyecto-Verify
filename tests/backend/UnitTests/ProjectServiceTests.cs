@@ -63,7 +63,7 @@ public class ProjectServiceTests
         Assert.Equal(ProjectCategory.Comercial, result.Categoria);
         Assert.Equal("DevData", result.DatosDesarrollador);
         Assert.Equal("DC-123", result.DesignacionCatastral);
-        Assert.Equal(ProjectStatus.Draft, result.EstadoProyecto);
+        Assert.Equal("Desconocido", result.EstatusDescripcion);
     }
 
     [Fact]
@@ -109,9 +109,8 @@ public class ProjectServiceTests
         // Arrange
         var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
         var p1 = new Proyecto("P1", "L1", user.Id);
-        p1.UpdateStatus(ProjectStatus.Published);
+
         var p2 = new Proyecto("P2", "L2", user.Id);
-        p2.UpdateStatus(ProjectStatus.InReview);
 
         _proyectoRepositoryMock.Setup(r => r.GetVisibleAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Proyecto> { p1, p2 });
 
@@ -153,3 +152,6 @@ public class ProjectServiceTests
         Assert.Null(result);
     }
 }
+
+
+
