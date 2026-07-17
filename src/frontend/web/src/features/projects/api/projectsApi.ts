@@ -118,6 +118,7 @@ export const projectsApi = {
       const response = await apiClient.post<{ url: string }>("/projects/upload-image", formData);
       return success(response.data.url);
     } catch (error: any) {
+      console.error("UPLOAD ERROR:", error);
       return failure(mapError(error));
     }
   },

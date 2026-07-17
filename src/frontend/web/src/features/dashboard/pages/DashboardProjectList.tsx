@@ -93,7 +93,7 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
 
                     <div className="flex items-center gap-6">
                       <div className="hidden sm:block text-right">
-                        <span className={`vf-badge ${p.estado === "Verified" || p.estado === "Published" ? "vf-badge-success" : p.estado === "InReview" ? "vf-badge-warning" : "vf-badge-default"}`}>
+                        <span className={`px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border ${p.estado === "Verified" || p.estado === "Published" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : p.estado === "InReview" ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-gray-100 text-gray-600 border-gray-200"}`}>
                           {translateStatus(p.estado)}
                         </span>
                       </div>

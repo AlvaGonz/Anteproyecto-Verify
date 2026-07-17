@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } from "../types";
@@ -91,6 +92,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   // useAuth must be called unconditionally at the top level (React rules).
   // In unit tests the component is wrapped in a test AuthProvider, so this is safe.
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // ── Fields State ──────────────────────────────────────────────────────────
   const [nombre, setNombre] = useState(initialData?.nombre ?? "");
@@ -195,13 +197,16 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       const res = await projectsApi.uploadProjectImage(file);
+      console.log("PORTRAIT UPLOAD RESULT:", res);
       if (isSuccess(res)) {
         setImagenUrl(res.value);
         setPortraitPreview(res.value);
       } else {
+        console.error("PORTRAIT UPLOAD FAIL:", res);
         setFotosError("Error al subir la foto de portada.");
       }
     } catch (err) {
+      console.error("PORTRAIT UPLOAD EXCEPTION:", err);
       setFotosError("Error al subir la foto de portada.");
     } finally {
       setIsUploadingPhotos(false);

@@ -20,6 +20,7 @@ let documentsDb: any[] = [];
 test.describe("Subida y Persistencia de Fotos de Proyecto — E2E con Mock stateful", () => {
   test.beforeEach(async ({ page }) => {
     // Escuchar errores para debug
+    page.on("console", (msg) => console.log("BROWSER CONSOLE:", msg.text()));
     page.on("pageerror", (err) => {
       console.error("BROWSER UNCAUGHT EXCEPTION:", err.message);
     });
@@ -107,7 +108,20 @@ test.describe("Subida y Persistencia de Fotos de Proyecto — E2E con Mock state
       }
     });
 
-    await page.route("**/api/projects/upload-image", async (route) => {
+    await page.route(/\/api\/projects\/upload-image/, async (route) => {
+      if (route.request().method() === "OPTIONS") {
+        await route.fulfill({
+          status: 204,
+          headers: {
+            "Access-Control-Allow-Origin": "http://localhost:3000",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization"
+          }
+        });
+        return;
+      }
+
       if (route.request().method() === "POST") {
         // Mock POST: simular éxito en la subida
         const formData = await route.request().postData(); // en form-data raw
@@ -132,8 +146,14 @@ test.describe("Subida y Persistencia de Fotos de Proyecto — E2E con Mock state
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({ url: newDoc.fileUrl })
+          body: JSON.stringify({ url: newDoc.fileUrl }),
+          headers: {
+            "Access-Control-Allow-Origin": "http://localhost:3000",
+            "Access-Control-Allow-Credentials": "true"
+          }
         });
+      } else {
+        await route.continue();
       }
     });
 
