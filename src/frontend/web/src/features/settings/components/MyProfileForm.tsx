@@ -6,7 +6,7 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase } from "lucide-react";
+import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase, AlertTriangle } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
 import { DeleteAccountSection } from "./DeleteAccountSection";
 import { useDgiiLookup, DgiiData } from "../../../shared/hooks/useDgiiLookup";
@@ -42,52 +42,52 @@ export const MyProfileForm: React.FC = () => {
       rnc: user?.rnc ?? "",
       changePassword: false,
     },
-});
+  });
 
-   // Phone input hook
-   const phoneValueRaw = watch("telefono") ? watch("telefono")!.replace(/\D/g, '') : "";
-   const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
-     const digits = formattedValue.replace(/\D/g, '');
-     setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
-   });
+  // Phone input hook
+  const phoneValueRaw = watch("telefono") ? watch("telefono")!.replace(/\D/g, '') : "";
+  const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
+    const digits = formattedValue.replace(/\D/g, '');
+    setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
+  });
 
-   // RNC auto-search logic
-   const { searchRnc, isSearching: isSearchingRnc, error: rncSearchError, setError: setRncSearchError } = useDgiiLookup();
-   const [previewDgii, setPreviewDgii] = useState<DgiiData | null>(null);
-   const currentRnc = watch("rnc");
+  // RNC auto-search logic
+  const { searchRnc, isSearching: isSearchingRnc, error: rncSearchError, setError: setRncSearchError } = useDgiiLookup();
+  const [previewDgii, setPreviewDgii] = useState<DgiiData | null>(null);
+  const currentRnc = watch("rnc");
 
-   useEffect(() => {
-     if (currentRnc) {
-       const cleaned = currentRnc.replace(/\D/g, "");
-       if (cleaned.length === 11 || cleaned.length === 9) {
-         handleSearchRnc(currentRnc);
-       }
-     } else {
-       if (previewDgii) setPreviewDgii(null);
-       if (rncSearchError) setRncSearchError(null);
-     }
-   }, [currentRnc]);
+  useEffect(() => {
+    if (currentRnc) {
+      const cleaned = currentRnc.replace(/\D/g, "");
+      if (cleaned.length === 11 || cleaned.length === 9) {
+        handleSearchRnc(currentRnc);
+      }
+    } else {
+      if (previewDgii) setPreviewDgii(null);
+      if (rncSearchError) setRncSearchError(null);
+    }
+  }, [currentRnc]);
 
-   const handleSearchRnc = async (val: string) => {
-     const data = await searchRnc(val);
-     if (data) {
-       setPreviewDgii(data);
-       setValue("rnc", val, { shouldDirty: true });
-     } else {
-       setPreviewDgii(null);
-     }
-   };
+  const handleSearchRnc = async (val: string) => {
+    const data = await searchRnc(val);
+    if (data) {
+      setPreviewDgii(data);
+      setValue("rnc", val, { shouldDirty: true });
+    } else {
+      setPreviewDgii(null);
+    }
+  };
 
-   const handleRncKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-     if (e.key === "Enter") {
-       e.preventDefault();
-       handleSearchRnc(currentRnc || "");
-     }
-   };
+  const handleRncKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearchRnc(currentRnc || "");
+    }
+  };
 
-   useEffect(() => {
-     refreshUser();
-   }, [refreshUser]);
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
 
   useEffect(() => {
     if (user) {
@@ -141,7 +141,7 @@ export const MyProfileForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-      {/* Two-column grid: left = avatar+identity, right = editable fields+buttons */}
+      {/* Two-column grid: left = avatar+identity, right = editable fields */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
         {/* ═══ LEFT COLUMN: Avatar + Read-only Identity ═══ */}
@@ -153,72 +153,72 @@ export const MyProfileForm: React.FC = () => {
               <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">
                 Datos de Identidad
               </p>
-            <div className="flex items-center gap-3">
-              <Mail className="w-4 h-4 text-text-secondary shrink-0" />
-              <div>
-                <p className="text-[10px] text-text-secondary uppercase font-bold">Correo Electrónico</p>
-                <p className="text-sm font-mono text-text-primary">{user?.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-4 h-4 text-text-secondary shrink-0" />
-              <div>
-                <p className="text-[10px] text-text-secondary uppercase font-bold">Cédula</p>
-                <p className="text-sm font-mono text-text-primary">{user?.cedula || "N/A"}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Shield className="w-4 h-4 text-text-secondary shrink-0" />
-              <div>
-                <p className="text-[10px] text-text-secondary uppercase font-bold">Rol</p>
-                <p className="text-sm font-bold text-text-primary">
-                  {ROLE_LABEL[user?.role ?? "user"] ?? user?.role}
-                </p>
-              </div>
-            </div>
-            {user?.role !== "admin" && (user?.plan || user?.isGuest) && (
               <div className="flex items-center gap-3">
-                <Award className="w-4 h-4 text-text-secondary shrink-0" />
+                <Mail className="w-4 h-4 text-text-secondary shrink-0" />
                 <div>
-                  <p className="text-[10px] text-text-secondary uppercase font-bold">Plan de Suscripción</p>
-                  <p className="text-sm font-bold text-primary">
-                    {user.isGuest ? `${user.inviterPlan || "N/A"} (Invitado)` : user.plan}
+                  <p className="text-[10px] text-text-secondary uppercase font-bold">Correo Electrónico</p>
+                  <p className="text-sm font-mono text-text-primary">{user?.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <CreditCard className="w-4 h-4 text-text-secondary shrink-0" />
+                <div>
+                  <p className="text-[10px] text-text-secondary uppercase font-bold">Cédula</p>
+                  <p className="text-sm font-mono text-text-primary">{user?.cedula || "N/A"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Shield className="w-4 h-4 text-text-secondary shrink-0" />
+                <div>
+                  <p className="text-[10px] text-text-secondary uppercase font-bold">Rol</p>
+                  <p className="text-sm font-bold text-text-primary">
+                    {ROLE_LABEL[user?.role ?? "user"] ?? user?.role}
                   </p>
                 </div>
               </div>
-            )}
-            <div className="flex items-center gap-3">
-              <Shield className="w-4 h-4 text-text-secondary shrink-0" />
-              <div>
-                <p className="text-[10px] text-text-secondary uppercase font-bold">Razón Social (DGII)</p>
-                <p className="text-sm font-bold text-text-primary">
-                  {previewDgii?.nombreRazonSocial || user?.razonSocial || "******* ******* *******"}
-                </p>
+              {user?.role !== "admin" && (user?.plan || user?.isGuest) && (
+                <div className="flex items-center gap-3">
+                  <Award className="w-4 h-4 text-text-secondary shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-text-secondary uppercase font-bold">Plan de Suscripción</p>
+                    <p className="text-sm font-bold text-primary">
+                      {user.isGuest ? `${user.inviterPlan || "N/A"} (Invitado)` : user.plan}
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-3">
+                <Shield className="w-4 h-4 text-text-secondary shrink-0" />
+                <div>
+                  <p className="text-[10px] text-text-secondary uppercase font-bold">Razón Social (DGII)</p>
+                  <p className="text-sm font-bold text-text-primary">
+                    {previewDgii?.nombreRazonSocial || user?.razonSocial || "******* ******* *******"}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Building2 className="w-4 h-4 text-text-secondary shrink-0" />
-              <div>
-                <p className="text-[10px] text-text-secondary uppercase font-bold">Nombre Comercial</p>
-                <p className="text-sm font-bold text-text-primary">
-                  {previewDgii?.nombreComercial || user?.nombreComercial || "******* ******* *******"}
-                </p>
+              <div className="flex items-center gap-3">
+                <Building2 className="w-4 h-4 text-text-secondary shrink-0" />
+                <div>
+                  <p className="text-[10px] text-text-secondary uppercase font-bold">Nombre Comercial</p>
+                  <p className="text-sm font-bold text-text-primary">
+                    {previewDgii?.nombreComercial || user?.nombreComercial || "******* ******* *******"}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Briefcase className="w-4 h-4 text-text-secondary shrink-0" />
-              <div>
-                <p className="text-[10px] text-text-secondary uppercase font-bold">Actividad Económica</p>
-                <p className="text-sm font-bold text-text-primary">
-                  {previewDgii?.actividadEconomica || user?.actividadEconomica || "******* ******* *******"}
-                </p>
+              <div className="flex items-center gap-3">
+                <Briefcase className="w-4 h-4 text-text-secondary shrink-0" />
+                <div>
+                  <p className="text-[10px] text-text-secondary uppercase font-bold">Actividad Económica</p>
+                  <p className="text-sm font-bold text-text-primary">
+                    {previewDgii?.actividadEconomica || user?.actividadEconomica || "******* ******* *******"}
+                  </p>
+                </div>
               </div>
-            </div>
             </div>
           </div>
         </div>
 
-        {/* ═══ RIGHT COLUMN: Editable fields + Buttons ═══ */}
+        {/* ═══ RIGHT COLUMN: Editable fields ═══ */}
         <div className="flex flex-col gap-6 h-full">
 
           {/* Editable fields card */}
@@ -333,8 +333,7 @@ export const MyProfileForm: React.FC = () => {
                   Cambiar Contraseña
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-text-secondary transition-transform ${showPasswordSection ? "rotate-180" : ""
-                    }`}
+                  className={`w-4 h-4 text-text-secondary transition-transform ${showPasswordSection ? "rotate-180" : ""}`}
                 />
               </button>
 
@@ -369,27 +368,34 @@ export const MyProfileForm: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Warning / Danger area + Save Button */}
-      <div className="mt-8 bg-rose-50 border border-rose-100 rounded-2xl p-5 shrink-0">
-        <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-2">
-          Zona de Peligro
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 items-start justify-between">
-          <div className="flex-1 w-full">
-            <DeleteAccountSection />
-          </div>
+          {/* Save button - OUTSIDE danger zone */}
           <button
             type="submit"
             disabled={!isDirty || updateProfile.isPending}
-            className="vf-btn-primary disabled:opacity-40 disabled:cursor-not-allowed shrink-0 py-3"
+            className="vf-btn-primary disabled:opacity-40 disabled:cursor-not-allowed shrink-0 py-3 mt-4"
           >
             {updateProfile.isPending ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </div>
+
+      {/* ═══ ZONA DE PELIGRO - Separated from main form ═══ */}
+      <section className="mt-10 pt-8 border-t border-border" aria-labelledby="danger-zone-title">
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-5 shrink-0">
+          <h2
+            id="danger-zone-title"
+            className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2"
+          >
+            <AlertTriangle className="w-4 h-4" />
+            Zona de Peligro
+          </h2>
+          <p className="text-sm text-red-700 mb-4">
+            Eliminar tu cuenta es permanente y no se puede deshacer.
+          </p>
+          <DeleteAccountSection />
+        </div>
+      </section>
     </form>
   );
 };
