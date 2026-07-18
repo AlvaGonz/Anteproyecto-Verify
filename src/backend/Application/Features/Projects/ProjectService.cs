@@ -118,7 +118,6 @@ public class ProjectService : IProjectService
             proyecto.UpdateEstado(estadoEditado);
         }
         
-        _proyectoRepository.Update(proyecto);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToDto(proyecto);

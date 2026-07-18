@@ -28,6 +28,11 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   usuarioCreadorId: String(apiProj.usuarioCreadorId),
   createdAtUtc: apiProj.createdAtUtc,
   imagenUrl: apiProj.imagenUrl,
+  imagenAdicional1: apiProj.imagenAdicional1,
+  imagenAdicional2: apiProj.imagenAdicional2,
+  imagenAdicional3: apiProj.imagenAdicional3,
+  imagenAdicional4: apiProj.imagenAdicional4,
+  imagenAdicional5: apiProj.imagenAdicional5,
   registradoPor: apiProj.registradoPor || null,
 });
 

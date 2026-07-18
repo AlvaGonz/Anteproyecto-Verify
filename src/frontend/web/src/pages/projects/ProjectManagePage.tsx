@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -8,7 +8,7 @@ import {
   UpdateProyectoDto
 } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
-import { useProject, useCreateProject, useDeleteProject } from "../../features/projects/api/useProjects";
+import { useProject, useCreateProject } from "../../features/projects/api/useProjects";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { PlansModal } from "../../features/settings/components/PlansModal";
 import { useAuth } from "../../shared/context/AuthContext";
@@ -17,6 +17,7 @@ import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
 import { ProjectStatusBar } from "../../features/projects/components/ProjectStatusBar";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { useProjectActionBar } from "../../features/projects/components/ProjectActionBarContext";
 
 const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
   if (!data) {
@@ -42,8 +43,7 @@ export const ProjectManagePage: React.FC = () => {
   const project = rawProject;
 
   const createMutation = useCreateProject();
-  const deleteMutation = useDeleteProject();
-  
+
   const { user } = useAuth();
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
@@ -60,23 +60,14 @@ export const ProjectManagePage: React.FC = () => {
     }
   });
 
-  const deleteDialogRef = useRef<HTMLDialogElement>(null);
+  const { setIsSaveDisabled, setIsSaving } = useProjectActionBar();
 
-  const handleDelete = () => {
-    if (!id) return;
-    deleteDialogRef.current?.showModal();
-  };
-
-  const handleConfirmDelete = async () => {
-    deleteDialogRef.current?.close();
-    try {
-      await deleteMutation.mutateAsync(id as string);
-      addToast("Proyecto eliminado exitosamente", "success");
-      navigate("/admin/projects");
-    } catch (error) {
-      addToast("Error al eliminar el proyecto", "error");
-    }
-  };
+  useEffect(() => {
+    setIsSaveDisabled(false);
+    return () => {
+      setIsSaveDisabled(true);
+    };
+  }, [setIsSaveDisabled]);
 
   const handleSubmit = async (data: CreateProyectoDto | UpdateProyectoDto) => {
     try {
@@ -85,13 +76,15 @@ export const ProjectManagePage: React.FC = () => {
         if (data.categoria == null) {
           throw new Error("Missing required field: categoria");
         }
+        setIsSaving(true);
         await updateMutation.mutateAsync({ id: id as string, payload: data });
         addToast("Proyecto actualizado exitosamente", "success");
-        navigate("/admin/projects");
+        // stay on current page per user request
       } else {
         if (!("usuarioCreadorId" in data) || !data.usuarioCreadorId) {
           throw new Error("Missing required field: usuarioCreadorId");
         }
+        setIsSaving(true);
         await createMutation.mutateAsync({
           nombre: data.nombre,
           ubicacionTexto: data.ubicacionTexto || "",
@@ -124,6 +117,8 @@ export const ProjectManagePage: React.FC = () => {
         addToast(error.message || "Error al guardar el proyecto", "error");
       }
       throw error;
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -155,46 +150,6 @@ export const ProjectManagePage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-4">
 
-      {/* ── Delete Confirmation Dialog ── */}
-      <dialog
-        ref={deleteDialogRef}
-        className="rounded-2xl shadow-2xl max-w-md w-[90vw] p-0 border-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm"
-        aria-labelledby="delete-dialog-title"
-        onClose={() => deleteDialogRef.current?.close()}
-      >
-        <div className="p-8 space-y-5">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span className="text-red-600 text-2xl">⚠</span>
-            </div>
-            <div>
-              <h2 id="delete-dialog-title" className="text-lg font-black text-gray-900">Eliminar Proyecto</h2>
-              <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer.</p>
-            </div>
-          </div>
-          <p className="text-sm text-gray-700">
-            ¿Está seguro de que desea eliminar este proyecto permanentemente? Todos los datos asociados serán borrados.
-          </p>
-          <div className="flex gap-3 justify-end pt-2">
-            <button
-              type="button"
-              onClick={() => deleteDialogRef.current?.close()}
-              className="px-6 py-3 rounded-xl font-bold text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirmDelete}
-              disabled={deleteMutation.isPending}
-              className="px-6 py-3 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-            >
-              {deleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
-            </button>
-          </div>
-        </div>
-      </dialog>
-
       {isEditing && project && (
         <ProjectStatusBar projectId={project.id} currentStatus={project.estadoProyecto} />
       )}
@@ -205,7 +160,6 @@ export const ProjectManagePage: React.FC = () => {
         initialData={project}
         onSubmit={handleSubmit}
         onCancel={() => navigate("/admin/projects")}
-        onDelete={handleDelete}
       />
 
       <LimitReachedModal 

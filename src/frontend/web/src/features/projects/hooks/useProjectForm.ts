@@ -633,7 +633,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     documentSection: {
       portraitPreview, handlePortraitChange, removePortrait, portraitInputRef,
       existingFotoUrls,
-      gallery: [] as File[], galleryPreviews, handleGalleryChange, removeGalleryPhoto,
+      galleryPreviews, handleGalleryChange, removeGalleryPhoto,
       galleryInputRef, fotosError,
     } as const,
   };

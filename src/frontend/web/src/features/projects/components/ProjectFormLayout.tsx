@@ -4,6 +4,7 @@ import { ProyectoDto } from "../types";
 import { ProjectFormBasicFields } from "./ProjectFormBasicFields";
 import { ProjectFormDetailsFields } from "./ProjectFormDetailsFields";
 import { ProjectFormDocumentSection } from "./ProjectFormDocumentSection";
+import { useOptionalProjectActionBar } from "./ProjectActionBarContext";
 
 interface ProjectFormLayoutProps {
   error: string | null;
@@ -46,8 +47,11 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
   basicFields,
   detailsFields,
   documentSection,
-}) => (
-  <form onSubmit={handleSubmit} className="w-full space-y-6" noValidate>
+}) => {
+  const actionBarCtx = useOptionalProjectActionBar();
+
+  return (
+  <form id="project-form" onSubmit={handleSubmit} className="w-full space-y-6" noValidate>
     {error && (
       <div className="p-4 rounded-2xl bg-red-50 text-red-700 text-sm border border-red-200 animate-fade-in">
         {error}
@@ -154,29 +158,28 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
       <ProjectFormDocumentSection {...documentSection} />
     </div>
 
-    {/* ── Action Buttons ── */}
-    <div className="flex justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
-      {initialData && onDelete && (
-        <button
-          type="button"
-          onClick={onDelete}
-          className="vf-btn-danger mr-auto"
-        >
-          Eliminar Expediente
+    {/* ── Action Buttons (hidden when ProjectActionBarProvider wraps us) ── */}
+    {!actionBarCtx && (
+      <div className="flex justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
+        {initialData && onDelete && (
+          <button type="button" onClick={onDelete} className="vf-btn-danger mr-auto">
+            Eliminar Expediente
+          </button>
+        )}
+        <button type="button" onClick={onCancel} className="vf-btn-secondary">
+          Cancelar
         </button>
-      )}
-      <button type="button" onClick={onCancel} className="vf-btn-secondary">
-        Cancelar
-      </button>
-      <button
-        type="submit"
-        disabled={isSaveDisabled}
-        className={`vf-btn-primary min-w-[140px] ${
-          isSaveDisabled ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400 hover:shadow-none" : ""
-        }`}
-      >
-        {isSubmitting ? "Guardando..." : "Guardar Proyecto"}
-      </button>
-    </div>
+        <button
+          type="submit"
+          disabled={isSaveDisabled}
+          className={`vf-btn-primary min-w-[140px] ${
+            isSaveDisabled ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400 hover:shadow-none" : ""
+          }`}
+        >
+          {isSubmitting ? "Guardando..." : "Guardar Proyecto"}
+        </button>
+      </div>
+    )}
   </form>
-);
+  );
+};

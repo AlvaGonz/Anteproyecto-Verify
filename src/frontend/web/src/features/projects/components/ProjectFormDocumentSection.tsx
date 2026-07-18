@@ -7,7 +7,6 @@ interface ProjectFormDocumentSectionProps {
   removePortrait: () => void;
   portraitInputRef: React.RefObject<HTMLInputElement | null>;
   existingFotoUrls: string[];
-  gallery: File[];
   galleryPreviews: string[];
   handleGalleryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removeGalleryPhoto: (idx: number) => void;
@@ -21,7 +20,6 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
   removePortrait,
   portraitInputRef,
   existingFotoUrls,
-  gallery,
   galleryPreviews,
   handleGalleryChange,
   removeGalleryPhoto,
@@ -124,7 +122,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
             <span className="text-xs text-[var(--color-text-secondary)]">· hasta 5 fotos</span>
           </div>
           <span className="text-xs font-medium text-[var(--color-text-secondary)]">
-            {gallery.length + (existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0)}/5
+            {Math.max(galleryPreviews.length, existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0)}/5
           </span>
         </div>
 
@@ -152,7 +150,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
           ))}
 
           {/* Botón agregar galería */}
-          {gallery.length + (existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0) < 5 && (
+          {Math.max(galleryPreviews.length, existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0) < 5 && (
             <button
               type="button"
               onClick={() => galleryInputRef.current?.click()}

@@ -20,5 +20,10 @@ export interface ProyectoDto {
   createdAtUtc: string;
   updatedAtUtc?: string;
   imagenUrl?: string;
+  imagenAdicional1?: string;
+  imagenAdicional2?: string;
+  imagenAdicional3?: string;
+  imagenAdicional4?: string;
+  imagenAdicional5?: string;
   registradoPor?: ProjectRegistrant | null;
 }

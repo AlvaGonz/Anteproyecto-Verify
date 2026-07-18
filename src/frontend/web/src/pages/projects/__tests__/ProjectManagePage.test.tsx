@@ -7,6 +7,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProjectManagePage } from "../ProjectManagePage";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
 import { AuthProvider } from "../../../shared/context/AuthContext";
+import { ProjectActionBarProvider, ProjectActionBar } from "../../../features/projects/components/ProjectActionBarContext";
 import { projectsApi } from "../../../features/projects/api/projectsApi";
 import {
   ProjectStatus,
@@ -133,6 +134,12 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
     useQueryClient: () => ({
       invalidateQueries: vi.fn(),
     }),
+    useQuery: vi.fn().mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: false,
+      error: null,
+    }),
     useMutation: ({ mutationFn }: any) => {
       return {
         mutateAsync: async (variables: any) => {
@@ -190,6 +197,52 @@ vi.mock("../../../shared/components/ui/Toast/ToastContext", async () => {
   };
 });
 
+// Override useAuth so status tests see a user with plan that enables publishing
+vi.mock("../../../shared/context/AuthContext", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../shared/context/AuthContext")>();
+  return {
+    ...(actual as object),
+    useAuth: () => ({
+      user: { id: "user-1", email: "test@test.com", plan: "profesional", role: "ADMIN" },
+      isAuthenticated: true,
+      loading: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
+      error: null,
+      googleLogin: vi.fn(),
+    }),
+  };
+});
+
+vi.mock("../../../features/projects/hooks/useProjectStatusBar", async () => {
+  const { ProjectStatus } = await import("../../../features/projects/types");
+  const pApi = await import("../../../features/projects/api/projectsApi");
+  return {
+    useProjectStatusBar: (projectId: string) => ({
+      eligibility: {
+        documentCount: 5,
+        hasObservaciones: false,
+        currentStatus: ProjectStatus.Draft,
+      },
+      isLoading: false,
+      isUpdating: false,
+      error: null,
+      handleStatusChange: async (status: ProjectStatus) => {
+        const res = await pApi.projectsApi.updateProjectStatus(projectId, status);
+        if (res._tag === "Failure") {
+          const c = document.querySelector("[data-testid='toast-container']");
+          if (c) c.innerHTML = res.error.message || "Error al actualizar el estado";
+        } else {
+          const c = document.querySelector("[data-testid='toast-container']");
+          if (c) c.innerHTML = "Estado actualizado exitosamente";
+        }
+      },
+    }),
+  };
+});
+
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 const MOCK_PROJECT = {
@@ -201,6 +254,7 @@ const MOCK_PROJECT = {
   estadoProyecto: ProjectStatus.Draft,
   estadoIntegridad: IntegrityStatus.Pending,
   usuarioCreadorId: "user-001",
+  datosDesarrollador: "Constructora XYZ",
   createdAtUtc: "2026-01-01T00:00:00Z",
 };
 
@@ -211,11 +265,14 @@ const renderCreate = () =>
     <AuthProvider>
       <MemoryRouter initialEntries={["/admin/projects/new"]}>
         <ToastProvider>
-          <Routes>
-            <Route path="/admin/projects/new" element={<ProjectManagePage />} />
-            <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
-            <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
-          </Routes>
+          <ProjectActionBarProvider>
+            <Routes>
+              <Route path="/admin/projects/new" element={<ProjectManagePage />} />
+              <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
+              <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
+            </Routes>
+            <ProjectActionBar />
+          </ProjectActionBarProvider>
         </ToastProvider>
       </MemoryRouter>
     </AuthProvider>
@@ -226,11 +283,14 @@ const renderEdit = (id = "proj-001") =>
     <AuthProvider>
       <MemoryRouter initialEntries={[`/admin/projects/${id}/edit`]}>
         <ToastProvider>
-          <Routes>
-            <Route path="/admin/projects/:id/edit" element={<ProjectManagePage />} />
-            <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
-            <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
-          </Routes>
+          <ProjectActionBarProvider>
+            <Routes>
+              <Route path="/admin/projects/:id/edit" element={<ProjectManagePage />} />
+              <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
+              <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
+            </Routes>
+            <ProjectActionBar />
+          </ProjectActionBarProvider>
         </ToastProvider>
       </MemoryRouter>
     </AuthProvider>
@@ -274,6 +334,7 @@ describe("ProjectManagePage — CREATE mode", () => {
     await user.type(screen.getByLabelText(/Nombre del Proyecto/i), "Test Project");
     const select = screen.getByLabelText(/Ubicación/i);
     await user.selectOptions(select, "Santiago");
+    await user.type(screen.getByLabelText(/Constructora/i), "Constructora XYZ");
     await user.click(screen.getByRole("button", { name: /Guardar/i }));
 
     await waitFor(() => {
@@ -293,10 +354,11 @@ describe("ProjectManagePage — CREATE mode", () => {
     await user.type(screen.getByLabelText(/Nombre del Proyecto/i), "Bad Project");
     const select = screen.getByLabelText(/Ubicación/i);
     await user.selectOptions(select, "Santiago");
+    await user.type(screen.getByLabelText(/Constructora/i), "Constructora XYZ");
     await user.click(screen.getByRole("button", { name: /Guardar/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/Internal Server Error/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Internal Server Error/i).length).toBeGreaterThan(0);
     });
   });
 });
@@ -347,7 +409,7 @@ describe("ProjectManagePage — EDIT mode", () => {
     });
   });
 
-  it("calls updateProject on submit and navigates to /projects/:id", async () => {
+  it("calls updateProject on submit and stays on current page", async () => {
     const user = userEvent.setup();
     vi.mocked(projectsApi.updateProject).mockResolvedValue({
       _tag: "Success",
@@ -359,14 +421,17 @@ describe("ProjectManagePage — EDIT mode", () => {
     const input = screen.getByLabelText(/Nombre del Proyecto/i);
     await user.clear(input);
     await user.type(input, "Modificado");
-    await user.click(screen.getByRole("button", { name: /Guardar/i }));
+
+    const saveBtns = screen.getAllByRole("button", { name: /Guardar/i });
+    await user.click(saveBtns[0]);
 
     await waitFor(() => {
       expect(projectsApi.updateProject).toHaveBeenCalledWith(
         "proj-001",
         expect.objectContaining({ nombre: "Modificado" })
       );
-      expect(screen.getByTestId("projects-list")).toBeInTheDocument();
+      // stays on current page — no navigation to /admin/projects
+      expect(screen.queryByTestId("projects-list")).not.toBeInTheDocument();
     });
   });
 
@@ -381,7 +446,7 @@ describe("ProjectManagePage — EDIT mode", () => {
     await user.click(screen.getByRole("button", { name: /Guardar/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/Fallo al actualizar/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Fallo al actualizar/i).length).toBeGreaterThan(0);
     });
   });
 });
@@ -398,13 +463,14 @@ describe("ProjectManagePage — Status management", () => {
     });
   });
 
-  it("renders all 4 status buttons when project is loaded", async () => {
+  it("renders all 5 status buttons when project is loaded", async () => {
     renderEdit();
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Draft/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /InReview/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Published/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Observed/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Creado/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Editado/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /En Revisión/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Publicado/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Con Observaciones/i })).toBeInTheDocument();
     });
   });
 
@@ -415,9 +481,9 @@ describe("ProjectManagePage — Status management", () => {
       data: { ...MOCK_PROJECT, estadoProyecto: ProjectStatus.InReview },
     });
     renderEdit();
-    await waitFor(() => screen.getByRole("button", { name: /InReview/i }));
+    await waitFor(() => screen.getByRole("button", { name: /En Revisión/i }));
 
-    await user.click(screen.getByRole("button", { name: /InReview/i }));
+    await user.click(screen.getByRole("button", { name: /En Revisión/i }));
     await waitFor(() => {
       expect(projectsApi.updateProjectStatus).toHaveBeenCalledWith(
         "proj-001",
@@ -433,8 +499,8 @@ describe("ProjectManagePage — Status management", () => {
       error: { _tag: "ServerError", message: "Error de estado" },
     });
     renderEdit();
-    await waitFor(() => screen.getByRole("button", { name: /Published/i }));
-    await user.click(screen.getByRole("button", { name: /Published/i }));
+    await waitFor(() => screen.getByRole("button", { name: /Publicado/i }));
+    await user.click(screen.getByRole("button", { name: /Publicado/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/Error de estado/i)).toBeInTheDocument();

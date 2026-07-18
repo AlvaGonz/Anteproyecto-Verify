@@ -75,7 +75,7 @@ export const useUpdateDocumentType = (projectId: string) => {
   return useMutation({
     mutationKey: ['useUpdateDocumentType'],
     mutationFn: (data: { documentId: string; tipoDocumento: number }) =>
-      apiClient.patch(`/v1/projects/${projectId}/documents/${data.documentId}/type`, { tipoDocumento: data.tipoDocumento }).then(res => res.data),
+      apiClient.patch(`/projects/${projectId}/documents/${data.documentId}/type`, { tipoDocumento: data.tipoDocumento }).then(res => res.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
   });
 };

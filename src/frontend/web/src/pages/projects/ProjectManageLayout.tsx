@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet, NavLink, useParams, useLocation } from "react-router-dom";
 import { PenTool, FileText, ShieldCheck, ClipboardList } from "lucide-react";
+import { ProjectActionBarProvider, ProjectActionBar } from "../../features/projects/components/ProjectActionBarContext";
 
 export const ProjectManageLayout: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -127,7 +128,10 @@ export const ProjectManageLayout: React.FC = () => {
 
       {/* Nested Route Content */}
       <div className="w-full">
-        <Outlet />
+        <ProjectActionBarProvider>
+          <Outlet />
+          <ProjectActionBar />
+        </ProjectActionBarProvider>
       </div>
     </div>
   );
