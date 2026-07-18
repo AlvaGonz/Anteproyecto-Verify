@@ -26,7 +26,8 @@ import {
   Mail,
   Phone,
   Info,
-  User
+  User,
+  ArrowRight
 } from "lucide-react";
 import { m } from "framer-motion";
 
@@ -56,6 +57,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const identifier = slug || id || "";
   const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
   const error = fetchError ? (fetchError as Error).message : null;
+  const [isInterested, setIsInterested] = React.useState(false);
 
   if (loading)
     return (
@@ -332,6 +334,31 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* Me Interesa Button */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsInterested(prev => !prev)}
+                      className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-4 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${
+                        isInterested
+                          ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
+                          : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
+                      }`}
+                    >
+                      {!isInterested && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                      )}
+                      <span className="relative z-10 text-center leading-tight">
+                        {isInterested ? "Guardado en tus registros" : "Me interesa el proyecto"}
+                      </span>
+                      {isInterested ? (
+                        <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />
+                      ) : (
+                        <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
+                      )}
+                    </button>
                   </div>
                 </div>
               </m.div>
