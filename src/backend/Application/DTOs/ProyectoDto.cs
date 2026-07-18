@@ -45,7 +45,8 @@ public record ProjectRegistrantDto(
     string? Telefono,
     string? AvatarUrl,
     DateTime FechaRegistro,
-    bool Verificado
+    bool Verificado,
+    Guid? TitularId = null
 );
 
 public record CreateProyectoDto(

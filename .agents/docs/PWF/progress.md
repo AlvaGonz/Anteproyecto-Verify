@@ -423,3 +423,5 @@
   - **Symptom:** `Error uploading gallery image Copy of EVANGELISMOS D2025.png` initially, followed by `415 Unsupported Media Type`.
   - **Root Cause:** In `useDocuments.ts`, `useDocumentMutations.ts` and `useSettings.ts`, an explicit `Content-Type: multipart/form-data` header was passed to Axios, breaking boundary generation. After removing it, Axios defaulted to the global `application/json` header defined in `client.ts`, which the backend rejected with `415 Unsupported Media Type` because the controller expects `multipart/form-data`.
   - **Fix:** Removed the explicit `headers` overrides in API hooks, and modified the request interceptor in `client.ts` to `delete config.headers['Content-Type']` whenever `config.data instanceof FormData`. This allows the browser to correctly set the `multipart/form-data; boundary=...` header natively.
+-   [ x ]   U p d a t e d   G e s t i ó n   d e   A c t i v o   a u t h o r i z a t i o n   l o g i c   a n d   M e   i n t e r e s a   b u t t o n   b e h a v i o r  
+ 

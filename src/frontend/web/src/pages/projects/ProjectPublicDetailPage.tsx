@@ -65,7 +65,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const canManage = user && project && (
     user.id === project.usuarioCreadorId ||
     user.id === project.registradoPor?.id ||
-    user.inviteesList?.some(i => i.id === project.usuarioCreadorId)
+    user.inviteesList?.some(i => i.id === project.usuarioCreadorId) ||
+    (user.titularId && user.titularId === project.usuarioCreadorId) ||
+    (user.titularId && project.registradoPor?.titularId === user.titularId)
   );
 
   if (loading)
@@ -362,7 +364,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                       )}
                       <span className="relative z-10 text-center leading-tight">
-                        {isInterested ? "Guardado en tus registros" : "Me interesa el proyecto"}
+                        {isInterested ? "El proyecto se ha guardado en tus registros" : "Me interesa el proyecto"}
                       </span>
                       {isInterested ? (
                         <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />

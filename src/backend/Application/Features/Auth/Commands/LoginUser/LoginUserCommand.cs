@@ -28,6 +28,7 @@ public record LoginUserUserDto(
     string? PendingPlanCode = null,
     string? PendingBillingCycle = null,
     bool IsGuest = false,
+    Guid? TitularId = null,
     string? InviterPlan = null,
     object? InviteesList = null
 );

@@ -25,6 +25,7 @@ export interface User {
   pendingBillingCycle?: string | null;
   // ponytail: guest/inviter fields for subscription display
   isGuest?: boolean;
+  titularId?: string | null;
   inviterPlan?: string;
   maxUsuariosSecundarios?: number;
   inviteesList?: Array<{

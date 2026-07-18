@@ -102,6 +102,7 @@ public class GoogleLoginUserCommandHandler
             user.PendingPlanCode,
             user.PendingBillingCycle,
             IsGuest: user.TitularId.HasValue,
+            TitularId: user.TitularId,
             InviterPlan: user.Titular?.Plan?.NombrePlan,
             InviteesList: user.MiembrosEquipo
                 .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)

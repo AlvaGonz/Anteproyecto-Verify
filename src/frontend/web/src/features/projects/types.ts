@@ -8,6 +8,7 @@ export interface ProjectRegistrant {
   avatarUrl?: string | null;
   fechaRegistro: string;
   verificado: boolean;
+  titularId?: string | null;
 }
 
 export interface ProyectoDto {

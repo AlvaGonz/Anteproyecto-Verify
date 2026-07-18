@@ -198,7 +198,8 @@ public class ProjectService : IProjectService
                 proyecto.UsuarioCreador.Telefono,
                 proyecto.UsuarioCreador.AvatarUrl,
                 proyecto.UsuarioCreador.CreatedAtUtc,
-                proyecto.UsuarioCreador.EmailVerificado
+                proyecto.UsuarioCreador.EmailVerificado,
+                proyecto.UsuarioCreador.TitularId
             );
         }
 
