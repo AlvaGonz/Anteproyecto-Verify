@@ -8,7 +8,6 @@ import {
   History,
   Info,
   ExternalLink,
-  ShieldCheck,
   AlertCircle
 } from "lucide-react";
 
@@ -102,11 +101,6 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${doc.activo ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
                        {DOCUMENT_TYPE_NAMES[doc.tipoDocumento] || "DESCONOCIDO"}
                     </span>
-                    {doc.activo && (
-                      <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3" /> VERIFICADO
-                      </span>
-                    )}
                   </div>
                   <h5 className="text-sm sm:text-base font-black text-secondary truncate group-hover:text-primary transition-colors max-w-[200px] sm:max-w-none">
                     {doc.nombreArchivoOriginal}

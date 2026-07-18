@@ -174,10 +174,20 @@ public class DocumentService : IDocumentService
         document.UpdateStatus(DocumentStatus.Processing);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Reset stream position for OCR
-        fileStream.Position = 0;
-        var ocrResult = await _ocrProvider.ProcessDocumentAsync(fileStream, fileName, cancellationToken);
-        _documentStateEngine.ApplyOcrResult(document, ocrResult);
+        try
+        {
+            // Reset stream position for OCR
+            fileStream.Position = 0;
+            var ocrResult = await _ocrProvider.ProcessDocumentAsync(fileStream, fileName, cancellationToken);
+            _documentStateEngine.ApplyOcrResult(document, ocrResult);
+        }
+        catch (Exception ocrEx)
+        {
+            // OCR failure must not abort an already-persisted upload.
+            // Mark as Observado so validators can review it manually.
+            var fallbackJson = $"{{\"error\": \"OCR processing failed: {ocrEx.Message.Replace("\"", "'")}\", \"success\": false}}";
+            document.SetOcrResult(fallbackJson, DocumentStatus.Observado);
+        }
         
         _documentoRepository.Update(document);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

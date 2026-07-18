@@ -64,12 +64,16 @@ public class PaddleOcrProvider : IOcrProvider
             }
             
             _logger.LogError("PaddleOCR API failed with status code {StatusCode}: {Response}", response.StatusCode, responseString);
-            return new OcrResult { Success = false, ExtractedText = string.Empty, RawJson = responseString };
+            var errorPayload = string.IsNullOrWhiteSpace(responseString)
+                ? $"{{\"error\": \"OCR service returned {(int)response.StatusCode}\"}}"
+                : responseString;
+            return new OcrResult { Success = false, ExtractedText = string.Empty, RawJson = errorPayload };
         }
         catch (System.Exception ex)
         {
             _logger.LogError(ex, "Error communicating with PaddleOCR API");
-            return new OcrResult { Success = false, ExtractedText = string.Empty, RawJson = ex.Message };
+            var safeMessage = string.IsNullOrWhiteSpace(ex.Message) ? "Connection error" : ex.Message;
+            return new OcrResult { Success = false, ExtractedText = string.Empty, RawJson = $"{{\"error\": \"{safeMessage.Replace("\"", "'")}\"}}"};
         }
     }
     

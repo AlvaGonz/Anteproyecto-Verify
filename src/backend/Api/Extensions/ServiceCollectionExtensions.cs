@@ -59,6 +59,7 @@ public static class ServiceCollectionExtensions
             };
         });
 
+        services.AddExceptionHandler<Api.Middleware.GlobalExceptionHandler>();
         services.AddProblemDetails();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

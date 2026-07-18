@@ -213,6 +213,18 @@ public class ProjectDocumentsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Application.Common.Exceptions.QuotaExceededException ex)
+        {
+            return StatusCode(StatusCodes.Status402PaymentRequired, new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Error al procesar el documento. Por favor intente de nuevo.", detail = ex.Message });
+        }
     }
 
     [HttpGet("{documentId}/download")]

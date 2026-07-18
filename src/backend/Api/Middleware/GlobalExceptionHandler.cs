@@ -38,6 +38,12 @@ public class GlobalExceptionHandler : IExceptionHandler
             problemDetails.Title = "Bad Request";
             problemDetails.Detail = exception.Message;
         }
+        else if (exception is Application.Common.Exceptions.QuotaExceededException)
+        {
+            problemDetails.Status = StatusCodes.Status402PaymentRequired;
+            problemDetails.Title = "Quota Exceeded";
+            problemDetails.Detail = exception.Message;
+        }
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
 
