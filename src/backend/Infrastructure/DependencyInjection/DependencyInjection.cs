@@ -50,6 +50,8 @@ public static class DependencyInjection
 
         // Document Intelligence
         services.AddScoped<Application.Abstractions.DocumentIntelligence.IDocumentValidationService, DocumentIntelligence.MockDocumentValidationService>();
+        services.AddScoped<Application.Services.DocumentProcessing.FieldValidation.IDocumentFieldNormalizer, DocumentProcessing.DocumentFieldNormalizer>();
+        services.AddScoped<Application.Services.DocumentProcessing.FieldValidation.IDocumentValidationRuleEngine, DocumentProcessing.DocumentValidationRuleEngine>();
 
         // Integrations
         services.AddScoped<Application.Abstractions.Integrations.IDgriService, Integrations.DgriMockService>();

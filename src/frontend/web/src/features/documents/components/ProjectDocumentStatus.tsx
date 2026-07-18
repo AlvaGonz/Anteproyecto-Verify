@@ -72,8 +72,9 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     if (!info) return null;
 
     const doc = documents.find(d => d.tipoDocumento === typeId);
-    const isValid = doc?.estadoDocumento === DocumentStatus.Valid;
-    const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isValid;
+    const isVerificado = doc?.estadoDocumento === DocumentStatus.Verificado || doc?.estadoDocumento === DocumentStatus.Valid;
+    const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isVerificado;
+    const isObservado = doc?.estadoDocumento === DocumentStatus.Observado;
 
     return (
       <m.div
@@ -81,25 +82,29 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
-        className={`group relative flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-[2rem] transition-all border ${isValid
+        className={`group relative flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-[2rem] transition-all border ${isVerificado
           ? "bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30"
-          : isPending
-            ? "bg-amber-500/[0.03] border-amber-500/10 hover:border-amber-500/30"
-            : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
+          : isObservado
+            ? "bg-rose-500/[0.03] border-rose-500/10 hover:border-rose-500/30"
+            : isPending
+              ? "bg-amber-500/[0.03] border-amber-500/10 hover:border-amber-500/30"
+              : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
           }`}
       >
         <div className="flex items-start gap-4">
-          <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${isValid
+          <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${isVerificado
             ? "bg-emerald-500/10 text-emerald-500"
-            : isPending
-              ? "bg-amber-500/10 text-amber-500"
-              : "bg-on-surface-variant/10 text-on-surface-variant"
+            : isObservado
+              ? "bg-rose-500/10 text-rose-500"
+              : isPending
+                ? "bg-amber-500/10 text-amber-500"
+                : "bg-on-surface-variant/10 text-on-surface-variant"
             }`}>
-            {isValid ? <ShieldCheck className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+            {isVerificado ? <ShieldCheck className="w-5 h-5" /> : isObservado ? <AlertTriangle className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
           </div>
 
           <div className="space-y-1">
-            <h4 className={`text-sm font-black uppercase tracking-tight ${isValid ? "text-secondary" : "text-on-surface-variant"}`}>
+            <h4 className={`text-sm font-black uppercase tracking-tight ${isVerificado ? "text-secondary" : "text-on-surface-variant"}`}>
               {info.name}
             </h4>
             <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
@@ -112,21 +117,42 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
                 <span className="text-[10px] font-black uppercase tracking-widest">{info.norm}</span>
               </div>
             </div>
+            
+            {/* Show related file name if doc exists */}
+            {doc && (
+              <div className="mt-3 flex items-center gap-2 px-3 py-1.5 bg-secondary/5 border border-secondary/10 rounded-xl w-fit group-hover:bg-secondary/10 transition-colors">
+                <FileCheck2 className="w-3.5 h-3.5 text-secondary/60" />
+                <span className="text-[11px] font-bold text-secondary/70 truncate max-w-[200px] md:max-w-[300px]" title={doc.nombreArchivoOriginal}>
+                  {doc.nombreArchivoOriginal}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="mt-4 sm:mt-0 flex items-center gap-4">
-          {isValid && (
+          {isVerificado && (
             <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-              INTEGRIDAD OK
+              VERIFICADO (OCR)
             </div>
           )}
-          {!isValid && !isPending && (
+          {isObservado && (
+            <div className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest border border-rose-500/20">
+              OBSERVADO
+            </div>
+          )}
+          {!isVerificado && !isPending && !isObservado && (
             <div className="px-3 py-1 rounded-full bg-on-surface-variant/5 text-on-surface-variant/40 text-[10px] font-black uppercase tracking-widest border border-on-surface-variant/5 italic">
               NO SUMINISTRADO
             </div>
           )}
-          {(isValid || isPending) && doc?.id && (
+          {isPending && !isObservado && (
+            <div className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase tracking-widest border border-amber-500/20">
+              EN PROCESO
+            </div>
+          )}
+          
+          {(isVerificado || isPending || isObservado) && doc?.id && (
             <button
               onClick={() => downloadDoc(doc.id)}
               disabled={isDownloading}

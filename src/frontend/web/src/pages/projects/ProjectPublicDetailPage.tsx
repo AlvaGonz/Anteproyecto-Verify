@@ -162,10 +162,10 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 aspect-video"
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-h-[32rem]"
               >
                 {/* Main Image */}
-                <div className={`rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-sm group ${project.fotoUrls && project.fotoUrls.length > 1 ? 'md:col-span-2' : 'md:col-span-3'}`}>
+                <div className={`aspect-video rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-sm group ${project.fotoUrls && project.fotoUrls.length > 1 ? 'md:col-span-2' : 'md:col-span-3'}`}>
                   <img
                     src={project.imagenUrl || (project.fotoUrls ? project.fotoUrls[0] : '')}
                     alt={project.nombre}
@@ -176,8 +176,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
                 {/* Additional Images (if any) */}
                 {project.fotoUrls && project.fotoUrls.length > 1 && (
-                  <div className="hidden md:flex flex-col gap-4 md:gap-6">
-                    <div className="rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
+                    <div className="hidden md:flex flex-col gap-4 md:gap-6">
+                    <div className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
                       <img
                         src={project.fotoUrls[1] || project.fotoUrls[0]}
                         alt={`${project.nombre} 2`}
@@ -185,7 +185,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                       />
                     </div>
                     {project.fotoUrls.length > 2 ? (
-                      <div className="rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
+                      <div className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
                         <img
                           src={project.fotoUrls[2]}
                           alt={`${project.nombre} 3`}
@@ -199,7 +199,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         )}
                       </div>
                     ) : (
-                      <div className="rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group bg-surface-container-high flex items-center justify-center">
+                      <div className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group bg-surface-container-high flex items-center justify-center">
                         <img
                           src={project.imagenUrl || project.fotoUrls[0]}
                           alt={`${project.nombre} alt`}
