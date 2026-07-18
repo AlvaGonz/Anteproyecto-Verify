@@ -115,5 +115,41 @@ test.describe('Document Processing States', () => {
     // Check that status changes to Cargado
     const statusText = page.getByTestId("requirement-status-titulo");
     await expect(statusText).toContainText("Cargado", { ignoreCase: true });
+
+    // Mock documents GET endpoint to return the uploaded document as Verificado (6)
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents`, async (route, request) => {
+      if (request.method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify([
+            {
+              id: "new-doc-123",
+              proyectoId: MOCK_PROJECT_ID,
+              tipoDocumento: 21,
+              nombreArchivoOriginal: "Acto de venta A.jpg",
+              activo: true,
+              estadoDocumento: 6 // Verificado
+            }
+          ])
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Refresh data to reflect Verificado status
+    // Or we just re-trigger diagnosis which might pull the new status if diagnosis provides it, 
+    // but the component reads from documents array. We can just reload the page for simplicity or 
+    // trigger a refetch in the UI if possible. Let's just wait for UI to update if it polls or reload.
+    await page.reload();
+
+    // Check that the status shows Verificado
+    const newStatusText = page.getByTestId("requirement-status-titulo");
+    await expect(newStatusText).toContainText("Verificado", { ignoreCase: true });
+    
+    // Check that the document name is displayed
+    const docName = page.getByText("Acto de venta A.jpg");
+    await expect(docName).toBeVisible();
   });
 });

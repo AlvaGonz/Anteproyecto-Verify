@@ -84,6 +84,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const integrityInfo = getIntegrityInfo(project.estadoIntegridad);
   const IntIcon = integrityInfo.icon;
 
+  const mainImg = project.imagenUrl || (project.fotoUrls?.[0]) || null;
+  const extraImgs = project.fotoUrls?.slice(1, 6) || [];
+
   return (
     <div className="min-h-screen bg-background font-body text-on-surface antialiased overflow-x-hidden selection:bg-primary-container">
 
@@ -157,63 +160,34 @@ export const ProjectPublicDetailPage: React.FC = () => {
             </header>
 
             {/* Project Photos Gallery */}
-            {((project.fotoUrls && project.fotoUrls.length > 0) || project.imagenUrl) && (
+            {mainImg && (
               <m.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-h-[32rem]"
               >
-                {/* Main Image */}
-                <div className={`aspect-video rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-sm group ${project.fotoUrls && project.fotoUrls.length > 1 ? 'md:col-span-2' : 'md:col-span-3'}`}>
-                  <img
-                    src={project.imagenUrl || (project.fotoUrls ? project.fotoUrls[0] : '')}
-                    alt={project.nombre}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                  {/* Main Image */}
+                  <div className={`aspect-video rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-sm group ${extraImgs.length > 0 ? 'md:col-span-2 md:row-span-2' : 'md:col-span-3'}`}>
+                    <img
+                      src={mainImg}
+                      alt={project.nombre}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
 
-                {/* Additional Images (if any) */}
-                {project.fotoUrls && project.fotoUrls.length > 1 && (
-                    <div className="hidden md:flex flex-col gap-4 md:gap-6">
-                    <div className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
+                  {/* Extra Images (up to 5) */}
+                  {extraImgs.map((url: string, i: number) => (
+                    <div key={i} className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm group">
                       <img
-                        src={project.fotoUrls[1] || project.fotoUrls[0]}
-                        alt={`${project.nombre} 2`}
+                        src={url}
+                        alt={`${project.nombre} ${i + 2}`}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     </div>
-                    {project.fotoUrls.length > 2 ? (
-                      <div className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
-                        <img
-                          src={project.fotoUrls[2]}
-                          alt={`${project.nombre} 3`}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        {project.fotoUrls.length > 3 && (
-                          <div className="absolute inset-0 bg-secondary/70 backdrop-blur-sm flex flex-col items-center justify-center text-white cursor-pointer hover:bg-secondary/80 transition-colors">
-                            <span className="font-display font-black text-3xl italic tracking-tighter">+{project.fotoUrls.length - 3}</span>
-                            <span className="text-[10px] font-black uppercase tracking-widest mt-1">Fotos</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group bg-surface-container-high flex items-center justify-center">
-                        <img
-                          src={project.imagenUrl || project.fotoUrls[0]}
-                          alt={`${project.nombre} alt`}
-                          className="w-full h-full object-cover opacity-50 blur-sm scale-110"
-                        />
-                        <div className="absolute inset-0 bg-secondary/50 backdrop-blur-md flex items-center justify-center">
-                          <div className="w-12 h-12 rounded-full border border-white/20 bg-white/10 flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-white"></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  ))}
+                </div>
               </m.section>
             )}
 
