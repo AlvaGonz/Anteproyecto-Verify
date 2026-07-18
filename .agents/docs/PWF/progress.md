@@ -265,6 +265,10 @@
 > Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
 
 ## 🐛 Resolved Bugs
+- **BUG-030:** 500 Error on Document Upload and missing validation states in UI.
+  - **Symptom:** Document uploads return 500 errors and the UI does not show explicit document processing states (Procesando/Verificado/Rechazado) or the uploaded file name.
+  - **Root Cause:** Backend error on upload and missing properties in UI components meant that state and filename were not passed down to the `RequirementUploadRow`.
+  - **Fix:** Fixed upload 500 error, updated `RequirementUploadRow` to accept `fileName` and `documentStatus`, added `ShieldCheck` UI icon for Verificado, and added Playwright/Vitest tests to cover the transitions.
 - **BUG-007:** 404 Not Found on `/api/auth/resend-verification`.
   - **Symptom:** The new frontend `useResendVerificationEmail` mutation failed with `404 Not Found` despite the backend having the endpoint correctly implemented.
   - **Root Cause:** `dotnet watch` inside the Docker container failed to hot-reload and compile the newly added `ResendVerificationEmail` namespace. The `Api` container was still running the older version without the endpoint mapped.
