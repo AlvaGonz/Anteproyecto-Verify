@@ -58,6 +58,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const error = fetchError ? (fetchError as Error).message : null;
   const { user } = useAuth();
   const [isInterested, setIsInterested] = React.useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
   // ponytail: el usuario puede gestionar si es el creador directo, o si es el titular del grupo y el creador es su invitado
   const canManage = user && project && (
@@ -95,8 +96,18 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const integrityInfo = getIntegrityInfo(project.estadoIntegridad);
   const IntIcon = integrityInfo.icon;
 
-  const mainImg = project.imagenUrl || (project.fotoUrls?.[0]) || null;
-  const extraImgs = project.fotoUrls?.slice(1, 6) || [];
+  // Gather all unique images
+  const allImgs = [
+    project.imagenUrl,
+    project.imagenAdicional1,
+    project.imagenAdicional2,
+    project.imagenAdicional3,
+    project.imagenAdicional4,
+    project.imagenAdicional5,
+    ...(project.fotoUrls || [])
+  ].filter(Boolean) as string[];
+
+  const uniqueImgs = Array.from(new Set(allImgs));
 
   return (
     <div className="min-h-screen bg-background font-body text-on-surface antialiased overflow-x-hidden selection:bg-primary-container">
@@ -139,7 +150,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     EXPEDIENTE INSTITUCIONAL #{project.codigoInterno}
                   </span>
                 </div>
-                <h1 className="text-5xl md:text-7xl xl:text-8xl font-display font-black text-secondary leading-[0.85] tracking-[-0.05em] uppercase italic break-words">
+                <h1 className="text-2xl md:text-7xl xl:text-8xl font-display font-black text-secondary leading-[0.85] tracking-[-0.05em] uppercase italic break-words">
                   {project.nombre}
                 </h1>
                 <div className="flex flex-wrap items-center gap-6 xl:gap-8 pt-4">
@@ -166,35 +177,54 @@ export const ProjectPublicDetailPage: React.FC = () => {
               </m.div>
             </header>
 
-            {/* Project Photos Gallery */}
-            {mainImg && (
+            {/* Project Photos Gallery — Interactive Hero + Thumbnails */}
+            {uniqueImgs.length > 0 && (
               <m.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
+                className="space-y-4 md:space-y-6"
               >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                  {/* Main Image */}
-                  <div className={`aspect-video rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-sm group ${extraImgs.length > 0 ? 'md:col-span-2 md:row-span-2' : 'md:col-span-3'}`}>
-                    <img
-                      src={mainImg}
-                      alt={project.nombre}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </div>
-
-                  {/* Extra Images (up to 5) */}
-                  {extraImgs.map((url: string, i: number) => (
-                    <div key={i} className="aspect-video rounded-[2rem] overflow-hidden relative shadow-sm group">
-                      <img
-                        src={url}
-                        alt={`${project.nombre} ${i + 2}`}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                  ))}
+                {/* Main Display — Premium rounded, hover zoom */}
+                <div className="aspect-video rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-[0_20px_60px_-15px_rgba(34,51,130,0.15)] group bg-secondary/5">
+                  <img
+                    src={uniqueImgs[selectedImageIndex]}
+                    alt={`${project.nombre} foto principal`}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 </div>
+
+                {/* Thumbnail Strip — Glassmorphism & Active states */}
+                {uniqueImgs.length > 1 && (
+                  <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide px-1">
+                    {uniqueImgs.map((url, i) => {
+                      const isActive = i === selectedImageIndex;
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setSelectedImageIndex(i)}
+                          className={`relative shrink-0 w-20 md:w-24 aspect-[4/3] rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary group ${
+                            isActive
+                              ? 'ring-2 ring-primary ring-offset-4 ring-offset-background scale-105 shadow-xl'
+                              : 'opacity-50 hover:opacity-100 hover:scale-[1.02] hover:shadow-md'
+                          }`}
+                          aria-label={`${project.nombre} miniatura ${i + 1}`}
+                        >
+                          <img
+                            src={url}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                          {!isActive && (
+                            <div className="absolute inset-0 bg-secondary/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </m.section>
             )}
 
@@ -346,11 +376,10 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsInterested(prev => !prev)}
-                      className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-4 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${
-                        isInterested
+                      className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-4 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
                           ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
                           : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
-                      }`}
+                        }`}
                     >
                       {!isInterested && (
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
