@@ -7,5 +7,6 @@ public enum DocumentStatus
     Valid = 2,
     Invalid = 3,
     PreVerificado = 4,
-    Observado = 5
+    Observado = 5,
+    Verificado = 6
 }

@@ -114,7 +114,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
       <main className="pt-32 md:pt-40 pb-32 px-6 md:px-10 max-w-[90rem] mx-auto">
         {/* Dynamic Grid Layout */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-10 xl:gap-16">
-          
+
           {/* Left Column: Header, Specs, Documents */}
           <div className="xl:col-span-8 flex flex-col gap-12 xl:gap-16">
             <header>
@@ -158,7 +158,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
             {/* Project Photos Gallery */}
             {((project.fotoUrls && project.fotoUrls.length > 0) || project.imagenUrl) && (
-              <m.section 
+              <m.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -166,9 +166,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
               >
                 {/* Main Image */}
                 <div className={`rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-sm group ${project.fotoUrls && project.fotoUrls.length > 1 ? 'md:col-span-2' : 'md:col-span-3'}`}>
-                  <img 
-                    src={project.imagenUrl || (project.fotoUrls ? project.fotoUrls[0] : '')} 
-                    alt={project.nombre} 
+                  <img
+                    src={project.imagenUrl || (project.fotoUrls ? project.fotoUrls[0] : '')}
+                    alt={project.nombre}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -178,17 +178,17 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 {project.fotoUrls && project.fotoUrls.length > 1 && (
                   <div className="hidden md:flex flex-col gap-4 md:gap-6">
                     <div className="rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
-                      <img 
-                        src={project.fotoUrls[1] || project.fotoUrls[0]} 
-                        alt={`${project.nombre} 2`} 
+                      <img
+                        src={project.fotoUrls[1] || project.fotoUrls[0]}
+                        alt={`${project.nombre} 2`}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     </div>
                     {project.fotoUrls.length > 2 ? (
                       <div className="rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group">
-                        <img 
-                          src={project.fotoUrls[2]} 
-                          alt={`${project.nombre} 3`} 
+                        <img
+                          src={project.fotoUrls[2]}
+                          alt={`${project.nombre} 3`}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         {project.fotoUrls.length > 3 && (
@@ -200,16 +200,16 @@ export const ProjectPublicDetailPage: React.FC = () => {
                       </div>
                     ) : (
                       <div className="rounded-[2rem] overflow-hidden relative shadow-sm flex-1 group bg-surface-container-high flex items-center justify-center">
-                        <img 
-                           src={project.imagenUrl || project.fotoUrls[0]} 
-                           alt={`${project.nombre} alt`} 
-                           className="w-full h-full object-cover opacity-50 blur-sm scale-110"
+                        <img
+                          src={project.imagenUrl || project.fotoUrls[0]}
+                          alt={`${project.nombre} alt`}
+                          className="w-full h-full object-cover opacity-50 blur-sm scale-110"
                         />
-                         <div className="absolute inset-0 bg-secondary/50 backdrop-blur-md flex items-center justify-center">
-                             <div className="w-12 h-12 rounded-full border border-white/20 bg-white/10 flex items-center justify-center">
-                                 <div className="w-2 h-2 rounded-full bg-white"></div>
-                             </div>
-                         </div>
+                        <div className="absolute inset-0 bg-secondary/50 backdrop-blur-md flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full border border-white/20 bg-white/10 flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-white"></div>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -264,7 +264,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     <span className="text-[10px] font-black uppercase tracking-widest text-[#223382]">Valor Registral Estimado</span>
                   </div>
                   <p className="text-xl md:text-2xl font-black text-primary leading-none tracking-tight font-display italic">
-                    {project.valorEstimado ? `$${(project.valorEstimado).toLocaleString()}` : "SUJETO A TASACIÓN"}
+                    {project.valorEstimado ? `RD$ ${(project.valorEstimado).toLocaleString()}` : "SUJETO A TASACIÓN"}
                   </p>
                 </div>
               </div>
