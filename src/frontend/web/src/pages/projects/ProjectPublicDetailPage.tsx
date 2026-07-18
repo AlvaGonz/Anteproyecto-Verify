@@ -5,6 +5,7 @@ import {
   ProjectCategory,
 } from "../../features/projects/types";
 import { useProject } from "../../features/projects/api/useProjects";
+import { useAuth } from "../../shared/context/AuthContext";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
@@ -57,7 +58,15 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const identifier = slug || id || "";
   const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
   const error = fetchError ? (fetchError as Error).message : null;
+  const { user } = useAuth();
   const [isInterested, setIsInterested] = React.useState(false);
+
+  // ponytail: el usuario puede gestionar si es el creador directo, o si es el titular del grupo y el creador es su invitado
+  const canManage = user && project && (
+    user.id === project.usuarioCreadorId ||
+    user.id === project.registradoPor?.id ||
+    user.inviteesList?.some(i => i.id === project.usuarioCreadorId)
+  );
 
   if (loading)
     return (
@@ -110,9 +119,11 @@ export const ProjectPublicDetailPage: React.FC = () => {
           <button type="button" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all">
             <Download className="w-5 h-5" />
           </button>
-          <Link to={`/admin/projects/${project.id}/edit`} className="vf-btn-primary h-12 !rounded-2xl px-8 ml-4 text-xs font-black tracking-widest border-none bg-primary text-white shadow-xl shadow-primary/20">
-            GESTIONAR ACTIVO
-          </Link>
+          {canManage && (
+            <Link to={`/admin/projects/${project.id}/edit`} className="vf-btn-primary h-12 !rounded-2xl px-8 ml-4 text-xs font-black tracking-widest border-none bg-primary text-white shadow-xl shadow-primary/20">
+              GESTIONAR ACTIVO
+            </Link>
+          )}
         </div>
       </nav>
 

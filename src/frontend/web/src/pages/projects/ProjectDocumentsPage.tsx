@@ -33,11 +33,10 @@ const REQUIRED_DOCUMENTS = [
 const RequiredDocumentsList: React.FC<{ 
   projectId: string; 
   documents: DocumentDto[];
-  handleAssignDocument: (documentId: string, tipoDocumento: number) => void;
   handleUnassignDocument: (documentId: string) => void;
   handleChangeDocument: (newDocumentId: string, oldDocumentId: string | undefined, tipoDocumento: number) => Promise<void>;
   isUpdatingType: boolean;
-}> = ({ projectId, documents, handleAssignDocument, handleUnassignDocument, handleChangeDocument, isUpdatingType }) => {
+}> = ({ projectId, documents, handleUnassignDocument, handleChangeDocument, isUpdatingType }) => {
   return (
     <div className="vf-card p-6 bg-surface-container-low/30 overflow-hidden relative group">
       <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -117,15 +116,6 @@ export const ProjectDocumentsPage: React.FC = () => {
       addToast(`Estado de certificación ${isActive ? "reanudado" : "suspendido"}`, isActive ? "success" : "info");
     } catch (err: any) {
       addToast("Error al modificar el estado de validez", "error");
-    }
-  };
-
-  const handleAssignDocument = async (documentId: string, tipoDocumento: number) => {
-    try {
-      await typeMutation.mutateAsync({ documentId, tipoDocumento });
-      addToast("Documento asignado correctamente", "success");
-    } catch (err: any) {
-      addToast("Error al asignar el documento", "error");
     }
   };
 
@@ -246,7 +236,6 @@ export const ProjectDocumentsPage: React.FC = () => {
           <RequiredDocumentsList 
             projectId={projectId} 
             documents={documents} 
-            handleAssignDocument={handleAssignDocument}
             handleUnassignDocument={handleUnassignDocument}
             handleChangeDocument={handleChangeDocument}
             isUpdatingType={typeMutation.isPending}

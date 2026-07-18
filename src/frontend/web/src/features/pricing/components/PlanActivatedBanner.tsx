@@ -1,6 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { CheckCircle2 } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 import { PlanCapabilities } from '../utils/planCapabilities'
 
 interface Props {
@@ -14,7 +12,6 @@ interface Props {
   Dismiss on: button click, Escape key, backdrop click.
 */
 export const PlanActivatedBanner: React.FC<Props> = ({ plan, onDismiss }) => {
-  const navigate = useNavigate()
   const panelRef = useRef<HTMLDivElement>(null)
 
   // ponytail: Escape key dismisses the modal — simplest keyboard support

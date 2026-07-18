@@ -8,7 +8,7 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {

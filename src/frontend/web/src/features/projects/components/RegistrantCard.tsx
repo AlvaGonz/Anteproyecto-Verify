@@ -9,10 +9,8 @@ interface RegistrantCardProps {
 export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) => {
   const {
     nombreCompleto,
-    razonSocial: empresa,
+    razonSocial,
     rol,
-    email,
-    telefono,
     email,
     telefono,
     avatarUrl,
@@ -20,7 +18,7 @@ export const RegistrantCard: React.FC<RegistrantCardProps> = ({ registrant }) =>
     fechaRegistro,
   } = registrant;
 
-  const fullName = (nombreCompleto || empresa)?.trim() || 'Sin nombre';
+  const fullName = (nombreCompleto || razonSocial)?.trim() || 'Sin nombre';
   const initials = fullName
     .split(' ')
     .map(n => n.charAt(0))

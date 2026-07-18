@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+
 import {
   ProyectoDto,
-  ProjectStatus,
   CreateProyectoDto,
   UpdateProyectoDto
 } from "../../features/projects/types";
-import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { useProject, useCreateProject } from "../../features/projects/api/useProjects";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { PlansModal } from "../../features/settings/components/PlansModal";
@@ -25,16 +23,10 @@ const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
   }
 };
 
-const sanitizeStatus = (status: ProjectStatus) => {
-  if (!Object.values(ProjectStatus).includes(status)) {
-    throw new Error("Invalid project status");
-  }
-  return status;
-};
+
 
 export const ProjectManagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const isEditing = !!id;
