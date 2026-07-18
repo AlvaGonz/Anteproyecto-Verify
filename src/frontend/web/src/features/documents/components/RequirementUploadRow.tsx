@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useUploadRequirementDocument } from '../api/useDocuments';
-import { CheckCircle, UploadCloud, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle, UploadCloud, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
 
 export interface RequirementUploadRowProps {
   projectId: string;
@@ -9,6 +9,8 @@ export interface RequirementUploadRowProps {
   description: string;
   categoryLabel: string;
   isUploaded: boolean;
+  fileName?: string;
+  documentStatus?: number; // 6 = Verificado, 3 = Rechazado, 1 = Procesando
 }
 
 export const RequirementUploadRow: React.FC<RequirementUploadRowProps> = ({
@@ -16,7 +18,9 @@ export const RequirementUploadRow: React.FC<RequirementUploadRowProps> = ({
   requirementCode,
   label,
   description,
-  isUploaded
+  isUploaded,
+  fileName,
+  documentStatus
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -63,9 +67,33 @@ export const RequirementUploadRow: React.FC<RequirementUploadRowProps> = ({
 
       <div className="flex items-center space-x-2 shrink-0">
         {isUploaded ? (
-          <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
-            <CheckCircle className="w-4 h-4 mr-2" />
-            <span className="text-sm font-medium">Cargado</span>
+          <div className="flex flex-col items-end gap-1">
+            {fileName && (
+              <span className="text-xs font-medium text-gray-500 max-w-[200px] truncate" title={fileName}>
+                {fileName}
+              </span>
+            )}
+            {documentStatus === 6 ? (
+              <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
+                <ShieldCheck className="w-4 h-4 mr-2" />
+                <span className="text-sm font-medium">Verificado</span>
+              </div>
+            ) : documentStatus === 3 ? (
+              <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-red-600 bg-red-50 px-3 py-1.5 rounded-full border border-red-100">
+                <AlertCircle className="w-4 h-4 mr-2" />
+                <span className="text-sm font-medium">Rechazado</span>
+              </div>
+            ) : documentStatus === 1 ? (
+              <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <span className="text-sm font-medium">Procesando</span>
+              </div>
+            ) : (
+              <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                <span className="text-sm font-medium">Cargado</span>
+              </div>
+            )}
           </div>
         ) : (
           <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center gap-2">

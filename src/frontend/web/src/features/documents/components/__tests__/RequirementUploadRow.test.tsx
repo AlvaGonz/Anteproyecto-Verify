@@ -43,10 +43,26 @@ describe('RequirementUploadRow', () => {
     expect(screen.getByRole('button', { name: /subir/i })).toBeInTheDocument();
   });
 
-  it('shows success status when uploaded', () => {
-    render(<RequirementUploadRow {...defaultProps} isUploaded={true} />, { wrapper: createWrapper() });
+  it('shows success status when uploaded but not verified', () => {
+    render(<RequirementUploadRow {...defaultProps} isUploaded={true} documentStatus={0} />, { wrapper: createWrapper() });
     
     expect(screen.getByText('Cargado')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /subir/i })).not.toBeInTheDocument();
+  });
+
+  it('shows Verificado status and file name when verified', () => {
+    render(
+      <RequirementUploadRow 
+        {...defaultProps} 
+        isUploaded={true} 
+        documentStatus={6} 
+        fileName="mi_titulo.pdf" 
+      />, 
+      { wrapper: createWrapper() }
+    );
+    
+    expect(screen.getByText('Verificado')).toBeInTheDocument();
+    expect(screen.getByText('mi_titulo.pdf')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /subir/i })).not.toBeInTheDocument();
   });
 

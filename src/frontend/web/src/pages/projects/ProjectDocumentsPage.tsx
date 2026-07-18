@@ -45,7 +45,8 @@ const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDt
 
       <div className="space-y-3 relative z-10">
         {REQUIRED_DOCUMENTS.map((doc) => {
-          const isUploaded = documents.some(u => u.tipoDocumento === doc.category && u.activo);
+          const uploadedDoc = documents.find(u => u.tipoDocumento === doc.category && u.activo);
+          const isUploaded = !!uploadedDoc;
           
           return (
             <RequirementUploadRow
@@ -56,6 +57,8 @@ const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDt
               description={doc.description}
               categoryLabel={doc.categoryLabel}
               isUploaded={isUploaded}
+              fileName={uploadedDoc?.nombreArchivoOriginal}
+              documentStatus={uploadedDoc?.estadoDocumento}
             />
           );
         })}
