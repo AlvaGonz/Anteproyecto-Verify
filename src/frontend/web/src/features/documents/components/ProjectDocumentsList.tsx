@@ -8,7 +8,6 @@ import {
   History,
   Info,
   ExternalLink,
-  AlertCircle
 } from "lucide-react";
 
 interface ProjectDocumentsListProps {
@@ -50,7 +49,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
     return (
       <div className="vf-card flex flex-col items-center justify-center py-20 text-center animate-fade-in group hover:border-dashed">
         <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/40 mb-6 group-hover:scale-110 transition-transform">
-           <FileText className="w-10 h-10" />
+          <FileText className="w-10 h-10" />
         </div>
         <h4 className="text-xl font-display font-black text-secondary uppercase tracking-tight">Repositorio Vacío</h4>
         <p className="text-sm text-on-surface-variant font-medium mt-2 max-w-xs mx-auto">
@@ -64,27 +63,27 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <h4 className="text-sm font-black text-secondary flex items-center gap-2">
-           <History className="w-4 h-4 text-primary" />
-           EXPEDIENTES DIGITALIZADOS ({documents.length})
+          <History className="w-4 h-4 text-primary" />
+          EXPEDIENTES DIGITALIZADOS ({documents.length})
         </h4>
         <div className="flex items-center gap-4">
-           <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-success"></span>
-              <span className="text-[10px] font-bold text-on-surface-variant">ACTIVO</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-error"></span>
-              <span className="text-[10px] font-bold text-on-surface-variant">DEPRECIADO</span>
-           </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-success"></span>
+            <span className="text-[10px] font-bold text-on-surface-variant">ACTIVO</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-error"></span>
+            <span className="text-[10px] font-bold text-on-surface-variant">DEPRECIADO</span>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3">
         {documents.map((doc, idx) => (
-          <div 
-            key={doc.id} 
-            className="vf-card group !p-0 overflow-hidden border-l-4 transition-all duration-300 animate-fade-in-up" 
-            style={{ 
+          <div
+            key={doc.id}
+            className="vf-card group !p-0 overflow-hidden border-l-4 transition-all duration-300 animate-fade-in-up"
+            style={{
               animationDelay: `${idx * 100}ms`,
               borderLeftColor: doc.activo ? "var(--color-success)" : "var(--color-error)"
             }}
@@ -92,14 +91,14 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
             <div className="p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="flex items-center gap-5 flex-1 min-w-0">
                 <div className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center relative flex-shrink-0 border transition-colors ${doc.activo ? "bg-success/[0.03] border-success/10 text-success ring-4 ring-success/[0.02]" : "bg-error/[0.03] border-error/10 text-error ring-4 ring-error/[0.02]"}`}>
-                   <FileText className="w-7 h-7" />
-                   <span className="text-[8px] font-black absolute bottom-1 uppercase">v{doc.version}</span>
+                  <FileText className="w-7 h-7" />
+                  <span className="text-[8px] font-black absolute bottom-1 uppercase">v{doc.version}</span>
                 </div>
-                
+
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${doc.activo ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
-                       {DOCUMENT_TYPE_NAMES[doc.tipoDocumento] || "DESCONOCIDO"}
+                      {DOCUMENT_TYPE_NAMES[doc.tipoDocumento] || "DESCONOCIDO"}
                     </span>
                   </div>
                   <h5 className="text-sm sm:text-base font-black text-secondary truncate group-hover:text-primary transition-colors max-w-[200px] sm:max-w-none">
@@ -124,14 +123,13 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                   <Download className="w-3.5 h-3.5" />
                   Descargar
                 </button>
-                
+
                 <button type="button"
                   onClick={() => onToggleStatus(doc.id, !doc.activo)}
-                  className={`flex-1 md:flex-none h-10 px-4 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
-                    doc.activo 
-                      ? "bg-error/10 text-error hover:bg-error hover:text-white" 
+                  className={`flex-1 md:flex-none h-10 px-4 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${doc.activo
+                      ? "bg-error/10 text-error hover:bg-error hover:text-white"
                       : "bg-success/10 text-success hover:bg-success hover:text-white"
-                  }`}
+                    }`}
                 >
                   {doc.activo ? (
                     <>
@@ -145,24 +143,14 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                     </>
                   )}
                 </button>
-                
+
                 <button type="button" className="h-10 w-10 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center">
-                   <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-4 h-4" />
                 </button>
               </div>
             </div>
           </div>
         ))}
-      </div>
-      
-      <div className="p-4 rounded-2xl bg-primary/[0.03] border border-primary/10 flex items-start gap-3 mt-8">
-         <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-         <div className="min-w-0 flex-1">
-            <p className="text-xs font-black text-secondary uppercase tracking-tight">Sobre las Versiones</p>
-            <p className="text-[10px] text-on-surface-variant font-medium mt-1">
-              Antigravity Verify mantiene un historial de versiones para cada documento subido. Los documentos archivados no se eliminan, permanecen en el repositorio inmutable para auditoría RI.
-            </p>
-         </div>
       </div>
     </div>
   );
