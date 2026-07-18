@@ -184,15 +184,7 @@ export const getProjectErrorMessage = (error: ProjectError): string => {
   }
 };
 
-export interface DocumentDiagnosisDto {
-  projectId: string;
-  score: number;
-  summary: string;
-  missingDocuments: string[];
-  recommendations: string[];
-  provider: string;
-  generatedAt: string;
-}
+
 
 export interface CatastroLookupDto {
   designacionCatastral?: string;

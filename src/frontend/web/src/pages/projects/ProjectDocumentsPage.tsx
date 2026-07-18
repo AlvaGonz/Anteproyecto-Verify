@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { DocumentDto, DocumentType } from "../../features/documents/types";
-import { useDocuments, useDownloadDocument, useUpdateDocumentStatus } from "../../features/documents/api/useDocuments";
+import { useDocuments, useDownloadDocument, useUpdateDocumentStatus, useUpdateDocumentType } from "../../features/documents/api/useDocuments";
 import { ProjectDocumentsList } from "../../features/documents/components/ProjectDocumentsList";
-import { ProjectDiagnosisPanel } from "../../features/projects/components/ProjectDiagnosisPanel";
+
 import { RequirementUploadRow } from "../../features/documents/components/RequirementUploadRow";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { m } from "framer-motion";
@@ -30,7 +30,14 @@ const REQUIRED_DOCUMENTS = [
   { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
 ];
 
-const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDto[] }> = ({ projectId, documents }) => {
+const RequiredDocumentsList: React.FC<{ 
+  projectId: string; 
+  documents: DocumentDto[];
+  handleAssignDocument: (documentId: string, tipoDocumento: number) => void;
+  handleUnassignDocument: (documentId: string) => void;
+  handleChangeDocument: (newDocumentId: string, oldDocumentId: string | undefined, tipoDocumento: number) => Promise<void>;
+  isUpdatingType: boolean;
+}> = ({ projectId, documents, handleAssignDocument, handleUnassignDocument, handleChangeDocument, isUpdatingType }) => {
   return (
     <div className="vf-card p-6 bg-surface-container-low/30 overflow-hidden relative group">
       <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -48,6 +55,10 @@ const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDt
           const uploadedDoc = documents.find(u => u.tipoDocumento === doc.category && u.activo);
           const isUploaded = !!uploadedDoc;
           
+          const availableDocs = documents
+            .filter(d => d.activo && d.tipoDocumento === DocumentType.Other)
+            .map(d => ({ id: d.id, name: d.nombreArchivoOriginal }));
+
           return (
             <RequirementUploadRow
               key={doc.id}
@@ -57,8 +68,15 @@ const RequiredDocumentsList: React.FC<{ projectId: string, documents: DocumentDt
               description={doc.description}
               categoryLabel={doc.categoryLabel}
               isUploaded={isUploaded}
+              uploadedDocumentId={uploadedDoc?.id}
               fileName={uploadedDoc?.nombreArchivoOriginal}
               documentStatus={uploadedDoc?.estadoDocumento}
+              availableDocuments={availableDocs}
+              onChangeDocument={async (newId, oldId) => {
+                await handleChangeDocument(newId, oldId, doc.category);
+              }}
+              onUnassignDocument={uploadedDoc ? () => handleUnassignDocument(uploadedDoc.id) : undefined}
+              isAssigning={isUpdatingType}
             />
           );
         })}
@@ -79,6 +97,7 @@ export const ProjectDocumentsPage: React.FC = () => {
 
   const downloadMutation = useDownloadDocument(projectId);
   const statusMutation = useUpdateDocumentStatus(projectId);
+  const typeMutation = useUpdateDocumentType(projectId);
 
   const documents = rawDocuments;
 
@@ -98,6 +117,38 @@ export const ProjectDocumentsPage: React.FC = () => {
       addToast(`Estado de certificación ${isActive ? "reanudado" : "suspendido"}`, isActive ? "success" : "info");
     } catch (err: any) {
       addToast("Error al modificar el estado de validez", "error");
+    }
+  };
+
+  const handleAssignDocument = async (documentId: string, tipoDocumento: number) => {
+    try {
+      await typeMutation.mutateAsync({ documentId, tipoDocumento });
+      addToast("Documento asignado correctamente", "success");
+    } catch (err: any) {
+      addToast("Error al asignar el documento", "error");
+    }
+  };
+
+  const handleUnassignDocument = async (documentId: string) => {
+    try {
+      await typeMutation.mutateAsync({ documentId, tipoDocumento: DocumentType.Other });
+      addToast("Documento desasignado", "info");
+    } catch (err: any) {
+      addToast("Error al desasignar el documento", "error");
+    }
+  };
+
+  const handleChangeDocument = async (newDocumentId: string, oldDocumentId: string | undefined, tipoDocumento: number) => {
+    try {
+      if (oldDocumentId) {
+        await typeMutation.mutateAsync({ documentId: oldDocumentId, tipoDocumento: DocumentType.Other });
+      }
+      if (newDocumentId) {
+        await typeMutation.mutateAsync({ documentId: newDocumentId, tipoDocumento });
+      }
+      addToast(newDocumentId ? "Documento asignado correctamente" : "Documento desasignado", "success");
+    } catch (err: any) {
+      addToast("Error al cambiar el documento", "error");
     }
   };
 
@@ -190,9 +241,16 @@ export const ProjectDocumentsPage: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
         {/* Column Left: Checklist + Upload Form */}
         <div className="xl:col-span-4 flex flex-col gap-6">
-          <ProjectDiagnosisPanel projectId={projectId} />
+
           
-          <RequiredDocumentsList projectId={projectId} documents={documents} />
+          <RequiredDocumentsList 
+            projectId={projectId} 
+            documents={documents} 
+            handleAssignDocument={handleAssignDocument}
+            handleUnassignDocument={handleUnassignDocument}
+            handleChangeDocument={handleChangeDocument}
+            isUpdatingType={typeMutation.isPending}
+          />
 
 
         </div>

@@ -70,6 +70,16 @@ export const useUpdateDocumentStatus = (projectId: string) => {
   });
 };
 
+export const useUpdateDocumentType = (projectId: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useUpdateDocumentType'],
+    mutationFn: (data: { documentId: string; tipoDocumento: number }) =>
+      apiClient.patch(`/v1/projects/${projectId}/documents/${data.documentId}/type`, { tipoDocumento: data.tipoDocumento }).then(res => res.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
+  });
+};
+
 export const useDownloadDocument = (projectId: string) => {
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   return useMutation({

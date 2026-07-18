@@ -6,7 +6,6 @@ import {
   ProjectStatus, 
   IntegrityStatus,
   ProjectError,
-  DocumentDiagnosisDto,
   CatastroLookupDto,
   StatusEligibility,
 } from "../types";
@@ -93,14 +92,7 @@ export const projectsApi = {
     }
   },
 
-  async getProjectDiagnosis(id: string): Promise<Result<DocumentDiagnosisDto, ProjectError>> {
-    try {
-      const response = await apiClient.get<DocumentDiagnosisDto>(`/projects/${id}/documents/diagnosis`);
-      return success(response.data);
-    } catch (error: any) {
-      return failure(mapError(error, id));
-    }
-  },
+
 
   async lookupCatastroByGps(lat: string, lon: string): Promise<Result<CatastroLookupDto, ProjectError>> {
     try {

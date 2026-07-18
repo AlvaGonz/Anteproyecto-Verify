@@ -246,6 +246,20 @@ public class DocumentService : IDocumentService
         return MapToDto(document);
     }
 
+    public async Task<DocumentDto> UpdateDocumentTypeAsync(Guid documentId, UpdateDocumentTypeDto dto, CancellationToken cancellationToken = default)
+    {
+        var document = await _documentoRepository.GetByIdAsync(documentId, cancellationToken);
+        if (document == null)
+            throw new KeyNotFoundException($"Documento con ID {documentId} no encontrado.");
+
+        document.UpdateType(dto.TipoDocumento);
+
+        _documentoRepository.Update(document);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return MapToDto(document);
+    }
+
     public async Task<IEnumerable<RequiredDocumentDto>> GetRequiredDocumentsAsync(Guid projectId, CancellationToken cancellationToken = default)
     {
         var project = await _proyectoRepository.GetByIdAsync(projectId, cancellationToken);

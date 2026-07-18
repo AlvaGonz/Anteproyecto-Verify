@@ -77,17 +77,6 @@ export const useUpdateProjectStatus = () => {
   });
 };
 
-export const useProjectDiagnosis = () => {
-  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
-  return useMutation({
-    mutationKey: ['projectDiagnosis'],
-    mutationFn: async (id: string) => {
-      // We will just return the diagnosis result directly from api
-      const response = await apiClient.get(`/projects/${id}/documents/diagnosis`);
-      return response.data;
-    }
-  });
-};
 
 export const useDeleteProject = () => {
   const qc = useQueryClient();

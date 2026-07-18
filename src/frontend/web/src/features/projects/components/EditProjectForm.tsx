@@ -64,7 +64,15 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
   }, [rncRawDigits]);
 
   const onSubmit = (data: UpdateProjectFormValues) => {
-    updateProject(data as unknown as UpdateProyectoDto, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/p/${project.id}`) });
+    const payload: UpdateProyectoDto = {
+      ...data,
+      imagenAdicional1: project.imagenAdicional1,
+      imagenAdicional2: project.imagenAdicional2,
+      imagenAdicional3: project.imagenAdicional3,
+      imagenAdicional4: project.imagenAdicional4,
+      imagenAdicional5: project.imagenAdicional5,
+    };
+    updateProject(payload, { onSuccess: () => onSuccess ? onSuccess() : navigate(`/p/${project.id}`) });
   };
 
   return (

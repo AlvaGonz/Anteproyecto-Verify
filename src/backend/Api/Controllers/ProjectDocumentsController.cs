@@ -259,6 +259,22 @@ public class ProjectDocumentsController : ControllerBase
         }
     }
 
+    [HttpPatch("{documentId}/type")]
+    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateDocumentType(Guid projectId, Guid documentId, [FromBody] UpdateDocumentTypeDto dto)
+    {
+        try
+        {
+            var document = await _documentService.UpdateDocumentTypeAsync(documentId, dto);
+            return Ok(document);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
     [HttpGet("required-documents")]
     [ProducesResponseType(typeof(IEnumerable<RequiredDocumentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

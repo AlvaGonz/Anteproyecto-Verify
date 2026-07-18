@@ -102,6 +102,12 @@ public class Documento : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void UpdateType(DocumentType newType)
+    {
+        TipoDocumento = newType;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void UpdateFormalStatus(DocumentFormalStatus status, DateTime? fechaVencimiento, string versionReglaAplicada)
     {
         FormalStatus = status;
