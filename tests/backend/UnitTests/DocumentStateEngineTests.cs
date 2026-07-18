@@ -2,7 +2,8 @@ namespace UnitTests;
 
 using System;
 using global::Application.Services.DocumentProcessing;
-using Application.Services.DocumentProcessing.FieldValidation;
+using global::Application.Services.DocumentProcessing.FieldValidation;
+using global::Application.Abstractions.Ocr;
 using Domain.Entities;
 using Domain.Enums;
 using Moq;
@@ -113,7 +114,7 @@ public class DocumentStateEngineTests
 
         var ocrResult = new OcrResult { Success = true, RawJson = "{}" };
 
-        var ex = Assert.Throws<InvalidOperationException>(() => _engine.ApplyOcrResult(doc, ocrResult));
+        var ex = Assert.Throws<InvalidOperationException>(() => { _engine.ApplyOcrResult(doc, ocrResult); });
         Assert.Contains("Cannot apply OCR result to document in state", ex.Message);
     }
 }

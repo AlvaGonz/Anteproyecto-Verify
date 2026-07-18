@@ -265,6 +265,10 @@
 > Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
 
 ## 🐛 Resolved Bugs
+- **BUG-031:** 404 Not Found on `PATCH /api/projects/{projectId}/documents/{documentId}/type`.
+  - **Symptom:** Selecting a document in the dropdown or clicking delete triggers a PATCH request that returns `404 Not Found`.
+  - **Root Cause:** A previous agent added the `[HttpPatch("{documentId}/type")]` route to `ProjectDocumentsController.cs`, but the backend Docker container `api` was not rebuilt to compile and host the new route.
+  - **Fix:** Fixed by executing `docker compose build api` and `docker compose up -d api` to rebuild the backend API container, after which the endpoint became available and returned 401/200 properly.
 - **BUG-030:** 500 Error on Document Upload and missing validation states in UI.
   - **Symptom:** Document uploads return 500 errors and the UI does not show explicit document processing states (Procesando/Verificado/Rechazado) or the uploaded file name.
   - **Root Cause:** Backend error on upload and missing properties in UI components meant that state and filename were not passed down to the `RequirementUploadRow`.
