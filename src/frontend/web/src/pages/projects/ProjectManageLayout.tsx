@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet, NavLink, useParams, useLocation } from "react-router-dom";
 import { PenTool, FileText, ShieldCheck, ClipboardList } from "lucide-react";
 import { ProjectActionBarProvider, ProjectActionBar } from "../../features/projects/components/ProjectActionBarContext";
+import { ProjectStatusBar } from "../../features/projects/components/ProjectStatusBar";
 
 export const ProjectManageLayout: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,6 +124,13 @@ export const ProjectManageLayout: React.FC = () => {
             <ClipboardList className="w-4 h-4" />
             Reportes y Auditoría
           </NavLink>
+        </div>
+      )}
+
+      {/* Status stepper — visible across all editing sections */}
+      {isEditing && id && (
+        <div className="mb-6">
+          <ProjectStatusBar projectId={id} />
         </div>
       )}
 

@@ -6,7 +6,7 @@ import { PLAN_CAPABILITIES, normalizePlanKey } from '@/features/pricing/utils/pl
 
 interface ProjectStatusBarProps {
   projectId: string;
-  currentStatus: ProjectStatus;
+  currentStatus?: ProjectStatus;
 }
 
 export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, currentStatus }) => {
@@ -25,7 +25,7 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
   const docCount = eligibility?.documentCount || 0;
   const hasObservaciones = eligibility?.hasObservaciones || false;
   // If the backend says the status is different (e.g., auto-updated), prefer that
-  const actualStatus = eligibility?.currentStatus !== undefined ? eligibility.currentStatus : currentStatus;
+  const actualStatus = eligibility?.currentStatus !== undefined ? eligibility.currentStatus : (currentStatus ?? ProjectStatus.Draft);
 
   // Plan capability check
   const planKey = normalizePlanKey(user?.plan as string);

@@ -13,7 +13,6 @@ import { useAuth } from "../../shared/context/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../infrastructure/api/client";
 import { ProjectForm } from "../../features/projects/components/ProjectForm";
-import { ProjectStatusBar } from "../../features/projects/components/ProjectStatusBar";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useProjectActionBar } from "../../features/projects/components/ProjectActionBarContext";
 
@@ -142,9 +141,7 @@ export const ProjectManagePage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-4">
 
-      {isEditing && project && (
-        <ProjectStatusBar projectId={project.id} currentStatus={project.estadoProyecto} />
-      )}
+      {/* Status bar moved to ProjectManageLayout */}
 
       {/* Title moved to layout */}
       <ProjectForm
