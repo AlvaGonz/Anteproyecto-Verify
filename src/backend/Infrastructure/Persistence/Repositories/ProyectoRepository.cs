@@ -22,6 +22,7 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
@@ -30,6 +31,7 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .ToListAsync(cancellationToken);
     }
@@ -40,6 +42,7 @@ public class ProyectoRepository : IProyectoRepository
 
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Where(p => p.Estado.CodigoUnico != draftCode)
             .ToListAsync(cancellationToken);
@@ -56,6 +59,7 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Proyectos
             .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Where(p => 
                 p.CedulaRncPropietario == query ||

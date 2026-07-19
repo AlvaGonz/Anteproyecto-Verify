@@ -25,5 +25,6 @@ export interface ProyectoDto {
   imagenAdicional3?: string;
   imagenAdicional4?: string;
   imagenAdicional5?: string;
+  planNombre?: string | null;
   registradoPor?: ProjectRegistrant | null;
 }

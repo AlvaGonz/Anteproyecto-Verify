@@ -49,6 +49,7 @@ const getIntegrityBadge = (status: IntegrityStatus) => {
 
 interface AdminProjectListProps {
   t: any;
+  isAdmin: boolean;
   isLoading: boolean;
   filtered: any[];
   openMenuId: string | null;
@@ -59,6 +60,7 @@ interface AdminProjectListProps {
 
 export const AdminProjectList: React.FC<AdminProjectListProps> = ({
   t,
+  isAdmin,
   isLoading,
   filtered,
   openMenuId,
@@ -178,6 +180,11 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
                       <h3 className="text-base font-bold text-gray-900 truncate group-hover:text-primary transition-colors">
                         {project.nombre}
                       </h3>
+                      {isAdmin && project.planNombre && (
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#223382]/10 text-[#223382] border border-[#223382]/20 shrink-0">
+                          Plan: {project.planNombre}
+                        </span>
+                      )}
                       {getIntegrityBadge(project.estadoIntegridad)}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 font-medium">
@@ -192,6 +199,9 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
                       <span className="flex items-center gap-1.5">
                         <Timer className="w-3.5 h-3.5" />
                         Act: {toUtcDate(project.updatedAtUtc || project.createdAtUtc)?.toLocaleDateString() ?? ''}
+                        {isAdmin && project.registradoPor?.nombreCompleto && (
+                          <span className="text-gray-500">· {project.registradoPor.nombreCompleto}</span>
+                        )}
                       </span>
                     </div>
                   </div>

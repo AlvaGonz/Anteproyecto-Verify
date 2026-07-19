@@ -8,6 +8,7 @@ import { AdminProjectList } from "./AdminProjectList";
 
 interface AdminProjectsPageLayoutProps {
   t: any;
+  isAdmin: boolean;
   searchTerm: string;
   setSearchTerm: (v: string) => void;
   activeFilter: string;
@@ -27,6 +28,7 @@ interface AdminProjectsPageLayoutProps {
 
 export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = ({
   t,
+  isAdmin,
   searchTerm,
   setSearchTerm,
   activeFilter,
@@ -78,6 +80,7 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
 
       <AdminProjectList
         t={t}
+        isAdmin={isAdmin}
         isLoading={isLoading}
         filtered={filtered}
         openMenuId={openMenuId}

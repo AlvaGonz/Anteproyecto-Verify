@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import subprocess
+import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Auto-install missing database drivers (pymssql is preferred, pyodbc as fallback)
@@ -40,6 +41,9 @@ if db_lib == "pymssql":
     import pymssql
 else:
     import pyodbc
+
+TRANSIENT_ERROR_CODES = {1205, 1204, 1222, 3960, 3961, -2, 0, 11, 64, 258, 4060, 40197, 40501, 40613, 42108, 42109}
+TRANSIENT_ERROR_MSGS = ["deadlock", "timeout", "connection", "network", "transport", "refused", "reset", "broken"]
 
 # Parse .env to get connection info
 def parse_env():
@@ -211,8 +215,21 @@ def parse_dgii_file(file_path):
             
             yield (rnc, nombre, comercial, categoria, regimen, estado, actividad, admin, facturador, licencias, fecha_mod)
 
-def insert_chunk(chunk_id, chunk_records):
-    print(f"[Thread {chunk_id}] Starting optimized insertion of {len(chunk_records)} records...")
+def is_transient_error(e):
+    err_msg = str(e).lower()
+    if hasattr(e, 'args') and e.args:
+        for arg in e.args:
+            if isinstance(arg, (int, float)):
+                if arg in TRANSIENT_ERROR_CODES:
+                    return True
+    for keyword in TRANSIENT_ERROR_MSGS:
+        if keyword in err_msg:
+            return True
+    return False
+
+def insert_chunk(chunk_id, chunk_records, attempt=1):
+    max_retries = 3
+    print(f"[Chunk {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
@@ -224,7 +241,6 @@ def insert_chunk(chunk_id, chunk_records):
             "LicenciasVhm", "FechaModificacion"
         ]
         
-        # Batch size of 150 (under parameter limit: 150 * 11 = 1650 parameters)
         batch_size = 150
         count = 0
         t0 = time.time()
@@ -236,7 +252,7 @@ def insert_chunk(chunk_id, chunk_records):
         for i in range(0, len(chunk_records), batch_size):
             batch = chunk_records[i : i + batch_size]
             placeholders_str = ", ".join([row_placeholder] * len(batch))
-            sql = f"INSERT INTO DGII ({cols_str}) VALUES {placeholders_str}"
+            sql = f"INSERT INTO DGII WITH (TABLOCK) ({cols_str}) VALUES {placeholders_str}"
             
             params = []
             for r in batch:
@@ -248,16 +264,22 @@ def insert_chunk(chunk_id, chunk_records):
                 conn.commit()
                 elapsed = time.time() - t0
                 speed = count / elapsed if elapsed > 0 else 0
-                print(f"[Thread {chunk_id}] Inserted {count}/{len(chunk_records)} records. Speed: {speed:.1f} rec/sec")
+                print(f"[Chunk {chunk_id}] Inserted {count}/{len(chunk_records)} records. Speed: {speed:.1f} rec/sec")
                 
         conn.commit()
-        print(f"[Thread {chunk_id}] Completed chunk insertion successfully in {time.time() - t0:.2f} seconds!")
+        print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {len(chunk_records)} records inserted successfully!")
         return len(chunk_records)
     except Exception as e:
-        print(f"[Thread {chunk_id}] ERROR during insert: {e}")
         if conn:
             try: conn.rollback()
             except: pass
+        if attempt < max_retries and is_transient_error(e):
+            wait = 2 ** attempt
+            print(f"[Chunk {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
+            time.sleep(wait)
+            return insert_chunk(chunk_id, chunk_records, attempt + 1)
+        print(f"[Chunk {chunk_id}] PERMANENT ERROR after {attempt} attempt(s): {e}")
+        traceback.print_exc()
         raise e
     finally:
         if conn: conn.close()
@@ -304,39 +326,66 @@ def main():
     current_chunk = []
     chunk_count = 0
     futures = []
+    chunk_map = {}
     t_start = time.time()
     
-    with ThreadPoolExecutor(max_workers=12) as executor:
+    with ThreadPoolExecutor(max_workers=6) as executor:
         for record in records_generator:
             current_chunk.append(record)
             if len(current_chunk) >= chunk_size:
                 chunk_count += 1
-                futures.append(executor.submit(insert_chunk, chunk_count, current_chunk))
+                chunk_copy = list(current_chunk)
+                chunk_map[chunk_count] = {"size": len(chunk_copy), "status": "pending"}
+                futures.append(executor.submit(insert_chunk, chunk_count, chunk_copy))
                 current_chunk = []
                 
         if current_chunk:
             chunk_count += 1
-            futures.append(executor.submit(insert_chunk, chunk_count, current_chunk))
+            chunk_copy = list(current_chunk)
+            chunk_map[chunk_count] = {"size": len(chunk_copy), "status": "pending"}
+            futures.append(executor.submit(insert_chunk, chunk_count, chunk_copy))
             
-        print(f"All {chunk_count} chunks submitted to ThreadPoolExecutor. Waiting for completion...")
+        print(f"\nAll {chunk_count} chunks submitted (max_workers=6). Waiting for completion...\n")
         
         total_rows = 0
+        failed_chunks = 0
         for fut in as_completed(futures):
             try:
                 rows_inserted = fut.result()
                 total_rows += rows_inserted
+                for cid in chunk_map:
+                    if chunk_map[cid]["status"] == "pending":
+                        chunk_map[cid]["status"] = "ok"
+                        break
             except Exception as e:
-                print(f"A thread worker encountered an error: {e}")
+                failed_chunks += 1
+                for cid in chunk_map:
+                    if chunk_map[cid]["status"] == "pending":
+                        chunk_map[cid]["status"] = f"FAIL: {e}"
+                        break
                 
     t_end = time.time()
     t_total = t_end - t_start
     m, s = divmod(t_total, 60)
     
-    print("\n" + "="*50)
-    print("--- Resumen Final DGII ---")
-    print(f"Total de registros insertados: {total_rows}")
-    print(f"Tiempo Total: {int(m)} minutos {int(s)} segundos")
-    print("="*50 + "\n")
+    print("\n" + "="*55)
+    print("  RESUMEN FINAL — CARGA DGII")
+    print("="*55)
+    for cid in sorted(chunk_map):
+        info = chunk_map[cid]
+        status_sym = "OK" if info["status"] == "ok" else info["status"]
+        print(f"  Chunk {cid:2d}: {info['size']:>7,} registros — {status_sym}")
+    print("-"*55)
+    print(f"  Total insertados: {total_rows:>10,} registros")
+    if failed_chunks:
+        print(f"  Chunks fallidos:  {failed_chunks:>10}")
+    print(f"  Tiempo total:     {int(m)}m {int(s)}s")
+    speed = total_rows / t_total if t_total > 0 else 0
+    print(f"  Velocidad media:  {speed:>.0f} reg/s")
+    expected = sum(v["size"] for v in chunk_map.values())
+    if total_rows < expected:
+        print(f"  PERDIDOS:         {expected - total_rows:>10,} registros")
+    print("="*55 + "\n")
 
 if __name__ == "__main__":
     main()

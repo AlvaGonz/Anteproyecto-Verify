@@ -6,9 +6,11 @@ import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../fea
 import { Building, FileCheck, Activity } from "lucide-react";
 import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
 import { toUtcDate } from "../../shared/utils/dates";
+import { useAuth } from "../../shared/context/AuthContext";
 
 export const AdminProjectsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
 
@@ -73,6 +75,7 @@ export const AdminProjectsPage: React.FC = () => {
   return (
     <AdminProjectsPageLayout
       t={t}
+      isAdmin={user?.role === "admin" || user?.role === "owner"}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
       activeFilter={activeFilter}
