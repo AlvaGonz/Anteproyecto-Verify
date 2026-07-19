@@ -123,23 +123,11 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   // ── Estado de fotos ────────────────────────────────────────────────────────
-  const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
-
-  const initialAdditionalUrls = [
-    initialData?.imagenAdicional1,
-    initialData?.imagenAdicional2,
-    initialData?.imagenAdicional3,
-    initialData?.imagenAdicional4,
-    initialData?.imagenAdicional5
-  ].filter(Boolean) as string[];
-
-  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [fotosError, setFotosError] = useState<string | null>(null);
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
 
   const portraitInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const existingFotoUrls: string[] = [initialData?.imagenUrl, ...initialAdditionalUrls].filter(Boolean) as string[];
 
   // ── Estado de superficie ───────────────────────────────────────────────────
   const [superficieM2, setSuperficieM2] = useState<number | string>(initialData?.superficieM2 ?? "");
@@ -200,7 +188,6 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       console.log("PORTRAIT UPLOAD RESULT:", res);
       if (isSuccess(res)) {
         setImagenUrl(res.value);
-        setPortraitPreview(res.value);
       } else {
         console.error("PORTRAIT UPLOAD FAIL:", res);
         setFotosError("Error al subir la foto de portada.");
@@ -216,13 +203,15 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
   const removePortrait = () => {
     setImagenUrl("");
-    setPortraitPreview(null);
   };
 
   const handleGalleryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setFotosError(null);
     const selected = Array.from(e.target.files ?? []);
-    const remaining = 5 - galleryPreviews.length;
+    
+    const currentUrls = [imagenAdicional1, imagenAdicional2, imagenAdicional3, imagenAdicional4, imagenAdicional5];
+    const currentCount = currentUrls.filter(Boolean).length;
+    const remaining = 5 - currentCount;
 
     if (selected.length > remaining) {
       setFotosError(`Solo puedes agregar ${remaining} foto${remaining !== 1 ? "s" : ""} más.`);
@@ -257,21 +246,19 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         setFotosError("Algunas fotos no se pudieron subir.");
       }
 
-      const currentUrls = [imagenAdicional1, imagenAdicional2, imagenAdicional3, imagenAdicional4, imagenAdicional5];
+      const updated = [...currentUrls];
       let uploadedIdx = 0;
       for (let i = 0; i < 5; i++) {
-        if (!currentUrls[i] && uploadedIdx < uploadedUrls.length) {
-          currentUrls[i] = uploadedUrls[uploadedIdx++];
+        if (!updated[i] && uploadedIdx < uploadedUrls.length) {
+          updated[i] = uploadedUrls[uploadedIdx++];
         }
       }
 
-      setImagenAdicional1(currentUrls[0] || "");
-      setImagenAdicional2(currentUrls[1] || "");
-      setImagenAdicional3(currentUrls[2] || "");
-      setImagenAdicional4(currentUrls[3] || "");
-      setImagenAdicional5(currentUrls[4] || "");
-
-      setGalleryPreviews(currentUrls.filter(Boolean) as string[]);
+      setImagenAdicional1(updated[0]);
+      setImagenAdicional2(updated[1]);
+      setImagenAdicional3(updated[2]);
+      setImagenAdicional4(updated[3]);
+      setImagenAdicional5(updated[4]);
     } catch (err) {
       setFotosError("Error al subir las fotos.");
     } finally {
@@ -281,25 +268,21 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   };
 
   const removeGalleryPhoto = (idx: number) => {
-    const updatedPreviews = galleryPreviews.filter((_, i) => i !== idx);
-    const padded = [...updatedPreviews, "", "", "", "", ""].slice(0, 5);
+    const currentUrls = [imagenAdicional1, imagenAdicional2, imagenAdicional3, imagenAdicional4, imagenAdicional5].filter(Boolean);
+    const updatedUrls = currentUrls.filter((_, i) => i !== idx);
+    const padded = [...updatedUrls, "", "", "", "", ""].slice(0, 5);
 
     setImagenAdicional1(padded[0]);
     setImagenAdicional2(padded[1]);
     setImagenAdicional3(padded[2]);
     setImagenAdicional4(padded[3]);
     setImagenAdicional5(padded[4]);
-
-    setGalleryPreviews(updatedPreviews);
   };
 
   // Limpiar object URLs al desmontar
   useEffect(() => {
     return () => {
-      if (portraitPreview) URL.revokeObjectURL(portraitPreview);
-      galleryPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps, react-doctor/exhaustive-deps
   }, []);
 
   // ── Validation State ──────────────────────────────────────────────────────
@@ -631,9 +614,10 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       superficieM2, setSuperficieM2,
     } as const,
     documentSection: {
-      portraitPreview, handlePortraitChange, removePortrait, portraitInputRef,
-      existingFotoUrls,
-      galleryPreviews, handleGalleryChange, removeGalleryPhoto,
+      portraitUrl: imagenUrl,
+      handlePortraitChange, removePortrait, portraitInputRef,
+      galleryUrls: [imagenAdicional1, imagenAdicional2, imagenAdicional3, imagenAdicional4, imagenAdicional5].filter(Boolean),
+      handleGalleryChange, removeGalleryPhoto,
       galleryInputRef, fotosError,
     } as const,
   };

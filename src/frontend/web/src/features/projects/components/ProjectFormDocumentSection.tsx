@@ -2,12 +2,11 @@ import React from "react";
 import { ImagePlus, X } from "lucide-react";
 
 interface ProjectFormDocumentSectionProps {
-  portraitPreview: string | null;
+  portraitUrl: string;
   handlePortraitChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removePortrait: () => void;
   portraitInputRef: React.RefObject<HTMLInputElement | null>;
-  existingFotoUrls: string[];
-  galleryPreviews: string[];
+  galleryUrls: string[];
   handleGalleryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removeGalleryPhoto: (idx: number) => void;
   galleryInputRef: React.RefObject<HTMLInputElement | null>;
@@ -15,12 +14,11 @@ interface ProjectFormDocumentSectionProps {
 }
 
 export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProps> = ({
-  portraitPreview,
+  portraitUrl,
   handlePortraitChange,
   removePortrait,
   portraitInputRef,
-  existingFotoUrls,
-  galleryPreviews,
+  galleryUrls,
   handleGalleryChange,
   removeGalleryPhoto,
   galleryInputRef,
@@ -47,12 +45,12 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
         </div>
 
         {/* Slot portada */}
-        {portraitPreview ? (
+        {portraitUrl ? (
           <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md group">
             <img
-              src={portraitPreview}
+              src={portraitUrl}
               alt="Vista previa de portada"
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
             <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
@@ -62,27 +60,15 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
               type="button"
               onClick={removePortrait}
               aria-label="Quitar foto de portada"
-              className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-md"
             >
               <X className="w-3 h-3 text-white" />
             </button>
-          </div>
-        ) : existingFotoUrls[0] ? (
-          <div className="relative w-full max-w-[140px] aspect-square rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md group">
-            <img
-              src={existingFotoUrls[0]}
-              alt="Portada actual"
-              className="w-full h-full object-cover object-center"
-              loading="lazy"
-            />
-            <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
-              PORTADA
-            </div>
             <button
               type="button"
               onClick={() => portraitInputRef.current?.click()}
               aria-label="Cambiar foto de portada"
-              className="absolute top-2 right-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold rounded-lg hover:bg-black/80 transition-colors opacity-0 group-hover:opacity-100 whitespace-nowrap"
+              className="absolute top-2 left-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold rounded-lg hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100 whitespace-nowrap shadow-md"
             >
               Cambiar
             </button>
@@ -122,27 +108,20 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
             <span className="text-xs text-[var(--color-text-secondary)]">· hasta 5 fotos</span>
           </div>
           <span className="text-xs font-medium text-[var(--color-text-secondary)]">
-            {Math.max(galleryPreviews.length, existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0)}/5
+            {galleryUrls.length}/5
           </span>
         </div>
 
         <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-          {/* Fotos de galería existentes (edit mode) */}
-          {existingFotoUrls.slice(1).map((url, idx) => (
-            <div key={`existing-${url}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
-              <img src={url} alt={`Foto adicional ${idx + 1}`} className="w-full h-full object-cover object-center" loading="lazy" />
-            </div>
-          ))}
-
-          {/* Previews de galería nuevas */}
-          {galleryPreviews.map((preview, idx) => (
-            <div key={`preview-${preview}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
-              <img src={preview} alt={`Nueva foto ${idx + 1}`} className="w-full h-full object-cover object-center" loading="lazy" />
+          {/* Fotos de galería */}
+          {galleryUrls.map((url, idx) => (
+            <div key={`gallery-${url}-${idx}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm group">
+              <img src={url} alt={`Foto adicional ${idx + 1}`} className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105" loading="lazy" />
               <button
                 type="button"
                 onClick={() => removeGalleryPhoto(idx)}
                 aria-label={`Quitar foto ${idx + 1}`}
-                className="absolute top-1 right-1 w-5 h-5 bg-black/50 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors"
+                className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-md"
               >
                 <X className="w-3 h-3 text-white" />
               </button>
@@ -150,7 +129,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
           ))}
 
           {/* Botón agregar galería */}
-          {Math.max(galleryPreviews.length, existingFotoUrls.length > 1 ? existingFotoUrls.length - 1 : 0) < 5 && (
+          {galleryUrls.length < 5 && (
             <button
               type="button"
               onClick={() => galleryInputRef.current?.click()}

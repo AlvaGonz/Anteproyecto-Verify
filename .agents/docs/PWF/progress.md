@@ -425,3 +425,7 @@
   - **Fix:** Removed the explicit `headers` overrides in API hooks, and modified the request interceptor in `client.ts` to `delete config.headers['Content-Type']` whenever `config.data instanceof FormData`. This allows the browser to correctly set the `multipart/form-data; boundary=...` header natively.
 -   [ x ]   U p d a t e d   G e s t i ó n   d e   A c t i v o   a u t h o r i z a t i o n   l o g i c   a n d   M e   i n t e r e s a   b u t t o n   b e h a v i o r  
  
+- **BUG-032:** Cannot edit existing gallery photos in ProjectForm.
+  - **Symptom:** The user was unable to remove or replace the gallery photos that were already attached to the project. Furthermore, uploading new photos caused existing photos to duplicate in the UI preview.
+  - **Root Cause:** The existingFotoUrls state (static from initialData) and the galleryPreviews state (new uploads) were being mapped independently and combined improperly, leading to duplicate renders and lack of an 'X' button for existing ones.
+  - **Fix:** Consolidated the image list into a single derived galleryUrls based on imagenAdicional1..5 states in useProjectForm.ts. Updated ProjectFormDocumentSection.tsx to apply modern ui-ux-pro-max styling and allow removing any image in the grid.
