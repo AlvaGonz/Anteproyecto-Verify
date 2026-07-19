@@ -52,7 +52,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
             <img
               src={portraitPreview}
               alt="Vista previa de portada"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
             <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
@@ -72,7 +72,7 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
             <img
               src={existingFotoUrls[0]}
               alt="Portada actual"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
               loading="lazy"
             />
             <div className="absolute bottom-0 inset-x-0 bg-amber-500 text-white text-xs font-bold uppercase tracking-wide text-center py-1.5 leading-none">
@@ -130,14 +130,14 @@ export const ProjectFormDocumentSection: React.FC<ProjectFormDocumentSectionProp
           {/* Fotos de galería existentes (edit mode) */}
           {existingFotoUrls.slice(1).map((url, idx) => (
             <div key={`existing-${url}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
-              <img src={url} alt={`Foto adicional ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
+              <img src={url} alt={`Foto adicional ${idx + 1}`} className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
           ))}
 
           {/* Previews de galería nuevas */}
           {galleryPreviews.map((preview, idx) => (
             <div key={`preview-${preview}`} className="relative w-full aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]/30 shadow-sm">
-              <img src={preview} alt={`Nueva foto ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
+              <img src={preview} alt={`Nueva foto ${idx + 1}`} className="w-full h-full object-cover object-center" loading="lazy" />
               <button
                 type="button"
                 onClick={() => removeGalleryPhoto(idx)}

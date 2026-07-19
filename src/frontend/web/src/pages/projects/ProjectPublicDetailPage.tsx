@@ -150,7 +150,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     EXPEDIENTE INSTITUCIONAL #{project.codigoInterno}
                   </span>
                 </div>
-                <h1 className="text-2xl md:text-7xl xl:text-8xl font-display font-black text-secondary leading-[0.85] tracking-[-0.05em] uppercase italic break-words">
+                <h1 className="text-5xl md:text-5xl xl:text-8xl font-display font-black text-secondary leading-[0.85] tracking-[-0.05em] uppercase italic break-words">
                   {project.nombre}
                 </h1>
                 <div className="flex flex-wrap items-center gap-6 xl:gap-8 pt-4">
@@ -183,21 +183,21 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="space-y-4 md:space-y-6"
+                className="space-y-3 md:space-y-4"
               >
-                {/* Main Display — Premium rounded, hover zoom */}
-                <div className="aspect-video rounded-[2rem] md:rounded-[2.5rem] overflow-hidden relative shadow-[0_20px_60px_-15px_rgba(34,51,130,0.15)] group bg-secondary/5">
+                {/* Main Display — 16/9 container, contain preserves full image */}
+                <div className="relative overflow-hidden rounded-[1.5rem] md:rounded-[2rem] bg-surface-container-lowest shadow-sm aspect-video">
                   <img
                     src={uniqueImgs[selectedImageIndex]}
-                    alt={`${project.nombre} foto principal`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    alt={`${project.nombre} foto ${selectedImageIndex + 1}`}
+                    className="w-full h-full object-contain object-center transition-opacity duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
                 </div>
 
-                {/* Thumbnail Strip — Glassmorphism & Active states */}
+                {/* Thumbnail Strip */}
                 {uniqueImgs.length > 1 && (
-                  <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide px-1">
+                  <div className="flex gap-2 md:gap-3 overflow-x-auto pb-1">
                     {uniqueImgs.map((url, i) => {
                       const isActive = i === selectedImageIndex;
                       return (
@@ -205,21 +205,17 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           key={i}
                           type="button"
                           onClick={() => setSelectedImageIndex(i)}
-                          className={`relative shrink-0 w-20 md:w-24 aspect-[4/3] rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary group ${
-                            isActive
-                              ? 'ring-2 ring-primary ring-offset-4 ring-offset-background scale-105 shadow-xl'
-                              : 'opacity-50 hover:opacity-100 hover:scale-[1.02] hover:shadow-md'
-                          }`}
-                          aria-label={`${project.nombre} miniatura ${i + 1}`}
+                          className={`relative shrink-0 w-[72px] md:w-20 aspect-square rounded-xl md:rounded-2xl overflow-hidden transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${isActive
+                            ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-105'
+                            : 'opacity-60 hover:opacity-100 hover:scale-105'
+                            }`}
+                          aria-label={`${project.nombre} foto ${i + 1}`}
                         >
                           <img
                             src={url}
                             alt=""
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover object-center"
                           />
-                          {!isActive && (
-                            <div className="absolute inset-0 bg-secondary/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                          )}
                         </button>
                       );
                     })}
@@ -229,7 +225,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
             )}
 
             {/* Asset Details Grid */}
-            <section className="bg-surface-container-lowest p-8 md:p-12 rounded-[3.5rem] border border-surface-container-high/50 relative overflow-hidden shadow-sm">
+            <section className="bg-surface-container-lowest p-2 md:p-12 rounded-[3.5rem] border border-surface-container-high/50 relative overflow-hidden shadow-sm">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/[0.02] rounded-full blur-3xl -mr-32 -mt-32"></div>
               <div className="flex items-center gap-4 mb-10 md:mb-12">
                 <div className="w-12 h-12 rounded-[1.25rem] bg-secondary flex items-center justify-center text-white shadow-lg">
@@ -329,9 +325,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <h3 className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-white/40 mb-2">Desarrollador / Representante</h3>
                     <div className="font-display">
-                      <span className="text-3xl sm:text-4xl md:text-5xl font-black leading-none tracking-tighter italic block break-words">
+                      <span className="text-3xl sm:text-2xl md:text-2xl font-black leading-none tracking-tighter italic block break-words">
                         {project.registradoPor.nombreCompleto}
                       </span>
                       {project.registradoPor.razonSocial && (
@@ -377,8 +372,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
                       type="button"
                       onClick={() => setIsInterested(prev => !prev)}
                       className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-4 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
-                          ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
-                          : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
+                        ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
+                        : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
                         }`}
                     >
                       {!isInterested && (
