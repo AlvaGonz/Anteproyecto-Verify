@@ -117,7 +117,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
                 <span className="text-[10px] font-black uppercase tracking-widest">{info.norm}</span>
               </div>
             </div>
-            
+
             {/* Show related file name if doc exists */}
             {doc && (
               <div className="mt-3 flex items-center gap-2 px-3 py-1.5 bg-secondary/5 border border-secondary/10 rounded-xl w-fit group-hover:bg-secondary/10 transition-colors">
@@ -151,7 +151,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               EN PROCESO
             </div>
           )}
-          
+
           {(isVerificado || isPending || isObservado) && doc?.id && (
             <button
               onClick={() => downloadDoc(doc.id)}
@@ -237,7 +237,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
           <Lock className="w-3 h-3" /> Reporte de integridad encriptado con protocolo SHA-512
         </div>
         <p className="text-[10px] font-black uppercase tracking-widest text-secondary/20 max-w-lg text-center leading-relaxed">
-          Antigravity / VeriFinca Institutional Audit System - Ref: {projectId.split("-")[0].toUpperCase()}
+          Ref: {projectId.split("-")[0].toUpperCase()}
         </p>
       </div>
     </section>

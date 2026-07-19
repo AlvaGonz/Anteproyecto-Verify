@@ -26,7 +26,7 @@ import {
   Phone,
   Info,
   User,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import { m } from "framer-motion";
 
@@ -225,52 +225,48 @@ export const ProjectPublicDetailPage: React.FC = () => {
             )}
 
             {/* Asset Details Grid */}
-            <section className="bg-surface-container-lowest p-2 md:p-12 rounded-[3.5rem] border border-surface-container-high/50 relative overflow-hidden shadow-sm">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/[0.02] rounded-full blur-3xl -mr-32 -mt-32"></div>
-              <div className="flex items-center gap-4 mb-10 md:mb-12">
-                <div className="w-12 h-12 rounded-[1.25rem] bg-secondary flex items-center justify-center text-white shadow-lg">
-                  <Info className="w-5 h-5" />
+            <section className="bg-surface-container-lowest p-2 md:p-5 rounded-[3.5rem] border border-surface-container-high/50 relative overflow-hidden shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-[1.25rem] bg-secondary flex items-center justify-center text-white shadow-lg">
+                  <Info className="w-4 h-4" />
                 </div>
-                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-secondary/40">Especificaciones Técnicas</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/40">Especificaciones Técnicas</h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 md:gap-y-12">
-                <div className="space-y-2 group">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-8">
+                <div className="space-y-1 group">
                   <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
                     <Landmark className="w-3.5 h-3.5" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#223382]">Entidad Desarrolladora</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Entidad Desarrolladora</span>
                   </div>
-                  <p className="text-xl md:text-2xl font-black text-secondary leading-none tracking-tight font-display italic">
+                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic">
                     {project.datosDesarrollador || "CORPORACIÓN NO ESPECIFICADA"}
                   </p>
                 </div>
-
-                <div className="space-y-2 group">
+                <div className="space-y-1 group">
                   <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
                     <Calendar className="w-3.5 h-3.5" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#223382]">Cronología de Registro</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Cronología de Registro</span>
                   </div>
-                  <p className="text-xl md:text-2xl font-black text-secondary leading-none tracking-tight font-display italic">
+                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic">
                     {toUtcDate(project.createdAtUtc)?.toLocaleDateString("es-ES", { year: "numeric", month: "long" }).toUpperCase() ?? ''}
                   </p>
                 </div>
-
-                <div className="space-y-2 group">
+                <div className="space-y-1 group">
                   <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
                     <Layers className="w-3.5 h-3.5" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#223382]">Clasificación de Activo</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Clasificación de Activo</span>
                   </div>
-                  <p className="text-xl md:text-2xl font-black text-secondary leading-none tracking-tight font-display italic">
+                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic">
                     {getCategoryLabel(project.categoria).toUpperCase()}
                   </p>
                 </div>
-
-                <div className="space-y-2 group">
+                <div className="space-y-1 group">
                   <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
                     <ExternalLink className="w-3.5 h-3.5" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#223382]">Valor Registral Estimado</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Valor Registral Estimado</span>
                   </div>
-                  <p className="text-xl md:text-2xl font-black text-primary leading-none tracking-tight font-display italic">
+                  <p className="text-lg md:text-xl font-black text-primary leading-none tracking-tight font-display italic">
                     {project.valorEstimado ? `RD$ ${(project.valorEstimado).toLocaleString()}` : "SUJETO A TASACIÓN"}
                   </p>
                 </div>
@@ -289,106 +285,107 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
           {/* Right Column: Registrant, Integrity, Historial */}
           <div className="xl:col-span-4 flex flex-col gap-8 xl:gap-10">
-            {/* Registrant Data Card */}
+            {/* Registrant Data Card — toggleable */}
             {project.registradoPor && (
               <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, type: "spring", damping: 20 }}
-                className="bg-secondary text-white p-8 md:p-10 rounded-[3rem] md:rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(34,51,130,0.35)] relative overflow-hidden border border-white/5"
+                className="bg-secondary text-white p-6 md:p-8 rounded-[3rem] md:rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(34,51,130,0.35)] relative overflow-hidden border border-white/5"
               >
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none"></div>
-                <div className="relative z-10 space-y-10">
-                  <div className="flex items-center justify-between">
-                    {project.registradoPor.avatarUrl ? (
-                      <img
-                        src={project.registradoPor.avatarUrl}
-                        alt={`Avatar de ${project.registradoPor.nombreCompleto}`}
-                        className="w-16 h-16 rounded-[1.25rem] object-cover border border-white/20"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-[1.25rem] flex items-center justify-center text-white/70 bg-white/10 border border-white/20">
-                        <User className="w-8 h-8" />
-                      </div>
-                    )}
-                    <div className="flex flex-col items-end">
-                      <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-40 text-right">Responsable Registral</span>
-                      <div className="flex gap-1 mt-1">
-                        {project.registradoPor.verificado && (
-                          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">
-                            <ShieldCheck className="w-3 h-3" />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Verificado</span>
-                          </div>
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+                <div className="relative z-10 space-y-6 md:space-y-8">
+
+                  {/* Registrant header */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {project.registradoPor.avatarUrl ? (
+                        <img
+                          src={project.registradoPor.avatarUrl}
+                          alt={`Avatar de ${project.registradoPor.nombreCompleto}`}
+                          className="w-14 h-14 rounded-[1.25rem] object-cover border border-white/20 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-[1.25rem] flex items-center justify-center text-white/70 bg-white/10 border border-white/20 shrink-0">
+                          <User className="w-7 h-7" />
+                        </div>
+                      )}
+                      <div className="font-display min-w-0">
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50 block mb-0.5">Responsable Registral</span>
+                        <span className="text-xl md:text-2xl font-black leading-tight tracking-tighter italic block break-words">
+                          {project.registradoPor.nombreCompleto}
+                        </span>
+                        {project.registradoPor.razonSocial && (
+                          <span className="text-xs font-medium text-primary mt-1 block break-words">
+                            {project.registradoPor.razonSocial}
+                          </span>
                         )}
                       </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <div className="font-display">
-                      <span className="text-3xl sm:text-2xl md:text-2xl font-black leading-none tracking-tighter italic block break-words">
-                        {project.registradoPor.nombreCompleto}
-                      </span>
-                      {project.registradoPor.razonSocial && (
-                        <span className="text-xs md:text-sm font-medium text-primary mt-2 block break-words">
-                          {project.registradoPor.razonSocial}
-                        </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {project.registradoPor.verificado && (
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">
+                          <ShieldCheck className="w-3 h-3" />
+                          <span className="text-[9px] font-black uppercase tracking-widest">Verificado</span>
+                        </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="p-5 md:p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
-                    {project.registradoPor.email && (
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                          <Mail className="w-4 h-4 text-primary" />
+                  {/* Registrant details */}
+                  <div className="space-y-6 md:space-y-8">
+                        <div className="p-4 md:p-5 rounded-3xl bg-white/5 border border-white/10 space-y-3">
+                          {project.registradoPor.email && (
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                                <Mail className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Correo Electrónico</span>
+                                <a href={`mailto:${project.registradoPor.email}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
+                                  {project.registradoPor.email}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          {project.registradoPor.telefono && (
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                                <Phone className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Teléfono Directo</span>
+                                <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
+                                  {project.registradoPor.telefono}
+                                </a>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <div className="min-w-0">
-                          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Correo Electrónico</span>
-                          <a href={`mailto:${project.registradoPor.email}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
-                            {project.registradoPor.email}
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                    {project.registradoPor.telefono && (
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                          <Phone className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Teléfono Directo</span>
-                          <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
-                            {project.registradoPor.telefono}
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Me Interesa Button */}
-                  <div className="pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsInterested(prev => !prev)}
-                      className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-4 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
-                        ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
-                        : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
-                        }`}
-                    >
-                      {!isInterested && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                      )}
-                      <span className="relative z-10 text-center leading-tight">
-                        {isInterested ? "El proyecto se ha guardado en tus registros" : "Me interesa el proyecto"}
-                      </span>
-                      {isInterested ? (
-                        <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />
-                      ) : (
-                        <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
-                      )}
-                    </button>
-                  </div>
+                        {/* Me Interesa Button */}
+                        <button
+                          type="button"
+                          onClick={() => setIsInterested(prev => !prev)}
+                          className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
+                            ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
+                            : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
+                            }`}
+                        >
+                          {!isInterested && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                          )}
+                          <span className="relative z-10 text-center leading-tight">
+                            {isInterested ? "El proyecto se ha guardado en tus registros" : "Me interesa el proyecto"}
+                          </span>
+                          {isInterested ? (
+                            <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />
+                          ) : (
+                            <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
+                          )}
+                        </button>
+                    </div>
+
                 </div>
               </m.div>
             )}
