@@ -11,6 +11,9 @@ public record UpdateProfileCommand(
     string? RazonSocial,
     string? NombreComercial,
     string? ActividadEconomica,
+    string? Direccion,
+    string? Provincia,
+    string? Nickname,
     string? CurrentPassword,
     string? NewPassword
 );

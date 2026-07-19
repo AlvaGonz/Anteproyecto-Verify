@@ -22,6 +22,9 @@ public class Usuario : EntityBase
     public string? RazonSocial { get; private set; }
     public string? NombreComercial { get; private set; }
     public string? ActividadEconomica { get; private set; }
+    public string? Direccion { get; private set; }
+    public string? Provincia { get; private set; }
+    public string? Nickname { get; private set; }
     public string Identificacion => Cedula;
     public UserRole Rol { get; private set; }
     public bool Activo { get; private set; }
@@ -147,6 +150,14 @@ public class Usuario : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
     
+    public void UpdateProfileExtension(string? direccion, string? provincia, string? nickname)
+    {
+        Direccion = direccion;
+        Provincia = provincia;
+        Nickname = nickname;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void UpdateRnc(string? rnc, string? razonSocial = null, string? nombreComercial = null, string? actividadEconomica = null)
     {
         Rnc = rnc;

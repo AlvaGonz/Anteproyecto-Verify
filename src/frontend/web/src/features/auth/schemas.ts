@@ -76,6 +76,16 @@ export const registerSchema = z.object({
 });
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
+const PROVINCIAS_RD = [
+  'Azua','Baoruco','Barahona','Dajabón','Duarte',
+  'El Seibo','Elías Piña','Espaillat','Hato Mayor','Hermanas Mirabal',
+  'Independencia','La Altagracia','La Romana','La Vega','María Trinidad Sánchez',
+  'Monseñor Nouel','Monte Cristi','Monte Plata','Pedernales',
+  'Peravia','Puerto Plata','Samaná','San Cristóbal','San José de Ocoa',
+  'San Juan','San Pedro de Macorís','Sánchez Ramírez','Santiago',
+  'Santiago Rodríguez','Santo Domingo','Valverde'
+] as const;
+
 export const UpdateProfileSchema = z.object({
   nombre: z
     .string()
@@ -100,6 +110,16 @@ export const UpdateProfileSchema = z.object({
   razonSocial: z.string().optional(),
   nombreComercial: z.string().optional(),
   actividadEconomica: z.string().optional(),
+  direccion: z
+    .string()
+    .min(1, "La dirección es requerida")
+    .max(200, "Máximo 200 caracteres"),
+  provincia: z
+    .enum(PROVINCIAS_RD, { message: "Seleccione una provincia válida" }),
+  nickname: z
+    .string()
+    .min(3, "Mínimo 3 caracteres")
+    .max(30, "Máximo 30 caracteres"),
   changePassword: z.boolean(),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),

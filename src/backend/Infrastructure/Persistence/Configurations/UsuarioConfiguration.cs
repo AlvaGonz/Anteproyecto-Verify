@@ -49,6 +49,12 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .HasForeignKey(u => u.PlanSuscripcionId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        // Profile extension fields
+        builder.Property(u => u.Direccion).HasMaxLength(200).IsRequired(false);
+        builder.Property(u => u.Provincia).HasMaxLength(50).IsRequired(false);
+        builder.Property(u => u.Nickname).HasMaxLength(30).IsRequired(false);
+        builder.HasIndex(u => u.Nickname).IsUnique().HasDatabaseName("UQ_Usuario_Nickname").HasFilter("[Nickname] IS NOT NULL");
+
         // Team properties
         builder.Property(u => u.TitularId).IsRequired(false);
 

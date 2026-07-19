@@ -49,7 +49,7 @@ public class DocumentStateEngine : IDocumentStateEngine
                 NormalizedFields = normalizedFields
             }, options);
 
-            var newStatus = validationResult.EstadoResultante == "Verificado" ? DocumentStatus.Verificado : DocumentStatus.Observado;
+            var newStatus = validationResult.EstadoResultante == "Verificado" ? DocumentStatus.EnRevision : DocumentStatus.EnRevision; // Always go to EnRevision for HITL
 
             document.SetOcrResult(enrichedJson, newStatus);
         }

@@ -14,6 +14,9 @@ export interface User {
   razonSocial?: string;
   nombreComercial?: string;
   actividadEconomica?: string;
+  direccion?: string;
+  provincia?: string;
+  nickname?: string;
   plan?: string;
   avatarUrl?: string;
   stripeCustomerId?: string | null;

@@ -73,6 +73,12 @@ public class UsuarioRepository : IUsuarioRepository
             .FirstOrDefaultAsync(u => u.PasswordResetToken == token, cancellationToken);
     }
 
+    public async Task<Usuario?> GetByNicknameAsync(string nickname, CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .FirstOrDefaultAsync(u => u.Nickname != null && u.Nickname.ToLower() == nickname.ToLower(), cancellationToken);
+    }
+
     public async Task<List<Usuario>> GetPendingPurgeAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;

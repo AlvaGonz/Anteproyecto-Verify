@@ -45,26 +45,26 @@ public class DocumentoTests
         var doc = CreateTestDocument();
         var json = "{\"key\":\"value\"}";
 
-        doc.SetOcrResult(json, DocumentStatus.PreVerificado);
+        doc.SetOcrResult(json, DocumentStatus.EnRevision);
 
         Assert.Equal(json, doc.ResultadoOcrJson);
-        Assert.Equal(DocumentStatus.PreVerificado, doc.EstadoDocumento);
+        Assert.Equal(DocumentStatus.EnRevision, doc.EstadoDocumento);
     }
 
     [Fact]
-    public void Documento_SetOcrResult_EmptyJson_ThrowsArgumentException()
+    public void SetOcrResult_ShouldThrowArgumentException_WhenJsonIsEmpty()
     {
         var doc = CreateTestDocument();
 
-        Assert.Throws<ArgumentException>(() => doc.SetOcrResult("", DocumentStatus.PreVerificado));
+        Assert.Throws<ArgumentException>(() => doc.SetOcrResult("", DocumentStatus.EnRevision));
     }
 
     [Fact]
-    public void Documento_SetOcrResult_Rejects_Invalid_Transition()
+    public void SetOcrResult_ShouldThrowInvalidOperationException_WhenStatusIsNotProcessingOrUploaded()
     {
         var doc = CreateTestDocument();
         doc.UpdateStatus(DocumentStatus.Valid);
 
-        Assert.Throws<InvalidOperationException>(() => doc.SetOcrResult("{}", DocumentStatus.PreVerificado));
+        Assert.Throws<InvalidOperationException>(() => doc.SetOcrResult("{}", DocumentStatus.EnRevision));
     }
 }

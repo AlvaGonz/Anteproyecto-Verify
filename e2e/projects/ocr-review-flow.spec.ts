@@ -77,7 +77,7 @@ test.describe('OCR Review Flow', () => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({}) });
     });
 
-    await page.locator('div').filter({ hasText: /Matricula/i }).getByRole('button', { name: 'Confirmar' }).click();
+    await page.locator('div.p-4.rounded-2xl').filter({ hasText: /Matricula/i }).getByRole('button', { name: 'Confirmar' }).click();
     await expect(async () => { expect(patchCalled).toBe(true); }).toPass();
 
     // Test Edit/Correct action
@@ -90,7 +90,7 @@ test.describe('OCR Review Flow', () => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({}) });
     });
 
-    await page.locator('div').filter({ hasText: /Propietario/i }).getByRole('button', { name: 'Corregir' }).click();
+    await page.locator('div.p-4.rounded-2xl').filter({ hasText: /Propietario/i }).getByRole('button', { name: 'Corregir' }).click();
     // Use the generic textbox that appears
     await page.getByRole('textbox').fill('Juan Perez Gomez');
     await page.getByRole('button', { name: 'Guardar corrección' }).click();
@@ -105,7 +105,7 @@ test.describe('OCR Review Flow', () => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({}) });
     });
 
-    await page.locator('div').filter({ hasText: /Designacion/i }).getByRole('button', { name: 'Ausente' }).click();
+    await page.locator('div.p-4.rounded-2xl').filter({ hasText: /Designacion/i }).getByRole('button', { name: 'Ausente' }).click();
     await expect(async () => { expect(absentPatchCalled).toBe(true); }).toPass();
   });
 });

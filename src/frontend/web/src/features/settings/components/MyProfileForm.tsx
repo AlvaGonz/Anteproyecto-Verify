@@ -6,9 +6,19 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase } from "lucide-react";
+import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase, MapPin, Globe, AtSign, BadgeCheck } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
 import { useDgiiLookup, DgiiData } from "../../../shared/hooks/useDgiiLookup";
+
+const PROVINCIAS_RD = [
+  'Azua','Baoruco','Barahona','Dajabón','Duarte',
+  'El Seibo','Elías Piña','Espaillat','Hato Mayor','Hermanas Mirabal',
+  'Independencia','La Altagracia','La Romana','La Vega','María Trinidad Sánchez',
+  'Monseñor Nouel','Monte Cristi','Monte Plata','Pedernales',
+  'Peravia','Puerto Plata','Samaná','San Cristóbal','San José de Ocoa',
+  'San Juan','San Pedro de Macorís','Sánchez Ramírez','Santiago',
+  'Santiago Rodríguez','Santo Domingo','Valverde'
+] as const;
 
 const ROLE_LABEL: Record<string, string> = {
   admin: "Administrador",
@@ -39,6 +49,9 @@ export const MyProfileForm: React.FC = () => {
       apellido: user?.apellido ?? "",
       telefono: user?.telefono ?? "",
       rnc: user?.rnc ?? "",
+      direccion: user?.direccion ?? "",
+      provincia: user?.provincia ?? "" as any,
+      nickname: user?.nickname ?? "",
       changePassword: false,
     },
   });
@@ -94,6 +107,9 @@ export const MyProfileForm: React.FC = () => {
         nombre: user.nombre ?? "",
         apellido: user.apellido ?? "",
         telefono: user.telefono ?? "",
+        direccion: user.direccion ?? "",
+        provincia: user.provincia ?? "" as any,
+        nickname: user.nickname ?? "",
         changePassword: false,
       });
     }
@@ -123,6 +139,9 @@ export const MyProfileForm: React.FC = () => {
         razonSocial: isRncEmpty ? "" : (previewDgii?.nombreRazonSocial || user?.razonSocial || ""),
         nombreComercial: isRncEmpty ? "" : (previewDgii?.nombreComercial || user?.nombreComercial || ""),
         actividadEconomica: isRncEmpty ? "" : (previewDgii?.actividadEconomica || user?.actividadEconomica || ""),
+        direccion: data.direccion,
+        provincia: data.provincia,
+        nickname: data.nickname,
         ...(data.changePassword && {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword,
@@ -290,6 +309,74 @@ export const MyProfileForm: React.FC = () => {
               )}
             </div>
 
+            {/* Direccion Field */}
+            <div>
+              <label htmlFor="mp-direccion" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                Dirección
+              </label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                <input
+                  id="mp-direccion"
+                  {...register("direccion")}
+                  type="text"
+                  maxLength={200}
+                  className="vf-input w-full pl-9"
+                  placeholder="Calle / Avenida / Sector"
+                  aria-label="Dirección de residencia"
+                />
+              </div>
+              {errors.direccion && (
+                <p className="text-[10px] text-red-500 mt-1">{errors.direccion.message}</p>
+              )}
+            </div>
+
+            {/* Provincia Field */}
+            <div>
+              <label htmlFor="mp-provincia" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                Provincia
+              </label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary z-10" />
+                <select
+                  id="mp-provincia"
+                  {...register("provincia")}
+                  className="vf-input w-full pl-9 appearance-none"
+                  aria-label="Provincia de residencia"
+                >
+                  <option value="">Seleccione una provincia</option>
+                  {PROVINCIAS_RD.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+              {errors.provincia && (
+                <p className="text-[10px] text-red-500 mt-1">{errors.provincia.message}</p>
+              )}
+            </div>
+
+            {/* Nickname Field */}
+            <div>
+              <label htmlFor="mp-nickname" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                Apodo / NickName
+              </label>
+              <div className="relative">
+                <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                <input
+                  id="mp-nickname"
+                  {...register("nickname")}
+                  type="text"
+                  maxLength={30}
+                  className="vf-input w-full pl-9"
+                  placeholder="Nombre de vendedor (visible al público)"
+                  aria-label="Apodo o nombre de vendedor"
+                />
+              </div>
+              {errors.nickname && (
+                <p className="text-[10px] text-red-500 mt-1">{errors.nickname.message}</p>
+              )}
+            </div>
+
             {/* RNC Field */}
             <div>
               <label htmlFor="rnc" className="block text-xs font-bold text-text-secondary uppercase mb-1">
@@ -317,6 +404,20 @@ export const MyProfileForm: React.FC = () => {
               )}
               {rncSearchError && !errors.rnc && (
                 <p className="text-[10px] text-red-500 mt-1">{rncSearchError}</p>
+              )}
+            </div>
+
+            {/* Seller Badge */}
+            <div className="flex items-center gap-2 px-1">
+              {user?.rnc && user.rnc.length > 0 ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-800 text-xs font-bold rounded-full border border-green-200">
+                  <BadgeCheck className="w-3.5 h-3.5" />
+                  Vendedor Verificado DGII
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-full border border-gray-200">
+                  Vendedor Particular
+                </span>
               )}
             </div>
 

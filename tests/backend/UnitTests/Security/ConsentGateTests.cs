@@ -10,7 +10,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Moq;
 using Xunit;
-using Application.Common;
+using global::Application.Common.Exceptions;
 
 public class ConsentGateTests
 {

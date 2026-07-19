@@ -54,6 +54,24 @@ public class UpdateProfileCommandHandler
             );
         }
 
+        // Profile extension fields (Direccion, Provincia, Nickname)
+        if (request.Nickname != null)
+        {
+            var trimmedNickname = request.Nickname.Trim();
+            if (trimmedNickname.Length < 3 || trimmedNickname.Length > 30)
+                return new UpdateProfileResultDto(false, "El apodo debe tener entre 3 y 30 caracteres.");
+
+            var existingWithNickname = await _usuarioRepository.GetByNicknameAsync(trimmedNickname, cancellationToken);
+            if (existingWithNickname != null && existingWithNickname.Id != request.UserId)
+                return new UpdateProfileResultDto(false, "El apodo ya está en uso por otro usuario.");
+        }
+
+        user.UpdateProfileExtension(
+            request.Direccion,
+            request.Provincia,
+            request.Nickname
+        );
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new UpdateProfileResultDto(true, null);
