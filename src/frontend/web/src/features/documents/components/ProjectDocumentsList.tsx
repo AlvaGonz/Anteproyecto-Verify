@@ -9,6 +9,7 @@ import {
   Info,
   ExternalLink,
 } from "lucide-react";
+import { OcrReviewPanel } from "./OcrReviewPanel";
 
 interface ProjectDocumentsListProps {
   documents: DocumentDto[];
@@ -148,6 +149,10 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
                   <ExternalLink className="w-4 h-4" />
                 </button>
               </div>
+            </div>
+            {/* Include OCR Review Panel */}
+            <div className="border-t border-[var(--color-border)]/10 bg-surface-container-lowest">
+              <OcrReviewPanel document={doc} />
             </div>
           </div>
         ))}

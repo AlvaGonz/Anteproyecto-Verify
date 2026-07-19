@@ -171,10 +171,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             )}
           </div>
         </div>
-        
-        {doc?.estadoDocumento === DocumentStatus.EnRevision && (
-          <OcrReviewPanel document={doc} />
-        )}
+        {doc && <OcrReviewPanel document={doc} />}
       </m.div>
     );
   };

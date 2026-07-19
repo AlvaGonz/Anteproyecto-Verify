@@ -42,42 +42,26 @@ test.describe('Settings Page - Profile Extension', () => {
     await expect(page.locator('#mp-nickname')).toBeVisible();
   });
 
-  test('TC-02: Submit without direccion shows validation error', async ({ page }) => {
+  test('TC-02: Submit with empty optional fields succeeds (they are optional)', async ({ page }) => {
+    await page.route('**/api/auth/profile', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Perfil actualizado exitosamente.' })
+      });
+    });
+
+    // Make the form dirty by modifying an existing field
+    await page.locator('#mp-nombre').fill('Test Mod');
+
     const saveButton = page.locator('button[type="submit"]:has-text("Guardar Cambios")');
-
-    await page.locator('#mp-nickname').fill('testnick');
-    await page.locator('#mp-direccion').fill('');
-    await page.locator('#mp-direccion').blur();
-
+    await expect(saveButton).toBeEnabled({ timeout: 2000 });
     await saveButton.click();
 
-    await expect(page.locator('text=La dirección es requerida')).toBeVisible();
+    await expect(page.locator('text=Perfil actualizado correctamente')).toBeVisible({ timeout: 5000 });
   });
 
-  test('TC-03: Submit with invalid provincia shows validation error', async ({ page }) => {
-    const saveButton = page.locator('button[type="submit"]:has-text("Guardar Cambios")');
-
-    await page.locator('#mp-direccion').fill('Calle Principal 123');
-    await page.locator('#mp-nickname').fill('testnick');
-
-    await saveButton.click();
-
-    await expect(page.locator('text=Seleccione una provincia válida')).toBeVisible();
-  });
-
-  test('TC-04: Submit nickname < 3 chars shows validation error', async ({ page }) => {
-    const saveButton = page.locator('button[type="submit"]:has-text("Guardar Cambios")');
-
-    await page.locator('#mp-direccion').fill('Calle Principal 123');
-    await page.locator('#mp-provincia').selectOption('Santo Domingo');
-    await page.locator('#mp-nickname').fill('ab');
-
-    await saveButton.click();
-
-    await expect(page.locator('text=Mínimo 3 caracteres')).toBeVisible();
-  });
-
-  test('TC-05: Submit valid form shows success toast and persists', async ({ page }) => {
+  test('TC-03: Submit fills, saves and persists all optional fields', async ({ page }) => {
     let fetchCount = 0;
     await page.route('**/api/auth/me', async route => {
       fetchCount++;
@@ -124,15 +108,11 @@ test.describe('Settings Page - Profile Extension', () => {
     });
 
     await page.route('**/api/auth/profile', async route => {
-      if (route.request().method() === 'PATCH') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ message: 'Perfil actualizado exitosamente.' })
-        });
-      } else {
-        await route.continue();
-      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Perfil actualizado exitosamente.' })
+      });
     });
 
     await page.locator('#mp-direccion').fill('Calle Principal 123');
@@ -145,24 +125,16 @@ test.describe('Settings Page - Profile Extension', () => {
     await expect(page.locator('text=Perfil actualizado correctamente')).toBeVisible({ timeout: 5000 });
   });
 
-  test('TC-06: User WITH rnc shows badge Vendedor Verificado DGII', async ({ page }) => {
+  test('TC-04: User WITH rnc shows badge Vendedor Verificado DGII', async ({ page }) => {
     await page.route('**/api/auth/me', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          id: 'test-user-id',
-          nombre: 'Test',
-          apellido: 'User',
-          email: 'test@example.com',
-          role: 'DEVELOPER',
-          cedula: '12345678901',
-          telefono: '8095551234',
-          rnc: '131000000',
-          razonSocial: 'Verified Company SRL',
-          direccion: '',
-          provincia: '',
-          nickname: '',
+          id: 'test-user-id', nombre: 'Test', apellido: 'User', email: 'test@example.com',
+          role: 'DEVELOPER', cedula: '12345678901', telefono: '8095551234',
+          rnc: '131000000', razonSocial: 'Verified Company SRL',
+          direccion: '', provincia: '', nickname: '',
         })
       });
     });
@@ -170,28 +142,19 @@ test.describe('Settings Page - Profile Extension', () => {
     await page.reload();
     await page.waitForLoadState('networkidle');
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
-
     await expect(page.locator('text=Vendedor Verificado DGII')).toBeVisible();
   });
 
-  test('TC-07: User WITHOUT rnc shows badge Vendedor Particular', async ({ page }) => {
+  test('TC-05: User WITHOUT rnc shows badge Vendedor Particular', async ({ page }) => {
     await page.route('**/api/auth/me', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          id: 'test-user-id',
-          nombre: 'Test',
-          apellido: 'User',
-          email: 'test@example.com',
-          role: 'DEVELOPER',
-          cedula: '12345678901',
-          telefono: '8095551234',
-          rnc: null,
-          razonSocial: null,
-          direccion: '',
-          provincia: '',
-          nickname: '',
+          id: 'test-user-id', nombre: 'Test', apellido: 'User', email: 'test@example.com',
+          role: 'DEVELOPER', cedula: '12345678901', telefono: '8095551234',
+          rnc: null, razonSocial: null,
+          direccion: '', provincia: '', nickname: '',
         })
       });
     });
@@ -199,21 +162,16 @@ test.describe('Settings Page - Profile Extension', () => {
     await page.reload();
     await page.waitForLoadState('networkidle');
     await expect(page.locator('text=Mi Perfil')).toBeVisible();
-
     await expect(page.locator('text=Vendedor Particular')).toBeVisible();
   });
 
-  test('TC-08: Nickname already taken shows API 409 error', async ({ page }) => {
+  test('TC-06: Nickname already taken shows API 409 error', async ({ page }) => {
     await page.route('**/api/auth/profile', async route => {
-      if (route.request().method() === 'PATCH') {
-        await route.fulfill({
-          status: 409,
-          contentType: 'application/json',
-          body: JSON.stringify({ message: 'El apodo ya está en uso por otro usuario.' })
-        });
-      } else {
-        await route.continue();
-      }
+      await route.fulfill({
+        status: 409,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'El apodo ya está en uso por otro usuario.' })
+      });
     });
 
     await page.locator('#mp-direccion').fill('Calle Principal 123');

@@ -112,14 +112,19 @@ export const UpdateProfileSchema = z.object({
   actividadEconomica: z.string().optional(),
   direccion: z
     .string()
-    .min(1, "La dirección es requerida")
-    .max(200, "Máximo 200 caracteres"),
+    .max(200, "Máximo 200 caracteres")
+    .optional()
+    .or(z.literal("")),
   provincia: z
-    .enum(PROVINCIAS_RD, { message: "Seleccione una provincia válida" }),
+    .enum(PROVINCIAS_RD, { message: "Seleccione una provincia válida" })
+    .optional()
+    .or(z.literal("")),
   nickname: z
     .string()
     .min(3, "Mínimo 3 caracteres")
-    .max(30, "Máximo 30 caracteres"),
+    .max(30, "Máximo 30 caracteres")
+    .optional()
+    .or(z.literal("")),
   changePassword: z.boolean(),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),

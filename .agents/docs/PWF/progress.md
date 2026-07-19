@@ -1,62 +1,62 @@
-| Additional Project Images (5 columns) — Migration, API endpoints, Frontend hooks & UI, Unit Test Fixes   | RF-2, OE-1  | ExpedienteRebuild                                    | 2d6adabf   | 2026-07-13 |
+| Additional Project Images (5 columns) â€” Migration, API endpoints, Frontend hooks & UI, Unit Test Fixes   | RF-2, OE-1  | ExpedienteRebuild                                    | 2d6adabf   | 2026-07-13 |
 | Corporate Invite Users Flow (Invitacion entity, SettingsController, UI Modal) | N/A | develop | (pending) | 2026-07-12 |
 | Fix Admin Dashboard Stats 403 & potential-invitees 404 | N/A | develop | (pending) | 2026-07-12 |
 | Corporate Invitee Confirmation Modal (Null Limits warning) | N/A | develop | (pending) | 2026-07-13 |
 | Fix Guest Initial Status marking "Activo" before login | N/A | develop | (pending) | 2026-07-13 |
 | Corporate Invitee Deletion Confirmation Modal | N/A | develop | (pending) | 2026-07-13 |
-## 🔄 In Progress
+## ðŸ”„ In Progress
 | Feature | TRD Section | Status | Blocker |
 | ------- | ----------- | ------ | ------- |
 | Document Ingestion Foundation (Azurite, OCR Stub, State Engine) | N/A | 100% | None |
 
 
-## 🔜 Next Up (Prioritized)
+## ðŸ”œ Next Up (Prioritized)
 1. Verify consent test passes in CI pipeline
 
-## ⚠️ Open Decisions (Human-in-the-Loop Required)
+## âš ï¸� Open Decisions (Human-in-the-Loop Required)
 - Human action required: confirm schema via MCP before proceeding with EF Core migrations.
 
-## 🚫 Known Constraints
+## ðŸš« Known Constraints
 - None
 
 ---
 
-## 📋 QA Backlog (from To-do.txt)
+## ðŸ“‹ QA Backlog (from To-do.txt)
 | Priority         | Count | Items                                         |
 | ---------------- | ----- | --------------------------------------------- |
-| 🔴 P0 — Critical  | 6     | WBS-001..006 — Routes rotas + E2E tests       |
-| 🟠 P1 — High      | 8     | WBS-007..014 — Security, Compliance, 17 UIs   |
-| 🟡 P2 — Medium    | 5     | WBS-015..019 — UX mejoras                     |
-| 🟢 P3 — Tech Debt | 10    | TEC-001..010 — Accesibilidad, rendimiento, CI |
+| ðŸ”´ P0 â€” Critical  | 6     | WBS-001..006 â€” Routes rotas + E2E tests       |
+| ðŸŸ  P1 â€” High      | 8     | WBS-007..014 â€” Security, Compliance, 17 UIs   |
+| ðŸŸ¡ P2 â€” Medium    | 5     | WBS-015..019 â€” UX mejoras                     |
+| ðŸŸ¢ P3 â€” Tech Debt | 10    | TEC-001..010 â€” Accesibilidad, rendimiento, CI |
 
-## 🔄 In Progress (QA Roadmap — ORCH-TEST-001 Proof)
+## ðŸ”„ In Progress (QA Roadmap â€” ORCH-TEST-001 Proof)
 | WBS     | Item                            | Agent                | Status                  |
 | ------- | ------------------------------- | -------------------- | ----------------------- |
-| WBS-001 | RegisterPage test               | tdd-guide            | ✅ 257 lines, 11 tests   |
-| WBS-005 | TC-002 coordinates diagnosis    | build-error-resolver | ✅ Diagnosis report      |
-| WBS-007 | JWT localStorage audit          | security-reviewer    | ✅ SEC-001 surfaced      |
-| WBS-009 | Bundle optimization             | refactor-cleaner     | ✅ Analysis report       |
-| WBS-012 | Password policy xUnit test      | tdd-guide            | ✅ 6 theory/2 fact tests |
-| WBS-013 | Consent gate audit (Law 172-13) | ley172-13-auditor    | ✅ COMP-001 surfaced     |
-| WBS-014 | 17 UI screens breakdown         | planner              | ✅ 17 screens mapped     |
-| WBS-020 | RF-10 Integrity Seal ADR        | architect            | ✅ ADR-005 (357 lines)   |
-| TEC-010 | SonarCloud pipeline gate        | devops-specialist    | ✅ Pipeline config       |
-| WBS-022 | Invitation Limits E2E Tests     | playwright-skill     | ✅ 08-invitation-limits  |
+| WBS-001 | RegisterPage test               | tdd-guide            | âœ… 257 lines, 11 tests   |
+| WBS-005 | TC-002 coordinates diagnosis    | build-error-resolver | âœ… Diagnosis report      |
+| WBS-007 | JWT localStorage audit          | security-reviewer    | âœ… SEC-001 surfaced      |
+| WBS-009 | Bundle optimization             | refactor-cleaner     | âœ… Analysis report       |
+| WBS-012 | Password policy xUnit test      | tdd-guide            | âœ… 6 theory/2 fact tests |
+| WBS-013 | Consent gate audit (Law 172-13) | ley172-13-auditor    | âœ… COMP-001 surfaced     |
+| WBS-014 | 17 UI screens breakdown         | planner              | âœ… 17 screens mapped     |
+| WBS-020 | RF-10 Integrity Seal ADR        | architect            | âœ… ADR-005 (357 lines)   |
+| TEC-010 | SonarCloud pipeline gate        | devops-specialist    | âœ… Pipeline config       |
+| WBS-022 | Invitation Limits E2E Tests     | playwright-skill     | âœ… 08-invitation-limits  |
 
-## ⚠️ Open Decisions (Human-in-the-Loop Required)
-- [x] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001 (DONE - Security Hardening)
-- [x] TransUnion consent gate verification (COMP-001) — surfaced in ORCH-TEST-001 (DONE)
-- [ ] Set GROQ_API_KEY environment variable — all 8 subagents return empty without it (ROOT CAUSE)
+## âš ï¸� Open Decisions (Human-in-the-Loop Required)
+- [x] JWT migration from localStorage to HttpOnly cookies (SEC-001) â€” surfaced in ORCH-TEST-001 (DONE - Security Hardening)
+- [x] TransUnion consent gate verification (COMP-001) â€” surfaced in ORCH-TEST-001 (DONE)
+- [ ] Set GROQ_API_KEY environment variable â€” all 8 subagents return empty without it (ROOT CAUSE)
 - [x] Create missing agent files: BatchExecutor.md, DocWriter.md (DONE)
 - [x] ADR-006: SEC-001 JWT cookie migration plan (PHASED, APPROVAL REQUIRED)
-- [x] ADR-007: COMP-001 TransUnion consent gate plan (IMPLEMENTED — version check + tests)
+- [x] ADR-007: COMP-001 TransUnion consent gate plan (IMPLEMENTED â€” version check + tests)
   - `ConsentGateConstants.CurrentVersionPolitica = "v1.0"` (Application.Common)
   - `ConsultarCreditoCommandHandler` blocks TransUnion if version mismatch
   - `VerificarConsentimientoVigenteQueryHandler` returns false if version mismatch
   - Test: `CreditCheck_ConsentVersionMismatch_BlocksTransUnion`
 - [ ] Public endpoint changes for Precios page (BUG-005)
 
-## 🔄 Expanded Scope (Post-Audit — 2026-06-29)
+## ðŸ”„ Expanded Scope (Post-Audit â€” 2026-06-29)
 | New ID  | Item                                     | Priority | RF    | OE      |
 | ------- | ---------------------------------------- | -------- | ----- | ------- |
 | WBS-020 | Sello Digital endpoint + QR (Law 126-02) | P1       | RF-10 | OE-7    |
@@ -67,9 +67,9 @@
 
 **Audit findings resolved:** RF-2 gap, RF-10 gap, RNF-3/4/5 gaps, PERF-001 reclassified P1, OE traceability corrected, "47 requisitos" source clarified.
 
-> Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
+> Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch â€” +5 items, 34 total)
 
-## 🐛 Resolved Bugs
+## ðŸ�› Resolved Bugs
 - **BUG-007:** 404 Not Found on `/api/auth/resend-verification`.
   - **Symptom:** The new frontend `useResendVerificationEmail` mutation failed with `404 Not Found` despite the backend having the endpoint correctly implemented.
   - **Root Cause:** `dotnet watch` inside the Docker container failed to hot-reload and compile the newly added `ResendVerificationEmail` namespace. The `Api` container was still running the older version without the endpoint mapped.
@@ -107,14 +107,14 @@
   - **Symptom:** Backend API crashes on startup during `MigrateAsync` with `Error Number:2705` "Column already exists".
   - **Root Cause:** A duplicated migration `20260630195243_AddStripeFieldsToUsuario.cs` attempted to add Stripe fields that were already added by `20260630163528_Add_Stripe_Fields_To_Usuario.cs`.
   - **Fix:** Emptied the `Up` and `Down` methods of the duplicate migration `20260630195243_AddStripeFieldsToUsuario.cs` so EF Core treats it as a no-op, preserving the migration chain without throwing.
-- **BUG-014:** POST `/api/projects` 500 — FK violation on `EstadoId`.
-  - **Symptom:** Creating a project from ProjectManagePage fails with `500 Internal Server Error` (`useProjects.ts` → `POST /api/projects`).
+- **BUG-014:** POST `/api/projects` 500 â€” FK violation on `EstadoId`.
+  - **Symptom:** Creating a project from ProjectManagePage fails with `500 Internal Server Error` (`useProjects.ts` â†’ `POST /api/projects`).
   - **Root Cause:** After migration `AddProyectoEstadosAndMigrateData`, `CreateProjectAsync` created `Proyecto` without assigning `EstadoId` (defaulted to `Guid.Empty`), violating `FK_ProyectosInmobiliarios_ProyectosEstados_EstadoId`. Lookup also used enum `.ToString()` (`Creado`) while DB stores uppercase codes (`CREADO`).
   - **Fix:** Assign `Estado` CREADO before save; add `ProjectStatusCodes.ToCodigoUnico()` and use it in repository/seeder/public handlers.
 - **BUG-015:** Expedientes list stays on CREADO after editing a project.
   - **Symptom:** Inside Editar Proyecto the status bar can show/enable Editado, but the Expedientes list badge remains CREADO after saving changes.
-  - **Root Cause:** `UpdateProjectAsync` updated fields but never promoted `EstadoId` from CREADO→EDITADO. List also lacked `Edited` badge/label mapping; PATCH `/status` rejected frontend string codes (`EDITADO`).
-  - **Fix:** Auto-promote CREADO→EDITADO on update; accept CodigoUnico on PATCH; show EDITADO in AdminProjectList + statusUtils.
+  - **Root Cause:** `UpdateProjectAsync` updated fields but never promoted `EstadoId` from CREADOâ†’EDITADO. List also lacked `Edited` badge/label mapping; PATCH `/status` rejected frontend string codes (`EDITADO`).
+  - **Fix:** Auto-promote CREADOâ†’EDITADO on update; accept CodigoUnico on PATCH; show EDITADO in AdminProjectList + statusUtils.
 - **BUG-014:** Application crash ("Error en la aplicacion") after successful Stripe checkout.
   - **Symptom:** After a successful Stripe checkout, the application redirects to `/#/dashboard` but shows an ErrorBoundary screen instead of the dashboard.
   - **Root Cause:** The `CheckoutReturnPage` and `PricingPage` components were navigating to the non-existent `/dashboard` route instead of the correct `/admin/dashboard` route. This caused the router to hit the `*` wildcard route which renders the `ErrorBoundary` directly.
@@ -178,10 +178,10 @@
   - **Symptom:** On the dashboard's "Flujo de Usuarios" tab, the "Ver Lista de Usuarios" button did not visually substitute the "Ver listado" and "Nuevo Proyecto" buttons in a centered manner.
   - **Root Cause:** The `DashboardPageLayout.tsx` used `justify-between` and the secondary button was right-aligned without proper container constraints to span the space where the two project buttons used to be.
   - **Fix:** Wrapped the "Ver Lista de Usuarios" button in a `w-full` flex container and changed its style to primary so it is now visually centered in the 300px space where the project buttons were located.
-- **TASK-1787:** Modificación de tabla `CatastroTitulo` y seeder.
-  - **Symptom:** Eliminar `IdProyecto` de `CatastroTitulo` y actualizar el script `generador_entidades_gubernamentales.py` para generar 1.6 millones de registros de títulos con los datos de designación catastral.
+- **TASK-1787:** ModificaciÃ³n de tabla `CatastroTitulo` y seeder.
+  - **Symptom:** Eliminar `IdProyecto` de `CatastroTitulo` y actualizar el script `generador_entidades_gubernamentales.py` para generar 1.6 millones de registros de tÃ­tulos con los datos de designaciÃ³n catastral.
   - **Status:** Complete (Background script finished in 926.42 seconds generating 1.6M rows).
-  - **Fix:** Script Python actualizado y ejecutado con éxito. Eliminado IdProyecto y añadido CodigoDesignacionCatastral con coordenadas GPS únicas.
+  - **Fix:** Script Python actualizado y ejecutado con Ã©xito. Eliminado IdProyecto y aÃ±adido CodigoDesignacionCatastral con coordenadas GPS Ãºnicas.
 
 ### Debug Session: Migration Error
 - **Symptom**: Migration failure on startup: `ALTER TABLE DROP COLUMN failed because column 'NombreCompleto' does not exist in table 'UsuarioLegacy'.` 
@@ -211,47 +211,47 @@
 - **TASK-1788:** PaddleOCR Integration and E2E Tests.
   - **Symptom:** PaddleOCR microservice was crashing inside Docker due to missing \libgomp1\ library. E2E tests related to destructive actions were failing because of layout locators and accessibility regressions with TEXTAREA components.
   - **Status:** Complete.
-## 🚫 Known Constraints
+## ðŸš« Known Constraints
 - None
 
 ---
 
-## 📋 QA Backlog (from To-do.txt)
+## ðŸ“‹ QA Backlog (from To-do.txt)
 | Priority         | Count | Items                                         |
 | ---------------- | ----- | --------------------------------------------- |
-| 🔴 P0 — Critical  | 6     | WBS-001..006 — Routes rotas + E2E tests       |
-| 🟠 P1 — High      | 8     | WBS-007..014 — Security, Compliance, 17 UIs   |
-| 🟡 P2 — Medium    | 5     | WBS-015..019 — UX mejoras                     |
-| 🟢 P3 — Tech Debt | 10    | TEC-001..010 — Accesibilidad, rendimiento, CI |
+| ðŸ”´ P0 â€” Critical  | 6     | WBS-001..006 â€” Routes rotas + E2E tests       |
+| ðŸŸ  P1 â€” High      | 8     | WBS-007..014 â€” Security, Compliance, 17 UIs   |
+| ðŸŸ¡ P2 â€” Medium    | 5     | WBS-015..019 â€” UX mejoras                     |
+| ðŸŸ¢ P3 â€” Tech Debt | 10    | TEC-001..010 â€” Accesibilidad, rendimiento, CI |
 
-## 🔄 In Progress (QA Roadmap — ORCH-TEST-001 Proof)
+## ðŸ”„ In Progress (QA Roadmap â€” ORCH-TEST-001 Proof)
 | WBS     | Item                            | Agent                | Status                  |
 | ------- | ------------------------------- | -------------------- | ----------------------- |
-| WBS-001 | RegisterPage test               | tdd-guide            | ✅ 257 lines, 11 tests   |
-| WBS-005 | TC-002 coordinates diagnosis    | build-error-resolver | ✅ Diagnosis report      |
-| WBS-007 | JWT localStorage audit          | security-reviewer    | ✅ SEC-001 surfaced      |
-| WBS-009 | Bundle optimization             | refactor-cleaner     | ✅ Analysis report       |
-| WBS-012 | Password policy xUnit test      | tdd-guide            | ✅ 6 theory/2 fact tests |
-| WBS-013 | Consent gate audit (Law 172-13) | ley172-13-auditor    | ✅ COMP-001 surfaced     |
-| WBS-014 | 17 UI screens breakdown         | planner              | ✅ 17 screens mapped     |
-| WBS-020 | RF-10 Integrity Seal ADR        | architect            | ✅ ADR-005 (357 lines)   |
-| TEC-010 | SonarCloud pipeline gate        | devops-specialist    | ✅ Pipeline config       |
-| WBS-022 | Invitation Limits E2E Tests     | playwright-skill     | ✅ 08-invitation-limits  |
+| WBS-001 | RegisterPage test               | tdd-guide            | âœ… 257 lines, 11 tests   |
+| WBS-005 | TC-002 coordinates diagnosis    | build-error-resolver | âœ… Diagnosis report      |
+| WBS-007 | JWT localStorage audit          | security-reviewer    | âœ… SEC-001 surfaced      |
+| WBS-009 | Bundle optimization             | refactor-cleaner     | âœ… Analysis report       |
+| WBS-012 | Password policy xUnit test      | tdd-guide            | âœ… 6 theory/2 fact tests |
+| WBS-013 | Consent gate audit (Law 172-13) | ley172-13-auditor    | âœ… COMP-001 surfaced     |
+| WBS-014 | 17 UI screens breakdown         | planner              | âœ… 17 screens mapped     |
+| WBS-020 | RF-10 Integrity Seal ADR        | architect            | âœ… ADR-005 (357 lines)   |
+| TEC-010 | SonarCloud pipeline gate        | devops-specialist    | âœ… Pipeline config       |
+| WBS-022 | Invitation Limits E2E Tests     | playwright-skill     | âœ… 08-invitation-limits  |
 
-## ⚠️ Open Decisions (Human-in-the-Loop Required)
-- [x] JWT migration from localStorage to HttpOnly cookies (SEC-001) — surfaced in ORCH-TEST-001 (DONE - Security Hardening)
-- [x] TransUnion consent gate verification (COMP-001) — surfaced in ORCH-TEST-001 (DONE)
-- [ ] Set GROQ_API_KEY environment variable — all 8 subagents return empty without it (ROOT CAUSE)
+## âš ï¸� Open Decisions (Human-in-the-Loop Required)
+- [x] JWT migration from localStorage to HttpOnly cookies (SEC-001) â€” surfaced in ORCH-TEST-001 (DONE - Security Hardening)
+- [x] TransUnion consent gate verification (COMP-001) â€” surfaced in ORCH-TEST-001 (DONE)
+- [ ] Set GROQ_API_KEY environment variable â€” all 8 subagents return empty without it (ROOT CAUSE)
 - [x] Create missing agent files: BatchExecutor.md, DocWriter.md (DONE)
 - [x] ADR-006: SEC-001 JWT cookie migration plan (PHASED, APPROVAL REQUIRED)
-- [x] ADR-007: COMP-001 TransUnion consent gate plan (IMPLEMENTED — version check + tests)
+- [x] ADR-007: COMP-001 TransUnion consent gate plan (IMPLEMENTED â€” version check + tests)
   - `ConsentGateConstants.CurrentVersionPolitica = "v1.0"` (Application.Common)
   - `ConsultarCreditoCommandHandler` blocks TransUnion if version mismatch
   - `VerificarConsentimientoVigenteQueryHandler` returns false if version mismatch
   - Test: `CreditCheck_ConsentVersionMismatch_BlocksTransUnion`
 - [ ] Public endpoint changes for Precios page (BUG-005)
 
-## 🔄 Expanded Scope (Post-Audit — 2026-06-29)
+## ðŸ”„ Expanded Scope (Post-Audit â€” 2026-06-29)
 | New ID  | Item                                     | Priority | RF    | OE      |
 | ------- | ---------------------------------------- | -------- | ----- | ------- |
 | WBS-020 | Sello Digital endpoint + QR (Law 126-02) | P1       | RF-10 | OE-7    |
@@ -262,9 +262,9 @@
 
 **Audit findings resolved:** RF-2 gap, RF-10 gap, RNF-3/4/5 gaps, PERF-001 reclassified P1, OE traceability corrected, "47 requisitos" source clarified.
 
-> Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch — +5 items, 34 total)
+> Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch â€” +5 items, 34 total)
 
-## 🐛 Resolved Bugs
+## ðŸ�› Resolved Bugs
 - **BUG-031:** 404 Not Found on `PATCH /api/projects/{projectId}/documents/{documentId}/type`.
   - **Symptom:** Selecting a document in the dropdown or clicking delete triggers a PATCH request that returns `404 Not Found`.
   - **Root Cause:** A previous agent added the `[HttpPatch("{documentId}/type")]` route to `ProjectDocumentsController.cs`, but the backend Docker container `api` was not rebuilt to compile and host the new route.
@@ -310,14 +310,14 @@
   - **Symptom:** Backend API crashes on startup during `MigrateAsync` with `Error Number:2705` "Column already exists".
   - **Root Cause:** A duplicated migration `20260630195243_AddStripeFieldsToUsuario.cs` attempted to add Stripe fields that were already added by `20260630163528_Add_Stripe_Fields_To_Usuario.cs`.
   - **Fix:** Emptied the `Up` and `Down` methods of the duplicate migration `20260630195243_AddStripeFieldsToUsuario.cs` so EF Core treats it as a no-op, preserving the migration chain without throwing.
-- **BUG-014:** POST `/api/projects` 500 — FK violation on `EstadoId`.
-  - **Symptom:** Creating a project from ProjectManagePage fails with `500 Internal Server Error` (`useProjects.ts` → `POST /api/projects`).
+- **BUG-014:** POST `/api/projects` 500 â€” FK violation on `EstadoId`.
+  - **Symptom:** Creating a project from ProjectManagePage fails with `500 Internal Server Error` (`useProjects.ts` â†’ `POST /api/projects`).
   - **Root Cause:** After migration `AddProyectoEstadosAndMigrateData`, `CreateProjectAsync` created `Proyecto` without assigning `EstadoId` (defaulted to `Guid.Empty`), violating `FK_ProyectosInmobiliarios_ProyectosEstados_EstadoId`. Lookup also used enum `.ToString()` (`Creado`) while DB stores uppercase codes (`CREADO`).
   - **Fix:** Assign `Estado` CREADO before save; add `ProjectStatusCodes.ToCodigoUnico()` and use it in repository/seeder/public handlers.
 - **BUG-015:** Expedientes list stays on CREADO after editing a project.
   - **Symptom:** Inside Editar Proyecto the status bar can show/enable Editado, but the Expedientes list badge remains CREADO after saving changes.
-  - **Root Cause:** `UpdateProjectAsync` updated fields but never promoted `EstadoId` from CREADO→EDITADO. List also lacked `Edited` badge/label mapping; PATCH `/status` rejected frontend string codes (`EDITADO`).
-  - **Fix:** Auto-promote CREADO→EDITADO on update; accept CodigoUnico on PATCH; show EDITADO in AdminProjectList + statusUtils.
+  - **Root Cause:** `UpdateProjectAsync` updated fields but never promoted `EstadoId` from CREADOâ†’EDITADO. List also lacked `Edited` badge/label mapping; PATCH `/status` rejected frontend string codes (`EDITADO`).
+  - **Fix:** Auto-promote CREADOâ†’EDITADO on update; accept CodigoUnico on PATCH; show EDITADO in AdminProjectList + statusUtils.
 - **BUG-014:** Application crash ("Error en la aplicacion") after successful Stripe checkout.
   - **Symptom:** After a successful Stripe checkout, the application redirects to `/#/dashboard` but shows an ErrorBoundary screen instead of the dashboard.
   - **Root Cause:** The `CheckoutReturnPage` and `PricingPage` components were navigating to the non-existent `/dashboard` route instead of the correct `/admin/dashboard` route. This caused the router to hit the `*` wildcard route which renders the `ErrorBoundary` directly.
@@ -381,10 +381,10 @@
   - **Symptom:** On the dashboard's "Flujo de Usuarios" tab, the "Ver Lista de Usuarios" button did not visually substitute the "Ver listado" and "Nuevo Proyecto" buttons in a centered manner.
   - **Root Cause:** The `DashboardPageLayout.tsx` used `justify-between` and the secondary button was right-aligned without proper container constraints to span the space where the two project buttons used to be.
   - **Fix:** Wrapped the "Ver Lista de Usuarios" button in a `w-full` flex container and changed its style to primary so it is now visually centered in the 300px space where the project buttons were located.
-- **TASK-1787:** Modificación de tabla `CatastroTitulo` y seeder.
-  - **Symptom:** Eliminar `IdProyecto` de `CatastroTitulo` y actualizar el script `generador_entidades_gubernamentales.py` para generar 1.6 millones de registros de títulos con los datos de designación catastral.
+- **TASK-1787:** ModificaciÃ³n de tabla `CatastroTitulo` y seeder.
+  - **Symptom:** Eliminar `IdProyecto` de `CatastroTitulo` y actualizar el script `generador_entidades_gubernamentales.py` para generar 1.6 millones de registros de tÃ­tulos con los datos de designaciÃ³n catastral.
   - **Status:** Complete (Background script finished in 926.42 seconds generating 1.6M rows).
-  - **Fix:** Script Python actualizado y ejecutado con éxito. Eliminado IdProyecto y añadido CodigoDesignacionCatastral con coordenadas GPS únicas.
+  - **Fix:** Script Python actualizado y ejecutado con Ã©xito. Eliminado IdProyecto y aÃ±adido CodigoDesignacionCatastral con coordenadas GPS Ãºnicas.
 
 ### Debug Session: Migration Error
 - **Symptom**: Migration failure on startup: `ALTER TABLE DROP COLUMN failed because column 'NombreCompleto' does not exist in table 'UsuarioLegacy'.` 
@@ -423,7 +423,7 @@
   - **Symptom:** `Error uploading gallery image Copy of EVANGELISMOS D2025.png` initially, followed by `415 Unsupported Media Type`.
   - **Root Cause:** In `useDocuments.ts`, `useDocumentMutations.ts` and `useSettings.ts`, an explicit `Content-Type: multipart/form-data` header was passed to Axios, breaking boundary generation. After removing it, Axios defaulted to the global `application/json` header defined in `client.ts`, which the backend rejected with `415 Unsupported Media Type` because the controller expects `multipart/form-data`.
   - **Fix:** Removed the explicit `headers` overrides in API hooks, and modified the request interceptor in `client.ts` to `delete config.headers['Content-Type']` whenever `config.data instanceof FormData`. This allows the browser to correctly set the `multipart/form-data; boundary=...` header natively.
--   [ x ]   U p d a t e d   G e s t i � n   d e   A c t i v o   a u t h o r i z a t i o n   l o g i c   a n d   M e   i n t e r e s a   b u t t o n   b e h a v i o r  
+-   [ x ]   U p d a t e d   G e s t i ó n   d e   A c t i v o   a u t h o r i z a t i o n   l o g i c   a n d   M e   i n t e r e s a   b u t t o n   b e h a v i o r  
  
 - **BUG-032:** Cannot edit existing gallery photos in ProjectForm.
   - **Symptom:** The user was unable to remove or replace the gallery photos that were already attached to the project. Furthermore, uploading new photos caused existing photos to duplicate in the UI preview.
@@ -432,4 +432,13 @@
 # # #   4 .   I m p l e m e n t   O C R   R e v i e w   W o r k f l o w   ( C O M P L E T E D )  
  -   * * S t a t u s * * :   '  * * C O M P L E T E D * *   ( T D D   +   P l a y w r i g h t   t e s t s   p a s s e d )  
  -   * * G o a l * * :   E n a b l e   h u m a n   r e v i e w   o f   O C R - e x t r a c t e d   f i e l d s   i n   D o c u m e n t S t a t u s . E n R e v i s i o n .  
- 
+ - **UX-033:** OCR Review Panel was not always visible and lacked modern sectioning.
+  - **Symptom:** OCR panel only appeared when document was in 'EnRevision', and its UI didn't match the new ui-ux-pro-max standard.
+  - **Root Cause:** Conditional rendering in ProjectDocumentStatus.tsx restricted its display. OcrReviewPanel.tsx used hardcoded dark mode text colors.
+  - **Fix:** Unconditionally render OcrReviewPanel if resultadoOcrJson exists. Redesigned OcrReviewPanel with light mode, distinct sectioning, blurred backgrounds, and conditionally hidden edit buttons for verified documents. Also added the `OcrReviewPanel` into the Admin interface (`ProjectDocumentsList.tsx`) so administrators can manage document OCR validations natively in the repository view.
+- **TEST-034:** E2E tests for OCR Review failed due to sticky navbar intercepting pointer events.
+  - **Symptom:** Playwright could not click the "Guardar corrección" button because the `autoFocus` on the input scrolled the container such that the button was overlaid by the sticky navbar.
+  - **Fix:** Added `onKeyDown` handler to the text input in `OcrReviewPanel.tsx` to save changes when pressing `Enter`. Updated the E2E test `ocr-review-flow.spec.ts` to `press('Enter')` instead of clicking the button with `{ force: true }`, ensuring accessibility and resolving the timeout failure. Tests now pass (16.0s).
+- **UX-035:** OCR Review Panel should always be visible for uploaded documents, not just when OCR is complete.
+  - **Symptom:** Users couldn't see the OCR panel if the document was missing `resultadoOcrJson`, making it seem like the feature was missing for unprocessed files.
+  - **Fix:** Removed the conditional rendering `{doc.resultadoOcrJson && ...}` in both the public and admin document lists. Added a beautiful empty state to `OcrReviewPanel.tsx` that displays a "Validación Pendiente" message when the OCR JSON is null. E2E tests confirmed passing.
