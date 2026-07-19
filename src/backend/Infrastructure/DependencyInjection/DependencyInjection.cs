@@ -161,6 +161,7 @@ public static class DependencyInjection
         services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Security.BCryptPasswordHasher>();
         services.AddScoped<Application.Abstractions.Security.IGoogleAuthService, Security.GoogleAuthService>();
         services.AddScoped<IStripeService, Services.StripeService>();
+        services.AddScoped<Application.Contracts.Subscriptions.ISubscriptionService, Services.SubscriptionService>();
 
         // Account Deletion
         services.AddScoped<Application.Features.Account.Commands.RequestAccountDeletion.RequestAccountDeletionCommandHandler>();

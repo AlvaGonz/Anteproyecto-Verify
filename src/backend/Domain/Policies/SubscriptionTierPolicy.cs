@@ -5,7 +5,7 @@ using Domain.Enums;
 
 public static class SubscriptionTierPolicy
 {
-    private static PlanSuscripcion? GetEffectivePlan(Usuario usuario)
+    public static PlanSuscripcion? GetEffectivePlan(Usuario usuario)
     {
         if (usuario.TitularId != null && usuario.Titular != null)
         {

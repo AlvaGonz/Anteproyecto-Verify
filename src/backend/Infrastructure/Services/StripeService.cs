@@ -19,7 +19,7 @@ public class StripeService : IStripeService
 
     public async Task<DateTime?> CancelAtPeriodEndAsync(string subscriptionId, CancellationToken cancellationToken = default)
     {
-        var service = new SubscriptionService();
+        var service = new Stripe.SubscriptionService();
         var options = new SubscriptionUpdateOptions
         {
             CancelAtPeriodEnd = true
@@ -30,7 +30,7 @@ public class StripeService : IStripeService
 
     public async Task ReactivateSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default)
     {
-        var service = new SubscriptionService();
+        var service = new Stripe.SubscriptionService();
         var options = new SubscriptionUpdateOptions
         {
             CancelAtPeriodEnd = false
