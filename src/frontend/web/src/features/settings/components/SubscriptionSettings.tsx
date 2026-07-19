@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift, Award } from "lucide-react";
 import { useMySubscription, useSyncSubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
-import { normalizePlanKey, PLAN_CAPABILITIES } from '../../pricing/utils/planCapabilities';
 import { PlansModal } from "./PlansModal";
 import { CancelSubscriptionModal } from "./CancelSubscriptionModal";
 
@@ -66,9 +65,8 @@ export const SubscriptionSettings: React.FC = () => {
 
   const status = data?.subscriptionStatus ?? null;
   const planName = data?.plan ?? (data as any)?.planName ?? (data?.isGuest ? data?.inviterPlan : null) ?? null;
-  const planKey = normalizePlanKey(planName);
-  const planCapabilities = planName ? PLAN_CAPABILITIES[planKey as keyof typeof PLAN_CAPABILITIES] : null;
   const currentPeriodEnd = data?.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
+  const limits = data?.planLimits;
 
   const badgeConfig = status ? (STATUS_CONFIG[status] ?? STATUS_CONFIG.active) : NO_PLAN_CONFIG;
   const hasPlan = !!planName;
@@ -85,23 +83,10 @@ export const SubscriptionSettings: React.FC = () => {
 
   let formattedPrice: string | null = null;
   if (hasPlan && data) {
-    // Determine the price based on the plan name and billing cycle (since DB stores DOP and we want USD UI)
-    const isAnnual = data.billingCycle === 'year' || data.billingCycle === 'yearly';
-    let priceVal = 0;
-
-    if (planKey === 'profesional') {
-      priceVal = isAnnual ? 48 : 60;
-    } else if (planKey === 'empresa') {
-      priceVal = isAnnual ? 136 : 170;
-    } else if (planKey === 'corporativo') {
-      priceVal = isAnnual ? 400 : 500;
-    }
-
-    if (priceVal > 0) {
-      formattedPrice = PRICE_FORMATTER.format(priceVal) + ` USD ${isAnnual ? '(anual)' : ''} / mes`;
-    } else if (data.planPrice === 0) {
+    if (data.planPrice === 0) {
       formattedPrice = "Gratis";
     } else if (data.planPrice && data.planPrice > 0) {
+      // API now returns price in USD
       formattedPrice = PRICE_FORMATTER.format(data.planPrice) + " USD / mes";
     }
   }
@@ -215,7 +200,7 @@ export const SubscriptionSettings: React.FC = () => {
                     {data?.isGuest && data?.inviterPlan
                       ? <span>{data.inviterPlan}</span>
                       : hasPlan
-                        ? <span className={planCapabilities?.color ?? ''}>{planCapabilities?.label ?? planName}</span>
+                        ? <span className="text-primary">{planName}</span>
                         : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>
                     }
                   </div>
@@ -255,6 +240,51 @@ export const SubscriptionSettings: React.FC = () => {
 
           </div>
 
+          {/* Limits Card */}
+          {limits && (
+            <div data-testid="subscription-plan-limits" className="bg-surface-raised rounded-2xl p-6 border border-border/60 shadow-sm mb-8">
+              <h3 className="text-lg font-bold text-[#223382] mb-4 flex items-center gap-2">
+                <Award className="w-5 h-5 text-primary" />
+                Límites de tu Plan
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div data-testid="consultas-limit" className="flex justify-between items-center p-3 bg-white rounded-lg border border-border/50">
+                  <span className="text-sm font-medium text-text-secondary">Consultas Mensuales</span>
+                  <span className="font-bold text-[#223382]">
+                    {limits.consultasUsadas} / {limits.maxConsultas === -1 ? 'Ilimitadas' : limits.maxConsultas}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-border/50">
+                  <span className="text-sm font-medium text-text-secondary">Proyectos</span>
+                  <span className="font-bold text-[#223382]">
+                    {limits.proyectosCreados} / {limits.maxProyectos === -1 ? 'Ilimitados' : limits.maxProyectos}
+                  </span>
+                </div>
+                <div data-testid="api-access-section" className="flex justify-between items-center p-3 bg-white rounded-lg border border-border/50">
+                  <span className="text-sm font-medium text-text-secondary">Acceso API</span>
+                  <span className="font-bold text-[#223382]">
+                    {limits.accesoApi ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <span className="text-slate-400">—</span>}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-border/50">
+                  <span className="text-sm font-medium text-text-secondary">Usuarios Adicionales</span>
+                  <span className="font-bold text-[#223382]">
+                    {limits.maxUsuariosSecundarios}
+                  </span>
+                </div>
+                {limits.exportacionPdf && (
+                  <div data-testid="export-pdf-btn" className="flex justify-between items-center p-3 bg-white rounded-lg border border-border/50">
+                    <span className="text-sm font-medium text-text-secondary">Exportar PDF</span>
+                    <span className="font-bold text-[#223382]">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+
           {/* CTA Footer */}
           <div className="pt-8 border-t border-border flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="text-sm text-text-secondary font-medium">
@@ -267,49 +297,49 @@ export const SubscriptionSettings: React.FC = () => {
               )}
             </div>
             {!data?.isGuest && (
-            <div className="flex gap-2">
-              {status === 'active' && data?.isManagedByStripe && (
+              <div className="flex gap-2">
+                {status === 'active' && data?.isManagedByStripe && (
+                  <button type="button"
+                    onClick={() => setIsCancelModalOpen(true)}
+                    disabled={isCanceling}
+                    className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 disabled:opacity-50"
+                  >
+                    <span className="flex items-center gap-2">
+                      {isCanceling ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                      Cancelar Suscripción
+                    </span>
+                  </button>
+                )}
+                {status === 'canceling' && data?.isManagedByStripe && (
+                  <button type="button"
+                    onClick={() => reactivateSubscription()}
+                    disabled={isReactivating}
+                    className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 disabled:opacity-50"
+                  >
+                    <span className="flex items-center gap-2">
+                      {isReactivating ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                      Reactivar Suscripción
+                    </span>
+                  </button>
+                )}
                 <button type="button"
-                  onClick={() => setIsCancelModalOpen(true)}
-                  disabled={isCanceling}
-                  className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 disabled:opacity-50"
+                  onClick={() => setIsPlansModalOpen(true)}
+                  className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
                 >
                   <span className="flex items-center gap-2">
-                    {isCanceling ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
-                    Cancelar Suscripción
+                    {hasPlan ? "Modificar Suscripción" : "Ver Planes"} <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
-              )}
-              {status === 'canceling' && data?.isManagedByStripe && (
-                <button type="button"
-                  onClick={() => reactivateSubscription()}
-                  disabled={isReactivating}
-                  className="vf-btn-secondary h-[48px] px-8 shadow-sm font-bold text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 disabled:opacity-50"
-                >
-                  <span className="flex items-center gap-2">
-                    {isReactivating ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
-                    Reactivar Suscripción
-                  </span>
-                </button>
-              )}
-              <button type="button"
-                onClick={() => setIsPlansModalOpen(true)}
-                className="vf-btn-primary h-[48px] px-8 shadow-floating hover:scale-[1.02] transition-transform font-bold text-sm"
-              >
-                <span className="flex items-center gap-2">
-                  {hasPlan ? "Modificar Suscripción" : "Ver Planes"} <ArrowRight className="w-4 h-4" />
-                </span>
-              </button>
-            </div>
+              </div>
             )}
           </div>
         </div>
       </div>
-      
-      <PlansModal 
-        isOpen={isPlansModalOpen} 
-        onClose={() => setIsPlansModalOpen(false)} 
-        currentPlan={planKey}
+
+      <PlansModal
+        isOpen={isPlansModalOpen}
+        onClose={() => setIsPlansModalOpen(false)}
+        currentPlan={planName ?? undefined}
       />
 
       <CancelSubscriptionModal

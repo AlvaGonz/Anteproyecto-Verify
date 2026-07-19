@@ -1,5 +1,6 @@
 namespace Api.Extensions;
 
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,6 +24,9 @@ public static class ServiceCollectionExtensions
             });
         services.AddMemoryCache();
         
+        // Register MediatR with Application assembly marker
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.DependencyInjection.DependencyInjection).Assembly));
+
         var jwtSecret = configuration["Jwt:Key"]
             ?? throw new InvalidOperationException("Jwt:Key is not configured in appsettings.");
 

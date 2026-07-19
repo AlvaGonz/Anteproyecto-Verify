@@ -8,6 +8,38 @@ test.describe('OCR Review Flow', () => {
     // Setup basic mock routes for project and auth
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin", role: "ADMIN" }) });
+    await page.route('**/api/v1/subscriptions/my-status', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          plan: 'Profesional',
+          subscriptionStatus: 'active',
+          planPrice: 0,
+          isGuest: false,
+          inviterPlan: null,
+          inviterName: null,
+          planLimits: {
+            maxConsultas: -1,
+            maxProyectos: -1,
+            presentacionPublica: true,
+            qrIncluido: true,
+            maxUsuariosSecundarios: -1,
+            maxAlmacenamientoMb: -1,
+            alertasTiempoReal: true,
+            modeloLm: true,
+            validacionLote: true,
+            exportacionExcel: true,
+            exportacionPdf: true,
+            integracionCrm: true,
+            soporteTipo: 'Prioritario',
+            accesoApi: true,
+            consultasUsadas: 0,
+            proyectosCreados: 0
+          }
+        })
+      });
+    });
     });
     await page.route('**/api/auth/refresh', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ accessToken: 'mock-token' }) });

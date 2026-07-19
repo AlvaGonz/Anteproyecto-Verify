@@ -7,8 +7,9 @@ using System.Security.Cryptography;
 using System.Text;
 using Domain.Common;
 using Domain.Enums;
+using Domain.Policies;
 
-public class Usuario : EntityBase
+public class Usuario : EntityBase, IEffectivePlanUser
 {
     public string Nombre { get; private set; } = null!;
     public string Apellido { get; private set; } = null!;
@@ -66,6 +67,7 @@ public class Usuario : EntityBase
 
     public Guid? PlanSuscripcionId { get; private set; }
     public PlanSuscripcion? Plan { get; private set; }
+    IPlanData? Domain.Policies.IEffectivePlanUser.Plan => Plan;
     public int ConsultasUsadas { get; private set; }
     public int ProyectosCreados { get; private set; }
 
@@ -74,10 +76,13 @@ public class Usuario : EntityBase
 
     public Guid? TitularId { get; private set; }
     public Usuario? Titular { get; private set; }
+    Domain.Policies.IEffectivePlanUser? Domain.Policies.IEffectivePlanUser.Titular => Titular;
     public ICollection<Usuario> MiembrosEquipo { get; private set; } = new List<Usuario>();
 
     // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
+
+    int? Domain.Policies.IEffectivePlanUser.MaxUsuariosSecundarios => Plan?.MaxUsuariosSecundarios;
 
     private Usuario() { } // For EF Core
 

@@ -3,11 +3,11 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Controllers;
-using Application.Abstractions.Notifications;
-using Infrastructure.Persistence;
+using Application.Contracts.Subscriptions;
+using Application.DTOs.Subscriptions;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -18,21 +18,19 @@ namespace UnitTests.Api.Controllers
     public class SubscriptionControllerTests
     {
         private readonly SubscriptionController _controller;
+        private readonly Mock<ISender> _mockSender;
+        private readonly Mock<ISubscriptionService> _mockSubscriptionService;
         private readonly Mock<IConfiguration> _mockConfig;
-        private readonly AppDbContext _dbContext;
+        private readonly Mock<ILogger<SubscriptionController>> _mockLogger;
 
         public SubscriptionControllerTests()
         {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-            _dbContext = new AppDbContext(options);
-
+            _mockSender = new Mock<ISender>();
+            _mockSubscriptionService = new Mock<ISubscriptionService>();
             _mockConfig = new Mock<IConfiguration>();
-            var mockLogger = new Mock<ILogger<SubscriptionController>>();
-            var mockEmailService = new Mock<IEmailService>();
+            _mockLogger = new Mock<ILogger<SubscriptionController>>();
 
-            _controller = new SubscriptionController(_dbContext, _mockConfig.Object, mockLogger.Object, mockEmailService.Object);
+            _controller = new SubscriptionController(_mockSender.Object, _mockSubscriptionService.Object, _mockConfig.Object, _mockLogger.Object);
 
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {

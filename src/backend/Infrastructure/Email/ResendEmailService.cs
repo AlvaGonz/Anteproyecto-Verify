@@ -44,7 +44,7 @@ public class ResendEmailService : IEmailService
             await _resend.EmailSendAsync(message, cancellationToken);
             _logger.LogInformation("Email sent successfully via Resend to {To}", to);
         }
-        catch (ResendException ex)
+        catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to send email via Resend to {To}. (If running E2E tests without a valid API key, this is expected).", to);
         }

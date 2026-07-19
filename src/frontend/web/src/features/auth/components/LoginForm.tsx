@@ -8,7 +8,6 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
-import { isSubscriptionActive } from "../../pricing/utils/planCapabilities";
 
 const containerVariants = {
   hidden: {},
@@ -54,7 +53,7 @@ export const LoginForm = () => {
       navigate(redirectUrl);
     } else if (
       user?.pendingPlanCode && 
-      !isSubscriptionActive(user.subscriptionStatus) && 
+      !['active', 'trialing', 'free'].includes(user.subscriptionStatus?.toLowerCase() || '') && 
       user?.rol !== 'Administrator' && 
       user?.role !== 'Administrator'
     ) {

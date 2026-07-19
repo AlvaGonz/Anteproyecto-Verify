@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Persistence.IProyectoRepository, Persistence.Repositories.ProyectoRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IDocumentoRepository, Persistence.Repositories.DocumentoRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IUsuarioRepository, Persistence.Repositories.UsuarioRepository>();
+        services.AddScoped<Application.Features.Subscriptions.Queries.GetMySubscriptionStatus.IUserSubscriptionReadRepository, Persistence.Repositories.UsuarioRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IPlanSuscripcionRepository, Persistence.Repositories.PlanSuscripcionRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IDashboardRepository, Persistence.Repositories.DashboardRepository>();
         services.AddScoped<Application.Abstractions.Persistence.IValidacionRepository, Persistence.Repositories.ValidacionRepository>();

@@ -2,8 +2,6 @@ import React, { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-import { isSubscriptionActive } from "../../../features/pricing/utils/planCapabilities";
-
 interface AuthGuardProps {
   children: ReactNode;
 }
@@ -27,6 +25,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     const authRoute = location.pathname.startsWith('/checkout') ? '/register' : '/login';
     return <Navigate to={`${authRoute}?redirect=${encodeURIComponent(redirectTarget)}`} replace />;
   }
+
+  const isSubscriptionActive = (status: string | null | undefined) => status === 'active' || status === 'trialing';
 
   // ponytail: if user has a pending plan but no active subscription, redirect to checkout
   // skip redirect if already on checkout to avoid redirect loops

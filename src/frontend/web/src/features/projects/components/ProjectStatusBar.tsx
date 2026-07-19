@@ -1,9 +1,7 @@
 import React from 'react';
 import { ProjectStatus } from '../types';
 import { useProjectStatusBar } from '../hooks/useProjectStatusBar';
-import { useAuth } from '@/shared/context/AuthContext';
-import { PLAN_CAPABILITIES, normalizePlanKey } from '@/features/pricing/utils/planCapabilities';
-
+import { useMySubscription } from '@/features/settings/api/useSettings';
 interface ProjectStatusBarProps {
   projectId: string;
   currentStatus?: ProjectStatus;
@@ -11,7 +9,7 @@ interface ProjectStatusBarProps {
 
 export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, currentStatus }) => {
   const { eligibility, isLoading, isUpdating, handleStatusChange } = useProjectStatusBar(projectId);
-  const { user } = useAuth();
+  const { data: subscription } = useMySubscription();
 
   if (isLoading) {
     return (
@@ -28,9 +26,7 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
   const actualStatus = eligibility?.currentStatus !== undefined ? eligibility.currentStatus : (currentStatus ?? ProjectStatus.Draft);
 
   // Plan capability check
-  const planKey = normalizePlanKey(user?.plan as string);
-  const capabilities = PLAN_CAPABILITIES[planKey];
-  const canPublishPlan = capabilities.publicPresentation;
+  const canPublishPlan = subscription?.planLimits?.presentacionPublica ?? false;
 
   // Determine enabled states
   const canDraft = true; // Always can be draft (or stay draft)
@@ -127,6 +123,7 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
             <div key={step.status} className="group relative" title={step.tooltip}>
               <button
                 type="button"
+                data-testid={step.status === ProjectStatus.Published ? "project-publication-control" : undefined}
                 disabled={!isClickable}
                 onClick={() => {
                   if (isClickable) {

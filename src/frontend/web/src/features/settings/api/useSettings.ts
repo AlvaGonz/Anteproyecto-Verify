@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import { PaginatedResponse, UserSettings, ProfilePermissions, SubscriptionPlan, CreateUserDto, UpdateUserDto } from "../types/settings.types";
 import { useAuth } from "../../../shared/context/AuthContext";
+import { z } from "zod";
 
 export const useUsers = (page = 1, pageSize = 50, enabled = true) =>
   useQuery({
@@ -115,18 +116,42 @@ export const useUploadAvatar = () => {
   });
 };
 
-export interface MySubscriptionStatus {
-  plan: string | null;
-  planPrice: number | null;
-  subscriptionStatus: string | null;
-  currentPeriodEnd: string | null;
-  stripeSubscriptionId: string | null;
-  isManagedByStripe: boolean;
-  billingCycle?: string | null;
-  isGuest?: boolean;
-  inviterPlan?: string;
-  inviterName?: string;
-}
+export const PlanLimitsSchema = z.object({
+  maxConsultas: z.number(),
+  maxProyectos: z.number(),
+  presentacionPublica: z.boolean(),
+  qrIncluido: z.boolean(),
+  maxUsuariosSecundarios: z.number(),
+  maxAlmacenamientoMb: z.number(),
+  alertasTiempoReal: z.boolean(),
+  modeloLm: z.boolean(),
+  validacionLote: z.boolean(),
+  exportacionExcel: z.boolean(),
+  exportacionPdf: z.boolean(),
+  integracionCrm: z.boolean(),
+  soporteTipo: z.string(),
+  accesoApi: z.boolean(),
+  consultasUsadas: z.number(),
+  proyectosCreados: z.number(),
+});
+
+export type PlanLimitsDto = z.infer<typeof PlanLimitsSchema>;
+
+export const MySubscriptionStatusSchema = z.object({
+  plan: z.string().nullable(),
+  planPrice: z.number().nullable(),
+  subscriptionStatus: z.string().nullable(),
+  currentPeriodEnd: z.string().nullable(),
+  stripeSubscriptionId: z.string().nullable(),
+  isManagedByStripe: z.boolean(),
+  billingCycle: z.string().nullable(),
+  isGuest: z.boolean().optional(),
+  inviterPlan: z.string().optional(),
+  inviterName: z.string().optional(),
+  planLimits: PlanLimitsSchema.nullable(),
+});
+
+export type MySubscriptionStatus = z.infer<typeof MySubscriptionStatusSchema>;
 
 export const useMySubscription = (options?: { refetchInterval?: number }) =>
   useQuery<MySubscriptionStatus>({
@@ -134,13 +159,25 @@ export const useMySubscription = (options?: { refetchInterval?: number }) =>
     queryFn: () =>
       apiClient
         .get<MySubscriptionStatus>("/v1/subscriptions/my-status")
-        .then((res) => res.data),
+        .then((res) => MySubscriptionStatusSchema.parse(res.data)),
     staleTime: 0,
     gcTime: 1000 * 30,
     refetchOnWindowFocus: true,
     refetchInterval: options?.refetchInterval ?? 15_000,
     retry: 1,
   });
+
+export const usePlanLimits = () => {
+  const { data, isLoading, isError, refetch } = useMySubscription();
+  
+  return {
+    planLimits: data?.planLimits ?? null,
+    isLoading,
+    isError,
+    isUnavailable: !isLoading && !isError && data?.planLimits === null,
+    refetch,
+  };
+};
 
 export const useSyncSubscription = () => {
   const qc = useQueryClient();

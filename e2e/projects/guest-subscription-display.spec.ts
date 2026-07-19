@@ -25,6 +25,7 @@ async function stubSettingsApis(page: import('@playwright/test').Page, overrides
       plan: null,
       isGuest: true,
       inviterPlan: 'Corporativo',
+      planPrice: 500,
       ...overrides?.subscription,
     }})
   );

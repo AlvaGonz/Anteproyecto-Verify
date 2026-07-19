@@ -3,7 +3,7 @@ import { FolderKanban, FileCheck, AlertCircle, TrendingUp } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useDashboardStats } from "../api/useDashboardStats";
 import { useProjects } from "../../projects/api/useProjects";
-import { PlanCapabilities } from "../../pricing/utils/planCapabilities";
+
 import { DashboardPageLayout, DashboardTab } from "./DashboardPageLayout";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { ProjectStatus } from "../../projects/types";
@@ -14,7 +14,7 @@ export const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>("projects");
   const location = useLocation();
   const [showBanner, setShowBanner] = useState<boolean>(!!(location.state as any)?.planJustActivated);
-  const activatedPlan = (location.state as any)?.activatedPlan as PlanCapabilities | undefined;
+  const activatedPlan = (location.state as any)?.activatedPlan as string | undefined;
   const handleDismissBanner = useCallback(() => setShowBanner(false), []);
   const { user } = useAuth();
   const isAdmin = user?.role === "admin" || user?.role === "owner";

@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Application.DTOs.Subscriptions;
 using Application.Contracts.Subscriptions;
+using Application.Features.Subscriptions.Queries.GetMySubscriptionStatus;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,15 +14,18 @@ namespace Api.Controllers;
 [Route("api/v1/subscriptions")]
 public class SubscriptionController : ControllerBase
 {
+    private readonly ISender _sender;
     private readonly ISubscriptionService _subscriptionService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<SubscriptionController> _logger;
 
     public SubscriptionController(
+        ISender sender,
         ISubscriptionService subscriptionService,
         IConfiguration configuration, 
         ILogger<SubscriptionController> logger)
     {
+        _sender = sender;
         _subscriptionService = subscriptionService;
         _configuration = configuration;
         _logger = logger;
@@ -73,10 +78,11 @@ public class SubscriptionController : ControllerBase
 
         try
         {
-            var status = await _subscriptionService.GetMySubscriptionStatusAsync(userId, ct);
+            var query = new GetMySubscriptionStatusQuery(userId);
+            var status = await _sender.Send(query, ct);
             return Ok(status);
         }
-        catch (Exception e) when (e.Message == "User not found.")
+        catch (InvalidOperationException e) when (e.Message == "User not found.")
         {
             return NotFound(new { message = e.Message });
         }

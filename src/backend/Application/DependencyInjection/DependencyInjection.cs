@@ -40,6 +40,9 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.PublicConsulta.Queries.GetPublicProjectStatus.GetPublicProjectStatusQueryHandler>();
         services.AddScoped<Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler>();
 
+// Subscription Queries
+        services.AddScoped<Application.Features.Subscriptions.Queries.GetMySubscriptionStatus.GetMySubscriptionStatusQueryHandler>();
+
         return services;
     }
 }

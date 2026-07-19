@@ -1,13 +1,16 @@
 namespace Infrastructure.Persistence.Repositories;
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
+using Application.Features.Subscriptions.Queries.GetMySubscriptionStatus;
 using Domain.Entities;
+using Domain.Policies;
 using Microsoft.EntityFrameworkCore;
 
-public class UsuarioRepository : IUsuarioRepository
+public class UsuarioRepository : IUsuarioRepository, Application.Features.Subscriptions.Queries.GetMySubscriptionStatus.IUserSubscriptionReadRepository
 {
     private readonly AppDbContext _context;
 
@@ -77,6 +80,75 @@ public class UsuarioRepository : IUsuarioRepository
     {
         return await _context.Usuarios
             .FirstOrDefaultAsync(u => u.Nickname != null && u.Nickname.ToLower() == nickname.ToLower(), cancellationToken);
+    }
+
+    public async Task<UserSubscriptionData?> GetUserWithPlansAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .AsNoTracking()
+            .Where(u => u.Id == userId)
+            .Select(u => new UserSubscriptionData
+            {
+                Id = u.Id,
+                Plan = u.Plan != null ? new PlanData
+                {
+                    Idsuscripcion = u.Plan.Idsuscripcion,
+                    NombrePlan = u.Plan.NombrePlan,
+                    Precio = u.Plan.Precio,
+                    MaxConsultas = u.Plan.MaxConsultas,
+                    MaxProyectos = u.Plan.MaxProyectos,
+                    PresentacionPublica = u.Plan.PresentacionPublica,
+                    QrIncluido = u.Plan.QrIncluido,
+                    MaxUsuariosSecundarios = u.Plan.MaxUsuariosSecundarios,
+                    MaxAlmacenamientoMb = u.Plan.MaxAlmacenamientoMb,
+                    AlertasTiempoRealDisponible = u.Plan.AlertasTiempoRealDisponible,
+                    ModeloLmDisponible = u.Plan.ModeloLmDisponible,
+                    ValidacionLoteDisponible = u.Plan.ValidacionLoteDisponible,
+                    ExportacionExcelDisponible = u.Plan.ExportacionExcelDisponible,
+                    ExportacionPdfDisponible = u.Plan.ExportacionPdfDisponible,
+                    IntegracionCrmDisponible = u.Plan.IntegracionCrmDisponible,
+                    SoporteTipo = u.Plan.SoporteTipo,
+                    AccesoApi = u.Plan.AccesoApi
+                } : null,
+                ConsultasUsadas = u.ConsultasUsadas,
+                ProyectosCreados = u.ProyectosCreados,
+                SubscriptionStatus = u.SubscriptionStatus,
+                CurrentPeriodEnd = u.CurrentPeriodEnd,
+                CancelAtPeriodEnd = u.CancelAtPeriodEnd,
+                CancelAt = u.CancelAt,
+                StripeSubscriptionId = u.StripeSubscriptionId,
+                PendingBillingCycle = u.PendingBillingCycle,
+                StripeCustomerId = u.StripeCustomerId,
+                TitularId = u.TitularId,
+                Titular = u.Titular != null ? new UserSubscriptionData
+                {
+                    Id = u.Titular.Id,
+                    Plan = u.Titular.Plan != null ? new PlanData
+                    {
+                        Idsuscripcion = u.Titular.Plan.Idsuscripcion,
+                        NombrePlan = u.Titular.Plan.NombrePlan,
+                        Precio = u.Titular.Plan.Precio,
+                        MaxConsultas = u.Titular.Plan.MaxConsultas,
+                        MaxProyectos = u.Titular.Plan.MaxProyectos,
+                        PresentacionPublica = u.Titular.Plan.PresentacionPublica,
+                        QrIncluido = u.Titular.Plan.QrIncluido,
+                        MaxUsuariosSecundarios = u.Titular.Plan.MaxUsuariosSecundarios,
+                        MaxAlmacenamientoMb = u.Titular.Plan.MaxAlmacenamientoMb,
+                        AlertasTiempoRealDisponible = u.Titular.Plan.AlertasTiempoRealDisponible,
+                        ModeloLmDisponible = u.Titular.Plan.ModeloLmDisponible,
+                        ValidacionLoteDisponible = u.Titular.Plan.ValidacionLoteDisponible,
+                        ExportacionExcelDisponible = u.Titular.Plan.ExportacionExcelDisponible,
+                        ExportacionPdfDisponible = u.Titular.Plan.ExportacionPdfDisponible,
+                        IntegracionCrmDisponible = u.Titular.Plan.IntegracionCrmDisponible,
+                        SoporteTipo = u.Titular.Plan.SoporteTipo,
+                        AccesoApi = u.Titular.Plan.AccesoApi
+                    } : null,
+                    NombreCompleto = u.Titular.NombreCompleto
+                } : null,
+                IsManagedByStripe = !string.IsNullOrEmpty(u.StripeSubscriptionId),
+                NombreCompleto = u.NombreCompleto
+            })
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<List<Usuario>> GetPendingPurgeAsync(CancellationToken cancellationToken = default)

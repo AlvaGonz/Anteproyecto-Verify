@@ -3,7 +3,7 @@ import { Plus, LayoutDashboard, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { m, AnimatePresence } from "framer-motion";
 import { PlanActivatedBanner } from "../../pricing/components/PlanActivatedBanner";
-import type { PlanCapabilities } from "../../pricing/utils/planCapabilities";
+
 import type { DashboardStatsDto, ProyectoRecienteDto, SuscripcionRecienteDto } from "../../../infrastructure/api/dashboard.api";
 import { DashboardStatsRow } from "./DashboardStatsRow";
 import { DashboardCharts } from "./DashboardCharts";
@@ -16,7 +16,7 @@ export type DashboardTab = "projects" | "subscriptions";
 
 interface DashboardPageLayoutProps {
   showBanner: boolean;
-  activatedPlan: PlanCapabilities | undefined;
+  activatedPlan: string | undefined;
   handleDismissBanner: () => void;
   activeTab: DashboardTab;
   setActiveTab: (tab: DashboardTab) => void;
@@ -56,7 +56,7 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
   return (
     <div className="animate-fade-in">
       {showBanner && activatedPlan && (
-        <PlanActivatedBanner plan={activatedPlan} onDismiss={handleDismissBanner} />
+        <PlanActivatedBanner planName={activatedPlan} onDismiss={handleDismissBanner} />
       )}
       <div className="animate-fade-in space-y-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">

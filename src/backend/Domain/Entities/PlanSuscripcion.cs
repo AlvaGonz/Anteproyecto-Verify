@@ -1,8 +1,9 @@
 namespace Domain.Entities;
 
 using System;
+using Domain.Policies;
 
-public class PlanSuscripcion
+public class PlanSuscripcion : IPlanData
 {
     public Guid Idsuscripcion { get; private set; }
     public string NombrePlan { get; private set; } = null!;

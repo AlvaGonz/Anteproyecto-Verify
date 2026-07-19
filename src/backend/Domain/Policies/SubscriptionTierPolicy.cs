@@ -3,6 +3,39 @@ namespace Domain.Policies;
 using Domain.Entities;
 using Domain.Enums;
 
+public interface IPlanData
+{
+    Guid Idsuscripcion { get; }
+    string NombrePlan { get; }
+    decimal Precio { get; }
+    int MaxConsultas { get; }
+    int MaxProyectos { get; }
+    bool PresentacionPublica { get; }
+    bool QrIncluido { get; }
+    int MaxUsuariosSecundarios { get; }
+    int MaxAlmacenamientoMb { get; }
+    bool AlertasTiempoRealDisponible { get; }
+    bool ModeloLmDisponible { get; }
+    bool ValidacionLoteDisponible { get; }
+    bool ExportacionExcelDisponible { get; }
+    bool ExportacionPdfDisponible { get; }
+    bool IntegracionCrmDisponible { get; }
+    string SoporteTipo { get; }
+    bool AccesoApi { get; }
+}
+
+public interface IEffectivePlanUser
+{
+    Guid? TitularId { get; }
+    IEffectivePlanUser? Titular { get; }
+    IPlanData? Plan { get; }
+    string? SubscriptionStatus { get; }
+    bool CancelAtPeriodEnd { get; }
+    string? StripeCustomerId { get; }
+    string? StripeSubscriptionId { get; }
+    int? MaxUsuariosSecundarios { get; }
+}
+
 public static class SubscriptionTierPolicy
 {
     public static PlanSuscripcion? GetEffectivePlan(Usuario usuario)
@@ -21,6 +54,26 @@ public static class SubscriptionTierPolicy
         if (usuario.SubscriptionStatus == "active" || usuario.SubscriptionStatus == "trialing")
         {
             return usuario.Plan;
+        }
+        return null; // Treat as no paid plan
+    }
+
+    public static PlanSuscripcion? GetEffectivePlan(IEffectivePlanUser user)
+    {
+        if (user.TitularId != null && user.Titular != null)
+        {
+            var titularPlan = GetEffectivePlan(user.Titular);
+            if (titularPlan != null && (titularPlan.MaxUsuariosSecundarios == -1 || titularPlan.MaxUsuariosSecundarios > 0))
+            {
+                return titularPlan as PlanSuscripcion;
+            }
+        }
+
+        if (user.Plan == null) return null;
+        if (user.Plan.Precio == 0m) return user.Plan as PlanSuscripcion; // Free plan is always active
+        if (user.SubscriptionStatus == "active" || user.SubscriptionStatus == "trialing")
+        {
+            return user.Plan as PlanSuscripcion;
         }
         return null; // Treat as no paid plan
     }

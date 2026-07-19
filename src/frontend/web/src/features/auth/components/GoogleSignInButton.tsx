@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { isSubscriptionActive } from "../../pricing/utils/planCapabilities";
 import { Loader2 } from "lucide-react";
 
 export const GoogleSignInButton = () => {
@@ -27,7 +26,7 @@ export const GoogleSignInButton = () => {
       
       if (redirectUrl) {
         navigate(redirectUrl);
-      } else if (user?.pendingPlanCode && !isSubscriptionActive(user.subscriptionStatus)) {
+      } else if (user?.pendingPlanCode && !['active', 'trialing', 'free'].includes(user.subscriptionStatus?.toLowerCase() || '')) {
         navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
       } else {
         navigate("/admin/dashboard");
