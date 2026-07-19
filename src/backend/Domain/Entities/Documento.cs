@@ -136,4 +136,11 @@ public class Documento : EntityBase
         EstadoDocumento = newStatus;
         UpdatedAtUtc = DateTime.UtcNow;
     }
+
+    public void UpdateOcrResult(string ocrResultJson)
+    {
+        if (string.IsNullOrWhiteSpace(ocrResultJson)) throw new ArgumentException("JSON de OCR es requerido", nameof(ocrResultJson));
+        ResultadoOcrJson = ocrResultJson;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
 }

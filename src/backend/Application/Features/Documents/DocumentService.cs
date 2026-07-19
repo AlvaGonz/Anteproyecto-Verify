@@ -328,6 +328,35 @@ public class DocumentService : IDocumentService
         );
     }
 
+    public async Task<DocumentDto> UpdateDocumentFieldReviewAsync(Guid documentId, string fieldName, UpdateDocumentFieldReviewDto dto, CancellationToken cancellationToken = default)
+    {
+        var document = await _documentoRepository.GetByIdAsync(documentId, cancellationToken);
+        if (document == null)
+            throw new KeyNotFoundException($"Documento con ID {documentId} no encontrado.");
+
+        if (string.IsNullOrWhiteSpace(document.ResultadoOcrJson))
+            throw new InvalidOperationException("El documento no tiene resultados OCR para revisar.");
+
+        var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(document.ResultadoOcrJson, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        if (ocrResult == null)
+            throw new InvalidOperationException("No se pudo parsear el resultado OCR.");
+
+        if (!ocrResult.Fields.ContainsKey(fieldName))
+            throw new KeyNotFoundException($"Campo {fieldName} no encontrado en el resultado OCR.");
+
+        var field = ocrResult.Fields[fieldName];
+        var updatedField = field with { ReviewState = dto.ReviewState, CorrectedValue = dto.CorrectedValue };
+        ocrResult.Fields[fieldName] = updatedField;
+
+        var updatedJson = System.Text.Json.JsonSerializer.Serialize(ocrResult, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+        document.UpdateOcrResult(updatedJson);
+
+        _documentoRepository.Update(document);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return MapToDto(document);
+    }
+
     private static DocumentDto MapToDto(Documento d) => new(
         d.Id,
         d.ProyectoId,
@@ -345,6 +374,7 @@ public class DocumentService : IDocumentService
         d.Observaciones,
         d.RutaArchivo,
         d.CreatedAtUtc,
-        d.UpdatedAtUtc
+        d.UpdatedAtUtc,
+        d.ResultadoOcrJson
     );
 }

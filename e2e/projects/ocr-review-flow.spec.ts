@@ -59,7 +59,7 @@ test.describe('OCR Review Flow', () => {
     await page.goto(`/#/p/${MOCK_PROJECT_ID}`);
 
     // Verify OCR panel is visible
-    await expect(page.getByText('Revisión OCR')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Revisión OCR' })).toBeVisible();
 
     // Verify fields are rendered
     await expect(page.getByText(/Matricula/i)).toBeVisible();

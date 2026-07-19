@@ -275,6 +275,27 @@ public class ProjectDocumentsController : ControllerBase
         }
     }
 
+    [HttpPatch("{documentId}/fields/{fieldName}")]
+    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateDocumentFieldReview(Guid projectId, Guid documentId, string fieldName, [FromBody] UpdateDocumentFieldReviewDto dto)
+    {
+        try
+        {
+            var document = await _documentService.UpdateDocumentFieldReviewAsync(documentId, fieldName, dto);
+            return Ok(document);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpGet("required-documents")]
     [ProducesResponseType(typeof(IEnumerable<RequiredDocumentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

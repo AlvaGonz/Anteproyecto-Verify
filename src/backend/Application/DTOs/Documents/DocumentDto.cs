@@ -20,5 +20,6 @@ public record DocumentDto(
     string? Observaciones,
     string FileUrl,
     DateTime CreatedAtUtc,
-    DateTime? UpdatedAtUtc
+    DateTime? UpdatedAtUtc,
+    string? ResultadoOcrJson = null
 );

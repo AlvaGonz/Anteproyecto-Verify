@@ -21,3 +21,19 @@ export const useUploadDocument = (projectId: string) => {
     },
   });
 };
+
+export const useUpdateDocumentFieldReview = (projectId: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useUpdateDocumentFieldReview'],
+    mutationFn: ({ documentId, fieldName, data }: { documentId: string, fieldName: string, data: import('../types').UpdateDocumentFieldReviewDto }) =>
+      apiClient.patch<DocumentoDto>(
+        `/projects/${projectId}/documents/${documentId}/fields/${fieldName}`,
+        data
+      ).then(res => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });
+      qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
+  });
+};

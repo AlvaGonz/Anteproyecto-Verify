@@ -1,6 +1,7 @@
 import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
 import { useDocuments, useDownloadDocument } from "../api/useDocuments";
+import { OcrReviewPanel } from "./OcrReviewPanel";
 import {
   AlertTriangle,
   Clock,
@@ -82,7 +83,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
-        className={`group relative flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-[2rem] transition-all border ${isVerificado
+        className={`group relative flex flex-col p-6 rounded-[2rem] transition-all border ${isVerificado
           ? "bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30"
           : isObservado
             ? "bg-rose-500/[0.03] border-rose-500/10 hover:border-rose-500/30"
@@ -91,78 +92,89 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
           }`}
       >
-        <div className="flex items-start gap-4">
-          <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${isVerificado
-            ? "bg-emerald-500/10 text-emerald-500"
-            : isObservado
-              ? "bg-rose-500/10 text-rose-500"
-              : isPending
-                ? "bg-amber-500/10 text-amber-500"
-                : "bg-on-surface-variant/10 text-on-surface-variant"
-            }`}>
-            {isVerificado ? <ShieldCheck className="w-5 h-5" /> : isObservado ? <AlertTriangle className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-          </div>
-
-          <div className="space-y-1">
-            <h4 className={`text-sm font-black uppercase tracking-tight ${isVerificado ? "text-secondary" : "text-on-surface-variant"}`}>
-              {info.name}
-            </h4>
-            <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
-              <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                <Building2 className="w-3 h-3" />
-                <span className="text-[10px] font-black uppercase tracking-widest">{info.entity}</span>
-              </div>
-              <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                <Gavel className="w-3 h-3" />
-                <span className="text-[10px] font-black uppercase tracking-widest">{info.norm}</span>
-              </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${isVerificado
+              ? "bg-emerald-500/10 text-emerald-500"
+              : isObservado
+                ? "bg-rose-500/10 text-rose-500"
+                : isPending
+                  ? "bg-amber-500/10 text-amber-500"
+                  : "bg-on-surface-variant/10 text-on-surface-variant"
+              }`}>
+              {isVerificado ? <ShieldCheck className="w-5 h-5" /> : isObservado ? <AlertTriangle className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
             </div>
 
-            {/* Show related file name if doc exists */}
-            {doc && (
-              <div className="mt-3 flex items-center gap-2 px-3 py-1.5 bg-secondary/5 border border-secondary/10 rounded-xl w-fit group-hover:bg-secondary/10 transition-colors">
-                <FileCheck2 className="w-3.5 h-3.5 text-secondary/60" />
-                <span className="text-[11px] font-bold text-secondary/70 truncate max-w-[200px] md:max-w-[300px]" title={doc.nombreArchivoOriginal}>
-                  {doc.nombreArchivoOriginal}
-                </span>
+            <div className="space-y-1">
+              <h4 className={`text-sm font-black uppercase tracking-tight ${isVerificado ? "text-secondary" : "text-on-surface-variant"}`}>
+                {info.name}
+              </h4>
+              <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
+                <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                  <Building2 className="w-3 h-3" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">{info.entity}</span>
+                </div>
+                <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                  <Gavel className="w-3 h-3" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">{info.norm}</span>
+                </div>
               </div>
+
+              {/* Show related file name if doc exists */}
+              {doc && (
+                <div className="mt-3 flex items-center gap-2 px-3 py-1.5 bg-secondary/5 border border-secondary/10 rounded-xl w-fit group-hover:bg-secondary/10 transition-colors">
+                  <FileCheck2 className="w-3.5 h-3.5 text-secondary/60" />
+                  <span className="text-[11px] font-bold text-secondary/70 truncate max-w-[200px] md:max-w-[300px]" title={doc.nombreArchivoOriginal}>
+                    {doc.nombreArchivoOriginal}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {isVerificado && (
+              <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
+                VERIFICADO (OCR)
+              </div>
+            )}
+            {isObservado && (
+              <div className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest border border-rose-500/20">
+                OBSERVADO
+              </div>
+            )}
+            {!isVerificado && !isPending && !isObservado && (
+              <div className="px-3 py-1 rounded-full bg-on-surface-variant/5 text-on-surface-variant/40 text-[10px] font-black uppercase tracking-widest border border-on-surface-variant/5 italic">
+                NO SUMINISTRADO
+              </div>
+            )}
+            {isPending && !isObservado && doc?.estadoDocumento === DocumentStatus.EnRevision && (
+              <div className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-[10px] font-black uppercase tracking-widest border border-blue-500/20">
+                EN REVISIÓN OCR
+              </div>
+            )}
+            {isPending && !isObservado && doc?.estadoDocumento !== DocumentStatus.EnRevision && (
+              <div className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase tracking-widest border border-amber-500/20">
+                EN PROCESO
+              </div>
+            )}
+
+            {(isVerificado || isPending || isObservado) && doc?.id && (
+              <button
+                onClick={() => downloadDoc(doc.id)}
+                disabled={isDownloading}
+                className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
+                title="Descargar Documento"
+              >
+                <Download className="w-4 h-4" />
+              </button>
             )}
           </div>
         </div>
-
-        <div className="mt-4 sm:mt-0 flex items-center gap-4">
-          {isVerificado && (
-            <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-              VERIFICADO (OCR)
-            </div>
-          )}
-          {isObservado && (
-            <div className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest border border-rose-500/20">
-              OBSERVADO
-            </div>
-          )}
-          {!isVerificado && !isPending && !isObservado && (
-            <div className="px-3 py-1 rounded-full bg-on-surface-variant/5 text-on-surface-variant/40 text-[10px] font-black uppercase tracking-widest border border-on-surface-variant/5 italic">
-              NO SUMINISTRADO
-            </div>
-          )}
-          {isPending && !isObservado && (
-            <div className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase tracking-widest border border-amber-500/20">
-              EN PROCESO
-            </div>
-          )}
-
-          {(isVerificado || isPending || isObservado) && doc?.id && (
-            <button
-              onClick={() => downloadDoc(doc.id)}
-              disabled={isDownloading}
-              className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
-              title="Descargar Documento"
-            >
-              <Download className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        
+        {doc?.estadoDocumento === DocumentStatus.EnRevision && (
+          <OcrReviewPanel document={doc} />
+        )}
       </m.div>
     );
   };

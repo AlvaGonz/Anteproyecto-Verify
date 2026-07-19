@@ -16,6 +16,7 @@ export interface DocumentDto {
   createdAtUtc: string;
   updatedAtUtc?: string;
   fileUrl: string;
+  resultadoOcrJson?: string;
 }
 
 export enum DocumentType {
@@ -53,7 +54,7 @@ export enum DocumentStatus {
   Processing = 1,
   Valid = 2,
   Invalid = 3,
-  PreVerificado = 4,
+  EnRevision = 4,
   Observado = 5,
   Verificado = 6,
 }
@@ -63,4 +64,32 @@ export interface UpdateDocumentStatusDto {
   estadoDocumento?: DocumentStatus;
   activo?: boolean;
   observaciones?: string;
+}
+
+export enum OcrFieldReviewState {
+  Unreviewed = 0,
+  Confirmed = 1,
+  Corrected = 2,
+  Absent = 3
+}
+
+export interface OcrField {
+  name: string;
+  value: string;
+  confidence: number;
+  reviewState: OcrFieldReviewState;
+  correctedValue?: string;
+}
+
+export interface OcrResult {
+  success: boolean;
+  provider: string;
+  confidenceScore: number;
+  fields: Record<string, OcrField>;
+  error?: string;
+}
+
+export interface UpdateDocumentFieldReviewDto {
+  reviewState: OcrFieldReviewState;
+  correctedValue?: string;
 }

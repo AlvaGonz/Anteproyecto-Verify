@@ -16,4 +16,5 @@ export interface DocumentoDto {
   fileUrl: string;
   createdAtUtc: string;
   updatedAtUtc?: string;
+  resultadoOcrJson?: string;
 }
