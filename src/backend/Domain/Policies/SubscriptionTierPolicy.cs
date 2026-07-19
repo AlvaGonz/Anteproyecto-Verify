@@ -65,17 +65,48 @@ public static class SubscriptionTierPolicy
             var titularPlan = GetEffectivePlan(user.Titular);
             if (titularPlan != null && (titularPlan.MaxUsuariosSecundarios == -1 || titularPlan.MaxUsuariosSecundarios > 0))
             {
-                return titularPlan as PlanSuscripcion;
+                return titularPlan;
             }
         }
 
-        if (user.Plan == null) return null;
-        if (user.Plan.Precio == 0m) return user.Plan as PlanSuscripcion; // Free plan is always active
+        if (user.Plan == null) 
+        {
+            return null;
+        }
+        
+        if (user.Plan.Precio == 0m) 
+        {
+            return CreatePlanFromData(user.Plan);
+        }
+        
         if (user.SubscriptionStatus == "active" || user.SubscriptionStatus == "trialing")
         {
-            return user.Plan as PlanSuscripcion;
+            return CreatePlanFromData(user.Plan);
         }
+        
         return null; // Treat as no paid plan
+    }
+
+    private static PlanSuscripcion CreatePlanFromData(IPlanData planData)
+    {
+        return PlanSuscripcion.Create(
+            planData.Idsuscripcion,
+            planData.NombrePlan,
+            planData.Precio,
+            planData.MaxConsultas,
+            planData.MaxProyectos,
+            planData.PresentacionPublica,
+            planData.QrIncluido,
+            planData.MaxUsuariosSecundarios,
+            planData.MaxAlmacenamientoMb,
+            planData.AlertasTiempoRealDisponible,
+            planData.ModeloLmDisponible,
+            planData.ValidacionLoteDisponible,
+            planData.ExportacionExcelDisponible,
+            planData.ExportacionPdfDisponible,
+            planData.IntegracionCrmDisponible,
+            planData.SoporteTipo,
+            planData.AccesoApi);
     }
 
     public static bool CanConsult(Usuario usuario)

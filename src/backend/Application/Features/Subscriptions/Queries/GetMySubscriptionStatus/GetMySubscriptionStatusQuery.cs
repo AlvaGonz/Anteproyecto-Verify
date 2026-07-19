@@ -2,8 +2,10 @@ namespace Application.Features.Subscriptions.Queries.GetMySubscriptionStatus;
 
 using System;
 using Domain.Policies;
+using MediatR;
+using Application.DTOs.Subscriptions;
 
-public record GetMySubscriptionStatusQuery(Guid UserId);
+public record GetMySubscriptionStatusQuery(Guid UserId) : IRequest<MySubscriptionStatusDto>;
 
 public interface IUserSubscriptionReadRepository
 {

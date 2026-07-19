@@ -1,12 +1,12 @@
 namespace Application.Features.Subscriptions.Queries.GetMySubscriptionStatus;
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.DTOs.Subscriptions;
 using Domain.Policies;
+using MediatR;
 
-public class GetMySubscriptionStatusQueryHandler
+public class GetMySubscriptionStatusQueryHandler : IRequestHandler<GetMySubscriptionStatusQuery, MySubscriptionStatusDto>
 {
     private readonly IUserSubscriptionReadRepository _repository;
 
@@ -15,9 +15,9 @@ public class GetMySubscriptionStatusQueryHandler
         _repository = repository;
     }
 
-    public async Task<MySubscriptionStatusDto> HandleAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<MySubscriptionStatusDto> Handle(GetMySubscriptionStatusQuery request, CancellationToken cancellationToken = default)
     {
-        var user = await _repository.GetUserWithPlansAsync(userId, cancellationToken);
+        var user = await _repository.GetUserWithPlansAsync(request.UserId, cancellationToken);
 
         if (user == null)
         {
@@ -51,7 +51,7 @@ public class GetMySubscriptionStatusQueryHandler
             billingCycle = user.PendingBillingCycle ?? "monthly";
         }
 
-        var effectivePlan = SubscriptionTierPolicy.GetEffectivePlan(new EffectivePlanUserAdapter(user));
+        var effectivePlan = SubscriptionTierPolicy.GetEffectivePlan(new EffectivePlanUserAdapter(user, effectiveStatus));
 
         return new MySubscriptionStatusDto
         {
@@ -92,16 +92,18 @@ public class GetMySubscriptionStatusQueryHandler
     private sealed class EffectivePlanUserAdapter : Domain.Policies.IEffectivePlanUser
     {
         private readonly UserSubscriptionData _user;
+        private readonly string? _effectiveStatus;
 
-        public EffectivePlanUserAdapter(UserSubscriptionData user)
+        public EffectivePlanUserAdapter(UserSubscriptionData user, string? effectiveStatus = null)
         {
             _user = user;
+            _effectiveStatus = effectiveStatus;
         }
 
         public Guid? TitularId => _user.TitularId;
         public Domain.Policies.IEffectivePlanUser? Titular => _user.Titular != null ? new EffectivePlanUserAdapter(_user.Titular) : null;
         public Domain.Policies.IPlanData? Plan => _user.Plan;
-        public string? SubscriptionStatus => _user.SubscriptionStatus;
+        public string? SubscriptionStatus => _effectiveStatus ?? _user.SubscriptionStatus;
         public bool CancelAtPeriodEnd => _user.CancelAtPeriodEnd;
         public string? StripeCustomerId => null;
         public string? StripeSubscriptionId => _user.StripeSubscriptionId;

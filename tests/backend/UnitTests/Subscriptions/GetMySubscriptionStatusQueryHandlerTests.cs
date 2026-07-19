@@ -77,7 +77,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_UserWithProfesionalPlan_ReturnsAllPlanLimitsFromDatabase()
+    public async Task Handle_UserWithProfesionalPlan_ReturnsAllPlanLimitsFromDatabase()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -88,7 +88,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var handler = new GetMySubscriptionStatusQueryHandler(repository);
 
         // Act
-        var result = await handler.HandleAsync(user.Id, CancellationToken.None);
+        var query = new GetMySubscriptionStatusQuery(user.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -117,7 +118,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_UserWithConsultorPlan_ReturnsFreePlanLimits()
+    public async Task Handle_UserWithConsultorPlan_ReturnsFreePlanLimits()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -128,7 +129,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var handler = new GetMySubscriptionStatusQueryHandler(repository);
 
         // Act
-        var result = await handler.HandleAsync(user.Id, CancellationToken.None);
+        var query = new GetMySubscriptionStatusQuery(user.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -155,7 +157,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_UserWithCorporativoPlan_ReturnsUnlimitedLimits()
+    public async Task Handle_UserWithCorporativoPlan_ReturnsUnlimitedLimits()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -166,7 +168,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var handler = new GetMySubscriptionStatusQueryHandler(repository);
 
         // Act
-        var result = await handler.HandleAsync(user.Id, CancellationToken.None);
+        var query = new GetMySubscriptionStatusQuery(user.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -191,7 +194,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_GuestUser_ReturnsTitularPlanLimits()
+    public async Task Handle_GuestUser_ReturnsTitularPlanLimits()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -214,7 +217,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var handler = new GetMySubscriptionStatusQueryHandler(repository);
 
         // Act
-        var result = await handler.HandleAsync(guest.Id, CancellationToken.None);
+        var query = new GetMySubscriptionStatusQuery(guest.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -231,7 +235,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_UserWithNoPlan_ReturnsNullPlanLimits()
+    public async Task Handle_UserWithNoPlan_ReturnsNullPlanLimits()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -245,7 +249,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var handler = new GetMySubscriptionStatusQueryHandler(repository);
 
         // Act
-        var result = await handler.HandleAsync(user.Id, CancellationToken.None);
+        var query = new GetMySubscriptionStatusQuery(user.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -254,7 +259,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_UserWithActiveSubscriptionButCancelledAtPeriodEnd_ReturnsCancelingStatus()
+    public async Task Handle_UserWithActiveSubscriptionButCancelledAtPeriodEnd_ReturnsCancelingStatus()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -269,7 +274,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var handler = new GetMySubscriptionStatusQueryHandler(repository);
 
         // Act
-        var result = await handler.HandleAsync(user.Id, CancellationToken.None);
+        var query = new GetMySubscriptionStatusQuery(user.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.Equal("canceling", result.SubscriptionStatus);
@@ -277,7 +283,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_IncludesUsageCountersFromUser()
+    public async Task Handle_IncludesUsageCountersFromUser()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -293,7 +299,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var handler = new GetMySubscriptionStatusQueryHandler(repository);
 
         // Act
-        var result = await handler.HandleAsync(user.Id, CancellationToken.None);
+        var query = new GetMySubscriptionStatusQuery(user.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result.PlanLimits);
