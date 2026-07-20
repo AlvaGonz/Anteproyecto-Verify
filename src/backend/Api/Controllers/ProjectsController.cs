@@ -10,6 +10,7 @@ using Application.Contracts.Projects;
 using Application.Contracts.Documents;
 using Application.DTOs;
 using Application.DTOs.Projects;
+using Domain.Entities;
 using Domain.Enums;
 using Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,7 @@ using Application.Common.Exceptions;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Application.Abstractions.Storage;
+using Infrastructure.Persistence;
 
 
 [ApiController]
@@ -29,17 +31,20 @@ public class ProjectsController : ControllerBase
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IBlobStorageService _blobStorageService;
     private readonly IDocumentService _documentService;
+    private readonly AppDbContext _dbContext;
 
     public ProjectsController(
         IProjectService projectService,
         IUsuarioRepository usuarioRepository,
         IBlobStorageService blobStorageService,
-        IDocumentService documentService)
+        IDocumentService documentService,
+        AppDbContext dbContext)
     {
         _projectService = projectService;
         _usuarioRepository = usuarioRepository;
         _blobStorageService = blobStorageService;
         _documentService = documentService;
+        _dbContext = dbContext;
     }
 
     [HttpGet]
@@ -59,6 +64,12 @@ public class ProjectsController : ControllerBase
                     {
                         projects = projects.Where(p => p.UsuarioCreadorId == userId);
                     }
+                    
+                    // Log the consulta for authenticated users viewing project list
+                    var log = new LogConsulta(userId, true, "Consulta lista de proyectos");
+                    _dbContext.LogConsultas.Add(log);
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                    
                     return Ok(projects);
                 }
             }
@@ -77,6 +88,19 @@ public class ProjectsController : ControllerBase
         {
             return NotFound();
         }
+
+        // Log the consulta for authenticated users viewing public projects
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (Guid.TryParse(userIdClaim, out var userId))
+            {
+                var log = new LogConsulta(userId, true, $"Consulta pública proyecto: {project.CodigoInterno}");
+                _dbContext.LogConsultas.Add(log);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         return Ok(project);
     }
 
