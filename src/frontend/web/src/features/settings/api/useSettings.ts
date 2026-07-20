@@ -129,7 +129,7 @@ export const PlanLimitsSchema = z.object({
   exportacionExcel: z.boolean(),
   exportacionPdf: z.boolean(),
   integracionCrm: z.boolean(),
-  soporteTipo: z.string(),
+  soporteTipo: z.string().nullable().default(''),
   accesoApi: z.boolean(),
   consultasUsadas: z.number(),
   proyectosCreados: z.number(),
@@ -146,8 +146,8 @@ export const MySubscriptionStatusSchema = z.object({
   isManagedByStripe: z.boolean(),
   billingCycle: z.string().nullable(),
   isGuest: z.boolean().optional(),
-  inviterPlan: z.string().optional(),
-  inviterName: z.string().optional(),
+  inviterPlan: z.string().nullable().optional(),
+  inviterName: z.string().nullable().optional(),
   planLimits: PlanLimitsSchema.nullable(),
 });
 
@@ -156,10 +156,24 @@ export type MySubscriptionStatus = z.infer<typeof MySubscriptionStatusSchema>;
 export const useMySubscription = (options?: { refetchInterval?: number }) =>
   useQuery<MySubscriptionStatus>({
     queryKey: ["subscription", "my-status"],
-    queryFn: () =>
-      apiClient
-        .get<MySubscriptionStatus>("/v1/subscriptions/my-status")
-        .then((res) => MySubscriptionStatusSchema.parse(res.data)),
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get<MySubscriptionStatus>("/v1/subscriptions/my-status");
+        // ponytail: log raw response for debugging
+        console.log('[useMySubscription] Raw response:', res.data);
+        return MySubscriptionStatusSchema.parse(res.data);
+      } catch (err: any) {
+        // ponytail: log actual error for debugging silent failures
+        console.error('[useMySubscription] API error:', {
+          status: err.response?.status,
+          data: err.response?.data,
+          message: err.message,
+          url: err.config?.url,
+          zodIssues: err.issues ?? err.errors,
+        });
+        throw err;
+      }
+    },
     staleTime: 0,
     gcTime: 1000 * 30,
     refetchOnWindowFocus: true,

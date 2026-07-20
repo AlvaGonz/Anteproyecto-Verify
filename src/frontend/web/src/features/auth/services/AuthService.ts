@@ -1,4 +1,4 @@
-import { apiClient, setAccessToken } from "../../../infrastructure/api/client";
+import { apiClient, setAccessToken, getAccessToken } from "../../../infrastructure/api/client";
 
 export interface User {
   id: string;
@@ -142,10 +142,29 @@ export const AuthService = {
     }
   },
 
+  async refreshAccessToken(): Promise<string | null> {
+    try {
+      const response = await apiClient.post('/auth/refresh', {}, { withCredentials: true });
+      const token = response.data.accessToken ?? null;
+      if (token) {
+        setAccessToken(token);
+      }
+      return token;
+    } catch {
+      setAccessToken(null);
+      return null;
+    }
+  },
+
   async getCurrentUser(): Promise<User | null> {
     try {
       const response = await apiClient.get('/auth/me');
-      return response.data;
+      const user = response.data;
+      // After successful auth via cookie, refresh to populate in-memory token for subsequent requests
+      if (user && !getAccessToken()) {
+        await this.refreshAccessToken();
+      }
+      return user;
     } catch {
       return null;
     }

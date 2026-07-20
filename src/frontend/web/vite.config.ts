@@ -5,8 +5,8 @@ import path from 'path';
 
 // In Docker, the API is reachable at 'api:8080' (container name + internal port)
 // On host, it's 'localhost:5000'
-const apiTarget = process.env.DOCKER_CONTAINER === 'true' 
-    ? 'http://api:8080' 
+const apiTarget = process.env.DOCKER_CONTAINER === 'true'
+    ? 'http://api:8080'
     : 'http://localhost:5000';
 
 export default defineConfig({
@@ -31,11 +31,15 @@ export default defineConfig({
                 target: apiTarget,
                 changeOrigin: true,
                 secure: false,
-            },
-            '/v1': {
-                target: apiTarget,
-                changeOrigin: true,
-                secure: false,
+                cookieDomainRewrite: 'localhost',
+                configure: (proxy, _options) => {
+                    proxy.on('error', (err, _req, _res) => {
+                        console.log('proxy error', err);
+                    });
+                    proxy.on('proxyReq', (proxyReq, req, _res) => {
+                        console.log('Proxying:', req.method, req.url, '->', apiTarget + req.url);
+                    });
+                },
             },
         },
     },

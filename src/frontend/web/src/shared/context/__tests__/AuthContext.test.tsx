@@ -10,6 +10,7 @@ vi.mock('../../../features/auth/services/AuthService', () => ({
     login: vi.fn(),
     logout: vi.fn(),
     getCurrentUser: vi.fn().mockResolvedValue(null),
+    refreshAccessToken: vi.fn().mockResolvedValue(null),
   }
 }));
 
