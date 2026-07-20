@@ -83,6 +83,10 @@ export const router = createHashRouter([
         element: <ProjectsPublicListPage />,
       },
       {
+        path: "/projects/publicados",
+        element: <Navigate to="/projects" replace />,
+      },
+      {
         path: "/login",
         element: (
           <GuestGuard>
