@@ -44,6 +44,20 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
     return <div className="text-red-500 text-sm mt-4 p-4 bg-red-50 rounded-xl border border-red-100">Error parsing OCR results.</div>;
   }
 
+  if (ocrResult.success === false || ocrResult.error) {
+    return (
+      <div className="mt-6 p-6 rounded-2xl bg-red-50/80 backdrop-blur-sm border border-red-200 shadow-sm">
+        <div className="flex items-center gap-3 mb-2 text-red-600">
+          <AlertTriangle className="w-5 h-5" />
+          <h4 className="text-sm font-bold uppercase tracking-wider">Error en Procesamiento OCR</h4>
+        </div>
+        <div className="text-sm text-red-700/80 mb-4">
+          Hubo un problema al procesar este documento. El equipo técnico ha sido notificado.
+        </div>
+      </div>
+    );
+  }
+
   const fields = Object.values(ocrResult.fields || {});
 
   if (fields.length === 0) {

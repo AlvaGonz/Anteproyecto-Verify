@@ -366,8 +366,8 @@ public class AuthController : ControllerBase
                              (!m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")),
                     maxProyectosDelegados = m.MaxProyectosDelegados,
                     maxConsultasDelegadas = m.MaxConsultasDelegadas,
-                    proyectosCreados = m.ProyectosCreados,
-                    consultasUsadas = m.ConsultasUsadas
+                    proyectosCreados = _context.Proyectos.Count(p => p.UsuarioCreadorId == m.Id),
+                    consultasUsadas = _context.LogConsultas.Count(lc => lc.UsuarioId == m.Id)
                 })
         });
     }

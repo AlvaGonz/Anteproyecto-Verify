@@ -316,6 +316,12 @@ export const SubscriptionSettings: React.FC = () => {
                 >
                   Presentación Pública
                 </button>
+                
+                {limits.accesoApi && (
+                  <div data-testid="api-access-section" className="px-4 py-2 rounded-lg border font-semibold text-sm bg-white text-text-primary">
+                    API
+                  </div>
+                )}
               </div>
             </div>
             </>

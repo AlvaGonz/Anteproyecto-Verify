@@ -4,11 +4,11 @@ using Xunit;
 
 namespace Api.Tests;
 
-public class SwaggerTests : IClassFixture<WebApplicationFactory<Program>>
+public class SwaggerTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public SwaggerTests(WebApplicationFactory<Program> factory)
+    public SwaggerTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }

@@ -102,6 +102,9 @@ public class SubscriptionService : ISubscriptionService
         if (user == null)
             throw new Exception("User not found.");
 
+        var realConsultasUsadas = await _dbContext.LogConsultas.CountAsync(lc => lc.UsuarioId == userId, ct);
+        var realProyectosCreados = await _dbContext.Proyectos.CountAsync(p => p.UsuarioCreadorId == userId, ct);
+
         var hasPlan = user.Plan != null;
         var effectiveStatus = user.SubscriptionStatus
             ?? (hasPlan ? "active" : null);
@@ -177,8 +180,8 @@ public class SubscriptionService : ISubscriptionService
                 IntegracionCrm = effectivePlan.IntegracionCrmDisponible,
                 SoporteTipo = effectivePlan.SoporteTipo,
                 AccesoApi = effectivePlan.AccesoApi,
-                ConsultasUsadas = user.ConsultasUsadas,
-                ProyectosCreados = user.ProyectosCreados
+                ConsultasUsadas = realConsultasUsadas,
+                ProyectosCreados = realProyectosCreados
             } : null
         };
     }

@@ -39,15 +39,20 @@ public class DocumentStateEngine : IDocumentStateEngine
             var normalizedFields = _normalizer.Normalize(ocrResult, document.TipoDocumento);
             var validationResult = _ruleEngine.Validate(normalizedFields, allRules);
 
-            // Merge the field validation result into the stored JSON
-            var options = new JsonSerializerOptions { WriteIndented = false };
-            
-            // As decided in the plan, we enrich the OCR JSON instead of a new DB column
-            var enrichedJson = JsonSerializer.Serialize(new {
-                RawOcr = ocrResult.RawJson,
-                FieldValidation = validationResult,
-                NormalizedFields = normalizedFields
-            }, options);
+            // Populate the Fields dictionary in OcrResult
+            foreach (var kvp in normalizedFields)
+            {
+                ocrResult.Fields[kvp.Key] = new OcrField 
+                {
+                    Name = kvp.Key,
+                    Value = kvp.Value.Value,
+                    Confidence = kvp.Value.Confidence,
+                    ReviewState = kvp.Value.Presente ? OcrFieldReviewState.Unreviewed : OcrFieldReviewState.Absent
+                };
+            }
+
+            var options = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var enrichedJson = JsonSerializer.Serialize(ocrResult, options);
 
             var newStatus = validationResult.EstadoResultante == "Verificado" ? DocumentStatus.EnRevision : DocumentStatus.EnRevision; // Always go to EnRevision for HITL
 
@@ -55,7 +60,9 @@ public class DocumentStateEngine : IDocumentStateEngine
         }
         else
         {
-            document.SetOcrResult(ocrResult.RawJson, DocumentStatus.Observado);
+            var options = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var errorJson = JsonSerializer.Serialize(ocrResult, options);
+            document.SetOcrResult(errorJson, DocumentStatus.Observado);
         }
     }
 }

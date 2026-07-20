@@ -12,14 +12,17 @@ using Application.Abstractions.Notifications;
 using Api.Controllers;
 using Infrastructure.Persistence;
 using System.Collections.Generic;
+using MediatR;
+using Application.Contracts.Subscriptions;
 
 namespace Api.Tests.Subscriptions;
 
 public class SubscriptionControllerTests
 {
-    private SubscriptionController CreateController()
+    private SubscriptionController CreateController(out ISubscriptionService subscriptionService)
     {
-        var dbContext = Substitute.For<AppDbContext>(new Microsoft.EntityFrameworkCore.DbContextOptions<AppDbContext>());
+        var sender = Substitute.For<ISender>();
+        subscriptionService = Substitute.For<ISubscriptionService>();
         var logger = Substitute.For<ILogger<SubscriptionController>>();
         var config = Substitute.For<IConfiguration>();
         var emailService = Substitute.For<IEmailService>();
@@ -32,11 +35,11 @@ public class SubscriptionControllerTests
         pricePlanMapSection.GetChildren().Returns(new List<IConfigurationSection> { childSection });
         config.GetSection("Stripe:PricePlanMap").Returns(pricePlanMapSection);
 
-        var controller = new SubscriptionController(dbContext, config, logger, emailService);
+        var controller = new SubscriptionController(sender, subscriptionService, config, logger);
         
         var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
-            new Claim(ClaimTypes.NameIdentifier, "123")
+            new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
         }, "mock"));
 
         controller.ControllerContext = new ControllerContext
@@ -51,14 +54,10 @@ public class SubscriptionControllerTests
     public async Task GetSessionStatus_WithCamelCaseSessionId_Returns200()
     {
         // Arrange
-        var controller = CreateController();
-        
-        var mockStripeClient = Substitute.For<IStripeClient>();
-        var sessionResponse = new Stripe.Checkout.Session { Id = "cs_test_xxx", Status = "complete" };
-        mockStripeClient.RequestAsync<Stripe.Checkout.Session>(Arg.Any<System.Net.Http.HttpMethod>(), Arg.Any<string>(), Arg.Any<BaseOptions>(), Arg.Any<RequestOptions>(), Arg.Any<CancellationToken>())
-                        .Returns(Task.FromResult(sessionResponse));
-        
-        StripeConfiguration.StripeClient = mockStripeClient;
+        var controller = CreateController(out var subscriptionService);
+        var expectedStatus = new Application.DTOs.Subscriptions.SessionStatusDto { Status = "complete" };
+        subscriptionService.GetSessionStatusAsync(Arg.Any<Guid>(), "cs_test_xxx", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(expectedStatus));
 
         // Act
         var result = await controller.GetSessionStatus(sessionId: "cs_test_xxx", session_id: null, CancellationToken.None);
@@ -72,14 +71,10 @@ public class SubscriptionControllerTests
     public async Task GetSessionStatus_WithSnakeCaseSessionId_Returns200()
     {
         // Arrange
-        var controller = CreateController();
-        
-        var mockStripeClient = Substitute.For<IStripeClient>();
-        var sessionResponse = new Stripe.Checkout.Session { Id = "cs_test_xxx", Status = "complete" };
-        mockStripeClient.RequestAsync<Stripe.Checkout.Session>(Arg.Any<System.Net.Http.HttpMethod>(), Arg.Any<string>(), Arg.Any<BaseOptions>(), Arg.Any<RequestOptions>(), Arg.Any<CancellationToken>())
-                        .Returns(Task.FromResult(sessionResponse));
-        
-        StripeConfiguration.StripeClient = mockStripeClient;
+        var controller = CreateController(out var subscriptionService);
+        var expectedStatus = new Application.DTOs.Subscriptions.SessionStatusDto { Status = "complete" };
+        subscriptionService.GetSessionStatusAsync(Arg.Any<Guid>(), "cs_test_xxx", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(expectedStatus));
 
         // Act
         var result = await controller.GetSessionStatus(sessionId: null, session_id: "cs_test_xxx", CancellationToken.None);
@@ -93,28 +88,10 @@ public class SubscriptionControllerTests
     public async Task GetSessionStatus_ReturnsPlanName_WhenConfigured()
     {
         // Arrange
-        var controller = CreateController();
-        
-        var mockStripeClient = Substitute.For<IStripeClient>();
-        var sessionResponse = new Stripe.Checkout.Session 
-        { 
-            Id = "cs_test_xxx", 
-            Status = "complete",
-            LineItems = new Stripe.StripeList<Stripe.LineItem>
-            {
-                Data = new List<Stripe.LineItem>
-                {
-                    new Stripe.LineItem
-                    {
-                        Price = new Stripe.Price { Id = "price_1TouQgIlzw9mY1SEz7GoFFQU" }
-                    }
-                }
-            }
-        };
-        mockStripeClient.RequestAsync<Stripe.Checkout.Session>(Arg.Any<System.Net.Http.HttpMethod>(), Arg.Any<string>(), Arg.Any<BaseOptions>(), Arg.Any<RequestOptions>(), Arg.Any<CancellationToken>())
-                        .Returns(Task.FromResult(sessionResponse));
-        
-        StripeConfiguration.StripeClient = mockStripeClient;
+        var controller = CreateController(out var subscriptionService);
+        var expectedStatus = new Application.DTOs.Subscriptions.SessionStatusDto { Status = "complete", Plan = "Profesional" };
+        subscriptionService.GetSessionStatusAsync(Arg.Any<Guid>(), "cs_test_xxx", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(expectedStatus));
 
         // Act
         var result = await controller.GetSessionStatus(sessionId: "cs_test_xxx", session_id: null, CancellationToken.None);
@@ -122,6 +99,6 @@ public class SubscriptionControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         var json = System.Text.Json.JsonSerializer.Serialize(okResult.Value);
-        Assert.Contains("\"plan\":\"Profesional\"", json);
+        Assert.Contains("\"Plan\":\"Profesional\"", json);
     }
 }

@@ -116,8 +116,8 @@ public class SettingsController : ControllerBase
                         PlanPrice = u.TitularId != null ? 0m : (u.Plan != null ? u.Plan.Precio : 0m),
                         PlanCreatedAt = u.CreatedAtUtc,
                         PlanExpiresAt = u.CurrentPeriodEnd,
-                        UsedProjects = u.ProyectosCreados,
-                        UsedQueries = u.ConsultasUsadas,
+                        UsedProjects = _context.Proyectos.Count(p => p.UsuarioCreadorId == u.Id),
+                        UsedQueries = _context.LogConsultas.Count(lc => lc.UsuarioId == u.Id),
                         MaxInvitees = u.TitularId != null ? 0 : (u.Plan != null ? u.Plan.MaxUsuariosSecundarios : 0),
                         InviteesCount = inviteesCount
                     };

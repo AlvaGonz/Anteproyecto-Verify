@@ -3,16 +3,13 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Controllers;
-using Application.Abstractions;
+using Application.Contracts.Subscriptions;
 using Application.Abstractions.Notifications;
-using Domain.Entities;
-using Domain.Enums;
-using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MediatR;
 using NSubstitute;
 using Xunit;
 
@@ -20,24 +17,17 @@ namespace Api.Tests.Subscriptions;
 
 public class SubscriptionCancellationTests
 {
-    private (SubscriptionController, AppDbContext, IStripeService) CreateControllerAndMocks(Guid userId, Usuario user)
+    private (SubscriptionController, ISubscriptionService) CreateControllerAndMocks(Guid userId)
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-            
-        var dbContext = new AppDbContext(options);
-        dbContext.Usuarios.Add(user);
-        dbContext.SaveChanges();
-
+        var sender = Substitute.For<ISender>();
+        var subscriptionService = Substitute.For<ISubscriptionService>();
         var logger = Substitute.For<ILogger<SubscriptionController>>();
         var config = Substitute.For<IConfiguration>();
         var emailService = Substitute.For<IEmailService>();
-        var stripeService = Substitute.For<IStripeService>();
 
         config["Stripe:SecretKey"].Returns("sk_test_mock");
 
-        var controller = new SubscriptionController(dbContext, config, logger, emailService);
+        var controller = new SubscriptionController(sender, subscriptionService, config, logger);
 
         var claimsUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
@@ -49,50 +39,36 @@ public class SubscriptionCancellationTests
             HttpContext = new DefaultHttpContext { User = claimsUser }
         };
 
-        return (controller, dbContext, stripeService);
+        return (controller, subscriptionService);
     }
 
     [Fact]
-    public async Task CancelSubscription_WithValidSub_ReturnsOkAndCallsStripe()
+    public async Task CancelSubscription_ReturnsOkAndCallsSubscriptionService()
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var user = new Usuario("Test", "User", "test@example.com", "hash", UserRole.User, "123", "123");
-        user.UpdateStripeSubscription("sub_123", "active", DateTime.UtcNow.AddDays(10));
-        // Using reflection to set ID since it's typically set by EF
-        typeof(Usuario).BaseType?.GetProperty("Id")?.SetValue(user, userId);
-
-        var (controller, dbContext, stripeService) = CreateControllerAndMocks(userId, user);
-
-        stripeService.CancelAtPeriodEndAsync("sub_123", Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<DateTime?>(DateTime.UtcNow.AddDays(10)));
+        var (controller, subscriptionService) = CreateControllerAndMocks(userId);
 
         // Act
-        var result = await controller.CancelSubscription(stripeService, CancellationToken.None);
+        var result = await controller.CancelSubscription(CancellationToken.None);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        await stripeService.Received(1).CancelAtPeriodEndAsync("sub_123", Arg.Any<CancellationToken>());
+        await subscriptionService.Received(1).CancelSubscriptionAsync(userId, Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task ReactivateSubscription_WithCancelPending_ReturnsOkAndCallsStripe()
+    public async Task ReactivateSubscription_ReturnsOkAndCallsSubscriptionService()
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var user = new Usuario("Test", "User", "test@example.com", "hash", UserRole.User, "123", "123");
-        user.UpdateStripeSubscription("sub_123", "active", DateTime.UtcNow.AddDays(10));
-        typeof(Usuario).BaseType?.GetProperty("Id")?.SetValue(user, userId);
-
-        var (controller, dbContext, stripeService) = CreateControllerAndMocks(userId, user);
-
-        user.SetCancellationScheduled(DateTime.UtcNow.AddDays(10));
+        var (controller, subscriptionService) = CreateControllerAndMocks(userId);
 
         // Act
-        var result = await controller.ReactivateSubscription(stripeService, CancellationToken.None);
+        var result = await controller.ReactivateSubscription(CancellationToken.None);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        await stripeService.Received(1).ReactivateSubscriptionAsync("sub_123", Arg.Any<CancellationToken>());
+        await subscriptionService.Received(1).ReactivateSubscriptionAsync(userId, Arg.Any<CancellationToken>());
     }
 }

@@ -38,7 +38,11 @@ async def extract_text(file: UploadFile = File(...)):
         # Let's handle both single image and multi-page pdf structures safely.
         
         if result is None:
-            extracted_text = ""
+            return {
+                "Success": False,
+                "ExtractedText": "",
+                "RawJson": "No text extracted or unsupported file format."
+            }
         else:
             for page in result:
                 if page is None:

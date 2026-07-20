@@ -60,6 +60,8 @@ public class ProjectServiceTests
 
         _usuarioRepoMock.GetByIdWithPlanAsync(userId, Arg.Any<CancellationToken>()).Returns(user);
         _proyectoRepoMock.CountByUsuarioAsync(userId, Arg.Any<CancellationToken>()).Returns(1);
+        _proyectoRepoMock.GetEstadoByStatusAsync(ProjectStatus.Creado, Arg.Any<CancellationToken>())
+            .Returns(new ProyectoEstado("CREADO", "Creado", "Desc", "Cond", "#000000"));
 
         var dto = new CreateProyectoDto(
             "New Project",

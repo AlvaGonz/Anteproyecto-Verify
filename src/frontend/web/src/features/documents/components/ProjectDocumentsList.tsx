@@ -18,6 +18,11 @@ interface ProjectDocumentsListProps {
 }
 
 const DOCUMENT_TYPE_NAMES: Record<number, string> = {
+  [DocumentType.TITLE]: "Certificado de Título",
+  [DocumentType.LEGAL_STATUS]: "Estado Jurídico",
+  [DocumentType.SURVEY]: "Plano Mensura",
+  [DocumentType.ID]: "Copia Cédula",
+  [DocumentType.NOTARIAL_POWER]: "Poder Notarial",
   [DocumentType.CertificadoTitulo]: "Certificado de Título",
   [DocumentType.CertificacionEstadoJuridico]: "Estado Jurídico",
   [DocumentType.PlanosArquitectonicos]: "Planos Arquitectónicos",

@@ -71,8 +71,7 @@ namespace Infrastructure.Persistence.Repositories
                 .Select(g => new { Plan = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);
                 
-            var totalConsultas = await activeUsersQuery.SumAsync(u => u.ConsultasUsadas, cancellationToken);
-            var totalProyectosRegistrados = await activeUsersQuery.SumAsync(u => u.ProyectosCreados, cancellationToken);
+            var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
 
             return new DashboardStatsDto
             {
@@ -87,7 +86,7 @@ namespace Infrastructure.Persistence.Repositories
                 ProyectosRecientes = proyectosRecientes,
                 UsuariosPorPlan = usuariosPorPlan,
                 TotalConsultasRealizadas = totalConsultas,
-                TotalProyectosRegistrados = totalProyectosRegistrados
+                TotalProyectosRegistrados = totalProyectos
             };
         }
     }

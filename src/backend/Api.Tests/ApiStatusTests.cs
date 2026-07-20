@@ -4,11 +4,11 @@ using Xunit;
 
 namespace Api.Tests;
 
-public class ApiStatusTests : IClassFixture<WebApplicationFactory<Program>>
+public class ApiStatusTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public ApiStatusTests(WebApplicationFactory<Program> factory)
+    public ApiStatusTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }

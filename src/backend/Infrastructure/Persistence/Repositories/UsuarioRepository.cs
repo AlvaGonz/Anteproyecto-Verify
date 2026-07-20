@@ -110,8 +110,8 @@ public class UsuarioRepository : IUsuarioRepository, Application.Features.Subscr
                     SoporteTipo = u.Plan.SoporteTipo,
                     AccesoApi = u.Plan.AccesoApi
                 } : null,
-                ConsultasUsadas = u.ConsultasUsadas,
-                ProyectosCreados = u.ProyectosCreados,
+                ConsultasUsadas = _context.LogConsultas.Count(lc => lc.UsuarioId == u.Id),
+                ProyectosCreados = _context.Proyectos.Count(p => p.UsuarioCreadorId == u.Id),
                 SubscriptionStatus = u.SubscriptionStatus,
                 CurrentPeriodEnd = u.CurrentPeriodEnd,
                 CancelAtPeriodEnd = u.CancelAtPeriodEnd,
