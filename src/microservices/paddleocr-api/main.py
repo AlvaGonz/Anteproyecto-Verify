@@ -21,8 +21,12 @@ async def extract_text(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="No file uploaded")
         
     try:
-        # Save uploaded file to a temporary file for processing
-        suffix = ".pdf" if file.filename.lower().endswith(".pdf") else ".png"
+        # Read the first 5 bytes to check for PDF signature
+        header = file.file.read(5)
+        file.file.seek(0)
+        
+        is_pdf = header == b'%PDF-'
+        suffix = ".pdf" if is_pdf else ".png"
         
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
             shutil.copyfileobj(file.file, temp_file)

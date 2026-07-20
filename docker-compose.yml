@@ -21,6 +21,7 @@ services:
       - UseMockData=false
       - ConnectionStrings__DefaultConnection=$ConnectionStrings__DockerConnection
       - AzureBlob__ConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+      - Ocr__PaddleOcrBaseUrl=http://paddleocr-api:8000
     env_file:
       - .env
     entrypoint: ["dotnet", "Api.dll", "--urls", "http://0.0.0.0:8080"]

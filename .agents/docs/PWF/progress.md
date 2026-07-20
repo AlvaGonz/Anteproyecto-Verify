@@ -69,7 +69,22 @@
 
 > Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch â€” +5 items, 34 total)
 
-## ðŸ�› Resolved Bugs
+## ðŸ› Resolved Bugs
+- **BUG-032:** Maple OCR processes PDF but extracted data doesn't appear in UI.
+  - **Symptom:** After uploading a PDF document, the UI displays "DESCONOCIDO" and "No se extrajeron datos de este documento."
+  - **Root Cause:** The `paddleocr-api` relied solely on the `.pdf` file extension to detect PDFs. If the backend sent a file with another extension (e.g., `document`), the Python script treated it as a PNG image, which caused PaddleOCR to fail with `error in loading image`, resulting in an empty extracted text string, which `DocumentStateEngine` interpreted as an empty OCR extraction (hence "No se extrajeron datos").
+  - [x] Integrate magic-byte checking in `paddleocr-api/main.py`.
+  - [x] Run full Playwright test suite (`e2e/projects/`).
+  - [x] Fix any E2E flakiness (`pricing-checkout.spec.ts`).
+  - [x] Validate OCR Review Panel integration and document state flow. Rebuilt/restarted the `paddleocr-api` container.
+- **BUG-031:** 404 Not Found on `PATCH /api/projects/{projectId}/documents/{documentId}/type`.
+  - **Symptom:** Selecting a document in the dropdown or clicking delete triggers a PATCH request that returns `404 Not Found`.
+  - **Root Cause:** A previous agent added the `[HttpPatch("{documentId}/type")]` route to `ProjectDocumentsController.cs`, but the backend Docker container `api` was not rebuilt to compile and host the new route.
+  - **Fix:** Fixed by executing `docker compose build api` and `docker compose up -d api` to rebuild the backend API container, after which the endpoint became available and returned 401/200 properly.
+- **BUG-030:** 500 Error on Document Upload and missing validation states in UI.
+  - **Symptom:** Document uploads return 500 errors and the UI does not show explicit document processing states (Procesando/Verificado/Rechazado) or the uploaded file name.
+  - **Root Cause:** Backend error on upload and missing properties in UI components meant that state and filename were not passed down to the `RequirementUploadRow`.
+  - **Fix:** Fixed upload 500 error, updated `RequirementUploadRow` to accept `fileName` and `documentStatus`, added `ShieldCheck` UI icon for Verificado, and added Playwright/Vitest tests to cover the transitions.
 - **BUG-007:** 404 Not Found on `/api/auth/resend-verification`.
   - **Symptom:** The new frontend `useResendVerificationEmail` mutation failed with `404 Not Found` despite the backend having the endpoint correctly implemented.
   - **Root Cause:** `dotnet watch` inside the Docker container failed to hot-reload and compile the newly added `ResendVerificationEmail` namespace. The `Api` container was still running the older version without the endpoint mapped.
@@ -262,21 +277,6 @@
 
 **Audit findings resolved:** RF-2 gap, RF-10 gap, RNF-3/4/5 gaps, PERF-001 reclassified P1, OE traceability corrected, "47 requisitos" source clarified.
 
-> Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch â€” +5 items, 34 total)
-
-## ðŸ�› Resolved Bugs
-- **BUG-031:** 404 Not Found on `PATCH /api/projects/{projectId}/documents/{documentId}/type`.
-  - **Symptom:** Selecting a document in the dropdown or clicking delete triggers a PATCH request that returns `404 Not Found`.
-  - **Root Cause:** A previous agent added the `[HttpPatch("{documentId}/type")]` route to `ProjectDocumentsController.cs`, but the backend Docker container `api` was not rebuilt to compile and host the new route.
-  - **Fix:** Fixed by executing `docker compose build api` and `docker compose up -d api` to rebuild the backend API container, after which the endpoint became available and returned 401/200 properly.
-- **BUG-030:** 500 Error on Document Upload and missing validation states in UI.
-  - **Symptom:** Document uploads return 500 errors and the UI does not show explicit document processing states (Procesando/Verificado/Rechazado) or the uploaded file name.
-  - **Root Cause:** Backend error on upload and missing properties in UI components meant that state and filename were not passed down to the `RequirementUploadRow`.
-  - **Fix:** Fixed upload 500 error, updated `RequirementUploadRow` to accept `fileName` and `documentStatus`, added `ShieldCheck` UI icon for Verificado, and added Playwright/Vitest tests to cover the transitions.
-- **BUG-007:** 404 Not Found on `/api/auth/resend-verification`.
-  - **Symptom:** The new frontend `useResendVerificationEmail` mutation failed with `404 Not Found` despite the backend having the endpoint correctly implemented.
-  - **Root Cause:** `dotnet watch` inside the Docker container failed to hot-reload and compile the newly added `ResendVerificationEmail` namespace. The `Api` container was still running the older version without the endpoint mapped.
-  - **Fix:** Fixed by manually executing `dotnet build` inside the container or forcing a restart of the container to pick up the new files properly, which successfully compiled the `Api` layer.
 - **BUG-006:** HashRouter + Stripe `return_url` incompatibility. 
   - **Symptom:** `session_id` persists in URL after hard reset on checkout return page.
   - **Root Cause:** Stripe redirects to a regular URL which HashRouter misinterprets, preventing `CheckoutReturnPage` from routing and maintaining `session_id` in the real search params.
