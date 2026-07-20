@@ -45,6 +45,7 @@ export interface ProyectoDto {
   completionRate?: number;
   superficieM2?: number;
   fotoUrls?: string[];
+  planNombre?: string | null;
   registradoPor?: ProjectRegistrant | null;
 }
 

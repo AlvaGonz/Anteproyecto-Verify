@@ -33,7 +33,8 @@ public record ProyectoDto(
     Guid UsuarioCreadorId,
     DateTime CreatedAtUtc,
     DateTime? UpdatedAtUtc,
-    ProjectRegistrantDto? RegistradoPor = null
+    ProjectRegistrantDto? RegistradoPor = null,
+    string? PlanNombre = null
 );
 
 public record ProjectRegistrantDto(

@@ -33,6 +33,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   imagenAdicional3: apiProj.imagenAdicional3,
   imagenAdicional4: apiProj.imagenAdicional4,
   imagenAdicional5: apiProj.imagenAdicional5,
+  planNombre: apiProj.planNombre || null,
   registradoPor: apiProj.registradoPor || null,
 });
 

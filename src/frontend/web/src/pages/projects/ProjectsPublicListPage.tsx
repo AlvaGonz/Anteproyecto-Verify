@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Filter,
@@ -8,7 +8,11 @@ import {
   LayoutGrid,
   List,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
+  Search,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";

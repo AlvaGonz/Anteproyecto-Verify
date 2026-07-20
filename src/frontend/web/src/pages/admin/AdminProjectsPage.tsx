@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ProjectStatus } from "../../features/projects/types";
 import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
-import { Building, FileCheck, Activity } from "lucide-react";
+import { Plus, Building, FileCheck, Activity } from "lucide-react";
 import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
+import { AdminPublishedProjectsView } from "./AdminPublishedProjectsView";
 import { toUtcDate } from "../../shared/utils/dates";
+import { useAuth } from "../../shared/context/AuthContext";
 
 export const AdminProjectsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
 
+  const [activeTab, setActiveTab] = useState<"proyectos" | "publicados">("proyectos");
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -71,24 +75,74 @@ export const AdminProjectsPage: React.FC = () => {
   });
 
   return (
-    <AdminProjectsPageLayout
-      t={t}
-      searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
-      activeFilter={activeFilter}
-      setActiveFilter={setActiveFilter}
-      selectedStatuses={selectedStatuses}
-      setSelectedStatuses={setSelectedStatuses}
-      isFilterDropdownOpen={isFilterDropdownOpen}
-      setIsFilterDropdownOpen={setIsFilterDropdownOpen}
-      openMenuId={openMenuId}
-      setOpenMenuId={setOpenMenuId}
-      isLoading={isLoading}
-      filtered={filtered}
-      metrics={metrics}
-      updateStatus={updateStatus}
-      deleteProject={deleteProject}
-    />
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight">
+            Gestión de Expedientes
+          </h1>
+          <p className="text-gray-500 text-sm font-medium">
+            Administra, valida y audita la base de datos inmobiliaria institucional.
+          </p>
+        </div>
+        <Link
+          to="/admin/projects/new"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+        >
+          <Plus className="w-5 h-5" />
+          Nuevo Expediente
+        </Link>
+      </div>
+
+      {/* Tabs: Proyectos / Proy. Publicados */}
+      <div className="flex border-b border-slate-200">
+        <button
+          type="button"
+          onClick={() => setActiveTab("proyectos")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
+            activeTab === "proyectos"
+              ? "border-[#223382] text-[#223382]"
+              : "border-transparent text-slate-400 hover:text-slate-600"
+          }`}
+        >
+          Proyectos
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("publicados")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
+            activeTab === "publicados"
+              ? "border-[#223382] text-[#223382]"
+              : "border-transparent text-slate-400 hover:text-slate-600"
+          }`}
+        >
+          Proy. Publicados
+        </button>
+      </div>
+
+      {activeTab === "proyectos" ? (
+        <AdminProjectsPageLayout
+          t={t}
+          isAdmin={user?.role === "admin" || user?.role === "owner"}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          selectedStatuses={selectedStatuses}
+          setSelectedStatuses={setSelectedStatuses}
+          isFilterDropdownOpen={isFilterDropdownOpen}
+          setIsFilterDropdownOpen={setIsFilterDropdownOpen}
+          openMenuId={openMenuId}
+          setOpenMenuId={setOpenMenuId}
+          isLoading={isLoading}
+          filtered={filtered}
+          metrics={metrics}
+          updateStatus={updateStatus}
+          deleteProject={deleteProject}
+        />
+      ) : (
+        <AdminPublishedProjectsView />
+      )}
+    </div>
   );
 };
-

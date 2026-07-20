@@ -233,7 +233,8 @@ public class ProjectService : IProjectService
             proyecto.UsuarioCreadorId,
             proyecto.CreatedAtUtc,
             proyecto.UpdatedAtUtc,
-            registradoPor
+            registradoPor,
+            proyecto.UsuarioCreador?.Plan?.NombrePlan
         );
     }
 }
