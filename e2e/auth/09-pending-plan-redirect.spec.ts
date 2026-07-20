@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('09 - Pending Plan Redirect Fix', () => {
+  test.use({ baseURL: process.env.FRONTEND_URL ?? 'http://localhost:3000' });
 
   async function setupAuth(page: import('@playwright/test').Page, overrides: Record<string, any> = {}) {
     const defaultUser = {
@@ -39,17 +40,52 @@ test.describe('09 - Pending Plan Redirect Fix', () => {
   }
 
   test('User with pendingPlanCode logs in → lands on dashboard (NOT checkout)', async ({ page }) => {
-    await setupAuth(page);
+    const defaultUser = {
+      id: 'e2e-pending-user',
+      nombre: 'Pending',
+      apellido: 'PlanUser',
+      email: 'pending@test.com',
+      role: 'DEVELOPER',
+      subscriptionStatus: null,
+      pendingPlanCode: 'profesional',
+      pendingBillingCycle: 'monthly',
+    };
+
+    // 1. Start unauthenticated
+    await page.route('**/api/auth/me', async route => {
+      await route.fulfill({ status: 401 });
+    });
+
     await stubDashboardApis(page);
 
+    // 2. Go to login page
     await page.goto('/#/login');
-    // Verify we are on login page
     await expect(page.locator('h3:has-text("Iniciar Sesión")')).toBeVisible();
 
-    // Simulate successful login by re-routing to dashboard
-    await page.goto('/#/admin/dashboard');
+    // 3. Mock login endpoints
+    await page.route('**/api/auth/login', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ user: defaultUser, accessToken: 'mock-token' }),
+      });
+    });
+    
+    // Override the 401 route with a 200 route for subsequent calls
+    await page.route('**/api/auth/me', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(defaultUser),
+      });
+    });
 
-    // Wait for page to settle
+    // 4. Fill form and submit
+    await page.fill('input[type="email"]', 'pending@test.com');
+    await page.fill('input[type="password"]', 'Password123!');
+    await page.click('button[type="submit"]');
+
+    // Wait for the page to settle on dashboard
     await page.waitForTimeout(1000);
 
     // Verify we are NOT redirected to checkout
