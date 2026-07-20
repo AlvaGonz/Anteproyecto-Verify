@@ -147,17 +147,17 @@ export const PricingInfoSchema = z.object({
 export type PricingInfoDto = z.infer<typeof PricingInfoSchema>;
 
 export const MySubscriptionStatusSchema = z.object({
-  plan: z.string().nullable(),
-  planPrice: z.number().nullable(),
-  subscriptionStatus: z.string().nullable(),
-  currentPeriodEnd: z.string().nullable(),
-  stripeSubscriptionId: z.string().nullable(),
-  isManagedByStripe: z.boolean(),
-  billingCycle: z.string().nullable(),
+  plan: z.string().nullable().optional(),
+  planPrice: z.number().nullable().optional(),
+  subscriptionStatus: z.string().nullable().optional(),
+  currentPeriodEnd: z.string().nullable().optional(),
+  stripeSubscriptionId: z.string().nullable().optional(),
+  isManagedByStripe: z.boolean().optional(),
+  billingCycle: z.string().nullable().optional(),
   isGuest: z.boolean().optional(),
   inviterPlan: z.string().nullable().optional(),
   inviterName: z.string().nullable().optional(),
-  planLimits: PlanLimitsSchema.nullable(),
+  planLimits: PlanLimitsSchema.nullable().optional(),
   pricing: PricingInfoSchema.nullable().optional(),
 });
 

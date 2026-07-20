@@ -58,7 +58,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
         exportacionPdf: true,
         integracionCrm: false,
         soporteTipo: 'Email',
-        accesoApi: false,
+        accesoApi: true,
         consultasUsadas: 5,
         proyectosCreados: 2
       }

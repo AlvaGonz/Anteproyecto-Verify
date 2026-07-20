@@ -90,18 +90,27 @@ export const SubscriptionSettings: React.FC = () => {
     : null;
 
   const billingCycle = data?.billingCycle ?? 'monthly';
-  const isAnnual = billingCycle === 'yearly' || billingCycle === 'annual' || billingCycle === 'year';
 
   let formattedPrice: string | null = null;
+  let originalMonthlyPrice: string | null = null;
+  let isDiscountApplied = false;
+
   if (hasPlan && data) {
-    if (data.planPrice === 0) {
+    const basePrice = data.planPrice ?? 0;
+    if (basePrice === 0 && !data.pricing?.monthlyPrice && !data.pricing?.yearlyPrice) {
       formattedPrice = 'Gratis';
-    } else if (data.planPrice && data.planPrice > 0) {
+    } else {
+      const monthlyPrice = data.pricing?.monthlyPrice ?? basePrice;
+      // ponytail: if billing cycle string is unreliable (e.g. defaults to monthly in backend), use daysRemaining > 35 as heuristic
+      const isAnnual = ['yearly', 'annual', 'year', 'anual'].includes(String(billingCycle).toLowerCase()) || (daysRemaining ?? 0) > 35;
+      
       if (isAnnual) {
-        const annualPrice = data.pricing?.yearlyPrice ?? data.planPrice;
-        formattedPrice = `${PRICE_FORMATTER.format(annualPrice)} USD / año`;
+        const yearlyPrice = data.pricing?.yearlyPrice ?? (monthlyPrice * 12 * 0.8);
+        formattedPrice = `${PRICE_FORMATTER.format(yearlyPrice)} USD / año`;
+        originalMonthlyPrice = `${PRICE_FORMATTER.format(monthlyPrice)} USD / mes`;
+        isDiscountApplied = true;
       } else {
-        formattedPrice = `${PRICE_FORMATTER.format(data.planPrice)} USD / mes`;
+        formattedPrice = `${PRICE_FORMATTER.format(monthlyPrice)} USD / mes`;
       }
     }
   }
@@ -210,14 +219,23 @@ export const SubscriptionSettings: React.FC = () => {
                           : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>
                       }
                     </div>
-                    {isAnnual && data?.pricing && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-                        {data.pricing.yearlyBadge}
-                      </span>
-                    )}
                   </div>
                   {formattedPrice && (
-                    <div className="text-sm text-text-secondary font-medium">{formattedPrice}</div>
+                    <div className="flex flex-col gap-0.5 mt-1">
+                      {originalMonthlyPrice && (
+                        <div className="text-xs text-text-secondary font-medium line-through opacity-70">
+                          {originalMonthlyPrice}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm text-text-secondary font-medium">{formattedPrice}</div>
+                        {isDiscountApplied && (
+                          <div className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wide">
+                            {data?.pricing?.yearlyBadge ?? '20% Dto. Anual'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </>
               )}
@@ -254,6 +272,7 @@ export const SubscriptionSettings: React.FC = () => {
 
           {/* Limits Card */}
           {limits && (
+            <>
             <div data-testid="subscription-plan-limits" className="bg-surface-raised rounded-2xl p-6 border border-border/60 shadow-sm mb-8">
               <h3 className="text-lg font-bold text-[#223382] mb-4 flex items-center gap-2">
                 <Award className="w-5 h-5 text-primary" />
@@ -269,11 +288,37 @@ export const SubscriptionSettings: React.FC = () => {
                 <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-border/50">
                   <span className="text-sm font-medium text-text-secondary">Proyectos</span>
                   <span className="font-bold text-[#223382]">
-{limits.proyectosCreados} / {limits.maxProyectos === -1 ? 'Ilimitados' : limits.maxProyectos}
-                    </span>
-                  </div>
+                    {limits.proyectosCreados} / {limits.maxProyectos === -1 ? 'Ilimitados' : limits.maxProyectos}
+                  </span>
                 </div>
+              </div>
             </div>
+
+            {/* Funciones Especiales */}
+            <div className="bg-surface-raised rounded-2xl p-6 border border-border/60 shadow-sm mb-8">
+              <h3 className="text-lg font-bold text-[#223382] mb-4 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary" />
+                Funciones Especiales
+              </h3>
+              <div className="flex flex-wrap gap-4">
+                {limits.exportacionPdf && (
+                  <button type="button" data-testid="export-pdf-btn" className="px-4 py-2 rounded-lg border font-semibold text-sm bg-white text-text-primary hover:bg-slate-50 transition-colors">
+                    PDF
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  data-testid="project-publication-control"
+                  disabled={!limits.presentacionPublica}
+                  title={!limits.presentacionPublica ? "Tu plan no permite presentar proyectos" : "Publicar Proyecto"}
+                  className="px-4 py-2 rounded-lg border font-semibold text-sm bg-white text-text-primary hover:bg-slate-50 transition-colors disabled:opacity-50"
+                >
+                  Presentación Pública
+                </button>
+              </div>
+            </div>
+            </>
           )}
 
 
