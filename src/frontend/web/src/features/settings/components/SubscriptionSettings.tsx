@@ -4,6 +4,7 @@ import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, Ref
 import { useMySubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
 import { PlansModal } from "./PlansModal";
 import { CancelSubscriptionModal } from "./CancelSubscriptionModal";
+import { useAuth } from "../../../shared/context/AuthContext";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('es', { day: '2-digit', month: 'long', year: 'numeric' });
 const PRICE_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -62,6 +63,7 @@ export const SubscriptionSettings: React.FC = () => {
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const { data, isLoading, isError, error, refetch } = useMySubscription();
+  const { user } = useAuth();
 
   const status = data?.subscriptionStatus ?? null;
   const planName = data?.plan ?? (data as any)?.planName ?? (data?.isGuest ? data?.inviterPlan : null) ?? null;
@@ -125,7 +127,7 @@ export const SubscriptionSettings: React.FC = () => {
             {/* Status Badge */}
             {isLoading ? (
               <div className="px-4 py-2 bg-slate-100 rounded-full w-40 h-9 animate-pulse" />
-            ) : !isError && (
+            ) : !isError && !(status === 'free' && (user?.role === "admin" || user?.role === "owner")) && (
               <div className={`px-4 py-2 rounded-full flex items-center gap-2 font-semibold text-sm border shadow-sm ${badgeConfig.className}`}>
                 {badgeConfig.icon}
                 {badgeConfig.label}
