@@ -49,6 +49,7 @@ services:
       - ./src/frontend/web:/app/src/frontend/web
     environment:
       - VITE_WATCH_POLLING=true
+      - DOCKER_CONTAINER=true
     env_file:
       - .env
     deploy:

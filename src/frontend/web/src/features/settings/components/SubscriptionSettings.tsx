@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { CreditCard, Calendar, AlertCircle, ArrowRight, CheckCircle2, Clock, RefreshCw, Gift, Award } from "lucide-react";
-import { useMySubscription, useSyncSubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
+import { useMySubscription, useCancelSubscription, useReactivateSubscription } from "../api/useSettings";
 import { PlansModal } from "./PlansModal";
 import { CancelSubscriptionModal } from "./CancelSubscriptionModal";
 
@@ -91,7 +91,6 @@ export const SubscriptionSettings: React.FC = () => {
     }
   }
 
-  const { mutate: syncSubscription, isPending: isSyncing } = useSyncSubscription();
   const { mutate: cancelSubscription, isPending: isCanceling } = useCancelSubscription();
   const { mutate: reactivateSubscription, isPending: isReactivating } = useReactivateSubscription();
 
@@ -110,15 +109,6 @@ export const SubscriptionSettings: React.FC = () => {
                   <CreditCard className="w-6 h-6 text-primary" />
                   Mi Suscripción
                 </h2>
-                <button
-                  type="button"
-                  onClick={() => syncSubscription()}
-                  disabled={isSyncing || isLoading}
-                  className="flex items-center gap-2 text-sm text-primary hover:text-primary-hover font-medium bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                  Sincronizar
-                </button>
               </div>
               <p className="text-text-secondary text-sm">
                 Gestiona tu plan actual y estado de facturación.

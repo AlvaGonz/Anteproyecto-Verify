@@ -111,4 +111,36 @@ describe('SubscriptionSettings', () => {
     expect(screen.queryByRole('button', { name: /Cancelar Suscripción/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Reactivar Suscripción/i })).not.toBeInTheDocument();
   });
+
+  it('renders guest subscription with inviter plan and name', () => {
+    (useMySubscription as any).mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: {
+        subscriptionStatus: 'active',
+        plan: 'profesional',
+        billingCycle: 'month',
+        isManagedByStripe: true,
+        currentPeriodEnd: new Date(Date.now() + 86400000 * 10).toISOString(),
+        isGuest: true,
+        inviterPlan: 'Corporativo',
+        inviterName: 'Juan Pérez',
+        planPrice: 99,
+      }
+    });
+
+    renderComponent();
+    
+    // Check guest badge is displayed
+    expect(screen.getByText('Invitado')).toBeInTheDocument();
+    
+    // Check inviter's plan is displayed
+    expect(screen.getByText('Corporativo')).toBeInTheDocument();
+    
+    // Check inviter name is shown in the footer text
+    expect(screen.getByText(/Tu suscripción es gestionada por el propietario de tu cuenta \(Juan Pérez\)/)).toBeInTheDocument();
+    
+    // Check next billing date is displayed
+    expect(screen.getByText(/Próximo cobro/)).toBeInTheDocument();
+  });
 });
