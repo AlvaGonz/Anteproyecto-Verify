@@ -12,16 +12,15 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
-import { ProjectStatus } from "../../features/projects/types";
-import { useProjects } from "../../features/projects/api/useProjects";
+import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
 import {
+  usePublishedProjects,
   PublishedProjectFilters,
   PROJECT_CATEGORIES,
   PROVINCIAS,
   PRICE_MAX,
   PRICE_STEPS,
 } from "../../features/projects/api/usePublishedProjects";
-import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
 
 export const AdminPublishedProjectsView: React.FC = () => {
   const [filtersVisible, setFiltersVisible] = useState(true);
@@ -37,11 +36,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
   const [itemsPerPage] = useState(20);
   const pageInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: allProjects = [], isLoading } = useProjects();
-
-  const publishedProjects = useMemo(() => {
-    return allProjects.filter((p) => p.estadoProyecto === ProjectStatus.Published);
-  }, [allProjects]);
+  const { data: publishedProjects = [], isLoading } = usePublishedProjects();
 
   const filteredProjects = useMemo(() => {
     return publishedProjects.filter((p) => {
@@ -49,7 +44,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
         const q = filters.searchQuery.toLowerCase();
         const matches =
           (p.rncDesarrollador?.toLowerCase().includes(q) ?? false) ||
-          (p.nombre?.toLowerCase().includes(q) ?? false) ||
+          (p.nombreProyecto?.toLowerCase().includes(q) ?? false) ||
           (p.designacionCatastral?.toLowerCase().includes(q) ?? false);
         if (!matches) return false;
       }
@@ -330,7 +325,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
                   <div className="relative aspect-video overflow-hidden">
                     <img
                       src={project.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop"}
-                      alt={project.nombre}
+                      alt={project.nombreProyecto}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute top-4 left-4">
@@ -348,7 +343,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="min-w-0">
                         <h3 className="text-lg font-black text-slate-900 truncate group-hover:text-primary transition-colors">
-                          {project.nombre}
+                          {project.nombreProyecto}
                         </h3>
                         <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wide mt-1">
                           <MapPin size={12} />
