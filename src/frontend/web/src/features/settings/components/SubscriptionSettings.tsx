@@ -71,7 +71,7 @@ export const SubscriptionSettings: React.FC = () => {
   const badgeConfig = status ? (STATUS_CONFIG[status] ?? STATUS_CONFIG.active) : NO_PLAN_CONFIG;
   const hasPlan = !!planName;
 
-let daysRemaining: number | null = null;
+  let daysRemaining: number | null = null;
   if (currentPeriodEnd) {
     const diffTime = currentPeriodEnd.getTime() - Date.now();
     daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
@@ -91,9 +91,9 @@ let daysRemaining: number | null = null;
     } else if (data.planPrice && data.planPrice > 0) {
       if (isAnnual) {
         const annualPrice = data.planPrice * 12 * 0.8; // 20% discount
-        formattedPrice = PRICE_FORMATTER.format(annualPrice) + ' USD / año (20% desc.)';
+        formattedPrice = `${PRICE_FORMATTER.format(annualPrice)} USD / año (20% desc.)`;
       } else {
-        formattedPrice = PRICE_FORMATTER.format(data.planPrice) + ' USD / mes';
+        formattedPrice = `${PRICE_FORMATTER.format(data.planPrice)} USD / mes`;
       }
     }
   }

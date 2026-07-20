@@ -5,14 +5,18 @@ using System.Threading.Tasks;
 using Application.DTOs.Subscriptions;
 using Domain.Policies;
 using MediatR;
+using Microsoft.Extensions.Configuration;
+using Stripe;
 
 public class GetMySubscriptionStatusQueryHandler : IRequestHandler<GetMySubscriptionStatusQuery, MySubscriptionStatusDto>
 {
     private readonly IUserSubscriptionReadRepository _repository;
+    private readonly IConfiguration _configuration;
 
-    public GetMySubscriptionStatusQueryHandler(IUserSubscriptionReadRepository repository)
+    public GetMySubscriptionStatusQueryHandler(IUserSubscriptionReadRepository repository, IConfiguration configuration)
     {
         _repository = repository;
+        _configuration = configuration;
     }
 
     public async Task<MySubscriptionStatusDto> Handle(GetMySubscriptionStatusQuery request, CancellationToken cancellationToken = default)
@@ -48,7 +52,28 @@ public class GetMySubscriptionStatusQueryHandler : IRequestHandler<GetMySubscrip
         string? billingCycle = user.PendingBillingCycle;
         if (string.IsNullOrEmpty(billingCycle) && !string.IsNullOrEmpty(user.StripeSubscriptionId))
         {
-            billingCycle = user.PendingBillingCycle ?? "monthly";
+            try
+            {
+                var stripeApiKey = _configuration["Stripe:SecretKey"];
+                if (!string.IsNullOrEmpty(stripeApiKey))
+                {
+                    StripeConfiguration.ApiKey = stripeApiKey;
+                    var subService = new SubscriptionService();
+                    var sub = await subService.GetAsync(user.StripeSubscriptionId, cancellationToken: cancellationToken);
+                    if (sub?.Items?.Data?.Count > 0)
+                    {
+                        billingCycle = sub.Items.Data[0].Price.Recurring?.Interval;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Log warning but don't fail - fallback to monthly
+            }
+        }
+        if (string.IsNullOrEmpty(billingCycle))
+        {
+            billingCycle = "monthly";
         }
 
         var effectivePlan = SubscriptionTierPolicy.GetEffectivePlan(new EffectivePlanUserAdapter(user, effectiveStatus));
@@ -63,7 +88,7 @@ public class GetMySubscriptionStatusQueryHandler : IRequestHandler<GetMySubscrip
             CancelAt = user.CancelAt,
             StripeSubscriptionId = user.StripeSubscriptionId,
             IsManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId),
-            BillingCycle = !string.IsNullOrEmpty(user.PendingBillingCycle) ? user.PendingBillingCycle : billingCycle,
+            BillingCycle = billingCycle,
             IsGuest = user.TitularId != null,
             InviterPlan = user.Titular?.Plan?.NombrePlan,
             InviterName = user.Titular?.NombreCompleto,

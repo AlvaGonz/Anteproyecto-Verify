@@ -75,7 +75,7 @@ export const SubscriptionInfoCard: React.FC = () => {
 
   const billingCycle = data?.billingCycle ?? 'monthly';
   const isAnnual = billingCycle === 'yearly' || billingCycle === 'annual';
-  
+
   let formattedPrice: string | null = null;
   if (hasPlan && data) {
     if (data.planPrice === 0) {
@@ -83,9 +83,9 @@ export const SubscriptionInfoCard: React.FC = () => {
     } else if (data.planPrice && data.planPrice > 0) {
       if (isAnnual) {
         const annualPrice = data.planPrice * 12 * 0.8; // 20% discount
-        formattedPrice = PRICE_FORMATTER.format(annualPrice) + ' USD / año (20% desc.)';
+        formattedPrice = `${PRICE_FORMATTER.format(annualPrice)} USD / año (20% desc.)`;
       } else {
-        formattedPrice = PRICE_FORMATTER.format(data.planPrice) + ' USD / mes';
+        formattedPrice = `${PRICE_FORMATTER.format(data.planPrice)} USD / mes`;
       }
     }
   }
