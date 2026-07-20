@@ -4,26 +4,30 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Controllers;
-using Application.Abstractions.Persistence;
-using Application.Abstractions.Storage;
-using Application.Common.Exceptions;
-using Application.Contracts.Projects;
-using Application.DTOs;
+using global::Application.Abstractions.Persistence;
+using global::Application.Abstractions.Storage;
+using global::Application.Contracts.Projects;
+using global::Application.Common.Exceptions;
+using global::Application.DTOs;
+using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
 namespace UnitTests.Api.Controllers
 {
-    public class PublicProjectConsultationQuotaTests
+    public class PublicProjectConsultationQuotaTests : IDisposable
     {
         private readonly Mock<IProjectService> _mockProjectService;
         private readonly Mock<IUsuarioRepository> _mockUsuarioRepository;
         private readonly Mock<IBlobStorageService> _mockBlobStorageService;
         private readonly Mock<global::Application.Contracts.Documents.IDocumentService> _mockDocumentService;
+        private readonly AppDbContext _dbContext;
         private readonly ProjectsController _controller;
 
         public PublicProjectConsultationQuotaTests()
@@ -33,17 +37,29 @@ namespace UnitTests.Api.Controllers
             _mockBlobStorageService = new Mock<IBlobStorageService>();
             _mockDocumentService = new Mock<global::Application.Contracts.Documents.IDocumentService>();
 
+            // Use in-memory database for testing
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+            _dbContext = new AppDbContext(options);
+
             _controller = new ProjectsController(
                 _mockProjectService.Object,
                 _mockUsuarioRepository.Object,
                 _mockBlobStorageService.Object,
-                _mockDocumentService.Object)
+                _mockDocumentService.Object,
+                _dbContext)
             {
                 ControllerContext = new ControllerContext
                 {
                     HttpContext = new DefaultHttpContext()
                 }
             };
+        }
+
+        public void Dispose()
+        {
+            _dbContext?.Dispose();
         }
 
         private ProyectoDto CreateProyectoDto(Guid id, Guid usuarioCreadorId, string estado = "Publicado")
@@ -64,7 +80,7 @@ namespace UnitTests.Api.Controllers
                 "Propietario Test",
                 "001-0000001-1",
                 "IPI-001",
-                EstadoJuridico.Aprobado,
+                EstadoJuridico.Valido,
                 "Vigente",
                 500,
                 estado,
