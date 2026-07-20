@@ -1,13 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { ProjectStatus } from "../../features/projects/types";
-import { Plus } from "lucide-react";
 import { AdminProjectMetricsBar } from "./AdminProjectMetricsBar";
 import { AdminProjectToolbar } from "./AdminProjectToolbar";
 import { AdminProjectList } from "./AdminProjectList";
 
 interface AdminProjectsPageLayoutProps {
   t: any;
+  isAdmin: boolean;
   searchTerm: string;
   setSearchTerm: (v: string) => void;
   activeFilter: string;
@@ -27,6 +26,7 @@ interface AdminProjectsPageLayoutProps {
 
 export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = ({
   t,
+  isAdmin,
   searchTerm,
   setSearchTerm,
   activeFilter,
@@ -44,25 +44,7 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
   deleteProject,
 }) => {
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight">
-            Gestión de Expedientes
-          </h1>
-          <p className="text-gray-500 text-sm font-medium">
-            Administra, valida y audita la base de datos inmobiliaria institucional.
-          </p>
-        </div>
-        <Link
-          to="/admin/projects/new"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          Nuevo Expediente
-        </Link>
-      </div>
-
+    <div className="space-y-6">
       <AdminProjectMetricsBar metrics={metrics} />
 
       <AdminProjectToolbar
@@ -78,6 +60,7 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
 
       <AdminProjectList
         t={t}
+        isAdmin={isAdmin}
         isLoading={isLoading}
         filtered={filtered}
         openMenuId={openMenuId}
