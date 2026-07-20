@@ -131,7 +131,12 @@ public class SubscriptionService : ISubscriptionService
                 var sub = await subService.GetAsync(user.StripeSubscriptionId, cancellationToken: ct);
                 if (sub != null && sub.Items.Data.Count > 0)
                 {
-                    billingCycle = sub.Items.Data[0].Price.Recurring.Interval;
+                    billingCycle = sub.Items.Data[0].Price.Recurring.Interval switch
+                    {
+                        "year" => "yearly",
+                        "month" => "monthly",
+                        var x => x
+                    };
                 }
             }
             catch (Exception ex)

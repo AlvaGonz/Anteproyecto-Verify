@@ -63,6 +63,12 @@ export const SubscriptionSettings: React.FC = () => {
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const { data, isLoading, isError, error, refetch } = useMySubscription();
+
+  React.useEffect(() => {
+    if (isError && error) {
+      console.error('[SubscriptionSettings] Error al cargar suscripción:', error);
+    }
+  }, [isError, error]);
   const { user } = useAuth();
 
   const status = data?.subscriptionStatus ?? null;
@@ -84,15 +90,16 @@ export const SubscriptionSettings: React.FC = () => {
     : null;
 
   const billingCycle = data?.billingCycle ?? 'monthly';
-  const isAnnual = billingCycle === 'yearly' || billingCycle === 'annual';
+  const isAnnual = billingCycle === 'yearly' || billingCycle === 'annual' || billingCycle === 'year';
 
   let formattedPrice: string | null = null;
   if (hasPlan && data) {
     if (data.planPrice === 0) {
       formattedPrice = 'Gratis';
     } else if (data.planPrice && data.planPrice > 0) {
-      if (isAnnual && data.pricing) {
-        formattedPrice = `${PRICE_FORMATTER.format(data.pricing.yearlyPrice)} USD / año`;
+      if (isAnnual) {
+        const annualPrice = data.pricing?.yearlyPrice ?? data.planPrice;
+        formattedPrice = `${PRICE_FORMATTER.format(annualPrice)} USD / año`;
       } else {
         formattedPrice = `${PRICE_FORMATTER.format(data.planPrice)} USD / mes`;
       }
@@ -136,17 +143,14 @@ export const SubscriptionSettings: React.FC = () => {
 
           {/* Error State */}
           {isError && (
-            <div className="mb-8 p-5 rounded-2xl bg-rose-50 border border-rose-200 flex flex-col gap-3">
+            <div className="mb-8 p-5 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-rose-700">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <p className="text-sm font-medium">No se pudo cargar la información de suscripción.</p>
               </div>
-              <div className="text-xs text-rose-600 font-mono bg-rose-100 p-2 rounded max-h-24 overflow-auto">
-                {(error as any)?.response?.data?.message ?? (error as any)?.message ?? 'Error desconocido'}
-              </div>
               <button type="button"
                 onClick={() => refetch()}
-                className="flex items-center gap-1.5 text-sm font-semibold text-rose-700 hover:text-rose-900 transition-colors self-start"
+                className="flex items-center gap-1.5 text-sm font-semibold text-rose-700 hover:text-rose-900 transition-colors whitespace-nowrap"
               >
                 <RefreshCw className="w-4 h-4" />
                 Reintentar
