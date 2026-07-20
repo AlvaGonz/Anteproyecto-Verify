@@ -17,6 +17,15 @@ public class MySubscriptionStatusDto
     public string? InviterPlan { get; set; }
     public string? InviterName { get; set; }
     public PlanLimitsDto? PlanLimits { get; set; }
+    public PricingInfoDto? Pricing { get; set; }
+}
+
+public class PricingInfoDto
+{
+    public decimal MonthlyPrice { get; set; }
+    public decimal YearlyPrice { get; set; }
+    public int YearlyDiscountPercent { get; set; }
+    public string YearlyBadge { get; set; } = string.Empty;
 }
 
 public class PlanLimitsDto

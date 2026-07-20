@@ -26,8 +26,6 @@ export const GoogleSignInButton = () => {
       
       if (redirectUrl) {
         navigate(redirectUrl);
-      } else if (user?.pendingPlanCode && !['active', 'trialing', 'free'].includes(user.subscriptionStatus?.toLowerCase() || '')) {
-        navigate(`/checkout?plan=${user.pendingPlanCode}&billing=${user.pendingBillingCycle || 'monthly'}`);
       } else {
         navigate("/admin/dashboard");
       }

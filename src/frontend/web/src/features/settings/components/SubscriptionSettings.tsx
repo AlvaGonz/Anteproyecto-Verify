@@ -91,9 +91,8 @@ export const SubscriptionSettings: React.FC = () => {
     if (data.planPrice === 0) {
       formattedPrice = 'Gratis';
     } else if (data.planPrice && data.planPrice > 0) {
-      if (isAnnual) {
-        const annualPrice = data.planPrice * 12 * 0.8; // 20% discount
-        formattedPrice = `${PRICE_FORMATTER.format(annualPrice)} USD / año (20% desc.)`;
+      if (isAnnual && data.pricing) {
+        formattedPrice = `${PRICE_FORMATTER.format(data.pricing.yearlyPrice)} USD / año`;
       } else {
         formattedPrice = `${PRICE_FORMATTER.format(data.planPrice)} USD / mes`;
       }
@@ -198,13 +197,20 @@ export const SubscriptionSettings: React.FC = () => {
                       Invitado
                     </div>
                   )}
-                  <div className="text-xl font-bold text-[#223382] capitalize mb-1">
-                    {data?.isGuest && data?.inviterPlan
-                      ? <span>{data.inviterPlan}</span>
-                      : hasPlan
-                        ? <span className="text-primary">{planName}</span>
-                        : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>
-                    }
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <div className="text-xl font-bold text-[#223382] capitalize">
+                      {data?.isGuest && data?.inviterPlan
+                        ? <span>{data.inviterPlan}</span>
+                        : hasPlan
+                          ? <span className="text-primary">{planName}</span>
+                          : <span className="text-text-secondary font-medium text-base">Sin suscripción</span>
+                      }
+                    </div>
+                    {isAnnual && data?.pricing && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+                        {data.pricing.yearlyBadge}
+                      </span>
+                    )}
                   </div>
                   {formattedPrice && (
                     <div className="text-sm text-text-secondary font-medium">{formattedPrice}</div>

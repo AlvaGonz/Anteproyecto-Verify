@@ -98,7 +98,7 @@ describe("LoginPage", () => {
     });
   });
 
-  it("redirects to checkout when user has pending plan and no active subscription", async () => {
+  it("redirects to dashboard when user has pending plan and no active subscription (no checkout redirect)", async () => {
     mockLogin = vi.fn().mockResolvedValue({
       id: "u1",
       email: "user@example.com",
@@ -116,7 +116,7 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /iniciar sesión/i }));
 
     await waitFor(() => {
-      expect(screen.getByTestId("checkout")).toBeInTheDocument();
+      expect(screen.getByTestId("dashboard")).toBeInTheDocument();
     });
   });
 

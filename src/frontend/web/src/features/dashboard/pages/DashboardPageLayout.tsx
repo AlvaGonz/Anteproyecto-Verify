@@ -3,6 +3,7 @@ import { Plus, LayoutDashboard, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { m, AnimatePresence } from "framer-motion";
 import { PlanActivatedBanner } from "../../pricing/components/PlanActivatedBanner";
+import { PendingPlanBanner } from "../../pricing/components/PendingPlanBanner";
 
 import type { DashboardStatsDto, ProyectoRecienteDto, SuscripcionRecienteDto } from "../../../infrastructure/api/dashboard.api";
 import { DashboardStatsRow } from "./DashboardStatsRow";
@@ -59,6 +60,7 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
         <PlanActivatedBanner planName={activatedPlan} onDismiss={handleDismissBanner} />
       )}
       <div className="animate-fade-in space-y-6">
+        <PendingPlanBanner />
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
             <h1 className="text-4xl font-display font-black text-[#223382] tracking-tight">

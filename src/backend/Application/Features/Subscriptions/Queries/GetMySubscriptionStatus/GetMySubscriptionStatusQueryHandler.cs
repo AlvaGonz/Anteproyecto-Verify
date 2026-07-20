@@ -76,6 +76,22 @@ public class GetMySubscriptionStatusQueryHandler : IRequestHandler<GetMySubscrip
             billingCycle = "monthly";
         }
 
+        PricingInfoDto? pricingInfo = null;
+        if (hasPlan && user.Plan!.Precio > 0)
+        {
+            var annualDiscountPercent = _configuration.GetValue<int>("Pricing:AnnualDiscountPercent", 20);
+            var monthlyPrice = user.Plan.Precio;
+            var yearlyPrice = Math.Round(monthlyPrice * 12 * (100 - annualDiscountPercent) / 100m, 2);
+
+            pricingInfo = new PricingInfoDto
+            {
+                MonthlyPrice = monthlyPrice,
+                YearlyPrice = yearlyPrice,
+                YearlyDiscountPercent = annualDiscountPercent,
+                YearlyBadge = $"Ahorra {annualDiscountPercent}%"
+            };
+        }
+
         var effectivePlan = SubscriptionTierPolicy.GetEffectivePlan(new EffectivePlanUserAdapter(user, effectiveStatus));
 
         return new MySubscriptionStatusDto
@@ -89,6 +105,7 @@ public class GetMySubscriptionStatusQueryHandler : IRequestHandler<GetMySubscrip
             StripeSubscriptionId = user.StripeSubscriptionId,
             IsManagedByStripe = !string.IsNullOrEmpty(user.StripeSubscriptionId),
             BillingCycle = billingCycle,
+            Pricing = pricingInfo,
             IsGuest = user.TitularId != null,
             InviterPlan = user.Titular?.Plan?.NombrePlan,
             InviterName = user.Titular?.NombreCompleto,

@@ -16,6 +16,7 @@ export const EmailVerifiedPage = () => {
   // ponytail: store nextStep from API to drive post-verify navigation
   const nextStepRef = useRef<string | null>(null);
   const pendingPlanRef = useRef<string | null>(null);
+  const pendingBillingRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -37,6 +38,7 @@ export const EmailVerifiedPage = () => {
             // Store nextStep and pendingPlan from backend response
             nextStepRef.current = response.data.nextStep ?? null;
             pendingPlanRef.current = response.data.pendingPlanCode ?? null;
+            pendingBillingRef.current = response.data.pendingBillingCycle ?? null;
         }
         setStatus("success");
       })
@@ -51,7 +53,8 @@ export const EmailVerifiedPage = () => {
   const computeTargetUrl = useCallback((): string => {
     // New flow: backend tells frontend where to go
     if (nextStepRef.current === "checkout" && pendingPlanRef.current) {
-      return `/checkout?plan=${pendingPlanRef.current}`;
+      const billing = pendingBillingRef.current || "monthly";
+      return `/checkout?plan=${pendingPlanRef.current}&billing=${billing}`;
     }
     if (nextStepRef.current === "choose-plan") {
       return "/pricing";

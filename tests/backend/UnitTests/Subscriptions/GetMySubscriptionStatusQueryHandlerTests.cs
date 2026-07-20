@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Policies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using global::Application.Features.Subscriptions.Queries.GetMySubscriptionStatus;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
@@ -71,6 +73,16 @@ public class GetMySubscriptionStatusQueryHandlerTests
         return user;
     }
 
+    private static IConfiguration CreateConfiguration(string discountPercent = "20")
+    {
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                { "Pricing:AnnualDiscountPercent", discountPercent }
+            })
+            .Build();
+    }
+
     private static global::Application.Features.Subscriptions.Queries.GetMySubscriptionStatus.IUserSubscriptionReadRepository CreateRepository(AppDbContext db)
     {
         return new UsuarioRepository(db);
@@ -85,7 +97,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var user = CreateUser(db, plan, activeSubscription: true);
         
         var repository = CreateRepository(db);
-        var handler = new GetMySubscriptionStatusQueryHandler(repository);
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, CreateConfiguration());
 
         // Act
         var query = new GetMySubscriptionStatusQuery(user.Id);
@@ -126,7 +138,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var user = CreateUser(db, plan, activeSubscription: false); // Free plan doesn't need active status
         
         var repository = CreateRepository(db);
-        var handler = new GetMySubscriptionStatusQueryHandler(repository);
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, CreateConfiguration());
 
         // Act
         var query = new GetMySubscriptionStatusQuery(user.Id);
@@ -165,7 +177,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         var user = CreateUser(db, plan, activeSubscription: true);
         
         var repository = CreateRepository(db);
-        var handler = new GetMySubscriptionStatusQueryHandler(repository);
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, CreateConfiguration());
 
         // Act
         var query = new GetMySubscriptionStatusQuery(user.Id);
@@ -214,7 +226,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         db.SaveChanges();
         
         var repository = CreateRepository(db);
-        var handler = new GetMySubscriptionStatusQueryHandler(repository);
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, CreateConfiguration());
 
         // Act
         var query = new GetMySubscriptionStatusQuery(guest.Id);
@@ -246,7 +258,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         db.SaveChanges();
         
         var repository = CreateRepository(db);
-        var handler = new GetMySubscriptionStatusQueryHandler(repository);
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, CreateConfiguration());
 
         // Act
         var query = new GetMySubscriptionStatusQuery(user.Id);
@@ -271,7 +283,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         db.SaveChanges();
         
         var repository = CreateRepository(db);
-        var handler = new GetMySubscriptionStatusQueryHandler(repository);
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, CreateConfiguration());
 
         // Act
         var query = new GetMySubscriptionStatusQuery(user.Id);
@@ -296,7 +308,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         db.SaveChanges();
         
         var repository = CreateRepository(db);
-        var handler = new GetMySubscriptionStatusQueryHandler(repository);
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, CreateConfiguration());
 
         // Act
         var query = new GetMySubscriptionStatusQuery(user.Id);
@@ -306,5 +318,30 @@ public class GetMySubscriptionStatusQueryHandlerTests
         Assert.NotNull(result.PlanLimits);
         Assert.Equal(10, result.PlanLimits!.ConsultasUsadas);
         Assert.Equal(3, result.PlanLimits!.ProyectosCreados);
+    }
+
+    [Fact]
+    public async Task Handle_PaidPlan_ReturnsPricingInfoWithYearlyDiscount()
+    {
+        // Arrange
+        using var db = CreateDbContext();
+        var plan = CreateProfesionalPlan(db); // Precio = 3500m
+        var user = CreateUser(db, plan, activeSubscription: true);
+        
+        var repository = CreateRepository(db);
+        var config = CreateConfiguration("20"); // 20% annual discount
+        var handler = new GetMySubscriptionStatusQueryHandler(repository, config);
+
+        // Act
+        var query = new GetMySubscriptionStatusQuery(user.Id);
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Pricing);
+        Assert.Equal(3500m, result.Pricing!.MonthlyPrice);
+        Assert.Equal(33600m, result.Pricing.YearlyPrice); // 3500 * 12 * 0.8
+        Assert.Equal(20, result.Pricing.YearlyDiscountPercent);
+        Assert.Equal("Ahorra 20%", result.Pricing.YearlyBadge);
     }
 }

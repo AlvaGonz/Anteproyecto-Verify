@@ -137,6 +137,15 @@ export const PlanLimitsSchema = z.object({
 
 export type PlanLimitsDto = z.infer<typeof PlanLimitsSchema>;
 
+export const PricingInfoSchema = z.object({
+  monthlyPrice: z.number(),
+  yearlyPrice: z.number(),
+  yearlyDiscountPercent: z.number(),
+  yearlyBadge: z.string(),
+});
+
+export type PricingInfoDto = z.infer<typeof PricingInfoSchema>;
+
 export const MySubscriptionStatusSchema = z.object({
   plan: z.string().nullable(),
   planPrice: z.number().nullable(),
@@ -149,6 +158,7 @@ export const MySubscriptionStatusSchema = z.object({
   inviterPlan: z.string().nullable().optional(),
   inviterName: z.string().nullable().optional(),
   planLimits: PlanLimitsSchema.nullable(),
+  pricing: PricingInfoSchema.nullable().optional(),
 });
 
 export type MySubscriptionStatus = z.infer<typeof MySubscriptionStatusSchema>;

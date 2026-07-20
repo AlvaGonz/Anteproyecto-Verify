@@ -6,6 +6,10 @@ import { useMySubscription, useSyncSubscription, useCancelSubscription, useReact
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock the hooks
+vi.mock('../../../../shared/context/AuthContext', () => ({
+  useAuth: () => ({ user: { role: 'user' }, isAuthenticated: true, loading: false }),
+}));
+
 vi.mock('../../api/useSettings', () => ({
   useMySubscription: vi.fn(),
   useSyncSubscription: vi.fn(),
@@ -110,6 +114,32 @@ describe('SubscriptionSettings', () => {
     
     expect(screen.queryByRole('button', { name: /Cancelar Suscripción/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Reactivar Suscripción/i })).not.toBeInTheDocument();
+  });
+
+  it('renders annual subscription with pricing info and discount badge', () => {
+    const yearlyPrice = 3500 * 12 * 0.8; // 33600
+    (useMySubscription as any).mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: {
+        subscriptionStatus: 'active',
+        plan: 'profesional',
+        planPrice: 3500,
+        billingCycle: 'yearly',
+        isManagedByStripe: true,
+        currentPeriodEnd: new Date(Date.now() + 86400000 * 30).toISOString(),
+        pricing: {
+          monthlyPrice: 3500,
+          yearlyPrice: yearlyPrice,
+          yearlyDiscountPercent: 20,
+          yearlyBadge: 'Ahorra 20%'
+        }
+      }
+    });
+
+    renderComponent();
+    expect(screen.getByText('Suscripción Activa')).toBeInTheDocument();
+    expect(screen.getByText('Ahorra 20%')).toBeInTheDocument();
   });
 
   it('renders guest subscription with inviter plan and name', () => {

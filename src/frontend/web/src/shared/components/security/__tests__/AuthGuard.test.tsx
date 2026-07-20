@@ -59,14 +59,14 @@ describe("AuthGuard", () => {
   // Pending Plan & Subscription Redirects
   // ─────────────────────────────────────────────────
 
-  it("redirects authenticated user with pending plan and no active subscription to checkout", () => {
+  it("renders children when user has pending plan but no active subscription (no redirect)", () => {
     (useAuth as any).mockReturnValue({
       isAuthenticated: true,
       loading: false,
       user: { pendingPlanCode: "profesional", pendingBillingCycle: "monthly", subscriptionStatus: null }
     });
     renderGuard("/dashboard");
-    expect(screen.getByTestId("location-display")).toHaveTextContent("/checkout?plan=profesional&billing=monthly");
+    expect(screen.getByTestId("protected-content")).toBeInTheDocument();
   });
 
   it("renders children when authenticated with active subscription even with pending plan", () => {
