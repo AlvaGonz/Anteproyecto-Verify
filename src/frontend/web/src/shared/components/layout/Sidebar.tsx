@@ -135,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* Navigation Section */}
-      <div className="relative flex-1 flex flex-col py-6 overflow-y-auto">
+      <div className="relative flex-1 flex flex-col py-6">
         <div
           className={clsx(
             "px-4 mb-4 overflow-hidden transition-all duration-500",
