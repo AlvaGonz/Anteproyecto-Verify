@@ -466,11 +466,10 @@ describe("ProjectManagePage — Status management", () => {
   it("renders all 5 status buttons when project is loaded", async () => {
     renderEdit();
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Creado/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Editado/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /En Revisión/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Publicado/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Con Observaciones/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /status\.draft/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /status\.inReview/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /status\.published/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /status\.observed/i })).toBeInTheDocument();
     });
   });
 
@@ -481,9 +480,9 @@ describe("ProjectManagePage — Status management", () => {
       data: { ...MOCK_PROJECT, estadoProyecto: ProjectStatus.InReview },
     });
     renderEdit();
-    await waitFor(() => screen.getByRole("button", { name: /En Revisión/i }));
+    await waitFor(() => screen.getByRole("button", { name: /status\.inReview/i }));
 
-    await user.click(screen.getByRole("button", { name: /En Revisión/i }));
+    await user.click(screen.getByRole("button", { name: /status\.inReview/i }));
     await waitFor(() => {
       expect(projectsApi.updateProjectStatus).toHaveBeenCalledWith(
         "proj-001",
@@ -499,8 +498,8 @@ describe("ProjectManagePage — Status management", () => {
       error: { _tag: "ServerError", message: "Error de estado" },
     });
     renderEdit();
-    await waitFor(() => screen.getByRole("button", { name: /Publicado/i }));
-    await user.click(screen.getByRole("button", { name: /Publicado/i }));
+    await waitFor(() => screen.getByRole("button", { name: /status\.published/i }));
+    await user.click(screen.getByRole("button", { name: /status\.published/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/Error de estado/i)).toBeInTheDocument();

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ProjectForm } from "./ProjectForm";
 import { AuthProvider } from "../../../shared/context/AuthContext";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock useAuth so we don't need the real AuthProvider which causes state update act() warnings.
 vi.mock("../../../shared/context/AuthContext", () => ({
@@ -36,8 +37,14 @@ vi.mock("leaflet/dist/images/marker-icon-2x.png", () => ({ default: "" }));
 vi.mock("leaflet/dist/images/marker-icon.png", () => ({ default: "" }));
 vi.mock("leaflet/dist/images/marker-shadow.png", () => ({ default: "" }));
 
+const queryClient = new QueryClient();
+
 const renderWithAuth = (ui: React.ReactElement) =>
-  render(<>{ui}</>);
+  render(
+    <QueryClientProvider client={queryClient}>
+      {ui}
+    </QueryClientProvider>
+  );
 
 describe("ProjectForm", () => {
   beforeEach(() => { vi.clearAllMocks(); });

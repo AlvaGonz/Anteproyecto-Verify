@@ -57,6 +57,7 @@ describe('RequirementUploadRow', () => {
         isUploaded={true} 
         documentStatus={6} 
         fileName="mi_titulo.pdf" 
+        uploadedDocumentId="doc-123"
       />, 
       { wrapper: createWrapper() }
     );

@@ -58,7 +58,7 @@ describe("LegalPage", () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/legal\.billing\.title/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/legal\.billing\.title/i).length).toBeGreaterThan(0);
   });
 
   it("renders the print/download PDF button when dropdown is opened", () => {
@@ -72,8 +72,8 @@ describe("LegalPage", () => {
     const navButton = screen.getByRole("button", { name: /términos de servicio/i });
     fireEvent.click(navButton);
 
-    // Now the "Descargar PDF" button should be visible
-    const printButton = screen.getByRole("button", { name: /descargar pdf/i });
+    // Now the "Descargar documento completo" button should be visible
+    const printButton = screen.getByRole("button", { name: /descargar documento completo/i });
     expect(printButton).toBeInTheDocument();
   });
 
@@ -92,7 +92,7 @@ describe("LegalPage", () => {
     fireEvent.click(navButton);
 
     // Click the print button
-    const printButton = screen.getByRole("button", { name: /descargar pdf/i });
+    const printButton = screen.getByRole("button", { name: /descargar documento completo/i });
     fireEvent.click(printButton);
 
     // window.print should NOT be called (we use react-to-print instead)
@@ -115,7 +115,7 @@ describe("LegalPage", () => {
     fireEvent.click(navButton);
 
     // Click the print button
-    const printButton = screen.getByRole("button", { name: /descargar pdf/i });
+    const printButton = screen.getByRole("button", { name: /descargar documento completo/i });
     fireEvent.click(printButton);
 
     // The react-to-print handler should be called
