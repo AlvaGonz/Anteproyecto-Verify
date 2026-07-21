@@ -121,7 +121,7 @@ export const BASE_REQUIREMENTS: RequirementDefinition[] = [
   },
 ];
 
-export const CATEGORY_REQUIREMENTS: Record<number, RequirementDefinition[]> = {
+export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
   1: [ // Residencial
     {
       code: "REGIMEN_CONDOMINIO",

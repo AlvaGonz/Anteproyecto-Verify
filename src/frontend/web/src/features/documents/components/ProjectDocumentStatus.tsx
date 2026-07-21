@@ -20,7 +20,7 @@ interface ProjectDocumentStatusProps {
   projectCategory?: ProjectCategory;
 }
 
-const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
+const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
   [DocumentType.CertificadoTitulo]: { name: "Certificado de Título (Duplicado del Dueño)", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico + Cargas y Gravámenes", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
   [DocumentType.PlanosArquitectonicos]: { name: "Planos Arquitectónicos aprobados", entity: "Ayuntamiento / MOPC", norm: "Ley 687-00", categories: [1, 2, 3, 4, 99] },

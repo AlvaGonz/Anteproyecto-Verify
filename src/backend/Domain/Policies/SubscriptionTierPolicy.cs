@@ -125,7 +125,7 @@ public static class SubscriptionTierPolicy
         return plan?.HasProyectosDisponibles(proyectosActuales) ?? false;
     }
 
-    public static bool CanViewPublicProject(Usuario usuario, Guid projectOwnerId)
+    public static bool CanViewPublicProject(Usuario usuario, Guid projectOwnerId, int consultasUsadas = -1)
     {
         // Admins can always view
         if (usuario.EsAdministrador()) return true;
@@ -137,7 +137,8 @@ public static class SubscriptionTierPolicy
         var plan = GetEffectivePlan(usuario);
         if (plan == null) return false;
 
-        return plan.HasConsultasDisponibles(usuario.ConsultasUsadas);
+        var used = consultasUsadas >= 0 ? consultasUsadas : usuario.ConsultasUsadas;
+        return plan.HasConsultasDisponibles(used);
     }
 
     public static bool IsProjectPublic(Usuario usuario)

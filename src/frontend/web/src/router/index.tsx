@@ -11,7 +11,7 @@ import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage
 import { ProjectPublicDetailPage } from "../pages/projects/ProjectPublicDetailPage";
 import { ProjectManagePage } from "../pages/projects/ProjectManagePage";
 import { ProjectManageLayout } from "../pages/projects/ProjectManageLayout";
-import { ProjectDocumentsPage } from "../pages/projects/ProjectDocumentsPage";
+
 import { ProjectValidationPage } from "../pages/projects/ProjectValidationPage";
 import { ProjectAuditPage } from "../pages/admin/ProjectAuditPage";
 import { ProjectReportsPage } from "../pages/admin/ProjectReportsPage";
@@ -306,7 +306,7 @@ export const router = createHashRouter([
         children: [
           { index: true, element: <Navigate to="edit" replace /> },
           { path: "edit", element: <ProjectManagePage /> },
-          { path: "documents", element: <ProjectDocumentsPage /> },
+
           { path: "validations", element: <ProjectValidationPage /> },
           { path: "reports", element: <ProjectReportsPage /> },
           { path: "audit", element: <ProjectAuditPage /> }

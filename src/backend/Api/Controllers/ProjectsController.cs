@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Application.Common.Exceptions;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Application.Abstractions.Storage;
 using Infrastructure.Persistence;
 
@@ -65,11 +66,6 @@ public class ProjectsController : ControllerBase
                         projects = projects.Where(p => p.UsuarioCreadorId == userId);
                     }
                     
-                    // Log the consulta for authenticated users viewing project list
-                    var log = new LogConsulta(userId, true, "Consulta lista de proyectos");
-                    _dbContext.LogConsultas.Add(log);
-                    await _dbContext.SaveChangesAsync(cancellationToken);
-                    
                     return Ok(projects);
                 }
             }
@@ -98,8 +94,11 @@ public class ProjectsController : ControllerBase
                 var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
                 if (user != null)
                 {
-                    // Check if user can view this public project (enforces consultation quota)
-                    if (!SubscriptionTierPolicy.CanViewPublicProject(user, project.UsuarioCreadorId))
+                    // Read actual consultas count from LogConsultas for accurate quota check
+                    var consultasUsadas = await _dbContext.LogConsultas
+                        .CountAsync(lc => lc.UsuarioId == userId, cancellationToken);
+
+                    if (!SubscriptionTierPolicy.CanViewPublicProject(user, project.UsuarioCreadorId, consultasUsadas))
                     {
                         return StatusCode(402, new
                         {

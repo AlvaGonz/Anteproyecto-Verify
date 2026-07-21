@@ -57,6 +57,18 @@ namespace UnitTests.Api.Controllers
             };
         }
 
+        private void SeedLogConsultas(Guid usuarioId, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                _dbContext.LogConsultas.Add(new LogConsulta(
+                    usuarioId,
+                    true,
+                    $"Consulta de prueba #{i + 1}"));
+            }
+            _dbContext.SaveChanges();
+        }
+
         public void Dispose()
         {
             _dbContext?.Dispose();
@@ -190,6 +202,7 @@ private ProyectoDto CreateProyectoDto(Guid id, Guid usuarioCreadorId, string est
             var user = CreateAuthenticatedUser(userId, UserRole.User, planId: Guid.NewGuid(), consultasUsadas: 1, maxConsultas: 1);
 
             SetAuthUser(userId, UserRole.User);
+            SeedLogConsultas(userId, 1);
 
             _mockProjectService
                 .Setup(s => s.GetProjectByIdAsync(projectId, It.IsAny<CancellationToken>()))
@@ -228,6 +241,7 @@ private ProyectoDto CreateProyectoDto(Guid id, Guid usuarioCreadorId, string est
             var user = CreateAuthenticatedUser(userId, UserRole.User, planId: Guid.NewGuid(), consultasUsadas: 2, maxConsultas: 1);
 
             SetAuthUser(userId, UserRole.User);
+            SeedLogConsultas(userId, 2);
 
             _mockProjectService
                 .Setup(s => s.GetProjectByIdAsync(projectId, It.IsAny<CancellationToken>()))

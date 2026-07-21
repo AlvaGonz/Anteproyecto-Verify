@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, NavLink, useParams, useLocation } from "react-router-dom";
-import { PenTool, FileText, ShieldCheck, ClipboardList } from "lucide-react";
+import { PenTool, ShieldCheck, ClipboardList } from "lucide-react";
 import { ProjectActionBarProvider, ProjectActionBar } from "../../features/projects/components/ProjectActionBarContext";
 import { ProjectStatusBar } from "../../features/projects/components/ProjectStatusBar";
 
@@ -17,13 +17,7 @@ export const ProjectManageLayout: React.FC = () => {
       };
     }
     
-    if (location.pathname.includes("/documents")) {
-      return {
-        title: "Expediente Documental",
-        description: "Gestiona los documentos asociados a este proyecto."
-      };
-    }
-    
+
     if (location.pathname.includes("/validations")) {
       return {
         title: "Validación Integral",
@@ -83,19 +77,6 @@ export const ProjectManageLayout: React.FC = () => {
             Detalles del Proyecto
           </NavLink>
 
-          <NavLink
-            to={`/admin/projects/${id}/documents`}
-            className={({ isActive }) =>
-              `flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap ${
-                isActive
-                  ? "border-[#223382] text-[#223382]"
-                  : "border-transparent text-text-secondary hover:text-text-primary"
-              }`
-            }
-          >
-            <FileText className="w-4 h-4" />
-            Expediente Documental
-          </NavLink>
 
           <NavLink
             to={`/admin/projects/${id}/validations`}

@@ -11,6 +11,7 @@ import { FindingsPanel } from "../../features/validations/components/findings/Fi
 import { AuditLogList } from "../../features/validations/components/audit/AuditLogList";
 import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import type { ValidationExecutionResult, FindingDto, AuditLogDto } from "../../features/validations/types";
+import { RequiredDocumentsList } from "../../features/documents/components/RequiredDocumentsList";
 
 interface ProjectValidationPageLayoutProps {
   id: string | undefined;
@@ -83,9 +84,6 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
                 <RefreshCw className="w-4 h-4" /> Ejecutar Auditoría Integral
               </button>
             )}
-            <button type="button" className="h-14 w-14 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all flex items-center justify-center border border-white/10 group/ext">
-               <ExternalLink className="w-5 h-5 group-hover/ext:scale-110 transition-transform" />
-            </button>
           </div>
         </div>
       </div>
@@ -136,6 +134,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
           <div className="lg:col-span-3 space-y-12">
             {activeTab === 'analysis' && (
               <>
+                <RequiredDocumentsList projectId={id || ""} />
                 {result ? (
                   <>
                     {/* Integrated Summary & Metrics */}
@@ -201,7 +200,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
                   <div className="w-1.5 h-6 bg-error rounded-full" />
                   <h2 className="h2 uppercase tracking-tighter italic">Hallazgos y Diferenciales de Riesgo</h2>
                 </div>
-                <FindingsPanel findings={findings} />
+                <FindingsPanel findings={findings} projectId={id} />
               </section>
             )}
 

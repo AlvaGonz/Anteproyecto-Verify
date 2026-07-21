@@ -225,6 +225,10 @@ namespace UnitTests.Api.Controllers
                 .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
+            // Seed LogConsulta so the controller sees the user at quota
+            _dbContext.LogConsultas.Add(new LogConsulta(userId, true, "Consulta previa"));
+            _dbContext.SaveChanges();
+
             // Act
             var result = await _controller.GetProjectById(projectId, CancellationToken.None);
 

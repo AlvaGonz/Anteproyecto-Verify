@@ -17,7 +17,7 @@ interface ProjectDocumentsListProps {
   onToggleStatus: (documentId: string, isActive: boolean) => Promise<void>;
 }
 
-const DOCUMENT_TYPE_NAMES: Record<number, string> = {
+const DOCUMENT_TYPE_NAMES: Record<string, string> = {
   [DocumentType.TITLE]: "Certificado de Título",
   [DocumentType.LEGAL_STATUS]: "Estado Jurídico",
   [DocumentType.SURVEY]: "Plano Mensura",
@@ -53,7 +53,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
 }) => {
   if (documents.length === 0) {
     return (
-      <div className="vf-card flex flex-col items-center justify-center py-20 text-center animate-fade-in group hover:border-dashed">
+      <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in group hover:border-dashed">
         <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/40 mb-6 group-hover:scale-110 transition-transform">
           <FileText className="w-10 h-10" />
         </div>

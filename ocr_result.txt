@@ -1,0 +1,32 @@
+--- Página 1 ---
+99.9%  REPÚBLICA
+100.0%  Junta Central Electoral
+98.5%  CÉDULA DE IDENTIDAD
+100.0%  DOMINICANA
+100.0%  JCE
+97.5%  Y ELECTORAL
+100.0%  Número de cédula
+96.3%  1345
+100.0%  001-0000000-9
+100.0%  Nombre
+100.0%  MARÍA
+100.0%  KAREN
+100.0%  Apellido
+100.0%  SÁNCHEZ
+100.0%  ESTELAR
+100.0%  Nacionalidad
+100.0%  Estado civil
+100.0%  DOMINICANA
+100.0%  SOLTERA
+100.0%  B-
+100.0%  Fecha de nacimiento
+100.0%  Sexo
+100.0%  08 NOVIEMBRE 2001
+100.0%  F
+100.0%  Lugar de nacimiento
+100.0%  Firma
+99.8%  SANTO DOMINGO
+99.7%  08/11/01
+99.8%  Ocupación u oficio
+100.0%  Vigencia hasta 05-12-2038
+99.7%  INGENIERO INDUSTRIAL
