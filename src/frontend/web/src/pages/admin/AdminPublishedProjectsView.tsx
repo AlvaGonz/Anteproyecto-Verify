@@ -394,7 +394,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
                       </div>
 
                       <Link
-                        to={`/admin/projects/${project.id}/edit`}
+                        to={`/admin/projects/${project.id}/publicado`}
                         className="flex items-center justify-center gap-2 w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all group/btn"
                       >
                         Ver Detalles <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />

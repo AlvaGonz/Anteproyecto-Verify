@@ -23,4 +23,10 @@ public class PublicProjectSearchResultDto
     public string? Constructora { get; set; }
     public string? Registrante { get; set; }
     public string? ImagenUrl { get; set; }
+    public int? Categoria { get; set; }
+    public decimal? ValorEstimado { get; set; }
+    public string? DesignacionCatastral { get; set; }
+    public string? Matricula { get; set; }
+    public string? RncDesarrollador { get; set; }
+    public string? CedulaRncPropietario { get; set; }
 }

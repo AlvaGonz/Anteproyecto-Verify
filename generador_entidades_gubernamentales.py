@@ -6,6 +6,9 @@ import uuid
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# Fixed seed for reproducibility — same random data every run
+random.seed(42)
+
 def ensure_db_library():
     try:
         import pymssql
