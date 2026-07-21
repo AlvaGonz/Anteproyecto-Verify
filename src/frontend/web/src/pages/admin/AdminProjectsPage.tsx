@@ -15,7 +15,8 @@ export const AdminProjectsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
 
-  const [activeTab, setActiveTab] = useState<"proyectos" | "publicados">("proyectos");
+  const initialTab = (searchParams.get('tab') as "proyectos" | "publicados") || "proyectos";
+  const [activeTab, setActiveTab] = useState<"proyectos" | "publicados">(initialTab);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -79,42 +80,50 @@ export const AdminProjectsPage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1">
           <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight">
-            Gestión de Expedientes
+            {activeTab === "publicados" ? "Navegación de Expedientes Publicados" : "Gestión de Expedientes"}
           </h1>
           <p className="text-gray-500 text-sm font-medium">
-            Administra, valida y audita la base de datos inmobiliaria institucional.
+            {activeTab === "publicados"
+              ? "Analiza, investiga y consulta proyectos inmobiliarios en el mercado."
+              : "Administra, valida y audita la base de datos inmobiliaria institucional."}
           </p>
         </div>
-        <Link
-          to="/admin/projects/new"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          Nuevo Expediente
-        </Link>
+        {activeTab === "proyectos" && (
+          <Link
+            to="/admin/projects/new"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            <Plus className="w-5 h-5" />
+            Nuevo Expediente
+          </Link>
+        )}
       </div>
 
       {/* Tabs: Proyectos / Proy. Publicados */}
       <div className="flex border-b border-slate-200">
         <button
           type="button"
-          onClick={() => setActiveTab("proyectos")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-            activeTab === "proyectos"
+          onClick={() => {
+            setActiveTab("proyectos");
+            window.history.replaceState(null, '', '/#/admin/projects?tab=proyectos');
+          }}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "proyectos"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"
-          }`}
+            }`}
         >
           Proyectos
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab("publicados")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
-            activeTab === "publicados"
+          onClick={() => {
+            setActiveTab("publicados");
+            window.history.replaceState(null, '', '/#/admin/projects?tab=publicados');
+          }}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "publicados"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"
-          }`}
+            }`}
         >
           Proy. Publicados
         </button>
