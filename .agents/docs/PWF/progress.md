@@ -1,3 +1,4 @@
+| Sidebar UX Polish — Motion spring animation, collapsed state footer, stagger nav, mobile overflow fix | N/A | develop | (pending) | 2026-07-21 |
 | Additional Project Images (5 columns) â€” Migration, API endpoints, Frontend hooks & UI, Unit Test Fixes   | RF-2, OE-1  | ExpedienteRebuild                                    | 2d6adabf   | 2026-07-13 |
 | Corporate Invite Users Flow (Invitacion entity, SettingsController, UI Modal) | N/A | develop | (pending) | 2026-07-12 |
 | Fix Admin Dashboard Stats 403 & potential-invitees 404 | N/A | develop | (pending) | 2026-07-12 |
@@ -439,6 +440,10 @@
 - **TEST-034:** E2E tests for OCR Review failed due to sticky navbar intercepting pointer events.
   - **Symptom:** Playwright could not click the "Guardar corrección" button because the `autoFocus` on the input scrolled the container such that the button was overlaid by the sticky navbar.
   - **Fix:** Added `onKeyDown` handler to the text input in `OcrReviewPanel.tsx` to save changes when pressing `Enter`. Updated the E2E test `ocr-review-flow.spec.ts` to `press('Enter')` instead of clicking the button with `{ force: true }`, ensuring accessibility and resolving the timeout failure. Tests now pass (16.0s).
+- **BUG-036:** Mobile sidebar cuts off "Explorar Portal Público" link and footer content.
+  - **Symptom:** On mobile viewports, the sidebar's "Explorar Portal Público" link and other bottom content (user section, logout) were not visible/reachable.
+  - **Root Cause:** The flex-1 nav area had `overflow-hidden` which clipped any content taller than the viewport. On mobile, the accumulated height of logo + nav items + CTA + footer + user section often exceeded the viewport height.
+  - **Fix:** Changed `overflow-hidden` → `overflow-y-auto` on the flex-1 nav container so users can scroll to see all sidebar content on small screens.
 - **UX-035:** OCR Review Panel should always be visible for uploaded documents, not just when OCR is complete.
   - **Symptom:** Users couldn't see the OCR panel if the document was missing `resultadoOcrJson`, making it seem like the feature was missing for unprocessed files.
   - **Fix:** Removed the conditional rendering `{doc.resultadoOcrJson && ...}` in both the public and admin document lists. Added a beautiful empty state to `OcrReviewPanel.tsx` that displays a "Validación Pendiente" message when the OCR JSON is null. E2E tests confirmed passing.

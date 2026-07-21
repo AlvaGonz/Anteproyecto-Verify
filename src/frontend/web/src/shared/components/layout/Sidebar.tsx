@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -33,11 +33,17 @@ const NAVIGATION = [
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: projects } = useProjects();
-  const projectCount = projects?.length || 0;
+  const { data: projects, error: projectsError } = useProjects();
+  const projectCount = projectsError ? 0 : (projects?.length || 0);
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (projectsError) {
+      console.error("Sidebar: failed to load project count", projectsError);
+    }
+  }, [projectsError]);
 
   const handleLogout = () => {
     logout();
@@ -63,11 +69,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   }[user?.role || "user"] || "Usuario";
 
   return (
-    <div
+    <motion.div
       className={clsx(
-        "flex flex-col h-full bg-secondary text-white relative overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-        isCollapsed ? "w-[80px]" : "w-[280px]"
+        "flex flex-col h-full bg-secondary text-white relative overflow-hidden"
       )}
+      animate={shouldReduceMotion ? { width: isCollapsed ? 80 : 280 } : {
+        width: isCollapsed ? 80 : 280,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 220,
+        damping: 30,
+        mass: 0.9,
+      }}
     >
       {/* Background decorative glow */}
       <div
@@ -121,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* Navigation Section */}
-      <div className="relative flex-1 flex flex-col py-6 overflow-hidden">
+      <div className="relative flex-1 flex flex-col py-6 overflow-y-auto">
         <div
           className={clsx(
             "px-4 mb-4 overflow-hidden transition-all duration-500",
@@ -380,6 +394,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </span>
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
