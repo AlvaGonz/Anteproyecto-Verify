@@ -24,8 +24,9 @@ const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   usuarioCargaId: apiDoc.usuarioCargaId || "system",
   observaciones: apiDoc.observaciones || "",
   createdAtUtc: apiDoc.createdAtUtc,
-  fileUrl: apiDoc.fileUrl,
+  cedulaExtraction: apiDoc.cedulaExtraction,
   resultadoOcrJson: apiDoc.resultadoOcrJson,
+  fileUrl: apiDoc.fileUrl,
 });
 
 export const useDocuments = (projectId: string) =>

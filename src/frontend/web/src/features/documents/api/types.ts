@@ -13,8 +13,7 @@ export interface DocumentoDto {
   institucionEmisora?: string;
   usuarioCargaId: string;
   observaciones?: string;
-  fileUrl: string;
   createdAtUtc: string;
   updatedAtUtc?: string;
-  resultadoOcrJson?: string;
+  cedulaExtraction?: any; // Will be properly typed in frontend types
 }

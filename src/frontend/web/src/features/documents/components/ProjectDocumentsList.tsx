@@ -10,6 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { OcrReviewPanel } from "./OcrReviewPanel";
+import { CedulaExtractionCard } from "./CedulaExtractionCard";
 
 interface ProjectDocumentsListProps {
   documents: DocumentDto[];
@@ -157,7 +158,10 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
             </div>
             {/* Include OCR Review Panel */}
             <div className="border-t border-[var(--color-border)]/10 bg-surface-container-lowest">
-              <OcrReviewPanel document={doc} />
+              {doc.tipoDocumento === DocumentType.ID 
+                ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
+                : <OcrReviewPanel document={doc} />
+              }
             </div>
           </div>
         ))}

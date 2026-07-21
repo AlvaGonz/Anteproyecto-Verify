@@ -58,16 +58,17 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<DocumentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ValidationDocumentDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProjectDocuments(Guid projectId)
     {
         var documents = await _documentService.GetProjectDocumentsAsync(projectId);
-        return Ok(documents);
+        var safeDocs = documents.Select(MapToValidationDto);
+        return Ok(safeDocs);
     }
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UploadDocument(
@@ -114,7 +115,7 @@ public class ProjectDocumentsController : ControllerBase
                 file.Length
             );
 
-            return CreatedAtAction(nameof(GetProjectDocuments), new { projectId }, document);
+            return CreatedAtAction(nameof(GetProjectDocuments), new { projectId }, MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -244,14 +245,14 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpPatch("{documentId}/status")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDocumentStatus(Guid projectId, Guid documentId, [FromBody] UpdateDocumentStatusDto dto)
     {
         try
         {
             var document = await _documentService.UpdateDocumentStatusAsync(documentId, dto);
-            return Ok(document);
+            return Ok(MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -260,14 +261,14 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpPatch("{documentId}/type")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDocumentType(Guid projectId, Guid documentId, [FromBody] UpdateDocumentTypeDto dto)
     {
         try
         {
             var document = await _documentService.UpdateDocumentTypeAsync(documentId, dto);
-            return Ok(document);
+            return Ok(MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -276,7 +277,7 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpPatch("{documentId}/fields/{fieldName}")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateDocumentFieldReview(Guid projectId, Guid documentId, string fieldName, [FromBody] UpdateDocumentFieldReviewDto dto)
@@ -284,7 +285,7 @@ public class ProjectDocumentsController : ControllerBase
         try
         {
             var document = await _documentService.UpdateDocumentFieldReviewAsync(documentId, fieldName, dto);
-            return Ok(document);
+            return Ok(MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -354,5 +355,33 @@ public class ProjectDocumentsController : ControllerBase
         {
             return BadRequest(new { errors = ex.Errors.Select(e => e.ErrorMessage) });
         }
+    }
+
+    private ValidationDocumentDto MapToValidationDto(DocumentDto d)
+    {
+        Application.Documents.Extractions.CedulaRdExtractionV1? cedulaExtraction = null;
+
+        if (d.TipoDocumento == DocumentType.ID && !string.IsNullOrEmpty(d.ResultadoOcrJson))
+        {
+            try
+            {
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+                var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(d.ResultadoOcrJson, options);
+                if (ocrResult != null)
+                {
+                    cedulaExtraction = Application.Documents.Extractions.CedulaExtractionMapper.MapFromOcrResult(ocrResult);
+                }
+            }
+            catch
+            {
+                // Ignore serialization errors to gracefully degrade
+            }
+        }
+
+        return new ValidationDocumentDto(
+            d.Id, d.ProyectoId, d.TipoDocumento, d.NombreArchivoOriginal, d.ContentType, d.Extension,
+            d.TamanoBytes, d.EstadoDocumento, d.Activo, d.Version, d.FechaEmision, d.InstitucionEmisora,
+            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction
+        );
     }
 }

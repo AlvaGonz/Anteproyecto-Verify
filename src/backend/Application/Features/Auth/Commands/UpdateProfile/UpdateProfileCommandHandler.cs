@@ -28,21 +28,20 @@ public class UpdateProfileCommandHandler
             return new UpdateProfileResultDto(false, "Usuario no encontrado.");
 
         if (!string.IsNullOrWhiteSpace(request.NewPassword))
-        {
-            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
-                return new UpdateProfileResultDto(false, "Debe proveer su contraseña actual para cambiarla.");
-
-            if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.ContrasenaHash))
-                return new UpdateProfileResultDto(false, "La contraseña actual es incorrecta.");
-
             user.UpdatePassword(_passwordHasher.HashPassword(request.NewPassword));
-        }
 
         var nombre = string.IsNullOrWhiteSpace(request.Nombre) ? user.Nombre : request.Nombre;
         var apellido = string.IsNullOrWhiteSpace(request.Apellido) ? user.Apellido : request.Apellido;
         var telefono = string.IsNullOrWhiteSpace(request.Telefono) ? user.Telefono : request.Telefono;
-        
+
         user.UpdateProfile(nombre, apellido, telefono ?? "0000000000");
+
+        // Update cedula if provided
+        if (request.Cedula != null)
+        {
+            var cedulaClean = request.Cedula.Replace("-", "").Trim();
+            user.UpdateContactInfo(telefono ?? user.Telefono, cedulaClean);
+        }
 
         if (request.Rnc != null)
         {

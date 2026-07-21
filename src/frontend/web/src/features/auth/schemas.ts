@@ -106,6 +106,21 @@ export const UpdateProfileSchema = z.object({
       if (val === undefined || val === "") return true;
       return /^(809|829|849)\d{7}$/.test(val);
     }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
+  cedula: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return val;
+      return val.replace(/\D/g, '');
+    })
+    .refine((val) => {
+      if (val === undefined || val === "") return true;
+      return /^\d{11}$/.test(val);
+    }, "La cédula debe tener 11 dígitos")
+    .refine((val) => {
+      if (val === undefined || val === "") return true;
+      return validateCedulaCheckDigit(val);
+    }, "Cédula inválida: el dígito verificador no es correcto"),
   rnc: z.string().optional(),
   razonSocial: z.string().optional(),
   nombreComercial: z.string().optional(),
@@ -133,7 +148,7 @@ export const UpdateProfileSchema = z.object({
 .superRefine((data, ctx) => {
   if (!data.changePassword) return;
   if (!data.currentPassword || data.currentPassword.length === 0) {
-    ctx.addIssue({ code: "custom", path: ["currentPassword"], message: "Requerida para cambiar contraseña" });
+    ctx.addIssue({ code: "custom", path: ["currentPassword"], message: "La contraseña actual es requerida" });
   }
   if (!data.newPassword || data.newPassword.length < 8) {
     ctx.addIssue({ code: "custom", path: ["newPassword"], message: "Mínimo 8 caracteres" });

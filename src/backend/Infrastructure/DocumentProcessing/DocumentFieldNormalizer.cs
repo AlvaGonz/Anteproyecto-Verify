@@ -10,7 +10,6 @@ using Domain.Enums;
 
 /// <summary>
 /// Normalizes raw OCR results into a typed field bag based on the expected rules for the document type.
-/// Uses heuristics to extract fields since the current OCR provider only returns raw text.
 /// </summary>
 public class DocumentFieldNormalizer : IDocumentFieldNormalizer
 {
@@ -26,19 +25,26 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
 
         var text = ocrResult.ExtractedText;
 
-        // In a real structured OCR, we would just map ocrResult.Fields.
-        // Since we only have raw text, we apply basic regex/heuristics to detect presence.
-        
-        foreach (var rule in rules)
+        if (documentType == DocumentType.ID)
         {
-            var (value, confidence, present) = ExtractFieldWithHeuristics(text, rule.Campo, rule.PatronEsperado);
-            fields[rule.Campo] = new ExtractedField(value, confidence, present);
+            fields["cedulaNumber"] = TryExtractCedulaNumber(text);
+            fields["firstNames"] = TryExtractLabeledName(text, "NOMBRES");
+            fields["lastNames"] = TryExtractLabeledName(text, "APELLIDOS");
+            fields["birthDate"] = TryExtractLabeledDate(text, "FECHA DE NACIMIENTO");
+            fields["expiryDate"] = TryExtractLabeledDate(text, "FECHA DE EXPIRACION");
+        }
+        else
+        {
+            foreach (var rule in rules)
+            {
+                var (value, confidence, present) = ExtractFieldWithHeuristics(text, rule.Campo, rule.PatronEsperado);
+                fields[rule.Campo] = new ExtractedField(value, confidence, present);
+            }
         }
 
         // Apply cross-cutting rules
         foreach (var rule in DocumentFieldRuleTable.CrossCuttingRules)
         {
-            // Stub alerts to NotImplementedYet as requested
             if (rule.Campo == "alertas_enmienda_tachadura_alteracion")
             {
                 fields[rule.Campo] = new ExtractedField("NotImplementedYet", 1.0, false);
@@ -52,18 +58,67 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
         return fields;
     }
 
+    public ExtractedField TryExtractCedulaNumber(string text)
+    {
+        var match = Regex.Match(text, @"\b\d{3}-?\d{7}-?\d{1}\b");
+        if (match.Success)
+        {
+            var raw = match.Value;
+            var normalized = raw.Replace("-", "").PadLeft(11, '0');
+            return new ExtractedField(normalized, 0.95, true);
+        }
+        return new ExtractedField(string.Empty, 0.0, false);
+    }
+
+    public ExtractedField TryExtractLabeledName(string text, string label)
+    {
+        var match = Regex.Match(text, $@"{label}\s*[\r\n]+([A-ZÑÁÉÍÓÚ\s]+)", RegexOptions.IgnoreCase);
+        if (match.Success && match.Groups.Count > 1)
+        {
+            var raw = match.Groups[1].Value.Trim();
+            var normalized = NormalizePersonName(raw);
+            return new ExtractedField(normalized, 0.90, true);
+        }
+        return new ExtractedField(string.Empty, 0.0, false);
+    }
+
+    public ExtractedField TryExtractLabeledDate(string text, string label)
+    {
+        var match = Regex.Match(text, $@"{label}[^\d]*(\d{{1,2}}[/-]\d{{1,2}}[/-]\d{{4}})", RegexOptions.IgnoreCase);
+        if (match.Success && match.Groups.Count > 1)
+        {
+            var raw = match.Groups[1].Value.Trim();
+            var normalized = NormalizeDominicanDate(raw);
+            if (!string.IsNullOrEmpty(normalized))
+            {
+                return new ExtractedField(normalized, 0.90, true);
+            }
+        }
+        return new ExtractedField(string.Empty, 0.0, false);
+    }
+
+    private string NormalizePersonName(string raw)
+    {
+        var upper = raw.ToUpperInvariant().Normalize(System.Text.NormalizationForm.FormC);
+        return Regex.Replace(upper, @"\s+", " ").Trim();
+    }
+
+    private string NormalizeDominicanDate(string raw)
+    {
+        var clean = raw.Replace("-", "/");
+        if (DateTime.TryParseExact(clean, new[] { "dd/MM/yyyy", "d/M/yyyy", "dd/M/yyyy", "d/MM/yyyy" }, 
+            System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var dt))
+        {
+            return dt.ToString("yyyy-MM-dd");
+        }
+        return string.Empty;
+    }
+
     private (string Value, double Confidence, bool Present) ExtractFieldWithHeuristics(string fullText, string fieldName, string expectedPattern)
     {
-        // This is a naive implementation simulating extraction from raw text.
-        // A true implementation would use NLP or layout-aware parsing.
-        
-        // Convert to lowercase for easier matching
         var normalizedText = fullText.ToLowerInvariant();
-        
-        // Very basic keyword presence check based on field name
         var keyword = fieldName.Replace("_", " ").ToLowerInvariant();
         
-        // Some specific overrides for common legal terms
         keyword = fieldName switch
         {
             "matricula_serial" => "matrícula",
@@ -78,8 +133,6 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
 
         if (isPresent)
         {
-            // Simulate extracting a value (just return the keyword as a placeholder for now)
-            // and a mock confidence score.
             return (keyword, 0.85, true);
         }
 

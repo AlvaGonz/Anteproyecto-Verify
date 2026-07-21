@@ -58,6 +58,15 @@ test.describe("Category Specific Requirements E2E", () => {
         body: JSON.stringify({ requirements: [], documents: [] })
       });
     });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/validation-result`, async (route) => {
+      await route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
+    });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/findings`, async (route) => {
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+    });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/audit`, async (route) => {
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+    });
   });
 
   test("Comercial project (Category 2) renders generic requirement rows", async ({ page }) => {
@@ -74,7 +83,7 @@ test.describe("Category Specific Requirements E2E", () => {
       });
     });
 
-    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/documents`);
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/validations`);
     
     // ponytail: category-specific requirements not implemented yet
     // Check that generic requirements are rendered
@@ -96,7 +105,7 @@ test.describe("Category Specific Requirements E2E", () => {
       });
     });
 
-    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/documents`);
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/validations`);
     
     // ponytail: category-specific requirements not implemented yet
     // Check that generic requirements are rendered

@@ -7,6 +7,7 @@ public record UpdateProfileCommand(
     string? Nombre,
     string? Apellido,
     string? Telefono,
+    string? Cedula,
     string? Rnc,
     string? RazonSocial,
     string? NombreComercial,
@@ -14,6 +15,5 @@ public record UpdateProfileCommand(
     string? Direccion,
     string? Provincia,
     string? Nickname,
-    string? CurrentPassword,
     string? NewPassword
 );

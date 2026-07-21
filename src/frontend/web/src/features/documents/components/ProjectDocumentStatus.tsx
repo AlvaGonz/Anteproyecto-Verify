@@ -2,6 +2,7 @@ import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
 import { useDocuments, useDownloadDocument } from "../api/useDocuments";
 import { OcrReviewPanel } from "./OcrReviewPanel";
+import { CedulaExtractionCard } from "./CedulaExtractionCard";
 import {
   AlertTriangle,
   Clock,
@@ -56,11 +57,11 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
 
   const requiredTypes = Object.entries(DOCUMENT_INFO)
     .reduce<DocumentType[]>((acc, [key, info]) => {
-      if (info.categories.includes(projectCategory)) acc.push(key as DocumentType);
+      if (info.categories.includes(projectCategory)) acc.push(Number(key) as DocumentType);
       return acc;
     }, []);
 
-  const uploadedDocs = documents.filter(d => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
+  const uploadedDocs = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
 
 
   const missingCount = requiredTypes.length - uploadedDocs.length;
@@ -72,7 +73,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     const info = DOCUMENT_INFO[typeId];
     if (!info) return null;
 
-    const doc = documents.find(d => d.tipoDocumento === typeId);
+    const doc = documents.find((d: any) => d.tipoDocumento === typeId);
     const isVerificado = doc?.estadoDocumento === DocumentStatus.Verificado || doc?.estadoDocumento === DocumentStatus.Valid;
     const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isVerificado;
     const isObservado = doc?.estadoDocumento === DocumentStatus.Observado;
@@ -135,7 +136,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
           <div className="flex items-center gap-4">
             {isVerificado && (
               <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-                VERIFICADO (OCR)
+                VERIFICADO
               </div>
             )}
             {isObservado && (
@@ -159,7 +160,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               </div>
             )}
 
-            {(isVerificado || isPending || isObservado) && doc?.id && (
+            {(isVerificado || isPending || isObservado) && doc?.id && doc.fileUrl && (
               <button
                 onClick={() => downloadDoc(doc.id)}
                 disabled={isDownloading}
@@ -171,7 +172,11 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             )}
           </div>
         </div>
-        {doc && <OcrReviewPanel document={doc} />}
+        {doc && (
+          doc.tipoDocumento === DocumentType.ID 
+            ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
+            : <OcrReviewPanel document={doc} />
+        )}
       </m.div>
     );
   };

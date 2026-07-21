@@ -2,6 +2,7 @@ import React from "react";
 import { DocumentType } from "../types";
 import { useDocuments, useUpdateDocumentType } from "../api/useDocuments";
 import { RequirementUploadRow } from "./RequirementUploadRow";
+import { CedulaExtractionCard } from "./CedulaExtractionCard";
 import { FileCheck2 } from "lucide-react";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 
@@ -54,34 +55,40 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
         </div>
       </div>
 
-      <div className="space-y-3 relative z-10">
+      <div className="space-y-4 relative z-10">
         {REQUIRED_DOCUMENTS.map((doc) => {
-          const uploadedDoc = documents.find(u => u.tipoDocumento === doc.category && u.activo);
+          const uploadedDoc = documents.find((u: any) => u.tipoDocumento === doc.category && u.activo);
           const isUploaded = !!uploadedDoc;
           
           const availableDocs = documents
-            .filter(d => d.activo && d.tipoDocumento === DocumentType.Other)
-            .map(d => ({ id: d.id, name: d.nombreArchivoOriginal }));
+            .filter((d: any) => d.activo && d.tipoDocumento === DocumentType.Other)
+            .map((d: any) => ({ id: d.id, name: d.nombreArchivoOriginal }));
 
           return (
-            <RequirementUploadRow
-              key={doc.id}
-              projectId={projectId}
-              requirementCode={doc.id}
-              label={doc.label}
-              description={doc.description}
-              categoryLabel={doc.categoryLabel}
-              isUploaded={isUploaded}
-              uploadedDocumentId={uploadedDoc?.id}
-              fileName={uploadedDoc?.nombreArchivoOriginal}
-              documentStatus={uploadedDoc?.estadoDocumento as unknown as number}
-              availableDocuments={availableDocs}
-              onChangeDocument={async (newId, oldId) => {
-                await handleChangeDocument(newId, oldId, doc.category);
-              }}
-              onUnassignDocument={uploadedDoc ? () => handleUnassignDocument(uploadedDoc.id) : undefined}
-              isAssigning={typeMutation.isPending}
-            />
+            <div key={doc.id} className="space-y-2">
+              <RequirementUploadRow
+                projectId={projectId}
+                requirementCode={doc.id}
+                label={doc.label}
+                description={doc.description}
+                categoryLabel={doc.categoryLabel}
+                isUploaded={isUploaded}
+                uploadedDocumentId={uploadedDoc?.id}
+                fileName={uploadedDoc?.nombreArchivoOriginal}
+                documentStatus={uploadedDoc?.estadoDocumento as unknown as number}
+                availableDocuments={availableDocs}
+                onChangeDocument={async (newId, oldId) => {
+                  await handleChangeDocument(newId, oldId, doc.category);
+                }}
+                onUnassignDocument={uploadedDoc ? () => handleUnassignDocument(uploadedDoc.id) : undefined}
+                isAssigning={typeMutation.isPending}
+              />
+              {doc.id === "cedula" && uploadedDoc?.cedulaExtraction && (
+                <div className="pl-4 sm:pl-12">
+                  <CedulaExtractionCard extraction={uploadedDoc.cedulaExtraction} />
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

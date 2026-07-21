@@ -1,3 +1,41 @@
+export enum ExtractionStatus {
+  Queued = 0,
+  Processing = 1,
+  Completed = 2,
+  Incomplete = 3,
+  Failed = 4
+}
+
+export enum FieldStatus {
+  Valid = 0,
+  Missing = 1,
+  Malformed = 2,
+  LowConfidence = 3
+}
+
+export interface ExtractedField {
+  rawValue: string;
+  normalizedValue: string;
+  confidence: number;
+  status: FieldStatus;
+  sourcePage: number;
+}
+
+export interface CedulaRdExtractionV1 {
+  schemaVersion: string;
+  documentType: string;
+  extractionStatus: ExtractionStatus;
+  overallConfidence: number;
+  cedulaNumber: ExtractedField;
+  firstNames: ExtractedField;
+  lastNames: ExtractedField;
+  birthDate: ExtractedField;
+  expiryDate: ExtractedField;
+  warnings: string[];
+  processorName: string;
+  processorVersion: string;
+}
+
 export interface DocumentDto {
   id: string;
   proyectoId: string;
@@ -15,48 +53,49 @@ export interface DocumentDto {
   observaciones?: string;
   createdAtUtc: string;
   updatedAtUtc?: string;
-  fileUrl: string;
+  cedulaExtraction?: CedulaRdExtractionV1;
   resultadoOcrJson?: string;
+  fileUrl?: string;
 }
 
 export enum DocumentType {
-  TITLE = "TITLE",
-  LEGAL_STATUS = "LEGAL_STATUS",
-  SURVEY = "SURVEY",
-  ID = "ID",
-  NOTARIAL_POWER = "NOTARIAL_POWER",
-  CertificadoUsoSuelo = "CertificadoUsoSuelo",
-  FormularioFIDVB009 = "FormularioFIDVB009",
-  CertificacionIPI = "CertificacionIPI",
-  RegistroMercantil = "RegistroMercantil",
-  ActaConstitutiva = "ActaConstitutiva",
-  PoderNotarial = "PoderNotarial",
-  RNC = "RNC",
-  EstadosFinancieros = "EstadosFinancieros",
-  CertificacionesBancarias = "CertificacionesBancarias",
-  FormularioKYCAML = "FormularioKYCAML",
-  DeclaracionPEP = "DeclaracionPEP",
-  CertificadoEIA = "CertificadoEIA",
-  NoObjecionINAPACAASD = "NoObjecionINAPACAASD",
-  DocumentosNotariales = "DocumentosNotariales",
-  DocumentosSupletorios = "DocumentosSupletorios",
-  CertificadoTitulo = "CertificadoTitulo",
-  CertificacionEstadoJuridico = "CertificacionEstadoJuridico",
-  PlanosArquitectonicos = "PlanosArquitectonicos",
-  PlanoMensuraCatastral = "PlanoMensuraCatastral",
-  PermisoConstruccion = "PermisoConstruccion",
-  CopiaCedulaIdentidad = "CopiaCedulaIdentidad", // Adding this to match frontend needs if missing in backend
-  Other = "OTHER",
+  TITLE = 1,
+  LEGAL_STATUS = 2,
+  SURVEY = 3,
+  ID = 4,
+  NOTARIAL_POWER = 5,
+  CertificadoUsoSuelo = 6,
+  FormularioFIDVB009 = 7,
+  CertificacionIPI = 8,
+  RegistroMercantil = 9,
+  ActaConstitutiva = 10,
+  PoderNotarial = 11,
+  RNC = 12,
+  EstadosFinancieros = 13,
+  CertificacionesBancarias = 14,
+  FormularioKYCAML = 15,
+  DeclaracionPEP = 16,
+  CertificadoEIA = 17,
+  NoObjecionINAPACAASD = 18,
+  DocumentosNotariales = 19,
+  DocumentosSupletorios = 20,
+  CertificadoTitulo = 21,
+  CertificacionEstadoJuridico = 22,
+  PlanosArquitectonicos = 23,
+  PlanoMensuraCatastral = 24,
+  PermisoConstruccion = 25,
+  CopiaCedulaIdentidad = 26, // Adding this to match frontend needs if missing in backend
+  Other = 99,
 }
 
 export enum DocumentStatus {
-  Uploaded = "Uploaded",
-  Processing = "Processing",
-  Valid = "Valid",
-  Invalid = "Invalid",
-  EnRevision = "EnRevision",
-  Observado = "Observado",
-  Verificado = "Verificado",
+  Uploaded = 0,
+  Processing = 1,
+  Valid = 2,
+  Invalid = 3,
+  EnRevision = 4,
+  Observado = 5,
+  Verificado = 6,
 }
 
 

@@ -6,18 +6,26 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase, MapPin, Globe, AtSign, BadgeCheck } from "lucide-react";
+import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase, MapPin, Globe, AtSign, BadgeCheck, ArrowRight, X } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
 import { useDgiiLookup, DgiiData } from "../../../shared/hooks/useDgiiLookup";
 
+// Cédula formatting: XXX-XXXXXXX-X
+const formatCedula = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 10) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 10)}-${digits.slice(10)}`;
+};
+
 const PROVINCIAS_RD = [
-  'Azua','Baoruco','Barahona','Dajabón','Duarte',
-  'El Seibo','Elías Piña','Espaillat','Hato Mayor','Hermanas Mirabal',
-  'Independencia','La Altagracia','La Romana','La Vega','María Trinidad Sánchez',
-  'Monseñor Nouel','Monte Cristi','Monte Plata','Pedernales',
-  'Peravia','Puerto Plata','Samaná','San Cristóbal','San José de Ocoa',
-  'San Juan','San Pedro de Macorís','Sánchez Ramírez','Santiago',
-  'Santiago Rodríguez','Santo Domingo','Valverde'
+  'Azua', 'Baoruco', 'Barahona', 'Dajabón', 'Duarte',
+  'El Seibo', 'Elías Piña', 'Espaillat', 'Hato Mayor', 'Hermanas Mirabal',
+  'Independencia', 'La Altagracia', 'La Romana', 'La Vega', 'María Trinidad Sánchez',
+  'Monseñor Nouel', 'Monte Cristi', 'Monte Plata', 'Pedernales',
+  'Peravia', 'Puerto Plata', 'Samaná', 'San Cristóbal', 'San José de Ocoa',
+  'San Juan', 'San Pedro de Macorís', 'Sánchez Ramírez', 'Santiago',
+  'Santiago Rodríguez', 'Santo Domingo', 'Valverde'
 ] as const;
 
 const ROLE_LABEL: Record<string, string> = {
@@ -34,6 +42,9 @@ export const MyProfileForm: React.FC = () => {
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [showCurrentPwd, setShowCurrentPwd] = useState(false);
   const [showNewPwd, setShowNewPwd] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingData, setPendingData] = useState<UpdateProfileDto | null>(null);
+  const [cedulaDisplay, setCedulaDisplay] = useState(() => user?.cedula ? formatCedula(user.cedula) : "");
 
   const {
     register,
@@ -48,6 +59,7 @@ export const MyProfileForm: React.FC = () => {
       nombre: user?.nombre ?? "",
       apellido: user?.apellido ?? "",
       telefono: user?.telefono ?? "",
+      cedula: user?.cedula ?? "",
       rnc: user?.rnc ?? "",
       direccion: user?.direccion ?? "",
       provincia: user?.provincia ?? "" as any,
@@ -107,11 +119,13 @@ export const MyProfileForm: React.FC = () => {
         nombre: user.nombre ?? "",
         apellido: user.apellido ?? "",
         telefono: user.telefono ?? "",
+        cedula: user.cedula ?? "",
         direccion: user.direccion ?? "",
         provincia: user.provincia ?? "" as any,
         nickname: user.nickname ?? "",
         changePassword: false,
       });
+      setCedulaDisplay(user.cedula ? formatCedula(user.cedula) : "");
     }
   }, [user, reset]);
 
@@ -128,13 +142,23 @@ export const MyProfileForm: React.FC = () => {
     }
   };
 
-  const onSubmit = async (data: UpdateProfileDto) => {
+  const onSubmit = (data: UpdateProfileDto) => {
+    // Store the pending data and show confirmation modal
+    setPendingData(data);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!pendingData) return;
+
+    const data = pendingData;
     try {
       const isRncEmpty = !data.rnc || data.rnc.trim() === "";
       await updateProfile.mutateAsync({
         nombre: data.nombre,
         apellido: data.apellido,
         telefono: data.telefono || undefined,
+        cedula: data.cedula ?? "",
         rnc: data.rnc ?? "",
         razonSocial: isRncEmpty ? "" : (previewDgii?.nombreRazonSocial || user?.razonSocial || ""),
         nombreComercial: isRncEmpty ? "" : (previewDgii?.nombreComercial || user?.nombreComercial || ""),
@@ -151,16 +175,50 @@ export const MyProfileForm: React.FC = () => {
       addToast("Perfil actualizado correctamente", "success");
       setShowPasswordSection(false);
       setValue("changePassword", false);
+      setShowConfirmModal(false);
+      setPendingData(null);
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Error al actualizar perfil";
       addToast(msg, "error");
     }
   };
 
+  const getChanges = () => {
+    if (!pendingData || !user) return [];
+    const changes: Array<{ field: string; current: string; new: string }> = [];
+
+    const fieldsToCompare = [
+      { key: "nombre" as const, label: "Nombre" },
+      { key: "apellido" as const, label: "Apellido" },
+      { key: "telefono" as const, label: "Teléfono" },
+      { key: "cedula" as const, label: "Cédula" },
+      { key: "rnc" as const, label: "RNC" },
+      { key: "direccion" as const, label: "Dirección" },
+      { key: "provincia" as const, label: "Provincia" },
+      { key: "nickname" as const, label: "Apodo / Nickname" },
+    ];
+
+    fieldsToCompare.forEach(({ key, label }) => {
+      const currentValue = user[key] || "";
+      const newValue = pendingData[key] || "";
+      if (currentValue !== newValue) {
+        changes.push({ field: label, current: currentValue || "(vacío)", new: newValue || "(vacío)" });
+      }
+    });
+
+    // Check password change
+    if (pendingData.changePassword) {
+      changes.push({ field: "Contraseña", current: "********", new: "******** (cambiada)" });
+    }
+
+    return changes;
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-      {/* Two-column grid: left = avatar+identity, right = editable fields */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+    <>
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+        {/* Two-column grid: left = avatar+identity, right = editable fields */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
         {/* ═══ LEFT COLUMN: Avatar + Read-only Identity ═══ */}
         <div className="flex flex-col gap-6 h-full">
@@ -407,6 +465,32 @@ export const MyProfileForm: React.FC = () => {
               )}
             </div>
 
+            {/* Cédula Field */}
+            <div>
+              <label htmlFor="mp-cedula" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                Cédula
+              </label>
+              <div className="relative">
+                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                <input
+                  id="mp-cedula"
+                  {...register("cedula", { setValueAs: (v: string) => v.replace(/\D/g, '').slice(0, 11) })}
+                  type="text"
+                  maxLength={15}
+                  value={cedulaDisplay}
+                  onChange={(e) => {
+                    const formatted = formatCedula(e.target.value);
+                    setCedulaDisplay(formatted);
+                  }}
+                  className="vf-input w-full pl-9"
+                  placeholder="Ej: 402-1234567-8"
+                />
+              </div>
+              {errors.cedula && (
+                <p className="text-[10px] text-red-500 mt-1">{errors.cedula.message}</p>
+              )}
+            </div>
+
             {/* Seller Badge */}
             <div className="flex items-center gap-2 px-1">
               {user?.rnc && user.rnc.length > 0 ? (
@@ -477,8 +561,62 @@ export const MyProfileForm: React.FC = () => {
           >
             {updateProfile.isPending ? "Guardando..." : "Guardar Cambios"}
           </button>
-        </div>
+</div>
       </div>
     </form>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && pendingData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => { setShowConfirmModal(false); setPendingData(null); }}>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-text-primary">Confirmar cambios</h3>
+              <button
+                type="button"
+                onClick={() => { setShowConfirmModal(false); setPendingData(null); }}
+                className="text-text-secondary hover:text-text-primary"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-text-secondary mb-4">Revisa los cambios antes de guardar:</p>
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {getChanges().map((change, index) => (
+                <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                  <p className="text-xs font-bold text-text-secondary uppercase">{change.field}</p>
+                  <div className="flex items-center gap-2 mt-1 text-sm">
+                    <span className="text-text-secondary flex-1 truncate">{change.current}</span>
+                    <ArrowRight className="w-4 h-4 text-primary flex-shrink-0" />
+                    <span className="text-primary font-medium flex-1 truncate">{change.new}</span>
+                  </div>
+                </div>
+              ))}
+              {getChanges().length === 0 && (
+                <p className="text-sm text-text-secondary text-center py-4">No hay cambios para guardar</p>
+              )}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => { setShowConfirmModal(false); setPendingData(null); }}
+                className="flex-1 vf-btn-secondary py-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSave}
+                disabled={updateProfile.isPending}
+                className="flex-1 vf-btn-primary py-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {updateProfile.isPending ? "Guardando..." : "Confirmar y Guardar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
   );
-};
+  };

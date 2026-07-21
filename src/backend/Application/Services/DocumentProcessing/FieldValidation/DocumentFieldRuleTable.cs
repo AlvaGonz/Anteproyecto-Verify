@@ -90,15 +90,11 @@ public static class DocumentFieldRuleTable
         },
         [DocumentType.ID] = new()
         {
-            new("nombre", "name", true, "JCE"),
-            new("numero", "alphanumeric-code", true, "JCE"),
-            new("fecha_nacimiento", "date", true, "JCE"),
-            new("sexo", "text", false, "JCE"),
-            new("nacionalidad", "text", false, "JCE"),
-            new("vencimiento_vigencia", "date", true, "JCE"),
-            new("foto", "text", false, "JCE"),
-            new("qr", "text", false, "JCE"),
-            new("marcas_autenticidad", "text", false, "JCE"),
+            new("cedulaNumber", "alphanumeric-code", true, "JCE"),
+            new("firstNames", "name", true, "JCE"),
+            new("lastNames", "name", true, "JCE"),
+            new("birthDate", "date", true, "JCE"),
+            new("expiryDate", "date", true, "JCE"),
         },
         // ponytail: Poder Notarial — criterio técnico, no validado contra fuente oficial dominicana
         [DocumentType.NOTARIAL_POWER] = new()
