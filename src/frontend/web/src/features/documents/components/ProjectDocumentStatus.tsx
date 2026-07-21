@@ -55,8 +55,8 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
   );
 
   const requiredTypes = Object.entries(DOCUMENT_INFO)
-    .reduce<number[]>((acc, [key, info]) => {
-      if (info.categories.includes(projectCategory)) acc.push(Number(key));
+    .reduce<DocumentType[]>((acc, [key, info]) => {
+      if (info.categories.includes(projectCategory)) acc.push(key as DocumentType);
       return acc;
     }, []);
 
@@ -68,7 +68,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     ? Math.round((uploadedDocs.length / requiredTypes.length) * 100)
     : 100;
 
-  const renderDocItem = (typeId: number, index: number) => {
+  const renderDocItem = (typeId: DocumentType, index: number) => {
     const info = DOCUMENT_INFO[typeId];
     if (!info) return null;
 

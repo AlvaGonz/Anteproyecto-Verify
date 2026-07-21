@@ -74,7 +74,7 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
               isUploaded={isUploaded}
               uploadedDocumentId={uploadedDoc?.id}
               fileName={uploadedDoc?.nombreArchivoOriginal}
-              documentStatus={uploadedDoc?.estadoDocumento}
+              documentStatus={uploadedDoc?.estadoDocumento as unknown as number}
               availableDocuments={availableDocs}
               onChangeDocument={async (newId, oldId) => {
                 await handleChangeDocument(newId, oldId, doc.category);

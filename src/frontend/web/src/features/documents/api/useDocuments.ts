@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import type { DocumentoDto as ApiDocumentoDto } from "./types";
 import type { DocumentDto } from "../types";
-import { DocumentStatus } from "../types";
+import { DocumentStatus, DocumentType } from "../types";
 
 export const documentKeys = {
   byProject: (projectId: string) => ["documents", projectId] as const,
@@ -11,12 +11,12 @@ export const documentKeys = {
 const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   id: String(apiDoc.id),
   proyectoId: String(apiDoc.proyectoId),
-  tipoDocumento: apiDoc.tipoDocumento as any,
+  tipoDocumento: apiDoc.tipoDocumento as unknown as any,
   nombreArchivoOriginal: apiDoc.nombreArchivoOriginal,
   contentType: apiDoc.contentType || "application/octet-stream",
   extension: apiDoc.extension || apiDoc.nombreArchivoOriginal?.split(".").pop() || "",
   tamanoBytes: apiDoc.tamanoBytes || 0,
-  estadoDocumento: apiDoc.estadoDocumento as DocumentStatus,
+  estadoDocumento: apiDoc.estadoDocumento as unknown as DocumentStatus,
   activo: apiDoc.activo,
   version: apiDoc.version || 1,
   fechaEmision: apiDoc.fechaEmision,
