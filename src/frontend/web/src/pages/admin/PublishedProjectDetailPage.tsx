@@ -130,7 +130,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
         </p>
         <button
           type="button"
-          onClick={() => navigate("/admin/projects")}
+          onClick={() => navigate("/admin/projects?tab=publicados")}
           className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-colors"
         >
           Volver a proyectos
@@ -141,10 +141,9 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   return (
     <div className="max-w-[1400px] mx-auto">
-      {/* Back button */}
       <button
         type="button"
-        onClick={() => navigate("/admin/projects")}
+        onClick={() => navigate("/admin/projects?tab=publicados")}
         className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-primary transition-colors mb-6 uppercase tracking-widest"
       >
         <ChevronLeft size={14} />
