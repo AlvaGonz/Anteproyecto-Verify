@@ -31,6 +31,7 @@ import { FindingsPage } from "../features/findings/FindingsPage";
 import { AdminLayout } from "../shared/components/layout/AdminLayout";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
 import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
+import { PublishedProjectDetailPage } from "../pages/admin/PublishedProjectDetailPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
 import { GuestGuard } from "../shared/components/security/GuestGuard";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
@@ -243,6 +244,17 @@ export const router = createHashRouter([
           <AuthGuard>
             <AdminLayout>
               <AdminProjectsPage />
+            </AdminLayout>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/admin/projects/:id/publicado",
+        errorElement: <AdminErrorFallback />,
+        element: (
+          <AuthGuard>
+            <AdminLayout>
+              <PublishedProjectDetailPage />
             </AdminLayout>
           </AuthGuard>
         ),

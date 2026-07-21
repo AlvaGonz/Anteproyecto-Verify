@@ -55,7 +55,13 @@ public class SearchPublicProjectsQueryHandler
                 EstadoIntegridad = (int)p.EstadoIntegridad,
                 Constructora = p.DatosDesarrollador ?? p.Propietario,
                 Registrante = p.UsuarioCreador?.NombreCompleto,
-                ImagenUrl = p.ImagenUrl
+                ImagenUrl = p.ImagenUrl,
+                Categoria = (int)p.Categoria,
+                ValorEstimado = p.ValorEstimado,
+                DesignacionCatastral = p.DesignacionCatastral,
+                Matricula = p.Matricula,
+                RncDesarrollador = p.RncDesarrollador,
+                CedulaRncPropietario = p.CedulaRncPropietario
             });
         }
 
