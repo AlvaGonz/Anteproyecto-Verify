@@ -62,35 +62,40 @@ namespace UnitTests.Api.Controllers
             _dbContext?.Dispose();
         }
 
-        private ProyectoDto CreateProyectoDto(Guid id, Guid usuarioCreadorId, string estado = "Publicado")
+private ProyectoDto CreateProyectoDto(Guid id, Guid usuarioCreadorId, string estado = "Publicado")
         {
             return new ProyectoDto(
-                id,
-                "PRJ-2024-001",
-                "Torre Bella Vista",
-                "Santo Domingo",
-                null,
-                null, null, null, null, null,
-                null,
-                ProjectCategory.Residencial,
-                "Constructora ABC",
-                "1-01-001",
-                "CAT-123",
-                "001-01",
-                "Propietario Test",
-                "001-0000001-1",
-                "IPI-001",
-                EstadoJuridico.Valido,
-                "Vigente",
-                500,
-                estado,
-                "Creado",
-                IntegrityStatus.Valid,
-                usuarioCreadorId,
-                DateTime.UtcNow,
-                null,
-                null,
-                "Test Plan"
+                Id: id,
+                CodigoInterno: "PRJ-2024-001",
+                Nombre: "Torre Bella Vista",
+                UbicacionTexto: "Santo Domingo",
+                UbicacionGps: null,
+                ImagenUrl: null,
+                ImagenAdicional1: null,
+                ImagenAdicional2: null,
+                ImagenAdicional3: null,
+                ImagenAdicional4: null,
+                ImagenAdicional5: null,
+                ValorEstimado: null,
+                Categoria: ProjectCategory.Residencial,
+                DatosDesarrollador: "Constructora ABC",
+                RncDesarrollador: "1-01-001",
+                DesignacionCatastral: "CAT-123",
+                Matricula: "001-01",
+                Propietario: "Propietario Test",
+                CedulaRncPropietario: "001-0000001-1",
+                Ipi: "IPI-001",
+                EstadoJuridico: EstadoJuridico.Valido,
+                EstatusIpi: "Vigente",
+                SuperficieM2: 500m,
+                EstatusDescripcion: estado,
+                EstadoProyecto: "Creado",
+                EstadoIntegridad: IntegrityStatus.Valid,
+                UsuarioCreadorId: usuarioCreadorId,
+                CreatedAtUtc: DateTime.UtcNow,
+                UpdatedAtUtc: null,
+                RegistradoPor: null,
+                PlanNombre: "Test Plan"
             );
         }
 
@@ -201,9 +206,16 @@ namespace UnitTests.Api.Controllers
             var statusResult = Assert.IsType<ObjectResult>(result.Result);
             Assert.Equal(402, statusResult.StatusCode);
 
-            var errorResponse = Assert.IsType<Dictionary<string, object>>(statusResult.Value);
-            Assert.Equal("QUOTA_EXCEEDED", errorResponse["error"]);
-            Assert.Equal("MaxConsultas", errorResponse["limitType"]);
+            // Check anonymous object properties
+            var errorObj = statusResult.Value!;
+            var errorType = errorObj.GetType();
+            var errorProp = errorType.GetProperty("error");
+            var limitTypeProp = errorType.GetProperty("limitType");
+            
+            Assert.NotNull(errorProp);
+            Assert.Equal("QUOTA_EXCEEDED", errorProp.GetValue(errorObj));
+            Assert.NotNull(limitTypeProp);
+            Assert.Equal("MaxConsultas", limitTypeProp.GetValue(errorObj));
         }
 
         [Fact]
@@ -232,8 +244,12 @@ namespace UnitTests.Api.Controllers
             var statusResult = Assert.IsType<ObjectResult>(result.Result);
             Assert.Equal(402, statusResult.StatusCode);
 
-            var errorResponse = Assert.IsType<Dictionary<string, object>>(statusResult.Value);
-            Assert.Equal("QUOTA_EXCEEDED", errorResponse["error"]);
+            var errorObj = statusResult.Value!;
+            var errorType = errorObj.GetType();
+            var errorProp = errorType.GetProperty("error");
+            
+            Assert.NotNull(errorProp);
+            Assert.Equal("QUOTA_EXCEEDED", errorProp.GetValue(errorObj));
         }
 
         [Fact]

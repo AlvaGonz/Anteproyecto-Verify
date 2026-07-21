@@ -89,15 +89,31 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
 
-        // Log the consulta for authenticated users viewing public projects
+        // Enforce consultation quota for authenticated users viewing public projects
         if (User.Identity?.IsAuthenticated == true)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (Guid.TryParse(userIdClaim, out var userId))
             {
-                var log = new LogConsulta(userId, true, $"Consulta pública proyecto: {project.CodigoInterno}");
-                _dbContext.LogConsultas.Add(log);
-                await _dbContext.SaveChangesAsync(cancellationToken);
+                var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
+                if (user != null)
+                {
+                    // Check if user can view this public project (enforces consultation quota)
+                    if (!SubscriptionTierPolicy.CanViewPublicProject(user, project.UsuarioCreadorId))
+                    {
+                        return StatusCode(402, new
+                        {
+                            error = "QUOTA_EXCEEDED",
+                            limitType = "MaxConsultas",
+                            message = "Has alcanzado el límite de consultas de tu plan actual. Mejora tu plan para continuar consultando proyectos."
+                        });
+                    }
+
+                    // Log the consulta for authenticated users viewing public projects
+                    var log = new LogConsulta(userId, true, $"Consulta pública proyecto: {project.CodigoInterno}");
+                    _dbContext.LogConsultas.Add(log);
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                }
             }
         }
 

@@ -46,7 +46,21 @@ export const useProjects = () =>
 export const useProject = (id: string) =>
   useQuery({
     queryKey: projectKeys.detail(id),
-    queryFn: () => apiClient.get<ApiProyectoDto>(`/projects/${id}`).then(res => mapApiProject(res.data)),
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get<ApiProyectoDto>(`/projects/${id}`);
+        return mapApiProject(response.data);
+      } catch (error: any) {
+        // Extract quota exceeded info from error response
+        if (error.response?.status === 402 && error.response?.data?.error === "QUOTA_EXCEEDED") {
+          const quotaError = new Error("QUOTA_EXCEEDED") as any;
+          quotaError.limitType = error.response.data.limitType;
+          quotaError.message = error.response.data.message;
+          throw quotaError;
+        }
+        throw error;
+      }
+    },
     enabled: !!id,
   });
 

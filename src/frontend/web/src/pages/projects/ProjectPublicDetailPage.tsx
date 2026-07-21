@@ -29,6 +29,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { m } from "framer-motion";
+import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 
 const getCategoryLabel = (cat: ProjectCategory) => {
   switch (cat) {
@@ -59,6 +60,15 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const { user } = useAuth();
   const [isInterested, setIsInterested] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [showQuotaModal, setShowQuotaModal] = React.useState(false);
+  const [quotaError, setQuotaError] = React.useState<{ used?: number; max?: number } | null>(null);
+
+  // Check for quota exceeded error from API
+  React.useEffect(() => {
+    if (fetchError && error?.includes("QUOTA_EXCEEDED")) {
+      setShowQuotaModal(true);
+    }
+  }, [fetchError, error]);
 
   // ponytail: el usuario puede gestionar si es el creador directo, o si es el titular del grupo y el creador es su invitado
   const canManage = user && project && (
@@ -79,7 +89,10 @@ export const ProjectPublicDetailPage: React.FC = () => {
       </div>
     );
 
-  if (error || !project)
+  // Don't show error page for quota exceeded - we show modal instead
+  const isQuotaExceeded = error?.includes("QUOTA_EXCEEDED");
+  
+  if (error && !project && !isQuotaExceeded)
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-10">
         <div className="vf-card !p-12 text-center max-w-md">
@@ -108,6 +121,17 @@ export const ProjectPublicDetailPage: React.FC = () => {
   ].filter(Boolean) as string[];
 
   const uniqueImgs = Array.from(new Set(allImgs));
+
+  const handleCloseQuotaModal = () => {
+    setShowQuotaModal(false);
+    setQuotaError(null);
+  };
+
+  const handleViewPlans = () => {
+    setShowQuotaModal(false);
+    // Navigate to pricing page
+    window.location.href = "/pricing";
+  };
 
   return (
     <div className="min-h-screen bg-background font-body text-on-surface antialiased overflow-x-hidden selection:bg-primary-container">
@@ -445,6 +469,16 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
       {/* Institutional Footer */}
       <LandingFooter />
+    
+    {/* Consultation Limit Modal */}
+    <LimitReachedModal
+      isOpen={showQuotaModal}
+      onClose={handleCloseQuotaModal}
+      onViewPlans={handleViewPlans}
+      limitType="consultations"
+      used={quotaError?.used}
+      max={quotaError?.max}
+    />
     </div>
   );
 };

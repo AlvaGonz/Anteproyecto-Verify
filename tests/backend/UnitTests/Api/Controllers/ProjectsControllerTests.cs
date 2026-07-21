@@ -14,18 +14,22 @@ using Application.DTOs;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
 namespace UnitTests.Api.Controllers
 {
-    public class ProjectsControllerTests
+    public class ProjectsControllerTests : IDisposable
     {
         private readonly Mock<IProjectService> _mockProjectService;
         private readonly Mock<IUsuarioRepository> _mockUsuarioRepository;
         private readonly Mock<IBlobStorageService> _mockBlobStorageService;
+        private readonly Mock<global::Application.Contracts.Documents.IDocumentService> _mockDocumentService;
+        private readonly AppDbContext _dbContext;
         private readonly ProjectsController _controller;
 
         public ProjectsControllerTests()
@@ -33,14 +37,30 @@ namespace UnitTests.Api.Controllers
             _mockProjectService = new Mock<IProjectService>();
             _mockUsuarioRepository = new Mock<IUsuarioRepository>();
             _mockBlobStorageService = new Mock<IBlobStorageService>();
+            _mockDocumentService = new Mock<global::Application.Contracts.Documents.IDocumentService>();
 
-            _controller = new ProjectsController(_mockProjectService.Object, _mockUsuarioRepository.Object, _mockBlobStorageService.Object, new Moq.Mock<global::Application.Contracts.Documents.IDocumentService>().Object)
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+            _dbContext = new AppDbContext(options);
+
+            _controller = new ProjectsController(
+                _mockProjectService.Object,
+                _mockUsuarioRepository.Object,
+                _mockBlobStorageService.Object,
+                _mockDocumentService.Object,
+                _dbContext)
             {
                 ControllerContext = new ControllerContext
                 {
                     HttpContext = new DefaultHttpContext()
                 }
             };
+        }
+
+        public void Dispose()
+        {
+            _dbContext?.Dispose();
         }
 
         private ProyectoDto CreateProyectoDto(Guid id, Guid usuarioCreadorId)
@@ -153,6 +173,7 @@ namespace UnitTests.Api.Controllers
             var user = CreateUsuario(userId, UserRole.User);
             user.GetType().GetProperty(nameof(Usuario.Plan))?.SetValue(user, Tests.Shared.TestPlanFactory.Profesional());
             user.GetType().GetProperty(nameof(Usuario.ConsultasUsadas))?.SetValue(user, 5);
+            user.GetType().GetProperty(nameof(Usuario.SubscriptionStatus))?.SetValue(user, "active");
             
             _mockUsuarioRepository
                 .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
@@ -198,6 +219,7 @@ namespace UnitTests.Api.Controllers
             var user = CreateUsuario(userId, UserRole.User);
             user.GetType().GetProperty(nameof(Usuario.Plan))?.SetValue(user, Tests.Shared.TestPlanFactory.Consultor());
             user.GetType().GetProperty(nameof(Usuario.ConsultasUsadas))?.SetValue(user, 1);
+            user.GetType().GetProperty(nameof(Usuario.SubscriptionStatus))?.SetValue(user, "active");
             
             _mockUsuarioRepository
                 .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
@@ -210,8 +232,13 @@ namespace UnitTests.Api.Controllers
             var statusResult = Assert.IsType<ObjectResult>(result.Result);
             Assert.Equal(402, statusResult.StatusCode);
             
-            var errorResponse = Assert.IsType<Dictionary<string, object>>(statusResult.Value);
-            Assert.Equal("QUOTA_EXCEEDED", errorResponse["error"]);
+            // Check anonymous object properties
+            var errorObj = statusResult.Value!;
+            var errorType = errorObj.GetType();
+            var errorProp = errorType.GetProperty("error");
+            
+            Assert.NotNull(errorProp);
+            Assert.Equal("QUOTA_EXCEEDED", errorProp.GetValue(errorObj));
         }
 
         [Fact]
@@ -240,6 +267,7 @@ namespace UnitTests.Api.Controllers
             var user = CreateUsuario(ownerId, UserRole.User);
             user.GetType().GetProperty(nameof(Usuario.Plan))?.SetValue(user, Tests.Shared.TestPlanFactory.Consultor());
             user.GetType().GetProperty(nameof(Usuario.ConsultasUsadas))?.SetValue(user, 1);
+            user.GetType().GetProperty(nameof(Usuario.SubscriptionStatus))?.SetValue(user, "active");
             
             _mockUsuarioRepository
                 .Setup(r => r.GetByIdAsync(ownerId, It.IsAny<CancellationToken>()))

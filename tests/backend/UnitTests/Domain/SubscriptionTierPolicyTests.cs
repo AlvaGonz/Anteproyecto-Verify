@@ -136,5 +136,68 @@ public class SubscriptionTierPolicyTests
         var admin = MakeUser(UserRole.Administrator, plan: null);
         Assert.True(SubscriptionTierPolicy.IsProjectPublic(admin));
     }
+
+    // ── CanViewPublicProject ──────────────────────
+
+    [Fact]
+    public void CanViewPublicProject_Admin_ReturnsTrue()
+    {
+        var admin = MakeUser(UserRole.Administrator, plan: null);
+        var projectOwnerId = Guid.NewGuid();
+        Assert.True(SubscriptionTierPolicy.CanViewPublicProject(admin, projectOwnerId));
+    }
+
+    [Fact]
+    public void CanViewPublicProject_ProjectOwner_ReturnsTrueEvenAtLimit()
+    {
+        var plan = MakePlan(maxConsultas: 1, maxProyectos: 1);
+        var owner = MakeUser(UserRole.User, plan, consultasUsadas: 1);
+        var projectOwnerId = owner.Id;
+        Assert.True(SubscriptionTierPolicy.CanViewPublicProject(owner, projectOwnerId));
+    }
+
+    [Fact]
+    public void CanViewPublicProject_UserUnderQuota_ReturnsTrue()
+    {
+        var plan = MakePlan(maxConsultas: 5, maxProyectos: 5);
+        var user = MakeUser(UserRole.User, plan, consultasUsadas: 2);
+        var projectOwnerId = Guid.NewGuid();
+        Assert.True(SubscriptionTierPolicy.CanViewPublicProject(user, projectOwnerId));
+    }
+
+    [Fact]
+    public void CanViewPublicProject_UserAtQuota_ReturnsFalse()
+    {
+        var plan = MakePlan(maxConsultas: 1, maxProyectos: 1);
+        var user = MakeUser(UserRole.User, plan, consultasUsadas: 1);
+        var projectOwnerId = Guid.NewGuid();
+        Assert.False(SubscriptionTierPolicy.CanViewPublicProject(user, projectOwnerId));
+    }
+
+    [Fact]
+    public void CanViewPublicProject_UserOverQuota_ReturnsFalse()
+    {
+        var plan = MakePlan(maxConsultas: 1, maxProyectos: 1);
+        var user = MakeUser(UserRole.User, plan, consultasUsadas: 2);
+        var projectOwnerId = Guid.NewGuid();
+        Assert.False(SubscriptionTierPolicy.CanViewPublicProject(user, projectOwnerId));
+    }
+
+    [Fact]
+    public void CanViewPublicProject_UserNoPlan_ReturnsFalse()
+    {
+        var user = MakeUser(UserRole.User, plan: null);
+        var projectOwnerId = Guid.NewGuid();
+        Assert.False(SubscriptionTierPolicy.CanViewPublicProject(user, projectOwnerId));
+    }
+
+    [Fact]
+    public void CanViewPublicProject_CorporativoUnlimited_ReturnsTrue()
+    {
+        var plan = MakePlan(maxConsultas: -1, maxProyectos: 50);
+        var user = MakeUser(UserRole.User, plan, consultasUsadas: 999999);
+        var projectOwnerId = Guid.NewGuid();
+        Assert.True(SubscriptionTierPolicy.CanViewPublicProject(user, projectOwnerId));
+    }
 }
 

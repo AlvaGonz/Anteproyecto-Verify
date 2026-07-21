@@ -7,12 +7,18 @@ interface LimitReachedModalProps {
   isOpen: boolean;
   onClose: () => void;
   onViewPlans: () => void;
+  limitType: 'projects' | 'consultations';
+  used?: number;
+  max?: number;
 }
 
 export const LimitReachedModal: React.FC<LimitReachedModalProps> = ({
   isOpen,
   onClose,
   onViewPlans,
+  limitType,
+  used,
+  max,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +34,12 @@ export const LimitReachedModal: React.FC<LimitReachedModalProps> = ({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const isConsultationLimit = limitType === 'consultations';
+  const title = isConsultationLimit ? "Límite de Consultas Alcanzado" : "Límite Alcanzado";
+  const description = isConsultationLimit
+    ? `Has utilizado todas las consultas disponibles en tu plan actual (${used} de ${max}). Para seguir consultando proyectos, te invitamos a mejorar tu suscripción.`
+    : `Has alcanzado el límite de proyectos permitidos por tu plan actual. Para seguir creando más proyectos y disfrutar de beneficios adicionales, te invitamos a mejorar tu suscripción.`;
 
   return createPortal(
     <AnimatePresence>
@@ -65,11 +77,19 @@ export const LimitReachedModal: React.FC<LimitReachedModalProps> = ({
             </div>
             
             <h2 id="limit-modal-title" className="text-2xl font-black text-[#223382] mb-3">
-              Límite Alcanzado
+              {title}
             </h2>
             <p className="text-gray-600 mb-8 leading-relaxed">
-              Has alcanzado el límite de proyectos permitidos por tu plan actual. Para seguir creando más proyectos y disfrutar de beneficios adicionales, te invitamos a mejorar tu suscripción.
+              {description}
             </p>
+
+            {isConsultationLimit && used !== undefined && max !== undefined && (
+              <div className="mb-6 p-4 bg-amber-50 rounded-xl border border-amber-200">
+                <p className="text-sm text-amber-800 font-medium">
+                  Consultas utilizadas: <span className="font-black">{used} de {max}</span>
+                </p>
+              </div>
+            )}
 
             <div className="flex flex-col gap-3">
               <button
@@ -86,7 +106,7 @@ export const LimitReachedModal: React.FC<LimitReachedModalProps> = ({
                 onClick={onClose}
                 className="w-full py-3 px-6 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-xl font-medium transition-colors"
               >
-                Cancelar
+                Volver al dashboard
               </button>
             </div>
           </div>
