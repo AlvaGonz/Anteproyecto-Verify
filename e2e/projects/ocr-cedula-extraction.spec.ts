@@ -73,6 +73,6 @@ test.describe('Real OCR Extraction Flow - Cédula', () => {
     // Basic assertions
     await expect(page.locator('text=Nombre').or(page.locator('text=Nombres'))).toBeVisible();
     await expect(page.locator('text=Apellidos').or(page.locator('text=Apellido'))).toBeVisible();
-    await expect(page.locator('text=Fecha de Nacimiento')).toBeVisible();
+    await expect(page.locator('text=Fecha Nacimiento')).toBeVisible();
   });
 });
