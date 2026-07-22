@@ -35,6 +35,22 @@ export interface CedulaRdExtractionV1 {
   processorName: string;
   processorVersion: string;
 }
+export interface CertificadoTituloRdExtractionV1 {
+  schemaVersion: string;
+  documentType: string;
+  extractionStatus: ExtractionStatus;
+  overallConfidence: number;
+  oficina: ExtractedField;
+  designacionCatastral: ExtractedField;
+  fechaYHoraInscripcion: ExtractedField;
+  vieneDe: ExtractedField;
+  municipio: ExtractedField;
+  provincia: ExtractedField;
+  superficieM2: ExtractedField;
+  warnings: string[];
+  processorName: string;
+  processorVersion: string;
+}
 
 export interface DocumentDto {
   id: string;
@@ -54,6 +70,7 @@ export interface DocumentDto {
   createdAtUtc: string;
   updatedAtUtc?: string;
   cedulaExtraction?: CedulaRdExtractionV1;
+  certificadoTituloExtraction?: CertificadoTituloRdExtractionV1;
   resultadoOcrJson?: string;
   fileUrl?: string;
 }

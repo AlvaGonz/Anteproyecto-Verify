@@ -3,6 +3,7 @@ import { DocumentType } from "../types";
 import { useDocuments, useUpdateDocumentType } from "../api/useDocuments";
 import { RequirementUploadRow } from "./RequirementUploadRow";
 import { CedulaExtractionCard } from "./CedulaExtractionCard";
+import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
 import { FileCheck2 } from "lucide-react";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 
@@ -86,6 +87,11 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
               {doc.id === "cedula" && uploadedDoc?.cedulaExtraction && (
                 <div className="pl-4 sm:pl-12">
                   <CedulaExtractionCard extraction={uploadedDoc.cedulaExtraction} />
+                </div>
+              )}
+              {doc.id === "titulo" && uploadedDoc?.certificadoTituloExtraction && (
+                <div className="pl-4 sm:pl-12">
+                  <CertificadoTituloExtractionCard extraction={uploadedDoc.certificadoTituloExtraction} />
                 </div>
               )}
             </div>

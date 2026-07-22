@@ -142,6 +142,53 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
         return string.Empty;
     }
 
+    public string NormalizeDateTimeIso8601(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+        
+        // Attempt to parse standard datetime
+        if (DateTime.TryParse(raw, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out var dt))
+        {
+            // Check if offset was provided in the raw string (Z or +/-00:00)
+            bool hasOffset = raw.EndsWith("Z", StringComparison.OrdinalIgnoreCase) || Regex.IsMatch(raw, @"[+-]\d{2}:\d{2}$");
+            bool hasTime = raw.Contains("T") || raw.Contains(":") || Regex.IsMatch(raw, @"\d{1,2}:\d{2}");
+
+            if (hasOffset)
+            {
+                return dt.ToString("yyyy-MM-ddTHH:mm:ssK");
+            }
+            else if (hasTime)
+            {
+                return dt.ToString("yyyy-MM-ddTHH:mm:ss");
+            }
+            else
+            {
+                return dt.ToString("yyyy-MM-dd");
+            }
+        }
+        
+        // Fallback for custom Dominican string formats without time
+        return NormalizeDominicanDate(raw);
+    }
+
+    public string NormalizeAreaM2(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+        
+        // Extract numbers and decimal point, handling commas/periods correctly depending on context
+        // Typically in DR: 1,200.50 (comma for thousands, dot for decimals)
+        var match = Regex.Match(raw.Replace(",", ""), @"\d+(\.\d+)?");
+        if (match.Success)
+        {
+            if (decimal.TryParse(match.Value, System.Globalization.CultureInfo.InvariantCulture, out var area))
+            {
+                return area.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+        
+        return string.Empty;
+    }
+
     private (string Value, double Confidence, bool Present) ExtractFieldWithHeuristics(string fullText, string fieldName, string expectedPattern)
     {
         var normalizedText = fullText.ToLowerInvariant();

@@ -25,6 +25,7 @@ const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   observaciones: apiDoc.observaciones || "",
   createdAtUtc: apiDoc.createdAtUtc,
   cedulaExtraction: apiDoc.cedulaExtraction,
+  certificadoTituloExtraction: apiDoc.certificadoTituloExtraction,
   resultadoOcrJson: apiDoc.resultadoOcrJson,
   fileUrl: apiDoc.fileUrl,
 });
@@ -56,7 +57,7 @@ export const useUploadRequirementDocument = (projectId: string) => {
       const formData = new FormData();
       formData.append('file', file);
       // Ensure we hit the v1 endpoint explicitly
-      return apiClient.post<ApiDocumentoDto>(`/v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData).then(res => mapApiDocument(res.data));
+      return apiClient.post<ApiDocumentoDto>(`v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData).then(res => mapApiDocument(res.data));
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
   });

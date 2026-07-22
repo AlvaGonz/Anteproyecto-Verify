@@ -10,7 +10,6 @@ export default defineConfig({
   reporter: [["html", { open: "never", outputFolder: "playwright-report" }], ["list"]],
   use: {
     baseURL: process.env.API_BASE_URL ?? "http://localhost:5000",
-    extraHTTPHeaders: { 'Content-Type': 'application/json' },
     ignoreHTTPSErrors: true,
     screenshot: "only-on-failure",
     video: "retain-on-failure",

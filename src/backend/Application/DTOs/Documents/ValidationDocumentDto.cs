@@ -21,5 +21,6 @@ public record ValidationDocumentDto(
     string? Observaciones,
     DateTime CreatedAtUtc,
     DateTime? UpdatedAtUtc,
-    CedulaRdExtractionV1? CedulaExtraction = null
+    CedulaRdExtractionV1? CedulaExtraction = null,
+    CertificadoTituloRdExtractionV1? CertificadoTituloExtraction = null
 );

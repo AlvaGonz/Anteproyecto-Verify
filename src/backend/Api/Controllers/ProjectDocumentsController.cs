@@ -131,7 +131,7 @@ public class ProjectDocumentsController : ControllerBase
     public async Task<IActionResult> UploadRequirementDocument(
         Guid projectId,
         string requirementCode,
-        IFormFile file)
+        [FromForm] IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("El archivo es requerido y no puede estar vacío.");
@@ -360,8 +360,9 @@ public class ProjectDocumentsController : ControllerBase
     private ValidationDocumentDto MapToValidationDto(DocumentDto d)
     {
         Application.Documents.Extractions.CedulaRdExtractionV1? cedulaExtraction = null;
+        Application.Documents.Extractions.CertificadoTituloRdExtractionV1? tituloExtraction = null;
 
-        if (d.TipoDocumento == DocumentType.ID && !string.IsNullOrEmpty(d.ResultadoOcrJson))
+        if (!string.IsNullOrEmpty(d.ResultadoOcrJson))
         {
             try
             {
@@ -369,7 +370,14 @@ public class ProjectDocumentsController : ControllerBase
                 var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(d.ResultadoOcrJson, options);
                 if (ocrResult != null)
                 {
-                    cedulaExtraction = Application.Documents.Extractions.CedulaExtractionMapper.MapFromOcrResult(ocrResult);
+                    if (d.TipoDocumento == DocumentType.ID)
+                    {
+                        cedulaExtraction = Application.Documents.Extractions.CedulaExtractionMapper.MapFromOcrResult(ocrResult);
+                    }
+                    else if (d.TipoDocumento == DocumentType.CertificadoTitulo || d.TipoDocumento == DocumentType.TITLE)
+                    {
+                        tituloExtraction = Application.Documents.Extractions.CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+                    }
                 }
             }
             catch
@@ -381,7 +389,7 @@ public class ProjectDocumentsController : ControllerBase
         return new ValidationDocumentDto(
             d.Id, d.ProyectoId, d.TipoDocumento, d.NombreArchivoOriginal, d.ContentType, d.Extension,
             d.TamanoBytes, d.EstadoDocumento, d.Activo, d.Version, d.FechaEmision, d.InstitucionEmisora,
-            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction
+            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction
         );
     }
 }

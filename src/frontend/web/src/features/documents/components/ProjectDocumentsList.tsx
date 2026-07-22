@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { OcrReviewPanel } from "./OcrReviewPanel";
 import { CedulaExtractionCard } from "./CedulaExtractionCard";
+import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
 
 interface ProjectDocumentsListProps {
   documents: DocumentDto[];
@@ -160,6 +161,8 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
             <div className="border-t border-[var(--color-border)]/10 bg-surface-container-lowest">
               {doc.tipoDocumento === DocumentType.ID 
                 ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
+                : (doc.tipoDocumento === DocumentType.CertificadoTitulo || doc.tipoDocumento === DocumentType.TITLE)
+                ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
                 : <OcrReviewPanel document={doc} />
               }
             </div>
