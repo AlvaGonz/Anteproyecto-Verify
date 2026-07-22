@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions;
 using Application.Abstractions.Persistence;
+using Domain.Entities;
 using Domain.Enums;
 
 public class SearchPublicProjectsQueryHandler
@@ -36,18 +37,22 @@ public class SearchPublicProjectsQueryHandler
         {
             proyectos = await _proyectoRepository.SearchAsync(request.Query, cancellationToken);
         }
-        var results = new List<PublicProjectSearchResultDto>();
 
-        foreach (var p in proyectos)
+        var proyectoList = proyectos.ToList();
+        var proyectoIds = proyectoList.Select(p => p.Id).ToList();
+
+        var sellos = await _selloRepository.GetByProyectoIdsAsync(proyectoIds, cancellationToken);
+        var sellosPorProyecto = sellos.ToDictionary(s => s.ProyectoId);
+
+        var results = proyectoList.Select(p =>
         {
-            var sello = await _selloRepository.GetByProyectoIdAsync(p.Id, cancellationToken);
-            
-            results.Add(new PublicProjectSearchResultDto
+            var sello = sellosPorProyecto.GetValueOrDefault(p.Id);
+            return new PublicProjectSearchResultDto
             {
                 Id = p.Id,
                 NombreProyecto = p.Nombre,
                 CodigoPublico = sello?.CodigoSello,
-                EstadoValidacion = p.Estado?.CodigoUnico == ProjectStatus.Publicado.ToCodigoUnico() ? "Verificado" : 
+                EstadoValidacion = p.Estado?.CodigoUnico == ProjectStatus.Publicado.ToCodigoUnico() ? "Verificado" :
                                    p.Estado?.CodigoUnico == ProjectStatus.ConObservacion.ToCodigoUnico() ? "NoVerificado" : "ConObservaciones",
                 UbicacionTexto = p.UbicacionTexto,
                 EstadoJuridico = (int)p.EstadoJuridico,
@@ -62,10 +67,9 @@ public class SearchPublicProjectsQueryHandler
                 Matricula = p.Matricula,
                 RncDesarrollador = p.RncDesarrollador,
                 CedulaRncPropietario = p.CedulaRncPropietario
-            });
-        }
+            };
+        }).ToList();
 
-        // Log audit
         await _auditLogger.AppendAsync(new AuditEntryDto
         {
             UsuarioId = null,

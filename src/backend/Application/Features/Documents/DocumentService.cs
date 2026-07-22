@@ -263,6 +263,7 @@ public class DocumentService : IDocumentService
                 var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(document.ResultadoOcrJson, options);
                 if (ocrResult != null)
                 {
+                    document.UpdateStatus(DocumentStatus.Processing);
                     _documentStateEngine.ApplyOcrResult(document, ocrResult);
                 }
             }

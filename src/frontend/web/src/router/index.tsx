@@ -1,46 +1,53 @@
 import { lazy, Suspense } from "react";
-import { createHashRouter, Navigate, useParams } from "react-router-dom";
-import { LandingPage } from "../pages/LandingPage";
-import { HealthPage } from "../pages/HealthPage";
-import { PricingPage } from "../features/pricing";
-import { LegalPage } from "../features/legal";
+import { createHashRouter, Navigate, Outlet, useParams } from "react-router-dom";
+
+const LandingPage = lazy(() => import("../pages/LandingPage").then(m => ({ default: m.LandingPage })));
+const HealthPage = lazy(() => import("../pages/HealthPage").then(m => ({ default: m.HealthPage })));
+const PricingPage = lazy(() => import("../features/pricing").then(m => ({ default: m.PricingPage })));
+const LegalPage = lazy(() => import("../features/legal").then(m => ({ default: m.LegalPage })));
 const CheckoutPage = lazy(() => import("../features/pricing/pages/CheckoutPage").then(m => ({ default: m.CheckoutPage })));
 const CheckoutReturnPage = lazy(() => import("../features/pricing/pages/CheckoutReturnPage").then(m => ({ default: m.CheckoutReturnPage })));
-import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage";
-import { ProjectPublicDetailPage } from "../pages/projects/ProjectPublicDetailPage";
-import { ProjectManagePage } from "../pages/projects/ProjectManagePage";
-import { ProjectManageLayout } from "../pages/projects/ProjectManageLayout";
+const ProjectsPublicListPage = lazy(() => import("../pages/projects/ProjectsPublicListPage").then(m => ({ default: m.ProjectsPublicListPage })));
+const ProjectPublicDetailPage = lazy(() => import("../pages/projects/ProjectPublicDetailPage").then(m => ({ default: m.ProjectPublicDetailPage })));
+const ProjectManagePage = lazy(() => import("../pages/projects/ProjectManagePage").then(m => ({ default: m.ProjectManagePage })));
+const ProjectManageLayout = lazy(() => import("../pages/projects/ProjectManageLayout").then(m => ({ default: m.ProjectManageLayout })));
+const ProjectValidationPage = lazy(() => import("../pages/projects/ProjectValidationPage").then(m => ({ default: m.ProjectValidationPage })));
+const ProjectAuditPage = lazy(() => import("../pages/admin/ProjectAuditPage").then(m => ({ default: m.ProjectAuditPage })));
+const ProjectReportsPage = lazy(() => import("../pages/admin/ProjectReportsPage").then(m => ({ default: m.ProjectReportsPage })));
+const RulesManagePage = lazy(() => import("../pages/admin/RulesManagePage").then(m => ({ default: m.RulesManagePage })));
+const SettingsPage = lazy(() => import("../pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const PublicVerifyResultPage = lazy(() => import("../pages/public/PublicVerifyResultPage").then(m => ({ default: m.PublicVerifyResultPage })));
+const LoginPage = lazy(() => import("../pages/auth/LoginPage").then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import("../pages/auth/RegisterPage").then(m => ({ default: m.RegisterPage })));
+const EmailVerifiedPage = lazy(() => import("../pages/auth/EmailVerifiedPage").then(m => ({ default: m.EmailVerifiedPage })));
+const ForgotPasswordPage = lazy(() => import("../pages/auth/ForgotPasswordPage").then(m => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import("../pages/auth/ResetPasswordPage").then(m => ({ default: m.ResetPasswordPage })));
+const ProjectDocumentUploadPage = lazy(() => import("../pages/projects/ProjectDocumentUploadPage").then(m => ({ default: m.ProjectDocumentUploadPage })));
+const AuditLogPage = lazy(() => import("../features/audit/pages/AuditLogPage").then(m => ({ default: m.AuditLogPage })));
+const ValidationExecutionPage = lazy(() => import("../features/validations/pages/ValidationExecutionPage").then(m => ({ default: m.ValidationExecutionPage })));
+const FindingsPage = lazy(() => import("../features/findings/FindingsPage").then(m => ({ default: m.FindingsPage })));
+const AdminLayout = lazy(() => import("../shared/components/layout/AdminLayout").then(m => ({ default: m.AdminLayout })));
+const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage").then(m => ({ default: m.DashboardPage })));
+const AdminProjectsPage = lazy(() => import("../pages/admin/AdminProjectsPage").then(m => ({ default: m.AdminProjectsPage })));
+const PublishedProjectDetailPage = lazy(() => import("../pages/admin/PublishedProjectDetailPage").then(m => ({ default: m.PublishedProjectDetailPage })));
+const CreateProjectPage = lazy(() => import("../pages/projects/CreateProjectPage").then(m => ({ default: m.CreateProjectPage })));
+const EditProjectPage = lazy(() => import("../pages/projects/EditProjectPage").then(m => ({ default: m.EditProjectPage })));
+const UploadDocumentPage = lazy(() => import("../pages/projects/UploadDocumentPage").then(m => ({ default: m.UploadDocumentPage })));
+const CreateValidationPage = lazy(() => import("../pages/projects/CreateValidationPage").then(m => ({ default: m.CreateValidationPage })));
 
-import { ProjectValidationPage } from "../pages/projects/ProjectValidationPage";
-import { ProjectAuditPage } from "../pages/admin/ProjectAuditPage";
-import { ProjectReportsPage } from "../pages/admin/ProjectReportsPage";
-import { RulesManagePage } from "../pages/admin/RulesManagePage";
-import { SettingsPage } from "../pages/admin/SettingsPage";
-import { PublicVerifyResultPage } from "../pages/public/PublicVerifyResultPage";
-import { LoginPage } from "../pages/auth/LoginPage";
-import { RegisterPage } from "../pages/auth/RegisterPage";
-import { EmailVerifiedPage } from "../pages/auth/EmailVerifiedPage";
-import { ForgotPasswordPage } from "../pages/auth/ForgotPasswordPage";
-import { ResetPasswordPage } from "../pages/auth/ResetPasswordPage";
-import { ProjectDocumentUploadPage } from "../pages/projects/ProjectDocumentUploadPage";
-import { AuditLogPage } from "../features/audit/pages/AuditLogPage";
-import { ValidationExecutionPage } from "../features/validations/pages/ValidationExecutionPage";
-import { FindingsPage } from "../features/findings/FindingsPage";
-
-import { AdminLayout } from "../shared/components/layout/AdminLayout";
-import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
-import { AdminProjectsPage } from "../pages/admin/AdminProjectsPage";
-import { PublishedProjectDetailPage } from "../pages/admin/PublishedProjectDetailPage";
 import { AuthGuard } from "../shared/components/security/AuthGuard";
 import { GuestGuard } from "../shared/components/security/GuestGuard";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
-
-// New Pages
-import { CreateProjectPage } from "../pages/projects/CreateProjectPage";
-import { EditProjectPage } from "../pages/projects/EditProjectPage";
-import { UploadDocumentPage } from "../pages/projects/UploadDocumentPage";
-import { CreateValidationPage } from "../pages/projects/CreateValidationPage";
 import { AdminErrorFallback } from "../components/ui/AdminErrorFallback";
+
+const PageFallback = () => <div className="min-h-screen bg-slate-50" />;
+
+const SuspenseLayout = () => (
+  <Suspense fallback={<PageFallback />}>
+    <Outlet />
+  </Suspense>
+);
+
 const NavigateToVerifyResult: React.FC = () => {
   const { code } = useParams<{ code: string }>();
   return <Navigate to={`/projects/verify/${code}`} replace />;
@@ -49,9 +56,9 @@ const NavigateToVerifyResult: React.FC = () => {
 export const router = createHashRouter([
   {
     path: "/",
+    element: <SuspenseLayout />,
     errorElement: <ErrorBoundary />,
     children: [
-      /* ===== Landing Page ===== */
       {
         index: true,
         element: <LandingPage />,
@@ -64,8 +71,6 @@ export const router = createHashRouter([
         path: "/plans",
         element: <PricingPage />,
       },
-
-      /* ===== Public Pages ===== */
       {
         path: "/portal",
         element: <Navigate to="/projects" replace />,
@@ -166,8 +171,6 @@ export const router = createHashRouter([
           </AuthGuard>
         ),
       },
-
-      /* ===== New Spec Routes ===== */
       {
         path: "/projects/new",
         element: (
@@ -200,8 +203,6 @@ export const router = createHashRouter([
           </AuthGuard>
         ),
       },
-
-      /* ===== Admin Pages ===== */
       {
         path: "/admin/expedientes",
         element: <Navigate to="/admin/projects" replace />,
@@ -301,7 +302,6 @@ export const router = createHashRouter([
         children: [
           { index: true, element: <Navigate to="edit" replace /> },
           { path: "edit", element: <ProjectManagePage /> },
-
           { path: "validations", element: <ProjectValidationPage /> },
           { path: "reports", element: <ProjectReportsPage /> },
           { path: "audit", element: <ProjectAuditPage /> }
@@ -340,7 +340,6 @@ export const router = createHashRouter([
           </AuthGuard>
         ),
       },
-
       {
         path: "/admin/audit-log",
         errorElement: <AdminErrorFallback />,

@@ -41,6 +41,7 @@ export const useProjects = () =>
   useQuery({
     queryKey: projectKeys.all,
     queryFn: () => apiClient.get<ApiProyectoDto[]>("/projects").then(res => res.data.map(mapApiProject)),
+    staleTime: 30_000,
   });
 
 export const useProject = (id: string) =>
@@ -62,6 +63,7 @@ export const useProject = (id: string) =>
       }
     },
     enabled: !!id,
+    staleTime: 60_000,
   });
 
 export const useCreateProject = () => {
