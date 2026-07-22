@@ -9,8 +9,9 @@ export const useDashboardStats = () => {
   return useQuery({
     queryKey: ["dashboardStats"],
     queryFn: adminDashboardApi.getStats,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
     enabled: !!isAdmin,
   });
 };

@@ -37,12 +37,15 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   registradoPor: apiProj.registradoPor || null,
 });
 
-export const useProjects = () =>
-  useQuery({
+export const useProjects = (options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled;
+  return useQuery({
     queryKey: projectKeys.all,
     queryFn: () => apiClient.get<ApiProyectoDto[]>("/projects").then(res => res.data.map(mapApiProject)),
     staleTime: 30_000,
+    enabled: enabled !== undefined ? enabled : true,
   });
+};
 
 export const useProject = (id: string) =>
   useQuery({

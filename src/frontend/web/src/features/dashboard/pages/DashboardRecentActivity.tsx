@@ -10,7 +10,7 @@ export interface DashboardRecentActivityProps {
   recentSubscriptions: SuscripcionRecienteDto[];
 }
 
-export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = ({ loading, statsData, recentSubscriptions }) => {
+export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = React.memo(({ loading, statsData, recentSubscriptions }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(recentSubscriptions.length / itemsPerPage);
@@ -209,4 +209,4 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = (
     </div>
   </>
   );
-};
+});

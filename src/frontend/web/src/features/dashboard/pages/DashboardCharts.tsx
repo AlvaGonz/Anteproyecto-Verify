@@ -7,7 +7,7 @@ export interface DashboardChartsProps {
   verified: number;
 }
 
-export const DashboardCharts: React.FC<DashboardChartsProps> = ({ totalProjects, verified }) => (
+export const DashboardCharts: React.FC<DashboardChartsProps> = React.memo(({ totalProjects, verified }) => (
   <div className="flex flex-col gap-8 animate-fade-in-up" style={{ animationDelay: "800ms" }}>
     <m.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -39,4 +39,4 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({ totalProjects,
       </div>
     </m.div>
   </div>
-);
+));
