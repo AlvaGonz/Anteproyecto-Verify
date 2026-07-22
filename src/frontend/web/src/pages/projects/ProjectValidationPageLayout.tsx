@@ -127,7 +127,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
         </div>
       )}
 
-      {!isEvaluating && (
+{!isEvaluating && (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
           {/* Main Area */}
@@ -135,7 +135,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
             {activeTab === 'analysis' && (
               <>
                 <RequiredDocumentsList projectId={id || ""} />
-                {result ? (
+                {result && (
                   <>
                     {/* Integrated Summary & Metrics */}
                     {result.internalValidation && (
@@ -175,21 +175,11 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
                                 ANALIZAR <ExternalLink className="w-3 h-3 group-hover/btn:scale-110 transition-transform" />
                               </button>
                             </div>
-                          </div>
+</div>
                         ))}
                       </div>
                     </section>
                   </>
-                ) : (
-                  <div className="vf-card py-32 flex flex-col items-center justify-center border-dashed gap-6 opacity-60 bg-surface-raised/30">
-                    <div className="w-20 h-20 rounded-[24px] bg-secondary/5 flex items-center justify-center">
-                       <FileText className="w-10 h-10 text-secondary/20" />
-                    </div>
-                    <div className="text-center">
-                      <p className="h2 text-secondary/30 mb-2 uppercase italic tracking-tighter">Sin Protocolo Activo</p>
-                      <p className="text-xs font-black text-text-secondary/40 tracking-widest uppercase">Requiere Auditoría para Desplegar Dashboard</p>
-                    </div>
-                  </div>
                 )}
               </>
             )}
