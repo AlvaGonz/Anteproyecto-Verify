@@ -28,10 +28,10 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
         if (documentType == DocumentType.ID)
         {
             fields["cedulaNumber"] = TryExtractCedulaNumber(text);
-            fields["firstNames"] = TryExtractLabeledName(text, "NOMBRES");
-            fields["lastNames"] = TryExtractLabeledName(text, "APELLIDOS");
-            fields["birthDate"] = TryExtractLabeledDate(text, "FECHA DE NACIMIENTO");
-            fields["expiryDate"] = TryExtractLabeledDate(text, "FECHA DE EXPIRACION");
+            fields["firstNames"] = TryExtractFirstNames(text);
+            fields["lastNames"] = TryExtractLastNames(text);
+            fields["birthDate"] = TryExtractBirthDate(text);
+            fields["expiryDate"] = TryExtractExpiryDate(text);
         }
         else
         {
@@ -70,29 +70,46 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
         return new ExtractedField(string.Empty, 0.0, false);
     }
 
-    public ExtractedField TryExtractLabeledName(string text, string label)
+    public ExtractedField TryExtractFirstNames(string text)
     {
-        var match = Regex.Match(text, $@"{label}\s*[\r\n]+([A-ZÑÁÉÍÓÚ\s]+)", RegexOptions.IgnoreCase);
-        if (match.Success && match.Groups.Count > 1)
+        var match = Regex.Match(text, @"(?:Nombre|NOMBRES)\s+([\w\sÁÉÍÓÚÑáéíóúñ]+?)\s+(?:Apellido|APELLIDOS)", RegexOptions.IgnoreCase);
+        if (match.Success)
         {
-            var raw = match.Groups[1].Value.Trim();
-            var normalized = NormalizePersonName(raw);
-            return new ExtractedField(normalized, 0.90, true);
+            return new ExtractedField(NormalizePersonName(match.Groups[1].Value), 0.90, true);
         }
         return new ExtractedField(string.Empty, 0.0, false);
     }
 
-    public ExtractedField TryExtractLabeledDate(string text, string label)
+    public ExtractedField TryExtractLastNames(string text)
     {
-        var match = Regex.Match(text, $@"{label}[^\d]*(\d{{1,2}}[/-]\d{{1,2}}[/-]\d{{4}})", RegexOptions.IgnoreCase);
-        if (match.Success && match.Groups.Count > 1)
+        var match = Regex.Match(text, @"(?:Apellido|APELLIDOS)\s+([\w\sÁÉÍÓÚÑáéíóúñ]+?)\s+(?:Nacionalidad|Lugar|Estado)", RegexOptions.IgnoreCase);
+        if (match.Success)
         {
-            var raw = match.Groups[1].Value.Trim();
-            var normalized = NormalizeDominicanDate(raw);
+            return new ExtractedField(NormalizePersonName(match.Groups[1].Value), 0.90, true);
+        }
+        return new ExtractedField(string.Empty, 0.0, false);
+    }
+
+    public ExtractedField TryExtractBirthDate(string text)
+    {
+        var match = Regex.Match(text, @"(?:Fecha de nacimiento|FECHA DE NACIMIENTO).*?(\d{2}\s*[A-Z]+\s*\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{4})", RegexOptions.IgnoreCase);
+        if (match.Success)
+        {
+            var normalized = NormalizeDominicanDate(match.Groups[1].Value);
             if (!string.IsNullOrEmpty(normalized))
-            {
                 return new ExtractedField(normalized, 0.90, true);
-            }
+        }
+        return new ExtractedField(string.Empty, 0.0, false);
+    }
+
+    public ExtractedField TryExtractExpiryDate(string text)
+    {
+        var match = Regex.Match(text, @"(?:Vigencia hasta|FECHA DE EXPIRACION)\s*(\d{2}\s*[A-Z]+\s*\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{4})", RegexOptions.IgnoreCase);
+        if (match.Success)
+        {
+            var normalized = NormalizeDominicanDate(match.Groups[1].Value);
+            if (!string.IsNullOrEmpty(normalized))
+                return new ExtractedField(normalized, 0.90, true);
         }
         return new ExtractedField(string.Empty, 0.0, false);
     }
@@ -100,12 +117,23 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
     private string NormalizePersonName(string raw)
     {
         var upper = raw.ToUpperInvariant().Normalize(System.Text.NormalizationForm.FormC);
-        return Regex.Replace(upper, @"\s+", " ").Trim();
+        return Regex.Match(upper, @"[A-ZÑÁÉÍÓÚ\s]+").Value.Trim();
     }
 
     private string NormalizeDominicanDate(string raw)
     {
-        var clean = raw.Replace("-", "/");
+        var clean = raw.Replace("-", "/").Replace(" ", "").ToUpperInvariant();
+        
+        var months = new[] { "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE" };
+        for (int i = 0; i < months.Length; i++)
+        {
+            if (clean.Contains(months[i]))
+            {
+                clean = clean.Replace(months[i], $"/{i + 1:D2}/");
+                break;
+            }
+        }
+
         if (DateTime.TryParseExact(clean, new[] { "dd/MM/yyyy", "d/M/yyyy", "dd/M/yyyy", "d/MM/yyyy" }, 
             System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var dt))
         {

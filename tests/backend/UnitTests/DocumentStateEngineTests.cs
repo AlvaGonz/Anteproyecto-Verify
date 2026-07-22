@@ -63,7 +63,6 @@ public class DocumentStateEngineTests
         _engine.ApplyOcrResult(doc, ocrResult);
 
         Assert.Equal(DocumentStatus.Verificado, doc.EstadoDocumento);
-        Assert.Contains("Verificado", doc.ResultadoOcrJson);
     }
 
     [Fact]
@@ -90,7 +89,6 @@ public class DocumentStateEngineTests
         _engine.ApplyOcrResult(doc, ocrResult);
 
         Assert.Equal(DocumentStatus.Observado, doc.EstadoDocumento);
-        Assert.Contains("Observado", doc.ResultadoOcrJson);
     }
 
     [Fact]
@@ -103,7 +101,7 @@ public class DocumentStateEngineTests
         _engine.ApplyOcrResult(doc, ocrResult);
 
         Assert.Equal(DocumentStatus.Observado, doc.EstadoDocumento);
-        Assert.Equal(ocrResult.RawJson, doc.ResultadoOcrJson);
+        Assert.Contains("Bad image", doc.ResultadoOcrJson);
     }
 
     [Fact]

@@ -54,7 +54,7 @@ public class DocumentStateEngine : IDocumentStateEngine
             var options = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var enrichedJson = JsonSerializer.Serialize(ocrResult, options);
 
-            var newStatus = validationResult.EstadoResultante == "Verificado" ? DocumentStatus.EnRevision : DocumentStatus.EnRevision; // Always go to EnRevision for HITL
+            var newStatus = validationResult.EstadoResultante == "Verificado" ? DocumentStatus.Verificado : DocumentStatus.Observado;
 
             document.SetOcrResult(enrichedJson, newStatus);
         }
