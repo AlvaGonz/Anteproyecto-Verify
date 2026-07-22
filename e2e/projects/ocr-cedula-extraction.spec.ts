@@ -14,6 +14,14 @@ test.describe('Real OCR Extraction Flow - Cédula', () => {
     // 1. Login via UI
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     page.on('pageerror', err => console.log('PAGE ERROR:', err.message));
+    page.on('response', async response => {
+      if (!response.ok() && response.status() >= 400) {
+        console.log(`PAGE NETWORK ERROR: ${response.status()} ${response.url()}`);
+        try {
+            console.log(`RESPONSE BODY:`, await response.text());
+        } catch(e) {}
+      }
+    });
     
     await page.goto(`${FRONTEND_BASE}/#/login`);
     await page.locator('input[type="email"]').fill('admin@verifinca.do');
