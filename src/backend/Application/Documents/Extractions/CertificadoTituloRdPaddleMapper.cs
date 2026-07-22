@@ -34,12 +34,12 @@ public static class CertificadoTituloRdPaddleMapper
 
         extraction = extraction with 
         {
-            Oficina = MapFieldRegex(fullText, @"(Registro\s*de\s*T[ií]tulos\s*(?:de|del)?\s*[a-zA-ZñÑ\s]+)(?:\d|$|Zunda)", @"(REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)"),
-            DesignacionCatastral = MapFieldRegex(fullText, @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.]+(?:\s+\d+)?)", @"(?:Parce[l]?a\s+)([\d\.]+(?:\s+\d+)?)"),
-            FechaYHoraInscripcion = MapFieldRegex(fullText, @"(?:Em[a-zA-Z]*do\s*el|Emitido\s*el)\s*(\d{1,2}\s*de\s*[a-zA-Z]+\s*del\s*\d{4})", @"(?:Em[a-zA-Z]*do\s*el\s*)([0-9]{1,2}\s*de[a-zA-Z\s]+del\s*[0-9]{4})", @"(?:fecha\s*)([0-9]{1,2}\s*de[a-zA-Z\s]+del\s*[0-9]{4})"),
-            VieneDe = MapFieldRegex(fullText, @"(cancela la anterior|viene de)"),
-            Municipio = MapFieldRegex(fullText, @"(?:ubicado en|SANTODOMINGODEOUMAN|SANTO DOMINGO DE GUZMAN)\s*([a-zA-Z\s]*?)(?:,([a-zA-Z\s]+))?\.?(?:El derecho|R[eé]gimen)", @"(Santo Domingo|Bonao|SANTODOMINGODEOUMAN|SANTO DOMINGO DE GUZMAN)"),
-            Provincia = MapFieldRegex(fullText, @"(SANTO DOMINGO|SANTIAGO|LA VEGA|BONAO|PUERTO PLATA)"),
+            Oficina = MapFieldRegex(fullText, @"(Registro\s*de\s*T[ií]tulos\s*(?:de|del)?\s*(?:Hig[uú]ey|[a-zA-ZñÑ\s]+))(?:\d|$|Zunda)", @"(REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)"),
+            DesignacionCatastral = MapFieldRegex(fullText, @"(?:DESIGNACI[OÓ]N\s+CATASTRAL\s*(?:S\s*)?)([\d\-]+)", @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.]+(?:\s+\d+)?)", @"(?:Parce[l]?a\s+)([\d\.]+(?:\s+\d+)?)"),
+            FechaYHoraInscripcion = MapFieldRegex(fullText, @"(?:Inscrito a las.*?el\s*)(\d{1,2}/[a-zA-Z]+/\d{4})", @"(?:FECHA Y HORA DE INSCRIPCION.*?)(?:\d{1,2}/\d{1,2}/\d{4})", @"(?:Em[a-zA-Z]*do\s*el|Emitido\s*el)\s*(\d{1,2}\s*de\s*[a-zA-Z]+\s*del\s*\d{4})", @"(?:Em[a-zA-Z]*do\s*el\s*)([0-9]{1,2}\s*de[a-zA-Z\s]+del\s*[0-9]{4})", @"(?:fecha\s*)([0-9]{1,2}\s*de[a-zA-Z\s]+del\s*[0-9]{4})"),
+            VieneDe = MapFieldRegex(fullText, @"(?:cancela la anterior|viene de)\s*([\w\.\s]+)"),
+            Municipio = MapFieldRegex(fullText, @"MUNICIPIO\s*(?:PODERJUDICIALREPUBLICA\s*DOMINICANA\s*)?([a-zA-Z]+)", @"(?:ubicado en|SANTODOMINGODEOUMAN|SANTO DOMINGO DE GUZMAN)\s*([a-zA-Z\s]*?)(?:,([a-zA-Z\s]+))?\.?(?:El derecho|R[eé]gimen)", @"(Santo Domingo|Bonao|SANTODOMINGODEOUMAN|SANTO DOMINGO DE GUZMAN)"),
+            Provincia = MapFieldRegex(fullText, @"PROVINCIA\s*(?:OFICINA\s*)?([a-zA-Z]+)", @"(SANTO DOMINGO|SANTIAGO|LA VEGA|BONAO|PUERTO PLATA|LAALTAGRACIA|LA ALTAGRACIA)"),
             SuperficieM2 = MapFieldRegex(fullText, @"(\d{1,3}(?:[,.]\d{3})*(?:[,.]\d+)?)\s*(?:m2|m²|m\b|mtros\.cuadrados|metros cuadrados)")
         };
 

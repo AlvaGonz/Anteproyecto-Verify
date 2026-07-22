@@ -8,8 +8,8 @@ const FRONTEND_BASE = 'http://localhost:3000';
 test.describe('Real OCR Extraction Flow - Título de Propiedad', () => {
   test.setTimeout(180000); // 3 minutes timeout
 
-  const testFileA = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad A.pdf';
-  const testFileB = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad B.pdf';
+  const testFileA = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad\\Título de Propiedad A.pdf';
+  const testFileB = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad\\Título de Propiedad B.pdf';
 
   test('Extracts data from Título de Propiedad A and B', async ({ page }) => {
     // 1. Login via UI
@@ -83,7 +83,10 @@ test.describe('Real OCR Extraction Flow - Título de Propiedad', () => {
       await expect(page.locator('text=Matrícula').or(page.locator('text=Superficie'))).toBeVisible();
     };
 
+    const testFileC = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad\\Cert.  505483687149 Exp. 2024-0086769.pdf';
+
     await runTestForFile(testFileA, 'media_ocr_titulo_a.png');
     await runTestForFile(testFileB, 'media_ocr_titulo_b.png');
+    await runTestForFile(testFileC, 'media_ocr_titulo_c.png');
   });
 });
