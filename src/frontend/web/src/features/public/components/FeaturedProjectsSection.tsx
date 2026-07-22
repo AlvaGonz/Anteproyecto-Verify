@@ -4,6 +4,7 @@ import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
 import { useSearchPublicProjects } from "../../projects/api/useSearchPublicProjects";
+import { getDefaultProjectImage } from "../../projects/api/usePublishedProjects";
 import { ProjectStatus, LegalStatus, IntegrityStatus } from "../../projects/types";
 
 interface Project {
@@ -20,7 +21,7 @@ const FALLBACK_PROJECTS: Project[] = [
   {
     name: "Blue Forest Residences",
     location: "Las Terrenas, Samaná",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    image: getDefaultProjectImage(1),
     status: "Auditado",
     risk: "Bajo",
     deliveredDocs: 10,
@@ -51,7 +52,7 @@ export const FeaturedProjectsSection: React.FC = () => {
     .map(p => ({
       name: p.nombreProyecto,
       location: p.ubicacionTexto || "Ubicación no especificada",
-      image: p.imagenUrl || "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      image: p.imagenUrl || getDefaultProjectImage(p.categoria),
       status: "Validado",
       risk: "Calculando",
       deliveredDocs: 8,

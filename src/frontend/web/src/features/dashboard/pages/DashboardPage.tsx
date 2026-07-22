@@ -49,7 +49,6 @@ export const DashboardPage: React.FC = () => {
     verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
     recentProjects = [...projectsData]
       .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
-      .slice(0, 5)
       .map(p => ({
         fechaRegistro: p.createdAtUtc,
         nombre: p.nombre,

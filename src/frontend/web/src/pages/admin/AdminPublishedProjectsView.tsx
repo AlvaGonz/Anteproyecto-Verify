@@ -20,6 +20,7 @@ import {
   PROVINCIAS,
   PRICE_MAX,
   PRICE_STEPS,
+  getDefaultProjectImage,
 } from "../../features/projects/api/usePublishedProjects";
 
 export const AdminPublishedProjectsView: React.FC = () => {
@@ -324,7 +325,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
                 >
                   <div className="relative aspect-video overflow-hidden">
                     <img
-                      src={project.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop"}
+                      src={project.imagenUrl || getDefaultProjectImage(project.categoria)}
                       alt={project.nombreProyecto}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
