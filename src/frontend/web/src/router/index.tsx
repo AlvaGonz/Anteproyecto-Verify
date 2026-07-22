@@ -2,9 +2,8 @@ import { lazy, Suspense } from "react";
 import { createHashRouter, Navigate, useParams } from "react-router-dom";
 import { LandingPage } from "../pages/LandingPage";
 import { HealthPage } from "../pages/HealthPage";
-
+import { PricingPage } from "../features/pricing";
 import { LegalPage } from "../features/legal";
-const PricingPage = lazy(() => import("../features/pricing").then(m => ({ default: m.PricingPage })));
 const CheckoutPage = lazy(() => import("../features/pricing/pages/CheckoutPage").then(m => ({ default: m.CheckoutPage })));
 const CheckoutReturnPage = lazy(() => import("../features/pricing/pages/CheckoutReturnPage").then(m => ({ default: m.CheckoutReturnPage })));
 import { ProjectsPublicListPage } from "../pages/projects/ProjectsPublicListPage";
@@ -63,11 +62,7 @@ export const router = createHashRouter([
       },
       {
         path: "/plans",
-        element: (
-          <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><span className="font-body text-on-surface-variant">Cargando...</span></div>}>
-            <PricingPage />
-          </Suspense>
-        ),
+        element: <PricingPage />,
       },
 
       /* ===== Public Pages ===== */

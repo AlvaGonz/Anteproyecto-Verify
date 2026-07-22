@@ -49,12 +49,7 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({ extr
             <div className={`w-2 h-2 rounded-full ${isLowConfidence ? 'bg-warning' : 'bg-success'}`} title={`Confianza: ${(field.confidence * 100).toFixed(0)}%`} />
           )}
         </div>
-        {!isMissing && field.rawValue !== field.normalizedValue && (
-           <div className="absolute top-full left-0 z-10 mt-1 hidden group-hover:block w-max max-w-[200px] p-2 bg-secondary text-white text-[10px] rounded shadow-xl border border-white/10">
-             <div className="text-white/60 mb-0.5 uppercase tracking-widest text-[8px]">OCR Original</div>
-             <div className="font-mono">{field.rawValue}</div>
-           </div>
-        )}
+
       </div>
     );
   };

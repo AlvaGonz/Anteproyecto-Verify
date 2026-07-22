@@ -83,7 +83,7 @@ public class ProjectDocumentsController : ControllerBase
             return BadRequest("El archivo es requerido y no puede estar vacío.");
 
         // Basic validation (can be moved to a validator or options pattern)
-        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".webp" };
         var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
         if (Array.IndexOf(allowedExtensions, extension) < 0)
             return BadRequest("Tipo de archivo no permitido.");
@@ -137,7 +137,7 @@ public class ProjectDocumentsController : ControllerBase
             return BadRequest("El archivo es requerido y no puede estar vacío.");
 
         // Validaciones básicas de archivo (reutilizando la lógica existente)
-        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".webp" };
         var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
         if (Array.IndexOf(allowedExtensions, extension) < 0)
             return BadRequest("Tipo de archivo no permitido.");

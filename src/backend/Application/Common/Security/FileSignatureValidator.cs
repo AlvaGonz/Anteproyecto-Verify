@@ -24,7 +24,8 @@ public static class FileSignatureValidator
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE1 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE8 }
             }
-        }
+        },
+        { ".webp", new List<byte[]> { new byte[] { 0x52, 0x49, 0x46, 0x46 } } }
     };
 
     public static bool IsValidFileSignature(string fileName, Stream fileStream)
