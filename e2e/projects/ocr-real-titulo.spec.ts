@@ -8,10 +8,17 @@ const FRONTEND_BASE = 'http://localhost:3000';
 test.describe('Real OCR Extraction Flow - Título de Propiedad', () => {
   test.setTimeout(180000); // 3 minutes timeout
 
-  const testFileA = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad\\Título de Propiedad A.pdf';
-  const testFileB = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad\\Título de Propiedad B.pdf';
+  const directory = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad';
+  
+  const files = [
+    { path: path.join(directory, 'Título de Propiedad A.pdf'), name: 'titulo_a' },
+    { path: path.join(directory, 'Título de Propiedad A2.pdf'), name: 'titulo_a2' },
+    { path: path.join(directory, 'Título de Propiedad B.pdf'), name: 'titulo_b' },
+    { path: path.join(directory, 'CT 505483687149 Exp. 2024-0086769.pdf'), name: 'titulo_c' },
+    { path: path.join(directory, 'CT Residencia del Parque 60 pdf.pdf'), name: 'titulo_d' }
+  ];
 
-  test('Extracts data from Título de Propiedad A and B', async ({ page }) => {
+  test('Extracts data from 5 real Título de Propiedad documents', async ({ page }) => {
     // 1. Login via UI
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     page.on('pageerror', err => console.log('PAGE ERROR:', err.message));
@@ -84,10 +91,10 @@ test.describe('Real OCR Extraction Flow - Título de Propiedad', () => {
       await expect(page.locator('text=Superficie').first()).toBeVisible();
     };
 
-    const testFileC = 'C:\\Users\\Alva\\OneDrive - Universidad Central del Este\\UCE\\Doceavo Cuatrimestre\\Proyecto de Grado\\Documentos para MODELO aplicacion UCE\\Título de Propiedad\\CT 505483687149 Exp. 2024-0086769.pdf';
-
-    await runTestForFile(testFileA, 'media_ocr_titulo_a.png');
-    await runTestForFile(testFileB, 'media_ocr_titulo_b.png');
-    await runTestForFile(testFileC, 'media_ocr_titulo_c.png');
+    // Run for all 5 files sequentially
+    for (const file of files) {
+      console.log(`Running extraction test for ${file.name}...`);
+      await runTestForFile(file.path, `media_ocr_${file.name}.png`);
+    }
   });
 });

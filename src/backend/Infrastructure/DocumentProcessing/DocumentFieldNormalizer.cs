@@ -177,7 +177,9 @@ public class DocumentFieldNormalizer : IDocumentFieldNormalizer
         
         // Extract numbers and decimal point, handling commas/periods correctly depending on context
         // Typically in DR: 1,200.50 (comma for thousands, dot for decimals)
-        var match = Regex.Match(raw.Replace(",", ""), @"\d+(\.\d+)?");
+        // Remove commas and spaces that might be OCR misreads for thousands separators
+        var cleanRaw = raw.Replace(",", "").Replace(" ", "");
+        var match = Regex.Match(cleanRaw, @"\d+(\.\d+)?");
         if (match.Success)
         {
             if (decimal.TryParse(match.Value, System.Globalization.CultureInfo.InvariantCulture, out var area))
