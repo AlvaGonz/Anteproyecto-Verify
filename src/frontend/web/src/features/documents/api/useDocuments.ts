@@ -26,6 +26,7 @@ const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   createdAtUtc: apiDoc.createdAtUtc,
   cedulaExtraction: apiDoc.cedulaExtraction,
   certificadoTituloExtraction: apiDoc.certificadoTituloExtraction,
+  planoMensuraExtraction: apiDoc.planoMensuraExtraction,
   resultadoOcrJson: apiDoc.resultadoOcrJson,
   fileUrl: apiDoc.fileUrl,
 });

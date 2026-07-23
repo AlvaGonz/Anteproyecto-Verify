@@ -4,6 +4,7 @@ import { useDocuments, useDownloadDocument } from "../api/useDocuments";
 import { OcrReviewPanel } from "./OcrReviewPanel";
 import { CedulaExtractionCard } from "./CedulaExtractionCard";
 import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
+import { PlanoMensuraExtractionCard } from "./PlanoMensuraExtractionCard";
 import {
   AlertTriangle,
   Clock,
@@ -178,6 +179,8 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
             : doc.tipoDocumento === DocumentType.CertificadoTitulo
             ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
+            : doc.tipoDocumento === DocumentType.PlanoMensuraCatastral
+            ? (doc.planoMensuraExtraction ? <PlanoMensuraExtractionCard extraction={doc.planoMensuraExtraction} /> : null)
             : <OcrReviewPanel document={doc} />
         )}
       </m.div>

@@ -35,23 +35,12 @@ export interface CedulaRdExtractionV1 {
   processorName: string;
   processorVersion: string;
 }
-export interface CertificadoTituloRdExtractionV1 {
-  schemaVersion: string;
-  documentType: string;
-  extractionStatus: ExtractionStatus;
-  overallConfidence: number;
-  oficina: ExtractedField;
-  designacionCatastral: ExtractedField;
-  fechaYHoraInscripcion: ExtractedField;
-  vieneDe: ExtractedField;
-  municipio: ExtractedField;
-  provincia: ExtractedField;
-  superficieM2: ExtractedField;
-  matricula: ExtractedField;
-  warnings: string[];
-  processorName: string;
-  processorVersion: string;
-}
+import { z } from "zod";
+import { planoMensuraExtractionSchema } from "./schemas/planoMensura.schema";
+import { certificadoTituloExtractionSchema } from "./schemas/certificadoTitulo.schema";
+
+export type PlanoMensuraCatastralRdExtractionV1 = z.infer<typeof planoMensuraExtractionSchema>;
+export type CertificadoTituloRdExtractionV1 = z.infer<typeof certificadoTituloExtractionSchema>;
 
 export interface DocumentDto {
   id: string;
@@ -72,6 +61,7 @@ export interface DocumentDto {
   updatedAtUtc?: string;
   cedulaExtraction?: CedulaRdExtractionV1;
   certificadoTituloExtraction?: CertificadoTituloRdExtractionV1;
+  planoMensuraExtraction?: PlanoMensuraCatastralRdExtractionV1;
   resultadoOcrJson?: string;
   fileUrl?: string;
 }

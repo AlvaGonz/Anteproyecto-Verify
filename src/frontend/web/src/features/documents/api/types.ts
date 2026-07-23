@@ -17,6 +17,7 @@ export interface DocumentoDto {
   updatedAtUtc?: string;
   cedulaExtraction?: any; // Will be properly typed in frontend types
   certificadoTituloExtraction?: any;
+  planoMensuraExtraction?: any;
   resultadoOcrJson?: string;
   fileUrl?: string;
 }

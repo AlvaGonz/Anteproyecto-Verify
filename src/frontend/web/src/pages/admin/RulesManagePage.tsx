@@ -6,7 +6,7 @@ import { RulesManagePageLayout } from "./RulesManagePageLayout";
 
 export const RulesManagePage: React.FC = () => {
   const { addToast } = useToast();
-  const { data: rawRules = [], isLoading: loading } = useRules();
+  const { data: rawRules = [], isLoading: loading } = useRules(1, 50);
   const createRuleMutation = useCreateRule();
   const toggleRuleMutation = useToggleRule();
 

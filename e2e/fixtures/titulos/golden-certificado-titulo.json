@@ -1,0 +1,48 @@
+[
+  {
+    "fixture": "Titulo A.pdf",
+    "expectedStatus": "Completed",
+    "expectedExtraction": {
+      "matricula": "3000275392",
+      "fechaYHoraInscripcion": "24/07/2017 08:19 a.m.",
+      "oficina": "Registro de Titulos de Santo Domingo",
+      "vieneDe": "L:1675, F:190, H:199",
+      "municipio": "Santo Domingo de Guzman",
+      "provincia": "Santo Domingo",
+      "superficieM2": "260.17",
+      "designacionCatastral": "Parcela 18, del Distrito Catastral No.18"
+    },
+    "toleranceRules": {
+      "matricula": "exact",
+      "fechaYHoraInscripcion": "ignoreCase",
+      "oficina": "ignoreCase",
+      "vieneDe": "ignoreSpace",
+      "municipio": "ignoreCase",
+      "provincia": "ignoreCase",
+      "superficieM2": "numeric",
+      "designacionCatastral": "contains"
+    }
+  },
+  {
+    "fixture": "Titulo B.pdf",
+    "expectedStatus": "Incomplete",
+    "expectedExtraction": {
+      "oficina": "REGISTRO DE TITULOS DE MONSEÑOR NOUEL",
+      "designacionCatastral": "Parcela 188, DC 2",
+      "municipio": "Bonao",
+      "provincia": "Monseñor Nouel",
+      "superficieM2": "2000.00",
+      "matricula": null,
+      "fechaYHoraInscripcion": null,
+      "vieneDe": null
+    },
+    "reasonForIncomplete": "Blurred fields for Matricula and FechaYHoraInscripcion prevent full extraction.",
+    "toleranceRules": {
+      "oficina": "ignoreCase",
+      "designacionCatastral": "contains",
+      "municipio": "ignoreCase",
+      "provincia": "ignoreCase",
+      "superficieM2": "numeric"
+    }
+  }
+]

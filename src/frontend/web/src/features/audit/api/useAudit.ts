@@ -3,7 +3,8 @@ import { apiClient } from "@/infrastructure/api/client";
 import type { LogProyectoDto } from "./types";
 import type { AuditFilters } from "../types";
 
-const auditKeys = {
+export const auditKeys = {
+  all: ["audit"] as const,
   global: (filters?: AuditFilters) => ["audit", "global", filters] as const,
   byProject: (projectId: string, filters?: AuditFilters) => ["audit", projectId, filters] as const,
 };
@@ -11,22 +12,31 @@ const auditKeys = {
 export const useAuditLog = (projectId: string, filters?: AuditFilters) =>
   useQuery({
     queryKey: auditKeys.byProject(projectId, filters),
-    queryFn: () => apiClient.get<LogProyectoDto[]>(`/projects/${projectId}/audit`, { params: filters }).then(res => res.data),
+    queryFn: () =>
+      apiClient
+        .get<LogProyectoDto[]>(`/projects/${projectId}/audit`, { params: filters })
+        .then((res) => res.data),
     enabled: !!projectId,
+    staleTime: 60_000,
+    gcTime: 10 * 60 * 1000,
   });
 
 export const useGlobalAuditTrail = (filters?: AuditFilters) =>
   useQuery({
     queryKey: auditKeys.global(filters),
-    queryFn: () => apiClient.get<LogProyectoDto[]>(`/admin/audit`, { params: filters }).then(res => res.data),
+    queryFn: () =>
+      apiClient
+        .get<LogProyectoDto[]>(`/admin/audit`, { params: filters })
+        .then((res) => res.data),
+    staleTime: 60_000,
+    gcTime: 10 * 60 * 1000,
   });
 
 export const useExportGlobalAudit = () =>
-  // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   useMutation({
-    mutationKey: ['auditKeys'],
+    mutationKey: ["audit", "export"],
     mutationFn: async () => {
-      const response = await apiClient.get(`/reports/global-audit`, { responseType: 'blob' }).then(res => res.data);
+      const response = await apiClient.get(`/reports/global-audit`, { responseType: "blob" }).then((res) => res.data);
       return response as Blob;
     },
   });

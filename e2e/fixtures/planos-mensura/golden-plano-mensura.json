@@ -1,0 +1,46 @@
+[
+  {
+    "filename": "PLANO 505483687149.pdf",
+    "expected": {
+      "SchemaVersion": "1.0",
+      "DocumentType": "PlanoMensuraCatastral",
+      "ExtractionStatus": "SUCCESS",
+      "OverallConfidence": 0.9,
+      "Payload": {
+        "DesignacionCatastralPosicional": "42018023893",
+        "DesignacionCatastralOrigen": "42018023893",
+        "Provincia": "LA ALTAGRACIA",
+        "Municipio": "HIGUEY",
+        "Lugar": "JUANILLO",
+        "SuperficieARegistrarParcelaM2": 12130.07
+      }
+    }
+  },
+  {
+    "filename": "PLANO RP 60.pdf",
+    "expected": {
+      "SchemaVersion": "1.0",
+      "DocumentType": "PlanoMensuraCatastral",
+      "ExtractionStatus": "SUCCESS",
+      "OverallConfidence": 0.85,
+      "Payload": {
+        "DesignacionCatastralPosicional": "42022121591",
+        "Lugar": "JUANILLO",
+        "SuperficieARegistrarParcelaM2": 927.30
+      }
+    }
+  },
+  {
+    "filename": "PLANO-MENSURA-CATASTRAL(2a6d4dc53820064f4c6aff8ca94f391c).pdf",
+    "expected": {
+      "SchemaVersion": "1.0",
+      "DocumentType": "PlanoMensuraCatastral",
+      "ExtractionStatus": "SUCCESS",
+      "OverallConfidence": 0.88,
+      "Payload": {
+        "Municipio": "CONCEPCION DE LA VEGA",
+        "Lugar": "TERRERO"
+      }
+    }
+  }
+]

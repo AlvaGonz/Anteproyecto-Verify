@@ -23,20 +23,30 @@ export interface CreateRuleCommand {
   tipoProyecto: number;
 }
 
-export const useRules = () =>
+export const ruleKeys = {
+  all: ["rules"] as const,
+  list: (page?: number, pageSize?: number) => ["rules", "list", page, pageSize] as const,
+};
+
+export const useRules = (page = 1, pageSize = 50) =>
   useQuery({
-    queryKey: ["rules"],
-    queryFn: () => apiClient.get<ReglaValidacionDto[]>("/admin/rules").then(res => res.data),
+    queryKey: ruleKeys.list(page, pageSize),
+    queryFn: () =>
+      apiClient
+        .get<ReglaValidacionDto[]>("/admin/rules", { params: { page, pageSize } })
+        .then((res) => res.data),
+    staleTime: 120_000,
+    gcTime: 15 * 60 * 1000,
   });
 
 export const useCreateRule = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationKey: ['useRules'],
+    mutationKey: ["rules", "create"],
     mutationFn: (command: CreateRuleCommand) =>
-      apiClient.post<{ id: string }>("/admin/rules", command).then(res => res.data),
+      apiClient.post<{ id: string }>("/admin/rules", command).then((res) => res.data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["rules"] });
+      qc.invalidateQueries({ queryKey: ruleKeys.all });
     },
   });
 };
@@ -44,11 +54,11 @@ export const useCreateRule = () => {
 export const useToggleRule = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationKey: ['useToggleRule'],
+    mutationKey: ["rules", "toggle"],
     mutationFn: (id: string) =>
-      apiClient.patch<void>(`/admin/rules/${id}/toggle`, {}).then(res => res.data),
+      apiClient.patch<void>(`/admin/rules/${id}/toggle`, {}).then((res) => res.data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["rules"] });
+      qc.invalidateQueries({ queryKey: ruleKeys.all });
     },
   });
 };
