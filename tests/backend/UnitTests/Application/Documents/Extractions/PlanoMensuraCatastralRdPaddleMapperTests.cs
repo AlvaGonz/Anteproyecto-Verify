@@ -45,7 +45,6 @@ namespace UnitTests.Application.Documents.Extractions
             extraction!.ExtractionStatus.Should().Be(ExtractionStatus.Completed);
             
             extraction.Departamento.RawValue.Should().Be("ESTE");
-            extraction.TipoPlano.NormalizedValue.Should().Be("PLANO INDIVIDUAL");
             extraction.Operacion.NormalizedValue.Should().Be("SUBDIVISION");
             extraction.DesignacionCatastralPosicional.RawValue.Should().Be("42018023893_1_1");
             extraction.DesignacionCatastralOrigen.RawValue.Should().Be("42018023893_11_1");
@@ -55,7 +54,6 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.Lugar.RawValue.Should().Be("JUANILLO");
             extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("12130.07");
             extraction.Escala.NormalizedValue.Should().Be("1:400");
-            extraction.NumeroLamina.RawValue.Should().Be("1 DE 1");
         }
 
         [Fact]
@@ -114,7 +112,6 @@ namespace UnitTests.Application.Documents.Extractions
             // Assert
             extraction.Should().NotBeNull();
             extraction!.Departamento.RawValue.Should().Be("ESTE");
-            extraction.TipoPlano.NormalizedValue.Should().Be("PLANO INDIVIDUAL");
             extraction.Operacion.NormalizedValue.Should().Be("SUBDIVISION");
             extraction.DesignacionCatastralPosicional.RawValue.Should().Be("42022121591_11_1");
             extraction.Seccion.RawValue.Should().Be("JINASARAGU");

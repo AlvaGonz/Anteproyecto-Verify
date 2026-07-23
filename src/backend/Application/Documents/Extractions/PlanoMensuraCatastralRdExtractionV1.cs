@@ -15,7 +15,6 @@ namespace Application.Documents.Extractions
         public ExtractedField JurisdiccionInmobiliaria { get; init; } = new();
         public ExtractedField DireccionRegionalMensurasCatastrales { get; init; } = new();
         public ExtractedField Departamento { get; init; } = new();
-        public ExtractedField TipoPlano { get; init; } = new();
         public ExtractedField Operacion { get; init; } = new();
         public ExtractedField DesignacionCatastralPosicional { get; init; } = new();
         public ExtractedField DesignacionCatastralOrigen { get; init; } = new();
@@ -25,6 +24,5 @@ namespace Application.Documents.Extractions
         public ExtractedField Lugar { get; init; } = new();
         public ExtractedField SuperficieARegistrarParcelaM2 { get; init; } = new();
         public ExtractedField Escala { get; init; } = new();
-        public ExtractedField NumeroLamina { get; init; } = new();
     }
 }

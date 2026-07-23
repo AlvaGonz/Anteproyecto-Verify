@@ -27,10 +27,6 @@ namespace Application.Documents.Extractions
                     new[] { @"DEPARTAMENTO" },
                     new[] { @"DEPARTAMENTO\s*([a-zA-Z]+)", @"DEPARTAMENTO\s*([a-zA-Z]+)\b", @"(ESTE|NORTE|SUR|OESTE|CENTRAL)" }),
 
-                TipoPlano = ExtractField(lines, fullText, "TipoPlano",
-                    new[] { @"TIPO\s*DE\s*PLANO", @"PLANO\s*INDIVIDUAL", @"PLANO\s*GENERAL" },
-                    new[] { @"(PLANO\s*INDIVIDUAL|PLANO\s*GENERAL)" }),
-
                 Operacion = ExtractField(lines, fullText, "Operacion",
                     new[] { @"OPERACION", @"OPERACIOSUBDISION", @"OPEACIONSUBDIVISIN" },
                     new[] { @"OPERACION[A-Z\s:]*([A-Za-z]+)", @"(SUBDIVISION|PLANO CATASTRAL|SANEAMIENTO|DESLINDE|REFUNDICION)" }),
@@ -65,11 +61,7 @@ namespace Application.Documents.Extractions
 
                 Escala = ExtractField(lines, fullText, "Escala",
                     new[] { @"ESCALA" },
-                    new[] { @"ESCALA\s*([\d:\s]+)", @"ESCALA\s*(1\s*:\s*\d+)" }),
-
-                NumeroLamina = ExtractField(lines, fullText, "NumeroLamina",
-                    new[] { @"HOJA", @"LAMINA" },
-                    new[] { @"(?:HOJA|LAMINA)\s*([\d\sA-Z]+)" })
+                    new[] { @"ESCALA\s*([\d:\s]+)", @"ESCALA\s*(1\s*:\s*\d+)" })
             };
 
             var warnings = new List<string>();
@@ -123,8 +115,7 @@ namespace Application.Documents.Extractions
                 {
                     if (Regex.IsMatch(line, labelPattern, RegexOptions.IgnoreCase))
                     {
-                        // Check if the label itself implies the value (e.g. "PLANO INDIVIDUAL", "OPERACIOSUBDISION")
-                        if (fieldType == "TipoPlano" || (fieldType == "Operacion" && !labelPattern.Equals(@"OPERACION", StringComparison.OrdinalIgnoreCase)))
+                        if (fieldType == "Operacion" && !labelPattern.Equals(@"OPERACION", StringComparison.OrdinalIgnoreCase))
                         {
                             rawValue = line;
                             break;
@@ -196,10 +187,7 @@ namespace Application.Documents.Extractions
                     case "Operacion":
                         normalizedValue = SharedFieldNormalizer.NormalizeOperacion(rawValue);
                         break;
-                    case "TipoPlano":
-                        if (normalizedValue.Contains("INDIVIDUAL", StringComparison.OrdinalIgnoreCase)) normalizedValue = "PLANO INDIVIDUAL";
-                        if (normalizedValue.Contains("GENERAL", StringComparison.OrdinalIgnoreCase)) normalizedValue = "PLANO GENERAL";
-                        break;
+
                 }
 
                 return new ExtractedField
