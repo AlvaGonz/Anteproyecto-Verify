@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "2714338bcea5acd21f57c5d959dcbec428496bd3",
-    "indexed_at": "2026-07-23T22:19:42Z",
+    "commit": "a5de29faa33123157e9330ad1d09513523001946",
+    "indexed_at": "2026-07-23T22:55:28Z",
     "project": "C-Users-Alva-Desktop-Anteproyecto-Verify",
     "nodes": 16547,
     "edges": 22084,
-    "original_size": 28835840,
-    "compressed_size": 4200898,
+    "original_size": 28901376,
+    "compressed_size": 4207153,
     "compression_level": 3
 }
