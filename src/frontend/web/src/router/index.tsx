@@ -53,6 +53,24 @@ const NavigateToVerifyResult: React.FC = () => {
   return <Navigate to={`/projects/verify/${code}`} replace />;
 };
 
+// Persistent Admin Shell — wraps all /admin/* routes without remounting
+const AdminShell = () => (
+  <AuthGuard>
+    <AdminLayout>
+      <Outlet />
+    </AdminLayout>
+  </AuthGuard>
+);
+
+// Project Manage Shell — wraps project edit sub-routes
+const ProjectManageShell = () => (
+  <AuthGuard>
+    <ProjectManageLayout>
+      <Outlet />
+    </ProjectManageLayout>
+  </AuthGuard>
+);
+
 export const router = createHashRouter([
   {
     path: "/",
@@ -211,145 +229,71 @@ export const router = createHashRouter([
         path: "/admin/validation-rules",
         element: <Navigate to="/admin/rules" replace />,
       },
+      // PERSISTENT ADMIN SHELL — avoids layout remount on route changes
       {
         path: "/admin",
         errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <Navigate to="/admin/dashboard" replace />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/dashboard",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <DashboardPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/projects",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <AdminProjectsPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/projects/:id/publicado",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <PublishedProjectDetailPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/projects/new",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ProjectManageLayout />
-            </AdminLayout>
-          </AuthGuard>
-        ),
+        element: <AdminShell />,
         children: [
-          { index: true, element: <ProjectManagePage /> }
+          {
+            index: true,
+            element: <Navigate to="/admin/dashboard" replace />,
+          },
+          {
+            path: "dashboard",
+            element: <DashboardPage />,
+          },
+          {
+            path: "projects",
+            element: <AdminProjectsPage />,
+          },
+          {
+            path: "projects/:id/publicado",
+            element: <PublishedProjectDetailPage />,
+          },
+          {
+            path: "projects/new",
+            element: <ProjectManageShell />,
+            children: [
+              { index: true, element: <ProjectManagePage /> }
+            ]
+          },
+          {
+            path: "projects/:id/upload",
+            element: <ProjectDocumentUploadPage />,
+          },
+          {
+            path: "validations/:projectId",
+            element: <ValidationExecutionPage />,
+          },
+          {
+            path: "projects/:id",
+            element: <ProjectManageShell />,
+            children: [
+              { index: true, element: <Navigate to="edit" replace /> },
+              { path: "edit", element: <ProjectManagePage /> },
+              { path: "validations", element: <ProjectValidationPage /> },
+              { path: "reports", element: <ProjectReportsPage /> },
+              { path: "audit", element: <ProjectAuditPage /> }
+            ]
+          },
+          {
+            path: "findings/:projectId",
+            element: <FindingsPage />,
+          },
+          {
+            path: "rules",
+            element: <RulesManagePage />,
+          },
+          {
+            path: "settings",
+            element: <SettingsPage />,
+          },
+          {
+            path: "audit-log",
+            element: <AuditLogPage />,
+          },
         ]
-      },
-      {
-        path: "/admin/projects/:id/upload",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <ProjectDocumentUploadPage />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/validations/:projectId",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ValidationExecutionPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/projects/:id",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <ProjectManageLayout />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-        children: [
-          { index: true, element: <Navigate to="edit" replace /> },
-          { path: "edit", element: <ProjectManagePage /> },
-          { path: "validations", element: <ProjectValidationPage /> },
-          { path: "reports", element: <ProjectReportsPage /> },
-          { path: "audit", element: <ProjectAuditPage /> }
-        ]
-      },
-      {
-        path: "/admin/findings/:projectId",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <FindingsPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/rules",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <RulesManagePage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/settings",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <SettingsPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
-      },
-      {
-        path: "/admin/audit-log",
-        errorElement: <AdminErrorFallback />,
-        element: (
-          <AuthGuard>
-            <AdminLayout>
-              <AuditLogPage />
-            </AdminLayout>
-          </AuthGuard>
-        ),
       },
       {
         path: "*",
