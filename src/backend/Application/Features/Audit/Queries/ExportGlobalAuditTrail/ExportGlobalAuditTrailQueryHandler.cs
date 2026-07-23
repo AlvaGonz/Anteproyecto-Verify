@@ -19,7 +19,7 @@ public class ExportGlobalAuditTrailQueryHandler
 
     public async Task<byte[]> HandleAsync(CancellationToken cancellationToken = default)
     {
-        var auditLogs = await _auditoriaRepository.GetAllAsync(cancellationToken);
+        var auditLogs = await _auditoriaRepository.GetFilteredAsync(null, null, null, cancellationToken);
         var orderedLogs = auditLogs.OrderByDescending(a => a.FechaEventoUtc).ToList();
 
         var csvBuilder = new StringBuilder();

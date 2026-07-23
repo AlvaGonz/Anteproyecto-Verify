@@ -19,26 +19,9 @@ public class GetGlobalAuditTrailQueryHandler
 
     public async Task<IEnumerable<AuditDto>> HandleAsync(string? tipoEvento = null, DateTime? fromDate = null, DateTime? toDate = null, CancellationToken cancellationToken = default)
     {
-        var auditLogs = await _auditoriaRepository.GetAllAsync(cancellationToken);
+        var auditLogs = await _auditoriaRepository.GetFilteredAsync(tipoEvento, fromDate, toDate, cancellationToken);
 
-        var query = auditLogs.AsQueryable();
-
-        if (!string.IsNullOrEmpty(tipoEvento))
-        {
-            query = query.Where(a => a.TipoEvento == tipoEvento);
-        }
-
-        if (fromDate.HasValue)
-        {
-            query = query.Where(a => a.FechaEventoUtc >= fromDate.Value);
-        }
-
-        if (toDate.HasValue)
-        {
-            query = query.Where(a => a.FechaEventoUtc <= toDate.Value);
-        }
-
-        return query.OrderByDescending(a => a.FechaEventoUtc).Select(a => new AuditDto(
+        return auditLogs.Select(a => new AuditDto(
             a.Id,
             a.ProyectoId,
             a.UsuarioId,

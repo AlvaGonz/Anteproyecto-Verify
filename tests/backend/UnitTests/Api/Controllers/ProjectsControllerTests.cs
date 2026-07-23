@@ -129,7 +129,7 @@ namespace UnitTests.Api.Controllers
             };
 
             _mockProjectService
-                .Setup(s => s.GetAllProjectsAsync(It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAllProjectsAsync(1, 50, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(allProjects);
 
             _mockUsuarioRepository
@@ -137,7 +137,7 @@ namespace UnitTests.Api.Controllers
                 .ReturnsAsync(CreateUsuario(developerId, UserRole.User));
 
             // Act
-            var result = await _controller.GetProjects(CancellationToken.None);
+            var result = await _controller.GetProjects(1, 50, CancellationToken.None);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);

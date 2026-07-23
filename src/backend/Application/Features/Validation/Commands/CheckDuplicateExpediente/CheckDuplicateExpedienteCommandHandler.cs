@@ -48,7 +48,7 @@ public class CheckDuplicateExpedienteCommandHandler
 
         // Basic duplicate detection logic
         // In a real scenario, this would be a more complex query or call to a specialized service
-        var allProjects = await _proyectoRepository.GetVisibleAsync(cancellationToken);
+        var allProjects = await _proyectoRepository.GetVisibleAsync(1, 500, cancellationToken);
         var potentialDuplicates = allProjects.Where(p => p.Id != project.Id).ToList();
 
         Proyecto? exactMatch = null;

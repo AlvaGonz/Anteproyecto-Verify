@@ -34,15 +34,15 @@ public class ProjectService : IProjectService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<ProyectoDto>> GetVisibleProjectsAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProyectoDto>> GetVisibleProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        var proyectos = await _proyectoRepository.GetVisibleAsync(cancellationToken);
+        var proyectos = await _proyectoRepository.GetVisibleAsync(page, pageSize, cancellationToken);
         return proyectos.Select(MapToDto);
     }
 
-    public async Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        var proyectos = await _proyectoRepository.GetAllAsync(cancellationToken);
+        var proyectos = await _proyectoRepository.GetAllAsync(page, pageSize, cancellationToken);
         return proyectos.Select(MapToDto);
     }
 

@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using System.Linq;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 public class VeriFincaWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
@@ -24,6 +26,14 @@ public class VeriFincaWebFactory : WebApplicationFactory<Program>, IAsyncLifetim
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            config.AddInMemoryCollection(new[]
+            {
+                new KeyValuePair<string, string?>("Stripe:SecretKey", "sk_test_mock")
+            });
+        });
+
         builder.ConfigureServices(services =>
         {
             var descriptor = services.SingleOrDefault(

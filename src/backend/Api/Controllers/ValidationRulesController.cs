@@ -29,9 +29,12 @@ public class ValidationRulesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRules(CancellationToken ct)
+    public async Task<IActionResult> GetRules(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        CancellationToken ct = default)
     {
-        var query = new GetValidationRulesQuery();
+        var query = new GetValidationRulesQuery { Page = page, PageSize = pageSize };
         var result = await _getHandler.Handle(query, ct);
         return Ok(result);
     }

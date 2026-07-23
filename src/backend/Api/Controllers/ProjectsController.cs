@@ -50,7 +50,10 @@ public class ProjectsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        CancellationToken cancellationToken = default)
     {
         if (User.Identity?.IsAuthenticated == true)
         {
@@ -60,7 +63,7 @@ public class ProjectsController : ControllerBase
                 var loggedInUser = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
                 if (loggedInUser != null)
                 {
-                    var projects = await _projectService.GetAllProjectsAsync(cancellationToken);
+                    var projects = await _projectService.GetAllProjectsAsync(page, pageSize, cancellationToken);
                     if (loggedInUser.Rol != UserRole.Administrator)
                     {
                         projects = projects.Where(p => p.UsuarioCreadorId == userId);
@@ -71,7 +74,7 @@ public class ProjectsController : ControllerBase
             }
         }
 
-        var visibleProjects = await _projectService.GetVisibleProjectsAsync(cancellationToken);
+        var visibleProjects = await _projectService.GetVisibleProjectsAsync(page, pageSize, cancellationToken);
         return Ok(visibleProjects);
     }
 

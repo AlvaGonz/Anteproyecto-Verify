@@ -29,10 +29,10 @@ public class SearchPublicProjectsQueryHandler
     {
         IEnumerable<Domain.Entities.Proyecto> proyectos;
 
-        if (string.IsNullOrWhiteSpace(request.Query))
-        {
-            proyectos = await _proyectoRepository.GetVisibleAsync(cancellationToken);
-        }
+if (string.IsNullOrWhiteSpace(request.Query))
+            {
+                proyectos = await _proyectoRepository.GetVisibleAsync(1, 50, cancellationToken);
+            }
         else
         {
             proyectos = await _proyectoRepository.SearchAsync(request.Query, cancellationToken);

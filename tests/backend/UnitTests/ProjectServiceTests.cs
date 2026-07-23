@@ -142,7 +142,7 @@ public class ProjectServiceTests
 
         var p2 = new Proyecto("P2", "L2", user.Id);
 
-        _proyectoRepositoryMock.Setup(r => r.GetVisibleAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Proyecto> { p1, p2 });
+        _proyectoRepositoryMock.Setup(r => r.GetVisibleAsync(1, 50, It.IsAny<CancellationToken>())).ReturnsAsync(new List<Proyecto> { p1, p2 });
 
         // Act
         var result = await _projectService.GetVisibleProjectsAsync();

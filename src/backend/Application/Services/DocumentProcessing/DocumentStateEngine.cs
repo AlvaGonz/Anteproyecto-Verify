@@ -51,6 +51,26 @@ public class DocumentStateEngine : IDocumentStateEngine
                 };
             }
 
+            // Generate Canonical JSON using type-specific mappers
+            if (document.TipoDocumento == DocumentType.CertificadoTitulo || document.TipoDocumento == DocumentType.TITLE)
+            {
+                var extraction = Application.Documents.Extractions.CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+                var envelope = new { schemaVersion = "1.0", documentType = "CertificadoTitulo", payload = extraction };
+                ocrResult.CanonicalDataJson = JsonSerializer.Serialize(envelope, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            }
+            else if (document.TipoDocumento == DocumentType.PlanoMensuraCatastral)
+            {
+                var extraction = Application.Documents.Extractions.PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+                var envelope = new { schemaVersion = "1.0", documentType = "PlanoMensuraCatastral", payload = extraction };
+                ocrResult.CanonicalDataJson = JsonSerializer.Serialize(envelope, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            }
+            else if (document.TipoDocumento == DocumentType.ID)
+            {
+                var extraction = Application.Documents.Extractions.CedulaExtractionMapper.MapFromOcrResult(ocrResult);
+                var envelope = new { schemaVersion = "1.0", documentType = "Cedula", payload = extraction };
+                ocrResult.CanonicalDataJson = JsonSerializer.Serialize(envelope, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            }
+
             var options = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var enrichedJson = JsonSerializer.Serialize(ocrResult, options);
 

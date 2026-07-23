@@ -125,7 +125,7 @@ public class ProjectDocumentsController : ControllerBase
 
     [HttpPost("/api/v1/projects/{projectId}/documents/requirements/{requirementCode}/upload")]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UploadRequirementDocument(
@@ -208,7 +208,7 @@ public class ProjectDocumentsController : ControllerBase
             );
 
             // Devolver Created, con ubicación a la lista o descarga
-            return Created($"/api/projects/{projectId}/documents/{document.Id}/download", document);
+            return Created($"/api/projects/{projectId}/documents/{document.Id}/download", MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -361,6 +361,7 @@ public class ProjectDocumentsController : ControllerBase
     {
         Application.Documents.Extractions.CedulaRdExtractionV1? cedulaExtraction = null;
         Application.Documents.Extractions.CertificadoTituloRdExtractionV1? tituloExtraction = null;
+        Application.Documents.Extractions.PlanoMensuraCatastralRdExtractionV1? mensuraExtraction = null;
 
         if (!string.IsNullOrEmpty(d.ResultadoOcrJson))
         {
@@ -370,13 +371,43 @@ public class ProjectDocumentsController : ControllerBase
                 var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(d.ResultadoOcrJson, options);
                 if (ocrResult != null)
                 {
-                    if (d.TipoDocumento == DocumentType.ID)
+                    if (!string.IsNullOrEmpty(ocrResult.CanonicalDataJson))
                     {
-                        cedulaExtraction = Application.Documents.Extractions.CedulaExtractionMapper.MapFromOcrResult(ocrResult);
+                        using var doc = System.Text.Json.JsonDocument.Parse(ocrResult.CanonicalDataJson);
+                        var root = doc.RootElement;
+                        if (root.TryGetProperty("documentType", out var typeElement))
+                        {
+                            var docType = typeElement.GetString();
+                            var payloadElement = root.GetProperty("payload");
+                            if (docType == "Cedula")
+                            {
+                                cedulaExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.CedulaRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
+                            else if (docType == "CertificadoTitulo")
+                            {
+                                tituloExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.CertificadoTituloRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
+                            else if (docType == "PlanoMensuraCatastral")
+                            {
+                                mensuraExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.PlanoMensuraCatastralRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
+                        }
                     }
-                    else if (d.TipoDocumento == DocumentType.CertificadoTitulo || d.TipoDocumento == DocumentType.TITLE)
+                    else
                     {
-                        tituloExtraction = Application.Documents.Extractions.CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        // Fallback for older documents that didn't persist CanonicalDataJson
+                        if (d.TipoDocumento == DocumentType.ID)
+                        {
+                            cedulaExtraction = Application.Documents.Extractions.CedulaExtractionMapper.MapFromOcrResult(ocrResult);
+                        }
+                        else if (d.TipoDocumento == DocumentType.CertificadoTitulo || d.TipoDocumento == DocumentType.TITLE)
+                        {
+                            tituloExtraction = Application.Documents.Extractions.CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        }
+                        else if (d.TipoDocumento == DocumentType.PlanoMensuraCatastral)
+                        {
+                            mensuraExtraction = Application.Documents.Extractions.PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        }
                     }
                 }
             }
@@ -389,7 +420,7 @@ public class ProjectDocumentsController : ControllerBase
         return new ValidationDocumentDto(
             d.Id, d.ProyectoId, d.TipoDocumento, d.NombreArchivoOriginal, d.ContentType, d.Extension,
             d.TamanoBytes, d.EstadoDocumento, d.Activo, d.Version, d.FechaEmision, d.InstitucionEmisora,
-            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction
+            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction, mensuraExtraction
         );
     }
 }

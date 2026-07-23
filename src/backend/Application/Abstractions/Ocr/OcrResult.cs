@@ -12,6 +12,7 @@ public record OcrResult
     public string Provider { get; init; } = string.Empty;
     public string SourceFile { get; init; } = string.Empty;
     public IReadOnlyList<OcrLine> Lines { get; init; } = Array.Empty<OcrLine>();
+    public string? CanonicalDataJson { get; set; } = null;
     public Dictionary<string, OcrField> Fields { get; init; } = new Dictionary<string, OcrField>();
     
     // Legacy support for older code until refactored

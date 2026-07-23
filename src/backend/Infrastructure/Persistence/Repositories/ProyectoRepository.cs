@@ -27,7 +27,7 @@ public class ProyectoRepository : IProyectoRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Proyecto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Proyecto>> GetAllAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
         return await _context.Proyectos
             .AsNoTracking()
@@ -35,10 +35,12 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Proyecto>> GetVisibleAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Proyecto>> GetVisibleAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var draftCode = ProjectStatus.Creado.ToCodigoUnico();
 
@@ -49,6 +51,8 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Where(p => p.Estado.CodigoUnico != draftCode)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
     }
 
@@ -63,7 +67,6 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Proyectos
             .AsNoTracking()
-            .AsSplitQuery()
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
@@ -72,7 +75,7 @@ public class ProyectoRepository : IProyectoRepository
                 p.Ipi == query ||
                 p.RncDesarrollador == query ||
                 p.Matricula == query ||
-                _context.Set<SelloIntegridad>().Any(s => s.ProyectoId == p.Id && s.CodigoSello == query)
+                _context.SellosIntegridad.Any(s => s.ProyectoId == p.Id && s.CodigoSello == query)
             )
             .ToListAsync(cancellationToken);
     }
