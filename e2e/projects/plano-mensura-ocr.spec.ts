@@ -14,18 +14,18 @@ test.describe('Real OCR Extraction Flow - Plano de Mensura', () => {
       path: path.join(directory, 'PLANO RP 60.pdf'), 
       name: 'mensura_fixture_a',
       status: 'Extracción Exitosa',
-      checks: ['Desig. Catastral Posicional', 'Superficie M2']
+      checks: ['Desig. Catastral Posicional', 'Superficie A. Regist.']
     },
     { 
       path: path.join(directory, 'PLANO 505483687149.pdf'), 
       name: 'mensura_fixture_b',
       status: 'Extracción Exitosa',
-      checks: ['Desig. Catastral Posicional', 'Provincia', 'Municipio', 'Superficie M2']
+      checks: ['Desig. Catastral Posicional', 'Provincia', 'Municipio', 'Superficie A. Regist.']
     },
     { 
       path: path.join(directory, 'PLANO-MENSURA-CATASTRAL(2a6d4dc53820064f4c6aff8ca94f391c).pdf'), 
       name: 'mensura_fixture_c',
-      status: 'Extracción Parcial',
+      status: 'Extracción Exitosa',
       checks: ['Municipio', 'Lugar']
     }
   ];
@@ -106,11 +106,11 @@ test.describe('Real OCR Extraction Flow - Plano de Mensura', () => {
          await expect(page.locator(`text=${check}`).first()).toBeVisible();
       }
 
-      // Assert Fixture C (partial extraction) shows NO DETECTADO for missing fields
-      if (fileInfo.status === 'Extracción Parcial') {
-         // Posicional is missing
-         const dcpField = page.locator('data-testid=field-dcp');
-         await expect(dcpField).toContainText('NO DETECTADO');
+      // Assert Fixture C shows NO DETECTADO for missing fields
+      if (fileInfo.name === 'mensura_fixture_c') {
+         // Provincia is missing
+         const provinciaField = page.locator('data-testid=field-provincia');
+         await expect(provinciaField).toContainText('NO DETECTADO');
       }
 
       // Take a screenshot

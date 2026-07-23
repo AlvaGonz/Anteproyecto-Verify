@@ -148,5 +148,35 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.Municipio.Status.Should().Be(FieldStatus.Missing);
             extraction.SuperficieARegistrarParcelaM2.Status.Should().Be(FieldStatus.Missing);
         }
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractConcatenatedFields_WhenOnSameLine()
+        {
+            // Arrange
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "SUPERFICIE PARCELA: 156,222.44 m² PROVINCIA: LA VEGA 1 No. de Lámina ESCALA: 1:2,500" },
+                new OcrLine { Text = "MUNICIPIO: CONCEPCIÓN DE LA VEGA" },
+                new OcrLine { Text = "SECCIÓN: LUGAR: TERRERO" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join("\n", lines.Select(l => l.Text))
+            };
+
+            // Act
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            // Assert
+            extraction.Should().NotBeNull();
+            extraction!.Provincia.NormalizedValue.Should().Be("LA VEGA");
+            extraction.Escala.NormalizedValue.Should().Be("1:2500");
+            extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("156222.44");
+            extraction.Municipio.NormalizedValue.Should().Be("CONCEPCIÓN DE LA VEGA");
+            extraction.Seccion.NormalizedValue.Should().Be(string.Empty);
+            extraction.Lugar.NormalizedValue.Should().Be("TERRERO");
+        }
     }
 }

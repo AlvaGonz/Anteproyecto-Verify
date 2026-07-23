@@ -22,8 +22,11 @@ public class ProjectDocumentsSecurityApiTests : IntegrationTestBase
     {
     }
 
-    // Covers: GET /api/projects/{projectId}/documents
-    // Which is the EXACT endpoint used by the React SPA inside the Validation Center UI to render the document list and extraction details.
+    // Explicit Coverage:
+    // 1. GET /api/projects/{projectId}/documents
+    // 2. POST /api/v1/projects/{projectId}/documents/requirements/MENSURA/upload
+    // We confirm these are the EXACT endpoint shapes used by the Validation Center UI 
+    // to upload and render the document list and extraction details.
     [Fact]
     public async Task GetProjectDocuments_ShouldNotExposeRawOcrData()
     {

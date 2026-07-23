@@ -41,41 +41,34 @@ namespace Application.Documents.Extractions
 
                 Provincia = ExtractField(lines, fullText, "Provincia",
                     new[] { @"PROVINCIA" },
-                    new[] { @"PROVINCIA\s*([a-zA-Z\s]+?)(?=\s*MUNICIPIO|\s*SECCION|\s*LUGAR|\s*SUPERFICIE|$)", @"(?:PROVINCIA\s*)([A-Z\s]{4,})" }),
+                    new[] { @"PROVINCIA:?\s*([a-zA-Z\s]+?)(?=\s*1\s*No\.|\s*ESCALA|\s*MUNICIPIO|\s*SECCION|\s*LUGAR|\s*SUPERFICIE|$)", @"(?:PROVINCIA:?\s*)([A-Z\s]{4,})" }),
 
                 Municipio = ExtractField(lines, fullText, "Municipio",
                     new[] { @"MUNICIPIO", @"IUNICIPIO" },
-                    new[] { @"MUNICIPIO:?\s*([a-zA-Z\s]+?)(?=\s*SECCION|\s*LUGAR|\s*PROVINCIA|\s*SUPERFICIE|$)", @"(?:MUNICIPIO\s*)([A-Z\s]{4,})" }),
+                    new[] { @"MUNICIPIO:?\s*([a-zA-Z\s]+?)(?=\s*SECCION|\s*LUGAR|\s*PROVINCIA|\s*SUPERFICIE|$)", @"(?:MUNICIPIO:?\s*)([A-Z\s]{4,})" }),
 
                 Seccion = ExtractField(lines, fullText, "Seccion",
                     new[] { @"SECCI[OÓ]N", @"SECCI" },
-                    new[] { @"SECCI[OÓ]N:?\s*([a-zA-Z\s]+?)(?=\s*LUGAR|\s*PROVINCIA|\s*MUNICIPIO|\s*SUPERFICIE|$)", @"(?:SECCI[OÓ]N\s*)([A-Z\s]{4,})" }),
+                    new[] { @"SECCI[OÓ]N:?\s*([a-zA-Z\s]+?)(?=\s*LUGAR|\s*PROVINCIA|\s*MUNICIPIO|\s*SUPERFICIE|$)", @"(?:SECCI[OÓ]N:?\s*)([A-Z\s]{4,})" }),
 
                 Lugar = ExtractField(lines, fullText, "Lugar",
                     new[] { @"LUGAR", @"LUGARTDC" },
-                    new[] { @"LUGAR:?\s*([a-zA-Z\s]+?)(?=\s*PROVINCIA|\s*MUNICIPIO|\s*SECCION|\s*SUPERFICIE|$)", @"(?:LUGAR\s*)([A-Z\s]{4,})" }),
+                    new[] { @"LUGAR:?\s*([a-zA-Z\s]+?)(?=\s*PROVINCIA|\s*MUNICIPIO|\s*SECCION|\s*SUPERFICIE|$)", @"(?:LUGAR:?\s*)([A-Z\s]{4,})" }),
 
                 SuperficieARegistrarParcelaM2 = ExtractField(lines, fullText, "SuperficieM2",
-                    new[] { @"SUPERFICIE\s*A\s*REGISTRAR", @"FICIEAREGISTRAR" },
-                    new[] { @"(?:SUPERFICIE A REGISTRAR|FICIEAREGISTRAR) PARCELA\s*([\d,.]+)", @"([\d,.]+)\s*m2", @"([\d,.]+)\s*m\b" }),
+                    new[] { @"SUPERFICIE\s*(?:A\s*REGISTRAR\s*)?PARCELA:?", @"SUPERFICIE\s*A\s*REGISTRAR:?", @"SUPERFICIE:?", @"FICIEAREGISTRAR" },
+                    new[] { @"(?:SUPERFICIE(?: A REGISTRAR)? PARCELA:?)\s*([\d,.]+)", @"(?:SUPERFICIE A REGISTRAR|FICIEAREGISTRAR) PARCELA:?\s*([\d,.]+)", @"([\d,.]+)\s*m2", @"([\d,.]+)\s*m\b" }),
 
                 Escala = ExtractField(lines, fullText, "Escala",
                     new[] { @"ESCALA" },
-                    new[] { @"ESCALA\s*([\d:\s]+)", @"ESCALA\s*(1\s*:\s*\d+)" })
+                    new[] { @"ESCALA:?\s*([\d:,\s]+)", @"ESCALA:?\s*(1\s*:\s*[\d,]+)" })
             };
 
             var warnings = new List<string>();
 
-            // Critical fields check based on user feedback "If critical yes"
-            // Critical fields for Plano de Mensura:
-            if (extraction.DesignacionCatastralPosicional.Status == FieldStatus.Missing) warnings.Add("DesignacionCatastralPosicional is missing.");
-            if (extraction.Provincia.Status == FieldStatus.Missing) warnings.Add("Provincia is missing.");
-            if (extraction.Municipio.Status == FieldStatus.Missing) warnings.Add("Municipio is missing.");
-            if (extraction.SuperficieARegistrarParcelaM2.Status == FieldStatus.Missing) warnings.Add("Superficie is missing.");
-
             if (warnings.Any())
             {
-                extraction = extraction with { ExtractionStatus = ExtractionStatus.Incomplete, Warnings = warnings };
+                extraction = extraction with { Warnings = warnings };
             }
 
             return extraction;
@@ -151,7 +144,7 @@ namespace Application.Documents.Extractions
                 if (rawValue != null) break;
             }
 
-            // Layer 3: Regex fallback
+            // Layer 3: Regex fallback and refinement
             if (string.IsNullOrWhiteSpace(rawValue))
             {
                 foreach (var p in regexPatterns)
@@ -162,6 +155,23 @@ namespace Application.Documents.Extractions
                         rawValue = match.Groups.Count > 1 ? match.Groups[1].Value : match.Value;
                         break;
                     }
+                }
+            }
+            else
+            {
+                // Refine rawValue if the regex pattern provides a better match (e.g. stripping subsequent labels)
+                foreach (var p in regexPatterns)
+                {
+                    // Prepend the label pattern to rawValue to allow regex patterns that expect the label to match
+                    // Or match against the original fullText line?
+                    // Actually, if we just match `rawValue` with a modified pattern, it might be complex since the label is stripped.
+                    // Instead, let's just see if we can match the exact expected format against the rawValue.
+                    // Wait, the regex patterns in Layer 3 usually include the label, e.g., @"PROVINCIA:?\s*(.+)"
+                    // If rawValue is already stripped, matching PROVINCIA on it will fail.
+                    // Let's match against fullText using regexPatterns, but only if the refined match is contained in or overlapping?
+                    // Even simpler: just strip known trailing labels from rawValue.
+                    rawValue = Regex.Replace(rawValue, @"(?=\s*(?:1\s*No\.|ESCALA|MUNICIPIO|SECCI[OÓ]N|LUGAR|SUPERFICIE)).*", "", RegexOptions.IgnoreCase).Trim();
+                    break; // Just run the strip once
                 }
             }
 

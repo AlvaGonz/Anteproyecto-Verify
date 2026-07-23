@@ -49,7 +49,7 @@ public static class SharedFieldNormalizer
     {
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
         var clean = raw.Replace(" ", "");
-        var match = Regex.Match(clean, @"\d+:\d+");
+        var match = Regex.Match(clean, @"\d+:[\d,]+");
         if (match.Success)
         {
             var parts = match.Value.Split(':');
@@ -57,11 +57,11 @@ public static class SharedFieldNormalizer
             {
                 var p1 = parts[0];
                 if (p1.Length > 1 && p1.StartsWith("1")) p1 = "1";
-                return $"{p1}:{parts[1]}";
+                var p2 = parts[1].Replace(",", "");
+                return $"{p1}:{p2}";
             }
-            return match.Value;
         }
-        return raw.Trim();
+        return string.Empty;
     }
 
     public static string NormalizeOperacion(string raw)
