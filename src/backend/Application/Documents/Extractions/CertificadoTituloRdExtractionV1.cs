@@ -12,6 +12,7 @@ public record CertificadoTituloRdExtractionV1
     public ExtractedField DesignacionCatastral { get; init; } = new();
     public ExtractedField FechaYHoraInscripcion { get; init; } = new();
     public ExtractedField VieneDe { get; init; } = new();
+    public ExtractedField Matricula { get; init; } = new();
     public ExtractedField Municipio { get; init; } = new();
     public ExtractedField Provincia { get; init; } = new();
     public ExtractedField SuperficieM2 { get; init; } = new();

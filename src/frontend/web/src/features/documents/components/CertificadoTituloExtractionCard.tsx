@@ -31,10 +31,10 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
     );
   }
 
-  const renderField = (label: string, field: ExtractedField, isPrimary = false) => {
-    if (!field) return null;
-    const isMissing = field.status === FieldStatus.Missing;
-    const isLowConfidence = field.status === FieldStatus.LowConfidence || field.confidence < 0.8;
+  const renderField = (label: string, field?: ExtractedField, isPrimary = false) => {
+    const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
+    const isMissing = safeField.status === FieldStatus.Missing;
+    const isLowConfidence = safeField.status === FieldStatus.LowConfidence || safeField.confidence < 0.8;
     
     return (
       <div className="flex flex-col p-3 rounded-lg bg-white border border-border/40 shadow-sm relative group">
@@ -43,10 +43,10 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
         </span>
         <div className="flex items-center justify-between gap-2">
           <span className={`text-sm font-bold ${isMissing ? 'text-error/60 italic' : isPrimary ? 'text-primary font-mono' : 'text-text-primary'}`}>
-            {isMissing ? 'NO DETECTADO' : field.normalizedValue}
+            {isMissing ? 'NO DETECTADO' : safeField.normalizedValue || safeField.rawValue}
           </span>
           {!isMissing && (
-            <div className={`w-2 h-2 rounded-full ${isLowConfidence ? 'bg-warning' : 'bg-success'}`} title={`Confianza: ${(field.confidence * 100).toFixed(0)}%`} />
+            <div className={`w-2 h-2 rounded-full ${isLowConfidence ? 'bg-warning' : 'bg-success'}`} title={`Confianza: ${(safeField.confidence * 100).toFixed(0)}%`} />
           )}
         </div>
 
@@ -84,6 +84,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
         {renderField("Designación Catastral", extraction.designacionCatastral, true)}
         {renderField("Oficina", extraction.oficina)}
+        {renderField("Matrícula", extraction.matricula)}
         {renderField("Fecha de Inscripción", extraction.fechaYHoraInscripcion)}
         {renderField("Viene De", extraction.vieneDe)}
         {renderField("Municipio", extraction.municipio)}

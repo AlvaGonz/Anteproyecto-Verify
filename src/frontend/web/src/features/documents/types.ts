@@ -47,6 +47,7 @@ export interface CertificadoTituloRdExtractionV1 {
   municipio: ExtractedField;
   provincia: ExtractedField;
   superficieM2: ExtractedField;
+  matricula: ExtractedField;
   warnings: string[];
   processorName: string;
   processorVersion: string;
