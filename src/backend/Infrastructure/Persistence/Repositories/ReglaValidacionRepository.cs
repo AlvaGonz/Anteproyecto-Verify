@@ -26,12 +26,13 @@ public class ReglaValidacionRepository : IReglaValidacionRepository
 
     public async Task<IEnumerable<ReglaValidacion>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.ReglasValidacion.OrderByDescending(r => r.FechaCreacionUtc).ToListAsync(cancellationToken);
+        return await _context.ReglasValidacion.AsNoTracking().OrderByDescending(r => r.FechaCreacionUtc).ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<ReglaValidacion>> GetActiveRulesAsync(TipoProyecto tipoProyecto, DocumentType tipoDocumento, CancellationToken cancellationToken = default)
     {
         return await _context.ReglasValidacion
+            .AsNoTracking()
             .Where(r => r.Activa && r.TipoProyecto == tipoProyecto && r.TipoDocumentoAplicable == tipoDocumento)
             .ToListAsync(cancellationToken);
     }

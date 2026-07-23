@@ -21,13 +21,14 @@ public class AuditoriaRepository : IAuditoriaRepository
     public async Task<IEnumerable<Auditoria>> GetByProyectoIdAsync(Guid proyectoId, CancellationToken cancellationToken = default)
     {
         return await _context.Auditorias
+            .AsNoTracking()
             .Where(a => a.ProyectoId == proyectoId)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Auditoria>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Auditorias.ToListAsync(cancellationToken);
+        return await _context.Auditorias.AsNoTracking().ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(Auditoria auditoria, CancellationToken cancellationToken = default)

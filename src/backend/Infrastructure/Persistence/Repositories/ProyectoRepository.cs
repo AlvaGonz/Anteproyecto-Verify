@@ -30,6 +30,8 @@ public class ProyectoRepository : IProyectoRepository
     public async Task<IEnumerable<Proyecto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
@@ -41,6 +43,8 @@ public class ProyectoRepository : IProyectoRepository
         var draftCode = ProjectStatus.Creado.ToCodigoUnico();
 
         return await _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
@@ -58,6 +62,8 @@ public class ProyectoRepository : IProyectoRepository
     public async Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default)
     {
         return await _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)

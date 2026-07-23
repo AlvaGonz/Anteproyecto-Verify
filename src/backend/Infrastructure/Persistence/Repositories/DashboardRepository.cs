@@ -22,19 +22,19 @@ namespace Infrastructure.Persistence.Repositories
             var activeUsersQuery = _context.Set<Usuario>()
                 .Where(u => u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator && (u.Plan == null || u.Plan.NombrePlan != "Consultor"));
 
-            var totalUsuariosTask = activeUsersQuery.CountAsync(cancellationToken);
-            var suscripcionesActivasTask = activeUsersQuery.CountAsync(u => u.PlanSuscripcionId != null && u.TitularId == null, cancellationToken);
-            var ingresosMensualesEstimadosTask = activeUsersQuery
+            var totalUsuarios = await activeUsersQuery.CountAsync(cancellationToken);
+            var suscripcionesActivas = await activeUsersQuery.CountAsync(u => u.PlanSuscripcionId != null && u.TitularId == null, cancellationToken);
+            var ingresosMensualesEstimados = await activeUsersQuery
                 .Include(u => u.Plan)
                 .Where(u => u.PlanSuscripcionId != null && u.Plan != null && u.TitularId == null)
                 .SumAsync(u => u.Plan!.Precio, cancellationToken);
 
-            var totalProyectosTask = _context.Set<Proyecto>().CountAsync(cancellationToken);
-            var proyectosPendientesTask = _context.Set<Proyecto>().CountAsync(p => p.Estado != null && (p.Estado.CodigoUnico == "CREADO" || p.Estado.CodigoUnico == "REVISION"), cancellationToken);
-            var proyectosAprobadosTask = _context.Set<Proyecto>().CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "PUBLICADO", cancellationToken);
-            var proyectosRechazadosTask = _context.Set<Proyecto>().CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "OBSERVACION", cancellationToken);
+            var totalProyectos = await _context.Set<Proyecto>().CountAsync(cancellationToken);
+            var proyectosPendientes = await _context.Set<Proyecto>().CountAsync(p => p.Estado != null && (p.Estado.CodigoUnico == "CREADO" || p.Estado.CodigoUnico == "REVISION"), cancellationToken);
+            var proyectosAprobados = await _context.Set<Proyecto>().CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "PUBLICADO", cancellationToken);
+            var proyectosRechazados = await _context.Set<Proyecto>().CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "OBSERVACION", cancellationToken);
 
-            var suscripcionesRecientesTask = activeUsersQuery
+            var suscripcionesRecientes = await activeUsersQuery
                 .Include(u => u.Plan)
                 .Where(u => u.PlanSuscripcionId != null)
                 .OrderByDescending(u => u.UpdatedAtUtc ?? u.CreatedAtUtc)
@@ -48,7 +48,7 @@ namespace Infrastructure.Persistence.Repositories
                 })
                 .ToListAsync(cancellationToken);
 
-            var proyectosRecientesTask = _context.Set<Proyecto>()
+            var proyectosRecientes = await _context.Set<Proyecto>()
                 .Include(p => p.UsuarioCreador)
                 .Include(p => p.Estado)
                 .OrderByDescending(p => p.CreatedAtUtc)
@@ -63,34 +63,28 @@ namespace Infrastructure.Persistence.Repositories
                 })
                 .ToListAsync(cancellationToken);
 
-            var usuariosPorPlanTask = activeUsersQuery
+            var usuariosPorPlan = await activeUsersQuery
                 .Include(u => u.Plan)
                 .GroupBy(u => u.TitularId != null ? "Invitado" : (u.Plan != null ? u.Plan.NombrePlan : "Gratuito"))
                 .Select(g => new { Plan = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);
 
-            var totalConsultasTask = _context.Set<LogConsulta>().CountAsync(cancellationToken);
-
-            await Task.WhenAll(
-                totalUsuariosTask, suscripcionesActivasTask, ingresosMensualesEstimadosTask,
-                totalProyectosTask, proyectosPendientesTask, proyectosAprobadosTask, proyectosRechazadosTask,
-                suscripcionesRecientesTask, proyectosRecientesTask, usuariosPorPlanTask, totalConsultasTask
-            );
+            var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
 
             return new DashboardStatsDto
             {
-                TotalUsuarios = totalUsuariosTask.Result,
-                SuscripcionesActivas = suscripcionesActivasTask.Result,
-                IngresosMensualesEstimados = ingresosMensualesEstimadosTask.Result,
-                TotalProyectos = totalProyectosTask.Result,
-                ProyectosPendientes = proyectosPendientesTask.Result,
-                ProyectosAprobados = proyectosAprobadosTask.Result,
-                ProyectosRechazados = proyectosRechazadosTask.Result,
-                SuscripcionesRecientes = suscripcionesRecientesTask.Result,
-                ProyectosRecientes = proyectosRecientesTask.Result,
-                UsuariosPorPlan = usuariosPorPlanTask.Result,
-                TotalConsultasRealizadas = totalConsultasTask.Result,
-                TotalProyectosRegistrados = totalProyectosTask.Result
+                TotalUsuarios = totalUsuarios,
+                SuscripcionesActivas = suscripcionesActivas,
+                IngresosMensualesEstimados = ingresosMensualesEstimados,
+                TotalProyectos = totalProyectos,
+                ProyectosPendientes = proyectosPendientes,
+                ProyectosAprobados = proyectosAprobados,
+                ProyectosRechazados = proyectosRechazados,
+                SuscripcionesRecientes = suscripcionesRecientes,
+                ProyectosRecientes = proyectosRecientes,
+                UsuariosPorPlan = usuariosPorPlan,
+                TotalConsultasRealizadas = totalConsultas,
+                TotalProyectosRegistrados = totalProyectos
             };
         }
     }

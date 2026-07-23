@@ -52,7 +52,7 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
         </div>
         <div>
           <h3 className="text-xl font-display font-black text-secondary tracking-tight">Estatus <span className="text-primary italic">Legal</span></h3>
-          <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mt-1">Checklist de Cumplimiento RI</p>
+          <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest leading-none mt-1">Checklist de Cumplimiento Documental</p>
         </div>
       </div>
 
@@ -60,7 +60,7 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
         {REQUIRED_DOCUMENTS.map((doc) => {
           const uploadedDoc = documents.find((u: any) => u.tipoDocumento === doc.category && u.activo);
           const isUploaded = !!uploadedDoc;
-          
+
           const availableDocs = documents
             .filter((d: any) => d.activo && d.tipoDocumento === DocumentType.Other)
             .map((d: any) => ({ id: d.id, name: d.nombreArchivoOriginal }));

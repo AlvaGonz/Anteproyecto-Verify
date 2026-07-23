@@ -27,6 +27,7 @@ public class UsuarioRepository : IUsuarioRepository, Application.Features.Subscr
     public async Task<Usuario?> GetByIdWithPlanAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Usuarios
+            .AsSplitQuery()
             .Include(u => u.Plan)
             .Include(u => u.Titular)
                 .ThenInclude(t => t!.Plan)
