@@ -12,11 +12,11 @@ import {
   History,
   LogOut,
   ChevronLeft,
+  Award,
 } from "lucide-react";
 import { useProjects } from "../../../features/projects/api/useProjects";
 import { useAuth } from "../../context/AuthContext";
 import { clsx } from "clsx";
-import { useRoutePrefetch } from "../../hooks/useRoutePrefetch";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -33,24 +33,11 @@ const NAVIGATION = [
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: projects, error: projectsError } = useProjects();
+  const { data: projects, error: projectsError } = useProjects(1, 500);
   const projectCount = projectsError ? 0 : (projects?.length || 0);
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-
-  // Prefetch route on hover for instant navigation
-  const prefetchRoute = (href: string) => {
-    // react-router v6 lazy loading - trigger the import by navigating to a special prefetch route
-    // or use the router's internal preload mechanism
-    const router = window.__REACT_ROUTER__;
-    if (router && router.routes) {
-      const route = router.routes.find((r: any) => r.path === href || r.path?.startsWith(href));
-      if (route && route.lazy) {
-        route.lazy();
-      }
-    }
-  };
 
   useEffect(() => {
     if (projectsError) {
@@ -181,7 +168,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                 <Link
                   to={item.href}
                   onClick={onClose}
-                  onMouseEnter={() => prefetchRoute(item.href)}
                   className={clsx(
                     "group flex items-center rounded-2xl transition-all duration-300 relative overflow-hidden",
                     isActive

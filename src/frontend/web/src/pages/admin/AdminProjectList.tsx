@@ -56,6 +56,9 @@ interface AdminProjectListProps {
   setOpenMenuId: (v: string | null) => void;
   updateStatus: (params: { id: string; status: ProjectStatus }) => void;
   deleteProject: (id: string) => void;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
 }
 
 export const AdminProjectList: React.FC<AdminProjectListProps> = ({

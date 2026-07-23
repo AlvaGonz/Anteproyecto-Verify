@@ -21,7 +21,6 @@ export const planoMensuraExtractionSchema = z.object({
   jurisdiccionInmobiliaria: extractedFieldSchema,
   direccionRegionalMensurasCatastrales: extractedFieldSchema,
   departamento: extractedFieldSchema,
-  tipoPlano: extractedFieldSchema,
   operacion: extractedFieldSchema,
   designacionCatastralPosicional: extractedFieldSchema,
   designacionCatastralOrigen: extractedFieldSchema,
@@ -30,6 +29,5 @@ export const planoMensuraExtractionSchema = z.object({
   seccion: extractedFieldSchema,
   lugar: extractedFieldSchema,
   superficieARegistrarParcelaM2: extractedFieldSchema,
-  escala: extractedFieldSchema,
-  numeroLamina: extractedFieldSchema
+  escala: extractedFieldSchema
 });

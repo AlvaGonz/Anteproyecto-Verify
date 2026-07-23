@@ -89,9 +89,8 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
         {renderField("Municipio", extraction.municipio, false, "field-municipio")}
         {renderField("Sección", extraction.seccion, false, "field-seccion")}
         {renderField("Lugar", extraction.lugar, false, "field-lugar")}
-        {renderField("Superficie M2", extraction.superficieARegistrarParcelaM2, false, "field-superficie")}
+        {renderField("Superficie A. Regist.", extraction.superficieARegistrarParcelaM2, true, "field-superficie")}
         {renderField("Escala", extraction.escala, false, "field-escala")}
-        {renderField("Número Lámina", extraction.numeroLamina, false, "field-lamina")}
       </div>
       
       {extraction.warnings && extraction.warnings.length > 0 && (
