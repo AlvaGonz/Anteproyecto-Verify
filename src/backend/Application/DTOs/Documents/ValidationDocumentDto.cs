@@ -23,5 +23,6 @@ public record ValidationDocumentDto(
     DateTime? UpdatedAtUtc,
     CedulaRdExtractionV1? CedulaExtraction = null,
     CertificadoTituloRdExtractionV1? CertificadoTituloExtraction = null,
-    PlanoMensuraCatastralRdExtractionV1? PlanoMensuraExtraction = null
+    PlanoMensuraCatastralRdExtractionV1? PlanoMensuraExtraction = null,
+    EstadoJuridicoRdExtractionV1? EstadoJuridicoExtraction = null
 );
