@@ -88,23 +88,11 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         {renderField("Oficina", extraction.oficina, false, "field-oficina")}
         {renderField("Provincia", extraction.provincia, false, "field-provincia")}
         {renderField("Municipio", extraction.municipio, false, "field-municipio")}
-        {renderField("Estado Legal", extraction.declaracionEstadoLegal, false, "field-estadoLegal")}
-        
-        {/* Special boolean fields */}
-        <div className="flex flex-col p-3 rounded-lg bg-white border border-border/40 shadow-sm relative group" data-testid="field-isFreeOfLiens">
-          <span className="text-[9px] font-black uppercase tracking-widest text-text-secondary/70 mb-1">Cargas / Gravámenes</span>
-          <div className="flex items-center justify-between gap-2">
-            <span className={`text-sm font-bold ${extraction.isFreeOfLiens ? 'text-success' : 'text-error'}`}>
-              {extraction.isFreeOfLiens ? 'Libre de Cargas' : 'Posee Cargas'}
-            </span>
-          </div>
-        </div>
-        {/* We assume hasActiveOppositions is inverted logic from isFreeOfLiens for the test, although the backend only gives IsFreeOfLiens. Wait, the e2e test checked hasActiveOppositions. Let's add it statically based on isFreeOfLiens since the backend DTO doesn't have it, or we just map it. The e2e mock has it. */}
         <div className="flex flex-col p-3 rounded-lg bg-white border border-border/40 shadow-sm relative group" data-testid="field-hasActiveOppositions">
           <span className="text-[9px] font-black uppercase tracking-widest text-text-secondary/70 mb-1">Oposiciones</span>
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-sm font-bold ${(extraction as any).hasActiveOppositions ? 'text-error' : 'text-success'}`}>
-              {(extraction as any).hasActiveOppositions ? 'Posee Oposiciones' : 'Sin Oposiciones'}
+            <span className={`text-sm font-bold ${extraction.hasActiveOppositions ? 'text-error' : 'text-success'}`}>
+              {extraction.hasActiveOppositions ? 'Posee Oposiciones' : 'Sin Oposiciones'}
             </span>
           </div>
         </div>

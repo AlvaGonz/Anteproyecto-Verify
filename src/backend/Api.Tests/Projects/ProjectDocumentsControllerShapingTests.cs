@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.Controllers;
 using Application.Contracts.Documents;
+using Application.Documents.Extractions;
 using Application.DTOs.Documents;
 using Application.Features.Documents.GetDocumentDiagnosis;
 using Domain.Enums;
@@ -44,7 +45,7 @@ namespace Api.Tests.Projects
                         ""confidence"": 0.99,
                         ""status"": 0
                     },
-                    ""isFreeOfLiens"": true
+                    ""hasActiveOppositions"": false
                 }
             }";
 
@@ -92,7 +93,7 @@ namespace Api.Tests.Projects
 
             Assert.NotNull(doc.EstadoJuridicoExtraction);
             Assert.Equal("3000362328", doc.EstadoJuridicoExtraction!.Matricula.RawValue);
-            Assert.True(doc.EstadoJuridicoExtraction.IsFreeOfLiens);
+            Assert.False(doc.EstadoJuridicoExtraction.HasActiveOppositions);
             Assert.Equal("EstadoJuridico", doc.EstadoJuridicoExtraction.DocumentType);
             Assert.Equal((ExtractionStatus)2, doc.EstadoJuridicoExtraction.ExtractionStatus);
         }

@@ -55,7 +55,6 @@ test.describe('Estado Jurídico OCR Extraction', () => {
                 confidence: 0.98,
                 status: 0
               },
-              isFreeOfLiens: true,
               hasActiveOppositions: false,
               fechaHoraInscripcion: {
                 rawValue: '16/07/2024',
@@ -121,10 +120,8 @@ test.describe('Estado Jurídico OCR Extraction', () => {
     await expect(designacionField).toBeVisible();
     await expect(designacionField).toContainText('400508493108');
 
-    // Verify Free of Liens
-    const isFreeOfLiensField = page.locator('[data-testid="field-isFreeOfLiens"]');
-    await expect(isFreeOfLiensField).toBeVisible();
-    await expect(isFreeOfLiensField).toContainText('Libre de Cargas'); // Or whatever the UI displays for true
+    // Verify Free of Liens card is NOT rendered (removed — Oposiciones covers this)
+    await expect(page.locator('[data-testid="field-isFreeOfLiens"]')).toHaveCount(0);
 
     // Verify Active Oppositions
     const hasOppositionsField = page.locator('[data-testid="field-hasActiveOppositions"]');

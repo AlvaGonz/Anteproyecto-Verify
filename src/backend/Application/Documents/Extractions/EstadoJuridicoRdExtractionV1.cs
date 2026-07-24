@@ -19,7 +19,7 @@ public record EstadoJuridicoRdExtractionV1
     public ExtractedField VieneDe { get; init; } = new();
     public ExtractedField DeclaracionEstadoLegal { get; init; } = new();
     
-    public bool IsFreeOfLiens { get; init; }
+    public bool HasActiveOppositions { get; init; }
     
     public List<string> Warnings { get; init; } = new();
     public string ProcessorName { get; init; } = "PaddleOCR";
