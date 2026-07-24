@@ -1,12 +1,13 @@
 import React from "react";
 import { CertificacionIPIExtraction, ExtractionStatus, FieldStatus, ExtractedField } from "../types";
-import { CheckCircle2, AlertTriangle, FileText, Loader2, Info } from "lucide-react";
+import { AlertTriangle, FileText, Loader2, Info, Pencil, Check, X } from "lucide-react";
 
 interface CertificacionIPIExtractionCardProps {
   extraction: CertificacionIPIExtraction;
+  onEditField?: (fieldName: string, value: string) => Promise<void>;
 }
 
-export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtractionCardProps> = ({ extraction }) => {
+export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtractionCardProps> = ({ extraction, onEditField }) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
 
@@ -31,10 +32,38 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
     );
   }
 
-  const renderField = (label: string, field?: ExtractedField, isPrimary = false, testId?: string) => {
+  const [editingField, setEditingField] = React.useState<string | null>(null);
+  const [editValue, setEditValue] = React.useState("");
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleEditClick = (fieldName: string, currentValue: string) => {
+    setEditingField(fieldName);
+    setEditValue(currentValue);
+  };
+
+  const handleSave = async (fieldName: string) => {
+    if (!onEditField) return;
+    try {
+      setIsSaving(true);
+      await onEditField(fieldName, editValue);
+      setEditingField(null);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingField(null);
+  };
+
+  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isMissing = safeField.status === FieldStatus.Missing;
     const isLowConfidence = safeField.status === FieldStatus.LowConfidence || safeField.confidence < 0.8;
+    const isEditing = editingField === fieldKey;
+    const displayValue = safeField.normalizedValue || safeField.rawValue || '';
 
     return (
       <div className="flex flex-col p-3 rounded-lg bg-white border border-border/40 shadow-sm relative group" data-testid={testId}>
@@ -42,11 +71,39 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
           {label}
         </span>
         <div className="flex items-center justify-between gap-2">
-          <span className={`text-sm font-bold ${isMissing ? 'text-error/60 italic' : isPrimary ? 'text-primary font-mono' : 'text-text-primary'}`}>
-            {isMissing ? 'NO DETECTADO' : safeField.normalizedValue || safeField.rawValue}
-          </span>
-          {!isMissing && (
-            <div className={`w-2 h-2 rounded-full ${isLowConfidence ? 'bg-warning' : 'bg-success'}`} title={`Confianza: ${(safeField.confidence * 100).toFixed(0)}%`} />
+          {isEditing ? (
+            <div className="flex items-center gap-1 w-full">
+               <input 
+                 type="text" 
+                 className="flex-1 text-sm border-b border-primary outline-none px-1 py-0.5 bg-transparent" 
+                 value={editValue} 
+                 onChange={(e) => setEditValue(e.target.value)}
+                 autoFocus
+                 disabled={isSaving}
+                 onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSave(fieldKey);
+                    if (e.key === 'Escape') handleCancel();
+                 }}
+               />
+               <button onClick={() => handleSave(fieldKey)} disabled={isSaving} className="text-success hover:bg-success/10 p-1 rounded transition-colors"><Check className="w-3 h-3" /></button>
+               <button onClick={handleCancel} disabled={isSaving} className="text-error hover:bg-error/10 p-1 rounded transition-colors"><X className="w-3 h-3" /></button>
+            </div>
+          ) : (
+            <>
+              <span className={`text-sm font-bold ${isMissing ? 'text-error/60 italic' : isPrimary ? 'text-primary font-mono' : 'text-text-primary'}`}>
+                {isMissing ? 'NO DETECTADO' : displayValue}
+              </span>
+              <div className="flex items-center gap-2">
+                 {!isMissing && (
+                   <div className={`w-2 h-2 rounded-full ${isLowConfidence ? 'bg-warning' : 'bg-success'}`} title={`Confianza: ${(safeField.confidence * 100).toFixed(0)}%`} />
+                 )}
+                 {onEditField && (
+                   <button onClick={() => handleEditClick(fieldKey, displayValue)} className="opacity-0 group-hover:opacity-100 text-text-secondary hover:text-primary transition-opacity p-0.5" title="Editar campo">
+                     <Pencil className="w-3 h-3" />
+                   </button>
+                 )}
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -67,23 +124,13 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
-           {extraction.extractionStatus === ExtractionStatus.Completed ? (
-             <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-success/10 text-success border border-success/20">
-               <CheckCircle2 className="w-3 h-3" /> Extracción Exitosa
-             </span>
-           ) : (
-             <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-warning/10 text-warning border border-warning/20">
-               <AlertTriangle className="w-3 h-3" /> Extracción Parcial
-             </span>
-           )}
-        </div>
+
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {renderField("No. de Certificación", extraction.numeroCertificacion, true, "field-numeroCertificacion")}
-        {renderField("No. Inmueble", extraction.numeroInmueble, true, "field-numeroInmueble")}
-        {renderField("Parcela No.", extraction.parcelaNumero, true, "field-parcelaNumero")}
+        {renderField("No. de Certificación", "numeroCertificacion", extraction.numeroCertificacion, true, "field-numeroCertificacion")}
+        {renderField("No. Inmueble", "numeroInmueble", extraction.numeroInmueble, true, "field-numeroInmueble")}
+        {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero")}
       </div>
 
       {extraction.warnings && extraction.warnings.length > 0 && (

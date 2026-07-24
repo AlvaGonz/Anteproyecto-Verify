@@ -20,7 +20,7 @@ public static class CedulaExtractionMapper
         {
             extraction = extraction with 
             {
-                CedulaNumber = MapField(ocrResult, "cedulaNumber", isCedula: true),
+                CedulaNumber = MapField(ocrResult, "cedulaNumber"),
                 FirstNames = MapField(ocrResult, "firstNames"),
                 LastNames = MapField(ocrResult, "lastNames"),
                 BirthDate = MapField(ocrResult, "birthDate"),
@@ -41,7 +41,7 @@ public static class CedulaExtractionMapper
         return extraction;
     }
 
-    private static ExtractedField MapField(OcrResult ocrResult, string fieldName, bool isCedula = false)
+    private static ExtractedField MapField(OcrResult ocrResult, string fieldName)
     {
         if (ocrResult.Fields.TryGetValue(fieldName, out var field))
         {
@@ -50,7 +50,7 @@ public static class CedulaExtractionMapper
             return new ExtractedField
             {
                 RawValue = field.Value,
-                NormalizedValue = isCedula ? MaskCedula(field.Value) : field.Value,
+                NormalizedValue = field.Value,
                 Confidence = field.Confidence,
                 Status = status,
                 SourcePage = 1
@@ -58,16 +58,5 @@ public static class CedulaExtractionMapper
         }
 
         return new ExtractedField { Status = FieldStatus.Missing };
-    }
-
-    private static string MaskCedula(string cedula)
-    {
-        if (string.IsNullOrWhiteSpace(cedula)) return string.Empty;
-        var clean = cedula.Replace("-", "");
-        if (clean.Length == 11)
-        {
-            return $"***-****{clean.Substring(7, 3)}-*";
-        }
-        return "***-*****-***";
     }
 }

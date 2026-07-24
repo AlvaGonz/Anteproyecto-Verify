@@ -360,12 +360,68 @@ public class DocumentService : IDocumentService
         if (ocrResult == null)
             throw new InvalidOperationException("No se pudo parsear el resultado OCR.");
 
-        if (!ocrResult.Fields.ContainsKey(fieldName))
-            throw new KeyNotFoundException($"Campo {fieldName} no encontrado en el resultado OCR.");
+        bool updated = false;
 
-        var field = ocrResult.Fields[fieldName];
-        var updatedField = field with { ReviewState = dto.ReviewState, CorrectedValue = dto.CorrectedValue };
-        ocrResult.Fields[fieldName] = updatedField;
+        // 1. Update in CanonicalDataJson if present
+        if (!string.IsNullOrEmpty(ocrResult.CanonicalDataJson))
+        {
+            try
+            {
+                var jObject = System.Text.Json.Nodes.JsonNode.Parse(ocrResult.CanonicalDataJson);
+                if (jObject != null && jObject["payload"] != null)
+                {
+                    var payload = jObject["payload"];
+                    var payloadObj = payload?.AsObject();
+                    if (payloadObj != null)
+                    {
+                        var matchingKey = payloadObj.Select(p => p.Key).FirstOrDefault(k => string.Equals(k, fieldName, StringComparison.OrdinalIgnoreCase));
+                        
+                        if (matchingKey != null && payloadObj[matchingKey] != null)
+                        {
+                            var fieldObj = payloadObj[matchingKey];
+                            if (fieldObj != null)
+                            {
+                                fieldObj["status"] = (int)dto.ReviewState;
+                                if (dto.CorrectedValue != null)
+                                {
+                                    fieldObj["normalizedValue"] = dto.CorrectedValue;
+                                }
+                                ocrResult.CanonicalDataJson = jObject.ToJsonString();
+                                updated = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore canonical JSON parsing errors
+            }
+        }
+
+        // 2. Update in Fields dict
+        var actualKey = ocrResult.Fields.Keys.FirstOrDefault(k => string.Equals(k, fieldName, StringComparison.OrdinalIgnoreCase));
+        if (actualKey != null)
+        {
+            var field = ocrResult.Fields[actualKey];
+            var updatedField = field with { ReviewState = dto.ReviewState, CorrectedValue = dto.CorrectedValue };
+            ocrResult.Fields[actualKey] = updatedField;
+            updated = true;
+        }
+        else if (updated)
+        {
+            // If it was found in CanonicalDataJson but not in Fields, add it to Fields so it syncs up
+            ocrResult.Fields[fieldName] = new Application.Abstractions.Ocr.OcrField {
+                Name = fieldName,
+                Value = dto.CorrectedValue ?? "",
+                Confidence = 1.0,
+                ReviewState = dto.ReviewState,
+                CorrectedValue = dto.CorrectedValue
+            };
+        }
+
+        if (!updated)
+            throw new KeyNotFoundException($"Campo {fieldName} no encontrado en el resultado OCR.");
 
         var updatedJson = System.Text.Json.JsonSerializer.Serialize(ocrResult, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
         document.UpdateOcrResult(updatedJson);

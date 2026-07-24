@@ -1,14 +1,19 @@
-# Task Plan: Debug Session
+# Debug Session: 404 Not Found on PATCH /fields/{fieldName}
 
-**ID**: debug-session
-**Symptom**: Dashboard Stats API returns 500/400 due to DB threading exception.
-`System.InvalidOperationException: A second operation was started on this context instance before a previous operation completed.`
-**File**: `src/backend/Infrastructure/Persistence/Repositories/DashboardRepository.cs`
+## Symptom
+`PATCH http://localhost:5000/api/projects/ecc3f121-f494-d477-6ce5-00069f8a27ab/documents/69173d16-d1c5-4966-82e2-52963c591cb0/fields/superficieM2` returned `404 (Not Found)`.
 
-## Pasos
+## Root Cause
+The backend parses the OCR JSON string into an `OcrResult` with a `Dictionary<string, OcrField> Fields`. Since it's deserialized by `System.Text.Json`, the dictionary keys keep the exact casing from the JSON (often PascalCase like `SuperficieM2`). The frontend passes `superficieM2` (camelCase).
+In `DocumentService.cs` line ~363, the code was doing a case-sensitive check:
+`if (!ocrResult.Fields.ContainsKey(fieldName))`
+which threw a `KeyNotFoundException`, returning a 404 to the frontend.
 
-- [x] PASO 0: Initialize planning files.
-- [x] PASO 1: Analyze logs and identify the root cause. (Found EF Core concurrency exception in DashboardRepository due to `Task.WhenAll`).
-- [x] PASO 2: Analyze the stack trace (ARQ protocol). The error is exactly at `DashboardRepository.cs:74`. It's a DB threading exception.
-- [x] PASO 3: Generate the fix (remove `Task.WhenAll`, await queries sequentially).
-- [ ] PASO 4: Update `progress.md` with BUG log.
+## Fix
+Changed the exact match lookup in `UpdateDocumentFieldReviewAsync` inside `DocumentService.cs` to use `FirstOrDefault(k => string.Equals(k, fieldName, StringComparison.OrdinalIgnoreCase))` to be resilient to casing differences between frontend and backend.
+
+## Status
+- [x] Analyze stack trace / behavior
+- [x] Fix applied to `DocumentService.cs`
+- [x] Tests run (`dotnet test` returned compilation errors in unrelated pre-existing tests).
+- [ ] Record in PWF progress (pending)

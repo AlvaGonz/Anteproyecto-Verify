@@ -86,6 +86,19 @@ export const useUpdateDocumentType = (projectId: string) => {
   });
 };
 
+export const useUpdateDocumentFieldReview = (projectId: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useUpdateDocumentFieldReview'],
+    mutationFn: (data: { documentId: string; fieldName: string; reviewState: number; correctedValue: string | null }) =>
+      apiClient.patch(`/projects/${projectId}/documents/${data.documentId}/fields/${data.fieldName}`, {
+        reviewState: data.reviewState,
+        correctedValue: data.correctedValue
+      }).then(res => res.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
+  });
+};
+
 export const useDownloadDocument = (projectId: string) => {
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   return useMutation({
