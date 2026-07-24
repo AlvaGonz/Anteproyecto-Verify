@@ -144,7 +144,10 @@ public class UsuarioRepository : IUsuarioRepository, Application.Features.Subscr
                         SoporteTipo = u.Titular.Plan.SoporteTipo,
                         AccesoApi = u.Titular.Plan.AccesoApi
                     } : null,
-                    NombreCompleto = u.Titular.NombreCompleto
+                    NombreCompleto = u.Titular.NombreCompleto,
+                    SubscriptionStatus = u.Titular.SubscriptionStatus,
+                    StripeSubscriptionId = u.Titular.StripeSubscriptionId,
+                    CancelAtPeriodEnd = u.Titular.CancelAtPeriodEnd
                 } : null,
                 IsManagedByStripe = !string.IsNullOrEmpty(u.StripeSubscriptionId),
                 NombreCompleto = u.NombreCompleto

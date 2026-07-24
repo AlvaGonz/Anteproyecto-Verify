@@ -66,6 +66,14 @@ namespace Application.Documents.Extractions
 
             var warnings = new List<string>();
 
+            if (extraction.DesignacionCatastralPosicional.Status == FieldStatus.Missing ||
+                extraction.Provincia.Status == FieldStatus.Missing ||
+                extraction.Municipio.Status == FieldStatus.Missing ||
+                extraction.SuperficieARegistrarParcelaM2.Status == FieldStatus.Missing)
+            {
+                extraction = extraction with { ExtractionStatus = ExtractionStatus.Incomplete };
+            }
+
             if (warnings.Any())
             {
                 extraction = extraction with { Warnings = warnings };

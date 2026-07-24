@@ -38,9 +38,11 @@ export interface CedulaRdExtractionV1 {
 import { z } from "zod";
 import { planoMensuraExtractionSchema } from "./schemas/planoMensura.schema";
 import { certificadoTituloExtractionSchema } from "./schemas/certificadoTitulo.schema";
+import { estadoJuridicoExtractionSchema } from "./schemas/estadoJuridico.schema";
 
 export type PlanoMensuraCatastralRdExtractionV1 = z.infer<typeof planoMensuraExtractionSchema>;
 export type CertificadoTituloRdExtractionV1 = z.infer<typeof certificadoTituloExtractionSchema>;
+export type EstadoJuridicoRdExtractionV1 = z.infer<typeof estadoJuridicoExtractionSchema>;
 
 export interface DocumentDto {
   id: string;
@@ -62,6 +64,7 @@ export interface DocumentDto {
   cedulaExtraction?: CedulaRdExtractionV1;
   certificadoTituloExtraction?: CertificadoTituloRdExtractionV1;
   planoMensuraExtraction?: PlanoMensuraCatastralRdExtractionV1;
+  estadoJuridicoExtraction?: EstadoJuridicoRdExtractionV1;
   resultadoOcrJson?: string;
   fileUrl?: string;
 }

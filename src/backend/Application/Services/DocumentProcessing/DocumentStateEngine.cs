@@ -70,6 +70,12 @@ public class DocumentStateEngine : IDocumentStateEngine
                 var envelope = new { schemaVersion = "1.0", documentType = "Cedula", payload = extraction };
                 ocrResult.CanonicalDataJson = JsonSerializer.Serialize(envelope, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             }
+            else if (document.TipoDocumento == DocumentType.CertificacionEstadoJuridico)
+            {
+                var extraction = Application.Documents.Extractions.EstadoJuridicoRdPaddleMapper.MapFromOcrResult(ocrResult);
+                var envelope = new { schemaVersion = "1.0", documentType = "EstadoJuridico", payload = extraction };
+                ocrResult.CanonicalDataJson = JsonSerializer.Serialize(envelope, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            }
 
             var options = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var enrichedJson = JsonSerializer.Serialize(ocrResult, options);

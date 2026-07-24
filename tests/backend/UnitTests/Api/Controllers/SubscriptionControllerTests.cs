@@ -44,10 +44,11 @@ namespace UnitTests.Api.Controllers
         }
 
         [Fact]
-        public async Task GetSessionStatus_WithMissingStripeKey_Returns500InternalServerError()
+        public async Task GetSessionStatus_WhenServiceThrows_Returns500InternalServerError()
         {
             // Arrange
-            _mockConfig.Setup(c => c["Stripe:SecretKey"]).Returns(string.Empty);
+            _mockSubscriptionService.Setup(s => s.GetSessionStatusAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("Stripe error"));
             
             // Act
             var result = await _controller.GetSessionStatus("cs_test_123", null, CancellationToken.None);

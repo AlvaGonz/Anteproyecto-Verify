@@ -301,10 +301,15 @@ public class GetMySubscriptionStatusQueryHandlerTests
         using var db = CreateDbContext();
         var plan = CreateProfesionalPlan(db);
         var user = CreateUser(db, plan, activeSubscription: true);
-        
-        // Set usage via reflection
-        typeof(Usuario).GetProperty(nameof(Usuario.ConsultasUsadas))!.SetValue(user, 10);
-        typeof(Usuario).GetProperty(nameof(Usuario.ProyectosCreados))!.SetValue(user, 3);
+        // Set usage by adding entities
+        for (int i = 0; i < 10; i++)
+        {
+            db.LogConsultas.Add(new global::Domain.Entities.LogConsulta(user.Id, true, "test"));
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            db.Proyectos.Add(new global::Domain.Entities.Proyecto("Test", "Test", user.Id));
+        }
         db.SaveChanges();
         
         var repository = CreateRepository(db);

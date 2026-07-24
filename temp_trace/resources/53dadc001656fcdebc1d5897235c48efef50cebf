@@ -1,0 +1,217 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: projects\estado-juridico-ocr.spec.ts >> Estado Jurídico OCR Extraction >> should display extracted OCR fields for Estado Jurídico
+- Location: e2e\projects\estado-juridico-ocr.spec.ts:29:3
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: locator('[data-testid="requirement-row-estado_juridico"]')
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('[data-testid="requirement-row-estado_juridico"]')
+
+```
+
+```yaml
+- link "VeriFinca VERIFINCA PORTAL ADMIN":
+  - /url: "#/admin/dashboard"
+  - img "VeriFinca"
+  - text: VERIFINCA PORTAL ADMIN
+- paragraph: Principal
+- navigation:
+  - link "Dashboard":
+    - /url: "#/admin/dashboard"
+  - link "Expedientes 99+":
+    - /url: "#/admin/projects"
+  - link "Reglas de Validacion":
+    - /url: "#/admin/rules"
+  - link "Logs de Auditoría":
+    - /url: "#/admin/audit-log"
+  - link "Configuracion":
+    - /url: "#/admin/settings"
+- link "NUEVO EXPEDIENTE":
+  - /url: "#/admin/projects/new"
+- link "Explorar Portal Público":
+  - /url: "#/projects"
+- button "Colapsar"
+- text: US
+- paragraph: Usuario
+- paragraph: Usuario
+- button "Cerrar Sesión"
+- banner:
+  - button "Ver notificaciones"
+- main:
+  - heading "Validación Integral" [level=1]
+  - paragraph: Revisa el estado de validación del expediente.
+  - link "Detalles del Proyecto":
+    - /url: "#/admin/projects/test-project-id/edit"
+  - link "Validación Integral":
+    - /url: "#/admin/projects/test-project-id/validations"
+  - link "Reportes y Auditoría":
+    - /url: "#/admin/projects/test-project-id/reports"
+  - button "Creado" [disabled]
+  - button "Editado"
+  - button "En Revisión" [disabled]
+  - button "Publicado" [disabled]
+  - button "Con Observaciones" [disabled]
+  - heading "Error en el Panel de Administración" [level=2]
+  - paragraph: Request failed with status code 400
+  - button "Volver al Dashboard"
+  - button "Eliminar Expediente"
+  - button "Cancelar"
+  - button "Guardar Proyecto" [disabled]
+- button "Open Tanstack query devtools":
+  - img
+```
+
+# Test source
+
+```ts
+  7   |         status: 200,
+  8   |         contentType: "application/json",
+  9   |         body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin User", role: "ADMIN" })
+  10  |       });
+  11  |     });
+  12  |     await page.route('**/api/v1/subscriptions/my-status', async (route) => {
+  13  |       await route.fulfill({
+  14  |         status: 200,
+  15  |         contentType: 'application/json',
+  16  |         body: JSON.stringify({
+  17  |           plan: 'Profesional',
+  18  |           subscriptionStatus: 'active',
+  19  |           planPrice: 0,
+  20  |           isGuest: false
+  21  |         })
+  22  |       });
+  23  |     });
+  24  |     await page.route("**/api/notifications*", async (route) => {
+  25  |       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) });
+  26  |     });
+  27  |   });
+  28  | 
+  29  |   test('should display extracted OCR fields for Estado Jurídico', async ({ page }) => {
+  30  |     // We will just mock the API responses for the documents to include our extraction.
+  31  | 
+  32  |     // Unified route for all project-related API calls
+  33  |     await page.route('**/api/v1/projects/**', async route => {
+  34  |       const url = route.request().url();
+  35  |       
+  36  |       if (url.includes('/documents')) {
+  37  |         const json = [
+  38  |           {
+  39  |             id: 'test-doc-id',
+  40  |             projectId: 'test-project-id',
+  41  |             documentType: 'CertificacionEstadoJuridico',
+  42  |             fileName: 'estado_juridico.pdf',
+  43  |             status: 'Verificado',
+  44  |             estadoJuridicoExtraction: {
+  45  |               extractionStatus: 2, // SUCCESS
+  46  |               documentType: 'EstadoJuridico',
+  47  |               matricula: {
+  48  |                 rawValue: '3000362328',
+  49  |                 confidence: 0.99,
+  50  |                 status: 0 // Match
+  51  |               },
+  52  |               designacionCatastral: {
+  53  |                 rawValue: '400508493108',
+  54  |                 confidence: 0.98,
+  55  |                 status: 0
+  56  |               },
+  57  |               isFreeOfLiens: true,
+  58  |               hasActiveOppositions: false,
+  59  |               fechaEmision: {
+  60  |                 rawValue: '16/07/2024',
+  61  |                 normalizedValue: '2024-07-16T00:00:00',
+  62  |                 confidence: 0.95,
+  63  |                 status: 0
+  64  |               }
+  65  |             }
+  66  |           }
+  67  |         ];
+  68  |         return route.fulfill({ json });
+  69  |       }
+  70  |       
+  71  |       if (url.includes('/validation-result')) {
+  72  |          return route.fulfill({ json: { internalValidation: null, externalSources: [] } });
+  73  |       }
+  74  |       if (url.includes('/findings')) {
+  75  |          return route.fulfill({ json: [] });
+  76  |       }
+  77  |       if (url.includes('/audit')) {
+  78  |          return route.fulfill({ json: [] });
+  79  |       }
+  80  |       if (url.includes('/status-eligibility')) {
+  81  |          return route.fulfill({ json: { documentCount: 1, hasObservaciones: false, currentStatus: "CREADO" } });
+  82  |       }
+  83  |       
+  84  |       // Project details - returning full schema to pass Zod validation
+  85  |       const json = {
+  86  |         id: 'test-project-id',
+  87  |         codigoInterno: 'PRJ-TEST-001',
+  88  |         nombre: 'Test Project',
+  89  |         ubicacionTexto: 'Santo Domingo',
+  90  |         categoria: 3, // Turistico to show estado_juridico
+  91  |         estadoJuridico: 1, // Valid
+  92  |         estadoProyecto: 'CREADO',
+  93  |         estadoIntegridad: 0,
+  94  |         usuarioCreadorId: 'user-001',
+  95  |         createdAtUtc: new Date().toISOString(),
+  96  |         matricula: '3000362328',
+  97  |         designacionCatastral: '400508493108'
+  98  |       };
+  99  |       await route.fulfill({ json });
+  100 |     });
+  101 | 
+  102 |     // Assume we can navigate directly to the validations page for this project
+  103 |     await page.goto('/#/admin/projects/test-project-id/validations');
+  104 | 
+  105 |     // Wait for the requirement row to be visible
+  106 |     const requirementRow = page.locator('[data-testid="requirement-row-estado_juridico"]');
+> 107 |     await expect(requirementRow).toBeVisible();
+      |                                  ^ Error: expect(locator).toBeVisible() failed
+  108 | 
+  109 |     // Click on the row to expand the accordion and see the extracted fields
+  110 |     // Assuming clicking the row expands it based on the Cédula implementation
+  111 |     await requirementRow.click();
+  112 | 
+  113 |     // Verify Matricula field
+  114 |     const matriculaField = page.locator('[data-testid="field-matricula"]');
+  115 |     await expect(matriculaField).toBeVisible();
+  116 |     await expect(matriculaField).toContainText('3000362328');
+  117 |     
+  118 |     // Verify Designación Catastral field
+  119 |     const designacionField = page.locator('[data-testid="field-designacionCatastral"]');
+  120 |     await expect(designacionField).toBeVisible();
+  121 |     await expect(designacionField).toContainText('400508493108');
+  122 | 
+  123 |     // Verify Free of Liens
+  124 |     const isFreeOfLiensField = page.locator('[data-testid="field-isFreeOfLiens"]');
+  125 |     await expect(isFreeOfLiensField).toBeVisible();
+  126 |     await expect(isFreeOfLiensField).toContainText('Libre de Cargas'); // Or whatever the UI displays for true
+  127 | 
+  128 |     // Verify Active Oppositions
+  129 |     const hasOppositionsField = page.locator('[data-testid="field-hasActiveOppositions"]');
+  130 |     await expect(hasOppositionsField).toBeVisible();
+  131 |     await expect(hasOppositionsField).toContainText('Sin Oposiciones'); // Or similar
+  132 | 
+  133 |     // Verify Fecha Emisión
+  134 |     const fechaEmisionField = page.locator('[data-testid="field-fechaEmision"]');
+  135 |     await expect(fechaEmisionField).toBeVisible();
+  136 |     await expect(fechaEmisionField).toContainText('16/07/2024');
+  137 |   });
+  138 | });
+  139 | 
+```

@@ -362,6 +362,7 @@ public class ProjectDocumentsController : ControllerBase
         Application.Documents.Extractions.CedulaRdExtractionV1? cedulaExtraction = null;
         Application.Documents.Extractions.CertificadoTituloRdExtractionV1? tituloExtraction = null;
         Application.Documents.Extractions.PlanoMensuraCatastralRdExtractionV1? mensuraExtraction = null;
+        Application.Documents.Extractions.EstadoJuridicoRdExtractionV1? estadoJuridicoExtraction = null;
 
         if (!string.IsNullOrEmpty(d.ResultadoOcrJson))
         {
@@ -391,6 +392,10 @@ public class ProjectDocumentsController : ControllerBase
                             {
                                 mensuraExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.PlanoMensuraCatastralRdExtractionV1>(payloadElement.GetRawText(), options);
                             }
+                            else if (docType == "EstadoJuridico")
+                            {
+                                estadoJuridicoExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.EstadoJuridicoRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
                         }
                     }
                     else
@@ -408,6 +413,10 @@ public class ProjectDocumentsController : ControllerBase
                         {
                             mensuraExtraction = Application.Documents.Extractions.PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
                         }
+                        else if (d.TipoDocumento == DocumentType.CertificacionEstadoJuridico)
+                        {
+                            estadoJuridicoExtraction = Application.Documents.Extractions.EstadoJuridicoRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        }
                     }
                 }
             }
@@ -420,7 +429,7 @@ public class ProjectDocumentsController : ControllerBase
         return new ValidationDocumentDto(
             d.Id, d.ProyectoId, d.TipoDocumento, d.NombreArchivoOriginal, d.ContentType, d.Extension,
             d.TamanoBytes, d.EstadoDocumento, d.Activo, d.Version, d.FechaEmision, d.InstitucionEmisora,
-            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction, mensuraExtraction
+            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction, mensuraExtraction, estadoJuridicoExtraction
         );
     }
 }

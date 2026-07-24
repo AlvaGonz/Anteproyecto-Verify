@@ -71,6 +71,7 @@ namespace Api.Tests.Projects
                     null,
                     Guid.NewGuid(),
                     null,
+                    "http://file-url",
                     DateTime.UtcNow,
                     null,
                     ocrResultJson
