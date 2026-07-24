@@ -184,6 +184,111 @@ public class ProjectService : IProjectService
         }
     }
 
+    public async Task InteresarProyectoAsync(Guid proyectoId, Guid usuarioInteresadoId, CancellationToken cancellationToken = default)
+    {
+        var proyecto = await _proyectoRepository.GetByIdAsync(proyectoId, cancellationToken);
+        if (proyecto == null) throw new NotFoundException($"Proyecto {proyectoId} no encontrado.");
+        if (proyecto.UsuarioCreadorId == usuarioInteresadoId) throw new BadRequestException("No puede interesarse en su propio proyecto.");
+
+        var existing = await _proyectoRepository.GetInteresAsync(proyectoId, usuarioInteresadoId, cancellationToken);
+        if (existing != null) return;
+
+        var interes = new ProyectoInteresado(proyectoId, proyecto.UsuarioCreadorId, usuarioInteresadoId);
+        await _proyectoRepository.AddInteresAsync(interes, cancellationToken);
+
+        var log = new LogProyecto(usuarioInteresadoId, proyectoId, "Interés registrado en el proyecto.");
+        await _proyectoRepository.AddLogProyectoAsync(log, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Send email notification without blocking
+        try
+        {
+            var creador = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
+            var interesado = await _usuarioRepository.GetByIdAsync(usuarioInteresadoId, cancellationToken);
+            if (creador != null && !string.IsNullOrWhiteSpace(creador.Email) && interesado != null)
+            {
+                await _emailNotificationService.SendInterestRegisteredAsync(creador.Email, proyecto, interesado.NombreCompleto, cancellationToken);
+            }
+        }
+        catch (Exception)
+        {
+            // Ignore email errors to prevent breaking the flow
+        }
+    }
+
+    public async Task GuardarProyectoAsync(Guid proyectoId, Guid usuarioGuardadorId, CancellationToken cancellationToken = default)
+    {
+        var proyecto = await _proyectoRepository.GetByIdAsync(proyectoId, cancellationToken);
+        if (proyecto == null) throw new NotFoundException($"Proyecto {proyectoId} no encontrado.");
+
+        var existing = await _proyectoRepository.GetGuardadoAsync(proyectoId, usuarioGuardadorId, cancellationToken);
+        if (existing != null) return;
+
+        var guardado = new ProyectoGuardado(proyectoId, proyecto.UsuarioCreadorId, usuarioGuardadorId);
+        await _proyectoRepository.AddGuardadoAsync(guardado, cancellationToken);
+
+        var log = new LogProyecto(usuarioGuardadorId, proyectoId, "Proyecto guardado en lista de seguimiento.");
+        await _proyectoRepository.AddLogProyectoAsync(log, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task QuitarGuardadoProyectoAsync(Guid proyectoId, Guid usuarioGuardadorId, CancellationToken cancellationToken = default)
+    {
+        var existing = await _proyectoRepository.GetGuardadoAsync(proyectoId, usuarioGuardadorId, cancellationToken);
+        if (existing == null) return;
+
+        _proyectoRepository.RemoveGuardado(existing);
+
+        var log = new LogProyecto(usuarioGuardadorId, proyectoId, "Proyecto removido de lista de guardados.");
+        await _proyectoRepository.AddLogProyectoAsync(log, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<dynamic>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        var misIntereses = await _proyectoRepository.GetInteresesByUsuarioAsync(usuarioId, cancellationToken);
+        var interesadosEnMisProyectos = await _proyectoRepository.GetInteresadosInUserProjectsAsync(usuarioId, cancellationToken);
+
+        var result = new List<dynamic>();
+
+        foreach (var i in misIntereses)
+        {
+            result.Add(new {
+                Tipo = "Mis Intereses",
+                ProyectoId = i.ProjectId,
+                NombreProyecto = i.Project.Nombre,
+                UsuarioId = i.CreatorId,
+                NombreUsuario = i.Project.UsuarioCreador.NombreCompleto,
+                AvatarUrl = i.Project.UsuarioCreador.AvatarUrl,
+                Fecha = i.CreatedAtUtc
+            });
+        }
+
+        foreach (var i in interesadosEnMisProyectos)
+        {
+            result.Add(new {
+                Tipo = "Interesados",
+                ProyectoId = i.ProjectId,
+                NombreProyecto = i.Project.Nombre,
+                UsuarioId = i.InterestedUserId,
+                NombreUsuario = i.InterestedUser.NombreCompleto,
+                AvatarUrl = i.InterestedUser.AvatarUrl,
+                Fecha = i.CreatedAtUtc
+            });
+        }
+
+        return result.OrderByDescending(x => x.Fecha);
+    }
+
+    public async Task<IEnumerable<ProyectoDto>> GetProyectosGuardadosAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        var guardados = await _proyectoRepository.GetGuardadosByUsuarioAsync(usuarioId, cancellationToken);
+        return guardados.Select(g => MapToDto(g.Project));
+    }
+
     private static ProyectoDto MapToDto(Proyecto proyecto)
     {
         ProjectRegistrantDto? registradoPor = null;

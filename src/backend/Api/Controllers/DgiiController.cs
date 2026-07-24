@@ -1,5 +1,6 @@
 namespace Api.Controllers;
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Persistence;
@@ -25,7 +26,7 @@ public class DgiiController : ControllerBase
             return BadRequest(new { message = "RNC is required." });
         }
 
-        var cleanedRnc = rnc.Replace("-", "").Replace(" ", "").Trim();
+        var cleanedRnc = new string(rnc.Where(char.IsDigit).ToArray());
 
         var record = await _context.DGII
             .FirstOrDefaultAsync(d => d.Rnc == cleanedRnc, cancellationToken);

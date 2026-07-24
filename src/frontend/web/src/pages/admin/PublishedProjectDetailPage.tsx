@@ -5,6 +5,11 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  Plus,
+  Minus,
+  Maximize,
   DollarSign,
   Building2,
   User,
@@ -18,9 +23,15 @@ import {
   Camera,
   AlertCircle,
   X,
+  Move,
+  Loader2,
 } from "lucide-react";
 import { useProject } from "../../features/projects/api/useProjects";
+import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
+import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
 import { IntegrityStatus } from "../../features/projects/types";
+import { useAuth } from "../../shared/context/AuthContext";
+import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -33,8 +44,10 @@ L.Icon.Default.mergeOptions({
 });
 
 const MiniMap: React.FC<{ lat: number; lng: number }> = ({ lat, lng }) => {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
@@ -43,8 +56,8 @@ const MiniMap: React.FC<{ lat: number; lng: number }> = ({ lat, lng }) => {
         zoom: 16,
         zoomControl: false,
         attributionControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
+        dragging: true,
+        scrollWheelZoom: true,
       });
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -64,7 +77,90 @@ const MiniMap: React.FC<{ lat: number; lng: number }> = ({ lat, lng }) => {
     };
   }, [lat, lng]);
 
-  return <div ref={mapRef} className="w-full h-full rounded-xl overflow-hidden" />;
+  const panMap = (dx: number, dy: number) => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.panBy([dx, dy]);
+    }
+  };
+
+  const changeZoom = (delta: number) => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setZoom(mapInstanceRef.current.getZoom() + delta);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (mapContainerRef.current) {
+      if (!document.fullscreenElement) {
+        mapContainerRef.current.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  return (
+    <div ref={mapContainerRef} className="relative w-full h-full overflow-hidden group bg-slate-100">
+      <div ref={mapRef} className="w-full h-full z-0" />
+      
+      {/* Map Controls */}
+      <div className="absolute right-4 bottom-4 z-10 flex gap-2">
+        {!showControls ? (
+          <button 
+            type="button" 
+            onClick={() => setShowControls(true)} 
+            className="w-8 h-8 bg-white/90 backdrop-blur rounded shadow-md flex items-center justify-center hover:bg-white transition-colors"
+            title="Mostrar controles del mapa"
+          >
+            <Move size={18} className="text-slate-700" />
+          </button>
+        ) : (
+          <div className="flex gap-2 items-center">
+            {/* Directional Pad */}
+            <div className="relative w-[72px] h-[72px]">
+              <button type="button" onClick={() => panMap(0, -50)} className="absolute top-0 left-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
+                <ChevronUp size={16} className="text-slate-700" />
+              </button>
+              <button type="button" onClick={() => panMap(-50, 0)} className="absolute top-1/2 left-0 -translate-y-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
+                <ChevronLeft size={16} className="text-slate-700" />
+              </button>
+              <button type="button" onClick={() => panMap(50, 0)} className="absolute top-1/2 right-0 -translate-y-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
+                <ChevronRight size={16} className="text-slate-700" />
+              </button>
+              <button type="button" onClick={() => panMap(0, 50)} className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
+                <ChevronDown size={16} className="text-slate-700" />
+              </button>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-slate-200 rounded-full" />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-1.5 justify-center ml-1">
+              <button type="button" onClick={() => changeZoom(1)} className="w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
+                <Plus size={16} className="text-slate-700" />
+              </button>
+              <button type="button" onClick={() => changeZoom(-1)} className="w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
+                <Minus size={16} className="text-slate-700" />
+              </button>
+              <button type="button" onClick={toggleFullscreen} className="w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform mt-0.5">
+                <Maximize size={14} className="text-slate-700" />
+              </button>
+            </div>
+            
+            {/* Close Controls Button */}
+            <button 
+              type="button" 
+              onClick={() => setShowControls(false)}
+              className="absolute -top-3 -right-3 w-6 h-6 bg-[#E63946] text-white rounded-full shadow-md flex items-center justify-center hover:bg-red-700 transition-colors z-20"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export const PublishedProjectDetailPage: React.FC = () => {
@@ -73,8 +169,34 @@ export const PublishedProjectDetailPage: React.FC = () => {
   const { data: project, isLoading, error } = useProject(id || "");
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isInterested, setIsInterested] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+  const { addToast } = useToast();
+  const [localSaved, setLocalSaved] = useState(false);
+  const [localInterested, setLocalInterested] = useState(false);
+
+  const { registerInterest, isRegisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
+  const { data: savedProjectsList } = useSavedProjects(isAuthenticated);
+  const { data: interestsList } = useInterests(isAuthenticated);
+
+  React.useEffect(() => {
+    if (isAuthenticated && savedProjectsList && id) {
+      setLocalSaved(savedProjectsList.some(p => p.id?.toLowerCase() === id.toLowerCase() || p.proyectoId?.toLowerCase() === id.toLowerCase()));
+    } else {
+      setLocalSaved(false);
+    }
+  }, [isAuthenticated, savedProjectsList, id]);
+
+  React.useEffect(() => {
+    if (isAuthenticated && interestsList && id) {
+      setLocalInterested(interestsList.some(i => i.id?.toLowerCase() === id.toLowerCase() || i.proyectoId?.toLowerCase() === id.toLowerCase()));
+    } else {
+      setLocalInterested(false);
+    }
+  }, [isAuthenticated, interestsList, id]);
+
+  const saved = localSaved;
+  const interested = localInterested;
 
   // Gather all available images
   const allImgs = [
@@ -87,7 +209,9 @@ export const PublishedProjectDetailPage: React.FC = () => {
     ...(project?.fotoUrls || []),
   ].filter(Boolean) as string[];
 
-  const uniqueImgs = Array.from(new Set(allImgs));
+  const uniqueImgs = allImgs.length > 0
+    ? Array.from(new Set(allImgs))
+    : [getDefaultProjectImage(project?.categoria as unknown as number)];
 
   // Parse GPS coordinates
   let gpsLat: number | null = null;
@@ -165,7 +289,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
         <div className="mt-4 md:mt-0 text-left md:text-right">
           <span className="text-2xl font-black text-slate-900">
             {project.valorEstimado
-              ? `RD$ ${project.valorEstimado.toLocaleString()}`
+              ? `RD$ ${project.valorEstimado.toLocaleString("es-DO")}`
               : "Valor no especificado"}
           </span>
         </div>
@@ -238,9 +362,51 @@ export const PublishedProjectDetailPage: React.FC = () => {
               </div>
               <button 
                 type="button"
-                className="bg-primary text-white text-xs font-bold px-4 py-2 rounded shadow-sm hover:bg-primary/90 transition-colors"
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate("/login");
+                    return;
+                  }
+                  if (!id) return;
+                  
+                  const isOwner = 
+                    user?.id?.toLowerCase() === project.usuarioCreadorId?.toLowerCase() || 
+                    (project.registradoPor?.id && user?.id?.toLowerCase() === project.registradoPor.id.toLowerCase());
+                    
+                  if (isOwner) {
+                    addToast("Esta acción no es posible porque usted es el vendedor de este proyecto", "error");
+                    return;
+                  }
+                  if (saved) {
+                    setLocalSaved(false);
+                    unsaveProject(id, {
+                      onError: () => setLocalSaved(true)
+                    });
+                  } else {
+                    setLocalSaved(true);
+                    saveProject(id, {
+                      onError: () => setLocalSaved(false)
+                    });
+                  }
+                }}
+                disabled={isSaving || isUnsaving}
+                className={`text-xs font-bold px-4 py-2 rounded shadow-sm transition-all duration-300 disabled:opacity-70 flex items-center gap-2 ${
+                  saved ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-[0_0_10px_rgba(5,150,105,0.4)]" : "bg-primary text-white hover:bg-primary/90"
+                }`}
               >
-                Guardar
+                {isSaving || isUnsaving ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Procesando...</span>
+                  </>
+                ) : saved ? (
+                  <>
+                    <CheckCircle2 size={14} />
+                    <span>Guardado</span>
+                  </>
+                ) : (
+                  <span>Guardar</span>
+                )}
               </button>
             </div>
           </div>
@@ -374,6 +540,11 @@ export const PublishedProjectDetailPage: React.FC = () => {
                 <span className="font-bold min-w-[60px]">Ubicación:</span> 
                 <span>{project.ubicacionTexto || "N/D"}</span>
               </li>
+              <li className="flex gap-2 items-start">
+                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                <span className="font-bold min-w-[60px]">Dirección:</span> 
+                <span>{project.registradoPor?.direccion || "N/D"}</span>
+              </li>
             </ul>
 
             {/* WhatsApp badges */}
@@ -392,12 +563,44 @@ export const PublishedProjectDetailPage: React.FC = () => {
             <div className="space-y-2 mb-6">
               <button 
                 type="button" 
-                onClick={() => setIsInterested(!isInterested)}
-                className={`w-full py-2.5 rounded text-sm font-bold transition-colors ${
-                  isInterested ? "bg-emerald-600 text-white" : "bg-[#E63946] text-white hover:bg-red-700"
-                }`}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate("/login");
+                    return;
+                  }
+                  if (!id) return;
+                  
+                  const isOwner = 
+                    user?.id?.toLowerCase() === project.usuarioCreadorId?.toLowerCase() || 
+                    (project.registradoPor?.id && user?.id?.toLowerCase() === project.registradoPor.id.toLowerCase());
+                    
+                  if (isOwner) {
+                    addToast("Esta acción no es posible porque usted es el vendedor de este proyecto", "error");
+                    return;
+                  }
+                  setLocalInterested(true);
+                  registerInterest(id, {
+                    onError: () => setLocalInterested(false)
+                  });
+                }}
+                disabled={isRegisteringInterest || interested}
+                className={`w-full py-2.5 rounded text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                  interested ? "bg-emerald-600 text-white shadow-[0_0_10px_rgba(5,150,105,0.4)]" : "bg-[#E63946] text-white hover:bg-red-700"
+                } disabled:opacity-70`}
               >
-                {isInterested ? "Interés Registrado" : "Contactar Responsable"}
+                {isRegisteringInterest ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Procesando...</span>
+                  </>
+                ) : interested ? (
+                  <>
+                    <CheckCircle2 size={16} />
+                    <span>Interés Registrado</span>
+                  </>
+                ) : (
+                  <span>Contactar Responsable</span>
+                )}
               </button>
               <button type="button" className="w-full bg-[#E63946] hover:bg-red-700 text-white py-2.5 rounded text-sm font-bold transition-colors">
                 Solicitar Validación
@@ -426,12 +629,13 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
       {/* Lightbox Modal via Portal */}
       {isLightboxOpen && uniqueImgs.length > 0 && createPortal(
-        <div className="fixed inset-0 z-[999999] flex flex-col bg-[#1a1a1a]">
+        <div className="fixed inset-0 z-[100000] flex flex-col bg-[#1a1a1a]">
           {/* Close Button */}
           <button
             type="button"
             onClick={() => setIsLightboxOpen(false)}
-            className="absolute top-4 right-4 z-50 bg-primary text-white p-2 hover:opacity-80 transition-opacity"
+            className="absolute top-6 right-6 z-[100001] bg-[#E63946] text-white p-3 rounded-full hover:bg-red-700 transition-transform hover:scale-110 shadow-lg"
+            title="Cerrar"
           >
             <X size={24} />
           </button>
@@ -443,9 +647,9 @@ export const PublishedProjectDetailPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : uniqueImgs.length - 1))}
-                className="absolute left-4 z-50 bg-primary text-white p-3 hover:opacity-80 transition-opacity"
+                className="absolute left-6 z-[100001] bg-primary text-white p-3 rounded-full hover:opacity-90 transition-transform hover:scale-110 shadow-lg"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={28} />
               </button>
             )}
 
@@ -461,23 +665,23 @@ export const PublishedProjectDetailPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedImageIndex((prev) => (prev < uniqueImgs.length - 1 ? prev + 1 : 0))}
-                className="absolute right-4 z-50 bg-primary text-white p-3 hover:opacity-80 transition-opacity"
+                className="absolute right-6 z-[100001] bg-primary text-white p-3 rounded-full hover:opacity-90 transition-transform hover:scale-110 shadow-lg"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={28} />
               </button>
             )}
           </div>
 
           {/* Bottom Thumbnails */}
           {uniqueImgs.length > 1 && (
-            <div className="h-28 bg-[#111111] p-4 flex gap-3 overflow-x-auto justify-center items-center shrink-0">
+            <div className="h-32 bg-[#0a0a0a] p-4 flex gap-3 overflow-x-auto justify-center items-center shrink-0 border-t border-white/10">
               {uniqueImgs.map((url, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => setSelectedImageIndex(i)}
-                  className={`relative h-full aspect-[4/3] shrink-0 overflow-hidden transition-all ${
-                    i === selectedImageIndex ? "border-2 border-primary scale-105" : "opacity-50 hover:opacity-100 border border-slate-700"
+                  className={`relative h-full aspect-[4/3] shrink-0 overflow-hidden rounded-md transition-all ${
+                    i === selectedImageIndex ? "border-2 border-primary scale-110 shadow-[0_0_15px_rgba(249,133,19,0.5)] z-10" : "opacity-40 hover:opacity-100 border border-slate-700"
                   }`}
                 >
                   <img src={url} alt="" className="w-full h-full object-cover" />

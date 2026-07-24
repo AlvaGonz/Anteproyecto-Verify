@@ -6,8 +6,12 @@ import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../fea
 import { Plus, Building, FileCheck, Activity } from "lucide-react";
 import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
 import { AdminPublishedProjectsView } from "./AdminPublishedProjectsView";
+import { AdminInterestsView } from "./AdminInterestsView";
+import { AdminSavedProjectsView } from "./AdminSavedProjectsView";
 import { toUtcDate } from "../../shared/utils/dates";
 import { useAuth } from "../../shared/context/AuthContext";
+
+type TabType = "proyectos" | "publicados" | "intereses" | "guardados";
 
 export const AdminProjectsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -15,8 +19,8 @@ export const AdminProjectsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
 
-  const initialTab = (searchParams.get('tab') as "proyectos" | "publicados") || "proyectos";
-  const [activeTab, setActiveTab] = useState<"proyectos" | "publicados">(initialTab);
+  const initialTab = (searchParams.get('tab') as TabType) || "proyectos";
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -80,11 +84,17 @@ export const AdminProjectsPage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1">
           <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight">
-            {activeTab === "publicados" ? "Navegación de Expedientes Publicados" : "Gestión de Expedientes"}
+            {activeTab === "publicados" ? "Navegación de Expedientes Publicados" :
+             activeTab === "intereses" ? "Mis Intereses y Solicitudes" :
+             activeTab === "guardados" ? "Proyectos Guardados" : "Gestión de Expedientes"}
           </h1>
           <p className="text-gray-500 text-sm font-medium">
             {activeTab === "publicados"
               ? "Analiza, investiga y consulta proyectos inmobiliarios en el mercado."
+              : activeTab === "intereses"
+              ? "Revisa quién está interesado en tus proyectos y aquellos en los que has mostrado interés."
+              : activeTab === "guardados"
+              ? "Accede rápidamente a los proyectos que has marcado para seguimiento."
               : "Administra, valida y audita la base de datos inmobiliaria institucional."}
           </p>
         </div>
@@ -99,15 +109,14 @@ export const AdminProjectsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Tabs: Proyectos / Proy. Publicados */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex overflow-x-auto border-b border-slate-200">
         <button
           type="button"
           onClick={() => {
             setActiveTab("proyectos");
             window.history.replaceState(null, '', '/#/admin/projects?tab=proyectos');
           }}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "proyectos"
+          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "proyectos"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"
             }`}
@@ -120,12 +129,38 @@ export const AdminProjectsPage: React.FC = () => {
             setActiveTab("publicados");
             window.history.replaceState(null, '', '/#/admin/projects?tab=publicados');
           }}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "publicados"
+          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "publicados"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"
             }`}
         >
           Proy. Publicados
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("intereses");
+            window.history.replaceState(null, '', '/#/admin/projects?tab=intereses');
+          }}
+          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "intereses"
+              ? "border-[#223382] text-[#223382]"
+              : "border-transparent text-slate-400 hover:text-slate-600"
+            }`}
+        >
+          Intereses
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("guardados");
+            window.history.replaceState(null, '', '/#/admin/projects?tab=guardados');
+          }}
+          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "guardados"
+              ? "border-[#223382] text-[#223382]"
+              : "border-transparent text-slate-400 hover:text-slate-600"
+            }`}
+        >
+          Proy. Guardados
         </button>
       </div>
 
@@ -149,8 +184,12 @@ export const AdminProjectsPage: React.FC = () => {
           updateStatus={updateStatus}
           deleteProject={deleteProject}
         />
-      ) : (
+      ) : activeTab === "publicados" ? (
         <AdminPublishedProjectsView />
+      ) : activeTab === "intereses" ? (
+        <AdminInterestsView />
+      ) : (
+        <AdminSavedProjectsView />
       )}
     </div>
   );

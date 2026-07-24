@@ -37,12 +37,32 @@ public class GlobalExceptionHandler : IExceptionHandler
             problemDetails.Status = StatusCodes.Status400BadRequest;
             problemDetails.Title = "Bad Request";
             problemDetails.Detail = exception.Message;
+            problemDetails.Type = "https://verifinca.do/errors/bad-request";
+        }
+        else if (exception is Application.Common.Exceptions.BadRequestException)
+        {
+            problemDetails.Status = StatusCodes.Status400BadRequest;
+            problemDetails.Title = "Bad Request";
+            problemDetails.Detail = exception.Message;
+            problemDetails.Type = "https://verifinca.do/errors/bad-request";
+        }
+        else if (exception is Application.Common.Exceptions.NotFoundException)
+        {
+            problemDetails.Status = StatusCodes.Status404NotFound;
+            problemDetails.Title = "Not Found";
+            problemDetails.Detail = exception.Message;
+            problemDetails.Type = "https://verifinca.do/errors/not-found";
         }
         else if (exception is Application.Common.Exceptions.QuotaExceededException)
         {
             problemDetails.Status = StatusCodes.Status402PaymentRequired;
             problemDetails.Title = "Quota Exceeded";
             problemDetails.Detail = exception.Message;
+            problemDetails.Type = "https://verifinca.do/errors/quota-exceeded";
+        }
+        else
+        {
+            problemDetails.Type = "https://verifinca.do/errors/internal-server-error";
         }
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;

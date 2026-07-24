@@ -16,4 +16,9 @@ public interface IProjectService
     Task<ProyectoDto> UpdateProjectAsync(Guid id, UpdateProyectoDto dto, CancellationToken cancellationToken = default);
     Task<ProyectoDto> UpdateProjectStatusAsync(Guid id, ProjectStatus status, CancellationToken cancellationToken = default);
     Task DeleteProjectAsync(Guid id, CancellationToken cancellationToken = default);
+    Task InteresarProyectoAsync(Guid proyectoId, Guid usuarioInteresadoId, CancellationToken cancellationToken = default);
+    Task GuardarProyectoAsync(Guid proyectoId, Guid usuarioGuardadorId, CancellationToken cancellationToken = default);
+    Task QuitarGuardadoProyectoAsync(Guid proyectoId, Guid usuarioGuardadorId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<dynamic>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProyectoDto>> GetProyectosGuardadosAsync(Guid usuarioId, CancellationToken cancellationToken = default);
 }

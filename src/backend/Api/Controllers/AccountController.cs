@@ -47,7 +47,7 @@ public class AccountController : ControllerBase
 
     private Guid GetCurrentUserId()
     {
-        var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (string.IsNullOrEmpty(idStr) || !Guid.TryParse(idStr, out var id))
             throw new UnauthorizedAccessException("Usuario no autenticado.");
         return id;

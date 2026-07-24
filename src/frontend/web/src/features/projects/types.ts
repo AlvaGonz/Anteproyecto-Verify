@@ -9,6 +9,7 @@ export interface ProjectRegistrant {
   fechaRegistro: string;
   verificado: boolean;
   titularId?: string | null;
+  direccion?: string | null;
 }
 
 export interface ProyectoDto {

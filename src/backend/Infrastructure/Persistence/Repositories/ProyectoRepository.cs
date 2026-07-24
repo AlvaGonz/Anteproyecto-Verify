@@ -99,35 +99,90 @@ public class ProyectoRepository : IProyectoRepository
     /// </summary>
     public async Task DeleteWithRelatedDataAsync(Guid proyectoId, CancellationToken cancellationToken = default)
     {
-        // 1. SellosIntegridad — Restrict on ProyectoId
-        var sellos = await _context.SellosIntegridad
-            .Where(s => s.ProyectoId == proyectoId)
-            .ToListAsync(cancellationToken);
-        _context.SellosIntegridad.RemoveRange(sellos);
+        var proyecto = await GetByIdAsync(proyectoId, cancellationToken);
+        if (proyecto == null) throw new KeyNotFoundException($"Proyecto {proyectoId} no encontrado.");
 
-        // 2. ResultadosCrediticios — Restrict on ProyectoId
-        var resultadosCrediticios = await _context.ResultadosCrediticios
-            .Where(r => r.ProyectoId == proyectoId)
-            .ToListAsync(cancellationToken);
-        _context.ResultadosCrediticios.RemoveRange(resultadosCrediticios);
+        var sellos = await _context.Set<SelloIntegridad>().Where(s => s.ProyectoId == proyectoId).ToListAsync(cancellationToken);
+        _context.Set<SelloIntegridad>().RemoveRange(sellos);
 
-        // 3. LogProyectos — Restrict on ProyectoId
-        var logs = await _context.LogProyectos
-            .Where(l => l.ProyectoId == proyectoId)
-            .ToListAsync(cancellationToken);
+        var rCrediticios = await _context.Set<ResultadoCrediticio>().Where(r => r.ProyectoId == proyectoId).ToListAsync(cancellationToken);
+        _context.Set<ResultadoCrediticio>().RemoveRange(rCrediticios);
+
+        var logs = await _context.LogProyectos.Where(l => l.ProyectoId == proyectoId).ToListAsync(cancellationToken);
         _context.LogProyectos.RemoveRange(logs);
 
-        // 4. Auditorias — Restrict on ProyectoId
-        var auditorias = await _context.Auditorias
-            .Where(a => a.ProyectoId == proyectoId)
-            .ToListAsync(cancellationToken);
+        var auditorias = await _context.Auditorias.Where(a => a.ProyectoId == proyectoId).ToListAsync(cancellationToken);
         _context.Auditorias.RemoveRange(auditorias);
 
-        // 5. Remove the project (Documentos, Validaciones, Hallazgos, Reportes cascade automatically)
-        var proyecto = await _context.Proyectos.FindAsync(new object[] { proyectoId }, cancellationToken);
-        if (proyecto == null)
-            throw new KeyNotFoundException($"Project with id {proyectoId} not found.");
+        var intereses = await _context.ProyectosInteresados.Where(i => i.ProjectId == proyectoId).ToListAsync(cancellationToken);
+        _context.ProyectosInteresados.RemoveRange(intereses);
+
+        var guardados = await _context.ProyectosGuardados.Where(g => g.ProjectId == proyectoId).ToListAsync(cancellationToken);
+        _context.ProyectosGuardados.RemoveRange(guardados);
 
         _context.Proyectos.Remove(proyecto);
+    }
+
+    public async Task AddInteresAsync(ProyectoInteresado interes, CancellationToken cancellationToken = default)
+    {
+        await _context.ProyectosInteresados.AddAsync(interes, cancellationToken);
+    }
+
+    public async Task AddGuardadoAsync(ProyectoGuardado guardado, CancellationToken cancellationToken = default)
+    {
+        await _context.ProyectosGuardados.AddAsync(guardado, cancellationToken);
+    }
+
+    public void RemoveGuardado(ProyectoGuardado guardado)
+    {
+        _context.ProyectosGuardados.Remove(guardado);
+    }
+
+    public async Task<ProyectoInteresado?> GetInteresAsync(Guid proyectoId, Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectosInteresados
+            .FirstOrDefaultAsync(i => i.ProjectId == proyectoId && i.InterestedUserId == usuarioId, cancellationToken);
+    }
+
+    public async Task<ProyectoGuardado?> GetGuardadoAsync(Guid proyectoId, Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectosGuardados
+            .FirstOrDefaultAsync(g => g.ProjectId == proyectoId && g.SaverId == usuarioId, cancellationToken);
+    }
+
+    public async Task<IEnumerable<ProyectoGuardado>> GetGuardadosByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectosGuardados
+            .Include(g => g.Project)
+                .ThenInclude(p => p.UsuarioCreador)
+            .Include(g => g.Project)
+                .ThenInclude(p => p.Estado)
+            .Where(g => g.SaverId == usuarioId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<ProyectoInteresado>> GetInteresesByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectosInteresados
+            .Include(i => i.Project)
+                .ThenInclude(p => p.UsuarioCreador)
+            .Include(i => i.InterestedUser)
+            .Where(i => i.InterestedUserId == usuarioId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<ProyectoInteresado>> GetInteresadosInUserProjectsAsync(Guid usuarioCreadorId, CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectosInteresados
+            .Include(i => i.Project)
+                .ThenInclude(p => p.UsuarioCreador)
+            .Include(i => i.InterestedUser)
+            .Where(i => i.CreatorId == usuarioCreadorId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task AddLogProyectoAsync(LogProyecto log, CancellationToken cancellationToken = default)
+    {
+        await _context.LogProyectos.AddAsync(log, cancellationToken);
     }
 }

@@ -19,5 +19,14 @@ public interface IProyectoRepository
     void Update(Proyecto proyecto);
     void Delete(Proyecto proyecto);
     Task DeleteWithRelatedDataAsync(Guid proyectoId, CancellationToken cancellationToken = default);
+    Task AddInteresAsync(ProyectoInteresado interes, CancellationToken cancellationToken = default);
+    Task AddGuardadoAsync(ProyectoGuardado guardado, CancellationToken cancellationToken = default);
+    void RemoveGuardado(ProyectoGuardado guardado);
+    Task<ProyectoInteresado?> GetInteresAsync(Guid proyectoId, Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<ProyectoGuardado?> GetGuardadoAsync(Guid proyectoId, Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProyectoGuardado>> GetGuardadosByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProyectoInteresado>> GetInteresesByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProyectoInteresado>> GetInteresadosInUserProjectsAsync(Guid usuarioCreadorId, CancellationToken cancellationToken = default);
+    Task AddLogProyectoAsync(LogProyecto log, CancellationToken cancellationToken = default);
 }
 

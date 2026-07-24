@@ -56,9 +56,21 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const identifier = slug || id || "";
   const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
   const error = fetchError ? (fetchError as Error).message : null;
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [isInterested, setIsInterested] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  
+  const { registerInterest, isRegisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
+  const { data: interestsList } = useInterests(isAuthenticated);
+  const { addToast } = useToast();
+
+  React.useEffect(() => {
+    if (isAuthenticated && interestsList && identifier) {
+      setIsInterested(interestsList.some(i => i.id?.toLowerCase() === identifier.toLowerCase() || i.proyectoId?.toLowerCase() === identifier.toLowerCase()));
+    } else {
+      setIsInterested(false);
+    }
+  }, [isAuthenticated, interestsList, identifier]);
 
   // ponytail: el usuario puede gestionar si es el creador directo, o si es el titular del grupo y el creador es su invitado
   const canManage = user && project && (
@@ -366,19 +378,35 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         {/* Me Interesa Button */}
                         <button
                           type="button"
-                          onClick={() => setIsInterested(prev => !prev)}
+                          disabled={isRegisteringInterest || isInterested}
+                          onClick={() => {
+                            if (!isAuthenticated) {
+                              addToast("Debe iniciar sesión para registrar su interés en el proyecto.", "info");
+                              return;
+                            }
+                            if (canManage) {
+                              addToast("Esta acción no es posible porque usted es el vendedor o representante de este proyecto.", "error");
+                              return;
+                            }
+                            setIsInterested(true);
+                            registerInterest(project.id, {
+                              onError: () => setIsInterested(false)
+                            });
+                          }}
                           className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
                             ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
                             : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
-                            }`}
+                            } disabled:opacity-70 disabled:cursor-not-allowed`}
                         >
-                          {!isInterested && (
+                          {!isInterested && !isRegisteringInterest && (
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                           )}
                           <span className="relative z-10 text-center leading-tight">
-                            {isInterested ? "El proyecto se ha guardado en tus registros" : "Me interesa el proyecto"}
+                            {isRegisteringInterest ? "Procesando..." : isInterested ? "El proyecto se ha guardado en tus registros" : "Me interesa el proyecto"}
                           </span>
-                          {isInterested ? (
+                          {isRegisteringInterest ? (
+                            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0 relative z-10" />
+                          ) : isInterested ? (
                             <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />
                           ) : (
                             <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />

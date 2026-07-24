@@ -252,31 +252,6 @@
 - [ ] Public endpoint changes for Precios page (BUG-005)
 
 ## ðŸ”„ Expanded Scope (Post-Audit â€” 2026-06-29)
-| New ID  | Item                                     | Priority | RF    | OE      |
-| ------- | ---------------------------------------- | -------- | ----- | ------- |
-| WBS-020 | Sello Digital endpoint + QR (Law 126-02) | P1       | RF-10 | OE-7    |
-| WBS-021 | Documentary Diagnosis UI + Rules Engine  | P1       | RF-2  | OE-1    |
-| TEC-011 | DataRetentionPurgeJob (30d/90d/7yr)      | P3       | RNF-5 | OE-6    |
-| TEC-012 | Availability monitoring + health checks  | P3       | RNF-3 | General |
-| TEC-013 | Load testing target with k6              | P3       | RNF-4 | General |
-
-**Audit findings resolved:** RF-2 gap, RF-10 gap, RNF-3/4/5 gaps, PERF-001 reclassified P1, OE traceability corrected, "47 requisitos" source clarified.
-
-> Updated: 2026-06-29T20:30:00-04:00 by DocWriter v1.0 (Post-Audit Patch â€” +5 items, 34 total)
-
-## ðŸ�› Resolved Bugs
-- **BUG-031:** 404 Not Found on `PATCH /api/projects/{projectId}/documents/{documentId}/type`.
-  - **Symptom:** Selecting a document in the dropdown or clicking delete triggers a PATCH request that returns `404 Not Found`.
-  - **Root Cause:** A previous agent added the `[HttpPatch("{documentId}/type")]` route to `ProjectDocumentsController.cs`, but the backend Docker container `api` was not rebuilt to compile and host the new route.
-  - **Fix:** Fixed by executing `docker compose build api` and `docker compose up -d api` to rebuild the backend API container, after which the endpoint became available and returned 401/200 properly.
-- **BUG-030:** 500 Error on Document Upload and missing validation states in UI.
-  - **Symptom:** Document uploads return 500 errors and the UI does not show explicit document processing states (Procesando/Verificado/Rechazado) or the uploaded file name.
-  - **Root Cause:** Backend error on upload and missing properties in UI components meant that state and filename were not passed down to the `RequirementUploadRow`.
-  - **Fix:** Fixed upload 500 error, updated `RequirementUploadRow` to accept `fileName` and `documentStatus`, added `ShieldCheck` UI icon for Verificado, and added Playwright/Vitest tests to cover the transitions.
-- **BUG-007:** 404 Not Found on `/api/auth/resend-verification`.
-  - **Symptom:** The new frontend `useResendVerificationEmail` mutation failed with `404 Not Found` despite the backend having the endpoint correctly implemented.
-  - **Root Cause:** `dotnet watch` inside the Docker container failed to hot-reload and compile the newly added `ResendVerificationEmail` namespace. The `Api` container was still running the older version without the endpoint mapped.
-  - **Fix:** Fixed by manually executing `dotnet build` inside the container or forcing a restart of the container to pick up the new files properly, which successfully compiled the `Api` layer.
 - **BUG-006:** HashRouter + Stripe `return_url` incompatibility. 
   - **Symptom:** `session_id` persists in URL after hard reset on checkout return page.
   - **Root Cause:** Stripe redirects to a regular URL which HashRouter misinterprets, preventing `CheckoutReturnPage` from routing and maintaining `session_id` in the real search params.
@@ -442,3 +417,10 @@
 - **UX-035:** OCR Review Panel should always be visible for uploaded documents, not just when OCR is complete.
   - **Symptom:** Users couldn't see the OCR panel if the document was missing `resultadoOcrJson`, making it seem like the feature was missing for unprocessed files.
   - **Fix:** Removed the conditional rendering `{doc.resultadoOcrJson && ...}` in both the public and admin document lists. Added a beautiful empty state to `OcrReviewPanel.tsx` that displays a "Validación Pendiente" message when the OCR JSON is null. E2E tests confirmed passing.
+-   * * B U G - 0 1 3 : * *   A d m i n S a v e d P r o j e c t s V i e w   n o t   r e n d e r i n g   s a v e d   p r o j e c t s   a n d   b u t t o n s   l a c k i n g   s t a t e s .  
+     -   * * S y m p t o m : * *   A d m i n S a v e d P r o j e c t s V i e w   d i s p l a y e d   a n   e m p t y   s t a t e   e v e n   a f t e r   s u c c e s s f u l l y   c r e a t i n g   s a v e d   p r o j e c t   r o w s   i n   D B .   T h e   s a v e   a n d   c o n t a c t   b u t t o n s   l a c k e d   l o a d i n g   a n i m a t i o n s   o r   v i s u a l   c o n f i r m a t i o n .  
+     -   * * R o o t   C a u s e : * *   A d m i n S a v e d P r o j e c t s V i e w   u s e d   ' n o m b r e P r o y e c t o '   i n s t e a d   o f   ' n o m b r e '   b a s e d   o n   t h e   P r o y e c t o D t o .   B u t t o n s   d i d n ' t   m a p   t h e   ' i s S a v i n g '   s t a t e   f r o m   r e a c t - q u e r y   o r   p r o v i d e   t o a s t   a l e r t s .  
+     -   * * F i x : * *   M a p p e d   t o   ' n o m b r e '   i n   f r o n t e n d ,   w i r e d   u p   l o a d i n g   s t a t e s   t o   ' d i s a b l e d ' ,   a d d e d   s t y l i n g   t r a n s i t i o n s   f o r   s u c c e s s e s ,   a n d   i n j e c t e d   T o a s t   c o m p o n e n t s .  
+ -   * * B U G - 0 1 4 : * *   ' P r o y e c t o I n t e r e s '   a n d   ' P r o y e c t o G u a r d a d o '   t a b l e s   n o t   c r e a t e d   p r o p e r l y   d u e   t o   D o c k e r   c a c h i n g   o l d   m i g r a t i o n   n a m e s .   R e n a m e d   t o   ' P r o y e c t o I n t e r e s e s '   a n d   ' P r o y e c t o s G u a r d a d o s ' .  
+ -   * * B U G - 0 1 5 : * *   A p p   c r a s h   ' C a n n o t   d e s t r u c t u r e   p r o p e r t y   b a s e n a m e '   w h e n   s h o w i n g   T o a s t s .   F i x e d   b y   r e m o v i n g   < L i n k >   f r o m   E r r o r B o u n d a r y .  
+ 

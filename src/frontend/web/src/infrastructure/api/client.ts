@@ -52,7 +52,7 @@ instance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
     
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== "/auth/refresh" && originalRequest.url !== "/auth/me" && !originalRequest.headers?.['X-Skip-Retry']) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== "/auth/refresh" && originalRequest.url !== "/auth/me" && originalRequest.url !== "/auth/logout" && !originalRequest.headers?.['X-Skip-Retry']) {
       if (isRefreshing) {
         return new Promise(function(resolve, reject) {
           failedQueue.push({ resolve, reject });
@@ -100,6 +100,9 @@ instance.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         setAccessToken(null);
+        // Hard delete cookies client-side as fallback to prevent 401 loops
+        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/api/auth/refresh;";
         window.dispatchEvent(new Event("auth:force-logout"));
         return Promise.reject(err);
       } finally {

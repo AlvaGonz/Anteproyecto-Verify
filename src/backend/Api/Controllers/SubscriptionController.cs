@@ -42,7 +42,7 @@ public class SubscriptionController : ControllerBase
             return BadRequest(new { message = "Validation failed", errors = validationResult.Errors.Select(e => e.ErrorMessage) });
         }
 
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (!Guid.TryParse(userIdString, out var userId))
             return Unauthorized();
 
@@ -72,7 +72,7 @@ public class SubscriptionController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetMySubscriptionStatus(CancellationToken ct)
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (!Guid.TryParse(userIdString, out var userId))
             return Unauthorized();
 
@@ -101,7 +101,7 @@ public class SubscriptionController : ControllerBase
         if (string.IsNullOrEmpty(finalSessionId))
             return BadRequest(new { message = "sessionId is required." });
 
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (string.IsNullOrEmpty(userIdString))
             return Unauthorized();
 
@@ -121,7 +121,7 @@ public class SubscriptionController : ControllerBase
     [Authorize]
     public async Task<IActionResult> CreatePortalSession(CancellationToken ct)
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (!Guid.TryParse(userIdString, out var userId))
             return Unauthorized();
 
@@ -142,7 +142,7 @@ public class SubscriptionController : ControllerBase
     [Authorize]
     public async Task<IActionResult> SyncSubscription(CancellationToken ct)
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (!Guid.TryParse(userIdString, out var userId))
             return Unauthorized();
 
@@ -225,7 +225,7 @@ public class SubscriptionController : ControllerBase
     [Authorize]
     public async Task<IActionResult> CancelSubscription(CancellationToken ct)
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
         try
@@ -244,7 +244,7 @@ public class SubscriptionController : ControllerBase
     [Authorize]
     public async Task<IActionResult> ReactivateSubscription(CancellationToken ct)
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
         try

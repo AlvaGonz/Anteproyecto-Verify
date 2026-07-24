@@ -8,4 +8,5 @@ public interface IEmailNotificationService
 {
     Task SendCriticalAlertAsync(string recipientEmail, AlertaValidacion alerta, CancellationToken ct = default);
     Task SendProjectStatusChangeAsync(string recipientEmail, Proyecto proyecto, CancellationToken ct = default);
+    Task SendInterestRegisteredAsync(string creatorEmail, Proyecto proyecto, string interestedUserName, CancellationToken ct = default);
 }

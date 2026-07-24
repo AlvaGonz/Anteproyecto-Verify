@@ -4,6 +4,10 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig, loadEnv} from 'vite';
 
+const apiTarget = process.env.DOCKER_CONTAINER === 'true'
+    ? 'http://api:8080'
+    : 'http://localhost:5000';
+
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
@@ -16,9 +20,16 @@ export default defineConfig(({mode}) => {
       dedupe: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâ€”file watching is disabled to prevent flickering during agent edits.
+      port: 3000,
+      host: process.env.NODE_ENV === 'development' ? '0.0.0.0' : 'localhost',
       hmr: process.env.DISABLE_HMR !== 'true',
+      proxy: {
+        '/api': {
+          target: apiTarget,
+          changeOrigin: false,
+          secure: false,
+        },
+      },
     },
     test: {
       environment: 'jsdom',

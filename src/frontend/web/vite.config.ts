@@ -31,7 +31,6 @@ export default defineConfig({
                 target: apiTarget,
                 changeOrigin: true,
                 secure: false,
-                cookieDomainRewrite: 'localhost',
                 configure: (proxy, _options) => {
                     proxy.on('error', (err, _req, _res) => {
                         console.log('proxy error', err);
