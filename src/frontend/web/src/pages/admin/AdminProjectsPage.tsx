@@ -45,15 +45,15 @@ export const AdminProjectsPage: React.FC = () => {
 
   const stats = {
     total: projects.length,
-    validated: projects.filter(p => p.estadoProyecto === ProjectStatus.Validated).length,
+    published: projects.filter(p => p.estadoProyecto === ProjectStatus.Published).length,
     pending: projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length
   };
 
   const totalValue = stats.total || 1;
   const metrics = [
     { label: "Total Proyectos", value: stats.total, icon: Building, color: "text-blue-600", bg: "bg-blue-50", barColor: "bg-blue-500", pct: 100 },
-    { label: "Validados (RD)", value: stats.validated, icon: FileCheck, color: "text-emerald-600", bg: "bg-emerald-50", barColor: "bg-emerald-500", pct: stats.total ? Math.round((stats.validated / totalValue) * 100) : 0 },
     { label: "En Revisión", value: stats.pending, icon: Activity, color: "text-indigo-600", bg: "bg-indigo-50", barColor: "bg-indigo-500", pct: stats.total ? Math.round((stats.pending / totalValue) * 100) : 0 },
+    { label: "Publicados", value: stats.published, icon: FileCheck, color: "text-emerald-600", bg: "bg-emerald-50", barColor: "bg-emerald-500", pct: stats.total ? Math.round((stats.published / totalValue) * 100) : 0 },
   ];
 
   const filtered = projects.filter((p) => {
@@ -74,7 +74,7 @@ export const AdminProjectsPage: React.FC = () => {
     }
 
     if (activeFilter === "all") return matchesSearch;
-    if (activeFilter === "validated") return matchesSearch && p.estadoProyecto === ProjectStatus.Validated;
+    if (activeFilter === "published") return matchesSearch && p.estadoProyecto === ProjectStatus.Published;
     if (activeFilter === "review") return matchesSearch && p.estadoProyecto === ProjectStatus.InReview;
     return matchesSearch;
   });
