@@ -28,6 +28,5 @@ export const planoMensuraExtractionSchema = z.object({
   municipio: extractedFieldSchema,
   seccion: extractedFieldSchema,
   lugar: extractedFieldSchema,
-  superficieARegistrarParcelaM2: extractedFieldSchema,
-  escala: extractedFieldSchema
+  superficieARegistrarParcelaM2: extractedFieldSchema
 });

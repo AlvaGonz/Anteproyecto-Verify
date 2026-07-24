@@ -19,8 +19,6 @@ public record EstadoJuridicoRdExtractionV1
     public ExtractedField VieneDe { get; init; } = new();
     public ExtractedField DeclaracionEstadoLegal { get; init; } = new();
     
-    public bool HasActiveOppositions { get; init; }
-    
     public List<string> Warnings { get; init; } = new();
     public string ProcessorName { get; init; } = "PaddleOCR";
     public string ProcessorVersion { get; init; } = "1.0";

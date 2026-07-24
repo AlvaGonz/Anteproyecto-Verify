@@ -44,8 +44,7 @@ namespace Api.Tests.Projects
                         ""normalizedValue"": null,
                         ""confidence"": 0.99,
                         ""status"": 0
-                    },
-                    ""hasActiveOppositions"": false
+                    }
                 }
             }";
 
@@ -93,7 +92,6 @@ namespace Api.Tests.Projects
 
             Assert.NotNull(doc.EstadoJuridicoExtraction);
             Assert.Equal("3000362328", doc.EstadoJuridicoExtraction!.Matricula.RawValue);
-            Assert.False(doc.EstadoJuridicoExtraction.HasActiveOppositions);
             Assert.Equal("EstadoJuridico", doc.EstadoJuridicoExtraction.DocumentType);
             Assert.Equal((ExtractionStatus)2, doc.EstadoJuridicoExtraction.ExtractionStatus);
         }

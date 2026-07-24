@@ -19,7 +19,5 @@ export const estadoJuridicoExtractionSchema = z.object({
   superficieMetrosCuadrados: extractedFieldSchema,
   designacionCatastral: extractedFieldSchema,
   vieneDe: extractedFieldSchema,
-  declaracionEstadoLegal: extractedFieldSchema,
-  
-  hasActiveOppositions: z.boolean()
+declaracionEstadoLegal: extractedFieldSchema
 });

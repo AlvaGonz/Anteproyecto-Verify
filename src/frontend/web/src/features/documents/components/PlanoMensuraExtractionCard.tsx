@@ -90,7 +90,6 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
         {renderField("Sección", extraction.seccion, false, "field-seccion")}
         {renderField("Lugar", extraction.lugar, false, "field-lugar")}
         {renderField("Superficie A. Regist.", extraction.superficieARegistrarParcelaM2, true, "field-superficie")}
-        {renderField("Escala", extraction.escala, false, "field-escala")}
       </div>
       
       {extraction.warnings && extraction.warnings.length > 0 && (

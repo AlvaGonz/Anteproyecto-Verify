@@ -88,14 +88,6 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         {renderField("Oficina", extraction.oficina, false, "field-oficina")}
         {renderField("Provincia", extraction.provincia, false, "field-provincia")}
         {renderField("Municipio", extraction.municipio, false, "field-municipio")}
-        <div className="flex flex-col p-3 rounded-lg bg-white border border-border/40 shadow-sm relative group" data-testid="field-hasActiveOppositions">
-          <span className="text-[9px] font-black uppercase tracking-widest text-text-secondary/70 mb-1">Oposiciones</span>
-          <div className="flex items-center justify-between gap-2">
-            <span className={`text-sm font-bold ${extraction.hasActiveOppositions ? 'text-error' : 'text-success'}`}>
-              {extraction.hasActiveOppositions ? 'Posee Oposiciones' : 'Sin Oposiciones'}
-            </span>
-          </div>
-        </div>
       </div>
       
       {extraction.warnings && extraction.warnings.length > 0 && (
