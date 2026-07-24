@@ -1,6 +1,7 @@
 namespace Infrastructure.Persistence.Repositories;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,15 @@ public class SelloIntegridadRepository : ISelloIntegridadRepository
             .Where(s => s.ProyectoId == proyectoId)
             .OrderByDescending(s => s.FechaEmisionUtc)
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<List<SelloIntegridad>> GetByProyectoIdsAsync(List<Guid> proyectoIds, CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<SelloIntegridad>()
+            .Where(s => proyectoIds.Contains(s.ProyectoId))
+            .GroupBy(s => s.ProyectoId)
+            .Select(g => g.OrderByDescending(s => s.FechaEmisionUtc).First())
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<SelloIntegridad?> GetByCodigoAsync(string codigoSello, CancellationToken cancellationToken = default)

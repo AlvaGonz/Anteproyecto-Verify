@@ -10,6 +10,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { OcrReviewPanel } from "./OcrReviewPanel";
+import { CedulaExtractionCard } from "./CedulaExtractionCard";
+import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
 
 interface ProjectDocumentsListProps {
   documents: DocumentDto[];
@@ -17,7 +19,7 @@ interface ProjectDocumentsListProps {
   onToggleStatus: (documentId: string, isActive: boolean) => Promise<void>;
 }
 
-const DOCUMENT_TYPE_NAMES: Record<number, string> = {
+const DOCUMENT_TYPE_NAMES: Record<string, string> = {
   [DocumentType.TITLE]: "Certificado de Título",
   [DocumentType.LEGAL_STATUS]: "Estado Jurídico",
   [DocumentType.SURVEY]: "Plano Mensura",
@@ -53,7 +55,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
 }) => {
   if (documents.length === 0) {
     return (
-      <div className="vf-card flex flex-col items-center justify-center py-20 text-center animate-fade-in group hover:border-dashed">
+      <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in group hover:border-dashed">
         <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/40 mb-6 group-hover:scale-110 transition-transform">
           <FileText className="w-10 h-10" />
         </div>
@@ -157,7 +159,12 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
             </div>
             {/* Include OCR Review Panel */}
             <div className="border-t border-[var(--color-border)]/10 bg-surface-container-lowest">
-              <OcrReviewPanel document={doc} />
+              {doc.tipoDocumento === DocumentType.ID 
+                ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
+                : (doc.tipoDocumento === DocumentType.CertificadoTitulo || doc.tipoDocumento === DocumentType.TITLE)
+                ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
+                : <OcrReviewPanel document={doc} />
+              }
             </div>
           </div>
         ))}

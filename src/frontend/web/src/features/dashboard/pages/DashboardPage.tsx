@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useDashboardStats } from "../api/useDashboardStats";
@@ -25,16 +25,17 @@ export const DashboardPage: React.FC = () => {
     }
   }, [location.state]);
 
-  const { data: projectsData, isLoading: loadingProjects } = useProjects();
+  const { data: projectsData, isLoading: loadingProjects } = useProjects({ enabled: !isAdmin });
   const { data: statsData, isLoading: loadingStats } = useDashboardStats();
 
   const loading = isAdmin ? loadingStats : loadingProjects;
 
-  let totalProjects = 0;
-  let inReview = 0;
-  let observed = 0;
-  let verified = 0;
-  let recentProjects: ProyectoRecienteDto[] = [];
+  const { totalProjects, inReview, observed, verified, recentProjects } = useMemo(() => {
+    let totalProjects = 0;
+    let inReview = 0;
+    let observed = 0;
+    let verified = 0;
+    let recentProjects: ProyectoRecienteDto[] = [];
 
   if (isAdmin && statsData) {
     totalProjects = statsData.totalProyectos || 0;
@@ -49,6 +50,7 @@ export const DashboardPage: React.FC = () => {
     verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
     recentProjects = [...projectsData]
       .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
+      .slice(0, 5)
       .map(p => ({
         fechaRegistro: p.createdAtUtc,
         nombre: p.nombre,
@@ -57,7 +59,10 @@ export const DashboardPage: React.FC = () => {
       }));
   }
 
-  const stats = [
+    return { totalProjects, inReview, observed, verified, recentProjects };
+  }, [isAdmin, statsData, projectsData]);
+
+  const stats = useMemo(() => [
     {
       name: "Total Proyectos",
       stat: loading ? "..." : totalProjects.toString(),
@@ -82,7 +87,7 @@ export const DashboardPage: React.FC = () => {
       icon: TrendingUp,
       bgColor: "bg-success",
     },
-  ];
+  ], [loading, totalProjects, inReview, observed, verified]);
 
   const recentSubscriptions = statsData?.suscripcionesRecientes || [];
 

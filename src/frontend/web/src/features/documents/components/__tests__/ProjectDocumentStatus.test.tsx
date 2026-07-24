@@ -3,6 +3,22 @@ import { describe, it, expect, vi } from "vitest";
 import { ProjectDocumentStatus } from "../ProjectDocumentStatus";
 import { DocumentStatus, DocumentType } from "../../types";
 import { ProjectCategory } from "../../../projects/types";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+    mutations: { retry: false },
+  },
+});
+
+const renderWithClient = (ui: React.ReactElement) => {
+  return render(
+    <QueryClientProvider client={queryClient}>
+      {ui}
+    </QueryClientProvider>
+  );
+};
 
 // Mock the hooks
 vi.mock("../../api/useDocuments", () => ({
@@ -20,7 +36,7 @@ describe("ProjectDocumentStatus", () => {
       error: null,
     } as any);
 
-    render(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
     expect(screen.getByText(/Auditoría Digital en curso.../i)).toBeInTheDocument();
   });
 
@@ -38,7 +54,7 @@ describe("ProjectDocumentStatus", () => {
       error: null,
     } as any);
 
-    render(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
     
     // Check if the filename is displayed
     expect(screen.getByText("titulo_original.pdf")).toBeInTheDocument();
@@ -60,7 +76,7 @@ describe("ProjectDocumentStatus", () => {
       error: null,
     } as any);
 
-    render(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
     
     // Check if the filename is displayed
     expect(screen.getByText("titulo_invalido.pdf")).toBeInTheDocument();

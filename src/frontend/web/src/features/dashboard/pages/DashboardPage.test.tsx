@@ -50,12 +50,7 @@ describe('DashboardPage', () => {
       pathname: '/admin/dashboard',
       state: {
         planJustActivated: true,
-        activatedPlan: {
-          label: 'Profesional',
-          queriesPerMonth: 10,
-          bgColor: 'bg-primary',
-          color: 'text-white'
-        }
+        activatedPlan: 'Profesional'
       }
     }]);
 

@@ -4,7 +4,6 @@ import { Menu } from "lucide-react";
 import { NotificationBell } from "../../../features/notifications/components/NotificationBell";
 
 interface HeaderProps {
-  title: string;
   onMenuClick?: () => void;
 }
 

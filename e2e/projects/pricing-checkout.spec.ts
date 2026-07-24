@@ -114,7 +114,7 @@ test.describe("Checkout Flow — E2E con Mock", () => {
     });
 
     // Now intercept /api/auth/me to simulate that the webhook HAS PROCESSED
-    await page.unroute("**/api/auth/me");
+    // Playwright route overrides the previous one; no need to unroute which can cause a race condition
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({
         status: 200,
@@ -142,7 +142,6 @@ test.describe("Checkout Flow — E2E con Mock", () => {
 
   test("SETTINGS — shows correct paid plan", async ({ page }) => {
     // Navigate straight to settings but mock the active subscription
-    await page.unroute("**/api/auth/me");
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({
         status: 200,

@@ -155,6 +155,7 @@ export const ProjectManagePage: React.FC = () => {
         isOpen={isLimitModalOpen}
         onClose={() => setIsLimitModalOpen(false)}
         onViewPlans={() => setIsPlansModalOpen(true)}
+        limitType="projects"
       />
 
       <PlansModal 

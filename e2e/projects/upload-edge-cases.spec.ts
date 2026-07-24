@@ -70,10 +70,19 @@ test.describe("Upload Edge Cases E2E", () => {
         body: JSON.stringify({ requirements: [], documents: [] })
       });
     });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/validation-result`, async (route) => {
+      await route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
+    });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/findings`, async (route) => {
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+    });
+    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/audit`, async (route) => {
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+    });
   });
 
   test("Shows an error message if the backend upload request fails", async ({ page }) => {
-    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/documents`);
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/validations`);
     
     // Wait for the requirement row
     const row = page.getByTestId("requirement-row-titulo");

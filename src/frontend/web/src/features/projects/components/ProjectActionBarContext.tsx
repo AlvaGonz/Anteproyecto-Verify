@@ -60,7 +60,7 @@ export const ProjectActionBarProvider: React.FC<{ children: React.ReactNode }> =
       {children}
       <dialog
         ref={deleteDialogRef}
-        className="rounded-2xl shadow-2xl max-w-md w-[90vw] p-0 border-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+        className="fixed inset-0 m-auto rounded-2xl shadow-2xl max-w-md w-[90vw] p-0 border-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm"
         aria-labelledby="delete-dialog-title"
       >
         <div className="p-8 space-y-5">

@@ -106,7 +106,7 @@ describe("projectsApi — READ", () => {
   it("getProjects — returns success with project list on 200", async () => {
     mockFetch(200, [MOCK_PROJECT]);
     const result = await projectsApi.getProjects();
-    expect(result).toMatchObject({ _tag: "Success", data: [MOCK_PROJECT] });
+    expect(result).toMatchObject({ _tag: "Success", value: [MOCK_PROJECT] });
   });
 
   it("getProjects — returns ServerError on non-200", async () => {
@@ -124,7 +124,7 @@ describe("projectsApi — READ", () => {
   it("getProjectById — returns success when project found", async () => {
     mockFetch(200, MOCK_PROJECT);
     const result = await projectsApi.getProjectById("proj-001");
-    expect(result).toMatchObject({ _tag: "Success", data: MOCK_PROJECT });
+    expect(result).toMatchObject({ _tag: "Success", value: MOCK_PROJECT });
   });
 
   it("getProjectById — returns NotFound on 404", async () => {
@@ -147,7 +147,7 @@ describe("projectsApi — CREATE", () => {
     const created = { ...MOCK_PROJECT, id: "proj-new", ...MOCK_CREATE_DTO };
     mockFetch(200, created);
     const result = await projectsApi.createProject(MOCK_CREATE_DTO);
-    expect(result).toMatchObject({ _tag: "Success", data: { id: "proj-new" } });
+    expect(result).toMatchObject({ _tag: "Success", value: { id: "proj-new" } });
     expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:5000/api/projects",
       expect.objectContaining({ method: "POST" })
@@ -177,7 +177,7 @@ describe("projectsApi — UPDATE", () => {
     const updated = { ...MOCK_PROJECT, ...MOCK_UPDATE_DTO };
     mockFetch(200, updated);
     const result = await projectsApi.updateProject("proj-001", MOCK_UPDATE_DTO);
-    expect(result).toMatchObject({ _tag: "Success", data: { nombre: "Proyecto Actualizado" } });
+    expect(result).toMatchObject({ _tag: "Success", value: { nombre: "Proyecto Actualizado" } });
     expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:5000/api/projects/proj-001",
       expect.objectContaining({ method: "PUT" })
@@ -196,7 +196,7 @@ describe("projectsApi — UPDATE", () => {
     const result = await projectsApi.updateProjectStatus("proj-001", ProjectStatus.InReview);
     expect(result).toMatchObject({
       _tag: "Success",
-      data: { estadoProyecto: ProjectStatus.InReview },
+      value: { estadoProyecto: ProjectStatus.InReview },
     });
     expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:5000/api/projects/proj-001/status",

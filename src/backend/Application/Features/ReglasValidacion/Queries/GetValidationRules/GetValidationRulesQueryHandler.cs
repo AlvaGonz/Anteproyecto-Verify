@@ -17,7 +17,7 @@ public class GetValidationRulesQueryHandler
 
     public async Task<IEnumerable<ReglaValidacionDto>> Handle(GetValidationRulesQuery request, CancellationToken cancellationToken)
     {
-        var reglas = await _repository.GetAllAsync(cancellationToken);
+        var reglas = await _repository.GetAllAsync(request.Page, request.PageSize, cancellationToken);
 
         return reglas.Select(r => new ReglaValidacionDto
         {

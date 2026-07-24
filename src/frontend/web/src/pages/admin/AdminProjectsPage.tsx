@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ProjectStatus } from "../../features/projects/types";
 import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
-import { Plus, Building, FileCheck, Activity } from "lucide-react";
+import { Plus, Building, FileCheck, Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
 import { AdminPublishedProjectsView } from "./AdminPublishedProjectsView";
 import { AdminInterestsView } from "./AdminInterestsView";
@@ -24,6 +24,8 @@ export const AdminProjectsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(50);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,7 +37,7 @@ export const AdminProjectsPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchParams]);
 
-  const { data: rawProjects = [], isLoading } = useProjects();
+  const { data: rawProjects = [], isLoading } = useProjects(page, pageSize);
   const projects = rawProjects;
 
   const [selectedStatuses, setSelectedStatuses] = useState<ProjectStatus[]>([]);
@@ -78,6 +80,10 @@ export const AdminProjectsPage: React.FC = () => {
     if (activeFilter === "review") return matchesSearch && p.estadoProyecto === ProjectStatus.InReview;
     return matchesSearch;
   });
+
+  const goToPage = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -183,6 +189,9 @@ export const AdminProjectsPage: React.FC = () => {
           metrics={metrics}
           updateStatus={updateStatus}
           deleteProject={deleteProject}
+          page={page}
+          pageSize={pageSize}
+          onPageChange={goToPage}
         />
       ) : activeTab === "publicados" ? (
         <AdminPublishedProjectsView />

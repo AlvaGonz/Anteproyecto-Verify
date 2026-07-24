@@ -207,17 +207,21 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false } },
 });
 
+import { ProjectActionBarProvider } from "../ProjectActionBarContext";
+
 const renderEdit = (id = "proj-photos-001") =>
   render(
     <MemoryRouter initialEntries={[`/admin/projects/${id}/edit`]}>
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
           <AuthProvider>
-            <Routes>
-              <Route path="/admin/projects/:id/edit" element={<ProjectManagePage />} />
-              <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
-              <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
-            </Routes>
+            <ProjectActionBarProvider>
+              <Routes>
+                <Route path="/admin/projects/:id/edit" element={<ProjectManagePage />} />
+                <Route path="/projects/:id" element={<div data-testid="project-detail">Detail</div>} />
+                <Route path="/admin/projects" element={<div data-testid="projects-list">List</div>} />
+              </Routes>
+            </ProjectActionBarProvider>
           </AuthProvider>
         </ToastProvider>
       </QueryClientProvider>

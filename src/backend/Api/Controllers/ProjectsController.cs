@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Application.Common.Exceptions;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Application.Abstractions.Storage;
 using Infrastructure.Persistence;
 
@@ -49,7 +50,10 @@ public class ProjectsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        CancellationToken cancellationToken = default)
     {
         if (User.Identity?.IsAuthenticated == true)
         {
@@ -59,23 +63,18 @@ public class ProjectsController : ControllerBase
                 var loggedInUser = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
                 if (loggedInUser != null)
                 {
-                    var projects = await _projectService.GetAllProjectsAsync(cancellationToken);
+                    var projects = await _projectService.GetAllProjectsAsync(page, pageSize, cancellationToken);
                     if (loggedInUser.Rol != UserRole.Administrator)
                     {
                         projects = projects.Where(p => p.UsuarioCreadorId == userId);
                     }
-                    
-                    // Log the consulta for authenticated users viewing project list
-                    var log = new LogConsulta(userId, true, "Consulta lista de proyectos");
-                    _dbContext.LogConsultas.Add(log);
-                    await _dbContext.SaveChangesAsync(cancellationToken);
                     
                     return Ok(projects);
                 }
             }
         }
 
-        var visibleProjects = await _projectService.GetVisibleProjectsAsync(cancellationToken);
+        var visibleProjects = await _projectService.GetVisibleProjectsAsync(page, pageSize, cancellationToken);
         return Ok(visibleProjects);
     }
 
@@ -89,15 +88,34 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
 
-        // Log the consulta for authenticated users viewing public projects
+        // Enforce consultation quota for authenticated users viewing public projects
         if (User.Identity?.IsAuthenticated == true)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
             if (Guid.TryParse(userIdClaim, out var userId))
             {
-                var log = new LogConsulta(userId, true, $"Consulta pública proyecto: {project.CodigoInterno}");
-                _dbContext.LogConsultas.Add(log);
-                await _dbContext.SaveChangesAsync(cancellationToken);
+                var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
+                if (user != null)
+                {
+                    // Read actual consultas count from LogConsultas for accurate quota check
+                    var consultasUsadas = await _dbContext.LogConsultas
+                        .CountAsync(lc => lc.UsuarioId == userId, cancellationToken);
+
+                    if (!SubscriptionTierPolicy.CanViewPublicProject(user, project.UsuarioCreadorId, consultasUsadas))
+                    {
+                        return StatusCode(402, new
+                        {
+                            error = "QUOTA_EXCEEDED",
+                            limitType = "MaxConsultas",
+                            message = "Has alcanzado el límite de consultas de tu plan actual. Mejora tu plan para continuar consultando proyectos."
+                        });
+                    }
+
+                    // Log the consulta for authenticated users viewing public projects
+                    var log = new LogConsulta(userId, true, $"Consulta pública proyecto: {project.CodigoInterno}");
+                    _dbContext.LogConsultas.Add(log);
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                }
             }
         }
 

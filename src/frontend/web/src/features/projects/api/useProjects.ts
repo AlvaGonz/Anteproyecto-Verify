@@ -6,6 +6,7 @@ import { ProjectCategory } from "../types";
 
 export const projectKeys = {
   all: ["projects"] as const,
+  list: (page?: number, pageSize?: number) => ["projects", "list", page, pageSize] as const,
   detail: (id: string) => ["projects", id] as const,
 };
 
@@ -37,28 +38,50 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   registradoPor: apiProj.registradoPor || null,
 });
 
-export const useProjects = () =>
+export const useProjects = (page = 1, pageSize = 50) =>
   useQuery({
-    queryKey: projectKeys.all,
-    queryFn: () => apiClient.get<ApiProyectoDto[]>("/projects").then(res => res.data.map(mapApiProject)),
+    queryKey: projectKeys.list(page, pageSize),
+    queryFn: () =>
+      apiClient
+        .get<ApiProyectoDto[]>("/projects", { params: { page, pageSize } })
+        .then((res) => res.data.map(mapApiProject)),
+    staleTime: 30_000,
+    gcTime: 5 * 60 * 1000,
   });
 
 export const useProject = (id: string) =>
   useQuery({
     queryKey: projectKeys.detail(id),
-    queryFn: () => apiClient.get<ApiProyectoDto>(`/projects/${id}`).then(res => mapApiProject(res.data)),
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get<ApiProyectoDto>(`/projects/${id}`);
+        return mapApiProject(response.data);
+      } catch (error: any) {
+        if (error.response?.status === 402 && error.response?.data?.error === "QUOTA_EXCEEDED") {
+          const quotaError = new Error("QUOTA_EXCEEDED") as any;
+          quotaError.limitType = error.response.data.limitType;
+          quotaError.message = error.response.data.message;
+          throw quotaError;
+        }
+        throw error;
+      }
+    },
     enabled: !!id,
+    staleTime: 60_000,
+    gcTime: 10 * 60 * 1000,
   });
 
 export const useCreateProject = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationKey: ['projectKeys'],
+    mutationKey: ["projects", "create"],
     mutationFn: (data: CreateProyectoDto) =>
-      apiClient.post<ApiProyectoDto>("/projects", {
-        ...data,
-        categoria: data.categoria ?? ProjectCategory.Residencial,
-      }).then(res => mapApiProject(res.data)),
+      apiClient
+        .post<ApiProyectoDto>("/projects", {
+          ...data,
+          categoria: data.categoria ?? ProjectCategory.Residencial,
+        })
+        .then((res) => mapApiProject(res.data)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: ["dashboardStats"] });
@@ -69,11 +92,13 @@ export const useCreateProject = () => {
 export const useUpdateProjectStatus = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationKey: ['updateProjectStatus'],
+    mutationKey: ["projects", "updateStatus"],
     mutationFn: ({ id, status }: { id: string; status: string }) =>
-      apiClient.patch<ApiProyectoDto>(`/projects/${id}/status`, JSON.stringify(status), {
-        headers: { 'Content-Type': 'application/json' }
-      }).then(res => mapApiProject(res.data)),
+      apiClient
+        .patch<ApiProyectoDto>(`/projects/${id}/status`, JSON.stringify(status), {
+          headers: { "Content-Type": "application/json" },
+        })
+        .then((res) => mapApiProject(res.data)),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: ["dashboardStats"] });
@@ -83,12 +108,11 @@ export const useUpdateProjectStatus = () => {
   });
 };
 
-
 export const useDeleteProject = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationKey: ['deleteProject'],
-    mutationFn: (id: string) => apiClient.delete(`/projects/${id}`).then(res => res.data),
+    mutationKey: ["projects", "delete"],
+    mutationFn: (id: string) => apiClient.delete(`/projects/${id}`).then((res) => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: ["dashboardStats"] });

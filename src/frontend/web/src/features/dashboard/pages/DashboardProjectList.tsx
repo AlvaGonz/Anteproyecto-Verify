@@ -10,7 +10,7 @@ export interface DashboardProjectListProps {
   recentProjects: ProyectoRecienteDto[];
 }
 
-export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ loading, recentProjects }) => {
+export const DashboardProjectList: React.FC<DashboardProjectListProps> = React.memo(({ loading, recentProjects }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(recentProjects.length / itemsPerPage);
@@ -145,4 +145,4 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = ({ load
     )}
   </m.div>
   );
-};
+});

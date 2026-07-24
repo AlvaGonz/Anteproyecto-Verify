@@ -28,6 +28,8 @@ export const usePublishedProjects = () =>
       apiClient
         .get<PublicProjectSearchResultDto[]>(`/public/projects/search`)
         .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO")),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
 export interface PublishedProjectFilters {
@@ -80,8 +82,6 @@ export function filterPublishedProjects(
     if (filters.latLng) {
       const match = filters.latLng.match(/([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+)/);
       if (match) {
-        const lat = parseFloat(match[1]);
-        const lng = parseFloat(match[2]);
         // Check if project's lat/lng is close (within ~10km)
         // We'll do this via provincia auto-assignment in the filter
       }

@@ -54,7 +54,7 @@ public class DuplicateDetectionTests
         _proyectoRepoMock.GetByIdAsync(targetProjectId, Arg.Any<CancellationToken>()).Returns(targetProject);
         
         var visibleProjects = new List<Proyecto> { targetProject, existingProject };
-        _proyectoRepoMock.GetVisibleAsync(Arg.Any<CancellationToken>()).Returns(visibleProjects);
+        _proyectoRepoMock.GetVisibleAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(visibleProjects);
 
         var command = new CheckDuplicateExpedienteCommand { ProyectoId = targetProjectId, UsuarioId = Guid.NewGuid() };
 
@@ -91,7 +91,7 @@ public class DuplicateDetectionTests
         _proyectoRepoMock.GetByIdAsync(targetProjectId, Arg.Any<CancellationToken>()).Returns(targetProject);
         
         var visibleProjects = new List<Proyecto> { targetProject, existingProject };
-        _proyectoRepoMock.GetVisibleAsync(Arg.Any<CancellationToken>()).Returns(visibleProjects);
+        _proyectoRepoMock.GetVisibleAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(visibleProjects);
 
         var command = new CheckDuplicateExpedienteCommand { ProyectoId = targetProjectId, UsuarioId = Guid.NewGuid() };
 
@@ -121,7 +121,7 @@ public class DuplicateDetectionTests
         _proyectoRepoMock.GetByIdAsync(targetProjectId, Arg.Any<CancellationToken>()).Returns(targetProject);
         
         var visibleProjects = new List<Proyecto> { targetProject };
-        _proyectoRepoMock.GetVisibleAsync(Arg.Any<CancellationToken>()).Returns(visibleProjects);
+        _proyectoRepoMock.GetVisibleAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(visibleProjects);
 
         var command = new CheckDuplicateExpedienteCommand { ProyectoId = targetProjectId, UsuarioId = Guid.NewGuid() };
 

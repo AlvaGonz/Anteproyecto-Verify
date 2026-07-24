@@ -254,6 +254,25 @@ public class DocumentService : IDocumentService
 
         document.UpdateType(dto.TipoDocumento);
 
+        // ponytail: re-apply OCR rules if raw OCR already exists to populate the new type's fields
+        if (!string.IsNullOrEmpty(document.ResultadoOcrJson))
+        {
+            try
+            {
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+                var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(document.ResultadoOcrJson, options);
+                if (ocrResult != null)
+                {
+                    document.UpdateStatus(DocumentStatus.Processing);
+                    _documentStateEngine.ApplyOcrResult(document, ocrResult);
+                }
+            }
+            catch
+            {
+                // Ignore parsing errors, continue with just the type update
+            }
+        }
+
         _documentoRepository.Update(document);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

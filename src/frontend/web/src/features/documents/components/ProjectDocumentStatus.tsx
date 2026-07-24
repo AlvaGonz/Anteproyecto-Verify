@@ -2,6 +2,9 @@ import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
 import { useDocuments, useDownloadDocument } from "../api/useDocuments";
 import { OcrReviewPanel } from "./OcrReviewPanel";
+import { CedulaExtractionCard } from "./CedulaExtractionCard";
+import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
+import { PlanoMensuraExtractionCard } from "./PlanoMensuraExtractionCard";
 import {
   AlertTriangle,
   Clock,
@@ -20,7 +23,7 @@ interface ProjectDocumentStatusProps {
   projectCategory?: ProjectCategory;
 }
 
-const DOCUMENT_INFO: Record<number, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
+const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
   [DocumentType.CertificadoTitulo]: { name: "Certificado de Título (Duplicado del Dueño)", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico + Cargas y Gravámenes", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
   [DocumentType.PlanosArquitectonicos]: { name: "Planos Arquitectónicos aprobados", entity: "Ayuntamiento / MOPC", norm: "Ley 687-00", categories: [1, 2, 3, 4, 99] },
@@ -55,12 +58,12 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
   );
 
   const requiredTypes = Object.entries(DOCUMENT_INFO)
-    .reduce<number[]>((acc, [key, info]) => {
-      if (info.categories.includes(projectCategory)) acc.push(Number(key));
+    .reduce<DocumentType[]>((acc, [key, info]) => {
+      if (info.categories.includes(projectCategory)) acc.push(Number(key) as DocumentType);
       return acc;
     }, []);
 
-  const uploadedDocs = documents.filter(d => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
+  const uploadedDocs = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
 
 
   const missingCount = requiredTypes.length - uploadedDocs.length;
@@ -68,11 +71,11 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     ? Math.round((uploadedDocs.length / requiredTypes.length) * 100)
     : 100;
 
-  const renderDocItem = (typeId: number, index: number) => {
+  const renderDocItem = (typeId: DocumentType, index: number) => {
     const info = DOCUMENT_INFO[typeId];
     if (!info) return null;
 
-    const doc = documents.find(d => d.tipoDocumento === typeId);
+    const doc = documents.find((d: any) => d.tipoDocumento === typeId);
     const isVerificado = doc?.estadoDocumento === DocumentStatus.Verificado || doc?.estadoDocumento === DocumentStatus.Valid;
     const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isVerificado;
     const isObservado = doc?.estadoDocumento === DocumentStatus.Observado;
@@ -135,7 +138,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
           <div className="flex items-center gap-4">
             {isVerificado && (
               <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-                VERIFICADO (OCR)
+                VERIFICADO
               </div>
             )}
             {isObservado && (
@@ -159,7 +162,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               </div>
             )}
 
-            {(isVerificado || isPending || isObservado) && doc?.id && (
+            {(isVerificado || isPending || isObservado) && doc?.id && doc.fileUrl && (
               <button
                 onClick={() => downloadDoc(doc.id)}
                 disabled={isDownloading}
@@ -171,7 +174,15 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             )}
           </div>
         </div>
-        {doc && <OcrReviewPanel document={doc} />}
+        {doc && (
+          doc.tipoDocumento === DocumentType.ID 
+            ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
+            : doc.tipoDocumento === DocumentType.CertificadoTitulo
+            ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
+            : doc.tipoDocumento === DocumentType.PlanoMensuraCatastral
+            ? (doc.planoMensuraExtraction ? <PlanoMensuraExtractionCard extraction={doc.planoMensuraExtraction} /> : null)
+            : <OcrReviewPanel document={doc} />
+        )}
       </m.div>
     );
   };

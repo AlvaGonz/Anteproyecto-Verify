@@ -45,7 +45,7 @@ public class CheckDuplicateExpedienteCommandHandlerTests
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);
             
-        _proyectoRepositoryMock.Setup(x => x.GetVisibleAsync(It.IsAny<CancellationToken>()))
+        _proyectoRepositoryMock.Setup(x => x.GetVisibleAsync(1, 500, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Proyecto> { project });
 
         var command = new CheckDuplicateExpedienteCommand { ProyectoId = projectId, UsuarioId = userId };

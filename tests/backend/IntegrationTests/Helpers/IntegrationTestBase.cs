@@ -64,6 +64,7 @@ public abstract class IntegrationTestBase : IClassFixture<VeriFincaWebFactory>
         if (user == null) throw new Exception($"User with id {registerData.UsuarioId} not found");
 
         user.AsignarPlan(plan.Idsuscripcion);
+        user.UpdateStripeSubscription(null, null, "active", DateTime.UtcNow.AddYears(1));
         var verificado = user.VerificarEmail(user.TokenVerificacion!);
         if (!verificado) throw new Exception($"Failed to verify email. Token: {user.TokenVerificacion}");
         await db.SaveChangesAsync();

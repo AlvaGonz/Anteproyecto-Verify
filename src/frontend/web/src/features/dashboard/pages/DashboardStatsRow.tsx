@@ -12,7 +12,7 @@ export interface DashboardStatsRowProps {
   stats: StatItem[];
 }
 
-export const DashboardStatsRow: React.FC<DashboardStatsRowProps> = ({ stats }) => (
+export const DashboardStatsRow: React.FC<DashboardStatsRowProps> = React.memo(({ stats }) => (
   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
     {stats.map((item, idx) => (
       <m.div
@@ -41,4 +41,4 @@ export const DashboardStatsRow: React.FC<DashboardStatsRowProps> = ({ stats }) =
       </m.div>
     ))}
   </div>
-);
+));

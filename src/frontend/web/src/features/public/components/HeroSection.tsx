@@ -36,8 +36,7 @@ export const HeroSection: React.FC = () => {
           className="w-full h-full object-cover opacity-40 mix-blend-multiply transition-all duration-1000 z-0 scale-110"
           poster="/media/verifinca_institutional.png"
         >
-          <source src="/media/landing_Sketch_to_finished_202604121407.webm" type="video/webm" />
-          <source src="/media/landing_Sketch_to_finished_202604121407.optimized.mp4" type="video/mp4" />
+          <source src="/media/landing_compressed_hd.webm" type="video/webm" />
         </video>
       </div>
 

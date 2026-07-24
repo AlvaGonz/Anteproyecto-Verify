@@ -24,8 +24,6 @@ namespace Infrastructure.Persistence.Repositories
 
             var totalUsuarios = await activeUsersQuery.CountAsync(cancellationToken);
             var suscripcionesActivas = await activeUsersQuery.CountAsync(u => u.PlanSuscripcionId != null && u.TitularId == null, cancellationToken);
-            
-            // Just an estimation logic
             var ingresosMensualesEstimados = await activeUsersQuery
                 .Include(u => u.Plan)
                 .Where(u => u.PlanSuscripcionId != null && u.Plan != null && u.TitularId == null)
@@ -70,7 +68,7 @@ namespace Infrastructure.Persistence.Repositories
                 .GroupBy(u => u.TitularId != null ? "Invitado" : (u.Plan != null ? u.Plan.NombrePlan : "Gratuito"))
                 .Select(g => new { Plan = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);
-                
+
             var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
 
             return new DashboardStatsDto

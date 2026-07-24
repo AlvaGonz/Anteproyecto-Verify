@@ -58,16 +58,17 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<DocumentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ValidationDocumentDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProjectDocuments(Guid projectId)
     {
         var documents = await _documentService.GetProjectDocumentsAsync(projectId);
-        return Ok(documents);
+        var safeDocs = documents.Select(MapToValidationDto);
+        return Ok(safeDocs);
     }
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UploadDocument(
@@ -82,7 +83,7 @@ public class ProjectDocumentsController : ControllerBase
             return BadRequest("El archivo es requerido y no puede estar vacío.");
 
         // Basic validation (can be moved to a validator or options pattern)
-        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".webp" };
         var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
         if (Array.IndexOf(allowedExtensions, extension) < 0)
             return BadRequest("Tipo de archivo no permitido.");
@@ -114,7 +115,7 @@ public class ProjectDocumentsController : ControllerBase
                 file.Length
             );
 
-            return CreatedAtAction(nameof(GetProjectDocuments), new { projectId }, document);
+            return CreatedAtAction(nameof(GetProjectDocuments), new { projectId }, MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -124,19 +125,19 @@ public class ProjectDocumentsController : ControllerBase
 
     [HttpPost("/api/v1/projects/{projectId}/documents/requirements/{requirementCode}/upload")]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UploadRequirementDocument(
         Guid projectId,
         string requirementCode,
-        IFormFile file)
+        [FromForm] IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("El archivo es requerido y no puede estar vacío.");
 
         // Validaciones básicas de archivo (reutilizando la lógica existente)
-        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".webp" };
         var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
         if (Array.IndexOf(allowedExtensions, extension) < 0)
             return BadRequest("Tipo de archivo no permitido.");
@@ -207,7 +208,7 @@ public class ProjectDocumentsController : ControllerBase
             );
 
             // Devolver Created, con ubicación a la lista o descarga
-            return Created($"/api/projects/{projectId}/documents/{document.Id}/download", document);
+            return Created($"/api/projects/{projectId}/documents/{document.Id}/download", MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -244,14 +245,14 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpPatch("{documentId}/status")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDocumentStatus(Guid projectId, Guid documentId, [FromBody] UpdateDocumentStatusDto dto)
     {
         try
         {
             var document = await _documentService.UpdateDocumentStatusAsync(documentId, dto);
-            return Ok(document);
+            return Ok(MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -260,14 +261,14 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpPatch("{documentId}/type")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDocumentType(Guid projectId, Guid documentId, [FromBody] UpdateDocumentTypeDto dto)
     {
         try
         {
             var document = await _documentService.UpdateDocumentTypeAsync(documentId, dto);
-            return Ok(document);
+            return Ok(MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -276,7 +277,7 @@ public class ProjectDocumentsController : ControllerBase
     }
 
     [HttpPatch("{documentId}/fields/{fieldName}")]
-    [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateDocumentFieldReview(Guid projectId, Guid documentId, string fieldName, [FromBody] UpdateDocumentFieldReviewDto dto)
@@ -284,7 +285,7 @@ public class ProjectDocumentsController : ControllerBase
         try
         {
             var document = await _documentService.UpdateDocumentFieldReviewAsync(documentId, fieldName, dto);
-            return Ok(document);
+            return Ok(MapToValidationDto(document));
         }
         catch (KeyNotFoundException ex)
         {
@@ -354,5 +355,81 @@ public class ProjectDocumentsController : ControllerBase
         {
             return BadRequest(new { errors = ex.Errors.Select(e => e.ErrorMessage) });
         }
+    }
+
+    private ValidationDocumentDto MapToValidationDto(DocumentDto d)
+    {
+        Application.Documents.Extractions.CedulaRdExtractionV1? cedulaExtraction = null;
+        Application.Documents.Extractions.CertificadoTituloRdExtractionV1? tituloExtraction = null;
+        Application.Documents.Extractions.PlanoMensuraCatastralRdExtractionV1? mensuraExtraction = null;
+        Application.Documents.Extractions.EstadoJuridicoRdExtractionV1? estadoJuridicoExtraction = null;
+
+        if (!string.IsNullOrEmpty(d.ResultadoOcrJson))
+        {
+            try
+            {
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+                var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(d.ResultadoOcrJson, options);
+                if (ocrResult != null)
+                {
+                    if (!string.IsNullOrEmpty(ocrResult.CanonicalDataJson))
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(ocrResult.CanonicalDataJson);
+                        var root = doc.RootElement;
+                        if (root.TryGetProperty("documentType", out var typeElement))
+                        {
+                            var docType = typeElement.GetString();
+                            var payloadElement = root.GetProperty("payload");
+                            if (docType == "Cedula")
+                            {
+                                cedulaExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.CedulaRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
+                            else if (docType == "CertificadoTitulo")
+                            {
+                                tituloExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.CertificadoTituloRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
+                            else if (docType == "PlanoMensuraCatastral")
+                            {
+                                mensuraExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.PlanoMensuraCatastralRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
+                            else if (docType == "EstadoJuridico")
+                            {
+                                estadoJuridicoExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.EstadoJuridicoRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Fallback for older documents that didn't persist CanonicalDataJson
+                        if (d.TipoDocumento == DocumentType.ID)
+                        {
+                            cedulaExtraction = Application.Documents.Extractions.CedulaExtractionMapper.MapFromOcrResult(ocrResult);
+                        }
+                        else if (d.TipoDocumento == DocumentType.CertificadoTitulo || d.TipoDocumento == DocumentType.TITLE)
+                        {
+                            tituloExtraction = Application.Documents.Extractions.CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        }
+                        else if (d.TipoDocumento == DocumentType.PlanoMensuraCatastral)
+                        {
+                            mensuraExtraction = Application.Documents.Extractions.PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        }
+                        else if (d.TipoDocumento == DocumentType.CertificacionEstadoJuridico)
+                        {
+                            estadoJuridicoExtraction = Application.Documents.Extractions.EstadoJuridicoRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore serialization errors to gracefully degrade
+            }
+        }
+
+        return new ValidationDocumentDto(
+            d.Id, d.ProyectoId, d.TipoDocumento, d.NombreArchivoOriginal, d.ContentType, d.Extension,
+            d.TamanoBytes, d.EstadoDocumento, d.Activo, d.Version, d.FechaEmision, d.InstitucionEmisora,
+            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction, mensuraExtraction, estadoJuridicoExtraction
+        );
     }
 }

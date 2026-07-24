@@ -42,3 +42,4 @@ Object.defineProperty(window, 'sessionStorage', {
   writable: true
 });
 
+window.HTMLElement.prototype.scrollIntoView = vi.fn();

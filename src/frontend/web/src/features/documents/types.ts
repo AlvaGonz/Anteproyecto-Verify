@@ -1,3 +1,49 @@
+export enum ExtractionStatus {
+  Queued = 0,
+  Processing = 1,
+  Completed = 2,
+  Incomplete = 3,
+  Failed = 4
+}
+
+export enum FieldStatus {
+  Valid = 0,
+  Missing = 1,
+  Malformed = 2,
+  LowConfidence = 3
+}
+
+export interface ExtractedField {
+  rawValue: string;
+  normalizedValue: string;
+  confidence: number;
+  status: FieldStatus;
+  sourcePage: number;
+}
+
+export interface CedulaRdExtractionV1 {
+  schemaVersion: string;
+  documentType: string;
+  extractionStatus: ExtractionStatus;
+  overallConfidence: number;
+  cedulaNumber: ExtractedField;
+  firstNames: ExtractedField;
+  lastNames: ExtractedField;
+  birthDate: ExtractedField;
+  expiryDate: ExtractedField;
+  warnings: string[];
+  processorName: string;
+  processorVersion: string;
+}
+import { z } from "zod";
+import { planoMensuraExtractionSchema } from "./schemas/planoMensura.schema";
+import { certificadoTituloExtractionSchema } from "./schemas/certificadoTitulo.schema";
+import { estadoJuridicoExtractionSchema } from "./schemas/estadoJuridico.schema";
+
+export type PlanoMensuraCatastralRdExtractionV1 = z.infer<typeof planoMensuraExtractionSchema>;
+export type CertificadoTituloRdExtractionV1 = z.infer<typeof certificadoTituloExtractionSchema>;
+export type EstadoJuridicoRdExtractionV1 = z.infer<typeof estadoJuridicoExtractionSchema>;
+
 export interface DocumentDto {
   id: string;
   proyectoId: string;
@@ -15,8 +61,12 @@ export interface DocumentDto {
   observaciones?: string;
   createdAtUtc: string;
   updatedAtUtc?: string;
-  fileUrl: string;
+  cedulaExtraction?: CedulaRdExtractionV1;
+  certificadoTituloExtraction?: CertificadoTituloRdExtractionV1;
+  planoMensuraExtraction?: PlanoMensuraCatastralRdExtractionV1;
+  estadoJuridicoExtraction?: EstadoJuridicoRdExtractionV1;
   resultadoOcrJson?: string;
+  fileUrl?: string;
 }
 
 export enum DocumentType {

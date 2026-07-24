@@ -22,6 +22,9 @@ interface AdminProjectsPageLayoutProps {
   metrics: Array<{ label: string; value: number; icon: React.ComponentType<any>; color: string; bg: string; barColor: string; pct: number }>;
   updateStatus: (params: { id: string; status: ProjectStatus }) => void;
   deleteProject: (id: string) => void;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
 }
 
 export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = ({
@@ -42,6 +45,9 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
   metrics,
   updateStatus,
   deleteProject,
+  page,
+  pageSize,
+  onPageChange,
 }) => {
   return (
     <div className="space-y-6">
@@ -67,6 +73,9 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
         setOpenMenuId={setOpenMenuId}
         updateStatus={updateStatus}
         deleteProject={deleteProject}
+        page={page}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
       />
     </div>
   );

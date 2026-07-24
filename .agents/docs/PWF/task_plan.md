@@ -1,15 +1,14 @@
-# debug-session
+# Task Plan: Debug Session
 
-## Symptom
-`GET http://localhost:5000/api/projects/{id}/reports/public` returns 404 Not Found when accessed from the public project detail page via `usePublicReport` hook.
+**ID**: debug-session
+**Symptom**: Dashboard Stats API returns 500/400 due to DB threading exception.
+`System.InvalidOperationException: A second operation was started on this context instance before a previous operation completed.`
+**File**: `src/backend/Infrastructure/Persistence/Repositories/DashboardRepository.cs`
 
-## Arch/Root Cause Analysis
-The frontend hook `usePublicReport` calls `/api/projects/{projectId}/reports/public` but this endpoint was missing in the backend controllers. `ReportsController.cs` and `ProjectReportsController.cs` defined `/api/projects/{projectId}/reports` and related POST actions, but no GET for `public`. The backend had the handler `GetPublicProjectReportQueryHandler` but it wasn't exposed via an endpoint.
+## Pasos
 
-## Steps
-- [x] Analizar el stack trace y ubicar controlador.
-- [x] Revisar `api/projects/{id}/reports/public` (faltaba el endpoint completo en el controlador).
-- [x] Fix específico en el archivo backend (`ReportsController.cs`).
-- [x] Ejecutar lint/build (Backend build succeeded).
-- [ ] Reiniciar contenedor de la API (en proceso).
-- [ ] Actualizar BUG log en `progress.md`.
+- [x] PASO 0: Initialize planning files.
+- [x] PASO 1: Analyze logs and identify the root cause. (Found EF Core concurrency exception in DashboardRepository due to `Task.WhenAll`).
+- [x] PASO 2: Analyze the stack trace (ARQ protocol). The error is exactly at `DashboardRepository.cs:74`. It's a DB threading exception.
+- [x] PASO 3: Generate the fix (remove `Task.WhenAll`, await queries sequentially).
+- [ ] PASO 4: Update `progress.md` with BUG log.

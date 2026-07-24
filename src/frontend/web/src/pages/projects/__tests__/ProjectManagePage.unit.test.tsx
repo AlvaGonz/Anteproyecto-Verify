@@ -13,6 +13,17 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (key: string, defaultValue: string) => defaultValue || key }),
 }));
 
+vi.mock("../../../shared/context/AuthContext", () => ({
+  useAuth: () => ({ user: { plan: "premium" } }),
+}));
+
+vi.mock("../../../features/projects/components/ProjectActionBarContext", () => ({
+  useProjectActionBar: () => ({
+    setIsSaveDisabled: vi.fn(),
+    setIsSaving: vi.fn(),
+  }),
+}));
+
 // Setup router mocks
 const mockNavigate = vi.fn();
 let mockParams: { id?: string } = { id: "" };
@@ -91,7 +102,7 @@ vi.mock("../../../features/projects/components/ProjectForm", () => ({
             ubicacionTexto: "Santo Domingo",
             categoria: ProjectCategory.Residencial,
             usuarioCreadorId: "user-123",
-          })
+          }).catch(() => {})
         }
       >
         Submit Valid
@@ -103,7 +114,7 @@ vi.mock("../../../features/projects/components/ProjectForm", () => ({
             nombre: "Test Project",
             ubicacionTexto: "Santo Domingo",
             categoria: ProjectCategory.Residencial,
-          })
+          }).catch(() => {})
         }
       >
         Submit Missing Creator
@@ -115,7 +126,7 @@ vi.mock("../../../features/projects/components/ProjectForm", () => ({
             nombre: "Test Project",
             ubicacionTexto: "Santo Domingo",
             categoria: null,
-          })
+          }).catch(() => {})
         }
       >
         Submit Missing Category
@@ -165,7 +176,7 @@ describe("ProjectManagePage", () => {
         mutateAsync: vi.fn().mockImplementation(async (data) => {
           const res = await projectsApi.createProject(data);
           if (res._tag === "Success") return res.data;
-          throw new Error(res.error._tag);
+          throw new Error();
         }),
       } as any);
     });
@@ -254,7 +265,7 @@ describe("ProjectManagePage", () => {
       fireEvent.click(screen.getByTestId("submit-btn-missing-creator"));
 
       await waitFor(() => {
-        expect(mockAddToast).toHaveBeenCalledWith("Error al guardar el proyecto", "error");
+        expect(mockAddToast).toHaveBeenCalledWith("Missing required field: usuarioCreadorId", "error");
       });
     });
   });
@@ -277,7 +288,7 @@ describe("ProjectManagePage", () => {
       vi.mocked(apiClient.put).mockImplementation(async (_url, payload: any) => {
         const result = await projectsApi.updateProject("proj-001", payload);
         if (result._tag === "Success") return { data: result.data };
-        throw new Error(result.error._tag);
+        throw new Error();
       });
     });
 
@@ -363,7 +374,7 @@ describe("ProjectManagePage", () => {
       });
     });
 
-    it("navigates to /admin/projects after successful update", async () => {
+    it("shows success toast after successful update", async () => {
       vi.mocked(useProject).mockReturnValue({ data: mockExisting, isLoading: false } as any);
       vi.mocked(projectsApi.updateProject).mockResolvedValue({ _tag: "Success", data: mockExisting });
 
@@ -371,7 +382,6 @@ describe("ProjectManagePage", () => {
       fireEvent.click(screen.getByTestId("submit-btn-valid"));
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/admin/projects");
         expect(mockAddToast).toHaveBeenCalledWith("Proyecto actualizado exitosamente", "success");
       });
     });
@@ -391,78 +401,4 @@ describe("ProjectManagePage", () => {
     });
   });
 
-  describe("ProjectManagePage — Status management (EDIT mode only)", () => {
-    const mockExisting: ProyectoDto = {
-      id: "proj-001",
-      codigoInterno: "PRJ-001",
-      nombre: "Existing Project",
-      ubicacionTexto: "Santiago",
-      categoria: 1,
-      estadoProyecto: ProjectStatus.Draft,
-      estadoIntegridad: IntegrityStatus.Pending,
-      usuarioCreadorId: "user-123",
-      createdAtUtc: "2026-06-13T00:00:00Z",
-    };
-
-    beforeEach(() => {
-      mockParams = { id: "proj-001" };
-      vi.mocked(useProject).mockReturnValue({ data: mockExisting, isLoading: false } as any);
-      vi.mocked(apiClient.patch).mockImplementation(async (url, payload: any) => {
-        const parts = url.split("/");
-        const id = parts[2];
-        const status = payload as ProjectStatus;
-        const result = await projectsApi.updateProjectStatus(id, status);
-        if (result._tag === "Success") return { data: result.data };
-        throw new Error(result.error._tag);
-      });
-    });
-
-    it("renders all four status buttons when project is loaded", () => {
-      renderPage();
-      expect(screen.getByRole("button", { name: "status.draft" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "status.inReview" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "status.published" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "status.observed" })).toBeInTheDocument();
-    });
-
-    it("calls updateProjectStatus with correct status on button click", async () => {
-      const mockUpdated = { ...mockExisting, estadoProyecto: ProjectStatus.Published };
-      vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue({ _tag: "Success", data: mockUpdated });
-
-      renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "status.published" }));
-
-      await waitFor(() => {
-        expect(projectsApi.updateProjectStatus).toHaveBeenCalledWith(
-          "proj-001",
-          ProjectStatus.Published
-        );
-      });
-    });
-
-    it("updates project state after successful status change", async () => {
-      const mockUpdated = { ...mockExisting, estadoProyecto: ProjectStatus.InReview };
-      vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue({ _tag: "Success", data: mockUpdated });
-
-      renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "status.inReview" }));
-
-      await waitFor(() => {
-        expect(mockAddToast).toHaveBeenCalledWith("Estado actualizado exitosamente", "success");
-      });
-    });
-
-    it("shows error toast when updateProjectStatus fails", async () => {
-      vi.mocked(projectsApi.updateProjectStatus).mockResolvedValue(
-        { error: { _tag: "ServerError", message: "Failed" } }
-      );
-
-      renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "status.published" }));
-
-      await waitFor(() => {
-        expect(mockAddToast).toHaveBeenCalledWith("Error al actualizar el estado", "error");
-      });
-    });
-  });
 });

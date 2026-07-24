@@ -27,7 +27,10 @@ instance.interceptors.request.use((config) => {
     config.headers['Authorization'] = `Bearer ${_accessToken}`;
   }
   
-  // Do not modify Content-Type for FormData, Axios handles it automatically in v1+
+  // Delete Content-Type for FormData, Axios handles it automatically and appends boundary in v1+
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
 
   return config;
 });

@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import type { DocumentoDto as ApiDocumentoDto } from "./types";
 import type { DocumentDto } from "../types";
-import { DocumentStatus } from "../types";
+import { DocumentStatus, DocumentType } from "../types";
 
 export const documentKeys = {
   byProject: (projectId: string) => ["documents", projectId] as const,
@@ -11,12 +11,12 @@ export const documentKeys = {
 const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   id: String(apiDoc.id),
   proyectoId: String(apiDoc.proyectoId),
-  tipoDocumento: apiDoc.tipoDocumento as any,
+  tipoDocumento: apiDoc.tipoDocumento as unknown as any,
   nombreArchivoOriginal: apiDoc.nombreArchivoOriginal,
   contentType: apiDoc.contentType || "application/octet-stream",
   extension: apiDoc.extension || apiDoc.nombreArchivoOriginal?.split(".").pop() || "",
   tamanoBytes: apiDoc.tamanoBytes || 0,
-  estadoDocumento: apiDoc.estadoDocumento as DocumentStatus,
+  estadoDocumento: apiDoc.estadoDocumento as unknown as DocumentStatus,
   activo: apiDoc.activo,
   version: apiDoc.version || 1,
   fechaEmision: apiDoc.fechaEmision,
@@ -24,8 +24,12 @@ const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   usuarioCargaId: apiDoc.usuarioCargaId || "system",
   observaciones: apiDoc.observaciones || "",
   createdAtUtc: apiDoc.createdAtUtc,
-  fileUrl: apiDoc.fileUrl,
+  cedulaExtraction: apiDoc.cedulaExtraction,
+  certificadoTituloExtraction: apiDoc.certificadoTituloExtraction,
+  planoMensuraExtraction: apiDoc.planoMensuraExtraction,
+  estadoJuridicoExtraction: apiDoc.estadoJuridicoExtraction,
   resultadoOcrJson: apiDoc.resultadoOcrJson,
+  fileUrl: apiDoc.fileUrl,
 });
 
 export const useDocuments = (projectId: string) =>
@@ -55,7 +59,7 @@ export const useUploadRequirementDocument = (projectId: string) => {
       const formData = new FormData();
       formData.append('file', file);
       // Ensure we hit the v1 endpoint explicitly
-      return apiClient.post<ApiDocumentoDto>(`/v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData).then(res => mapApiDocument(res.data));
+      return apiClient.post<ApiDocumentoDto>(`v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData).then(res => mapApiDocument(res.data));
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
   });
@@ -75,7 +79,7 @@ export const useUpdateDocumentType = (projectId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: ['useUpdateDocumentType'],
-    mutationFn: (data: { documentId: string; tipoDocumento: number }) =>
+    mutationFn: (data: { documentId: string; tipoDocumento: DocumentType }) =>
       apiClient.patch(`/projects/${projectId}/documents/${data.documentId}/type`, { tipoDocumento: data.tipoDocumento }).then(res => res.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
   });

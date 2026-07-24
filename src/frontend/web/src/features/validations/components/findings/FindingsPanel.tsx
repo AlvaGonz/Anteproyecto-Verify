@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { FindingDto, FindingSeverity } from "../../types";
 import { toUtcDate } from "../../../../shared/utils/dates";
@@ -11,10 +11,14 @@ import {
   ShieldAlert,
   Clock
 } from "lucide-react";
+import { useDocuments, useDownloadDocument, useUpdateDocumentStatus } from "../../../documents/api/useDocuments";
+import { ProjectDocumentsList } from "../../../documents/components/ProjectDocumentsList";
+import { useToast } from "../../../../shared/components/ui/Toast/ToastContext";
 
 interface FindingsPanelProps {
   findings: FindingDto[];
   isLoading?: boolean;
+  projectId?: string;
 }
 
 const SEVERITY_CONFIG = {
@@ -54,9 +58,32 @@ const SEVERITY_CONFIG = {
 
 export const FindingsPanel: React.FC<FindingsPanelProps> = ({ 
   findings, 
-  isLoading = false 
+  isLoading = false,
+  projectId
 }) => {
-  if (isLoading) {
+  const { data: documents = [], isLoading: isDocsLoading } = useDocuments(projectId || "");
+  const downloadMutation = useDownloadDocument(projectId || "");
+  const statusMutation = useUpdateDocumentStatus(projectId || "");
+  const { addToast } = useToast();
+
+  const handleDownload = async (documentId: string) => {
+    try {
+      await downloadMutation.mutateAsync(documentId);
+    } catch (err: any) {
+      addToast("Error al obtener la descarga segura", "error");
+    }
+  };
+
+  const handleToggleStatus = async (documentId: string, isActive: boolean) => {
+    try {
+      await statusMutation.mutateAsync({ documentId, activo: isActive });
+      addToast(`Estado de certificación ${isActive ? "reanudado" : "suspendido"}`, isActive ? "success" : "info");
+    } catch (err: any) {
+      addToast("Error al modificar el estado de validez", "error");
+    }
+  };
+
+  if (isLoading || isDocsLoading) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
@@ -68,13 +95,26 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
 
   if (findings.length === 0) {
     return (
-      <div className="vf-card py-16 flex flex-col items-center justify-center border-dashed gap-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center text-success">
-          <CheckCircle2 className="w-8 h-8" />
+      <div className="space-y-8">
+        <div className="vf-card p-6">
+          <div className="vf-card flex flex-col items-center justify-center py-20 text-center animate-fade-in group hover:border-dashed">
+            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center text-success mb-6 group-hover:scale-110 transition-transform">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+            <h4 className="text-xl font-display font-black text-secondary uppercase tracking-tight">Sin Hallazgos</h4>
+            <p className="text-sm text-on-surface-variant font-medium mt-2 max-w-xs mx-auto">
+              No se han detectado irregularidades o diferenciales de riesgo en la validación actual.
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-xl font-display font-black text-secondary uppercase tracking-tight">Sin Hallazgos Adversos</h3>
-          <p className="text-sm text-on-surface-variant font-medium mt-1">El expediente cumple con todos los criterios institucionales.</p>
+
+        <div className="mt-8">
+          <h3 className="text-lg font-display font-black text-secondary tracking-tight mb-4 uppercase">Documentos Asociados</h3>
+          <ProjectDocumentsList
+            documents={documents}
+            onDownload={handleDownload}
+            onToggleStatus={handleToggleStatus}
+          />
         </div>
       </div>
     );
@@ -154,6 +194,15 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
           );
         })}
       </AnimatePresence>
+
+      <div className="mt-12 pt-8 border-t border-border/30">
+        <h3 className="text-lg font-display font-black text-secondary tracking-tight mb-4 uppercase">Documentos Asociados</h3>
+        <ProjectDocumentsList
+          documents={documents}
+          onDownload={handleDownload}
+          onToggleStatus={handleToggleStatus}
+        />
+      </div>
     </div>
   );
 };
