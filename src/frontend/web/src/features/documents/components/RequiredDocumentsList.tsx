@@ -6,6 +6,7 @@ import { CedulaExtractionCard } from "./CedulaExtractionCard";
 import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
 import { PlanoMensuraExtractionCard } from "./PlanoMensuraExtractionCard";
 import { EstadoJuridicoExtractionCard } from "./EstadoJuridicoExtractionCard";
+import { CertificacionIPIExtractionCard } from "./CertificacionIPIExtractionCard";
 import { FileCheck2 } from "lucide-react";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 
@@ -16,6 +17,7 @@ const REQUIRED_DOCUMENTS = [
   { id: "mensura", label: "Plano de Mensura", category: DocumentType.PlanoMensuraCatastral, categoryLabel: "MENSURA", description: "Plano catastral aprobado por autoridad competente" },
   { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.ID, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
   { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
+  { id: "certificacion_ipi", label: "Certificación IPI", category: DocumentType.CertificacionIPI, categoryLabel: "CATASTRO", description: "Certificación de Impuesto sobre la Propiedad Inmobiliaria" },
 ];
 
 export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ projectId }) => {
@@ -104,6 +106,11 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
               {doc.id === "estado_juridico" && uploadedDoc?.estadoJuridicoExtraction && (
                 <div className="pl-4 sm:pl-12">
                   <EstadoJuridicoExtractionCard extraction={uploadedDoc.estadoJuridicoExtraction} />
+                </div>
+              )}
+              {doc.id === "certificacion_ipi" && uploadedDoc?.certificacionIPIExtraction && (
+                <div className="pl-4 sm:pl-12">
+                  <CertificacionIPIExtractionCard extraction={uploadedDoc.certificacionIPIExtraction} />
                 </div>
               )}
             </div>

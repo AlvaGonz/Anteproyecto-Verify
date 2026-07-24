@@ -5,6 +5,7 @@ import { OcrReviewPanel } from "./OcrReviewPanel";
 import { CedulaExtractionCard } from "./CedulaExtractionCard";
 import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
 import { PlanoMensuraExtractionCard } from "./PlanoMensuraExtractionCard";
+import { CertificacionIPIExtractionCard } from "./CertificacionIPIExtractionCard";
 import {
   AlertTriangle,
   Clock,
@@ -181,6 +182,8 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
             : doc.tipoDocumento === DocumentType.PlanoMensuraCatastral
             ? (doc.planoMensuraExtraction ? <PlanoMensuraExtractionCard extraction={doc.planoMensuraExtraction} /> : null)
+            : doc.tipoDocumento === DocumentType.CertificacionIPI
+            ? (doc.certificacionIPIExtraction ? <CertificacionIPIExtractionCard extraction={doc.certificacionIPIExtraction} /> : null)
             : <OcrReviewPanel document={doc} />
         )}
       </m.div>

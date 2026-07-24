@@ -39,10 +39,12 @@ import { z } from "zod";
 import { planoMensuraExtractionSchema } from "./schemas/planoMensura.schema";
 import { certificadoTituloExtractionSchema } from "./schemas/certificadoTitulo.schema";
 import { estadoJuridicoExtractionSchema } from "./schemas/estadoJuridico.schema";
+import { certificacionIPIExtractionSchema } from "./schemas/certificacionIPI.schema";
 
 export type PlanoMensuraCatastralRdExtractionV1 = z.infer<typeof planoMensuraExtractionSchema>;
 export type CertificadoTituloRdExtractionV1 = z.infer<typeof certificadoTituloExtractionSchema>;
 export type EstadoJuridicoRdExtractionV1 = z.infer<typeof estadoJuridicoExtractionSchema>;
+export type CertificacionIPIExtraction = z.infer<typeof certificacionIPIExtractionSchema>;
 
 export interface DocumentDto {
   id: string;
@@ -65,6 +67,7 @@ export interface DocumentDto {
   certificadoTituloExtraction?: CertificadoTituloRdExtractionV1;
   planoMensuraExtraction?: PlanoMensuraCatastralRdExtractionV1;
   estadoJuridicoExtraction?: EstadoJuridicoRdExtractionV1;
+  certificacionIPIExtraction?: CertificacionIPIExtraction;
   resultadoOcrJson?: string;
   fileUrl?: string;
 }

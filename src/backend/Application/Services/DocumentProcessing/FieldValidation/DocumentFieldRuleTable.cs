@@ -119,6 +119,14 @@ public static class DocumentFieldRuleTable
             new("firmas", "text", false, "Notaría Pública"),
             new("sello", "text", false, "Notaría Pública"),
         },
+        [DocumentType.CertificacionIPI] = new()
+        {
+            new("numero_certificacion", "alphanumeric-code", true, "Registro Inmobiliario"),
+            new("numero_inmueble", "alphanumeric-code", true, "Registro Inmobiliario"),
+            new("parcela_numero", "alphanumeric-code", true, "Registro Inmobiliario"),
+            new("fecha_emision", "date", false, "Registro Inmobiliario"),
+            new("entidad_emisora", "text", false, "Registro Inmobiliario"),
+        },
     };
 
     /// <summary>
@@ -155,5 +163,6 @@ public static class DocumentFieldRuleTable
         DocumentType.SURVEY, DocumentType.PlanoMensuraCatastral,
         DocumentType.ID,
         DocumentType.NOTARIAL_POWER, DocumentType.PoderNotarial,
+        DocumentType.CertificacionIPI,
     }.AsReadOnly();
 }

@@ -19,6 +19,7 @@ export interface DocumentoDto {
   certificadoTituloExtraction?: any;
   planoMensuraExtraction?: any;
   estadoJuridicoExtraction?: any;
+  certificacionIPIExtraction?: any;
   resultadoOcrJson?: string;
   fileUrl?: string;
 }
