@@ -13,6 +13,7 @@ export interface DashboardStatsDto {
   usuariosPorPlan: Record<string, number>;
   totalConsultasRealizadas: number;
   totalProyectosRegistrados: number;
+  totalOfertas: number;
 }
 export interface SuscripcionRecienteDto {
   fechaAlta: string;

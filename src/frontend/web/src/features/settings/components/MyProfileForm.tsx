@@ -6,6 +6,7 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
+import { useProvinces } from "../../provinces/api/useProvinces";
 import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase, MapPin, Globe, AtSign, BadgeCheck, ArrowRight, X } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
 import { useDgiiLookup, DgiiData } from "../../../shared/hooks/useDgiiLookup";
@@ -18,16 +19,6 @@ const formatCedula = (value: string): string => {
   return `${digits.slice(0, 3)}-${digits.slice(3, 10)}-${digits.slice(10)}`;
 };
 
-const PROVINCIAS_RD = [
-  'Azua', 'Baoruco', 'Barahona', 'Dajabón', 'Duarte',
-  'El Seibo', 'Elías Piña', 'Espaillat', 'Hato Mayor', 'Hermanas Mirabal',
-  'Independencia', 'La Altagracia', 'La Romana', 'La Vega', 'María Trinidad Sánchez',
-  'Monseñor Nouel', 'Monte Cristi', 'Monte Plata', 'Pedernales',
-  'Peravia', 'Puerto Plata', 'Samaná', 'San Cristóbal', 'San José de Ocoa',
-  'San Juan', 'San Pedro de Macorís', 'Sánchez Ramírez', 'Santiago',
-  'Santiago Rodríguez', 'Santo Domingo', 'Valverde'
-] as const;
-
 const ROLE_LABEL: Record<string, string> = {
   admin: "Administrador",
   dev: "Desarrollador",
@@ -37,6 +28,7 @@ const ROLE_LABEL: Record<string, string> = {
 
 export const MyProfileForm: React.FC = () => {
   const { user, refreshUser } = useAuth();
+  const { data: provincias } = useProvinces();
   const { addToast } = useToast();
   const updateProfile = useUpdateMyProfile();
   const [showPasswordSection, setShowPasswordSection] = useState(false);
@@ -403,8 +395,8 @@ export const MyProfileForm: React.FC = () => {
                   aria-label="Provincia de residencia"
                 >
                   <option value="">Seleccione una provincia</option>
-                  {PROVINCIAS_RD.map((p) => (
-                    <option key={p} value={p}>{p}</option>
+                  {provincias?.map((p) => (
+                    <option key={p.nombre} value={p.nombre}>{p.nombre}</option>
                   ))}
                 </select>
               </div>

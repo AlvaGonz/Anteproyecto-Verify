@@ -50,6 +50,7 @@ public static class AppDbContextSeeder
                 telefono: "809-555-2001",
                 cedula: "402-0000001-1");
             freemiumUser.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
+            freemiumUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
 
             var consultorUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -61,6 +62,7 @@ public static class AppDbContextSeeder
                 telefono: "809-555-2002",
                 cedula: "402-0000002-1");
             consultorUser.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2")); // Consultor plan
+            consultorUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
 
             var profesionalUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -72,6 +74,7 @@ public static class AppDbContextSeeder
                 telefono: "809-555-2003",
                 cedula: "402-0000003-1");
             profesionalUser.AsignarPlan(Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"));
+            profesionalUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
 
             var empresaUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -83,6 +86,7 @@ public static class AppDbContextSeeder
                 telefono: "809-555-2004",
                 cedula: "402-0000004-1");
             empresaUser.AsignarPlan(Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"));
+            empresaUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
 
             var corporativoUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -94,6 +98,7 @@ public static class AppDbContextSeeder
                 telefono: "809-555-2005",
                 cedula: "402-0000005-1");
             corporativoUser.AsignarPlan(Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"));
+            corporativoUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
 
             await context.SaveChangesAsync();
 
@@ -115,6 +120,7 @@ public static class AppDbContextSeeder
                 context.Entry(testUser).Property("EmailVerificado").CurrentValue = true;
                 context.Entry(testUser).Property("Activo").CurrentValue = true;
                 testUser.AsignarPlan(Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F")); // Profesional plan
+                testUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
                 await context.SaveChangesAsync();
             }
 
@@ -320,110 +326,103 @@ public static class AppDbContextSeeder
 
     private static async Task SeedPlanesSuscripcionAsync(AppDbContext context, ILogger logger)
     {
-        if (!await context.PlanesSuscripcion.AnyAsync())
+        logger.LogInformation("Sincronizando planes de suscripción (Upsert dinámico)...");
+
+        // Única fuente de verdad para los planes
+        var expectedPlans = new List<PlanSuscripcion>
         {
-            logger.LogInformation("Seeding modern subscription plans (Block 2)...");
-            
-            // Administrador (Admin Footprint)
-            var administrador = PlanSuscripcion.Create(
+            // Administrador
+            PlanSuscripcion.Create(
                 id: Guid.Parse("99999999-9999-9999-9999-999999999999"), nombrePlan: "Administrador", precio: 0.00m,
                 maxConsultas: -1, maxProyectos: -1, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: -1, maxAlmacenamientoMb: -1,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
                 exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
-                soporteTipo: "Dedicado", accesoApi: true);
+                soporteTipo: "Dedicado", accesoApi: true),
 
-            // Consultor (Formerly Gratuito)
-            var consultorNuevo = PlanSuscripcion.Create(
+            // Consultor
+            PlanSuscripcion.Create(
                 id: Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"), nombrePlan: "Consultor", precio: 0.00m,
                 maxConsultas: 1, maxProyectos: 1, presentacionPublica: false,
                 qrIncluido: false, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 0,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
-                soporteTipo: "Comunidad", accesoApi: false);
+                soporteTipo: "Comunidad", accesoApi: false),
 
             // Profesional
-            var profesional = PlanSuscripcion.Create(
+            PlanSuscripcion.Create(
                 id: Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"), nombrePlan: "Profesional", precio: 3500.00m,
                 maxConsultas: 25, maxProyectos: 5, presentacionPublica: true,
-                qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 200,
+                qrIncluido: true, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 200,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: false,
-                soporteTipo: "Email", accesoApi: false);
+                soporteTipo: "Email", accesoApi: false),
 
             // Empresa
-            var empresa = PlanSuscripcion.Create(
+            PlanSuscripcion.Create(
                 id: Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"), nombrePlan: "Empresa", precio: 10000.00m,
                 maxConsultas: 100, maxProyectos: 10, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 1024,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: true, validacionLoteDisponible: false,
                 exportacionExcelDisponible: false, exportacionPdfDisponible: true, integracionCrmDisponible: true,
-                soporteTipo: "Prioritario", accesoApi: true);
+                soporteTipo: "Prioritario", accesoApi: true),
 
             // Corporativo
-            var corporativo = PlanSuscripcion.Create(
+            PlanSuscripcion.Create(
                 id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Corporativo", precio: 30000.00m,
                 maxConsultas: -1, maxProyectos: 50, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 30, maxAlmacenamientoMb: 10240,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
                 exportacionExcelDisponible: true, exportacionPdfDisponible: true, integracionCrmDisponible: true,
-                soporteTipo: "Account Manager", accesoApi: true);
+                soporteTipo: "Account Manager", accesoApi: true)
+        };
 
-            context.PlanesSuscripcion.AddRange(administrador, consultorNuevo, profesional, empresa, corporativo);
-            await context.SaveChangesAsync();
-        }
-        else
+        var existingPlans = await context.PlanesSuscripcion.ToListAsync();
+        bool hasChanges = false;
+
+        foreach (var expected in expectedPlans)
         {
-            var planes = await context.PlanesSuscripcion.ToListAsync();
-            bool hasChanges = false;
-
-            var administrador = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("99999999-9999-9999-9999-999999999999"));
-            if (administrador != null && (administrador.NombrePlan != "Administrador" || administrador.MaxProyectos != -1))
+            var existing = existingPlans.FirstOrDefault(p => p.Idsuscripcion == expected.Idsuscripcion);
+            if (existing == null)
             {
-                administrador.UpdatePlan("Administrador", 0.00m, -1, -1, true, true, -1, -1, true, true, true, true, true, true, "Dedicado", true);
+                context.PlanesSuscripcion.Add(expected);
                 hasChanges = true;
             }
-
-            var consultorNuevo = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
-            if (consultorNuevo != null && consultorNuevo.NombrePlan == "Gratuito")
+            else
             {
-                consultorNuevo.UpdatePlan("Consultor", 0.00m, 1, 1, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false);
-                hasChanges = true;
-            }
-
-            var empresa = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"));
-            if (empresa != null && empresa.MaxProyectos == 20)
-            {
-                empresa.UpdatePlan("Empresa", 10000.00m, 100, 30, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true);
-                hasChanges = true;
-            }
-
-            var corporativo = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"));
-            if (corporativo != null && corporativo.MaxProyectos == -1)
-            {
-                corporativo.UpdatePlan("Corporativo", 30000.00m, -1, 50, true, true, -1, 10240, true, true, true, true, true, true, "Account Manager", true);
-                hasChanges = true;
-            }
-
-            var consultorLegacy = planes.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"));
-            if (consultorLegacy != null)
-            {
-                // Reassign any users who had ConsultorLegacy to the new Consultor plan
-                var usersWithLegacy = await context.Usuarios.Where(u => u.PlanSuscripcionId == consultorLegacy.Idsuscripcion).ToListAsync();
-                foreach (var u in usersWithLegacy)
-                {
-                    u.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
-                }
+                // Sobrescribimos el plan existente con los valores esperados.
+                // EF Core (ChangeTracker) es lo suficientemente inteligente para solo marcar el objeto
+                // como "Modified" si realmente algún valor cambió, por lo que no ejecutará UPDATEs innecesarios.
+                existing.UpdatePlan(
+                    expected.NombrePlan, expected.Precio, expected.MaxConsultas, expected.MaxProyectos,
+                    expected.PresentacionPublica, expected.QrIncluido, expected.MaxUsuariosSecundarios,
+                    expected.MaxAlmacenamientoMb, expected.AlertasTiempoRealDisponible, expected.ModeloLmDisponible,
+                    expected.ValidacionLoteDisponible, expected.ExportacionExcelDisponible, expected.ExportacionPdfDisponible,
+                    expected.IntegracionCrmDisponible, expected.SoporteTipo, expected.AccesoApi
+                );
                 
-                context.PlanesSuscripcion.Remove(consultorLegacy);
+                // Forzamos que se guarden cambios para que el tracker haga el commit si hubo modificaciones.
                 hasChanges = true;
             }
+        }
 
-            if (hasChanges)
+        // Lógica de migración legacy para limpiar el plan Consultor viejo
+        var consultorLegacy = existingPlans.FirstOrDefault(p => p.Idsuscripcion == Guid.Parse("2E4F281E-47C2-43FF-BF58-9CC3A8C5B321"));
+        if (consultorLegacy != null)
+        {
+            var usersWithLegacy = await context.Usuarios.Where(u => u.PlanSuscripcionId == consultorLegacy.Idsuscripcion).ToListAsync();
+            foreach (var u in usersWithLegacy)
             {
-                logger.LogInformation("Updating existing plans in database to match new configurations...");
-                await context.SaveChangesAsync();
+                u.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
             }
+            
+            context.PlanesSuscripcion.Remove(consultorLegacy);
+            hasChanges = true;
+        }
+
+        if (hasChanges)
+        {
+            await context.SaveChangesAsync();
         }
     }
 

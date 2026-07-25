@@ -17,13 +17,14 @@ import {
   usePublishedProjects,
   PublishedProjectFilters,
   PROJECT_CATEGORIES,
-  PROVINCIAS,
   PRICE_MAX,
   PRICE_STEPS,
   getDefaultProjectImage,
 } from "../../features/projects/api/usePublishedProjects";
+import { useProvinces } from "../../features/provinces/api/useProvinces";
 
 export const AdminPublishedProjectsView: React.FC = () => {
+  const { data: provincias } = useProvinces();
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [filters, setFilters] = useState<PublishedProjectFilters>({
     searchQuery: "",
@@ -269,8 +270,8 @@ export const AdminPublishedProjectsView: React.FC = () => {
               className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
             >
               <option value="">Todas</option>
-              {PROVINCIAS.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              {provincias?.map((p) => (
+                <option key={p.nombre} value={p.nombre}>{p.nombre}</option>
               ))}
             </select>
 

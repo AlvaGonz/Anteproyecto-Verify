@@ -8,6 +8,7 @@ import { apiClient } from "../../../infrastructure/api/client";
 import { projectsApi } from "../api/projectsApi";
 import { isSuccess } from "@/shared/utils/functional";
 import { getProjectErrorMessage } from "../types";
+import { useProvinces } from "../../provinces/api/useProvinces";
 
 // Fix Leaflet default marker icon paths broken by Vite's asset bundler
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -35,46 +36,20 @@ interface ProvinciaInfo {
   dcPrefix: string;
 }
 
-const PROVINCIAS: ProvinciaInfo[] = [
-  { nombre: "Distrito Nacional", lat: 18.47186, lng: -69.93988, dcPrefix: "DC-01" },
-  { nombre: "Azua", lat: 18.45320, lng: -70.73490, dcPrefix: "DC-02" },
-  { nombre: "Baoruco", lat: 18.50000, lng: -71.30000, dcPrefix: "DC-03" },
-  { nombre: "Barahona", lat: 18.20850, lng: -71.10080, dcPrefix: "DC-04" },
-  { nombre: "Dajabón", lat: 19.54000, lng: -71.70000, dcPrefix: "DC-05" },
-  { nombre: "Duarte", lat: 19.30000, lng: -70.25000, dcPrefix: "DC-06" },
-  { nombre: "El Seibo", lat: 18.76000, lng: -69.04000, dcPrefix: "DC-07" },
-  { nombre: "Elías Piña", lat: 18.88000, lng: -71.68000, dcPrefix: "DC-08" },
-  { nombre: "Espaillat", lat: 19.50000, lng: -70.50000, dcPrefix: "DC-09" },
-  { nombre: "Hato Mayor", lat: 18.76000, lng: -69.25000, dcPrefix: "DC-10" },
-  { nombre: "Hermanas Mirabal", lat: 19.38000, lng: -70.35000, dcPrefix: "DC-11" },
-  { nombre: "Independencia", lat: 18.40000, lng: -71.60000, dcPrefix: "DC-12" },
-  { nombre: "La Altagracia", lat: 18.61890, lng: -68.70830, dcPrefix: "DC-13" },
-  { nombre: "La Romana", lat: 18.42730, lng: -68.97280, dcPrefix: "DC-14" },
-  { nombre: "La Vega", lat: 19.22000, lng: -70.53000, dcPrefix: "DC-15" },
-  { nombre: "María Trinidad Sánchez", lat: 19.38000, lng: -69.95000, dcPrefix: "DC-16" },
-  { nombre: "Monseñor Nouel", lat: 18.91000, lng: -70.43000, dcPrefix: "DC-17" },
-  { nombre: "Monte Cristi", lat: 19.72000, lng: -71.58000, dcPrefix: "DC-18" },
-  { nombre: "Monte Plata", lat: 18.80700, lng: -69.78900, dcPrefix: "DC-19" },
-  { nombre: "Pedernales", lat: 18.03000, lng: -71.74000, dcPrefix: "DC-20" },
-  { nombre: "Peravia", lat: 18.28000, lng: -70.33000, dcPrefix: "DC-21" },
-  { nombre: "Puerto Plata", lat: 19.79340, lng: -70.68840, dcPrefix: "DC-22" },
-  { nombre: "Samaná", lat: 19.20000, lng: -69.33000, dcPrefix: "DC-23" },
-  { nombre: "San Cristóbal", lat: 18.41667, lng: -70.10000, dcPrefix: "DC-24" },
-  { nombre: "San José de Ocoa", lat: 18.55000, lng: -70.50000, dcPrefix: "DC-25" },
-  { nombre: "San Juan", lat: 18.80580, lng: -71.22990, dcPrefix: "DC-26" },
-  { nombre: "San Pedro de Macorís", lat: 18.45390, lng: -69.30820, dcPrefix: "DC-27" },
-  { nombre: "Sánchez Ramírez", lat: 19.00160, lng: -70.14920, dcPrefix: "DC-28" },
-  { nombre: "Santiago", lat: 19.45170, lng: -70.69703, dcPrefix: "DC-29" },
-  { nombre: "Santiago Rodríguez", lat: 19.48000, lng: -71.34000, dcPrefix: "DC-30" },
-  { nombre: "Santo Domingo", lat: 18.54119, lng: -69.41817, dcPrefix: "DC-31" },
-  { nombre: "Valverde", lat: 19.58000, lng: -71.07000, dcPrefix: "DC-32" },
-];
+const toProvinciaInfo = (apiData: { id: string; nombre: string; latitud: number; longitud: number }[]): ProvinciaInfo[] =>
+  apiData.map((p, i) => ({
+    nombre: p.nombre,
+    lat: Number(p.latitud),
+    lng: Number(p.longitud),
+    dcPrefix: `DC-${String(i + 1).padStart(2, "0")}`,
+  }));
 
-export const getClosestProvincia = (lat: number, lng: number): string => {
-  let closestProvince = "Distrito Nacional";
+const getClosestProvincia = (provinces: ProvinciaInfo[], lat: number, lng: number): string => {
+  if (provinces.length === 0) return "Distrito Nacional";
+  let closestProvince = provinces[0].nombre;
   let minDistance = Infinity;
 
-  PROVINCIAS.forEach(p => {
+  provinces.forEach(p => {
     const dLat = p.lat - lat;
     const dLng = p.lng - lng;
     const distance = Math.sqrt(dLat * dLat + dLng * dLng);
@@ -93,6 +68,11 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   // In unit tests the component is wrapped in a test AuthProvider, so this is safe.
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  const { data: provinciasApi } = useProvinces();
+  const provincias = toProvinciaInfo(provinciasApi ?? []);
+  const provinciasRef = useRef(provincias);
+  provinciasRef.current = provincias;
 
   // ── Fields State ──────────────────────────────────────────────────────────
   const [nombre, setNombre] = useState(initialData?.nombre ?? "");
@@ -320,7 +300,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
-      const closestProvName = getClosestProvincia(lat, lng);
+      skipFlyToRef.current = true;
+      let closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
       setUbicacionTexto(closestProvName);
 
       try {
@@ -334,7 +315,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           if (catastroData.cedulaRncPropietario) setCedulaRncPropietario(catastroData.cedulaRncPropietario);
           if (catastroData.ipi) setIpi(catastroData.ipi);
           if (catastroData.estatusIpi) setEstatusIpi(catastroData.estatusIpi);
-          const closestProvName = getClosestProvincia(lat, lng);
+          skipFlyToRef.current = true;
+          closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
           setUbicacionTexto(closestProvName);
         } else {
           throw new Error(getProjectErrorMessage(result.error));
@@ -343,7 +325,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         console.error("No catastro data found:", error);
         // Fallback for demo purposes if no real data is found
         const randomParcel = Math.floor(Math.random() * 500) + 1;
-        const matchedProv = PROVINCIAS.find(p => p.nombre === closestProvName);
+        const matchedProv = provinciasRef.current.find(p => p.nombre === closestProvName);
         const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
         setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
       }
@@ -360,6 +342,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   // always has the current province without needing to re-register
   const ubicacionTextoRef = useRef(ubicacionTexto);
   useEffect(() => { ubicacionTextoRef.current = ubicacionTexto; }, [ubicacionTexto]);
+  const skipFlyToRef = useRef(false);
 
   // ── Leaflet: Initialize map once on mount ─────────────────────────────────
   useEffect(() => {
@@ -380,7 +363,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       const { lat, lng } = e.latlng;
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
 
-      const closestProvName = getClosestProvincia(lat, lng);
+      skipFlyToRef.current = true;
+      const closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
       setUbicacionTexto(closestProvName);
 
       try {
@@ -399,10 +383,11 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         }
       } catch (error) {
         console.error("No catastro data found:", error);
-        const closestProvName = getClosestProvincia(lat, lng);
+        skipFlyToRef.current = true;
+        const closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
         setUbicacionTexto(closestProvName);
         const randomParcel = Math.floor(Math.random() * 500) + 1;
-        const matchedProv = PROVINCIAS.find(p => p.nombre === closestProvName);
+        const matchedProv = provinciasRef.current.find(p => p.nombre === closestProvName);
         const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
         setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
       }
@@ -427,10 +412,14 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
   // ── Leaflet: Fly to province centroid when selection changes ──────────────
   useEffect(() => {
+    if (skipFlyToRef.current) {
+      skipFlyToRef.current = false;
+      return;
+    }
     const map = leafletMapRef.current;
     if (!map || !ubicacionTexto) return;
 
-    const prov = PROVINCIAS.find(p => p.nombre === ubicacionTexto);
+    const prov = provinciasRef.current.find(p => p.nombre === ubicacionTexto);
     if (!prov) return;
 
     map.flyTo([prov.lat, prov.lng], 11, { duration: 1.2 });
@@ -461,7 +450,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     if (!event.origin.includes("ri.gob.do") && event.origin !== "null") return;
     if (event.data?.event !== "geoPermission") return;
 
-    const prov = PROVINCIAS.find(p => p.nombre === ubicacionTextoRef.current);
+    const prov = provinciasRef.current.find(p => p.nombre === ubicacionTextoRef.current);
     const lat = prov?.lat ?? 18.7357;
     const lng = prov?.lng ?? -70.1627;
 
@@ -597,7 +586,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     handleSearchCoordinates,
     // Grouped field props
     basicFields: {
-      provincias: PROVINCIAS,
+      provincias: provincias,
       nombre, setNombre, nombreTouched, setNombreTouched,
       ubicacionTexto, setUbicacionTexto, ubicacionTouched, setUbicacionTouched,
       setUbicacionGps, setDesignacionCatastral,

@@ -19,6 +19,7 @@ namespace Application.DTOs.Admin
         public Dictionary<string, int> UsuariosPorPlan { get; init; } = new();
         public int TotalConsultasRealizadas { get; init; }
         public int TotalProyectosRegistrados { get; init; }
+        public int TotalOfertas { get; init; }
     }
 
     public record SuscripcionRecienteDto

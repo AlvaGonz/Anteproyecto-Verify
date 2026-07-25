@@ -70,6 +70,7 @@ public class RegisterUserCommandHandler
         if (consultorPlan != null)
         {
             user.AsignarPlan(consultorPlan.Idsuscripcion);
+            user.UpdateStripeSubscription(null, null, "active", DateTime.UtcNow.AddYears(1));
         }
 
         // Store pending plan if user came from pricing page

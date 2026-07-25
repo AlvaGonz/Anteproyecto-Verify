@@ -63,11 +63,8 @@ public class ProjectsController : ControllerBase
                 var loggedInUser = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
                 if (loggedInUser != null)
                 {
-                    var projects = await _projectService.GetAllProjectsAsync(page, pageSize, cancellationToken);
-                    if (loggedInUser.Rol != UserRole.Administrator)
-                    {
-                        projects = projects.Where(p => p.UsuarioCreadorId == userId);
-                    }
+                    Guid? filterUserId = loggedInUser.Rol != UserRole.Administrator ? userId : null;
+                    var projects = await _projectService.GetAllProjectsAsync(filterUserId, page, pageSize, cancellationToken);
                     
                     return Ok(projects);
                 }
