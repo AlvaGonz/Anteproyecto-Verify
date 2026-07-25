@@ -103,14 +103,14 @@ export const useDownloadDocument = (projectId: string) => {
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   return useMutation({
     mutationKey: ['useDownloadDocument'],
-    mutationFn: (documentId: string) =>
-      apiClient.get(`/projects/${projectId}/documents/${documentId}/download`, { responseType: "blob" }).then(res => res.data),
-    onSuccess: (data: any) => {
+    mutationFn: (data: { id: string, fileName: string }) =>
+      apiClient.get(`/projects/${projectId}/documents/${data.id}/download`, { responseType: "blob" }).then(res => ({ blob: res.data, fileName: data.fileName })),
+    onSuccess: ({ blob, fileName }) => {
       // Create object URL and trigger download (simplistic approach for now)
-      const url = window.URL.createObjectURL(new Blob([data]));
+      const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "documento.pdf"); // Forced to PDF as requested
+      link.setAttribute("download", fileName || "documento.pdf");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

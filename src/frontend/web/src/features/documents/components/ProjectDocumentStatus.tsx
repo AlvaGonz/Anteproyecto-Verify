@@ -156,9 +156,9 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               </div>
             )}
 
-            {(isVerificado || isPending || isObservado) && doc?.id && doc.fileUrl && (
+            {(isVerificado || isPending || isObservado) && doc?.id && (
               <button
-                onClick={() => downloadDoc(doc.id)}
+                onClick={() => downloadDoc({ id: doc.id, fileName: doc.nombreArchivoOriginal })}
                 disabled={isDownloading}
                 className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
                 title="Descargar Documento"
@@ -168,17 +168,6 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             )}
           </div>
         </div>
-        {doc && (
-          doc.tipoDocumento === DocumentType.ID
-            ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
-            : doc.tipoDocumento === DocumentType.CertificadoTitulo
-              ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
-              : doc.tipoDocumento === DocumentType.PlanoMensuraCatastral
-                ? (doc.planoMensuraExtraction ? <PlanoMensuraExtractionCard extraction={doc.planoMensuraExtraction} /> : null)
-                : doc.tipoDocumento === DocumentType.CertificacionIPI
-                  ? (doc.certificacionIPIExtraction ? <CertificacionIPIExtractionCard extraction={doc.certificacionIPIExtraction} /> : null)
-                  : <OcrReviewPanel document={doc} />
-        )}
       </m.div>
     );
   };
@@ -194,7 +183,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             </p>
             <div className="flex items-center gap-2 text-xs font-medium text-white/60 bg-white/5 py-3 px-6 rounded-2xl border border-white/5 inline-flex">
               <FileCheck2 className="w-4 h-4 text-primary" />
-              Criterio de Validación: <strong className="text-white ml-2">Contraste</strong>
+              Criterio de Validación: <strong className="text-white ml-2">Contraste de Información</strong>
             </div>
           </div>
 

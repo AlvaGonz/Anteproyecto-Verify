@@ -15,7 +15,7 @@ import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCa
 
 interface ProjectDocumentsListProps {
   documents: DocumentDto[];
-  onDownload: (documentId: string) => Promise<void>;
+  onDownload: (documentId: string, fileName: string) => Promise<void>;
   onToggleStatus: (documentId: string, isActive: boolean) => Promise<void>;
 }
 
@@ -119,7 +119,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
 
               <div className="flex items-center gap-2 self-end md:self-center w-full md:w-auto">
                 <button type="button"
-                  onClick={() => onDownload(doc.id)}
+                  onClick={() => onDownload(doc.id, doc.nombreArchivoOriginal)}
                   className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-surface-container-high hover:bg-primary hover:text-white text-secondary font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2"
                 >
                   <Download className="w-3.5 h-3.5" />
