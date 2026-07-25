@@ -27,24 +27,17 @@ interface ProjectDocumentStatusProps {
 const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
   [DocumentType.CertificadoTitulo]: { name: "Certificado de Título (Duplicado del Dueño)", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico + Cargas y Gravámenes", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.PlanosArquitectonicos]: { name: "Planos Arquitectónicos aprobados", entity: "Ayuntamiento / MOPC", norm: "Ley 687-00", categories: [1, 2, 3, 4, 99] },
   [DocumentType.PlanoMensuraCatastral]: { name: "Plano de Mensura Catastral", entity: "Tribunal de Tierras", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
   [DocumentType.PermisoConstruccion]: { name: "Permiso de Construcción vigente", entity: "Ayuntamiento Municipal", norm: "Ordenanzas", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificadoUsoSuelo]: { name: "Certificado de Uso de Suelo / No Objeción Municipal", entity: "Ayuntamiento", norm: "Ordenanzas", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.FormularioFIDVB009]: { name: "Formulario FI-DVB-009 registrado en DGII", entity: "DGII", norm: "Norma Gral. 07-2007", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88", categories: [1, 2, 3, 4, 99] },
   [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.ActaConstitutiva]: { name: "Acta Constitutiva + Estatutos Sociales", entity: "Cámara / Notaría", norm: "Ley 479-08", categories: [1, 2, 3, 4, 99] },
   [DocumentType.PoderNotarial]: { name: "Poder Notarial del Representante Legal", entity: "Notaría Pública", norm: "Ley 301 Notarial", categories: [1, 2, 3, 4, 99] },
   [DocumentType.RNC]: { name: "RNC activo + estatus fiscal", entity: "DGII", norm: "-", categories: [1, 2, 3, 4, 99] },
   [DocumentType.EstadosFinancieros]: { name: "Estados Financieros Auditados", entity: "Firma Auditora Certificada", norm: "-", categories: [2, 3, 4] },
   [DocumentType.CertificacionesBancarias]: { name: "Certificaciones bancarias / origen de fondos", entity: "Banco / Institución Financiera", norm: "-", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.FormularioKYCAML]: { name: "Formulario de Debida Diligencia KYC/AML", entity: "Propia empresa (sujeto obligado)", norm: "Ley 155-17, Art. 32", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.DeclaracionPEP]: { name: "Declaración PEP", entity: "Propia empresa", norm: "Ley 155-17", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00", categories: [2, 3, 4] },
   [DocumentType.NoObjecionINAPACAASD]: { name: "No objeción INAPA/CAASD", entity: "INAPA / CAASD", norm: "-", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.DocumentosNotariales]: { name: "Documentos notariales firmados digitalmente", entity: "Notaría / e-firma", norm: "Ley 126-02", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.DocumentosSupletorios]: { name: "Documentos supletorios (inmuebles no registrados)", entity: "Tribunal de Tierras", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
 };
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, projectCategory = ProjectCategory.Residencial }) => {
@@ -176,15 +169,15 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
           </div>
         </div>
         {doc && (
-          doc.tipoDocumento === DocumentType.ID 
+          doc.tipoDocumento === DocumentType.ID
             ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} /> : null)
             : doc.tipoDocumento === DocumentType.CertificadoTitulo
-            ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
-            : doc.tipoDocumento === DocumentType.PlanoMensuraCatastral
-            ? (doc.planoMensuraExtraction ? <PlanoMensuraExtractionCard extraction={doc.planoMensuraExtraction} /> : null)
-            : doc.tipoDocumento === DocumentType.CertificacionIPI
-            ? (doc.certificacionIPIExtraction ? <CertificacionIPIExtractionCard extraction={doc.certificacionIPIExtraction} /> : null)
-            : <OcrReviewPanel document={doc} />
+              ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} /> : null)
+              : doc.tipoDocumento === DocumentType.PlanoMensuraCatastral
+                ? (doc.planoMensuraExtraction ? <PlanoMensuraExtractionCard extraction={doc.planoMensuraExtraction} /> : null)
+                : doc.tipoDocumento === DocumentType.CertificacionIPI
+                  ? (doc.certificacionIPIExtraction ? <CertificacionIPIExtractionCard extraction={doc.certificacionIPIExtraction} /> : null)
+                  : <OcrReviewPanel document={doc} />
         )}
       </m.div>
     );
@@ -196,16 +189,12 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-white/40">Compliance Tracking</h2>
-            </div>
             <p className="text-4xl font-display font-black tracking-trough uppercase italic leading-none max-w-sm">
               Protocolo de Auditoría <span className="text-primary italic">Documental</span>
             </p>
             <div className="flex items-center gap-2 text-xs font-medium text-white/60 bg-white/5 py-3 px-6 rounded-2xl border border-white/5 inline-flex">
               <FileCheck2 className="w-4 h-4 text-primary" />
-              Criterio de Validación: <strong className="text-white ml-2">ESTÁNDAR REID</strong>
+              Criterio de Validación: <strong className="text-white ml-2">Contraste</strong>
             </div>
           </div>
 

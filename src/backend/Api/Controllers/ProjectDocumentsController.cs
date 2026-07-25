@@ -173,9 +173,7 @@ public class ProjectDocumentsController : ControllerBase
                 case "CERTIFICACION_IPI":
                     tipoDocumento = DocumentType.CertificacionIPI;
                     break;
-                case "ESTATUTOS":
-                    tipoDocumento = DocumentType.ActaConstitutiva;
-                    break;
+
                 case "RNC":
                     tipoDocumento = DocumentType.RNC;
                     break;

@@ -52,8 +52,8 @@ public class InternalValidationEngineTests
         Assert.NotNull(result);
         Assert.False(result.EsLegitimo);
         Assert.Equal(0, result.PassedCount);
-        Assert.Equal(25, result.FailedCount); // 25 required documents are missing
-        mockHallazgoRepo.Verify(r => r.AddAsync(It.IsAny<Hallazgo>(), It.IsAny<CancellationToken>()), Times.Exactly(25));
+        Assert.Equal(18, result.FailedCount); // 18 required documents are missing
+        mockHallazgoRepo.Verify(r => r.AddAsync(It.IsAny<Hallazgo>(), It.IsAny<CancellationToken>()), Times.Exactly(18));
         mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

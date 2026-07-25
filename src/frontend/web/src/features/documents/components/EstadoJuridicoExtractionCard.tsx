@@ -111,7 +111,7 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
   };
 
   const filteredWarnings = (extraction.warnings || []).filter(w => {
-    if (w === "El campo VieneDe fue detectado pero no contiene valor") {
+    if (w.includes("VieneDe") || w.includes("Viene de")) {
       const vieneDe = extraction.vieneDe;
       const hasValue = vieneDe && (vieneDe.rawValue || vieneDe.normalizedValue);
       const isNotMissing = vieneDe && vieneDe.status !== FieldStatus.Missing;

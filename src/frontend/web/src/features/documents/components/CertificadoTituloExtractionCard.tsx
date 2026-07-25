@@ -60,10 +60,10 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
 
   const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
-    const isMissing = safeField.status === FieldStatus.Missing;
+    const displayValue = safeField.normalizedValue || safeField.rawValue || '';
+    const isMissing = safeField.status === FieldStatus.Missing && !displayValue;
     const isLowConfidence = safeField.status === FieldStatus.LowConfidence || safeField.confidence < 0.8;
     const isEditing = editingField === fieldKey;
-    const displayValue = safeField.normalizedValue || safeField.rawValue || '';
     
     return (
       <div className="flex flex-col p-3 rounded-lg bg-white border border-border/40 shadow-sm relative group">
