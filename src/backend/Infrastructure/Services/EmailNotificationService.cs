@@ -72,4 +72,37 @@ public class EmailNotificationService : IEmailNotificationService
             }, ct);
         }
     }
+
+    public async Task SendInterestRegisteredAsync(string creatorEmail, Proyecto proyecto, string interestedUserName, CancellationToken ct = default)
+    {
+        string subject = $"¡Nuevo interesado en tu proyecto {proyecto.Nombre}!";
+        string body = $@"
+            <div style='font-family: Arial, sans-serif; color: #333;'>
+                <h2>¡Buenas noticias!</h2>
+                <p>El usuario <b>{interestedUserName}</b> acaba de registrar interés en tu proyecto <b>{proyecto.Nombre}</b>.</p>
+                <p>Inicia sesión en VeriFinca para revisar tus interesados y contactarlos.</p>
+                <br/>
+                <p>Atentamente,</p>
+                <p>El equipo de VeriFinca</p>
+            </div>
+        ";
+
+        try
+        {
+            // We use Task.Run to avoid blocking the main thread for SMTP latency
+            _ = Task.Run(async () => 
+            {
+                try {
+                    await _emailService.SendEmailAsync(creatorEmail, subject, body, "VeriFinca <notificaciones@handymansolutionrd.lat>", CancellationToken.None);
+                } catch (Exception e) {
+                    _logger.LogError(e, "Error sending interest email to {Email}", creatorEmail);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error scheduling interest email to {Email}", creatorEmail);
+        }
+        await Task.CompletedTask;
+    }
 }

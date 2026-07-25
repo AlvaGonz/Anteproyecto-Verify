@@ -18,6 +18,7 @@ import { ProjectStatusBadge } from "../../features/public/components/ProjectStat
 import { VerifySearchForm } from "../../features/public/components/VerifySearchForm";
 
 import { useSearchPublicProjects } from "../../features/projects/api/useSearchPublicProjects";
+import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
 
 interface ProjectCardProps {
   project: {
@@ -121,7 +122,7 @@ export const ProjectsPublicListPage: React.FC = () => {
         name: p.nombre || p.nombreProyecto,
         location: p.ubicacionTexto || "Ubicación no especificada",
         status: p.estadoValidacion === "Verificado" ? "CERTIFIED" : "PROCESSING",
-        imageUrl: p.imagenUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
+        imageUrl: p.imagenUrl || getDefaultProjectImage(p.categoria),
         description: "",
         completionPercentage: p.estadoValidacion === "Verificado" ? 100 : 50,
         constructora: p.constructora || "",

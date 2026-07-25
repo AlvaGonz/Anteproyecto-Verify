@@ -37,27 +37,27 @@ export const DashboardPage: React.FC = () => {
     let verified = 0;
     let recentProjects: ProyectoRecienteDto[] = [];
 
-    if (isAdmin && statsData) {
-      totalProjects = statsData.totalProyectos || 0;
-      inReview = statsData.proyectosPendientes || 0;
-      observed = statsData.proyectosRechazados || 0;
-      verified = statsData.proyectosAprobados || 0;
-      recentProjects = statsData.proyectosRecientes || [];
-    } else if (!isAdmin && projectsData) {
-      totalProjects = projectsData.length;
-      inReview = projectsData.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
-      observed = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Observed).length;
-      verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
-      recentProjects = [...projectsData]
-        .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
-        .slice(0, 5)
-        .map(p => ({
-          fechaRegistro: p.createdAtUtc,
-          nombre: p.nombre,
-          desarrollador: p.rncDesarrollador || "",
-          estado: p.estadoProyecto === ProjectStatus.Validated ? "Aprobado" : p.estadoProyecto === ProjectStatus.Observed ? "Rechazado" : "En Revisión"
-        }));
-    }
+  if (isAdmin && statsData) {
+    totalProjects = statsData.totalProyectos || 0;
+    inReview = statsData.proyectosPendientes || 0;
+    observed = statsData.proyectosRechazados || 0;
+    verified = statsData.proyectosAprobados || 0;
+    recentProjects = statsData.proyectosRecientes || [];
+  } else if (!isAdmin && projectsData) {
+    totalProjects = projectsData.length;
+    inReview = projectsData.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
+    observed = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Observed).length;
+    verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
+    recentProjects = [...projectsData]
+      .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
+      .slice(0, 5)
+      .map(p => ({
+        fechaRegistro: p.createdAtUtc,
+        nombre: p.nombre,
+        desarrollador: p.rncDesarrollador || "",
+        estado: p.estadoProyecto === ProjectStatus.Validated ? "Aprobado" : p.estadoProyecto === ProjectStatus.Observed ? "Rechazado" : "En Revisión"
+      }));
+  }
 
     return { totalProjects, inReview, observed, verified, recentProjects };
   }, [isAdmin, statsData, projectsData]);

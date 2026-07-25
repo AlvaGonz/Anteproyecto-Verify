@@ -23,7 +23,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const currentUser = await AuthService.getCurrentUser();
+      // First try to get user directly (relies on the 'jwt' cookie which persists beyond IMemoryCache)
+      let currentUser = await AuthService.getCurrentUser();
+      
+      // If that failed (e.g., jwt cookie expired or absent), fallback to refresh
+      if (!currentUser) {
+        try {
+          await AuthService.refreshAccessToken();
+          currentUser = await AuthService.getCurrentUser();
+        } catch (err) {
+          console.error("Auth refresh failed during init:", err);
+          // Interceptor handles the force-logout if necessary
+        }
+      }
       
       if (currentUser) {
         setUser(currentUser);

@@ -162,11 +162,21 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = Request.IsHttps,
             SameSite = SameSiteMode.Lax,
-            Path = "/"
+            Path = "/",
+            MaxAge = TimeSpan.FromDays(1)
         });
 
         var refreshToken = Guid.NewGuid().ToString("N");
-        _cache.Set(refreshToken, responseData.User.Id.ToString(), TimeSpan.FromDays(30));
+        var sesion = new Domain.Entities.SesionUsuario
+        {
+            RefreshToken = refreshToken,
+            UsuarioId = responseData.User.Id,
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(30),
+            IsRevoked = false,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+        _context.SesionesUsuario.Add(sesion);
+        _context.SaveChanges();
 
         Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
         {
@@ -219,7 +229,16 @@ public class AuthController : ControllerBase
             {
                 var accessToken = _jwtTokenGenerator.GenerateToken(user);
                 var refreshToken = Guid.NewGuid().ToString("N");
-                _cache.Set(refreshToken, user.Id.ToString(), TimeSpan.FromDays(30));
+                var sesion = new Domain.Entities.SesionUsuario
+                {
+                    RefreshToken = refreshToken,
+                    UsuarioId = user.Id,
+                    ExpiresAtUtc = DateTime.UtcNow.AddDays(30),
+                    IsRevoked = false,
+                    CreatedAtUtc = DateTime.UtcNow
+                };
+                _context.SesionesUsuario.Add(sesion);
+                _context.SaveChanges();
 
                 Response.Cookies.Append("jwt", accessToken, new CookieOptions
                 {
@@ -265,12 +284,17 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("logout")]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
         var refreshToken = Request.Cookies["refreshToken"];
         if (!string.IsNullOrEmpty(refreshToken))
         {
-            _cache.Remove(refreshToken);
+            var sesion = await _context.SesionesUsuario.FirstOrDefaultAsync(s => s.RefreshToken == refreshToken, cancellationToken);
+            if (sesion != null)
+            {
+                sesion.IsRevoked = true;
+                await _context.SaveChangesAsync(cancellationToken);
+            }
         }
 
         Response.Cookies.Append("jwt", "", new CookieOptions
@@ -376,15 +400,18 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
     {
         var token = Request.Cookies["refreshToken"];
-        if (string.IsNullOrEmpty(token) || !_cache.TryGetValue(token, out string? userIdStr) || userIdStr == null)
+        if (string.IsNullOrEmpty(token))
         {
             return Unauthorized(new { Message = "Token de refresco inválido o expirado." });
         }
 
-        if (!Guid.TryParse(userIdStr, out var userId))
+        var sesion = await _context.SesionesUsuario.FirstOrDefaultAsync(s => s.RefreshToken == token, cancellationToken);
+        if (sesion == null || sesion.IsRevoked || sesion.ExpiresAtUtc < DateTime.UtcNow)
         {
-            return Unauthorized(new { Message = "Token de refresco inválido." });
+            return Unauthorized(new { Message = "Token de refresco inválido o expirado." });
         }
+
+        var userId = sesion.UsuarioId;
 
         var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null || !user.Activo || user.AccountStatus == Domain.Enums.UserAccountStatus.PendingDeletion)
@@ -393,13 +420,22 @@ public class AuthController : ControllerBase
         }
 
         // Rotate token (single-use)
-        _cache.Remove(token);
+        sesion.IsRevoked = true;
 
         // Generate real access token
         var newAccessToken = _jwtTokenGenerator.GenerateToken(user);
         
         var newRefreshToken = Guid.NewGuid().ToString("N");
-        _cache.Set(newRefreshToken, userId.ToString(), TimeSpan.FromDays(30));
+        var nuevaSesion = new Domain.Entities.SesionUsuario
+        {
+            RefreshToken = newRefreshToken,
+            UsuarioId = userId,
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(30),
+            IsRevoked = false,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+        _context.SesionesUsuario.Add(nuevaSesion);
+        await _context.SaveChangesAsync(cancellationToken);
 
         // Overwrite the jwt cookie with the new valid token
         Response.Cookies.Append("jwt", newAccessToken, new CookieOptions
@@ -407,7 +443,8 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = Request.IsHttps,
             SameSite = SameSiteMode.Lax,
-            Path = "/"
+            Path = "/",
+            MaxAge = TimeSpan.FromDays(1)
         });
 
         Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
@@ -422,7 +459,7 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             accessToken = newAccessToken,
-            expiresIn = 3600 // 1 hour per appsettings
+            expiresIn = 86400 // 24h
         });
     }
     [Microsoft.AspNetCore.Authorization.Authorize]

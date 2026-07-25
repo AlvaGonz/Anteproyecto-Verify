@@ -1,6 +1,5 @@
 import React from "react";
 import { AlertTriangle, Home } from "lucide-react";
-import { Link } from "react-router-dom";
 
 interface ErrorFallbackProps {
   error: Error;
@@ -12,13 +11,13 @@ function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
     <div className="min-h-screen bg-[var(--color-surface-base)] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center mb-8">
-          <Link to="/">
+          <a href="/">
             <img
               src="/brand/isotipo/ISOTIPO WHITE.optimized.svg"
               alt="VeriFinca"
               className="h-25 w-auto group-hover:scale-105 transition-transform"
             />
-          </Link>
+          </a>
         </div>
         <div className="vf-card py-8 px-6 text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-[var(--color-brand-accent)] mb-4" />
@@ -40,10 +39,10 @@ function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
             >
               Intentar de nuevo
             </button>
-            <Link to="/" className="vf-btn-secondary">
+            <a href="/" className="vf-btn-secondary">
               <Home className="w-4 h-4" />
               Volver al inicio
-            </Link>
+            </a>
           </div>
         </div>
       </div>

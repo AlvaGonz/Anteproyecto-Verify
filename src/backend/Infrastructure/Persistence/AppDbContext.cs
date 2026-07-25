@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<Certificacion> Certificaciones => Set<Certificacion>();
     public DbSet<Invitacion> Invitaciones => Set<Invitacion>();
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
+    public DbSet<SesionUsuario> SesionesUsuario => Set<SesionUsuario>();
 
     // Legacy Tables for Admin Settings
     public DbSet<UsuarioLegacy> UsuariosLegacy => Set<UsuarioLegacy>();
@@ -47,11 +48,57 @@ public class AppDbContext : DbContext
     // Logging & Tokens
     public DbSet<LogConsulta> LogConsultas => Set<LogConsulta>();
     public DbSet<LogProyecto> LogProyectos => Set<LogProyecto>();
+    public DbSet<ProyectoInteresado> ProyectosInteresados => Set<ProyectoInteresado>();
+    public DbSet<ProyectoGuardado> ProyectosGuardados => Set<ProyectoGuardado>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Usuario>().ToTable("Usuario");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // ProjectInterest Config
+        modelBuilder.Entity<ProyectoInteresado>()
+            .ToTable("ProyectoInteres")
+            .HasOne(i => i.Project)
+            .WithMany()
+            .HasForeignKey(i => i.ProjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ProyectoInteresado>()
+            .HasOne(i => i.Creator)
+            .WithMany()
+            .HasForeignKey(i => i.CreatorId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ProyectoInteresado>()
+            .HasOne(i => i.InterestedUser)
+            .WithMany()
+            .HasForeignKey(i => i.InterestedUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // SavedProject Config
+        modelBuilder.Entity<ProyectoGuardado>()
+            .ToTable("ProyectoGuardado")
+            .HasOne(s => s.Project)
+            .WithMany()
+            .HasForeignKey(s => s.ProjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ProyectoGuardado>()
+            .HasOne(s => s.Creator)
+            .WithMany()
+            .HasForeignKey(s => s.CreatorId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ProyectoGuardado>()
+            .HasOne(s => s.Saver)
+            .WithMany()
+            .HasForeignKey(s => s.SaverId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // SesionUsuario Config
+        modelBuilder.Entity<SesionUsuario>()
+            .ToTable("SesionUsuario")
+            .HasOne(s => s.Usuario)
+            .WithMany()
+            .HasForeignKey(s => s.UsuarioId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

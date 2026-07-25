@@ -100,6 +100,23 @@ export const PROJECT_CATEGORIES = [
   { value: 99, label: "Otro" },
 ];
 
+export function getDefaultProjectImage(categoryId?: number): string {
+  switch (categoryId) {
+    case 1: // Residencial
+      return "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop";
+    case 2: // Comercial
+      return "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop";
+    case 3: // Turístico
+      return "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop";
+    case 4: // Mixto
+      return "https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=1000&auto=format&fit=crop";
+    case 5: // Industrial
+      return "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop";
+    default:
+      return "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop";
+  }
+}
+
 export const PROVINCIAS = [
   "Distrito Nacional",
   "Azua",

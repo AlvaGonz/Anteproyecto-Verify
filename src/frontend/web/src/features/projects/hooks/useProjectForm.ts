@@ -137,7 +137,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const [rncError, setRncError] = useState<string | null>(null);
 
   const handleRncSearch = async (rncValue: string) => {
-    const cleaned = rncValue.replace(/[- ]/g, "").trim();
+    const cleaned = rncValue.replace(/\D/g, "");
     if (!cleaned) return;
 
     setIsSearchingRnc(true);
@@ -157,7 +157,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   };
 
   useEffect(() => {
-    const cleaned = rncDesarrollador.replace(/[- ]/g, "").trim();
+    const cleaned = rncDesarrollador.replace(/\D/g, "");
     if (cleaned.length === 11 || cleaned.length === 9) {
       const timer = setTimeout(() => {
         handleRncSearch(rncDesarrollador);

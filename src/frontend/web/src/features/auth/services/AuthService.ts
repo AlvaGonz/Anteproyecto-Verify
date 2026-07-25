@@ -1,5 +1,8 @@
 import { apiClient, setAccessToken, getAccessToken } from "../../../infrastructure/api/client";
 
+// Module-level variable to deduplicate parallel refresh requests
+let refreshPromise: Promise<string | null> | null = null;
+
 export interface User {
   id: string;
   email: string;
@@ -139,32 +142,62 @@ export const AuthService = {
       // Ignore errors on logout
     } finally {
       setAccessToken(null);
+      // Hard delete cookies client-side as fallback to prevent 401 loops
+      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/api/auth/refresh;";
     }
   },
 
   async refreshAccessToken(): Promise<string | null> {
-    try {
-      const response = await apiClient.post('/auth/refresh', {}, { withCredentials: true });
-      const token = response.data.accessToken ?? null;
-      if (token) {
-        setAccessToken(token);
-      }
-      return token;
-    } catch {
-      setAccessToken(null);
-      return null;
+    if (refreshPromise) {
+      return refreshPromise;
     }
+
+    refreshPromise = (async () => {
+      try {
+        const response = await apiClient.post('/auth/refresh', {}, { withCredentials: true });
+        const token = response.data.accessToken ?? null;
+        if (token) {
+          setAccessToken(token);
+        }
+        return token;
+      } catch {
+        setAccessToken(null);
+        return null;
+      } finally {
+        refreshPromise = null;
+      }
+    })();
+
+    return refreshPromise;
   },
 
   async getCurrentUser(): Promise<User | null> {
+    // If we already have an in-memory token, use it directly
+    if (getAccessToken()) {
+      try {
+        const response = await apiClient.get('/auth/me');
+        return response.data;
+      } catch {
+        return null;
+      }
+    }
+
+    // No in-memory token — try refresh first (relies on refresh token cookie)
+    const newToken = await this.refreshAccessToken();
+    if (newToken) {
+      try {
+        const response = await apiClient.get('/auth/me');
+        return response.data;
+      } catch {
+        return null;
+      }
+    }
+
+    // Refresh failed — try cookie-based auth as last resort
     try {
       const response = await apiClient.get('/auth/me');
-      const user = response.data;
-      // After successful auth via cookie, refresh to populate in-memory token for subsequent requests
-      if (user && !getAccessToken()) {
-        await this.refreshAccessToken();
-      }
-      return user;
+      return response.data;
     } catch {
       return null;
     }

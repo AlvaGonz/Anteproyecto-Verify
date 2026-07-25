@@ -125,6 +125,13 @@ public static class AppDbContextSeeder
                 new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Publicado },
                 new { Nombre = "Residencial Los Cacicazgos", Ubicacion = "Los Cacicazgos, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Desarrollos Inmobiliarios XYZ", Cat = "DC-67890", Status = ProjectStatus.Creado },
                 new { Nombre = "Proyecto Costero La Romana", Ubicacion = "La Romana, RD", Categoria = ProjectCategory.Turistico, Dev = "Grupo Turístico del Este", Cat = "DC-11223", Status = ProjectStatus.Revision },
+                new { Nombre = "Condominio Oasis", Ubicacion = "Bávaro, Punta Cana", Categoria = ProjectCategory.Residencial, Dev = "Desarrollos Inmobiliarios", Cat = "DC-22334", Status = ProjectStatus.Publicado },
+                new { Nombre = "Plaza del Sol", Ubicacion = "Santiago", Categoria = ProjectCategory.Comercial, Dev = "Grupo Constructor Sur", Cat = "DC-33445", Status = ProjectStatus.Publicado },
+                new { Nombre = "Torre Lumiere", Ubicacion = "Santo Domingo Centro", Categoria = ProjectCategory.Residencial, Dev = "Inversiones Caribe", Cat = "DC-44556", Status = ProjectStatus.Publicado },
+                new { Nombre = "Residencial Altos del Mar", Ubicacion = "Puerto Plata", Categoria = ProjectCategory.Residencial, Dev = "Constructora del Norte", Cat = "DC-55667", Status = ProjectStatus.Publicado },
+                new { Nombre = "Villa Costa Marina", Ubicacion = "Samaná", Categoria = ProjectCategory.Turistico, Dev = "Desarrollos Marinos", Cat = "DC-66778", Status = ProjectStatus.Publicado },
+                new { Nombre = "Plaza Comercial Norte", Ubicacion = "Santo Domingo Norte", Categoria = ProjectCategory.Comercial, Dev = "Inmobiliaria del Este", Cat = "DC-77889", Status = ProjectStatus.Publicado },
+                new { Nombre = "Condominio Vista Bella", Ubicacion = "La Vega", Categoria = ProjectCategory.Residencial, Dev = "Constructora VIP", Cat = "DC-88990", Status = ProjectStatus.Publicado },
             };
 
             var proyectoEntities = new List<Proyecto>();
@@ -134,7 +141,7 @@ public static class AppDbContextSeeder
                     context,
                     nombre: p.Nombre,
                     ubicacionTexto: p.Ubicacion,
-                    usuarioCreadorId: profesionalUser.Id,
+                    usuarioCreadorId: corporativoUser.Id,
                     categoria: p.Categoria,
                     datosDesarrollador: p.Dev,
                     designacionCatastral: p.Cat,
@@ -142,7 +149,43 @@ public static class AppDbContextSeeder
                 proyectoEntities.Add(proyecto);
             }
 
-            await SeedDashboardDummyDataAsync(context, logger, adminUser, profesionalUser, freemiumUser, proyectoEntities);
+            await SeedDashboardDummyDataAsync(context, logger, adminUser, corporativoUser, freemiumUser, proyectoEntities);
+
+            var currentInterests = await context.Set<ProyectoInteresado>().CountAsync();
+            if (currentInterests < 10)
+            {
+                logger.LogInformation("Seeding interests...");
+                var intereses = new List<ProyectoInteresado>();
+                
+                // Generar 10 intereses donde corporativo (corporativoUser) es el creador y otros están interesados
+                for (int i = 0; i < 5; i++)
+                {
+                    intereses.Add(new ProyectoInteresado(proyectoEntities[i].Id, corporativoUser.Id, adminUser.Id));
+                }
+                for (int i = 5; i < 10; i++)
+                {
+                    intereses.Add(new ProyectoInteresado(proyectoEntities[i].Id, corporativoUser.Id, freemiumUser.Id));
+                }
+
+                context.Set<ProyectoInteresado>().AddRange(intereses);
+                await context.SaveChangesAsync();
+            }
+            
+            var currentSaved = await context.Set<ProyectoGuardado>().CountAsync();
+            if (currentSaved < 10)
+            {
+                logger.LogInformation("Seeding saved projects...");
+                var guardados = new List<ProyectoGuardado>();
+                
+                // Generar 10 proyectos guardados por el usuario corporativo (corporativoUser)
+                for (int i = 0; i < 10; i++)
+                {
+                    guardados.Add(new ProyectoGuardado(proyectoEntities[i].Id, corporativoUser.Id, corporativoUser.Id));
+                }
+
+                context.Set<ProyectoGuardado>().AddRange(guardados);
+                await context.SaveChangesAsync();
+            }
 
             try {
                 var p1 = proyectoEntities[0];

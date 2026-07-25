@@ -40,7 +40,7 @@ export const ProjectAuditPage: React.FC = () => {
           </p>
         </div>
         <button type="button"
-          onClick={() => id && (window.location.href = `${import.meta.env.VITE_API_URL}/projects/${id}/audit/export`)}
+          onClick={() => id && (window.location.href = `/api/projects/${id}/audit/export`)}
           className="vf-btn-secondary"
         >
           <Download className="w-4 h-4" />

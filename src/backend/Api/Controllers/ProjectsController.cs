@@ -57,7 +57,7 @@ public class ProjectsController : ControllerBase
     {
         if (User.Identity?.IsAuthenticated == true)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
             if (Guid.TryParse(userIdClaim, out var userId))
             {
                 var loggedInUser = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
@@ -91,7 +91,7 @@ public class ProjectsController : ControllerBase
         // Enforce consultation quota for authenticated users viewing public projects
         if (User.Identity?.IsAuthenticated == true)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
             if (Guid.TryParse(userIdClaim, out var userId))
             {
                 var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
@@ -275,5 +275,73 @@ public class ProjectsController : ControllerBase
         {
             return BadRequest($"Error al subir la imagen: {ex.Message}");
         }
+    }
+
+    [HttpPost("{id:guid}/interest")]
+    public async Task<IActionResult> InteresarProyecto(Guid id, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        try
+        {
+            await _projectService.InteresarProyectoAsync(id, userId, cancellationToken);
+            return Ok(new { message = "Interés registrado exitosamente." });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("{id:guid}/save")]
+    public async Task<IActionResult> GuardarProyecto(Guid id, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        try
+        {
+            await _projectService.GuardarProyectoAsync(id, userId, cancellationToken);
+            return Ok(new { message = "Proyecto guardado." });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id:guid}/save")]
+    public async Task<IActionResult> QuitarGuardadoProyecto(Guid id, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        await _projectService.QuitarGuardadoProyectoAsync(id, userId, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpGet("interests")]
+    public async Task<IActionResult> GetIntereses(CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var intereses = await _projectService.GetProyectosInteresesAsync(userId, cancellationToken);
+        return Ok(intereses);
+    }
+
+    [HttpGet("saved")]
+    public async Task<IActionResult> GetGuardados(CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var guardados = await _projectService.GetProyectosGuardadosAsync(userId, cancellationToken);
+        return Ok(guardados);
     }
 }

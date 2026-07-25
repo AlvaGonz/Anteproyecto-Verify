@@ -14,15 +14,17 @@ import { Result, success, failure } from "@/shared/utils/functional";
 const mapError = (error: any, id?: string): ProjectError => {
   if (error?.response) {
     const status = error.response.status;
-    const message = error.response.data?.message || error.message || "API error";
+    const data = error.response.data;
+    const message = data?.detail || data?.message || error.message || "API error";
     if (status === 404) {
       return { _tag: "NotFound", id: id || "" };
     }
     if (status === 401 || status === 403) {
       return { _tag: "Unauthorized" };
     }
-    if (status === 400) {
-      return { _tag: "ValidationError", errors: error.response.data?.errors || [message] };
+    if (status === 400 || status === 422) {
+      // API might return standard ProblemDetails or validation errors
+      return { _tag: "ValidationError", errors: data?.errors ? Object.values(data.errors).flat() : [message] };
     }
     if (status === 402) {
       return { _tag: "LimitReached", message };
@@ -121,6 +123,51 @@ export const projectsApi = {
       return success(response.data);
     } catch (error: any) {
       return failure(mapError(error, id));
+    }
+  },
+
+  async registerInterest(id: string): Promise<Result<void, ProjectError>> {
+    try {
+      await apiClient.post(`/projects/${id}/interest`);
+      return success(undefined);
+    } catch (error: any) {
+      return failure(mapError(error, id));
+    }
+  },
+
+  async saveProject(id: string): Promise<Result<void, ProjectError>> {
+    try {
+      await apiClient.post(`/projects/${id}/save`);
+      return success(undefined);
+    } catch (error: any) {
+      return failure(mapError(error, id));
+    }
+  },
+
+  async unsaveProject(id: string): Promise<Result<void, ProjectError>> {
+    try {
+      await apiClient.delete(`/projects/${id}/save`);
+      return success(undefined);
+    } catch (error: any) {
+      return failure(mapError(error, id));
+    }
+  },
+
+  async getInterests(): Promise<Result<any[], ProjectError>> {
+    try {
+      const response = await apiClient.get<any[]>("/projects/interests");
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error));
+    }
+  },
+
+  async getSavedProjects(): Promise<Result<ProyectoDto[], ProjectError>> {
+    try {
+      const response = await apiClient.get<ProyectoDto[]>("/projects/saved");
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error));
     }
   }
 };

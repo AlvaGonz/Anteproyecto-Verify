@@ -8,7 +8,6 @@ const ALL_STATUSES = [
   { value: ProjectStatus.InReview, label: "En Revisión" },
   { value: ProjectStatus.Observed, label: "Con Observaciones" },
   { value: ProjectStatus.Published, label: "Publicado" },
-  { value: ProjectStatus.Validated, label: "Validado" },
   { value: ProjectStatus.Rejected, label: "Rechazado" },
 ];
 
@@ -49,7 +48,7 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
     <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-2xl">
       {[
         { id: "all", label: "Todos" },
-        { id: "validated", label: "Validados" },
+        { id: "published", label: "Publicados" },
         { id: "review", label: "En Revisión" },
       ].map((f) => (
         <button type="button"
@@ -58,8 +57,8 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
             setActiveFilter(f.id);
             if (f.id === "all") {
               setSelectedStatuses([]);
-            } else if (f.id === "validated") {
-              setSelectedStatuses([ProjectStatus.Validated]);
+            } else if (f.id === "published") {
+              setSelectedStatuses([ProjectStatus.Published]);
             } else if (f.id === "review") {
               setSelectedStatuses([ProjectStatus.InReview]);
             }
@@ -67,7 +66,7 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             (activeFilter === f.id ||
              (f.id === "all" && selectedStatuses.length === 0) ||
-             (f.id === "validated" && selectedStatuses.length === 1 && selectedStatuses[0] === ProjectStatus.Validated) ||
+             (f.id === "published" && selectedStatuses.length === 1 && selectedStatuses[0] === ProjectStatus.Published) ||
              (f.id === "review" && selectedStatuses.length === 1 && selectedStatuses[0] === ProjectStatus.InReview))
               ? "bg-white text-primary shadow-sm border border-gray-100"
               : "text-gray-500 hover:text-gray-900"
@@ -119,8 +118,8 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
 
                       if (next.length === 0) {
                         setActiveFilter("all");
-                      } else if (next.length === 1 && next[0] === ProjectStatus.Validated) {
-                        setActiveFilter("validated");
+                      } else if (next.length === 1 && next[0] === ProjectStatus.Published) {
+                        setActiveFilter("published");
                       } else if (next.length === 1 && next[0] === ProjectStatus.InReview) {
                         setActiveFilter("review");
                       } else {

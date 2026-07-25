@@ -169,18 +169,9 @@ export const useMySubscription = (options?: { refetchInterval?: number }) =>
     queryFn: async () => {
       try {
         const res = await apiClient.get<MySubscriptionStatus>("/v1/subscriptions/my-status");
-        // ponytail: log raw response for debugging
-        console.log('[useMySubscription] Raw response:', res.data);
         return MySubscriptionStatusSchema.parse(res.data);
       } catch (err: any) {
-        // ponytail: log actual error for debugging silent failures
-        console.error('[useMySubscription] API error:', {
-          status: err.response?.status,
-          data: err.response?.data,
-          message: err.message,
-          url: err.config?.url,
-          zodIssues: err.issues ?? err.errors,
-        });
+        // ponytail: log removed to prevent console pollution
         throw err;
       }
     },
