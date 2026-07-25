@@ -110,6 +110,39 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
     );
   };
 
+  const generateUserFriendlyWarnings = () => {
+    const warnings: string[] = [];
+    
+    // Check specific missing fields
+    if (extraction.numeroCertificacion?.status === FieldStatus.Missing) {
+      warnings.push("Falta ingresar el No. de Certificación. Por favor, agregue este valor manualmente.");
+    }
+    if (extraction.numeroInmueble?.status === FieldStatus.Missing) {
+      warnings.push("Falta ingresar el No. de Inmueble. Por favor, agregue este valor manualmente.");
+    }
+    if (extraction.parcelaNumero?.status === FieldStatus.Missing) {
+      warnings.push("Falta ingresar la Parcela No. Por favor, agregue este valor manualmente.");
+    }
+
+    // Combine with backend warnings, filtering out technical messages
+    if (extraction.warnings && Array.isArray(extraction.warnings)) {
+      extraction.warnings.forEach(w => {
+        // Filter out the technical message that the user complained about
+        if (!w.includes("Required field") && 
+            !w.includes("is missing") && 
+            !w.includes("Falta el No. de Inmueble") && 
+            !w.includes("Falta el número de parcela") &&
+            !w.includes("No se pudo detectar el No. de Certificación")) {
+          warnings.push(w);
+        }
+      });
+    }
+
+    return warnings;
+  };
+
+  const userWarnings = generateUserFriendlyWarnings();
+
   return (
     <div className="w-full mt-2 p-4 sm:p-5 rounded-xl border border-border/50 bg-surface-container-low shadow-sm" data-testid="certificacion-ipi-extraction-card">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
@@ -133,11 +166,11 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
         {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero")}
       </div>
 
-      {extraction.warnings && extraction.warnings.length > 0 && (
+      {userWarnings.length > 0 && (
         <div className="mt-4 p-3 rounded-lg bg-warning/10 border border-warning/20 flex items-start gap-2 text-warning text-xs">
           <Info className="w-4 h-4 shrink-0 mt-0.5" />
           <ul className="list-disc list-inside space-y-1">
-            {extraction.warnings.map((w: string, i: number) => <li key={i}>{w}</li>)}
+            {userWarnings.map((w: string, i: number) => <li key={i}>{w}</li>)}
           </ul>
         </div>
       )}

@@ -25,28 +25,30 @@ public static class CertificacionIPIRdPaddleMapper
             NumeroCertificacion = ExtractField(lines, fullText, "NumeroCertificacion",
                 // Label patterns - more flexible for OCR variations
                 new[] { 
-                    @"NO\.\s*DE\s*CERTIFICACI[OÓ]N", 
+                    @"NO\.?\s*DE\s*CERTIFICACI[OÓ]N", 
                     @"N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ]N", 
                     @"CERTIFICACI[OÓ]N\s*N[ÚU]MERO",
-                    @"CERTIFICACION\s*NO",
-                    @"NO\s*CERTIFICACION",
+                    @"CERTIFICACION\s*NO\.?",
+                    @"CERT\.?\s*NO\.?",
+                    @"NO\.?\s*CERTIFICACION",
                     @"NUMERO\s*CERTIFICACION"
                 },
                 // Regex patterns - capture alphanumeric with hyphens
                 new[] { 
                     @"(?:NO\.\s*DE\s*CERTIFICACI[OÓ]N|N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ]N|CERTIFICACI[OÓ]N\s*N[ÚU]MERO|CERTIFICACION\s*NO|NO\s*CERTIFICACION|NUMERO\s*CERTIFICACION)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
                     @"(?:CERTIFICACI[OÓ]N\s*)([A-Z0-9\-\/]{6,})",
-                    @"(?:NO\s*DE\s*CERTIFICACION\s*)([A-Z0-9\-\/]{6,})"
+                    @"(?:NO\s*DE\s*CERTIFICACION\s*)([A-Z0-9\-\/]{6,})",
+                    @"\b([Cc]\d{13})\b"
                 }),
 
             NumeroInmueble = ExtractField(lines, fullText, "NumeroInmueble",
                 // Label patterns - more flexible for OCR variations
                 new[] { 
-                    @"NO\.\s*INMUEBLE", 
+                    @"NO\.?\s*INMUEBLE", 
+                    @"NO\.?\s*INM\.?",
                     @"N[ÚU]MERO\s*INMUEBLE", 
                     @"INMUEBLE\s*N[ÚU]MERO",
-                    @"INMUEBLE\s*NO",
-                    @"NO\s*INMUEBLE",
+                    @"INMUEBLE\s*NO\.?",
                     @"NUMERO\s*INMUEBLE"
                 },
                 // Regex patterns - capture alphanumeric with hyphens
@@ -58,11 +60,10 @@ public static class CertificacionIPIRdPaddleMapper
             ParcelaNumero = ExtractField(lines, fullText, "ParcelaNumero",
                 // Label patterns - more flexible for OCR variations
                 new[] { 
-                    @"PARCELA\s*NO\.", 
+                    @"PARCELA\s*NO\.?", 
                     @"PARCELA\s*N[ÚU]MERO", 
                     @"N[ÚU]MERO\s*DE\s*PARCELA",
-                    @"PARCELA\s*NO",
-                    @"NO\s*PARCELA",
+                    @"NO\.?\s*PARCELA",
                     @"NUMERO\s*PARCELA"
                 },
                 // Regex patterns - capture alphanumeric with hyphens (cadastral format)
@@ -81,12 +82,12 @@ public static class CertificacionIPIRdPaddleMapper
             extraction = extraction with { ExtractionStatus = ExtractionStatus.Incomplete };
         }
 
-        if (extraction.NumeroCertificacion.Status == FieldStatus.Missing)
-            warnings.Add("Required field NumeroCertificacion is missing.");
-        if (extraction.NumeroInmueble.Status == FieldStatus.Missing)
-            warnings.Add("Required field NumeroInmueble is missing.");
-        if (extraction.ParcelaNumero.Status == FieldStatus.Missing)
-            warnings.Add("Required field ParcelaNumero is missing.");
+        if (extraction.NumeroCertificacion.Status == FieldStatus.Missing) 
+            warnings.Add("No se pudo detectar el No. de Certificación en el documento.");
+        if (extraction.NumeroInmueble.Status == FieldStatus.Missing) 
+            warnings.Add("Falta el No. de Inmueble.");
+        if (extraction.ParcelaNumero.Status == FieldStatus.Missing) 
+            warnings.Add("Falta el número de parcela.");
 
         if (warnings.Any())
         {
@@ -134,12 +135,16 @@ public static class CertificacionIPIRdPaddleMapper
                     var inlineMatch = Regex.Match(line, $@"{labelPattern}\s*[:\-]?\s*(.+)", RegexOptions.IgnoreCase);
                     if (inlineMatch.Success && !string.IsNullOrWhiteSpace(inlineMatch.Groups[1].Value))
                     {
-                        rawValue = inlineMatch.Groups[1].Value;
-                        break;
+                        var val = inlineMatch.Groups[1].Value.Trim();
+                        if (val != "." && val != ":" && val != "-")
+                        {
+                            rawValue = val;
+                            break;
+                        }
                     }
 
                     // Check next line for proximity block (not another all-caps label)
-                    if (i + 1 < lines.Count && !Regex.IsMatch(lines[i + 1], @"^[A-ZÁÉÍÓÚÑ0-9\s\.\:\-]+$"))
+                    if (i + 1 < lines.Count && !Regex.IsMatch(lines[i + 1], @"^[A-ZÁÉÍÓÚ\s\.\:\-]+$"))
                     {
                         rawValue = lines[i + 1];
                         break;

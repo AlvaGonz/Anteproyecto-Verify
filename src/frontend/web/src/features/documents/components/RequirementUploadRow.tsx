@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useUploadRequirementDocument } from '../api/useDocuments';
-import { CheckCircle, UploadCloud, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
+import { CheckCircle, UploadCloud, Loader2, AlertCircle } from 'lucide-react';
 
 export interface RequirementUploadRowProps {
   projectId: string;
@@ -101,12 +101,7 @@ export const RequirementUploadRow: React.FC<RequirementUploadRowProps> = ({
               {isAssigning && <Loader2 className="w-3 h-3 animate-spin text-gray-500" />}
             </div>
             <div className="flex items-center gap-2">
-              {documentStatus === 6 ? (
-                <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
-                  <ShieldCheck className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-medium">Verificado</span>
-                </div>
-              ) : documentStatus === 3 ? (
+              {documentStatus === 3 ? (
                 <div data-testid={`requirement-status-${requirementCode}`} className="flex items-center text-red-600 bg-red-50 px-3 py-1.5 rounded-full border border-red-100">
                   <AlertCircle className="w-4 h-4 mr-2" />
                   <span className="text-sm font-medium">Rechazado</span>

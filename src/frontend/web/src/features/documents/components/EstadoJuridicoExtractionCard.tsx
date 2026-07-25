@@ -110,6 +110,18 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
     );
   };
 
+  const filteredWarnings = (extraction.warnings || []).filter(w => {
+    if (w === "El campo VieneDe fue detectado pero no contiene valor") {
+      const vieneDe = extraction.vieneDe;
+      const hasValue = vieneDe && (vieneDe.rawValue || vieneDe.normalizedValue);
+      const isNotMissing = vieneDe && vieneDe.status !== FieldStatus.Missing;
+      if (hasValue || isNotMissing) {
+        return false; // Hide warning if field has a value now
+      }
+    }
+    return true;
+  });
+
   return (
     <div className="w-full mt-2 p-4 sm:p-5 rounded-xl border border-border/50 bg-surface-container-low shadow-sm" data-testid="estado-juridico-extraction-card">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
@@ -137,11 +149,11 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         {renderField("Municipio", "municipio", extraction.municipio, false, "field-municipio")}
       </div>
       
-      {extraction.warnings && extraction.warnings.length > 0 && (
+      {filteredWarnings.length > 0 && (
          <div className="mt-4 p-3 rounded-lg bg-warning/10 border border-warning/20 flex items-start gap-2 text-warning text-xs">
            <Info className="w-4 h-4 shrink-0 mt-0.5" />
            <ul className="list-disc list-inside space-y-1">
-             {extraction.warnings.map((w, i) => <li key={i}>{w}</li>)}
+             {filteredWarnings.map((w, i) => <li key={i}>{w}</li>)}
            </ul>
          </div>
       )}
