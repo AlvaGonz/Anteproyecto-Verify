@@ -275,11 +275,10 @@ export const LegalPage: React.FC = () => {
             type="button"
             onClick={downloadSelected}
             disabled={selCount === 0}
-            className={`w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-label font-semibold text-sm transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
-              selCount > 0
+            className={`w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-label font-semibold text-sm transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${selCount > 0
                 ? "bg-primary text-on-primary hover:bg-primary-hover shadow-sm"
                 : "bg-surface-container-low text-slate-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             <span className="material-symbols-outlined text-[18px]">{ICONS.download}</span>
             {selCount > 0
@@ -303,9 +302,6 @@ export const LegalPage: React.FC = () => {
         <main ref={contentRef} className="min-w-0 w-full max-w-4xl mx-auto">
           {/* Header */}
           <div className={`mb-12 fade-up stagger-2 ${isRevealed ? "is-visible" : ""}`}>
-            <span className="font-sans font-semibold text-[11px] tracking-widest uppercase text-secondary mb-2 block">
-              LEGAL & COMPLIANCE
-            </span>
             <h1 className="font-headline text-4xl md:text-5xl font-black text-on-surface mb-4 leading-tight">
               Documentación Legal
             </h1>
