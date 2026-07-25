@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 
 export interface PublicProjectSearchResultDto {
@@ -23,6 +23,17 @@ export interface PublicProjectSearchResultDto {
 
 export const usePublishedProjects = () =>
   useQuery({
+    queryKey: ["publishedProjects"],
+    queryFn: () =>
+      apiClient
+        .get<PublicProjectSearchResultDto[]>(`/public/projects/search`)
+        .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO")),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+export const useSuspensePublishedProjects = () =>
+  useSuspenseQuery({
     queryKey: ["publishedProjects"],
     queryFn: () =>
       apiClient
