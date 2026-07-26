@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
 using Application.Abstractions.Storage;
 using Application.Contracts.Documents;
+using Application.Contracts.Geo;
 using Application.DTOs.Documents;
 using Application.DTOs.Projects;
+using Application.Documents.Extractions;
 using Application.Common.Security;
 using Domain.Entities;
 using Domain.Enums;
@@ -27,6 +29,7 @@ public class DocumentService : IDocumentService
     private readonly Application.Abstractions.Persistence.IAuditoriaRepository _auditoriaRepository;
     private readonly Application.Abstractions.Ocr.IOcrProvider _ocrProvider;
     private readonly Application.Services.DocumentProcessing.IDocumentStateEngine _documentStateEngine;
+    private readonly IGeoResolutionService _geoResolutionService;
 
     public DocumentService(
         IDocumentoRepository documentoRepository,
@@ -38,7 +41,8 @@ public class DocumentService : IDocumentService
         Application.Abstractions.Persistence.IValidacionRepository validacionRepository,
         Application.Abstractions.Persistence.IAuditoriaRepository auditoriaRepository,
         Application.Abstractions.Ocr.IOcrProvider ocrProvider,
-        Application.Services.DocumentProcessing.IDocumentStateEngine documentStateEngine)
+        Application.Services.DocumentProcessing.IDocumentStateEngine documentStateEngine,
+        IGeoResolutionService geoResolutionService)
     {
         _documentoRepository = documentoRepository;
         _proyectoRepository = proyectoRepository;
@@ -50,6 +54,7 @@ public class DocumentService : IDocumentService
         _auditoriaRepository = auditoriaRepository;
         _ocrProvider = ocrProvider;
         _documentStateEngine = documentStateEngine;
+        _geoResolutionService = geoResolutionService;
     }
 
     public async Task<DocumentDto> UploadDocumentAsync(Guid projectId, UploadDocumentDto dto, Stream fileStream, string fileName, string contentType, long length, CancellationToken cancellationToken = default)
@@ -174,13 +179,19 @@ public class DocumentService : IDocumentService
         document.UpdateStatus(DocumentStatus.Processing);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        try
-        {
-            // Reset stream position for OCR
-            fileStream.Position = 0;
-            var ocrResult = await _ocrProvider.ProcessDocumentAsync(fileStream, fileName, cancellationToken);
-            _documentStateEngine.ApplyOcrResult(document, ocrResult);
-        }
+try
+            {
+                // Reset stream position for OCR
+                fileStream.Position = 0;
+                var ocrResult = await _ocrProvider.ProcessDocumentAsync(fileStream, fileName, cancellationToken);
+                _documentStateEngine.ApplyOcrResult(document, ocrResult);
+
+                // Geographic resolution for CertificadoTitulo documents (Provincia + Municipio)
+                if (document.TipoDocumento == DocumentType.CertificadoTitulo)
+                {
+                    await ApplyGeographicResolutionAsync(document, cancellationToken);
+                }
+            }
         catch (Exception ocrEx)
         {
             // OCR failure must not abort an already-persisted upload.
@@ -265,6 +276,12 @@ public class DocumentService : IDocumentService
                 {
                     document.UpdateStatus(DocumentStatus.Processing);
                     _documentStateEngine.ApplyOcrResult(document, ocrResult);
+
+                    // Re-apply geographic resolution for CertificadoTitulo
+                    if (document.TipoDocumento == DocumentType.CertificadoTitulo)
+                    {
+                        await ApplyGeographicResolutionAsync(document, cancellationToken);
+                    }
                 }
             }
             catch
@@ -452,4 +469,49 @@ public class DocumentService : IDocumentService
         d.UpdatedAtUtc,
         d.ResultadoOcrJson
     );
+
+    private async Task ApplyGeographicResolutionAsync(Documento document, CancellationToken ct)
+    {
+        try
+        {
+            // Deserialize the current OCR result
+            var ocrJson = document.ResultadoOcrJson;
+            if (string.IsNullOrWhiteSpace(ocrJson)) return;
+
+            var extraction = System.Text.Json.JsonSerializer.Deserialize<CertificadoTituloRdExtractionV1>(ocrJson, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (extraction == null) return;
+
+            // Resolve Provincia
+            if (extraction.Provincia != null && !string.IsNullOrWhiteSpace(extraction.Provincia.RawValue))
+            {
+                var provinceResolution = await _geoResolutionService.ResolveProvinciaAsync(extraction.Provincia.RawValue, ct);
+                extraction = extraction with { ProvinceResolution = provinceResolution };
+            }
+
+            // Resolve Municipio (scoped to resolved province if available)
+            if (extraction.Municipio != null && !string.IsNullOrWhiteSpace(extraction.Municipio.RawValue))
+            {
+                var provinciaId = extraction.ProvinceResolution?.ResolvedId;
+                var municipalityResolution = await _geoResolutionService.ResolveMunicipioAsync(extraction.Municipio.RawValue, provinciaId, ct);
+                extraction = extraction with { MunicipalityResolution = municipalityResolution };
+            }
+
+            // Serialize back to JSON
+            var updatedJson = System.Text.Json.JsonSerializer.Serialize(extraction, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
+
+            document.SetOcrResult(updatedJson, document.EstadoDocumento);
+        }
+        catch
+        {
+            // Geographic resolution failure must not abort document upload
+            // Log and continue with original OCR result
+        }
+    }
 }

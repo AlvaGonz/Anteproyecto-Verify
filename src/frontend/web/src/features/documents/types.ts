@@ -15,7 +15,7 @@ export enum FieldStatus {
 
 export interface ExtractedField {
   rawValue: string;
-  normalizedValue: string;
+  normalizedValue?: string | null;
   confidence: number;
   status: FieldStatus;
   sourcePage: number;
@@ -45,6 +45,10 @@ export type PlanoMensuraCatastralRdExtractionV1 = z.infer<typeof planoMensuraExt
 export type CertificadoTituloRdExtractionV1 = z.infer<typeof certificadoTituloExtractionSchema>;
 export type EstadoJuridicoRdExtractionV1 = z.infer<typeof estadoJuridicoExtractionSchema>;
 export type CertificacionIPIExtraction = z.infer<typeof certificacionIPIExtractionSchema>;
+
+// Re-export geographic resolution types from schema
+export type { GeographicResolutionResult } from './schemas/certificadoTitulo.schema';
+export type { ResolutionAction } from './schemas/certificadoTitulo.schema';
 
 export interface DocumentDto {
   id: string;

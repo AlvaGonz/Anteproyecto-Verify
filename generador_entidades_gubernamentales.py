@@ -148,38 +148,169 @@ def get_db_connection():
     raise last_ex
 
 PROVINCIAS_COORDENADAS = {
-    "Distrito Nacional": {"lat": 18.4861, "lon": -69.9312, "municipios": ["Santo Domingo de Guzman"]},
-    "Santo Domingo": {"lat": 18.5833, "lon": -69.8333, "municipios": ["Santo Domingo Este", "Santo Domingo Oeste", "Santo Domingo Norte", "Boca Chica", "San Antonio de Guerra"]},
-    "Santiago": {"lat": 19.4500, "lon": -70.7000, "municipios": ["Santiago de los Caballeros", "Tamboril", "Villa Gonzalez", "Licey al Medio", "Bisono"]},
-    "La Altagracia": {"lat": 18.6167, "lon": -68.7000, "municipios": ["Higuey", "San Rafael del Yuma"]},
-    "San Pedro de Macoris": {"lat": 18.4500, "lon": -69.3000, "municipios": ["San Pedro de Macoris", "Consuelo", "Ramon Santana", "Quisqueya"]},
-    "La Romana": {"lat": 18.4333, "lon": -68.9667, "municipios": ["La Romana", "Guaymate", "Villa Hermosa"]},
-    "Puerto Plata": {"lat": 19.7833, "lon": -70.6833, "municipios": ["San Felipe de Puerto Plata", "Sosua", "Cabarete", "Imbert", "Altamira"]},
-    "Duarte": {"lat": 19.3000, "lon": -70.2500, "municipios": ["San Francisco de Macoris", "Pimentel", "Castillo", "Villa Riva"]},
-    "San Cristobal": {"lat": 18.4167, "lon": -70.1000, "municipios": ["San Cristobal", "Haina", "Yaguate", "Villa Altagracia"]},
-    "La Vega": {"lat": 19.2200, "lon": -70.5300, "municipios": ["Concepcion de La Vega", "Constanza", "Jarabacoa"]},
-    "Espaillat": {"lat": 19.5000, "lon": -70.5000, "municipios": ["Moca", "Gaspar Hernandez", "Cayetano Germosen"]},
-    "Monsenor Nouel": {"lat": 18.9400, "lon": -70.4100, "municipios": ["Bonao", "Maimon", "Piedra Blanca"]},
-    "Peravia": {"lat": 18.2800, "lon": -70.3300, "municipios": ["Bani", "Nizao"]},
-    "San Juan": {"lat": 18.8000, "lon": -71.2300, "municipios": ["San Juan de la Maguana", "Las Matas de Farfan", "El Cercado"]},
-    "Barahona": {"lat": 18.2000, "lon": -71.1000, "municipios": ["Santa Cruz de Barahona", "Cabral", "Enriquillo", "Vicente Noble"]},
-    "Samana": {"lat": 19.2000, "lon": -69.3300, "municipios": ["Santa Barbara de Samana", "Sanchez", "Las Terrenas"]},
-    "Monte Plata": {"lat": 18.8000, "lon": -69.8000, "municipios": ["Monte Plata", "Bayaguana", "Sabana Grande de Boya", "Yamasao"]},
-    "Azua": {"lat": 18.4532, "lon": -70.7368, "municipios": ["Azua de Compostela", "Las Yayas de Viajama", "Padre Las Casas"]},
-    "Bahoruco": {"lat": 18.4833, "lon": -71.4167, "municipios": ["Neiba", "Galvan", "Villa Jaragua"]},
-    "Dajabon": {"lat": 19.5500, "lon": -71.7167, "municipios": ["Dajabon", "Loma de Cabrera", "Restauracion"]},
-    "El Seibo": {"lat": 18.7667, "lon": -69.0333, "municipios": ["Santa Cruz de El Seibo", "Miches"]},
-    "Elias Pina": {"lat": 18.8800, "lon": -71.7000, "municipios": ["Comendador", "Bánica"]},
-    "Hato Mayor": {"lat": 18.7667, "lon": -69.2500, "municipios": ["Hato Mayor del Rey", "Sabana de la Mar", "El Valle"]},
-    "Hermanas Mirabal": {"lat": 19.3833, "lon": -70.4167, "municipios": ["Salcedo", "Tenares", "Villa Tapia"]},
-    "Independencia": {"lat": 18.4833, "lon": -71.8500, "municipios": ["Jimani", "Duverge", "La Descubierta"]},
-    "Maria Trinidad Sanchez": {"lat": 19.3833, "lon": -69.8500, "municipios": ["Nagua", "Cabrera", "El Factor", "Rio San Juan"]},
-    "Monte Cristi": {"lat": 19.8500, "lon": -71.6500, "municipios": ["San Fernando de Monte Cristi", "Guayubin", "Villa Vasquez"]},
-    "Pedernales": {"lat": 18.0333, "lon": -71.7500, "municipios": ["Pedernales", "Oviedo"]},
-    "Sanchez Ramirez": {"lat": 19.0500, "lon": -70.1500, "municipios": ["Cotui", "Fantino", "Cevicos"]},
-    "Santiago Rodriguez": {"lat": 19.4667, "lon": -71.3333, "municipios": ["Sabaneta", "Moncion"]},
-    "Valverde": {"lat": 19.5500, "lon": -71.0833, "municipios": ["Mao", "Esperanza", "Laguna Salada"]},
-    "San Jose de Ocoa": {"lat": 18.5500, "lon": -70.5000, "municipios": ["San Jose de Ocoa", "Sabana Larga"]}
+    "Distrito Nacional": {"lat": 18.4861, "lon": -69.9312, "municipios": {
+        "Santo Domingo de Guzman": {"lat": 18.485, "lon": -69.93},
+    }},
+    "Santo Domingo": {"lat": 18.5833, "lon": -69.8333, "municipios": {
+        "Santo Domingo Este": {"lat": 18.526, "lon": -69.802},
+        "Santo Domingo Oeste": {"lat": 18.463, "lon": -69.992},
+        "Santo Domingo Norte": {"lat": 18.612, "lon": -69.912},
+        "Boca Chica": {"lat": 18.457, "lon": -69.615},
+        "San Antonio de Guerra": {"lat": 18.581, "lon": -69.654},
+    }},
+    "Santiago": {"lat": 19.45, "lon": -70.7, "municipios": {
+        "Santiago de los Caballeros": {"lat": 19.517, "lon": -70.697},
+        "Tamboril": {"lat": 19.488, "lon": -70.608},
+        "Villa Gonzalez": {"lat": 19.45, "lon": -70.7},
+        "Licey al Medio": {"lat": 19.428, "lon": -70.619},
+        "Bisono": {"lat": 19.45, "lon": -70.7},
+    }},
+    "La Altagracia": {"lat": 18.6167, "lon": -68.7, "municipios": {
+        "Higuey": {"lat": 18.708, "lon": -68.687},
+        "San Rafael del Yuma": {"lat": 18.373, "lon": -68.727},
+    }},
+    "San Pedro de Macoris": {"lat": 18.45, "lon": -69.3, "municipios": {
+        "San Pedro de Macoris": {"lat": 18.482, "lon": -69.26},
+        "Consuelo": {"lat": 18.594, "lon": -69.253},
+        "Ramon Santana": {"lat": 18.45, "lon": -69.3},
+        "Quisqueya": {"lat": 18.546, "lon": -69.423},
+    }},
+    "La Romana": {"lat": 18.4333, "lon": -68.9667, "municipios": {
+        "La Romana": {"lat": 18.155, "lon": -68.677},
+        "Guaymate": {"lat": 18.567, "lon": -68.951},
+        "Villa Hermosa": {"lat": 18.451, "lon": -69.051},
+    }},
+    "Puerto Plata": {"lat": 19.7833, "lon": -70.6833, "municipios": {
+        "San Felipe de Puerto Plata": {"lat": 19.71, "lon": -70.692},
+        "Sosua": {"lat": 19.666, "lon": -70.491},
+        "Cabarete": {"lat": 19.7833, "lon": -70.6833},
+        "Imbert": {"lat": 19.765, "lon": -70.872},
+        "Altamira": {"lat": 19.651, "lon": -70.793},
+    }},
+    "Duarte": {"lat": 19.3, "lon": -70.25, "municipios": {
+        "San Francisco de Macoris": {"lat": 19.339, "lon": -70.206},
+        "Pimentel": {"lat": 19.216, "lon": -70.147},
+        "Castillo": {"lat": 19.24, "lon": -70.028},
+        "Villa Riva": {"lat": 19.152, "lon": -69.903},
+    }},
+    "San Cristobal": {"lat": 18.4167, "lon": -70.1, "municipios": {
+        "San Cristobal": {"lat": 18.415, "lon": -70.11},
+        "Haina": {"lat": 18.432, "lon": -70.031},
+        "Yaguate": {"lat": 18.34, "lon": -70.188},
+        "Villa Altagracia": {"lat": 18.656, "lon": -70.226},
+    }},
+    "La Vega": {"lat": 19.22, "lon": -70.53, "municipios": {
+        "Concepcion de La Vega": {"lat": 19.208, "lon": -70.458},
+        "Constanza": {"lat": 18.865, "lon": -70.691},
+        "Jarabacoa": {"lat": 19.106, "lon": -70.702},
+    }},
+    "Espaillat": {"lat": 19.5, "lon": -70.5, "municipios": {
+        "Moca": {"lat": 19.478, "lon": -70.505},
+        "Gaspar Hernandez": {"lat": 19.614, "lon": -70.241},
+        "Cayetano Germosen": {"lat": 19.344, "lon": -70.472},
+    }},
+    "Monsenor Nouel": {"lat": 18.94, "lon": -70.41, "municipios": {
+        "Bonao": {"lat": 18.943, "lon": -70.441},
+        "Maimon": {"lat": 18.888, "lon": -70.27},
+        "Piedra Blanca": {"lat": 18.812, "lon": -70.331},
+    }},
+    "Peravia": {"lat": 18.28, "lon": -70.33, "municipios": {
+        "Bani": {"lat": 18.351, "lon": -70.37},
+        "Nizao": {"lat": 18.269, "lon": -70.21},
+    }},
+    "San Juan": {"lat": 18.8, "lon": -71.23, "municipios": {
+        "San Juan de la Maguana": {"lat": 18.897, "lon": -71.326},
+        "Las Matas de Farfan": {"lat": 18.954, "lon": -71.493},
+        "El Cercado": {"lat": 18.71, "lon": -71.512},
+    }},
+    "Barahona": {"lat": 18.2, "lon": -71.1, "municipios": {
+        "Santa Cruz de Barahona": {"lat": 18.187, "lon": -71.139},
+        "Cabral": {"lat": 18.195, "lon": -71.248},
+        "Enriquillo": {"lat": 17.979, "lon": -71.339},
+        "Vicente Noble": {"lat": 18.41, "lon": -71.088},
+    }},
+    "Samana": {"lat": 19.2, "lon": -69.33, "municipios": {
+        "Santa Barbara de Samana": {"lat": 19.272, "lon": -69.32},
+        "Sanchez": {"lat": 19.143, "lon": -69.678},
+        "Las Terrenas": {"lat": 19.284, "lon": -69.566},
+    }},
+    "Monte Plata": {"lat": 18.8, "lon": -69.8, "municipios": {
+        "Monte Plata": {"lat": 18.76, "lon": -69.839},
+        "Bayaguana": {"lat": 18.815, "lon": -69.592},
+        "Sabana Grande de Boya": {"lat": 18.976, "lon": -69.775},
+        "Yamasao": {"lat": 18.768, "lon": -70.085},
+    }},
+    "Azua": {"lat": 18.4532, "lon": -70.7368, "municipios": {
+        "Azua de Compostela": {"lat": 18.459, "lon": -70.754},
+        "Las Yayas de Viajama": {"lat": 18.594, "lon": -71.034},
+        "Padre Las Casas": {"lat": 18.833, "lon": -70.895},
+    }},
+    "Bahoruco": {"lat": 18.4833, "lon": -71.4167, "municipios": {
+        "Neiba": {"lat": 18.419, "lon": -71.262},
+        "Galvan": {"lat": 18.4833, "lon": -71.4167},
+        "Villa Jaragua": {"lat": 18.544, "lon": -71.493},
+    }},
+    "Dajabon": {"lat": 19.55, "lon": -71.7167, "municipios": {
+        "Dajabon": {"lat": 19.571, "lon": -71.622},
+        "Loma de Cabrera": {"lat": 19.433, "lon": -71.618},
+        "Restauracion": {"lat": 19.304, "lon": -71.633},
+    }},
+    "El Seibo": {"lat": 18.7667, "lon": -69.0333, "municipios": {
+        "Santa Cruz de El Seibo": {"lat": 18.741, "lon": -69.031},
+        "Miches": {"lat": 18.962, "lon": -68.981},
+    }},
+    "Elias Pina": {"lat": 18.88, "lon": -71.7, "municipios": {
+        "Comendador": {"lat": 18.919, "lon": -71.696},
+        "Banica": {"lat": 19.018, "lon": -71.645},
+    }},
+    "Hato Mayor": {"lat": 18.7667, "lon": -69.25, "municipios": {
+        "Hato Mayor del Rey": {"lat": 18.709, "lon": -69.326},
+        "Sabana de la Mar": {"lat": 19.008, "lon": -69.412},
+        "El Valle": {"lat": 18.944, "lon": -69.385},
+    }},
+    "Hermanas Mirabal": {"lat": 19.3833, "lon": -70.4167, "municipios": {
+        "Salcedo": {"lat": 19.447, "lon": -70.389},
+        "Tenares": {"lat": 19.448, "lon": -70.307},
+        "Villa Tapia": {"lat": 19.291, "lon": -70.39},
+    }},
+    "Independencia": {"lat": 18.4833, "lon": -71.85, "municipios": {
+        "Jimani": {"lat": 18.501, "lon": -71.844},
+        "Duverge": {"lat": 18.32, "lon": -71.621},
+        "La Descubierta": {"lat": 18.598, "lon": -71.756},
+    }},
+    "Maria Trinidad Sanchez": {"lat": 19.3833, "lon": -69.85, "municipios": {
+        "Nagua": {"lat": 19.35, "lon": -70.003},
+        "Cabrera": {"lat": 19.58, "lon": -69.98},
+        "El Factor": {"lat": 19.294, "lon": -69.931},
+        "Rio San Juan": {"lat": 19.3833, "lon": -69.85},
+    }},
+    "Monte Cristi": {"lat": 19.85, "lon": -71.65, "municipios": {
+        "San Fernando de Monte Cristi": {"lat": 19.76, "lon": -71.652},
+        "Guayubin": {"lat": 19.688, "lon": -71.309},
+        "Villa Vasquez": {"lat": 19.809, "lon": -71.443},
+    }},
+    "Pedernales": {"lat": 18.0333, "lon": -71.75, "municipios": {
+        "Pedernales": {"lat": 18.064, "lon": -71.567},
+        "Oviedo": {"lat": 17.827, "lon": -71.46},
+    }},
+    "Sanchez Ramirez": {"lat": 19.05, "lon": -70.15, "municipios": {
+        "Cotui": {"lat": 18.998, "lon": -70.131},
+        "Fantino": {"lat": 19.103, "lon": -70.303},
+        "Cevicos": {"lat": 19.007, "lon": -69.976},
+    }},
+    "Santiago Rodriguez": {"lat": 19.4667, "lon": -71.3333, "municipios": {
+        "Sabaneta": {"lat": 19.369, "lon": -71.327},
+        "Moncion": {"lat": 19.391, "lon": -71.185},
+    }},
+    "Valverde": {"lat": 19.55, "lon": -71.0833, "municipios": {
+        "Mao": {"lat": 19.534, "lon": -71.042},
+        "Esperanza": {"lat": 19.628, "lon": -70.96},
+        "Laguna Salada": {"lat": 19.669, "lon": -71.101},
+    }},
+    "San Jose de Ocoa": {"lat": 18.55, "lon": -70.5, "municipios": {
+        "San Jose de Ocoa": {"lat": 18.557, "lon": -70.439},
+        "Sabana Larga": {"lat": 18.645, "lon": -70.559},
+    }},
 }
 PROVINCIA_NAMES = list(PROVINCIAS_COORDENADAS.keys())
 SUPERFICIE_OPTIONS = [50.00, 75.50, 100.00, 126.51, 150.00, 200.00, 250.00, 300.00, 500.00]
@@ -294,14 +425,17 @@ def generate_catastro_ps_records(rncs_list):
     
     for p_idx, provincia in enumerate(PROVINCIA_NAMES):
         coord_info = PROVINCIAS_COORDENADAS[provincia]
+        # Get municipality names from the dict keys
+        municipio_names = list(coord_info["municipios"].keys())
         for parcel in range(1, 501):
             base_dc = f"{p_idx+1:02d}{parcel:04d}{random.randint(100000, 999999)}"
             for unit in range(1, 101):
                 dc = f"{base_dc}:{unit:04d}"
                 rnc = random.choice(rncs_list)
-                municipio = random.choice(coord_info["municipios"])
-                lat = coord_info["lat"] + random.uniform(-0.02, 0.02)
-                lon = coord_info["lon"] + random.uniform(-0.02, 0.02)
+                municipio = random.choice(municipio_names)
+                muni_coords = coord_info["municipios"][municipio]
+                lat = muni_coords["lat"] + random.uniform(-0.02, 0.02)
+                lon = muni_coords["lon"] + random.uniform(-0.02, 0.02)
                 superficie = random.choice(SUPERFICIE_OPTIONS)
                 base_matricula += 1
                 base_titulo += 1
