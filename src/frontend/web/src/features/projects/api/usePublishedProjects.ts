@@ -56,6 +56,7 @@ export function filterPublishedProjects(
   filters: PublishedProjectFilters
 ): PublicProjectSearchResultDto[] {
   return projects.filter((p) => {
+
     // Search query: RNC, Cedula, Project Name, Cadastral Designation
     if (filters.searchQuery) {
       const q = filters.searchQuery.toLowerCase();

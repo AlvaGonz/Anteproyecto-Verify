@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
-import { useSuspenseFeaturedProjects } from "../../projects/api/useFeaturedProjects";
+import { useSuspensePublishedProjects, filterPublishedProjects } from "../../projects/api/usePublishedProjects";
 import { getDefaultProjectImage } from "../../projects/api/usePublishedProjects";
 import { ProjectStatus, LegalStatus, IntegrityStatus } from "../../projects/types";
 
 interface Project {
+  id: string;
+  codigoPublico?: string;
   name: string;
   location: string;
   image: string;
@@ -27,19 +29,21 @@ export const FeaturedProjectsSection: React.FC = () => {
   const scrollLeftValRef = useRef(0);
   const hasDraggedRef = useRef(false);
 
-  const { data: featuredProjects = [] } = useSuspenseFeaturedProjects(5);
+  // Use the same data source as the projects page, then filter for verified
+  const { data: searchResults = [] } = useSuspensePublishedProjects();
 
-  const publicProjects = Array.isArray(featuredProjects) ? featuredProjects : [];
+  const verifiedProjects = filterPublishedProjects(searchResults, {
+    searchQuery: "",
+    projectTypes: [],
+    priceRange: [0, 15_000_000],
+    province: "",
+    latLng: "",
+  });
 
-  const formattedProjects: Project[] = publicProjects
-    .filter(p =>
-      p.estadoJuridico === LegalStatus.Valid &&
-      (p.estadoProyecto === ProjectStatus.Published || 
-       p.estadoProyecto === ProjectStatus.Validated ||
-       p.estadoProyecto === ProjectStatus.InReview) &&
-      p.estadoIntegridad === IntegrityStatus.Verified
-    )
+  const formattedProjects: Project[] = verifiedProjects
     .map(p => ({
+      id: p.id,
+      codigoPublico: p.codigoPublico,
       name: p.nombreProyecto,
       location: p.ubicacionTexto || "Ubicación no especificada",
       image: p.imagenUrl || getDefaultProjectImage(p.categoria),
@@ -274,7 +278,7 @@ export const FeaturedProjectsSection: React.FC = () => {
                         </div>
                       </div>
                       <Link
-                        to="/projects"
+                        to={`/p/${project.codigoPublico || project.id}`}
                         onClick={(e) => {
                           if (hasDraggedRef.current) {
                             e.preventDefault();
