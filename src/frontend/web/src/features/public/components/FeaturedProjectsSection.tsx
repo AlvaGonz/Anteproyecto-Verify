@@ -15,8 +15,7 @@ interface Project {
   image: string;
   status: string;
   risk: string;
-  deliveredDocs: number;
-  totalDocs: number;
+  completionRate: number;
 }
 
 export const FeaturedProjectsSection: React.FC = () => {
@@ -49,12 +48,11 @@ export const FeaturedProjectsSection: React.FC = () => {
       image: p.imagenUrl || getDefaultProjectImage(p.categoria),
       status: "Verificado",
       risk: "Calculando",
-      deliveredDocs: 8,
-      totalDocs: 10,
+      completionRate: p.completionRate ?? 80,
     }));
 
   const filteredProjects = formattedProjects
-    .filter((p) => (p.deliveredDocs / p.totalDocs) >= 0.8)
+    .filter((p) => p.completionRate >= 80)
     .slice(0, 12);
 
   // Triple items for seamless marquee wrap-around
@@ -234,7 +232,7 @@ export const FeaturedProjectsSection: React.FC = () => {
           onMouseLeave={handleMouseUpOrLeave}
         >
           {carouselItems.map((project, i) => {
-            const deliveryPercentage = Math.round((project.deliveredDocs / project.totalDocs) * 100);
+            const deliveryPercentage = project.completionRate;
 
             return (
               <div

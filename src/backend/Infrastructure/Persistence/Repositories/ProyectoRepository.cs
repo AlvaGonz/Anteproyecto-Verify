@@ -271,4 +271,69 @@ public class ProyectoRepository : IProyectoRepository
     {
         await _context.LogProyectos.AddAsync(log, cancellationToken);
     }
+
+    public async Task<IEnumerable<Documento>> GetDocumentosByProyectoIdAsync(Guid proyectoId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Documentos
+            .AsNoTracking()
+            .Where(d => d.ProyectoId == proyectoId && d.Activo)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, ProjectCategory category, CancellationToken cancellationToken = default)
+    {
+        // Define required document types for the project category (same logic as ProjectDocumentStatus component)
+        var requiredTypes = GetRequiredDocumentTypesForCategory(category);
+
+        if (requiredTypes.Count == 0) return 100;
+
+        // Get uploaded documents for this project that match required types and are not invalid
+        var uploadedCount = await _context.Documentos
+            .AsNoTracking()
+            .Where(d => d.ProyectoId == proyectoId
+                && d.Activo
+                && d.EstadoDocumento != DocumentStatus.Invalid
+                && requiredTypes.Contains(d.TipoDocumento))
+            .CountAsync(cancellationToken);
+
+        var rate = (int)Math.Round((double)uploadedCount / requiredTypes.Count * 100);
+        return Math.Min(rate, 100);
+    }
+
+    private static List<DocumentType> GetRequiredDocumentTypesForCategory(ProjectCategory category)
+    {
+        // Same logic as DOCUMENT_INFO in ProjectDocumentStatus.tsx
+        var allTypes = new Dictionary<DocumentType, List<ProjectCategory>>
+        {
+            { DocumentType.TITLE, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.LEGAL_STATUS, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.SURVEY, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.ID, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.NOTARIAL_POWER, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.OTHER, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.CertificadoTitulo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.CertificacionEstadoJuridico, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.PlanoMensuraCatastral, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.PermisoConstruccion, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.CertificadoUsoSuelo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.CertificacionIPI, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.RegistroMercantil, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.PoderNotarial, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.RNC, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.EstadosFinancieros, new List<ProjectCategory> { ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto } },
+            { DocumentType.CertificacionesBancarias, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.CertificadoEIA, new List<ProjectCategory> { ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto } },
+            { DocumentType.NoObjecionINAPACAASD, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+        };
+
+        var result = new List<DocumentType>();
+        foreach (var kvp in allTypes)
+        {
+            if (kvp.Value.Contains(category))
+            {
+                result.Add(kvp.Key);
+            }
+        }
+        return result;
+    }
 }

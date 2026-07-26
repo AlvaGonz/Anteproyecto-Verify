@@ -31,5 +31,6 @@ public interface IProyectoRepository
     Task<IEnumerable<ProyectoInteresado>> GetInteresesByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<IEnumerable<ProyectoInteresado>> GetInteresadosInUserProjectsAsync(Guid usuarioCreadorId, CancellationToken cancellationToken = default);
     Task AddLogProyectoAsync(LogProyecto log, CancellationToken cancellationToken = default);
+    Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, ProjectCategory category, CancellationToken cancellationToken = default);
 }
 

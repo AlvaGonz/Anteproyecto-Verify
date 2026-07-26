@@ -19,6 +19,7 @@ export interface FeaturedProjectDto {
   matricula?: string;
   rncDesarrollador?: string;
   cedulaRncPropietario?: string;
+  completionRate: number;
 }
 
 export const useFeaturedProjects = (count = 5) =>

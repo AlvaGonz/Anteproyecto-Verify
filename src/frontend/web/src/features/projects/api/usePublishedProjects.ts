@@ -19,6 +19,7 @@ export interface PublicProjectSearchResultDto {
   matricula?: string;
   rncDesarrollador?: string;
   cedulaRncPropietario?: string;
+  completionRate: number;
 }
 
 export const usePublishedProjects = () =>
