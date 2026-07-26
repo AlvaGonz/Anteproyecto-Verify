@@ -492,6 +492,32 @@ public static class EmailTemplates
     }
 
     // ════════════════════════════════════════════════════════════════════════
+    // 8. Interest Registered
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetInterestRegisteredEmail(string interestedUserName, string projectName, string projectId)
+    {
+        string loginUrl = $"http://localhost:3000/#/admin/projects";
+
+        string content = $@"
+            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Buenas noticias! 👋</h2>
+            
+            <p style=""margin:0 0 16px 0;"">El usuario <strong>{interestedUserName}</strong> acaba de registrar interés en tu proyecto <strong>{projectName}</strong>.</p>
+            
+            <div style=""background-color:{BgMuted};padding:16px;border-radius:8px;margin-bottom:24px;border:1px solid {BorderLine};"">
+                <p style=""margin:0;"">Inicia sesión en VeriFinca para revisar tus interesados y contactarlos oportunamente.</p>
+            </div>
+
+            <div style=""text-align:center;"">
+                {CtaButton(loginUrl, "Revisar mis proyectos")}
+            </div>";
+
+        return BuildEmailWrapper(
+            $"Nuevo interesado: {projectName}",
+            $"{interestedUserName} ha registrado interés en tu proyecto.",
+            content);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
     // 7. Password Reset
     // ════════════════════════════════════════════════════════════════════════
     public static string GetPasswordResetEmail(string userName, string resetToken, string? returnUrl = null)

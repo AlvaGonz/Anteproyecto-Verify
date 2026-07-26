@@ -27,7 +27,6 @@ public class ConsultaQuotaGuard
         if (!SubscriptionTierPolicy.CanConsult(user))
             throw new QuotaExceededException(user.Plan?.NombrePlan ?? "None", "Consultas", "Consultas quota exceeded");
 
-        user.IncrementarConsulta();
-        await _unitOfWork.SaveChangesAsync();
+        await _usuarioRepository.IncrementarConsultaAsync(user.Id);
     }
 }

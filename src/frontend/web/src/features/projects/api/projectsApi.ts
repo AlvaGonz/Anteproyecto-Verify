@@ -27,7 +27,7 @@ const mapError = (error: any, id?: string): ProjectError => {
       return { _tag: "ValidationError", errors: data?.errors ? Object.values(data.errors).flat() : [message] };
     }
     if (status === 402) {
-      return { _tag: "LimitReached", message };
+      return { _tag: "LimitReached", message, used: data?.used, max: data?.max };
     }
     return { _tag: "ServerError", message };
   }
@@ -166,6 +166,23 @@ export const projectsApi = {
     try {
       const response = await apiClient.get<ProyectoDto[]>("/projects/saved");
       return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error));
+    }
+  },
+
+  async consumeQuota(request: { projectId?: string; codigo?: string }): Promise<Result<void, ProjectError>> {
+    try {
+      const response = await apiClient.post("/projects/consume-quota", request);
+      if (response.data?.allowed === false) {
+        return failure({
+          _tag: "LimitReached",
+          message: response.data.message || "Has alcanzado el límite de consultas.",
+          used: response.data.used,
+          max: response.data.max,
+        });
+      }
+      return success(undefined);
     } catch (error: any) {
       return failure(mapError(error));
     }

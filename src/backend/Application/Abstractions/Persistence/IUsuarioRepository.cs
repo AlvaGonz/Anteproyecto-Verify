@@ -18,4 +18,5 @@ public interface IUsuarioRepository
     Task<Usuario?> GetByPasswordResetTokenAsync(string token, CancellationToken cancellationToken = default);
     Task<List<Usuario>> GetPendingPurgeAsync(CancellationToken cancellationToken = default);
     Task<Usuario?> GetByNicknameAsync(string nickname, CancellationToken cancellationToken = default);
+    Task IncrementarConsultaAsync(Guid userId, CancellationToken cancellationToken = default);
 }

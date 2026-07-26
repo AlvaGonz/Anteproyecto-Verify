@@ -10,6 +10,19 @@ import { ProjectStatus } from "../../projects/types";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
 import { toUtcDate } from "../../../shared/utils/dates";
 
+const statusLabels: Record<string, string> = {
+  [ProjectStatus.Draft]: "Borrador",
+  [ProjectStatus.Edited]: "Editado",
+  [ProjectStatus.InReview]: "En Revisión",
+  [ProjectStatus.Observed]: "Observado",
+  [ProjectStatus.Published]: "Publicado",
+  [ProjectStatus.Validated]: "Publicado",
+  [ProjectStatus.Rejected]: "Rechazado",
+};
+
+const getStatusDisplay = (status: ProjectStatus): string =>
+  statusLabels[status] ?? "Desconocido";
+
 export const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>("projects");
   const location = useLocation();
@@ -25,7 +38,7 @@ export const DashboardPage: React.FC = () => {
     }
   }, [location.state]);
 
-  const { data: projectsData, isLoading: loadingProjects } = useProjects({ enabled: !isAdmin });
+  const { data: projectsData, totalCount: userTotal, isLoading: loadingProjects } = useProjects(1, 500);
   const { data: statsData, isLoading: loadingStats } = useDashboardStats();
 
   const loading = isAdmin ? loadingStats : loadingProjects;
@@ -44,9 +57,9 @@ export const DashboardPage: React.FC = () => {
     offers = statsData.totalOfertas || 0;
     recentProjects = statsData.proyectosRecientes || [];
   } else if (!isAdmin && projectsData) {
-    totalProjects = projectsData.length;
+    totalProjects = userTotal;
     inReview = projectsData.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
-    verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
+    verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Published || p.estadoProyecto === ProjectStatus.Validated).length;
     recentProjects = [...projectsData]
       .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
       .slice(0, 5)
@@ -54,12 +67,12 @@ export const DashboardPage: React.FC = () => {
         fechaRegistro: p.createdAtUtc,
         nombre: p.nombre,
         desarrollador: p.rncDesarrollador || "",
-        estado: p.estadoProyecto === ProjectStatus.Validated ? "Aprobado" : p.estadoProyecto === ProjectStatus.Observed ? "Rechazado" : "En Revisión"
+        estado: getStatusDisplay(p.estadoProyecto),
       }));
   }
 
     return { totalProjects, inReview, verified, offers, recentProjects };
-  }, [isAdmin, statsData, projectsData]);
+  }, [isAdmin, statsData, projectsData, userTotal]);
 
   const stats = useMemo(() => [
     {

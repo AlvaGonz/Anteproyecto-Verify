@@ -1,6 +1,5 @@
-import React, { useState, useMemo, memo, useRef, Suspense } from "react";
+import React, { useState, useMemo, memo, useRef, useEffect, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import type { FC } from "react";
 import {
   Filter,
   ArrowRight,
@@ -11,6 +10,9 @@ import {
   ChevronsRight,
   CheckCircle2,
   AlertCircle,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
   MapPin,
   Search,
   DollarSign,

@@ -217,67 +217,67 @@ export const MyProfileForm: React.FC = () => {
           {/* READ-ONLY identity section with Avatar */}
           <div className="bg-surface-raised/30 border border-border rounded-2xl p-5 space-y-3 flex-1 flex flex-col">
             <UserAvatarUpload />
-            <div className="flex-1 space-y-3">
-              <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">
+            <div className="flex-1 space-y-5">
+              <p className="text-xs font-black text-text-secondary uppercase tracking-widest mb-4 pb-2 border-b border-border/50">
                 Datos de Identidad
               </p>
-              <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-text-secondary shrink-0" />
+              <div className="flex items-center gap-4">
+                <Mail className="w-6 h-6 text-text-secondary shrink-0" />
                 <div>
-                  <p className="text-[10px] text-text-secondary uppercase font-bold">Correo Electrónico</p>
-                  <p className="text-sm font-mono text-text-primary">{user?.email}</p>
+                  <p className="text-xs text-text-secondary uppercase font-bold">Correo Electrónico</p>
+                  <p className="text-base font-mono text-text-primary">{user?.email}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-4 h-4 text-text-secondary shrink-0" />
+              <div className="flex items-center gap-4">
+                <CreditCard className="w-6 h-6 text-text-secondary shrink-0" />
                 <div>
-                  <p className="text-[10px] text-text-secondary uppercase font-bold">Cédula</p>
-                  <p className="text-sm font-mono text-text-primary">{user?.cedula || "N/A"}</p>
+                  <p className="text-xs text-text-secondary uppercase font-bold">Cédula</p>
+                  <p className="text-base font-mono text-text-primary">{user?.cedula || "N/A"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Shield className="w-4 h-4 text-text-secondary shrink-0" />
+              <div className="flex items-center gap-4">
+                <Shield className="w-6 h-6 text-text-secondary shrink-0" />
                 <div>
-                  <p className="text-[10px] text-text-secondary uppercase font-bold">Rol</p>
-                  <p className="text-sm font-bold text-text-primary">
+                  <p className="text-xs text-text-secondary uppercase font-bold">Rol</p>
+                  <p className="text-base font-bold text-text-primary">
                     {ROLE_LABEL[user?.role ?? "user"] ?? user?.role}
                   </p>
                 </div>
               </div>
               {user?.role !== "admin" && (user?.plan || user?.isGuest) && (
-                <div className="flex items-center gap-3">
-                  <Award className="w-4 h-4 text-text-secondary shrink-0" />
+                <div className="flex items-center gap-4">
+                  <Award className="w-6 h-6 text-text-secondary shrink-0" />
                   <div>
-                    <p className="text-[10px] text-text-secondary uppercase font-bold">Plan de Suscripción</p>
-                    <p className="text-sm font-bold text-primary">
+                    <p className="text-xs text-text-secondary uppercase font-bold">Plan de Suscripción</p>
+                    <p className="text-base font-bold text-primary">
                       {user.isGuest ? `${user.inviterPlan || "N/A"} (Invitado)` : user.plan}
                     </p>
                   </div>
                 </div>
               )}
-              <div className="flex items-center gap-3">
-                <Shield className="w-4 h-4 text-text-secondary shrink-0" />
+              <div className="flex items-center gap-4">
+                <Shield className="w-6 h-6 text-text-secondary shrink-0" />
                 <div>
-                  <p className="text-[10px] text-text-secondary uppercase font-bold">Razón Social (DGII)</p>
-                  <p className="text-sm font-bold text-text-primary">
+                  <p className="text-xs text-text-secondary uppercase font-bold">Razón Social (DGII)</p>
+                  <p className="text-base font-bold text-text-primary">
                     {previewDgii?.nombreRazonSocial || user?.razonSocial || "******* ******* *******"}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Building2 className="w-4 h-4 text-text-secondary shrink-0" />
+              <div className="flex items-center gap-4">
+                <Building2 className="w-6 h-6 text-text-secondary shrink-0" />
                 <div>
-                  <p className="text-[10px] text-text-secondary uppercase font-bold">Nombre Comercial</p>
-                  <p className="text-sm font-bold text-text-primary">
+                  <p className="text-xs text-text-secondary uppercase font-bold">Nombre Comercial</p>
+                  <p className="text-base font-bold text-text-primary">
                     {previewDgii?.nombreComercial || user?.nombreComercial || "******* ******* *******"}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Briefcase className="w-4 h-4 text-text-secondary shrink-0" />
+              <div className="flex items-center gap-4">
+                <Briefcase className="w-6 h-6 text-text-secondary shrink-0" />
                 <div>
-                  <p className="text-[10px] text-text-secondary uppercase font-bold">Actividad Económica</p>
-                  <p className="text-sm font-bold text-text-primary">
+                  <p className="text-xs text-text-secondary uppercase font-bold">Actividad Económica</p>
+                  <p className="text-base font-bold text-text-primary">
                     {previewDgii?.actividadEconomica || user?.actividadEconomica || "******* ******* *******"}
                   </p>
                 </div>

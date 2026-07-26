@@ -76,16 +76,11 @@ public class EmailNotificationService : IEmailNotificationService
     public async Task SendInterestRegisteredAsync(string creatorEmail, Proyecto proyecto, string interestedUserName, CancellationToken ct = default)
     {
         string subject = $"¡Nuevo interesado en tu proyecto {proyecto.Nombre}!";
-        string body = $@"
-            <div style='font-family: Arial, sans-serif; color: #333;'>
-                <h2>¡Buenas noticias!</h2>
-                <p>El usuario <b>{interestedUserName}</b> acaba de registrar interés en tu proyecto <b>{proyecto.Nombre}</b>.</p>
-                <p>Inicia sesión en VeriFinca para revisar tus interesados y contactarlos.</p>
-                <br/>
-                <p>Atentamente,</p>
-                <p>El equipo de VeriFinca</p>
-            </div>
-        ";
+        string body = Email.EmailTemplates.GetInterestRegisteredEmail(
+            interestedUserName,
+            proyecto.Nombre,
+            proyecto.Id.ToString()
+        );
 
         try
         {

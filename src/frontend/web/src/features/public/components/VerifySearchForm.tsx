@@ -15,8 +15,10 @@ import {
   User,
   Check
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -124,6 +126,8 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { addToast } = useToast();
 
   const isDark = variant === "dark";
 
@@ -137,7 +141,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationError = validateInput(code.trim(), searchType.id);
 
@@ -147,6 +151,20 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     }
 
     if (code.trim()) {
+      const { projectsApi } = await import("../../projects/api/projectsApi");
+      const result = await projectsApi.consumeQuota({ codigo: code.trim() });
+      
+      if (result._tag === 'failure') {
+        if (result.error._tag === 'LimitReached') {
+          addToast("Límite de consultas alcanzado. Mejora tu plan para continuar.", "error");
+        } else {
+          addToast("Error al procesar la consulta del proyecto.", "error");
+        }
+        return;
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+      
       if (searchType.id === "cert") {
         navigate(`/projects/verify/${encodeURIComponent(code.trim())}`);
       } else {

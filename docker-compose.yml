@@ -48,6 +48,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/frontend/web:/app/src/frontend/web
+      - /app/src/frontend/web/node_modules
     environment:
       - VITE_WATCH_POLLING=true
       - DOCKER_CONTAINER=true

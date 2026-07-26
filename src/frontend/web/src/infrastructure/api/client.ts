@@ -49,6 +49,40 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
+export const refreshAuthToken = (): Promise<string | null> => {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      failedQueue.push({ resolve, reject });
+    });
+  }
+
+  isRefreshing = true;
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data } = await instance.post(
+        '/auth/refresh',
+        {},
+        { 
+          withCredentials: true,
+          headers: { 'X-Skip-Retry': '1' } 
+        }
+      );
+      
+      setAccessToken(data.accessToken);
+      processQueue(null, data.accessToken);
+      resolve(data.accessToken);
+    } catch (err) {
+      processQueue(err, null);
+      setAccessToken(null);
+      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/api/auth/refresh;";
+      reject(err);
+    } finally {
+      isRefreshing = false;
+    }
+  });
+};
+
 // Response interceptor — surface API errors cleanly
 instance.interceptors.response.use(
   (response) => response,
@@ -56,60 +90,14 @@ instance.interceptors.response.use(
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
     
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== "/auth/refresh" && originalRequest.url !== "/auth/me" && originalRequest.url !== "/auth/logout" && !originalRequest.headers?.['X-Skip-Retry']) {
-      if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
-          failedQueue.push({ resolve, reject });
-        }).then(token => {
-          originalRequest.headers['Authorization'] = `Bearer ${token}`;
-          return instance(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err);
-        });
-      }
-
       originalRequest._retry = true;
-      isRefreshing = true;
-
       try {
-        // Use the same instance (not raw axios) to enforce interceptors + baseURL
-        // Pin to exact path to prevent SSRF-like open redirect in BASE_URL tampering
-        const { data } = await instance.post(
-          '/auth/refresh',
-          {},
-          { 
-            withCredentials: true,
-            // Prevent this refresh call from triggering another 401 retry loop
-            headers: { 'X-Skip-Retry': '1' } 
-          }
-        );
-        
-        // DEV-ONLY guard: warn if backend is not setting the refresh cookie
-        if (import.meta.env.DEV) {
-          const setCookie = (error.config as any)?._originalResponse?.headers?.['set-cookie']
-          if (!setCookie) {
-            console.warn(
-              '[Security] /auth/refresh did not return a Set-Cookie header. ' +
-              'Ensure the refresh_token cookie is HttpOnly, Secure, SameSite=Strict ' +
-              'and scoped to /api/auth/refresh path. (OWASP A02)'
-            )
-          }
-        }
-        
-        setAccessToken(data.accessToken);
-        originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        
-        processQueue(null, data.accessToken);
+        const token = await refreshAuthToken();
+        originalRequest.headers['Authorization'] = `Bearer ${token}`;
         return instance(originalRequest);
       } catch (err) {
-        processQueue(err, null);
-        setAccessToken(null);
-        // Hard delete cookies client-side as fallback to prevent 401 loops
-        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/api/auth/refresh;";
         window.dispatchEvent(new Event("auth:force-logout"));
         return Promise.reject(err);
-      } finally {
-        isRefreshing = false;
       }
     }
 
