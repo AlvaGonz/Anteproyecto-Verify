@@ -1,7 +1,4 @@
-import { apiClient, setAccessToken, getAccessToken } from "../../../infrastructure/api/client";
-
-// Module-level variable to deduplicate parallel refresh requests
-let refreshPromise: Promise<string | null> | null = null;
+import { apiClient, setAccessToken, getAccessToken, refreshAuthToken } from "../../../infrastructure/api/client";
 
 export interface User {
   id: string;
@@ -149,41 +146,25 @@ export const AuthService = {
   },
 
   async refreshAccessToken(): Promise<string | null> {
-    if (refreshPromise) {
-      return refreshPromise;
+    try {
+      return await refreshAuthToken();
+    } catch {
+      return null;
     }
-
-    refreshPromise = (async () => {
-      try {
-        const response = await apiClient.post('/auth/refresh', {}, { withCredentials: true });
-        const token = response.data.accessToken ?? null;
-        if (token) {
-          setAccessToken(token);
-        }
-        return token;
-      } catch {
-        setAccessToken(null);
-        return null;
-      } finally {
-        refreshPromise = null;
-      }
-    })();
-
-    return refreshPromise;
   },
 
   async getCurrentUser(): Promise<User | null> {
-    // If we already have an in-memory token, use it directly
+    // Fast path: use in-memory access token if available
     if (getAccessToken()) {
       try {
         const response = await apiClient.get('/auth/me');
         return response.data;
       } catch {
-        return null;
+        // Token expired — fall through to refresh
       }
     }
 
-    // No in-memory token — try refresh first (relies on refresh token cookie)
+    // Try refresh token (cookie-based)
     const newToken = await this.refreshAccessToken();
     if (newToken) {
       try {
@@ -194,12 +175,6 @@ export const AuthService = {
       }
     }
 
-    // Refresh failed — try cookie-based auth as last resort
-    try {
-      const response = await apiClient.get('/auth/me');
-      return response.data;
-    } catch {
-      return null;
-    }
+    return null;
   }
 };

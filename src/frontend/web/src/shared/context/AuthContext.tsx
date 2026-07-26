@@ -1,4 +1,4 @@
-import { createContext, use, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
+import { createContext, use, useState, useEffect, useRef, ReactNode, useCallback, useMemo } from "react";
 import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
 import { queryClient } from "../../infrastructure/api/queryClient";
 
@@ -20,27 +20,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AuthError | null>(null);
+  const initRef = useRef(false);
 
   useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
+
     const initAuth = async () => {
-      // First try to get user directly (relies on the 'jwt' cookie which persists beyond IMemoryCache)
-      let currentUser = await AuthService.getCurrentUser();
-      
-      // If that failed (e.g., jwt cookie expired or absent), fallback to refresh
-      if (!currentUser) {
-        try {
-          await AuthService.refreshAccessToken();
-          currentUser = await AuthService.getCurrentUser();
-        } catch (err) {
-          console.error("Auth refresh failed during init:", err);
-          // Interceptor handles the force-logout if necessary
-        }
-      }
-      
+      const currentUser = await AuthService.getCurrentUser();
+
       if (currentUser) {
         setUser(currentUser);
       }
-      
+
       setLoading(false);
     };
 

@@ -9,6 +9,7 @@ using Application.Abstractions.Persistence;
 using Application.Contracts.Projects;
 using Application.Contracts.Documents;
 using Application.DTOs;
+using Application.DTOs.Common;
 using Application.DTOs.Projects;
 using Domain.Entities;
 using Domain.Enums;
@@ -50,7 +51,7 @@ public class ProjectsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProyectoDto>>> GetProjects(
+    public async Task<ActionResult<PaginatedResult<ProyectoDto>>> GetProjects(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
         CancellationToken cancellationToken = default)
@@ -64,15 +65,15 @@ public class ProjectsController : ControllerBase
                 if (loggedInUser != null)
                 {
                     Guid? filterUserId = loggedInUser.Rol != UserRole.Administrator ? userId : null;
-                    var projects = await _projectService.GetAllProjectsAsync(filterUserId, page, pageSize, cancellationToken);
+                    var result = await _projectService.GetAllProjectsWithCountAsync(filterUserId, page, pageSize, cancellationToken);
                     
-                    return Ok(projects);
+                    return Ok(result);
                 }
             }
         }
 
-        var visibleProjects = await _projectService.GetVisibleProjectsAsync(page, pageSize, cancellationToken);
-        return Ok(visibleProjects);
+        var visibleResult = await _projectService.GetVisibleProjectsWithCountAsync(page, pageSize, cancellationToken);
+        return Ok(visibleResult);
     }
 
     [HttpGet("{id:guid}")]
@@ -85,38 +86,99 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
 
-        // Enforce consultation quota for authenticated users viewing public projects
-        if (User.Identity?.IsAuthenticated == true)
+        return Ok(project);
+    }
+
+    public class ConsumeQuotaRequest
+    {
+        public Guid? ProjectId { get; set; }
+        public string? Codigo { get; set; }
+        public string? Detalle { get; set; }
+    }
+
+    [HttpPost("consume-quota")]
+    public async Task<ActionResult> ConsumeQuota([FromBody] ConsumeQuotaRequest request, CancellationToken cancellationToken)
+    {
+        if (User.Identity?.IsAuthenticated != true)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-            if (Guid.TryParse(userIdClaim, out var userId))
-            {
-                var user = await _usuarioRepository.GetByIdAsync(userId, cancellationToken);
-                if (user != null)
-                {
-                    // Read actual consultas count from LogConsultas for accurate quota check
-                    var consultasUsadas = await _dbContext.LogConsultas
-                        .CountAsync(lc => lc.UsuarioId == userId, cancellationToken);
-
-                    if (!SubscriptionTierPolicy.CanViewPublicProject(user, project.UsuarioCreadorId, consultasUsadas))
-                    {
-                        return StatusCode(402, new
-                        {
-                            error = "QUOTA_EXCEEDED",
-                            limitType = "MaxConsultas",
-                            message = "Has alcanzado el límite de consultas de tu plan actual. Mejora tu plan para continuar consultando proyectos."
-                        });
-                    }
-
-                    // Log the consulta for authenticated users viewing public projects
-                    var log = new LogConsulta(userId, true, $"Consulta pública proyecto: {project.CodigoInterno}");
-                    _dbContext.LogConsultas.Add(log);
-                    await _dbContext.SaveChangesAsync(cancellationToken);
-                }
-            }
+            return Ok(); // Anonymous users don't consume quota
         }
 
-        return Ok(project);
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _usuarioRepository.GetByIdWithPlanAsync(userId, cancellationToken);
+        if (user == null) return Unauthorized();
+
+        string logDetail = request.Detalle ?? "Consulta de proyecto";
+        Guid? ownerId = null;
+
+        if (request.ProjectId.HasValue)
+        {
+            var project = await _dbContext.Proyectos.FindAsync(new object[] { request.ProjectId.Value }, cancellationToken);
+            if (project != null)
+            {
+                ownerId = project.UsuarioCreadorId;
+                logDetail = $"Consulta pública proyecto: {project.CodigoInterno}";
+            }
+        }
+        else if (!string.IsNullOrEmpty(request.Codigo))
+        {
+            logDetail = $"Consulta código: {request.Codigo}";
+        }
+
+        bool isOwnerOrTeam = false;
+        if (ownerId.HasValue)
+        {
+            isOwnerOrTeam = user.Id == ownerId.Value || 
+                            (user.TitularId.HasValue && user.TitularId.Value == ownerId.Value) ||
+                            (user.MiembrosEquipo != null && user.MiembrosEquipo.Any(m => m.Id == ownerId.Value));
+        }
+
+        if (!isOwnerOrTeam && user.Rol != Domain.Enums.UserRole.Administrator)
+        {
+            var plan = SubscriptionTierPolicy.GetEffectivePlan(user);
+            if (plan == null)
+            {
+                return Ok(new
+                {
+                    allowed = false,
+                    error = "QUOTA_EXCEEDED",
+                    limitType = "MaxConsultas",
+                    used = user.ConsultasUsadas,
+                    max = 0,
+                    message = "No tienes un plan activo. Adquiere una suscripción para consultar proyectos."
+                });
+            }
+
+            if (!plan.HasConsultasDisponibles(user.ConsultasUsadas))
+            {
+                return Ok(new
+                {
+                    allowed = false,
+                    error = "QUOTA_EXCEEDED",
+                    limitType = "MaxConsultas",
+                    used = user.ConsultasUsadas,
+                    max = plan.MaxConsultas,
+                    message = "Has alcanzado el límite de consultas de tu plan actual. Mejora tu plan para continuar consultando proyectos."
+                });
+            }
+
+            // Atomic increment + log in a single transaction
+            using var tx = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+            user.IncrementarConsulta();
+            var log = new LogConsulta(userId, true, logDetail);
+            _dbContext.LogConsultas.Add(log);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            await tx.CommitAsync(cancellationToken);
+        }
+
+        return Ok(new { allowed = true });
     }
 
     [HttpGet("{id:guid}/status-eligibility")]

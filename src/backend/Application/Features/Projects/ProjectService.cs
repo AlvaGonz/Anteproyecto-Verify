@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
 using Application.Contracts.Projects;
 using Application.DTOs;
+using Application.DTOs.Common;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Policies;
@@ -44,6 +45,28 @@ public class ProjectService : IProjectService
     {
         var proyectos = await _proyectoRepository.GetAllAsync(usuarioId, page, pageSize, cancellationToken);
         return proyectos.Select(MapToDto);
+    }
+
+    public async Task<PaginatedResult<ProyectoDto>> GetAllProjectsWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    {
+        var (items, totalCount) = await _proyectoRepository.GetAllWithCountAsync(usuarioId, page, pageSize, cancellationToken);
+        return new PaginatedResult<ProyectoDto>(
+            items.Select(MapToDto).ToList(),
+            totalCount,
+            page,
+            pageSize
+        );
+    }
+
+    public async Task<PaginatedResult<ProyectoDto>> GetVisibleProjectsWithCountAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    {
+        var (items, totalCount) = await _proyectoRepository.GetVisibleWithCountAsync(page, pageSize, cancellationToken);
+        return new PaginatedResult<ProyectoDto>(
+            items.Select(MapToDto).ToList(),
+            totalCount,
+            page,
+            pageSize
+        );
     }
 
     public async Task<ProyectoDto?> GetProjectByIdAsync(Guid id, CancellationToken cancellationToken = default)

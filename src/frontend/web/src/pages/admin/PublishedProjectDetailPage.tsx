@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   MapPin,
   ChevronLeft,
@@ -31,6 +32,8 @@ import { getDefaultProjectImage } from "../../features/projects/api/usePublished
 import { IntegrityStatus } from "../../features/projects/types";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
+import { usePlanLimits } from "../../features/settings/api/useSettings";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -165,12 +168,73 @@ const MiniMap: React.FC<{ lat: number; lng: number }> = ({ lat, lng }) => {
 export const PublishedProjectDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
   const { data: project, isLoading, error } = useProject(id || "");
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { addToast } = useToast();
+
+  const [hasQuota, setHasQuota] = useState<boolean | null>(null);
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
+  const [quotaError, setQuotaError] = useState<{ used?: number; max?: number } | null>(null);
+  const fromSaved = !!location.state?.fromSaved;
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
+  const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
+  const quotaHandledRef = useRef(false);
+
+  React.useEffect(() => {
+    async function consumeBg() {
+      try {
+        const { projectsApi } = await import("../../features/projects/api/projectsApi");
+        const result = await projectsApi.consumeQuota({ projectId: id || "" });
+        if (result._tag === 'success') {
+          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+        }
+      } catch (e) {
+        console.error("Error consumiendo cuota (no bloqueante):", e);
+      }
+    }
+
+    if (authLoading) return;
+    if (quotaHandledRef.current) return;
+
+    if (isAdmin || fromSaved || !isAuthenticated) {
+      setHasQuota(true);
+      quotaHandledRef.current = true;
+      return;
+    }
+
+    if (planLimitsLoading) {
+      const timer = setTimeout(() => {
+        if (!quotaHandledRef.current) {
+          quotaHandledRef.current = true;
+          setHasQuota(true);
+          consumeBg();
+        }
+      }, 1000);
+      return () => { clearTimeout(timer); };
+    }
+
+    quotaHandledRef.current = true;
+    if (planLimits && planLimits.maxConsultas !== -1 && planLimits.consultasUsadas >= planLimits.maxConsultas) {
+      setQuotaError({ used: planLimits.consultasUsadas, max: planLimits.maxConsultas });
+      setShowQuotaModal(true);
+      setHasQuota(false);
+      return;
+    }
+
+    setHasQuota(true);
+    consumeBg();
+  }, [id, fromSaved, isAuthenticated, isAdmin, planLimits, planLimitsLoading, authLoading]);
+
+  React.useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+    };
+  }, []);
   const [localSaved, setLocalSaved] = useState(false);
   const [localInterested, setLocalInterested] = useState(false);
 
@@ -232,15 +296,48 @@ export const PublishedProjectDetailPage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || hasQuota === null) {
     return (
       <div className="flex items-center justify-center py-32">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
-            Cargando proyecto...
+            {hasQuota === null ? "Verificando acceso..." : "Cargando proyecto..."}
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (hasQuota === false) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center">
+        <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+        <h3 className="text-lg font-bold text-slate-900 mb-2">
+          Límite de Consultas Alcanzado
+        </h3>
+        <p className="text-sm text-slate-500 mb-6 max-w-md">
+          Has alcanzado el límite de consultas de tu plan actual. Mejora tu plan para continuar consultando proyectos.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate("/admin/projects?tab=publicados")}
+          className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-colors"
+        >
+          Volver a proyectos
+        </button>
+
+        <LimitReachedModal
+          isOpen={showQuotaModal}
+          onClose={() => {
+            setShowQuotaModal(false);
+            navigate("/admin/projects?tab=publicados");
+          }}
+          onViewPlans={() => navigate("/plans")}
+          limitType="consultations"
+          used={quotaError?.used}
+          max={quotaError?.max}
+        />
       </div>
     );
   }
@@ -252,7 +349,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
         <h3 className="text-lg font-bold text-slate-900 mb-2">
           No se pudo cargar el proyecto
         </h3>
-        <p className="text-sm text-slate-500 mb-6">
+        <p className="text-sm text-slate-500 mb-6 max-w-md">
           {error instanceof Error ? error.message : "Proyecto no encontrado"}
         </p>
         <button

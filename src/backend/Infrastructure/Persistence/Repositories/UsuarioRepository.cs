@@ -1,9 +1,11 @@
+
 namespace Infrastructure.Persistence.Repositories;
 
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Application.Abstractions.Persistence;
 using Application.Features.Subscriptions.Queries.GetMySubscriptionStatus;
 using Domain.Entities;
@@ -111,7 +113,7 @@ public class UsuarioRepository : IUsuarioRepository, Application.Features.Subscr
                     SoporteTipo = u.Plan.SoporteTipo,
                     AccesoApi = u.Plan.AccesoApi
                 } : null,
-                ConsultasUsadas = _context.LogConsultas.Count(lc => lc.UsuarioId == u.Id),
+                ConsultasUsadas = u.ConsultasUsadas,
                 ProyectosCreados = _context.Proyectos.Count(p => p.UsuarioCreadorId == u.Id),
                 SubscriptionStatus = u.SubscriptionStatus,
                 CurrentPeriodEnd = u.CurrentPeriodEnd,
@@ -162,5 +164,14 @@ public class UsuarioRepository : IUsuarioRepository, Application.Features.Subscr
             .Where(u => u.AccountStatus == Domain.Enums.UserAccountStatus.PendingDeletion)
             .Where(u => u.PurgeAtUtc != null && u.PurgeAtUtc <= now)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task IncrementarConsultaAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        await _context.Usuarios
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.ConsultasUsadas, u => u.ConsultasUsadas + 1)
+                .SetProperty(u => u.UpdatedAtUtc, DateTime.UtcNow), cancellationToken);
     }
 }

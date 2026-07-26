@@ -173,7 +173,7 @@ export type ProjectError =
   | { _tag: "ValidationError"; errors: string[] }
   | { _tag: "ServerError"; message: string }
   | { _tag: "UnknownError"; original: unknown }
-  | { _tag: "LimitReached"; message: string };
+  | { _tag: "LimitReached"; message: string; used?: number; max?: number };
 
 export const getProjectErrorMessage = (error: ProjectError): string => {
   switch (error._tag) {

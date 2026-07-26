@@ -26,7 +26,7 @@ export const AdminProjectsPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(50);
+  const [pageSize] = useState(1000);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,7 +38,7 @@ export const AdminProjectsPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchParams]);
 
-  const { data: rawProjects = [], isLoading } = useProjects(page, pageSize);
+  const { data: rawProjects = [], totalCount, isLoading } = useProjects(page, pageSize);
   const projects = rawProjects;
 
   const { data: dashboardStats } = useDashboardStats();
@@ -49,7 +49,7 @@ export const AdminProjectsPage: React.FC = () => {
   const { mutate: updateStatus } = useUpdateProjectStatus();
 
   const stats = {
-    total: dashboardStats?.totalProyectos ?? projects.length,
+    total: dashboardStats?.totalProyectos ?? totalCount ?? projects.length,
     published: dashboardStats?.proyectosAprobados ?? projects.filter(p => p.estadoProyecto === ProjectStatus.Published).length,
     pending: dashboardStats?.proyectosPendientes ?? projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length
   };

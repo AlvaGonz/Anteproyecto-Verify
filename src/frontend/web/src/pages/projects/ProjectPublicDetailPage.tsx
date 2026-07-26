@@ -8,6 +8,7 @@ import { useProject } from "../../features/projects/api/useProjects";
 import { useProjectsInteractions, useInterests } from "../../features/projects/api/useProjectsInteractions";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
@@ -32,6 +33,7 @@ import {
 } from "lucide-react";
 import { m } from "framer-motion";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
+import { usePlanLimits } from "../../features/settings/api/useSettings";
 
 const getCategoryLabel = (cat: ProjectCategory) => {
   switch (cat) {
@@ -59,10 +61,13 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const identifier = slug || id || "";
   const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
   const error = fetchError ? (fetchError as Error).message : null;
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [isInterested, setIsInterested] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [hasQuota, setHasQuota] = React.useState<boolean | null>(null);
+
   
+  const queryClient = useQueryClient();
   const { registerInterest, isRegisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
   const { data: interestsList } = useInterests(isAuthenticated);
   const { addToast } = useToast();
@@ -77,13 +82,60 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
   const [showQuotaModal, setShowQuotaModal] = React.useState(false);
   const [quotaError, setQuotaError] = React.useState<{ used?: number; max?: number } | null>(null);
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
+  const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
+  const quotaHandledRef = React.useRef(false);
 
-  // Check for quota exceeded error from API
   React.useEffect(() => {
-    if (fetchError && error?.includes("QUOTA_EXCEEDED")) {
-      setShowQuotaModal(true);
+    async function consumeBg() {
+      try {
+        const { projectsApi } = await import("../../features/projects/api/projectsApi");
+        const result = await projectsApi.consumeQuota({ projectId: identifier });
+        if (result._tag === 'success') {
+          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+        }
+      } catch (e) {
+        console.error("Error consumiendo cuota (no bloqueante):", e);
+      }
     }
-  }, [fetchError, error]);
+
+    if (authLoading) return;
+    if (quotaHandledRef.current) return;
+
+    if (isAdmin || !isAuthenticated || !identifier) {
+      setHasQuota(true);
+      quotaHandledRef.current = true;
+      return;
+    }
+
+    if (planLimitsLoading) {
+      const timer = setTimeout(() => {
+        if (!quotaHandledRef.current) {
+          quotaHandledRef.current = true;
+          setHasQuota(true);
+          consumeBg();
+        }
+      }, 1000);
+      return () => { clearTimeout(timer); };
+    }
+
+    quotaHandledRef.current = true;
+    if (planLimits && planLimits.maxConsultas !== -1 && planLimits.consultasUsadas >= planLimits.maxConsultas) {
+      setQuotaError({ used: planLimits.consultasUsadas, max: planLimits.maxConsultas });
+      setShowQuotaModal(true);
+      setHasQuota(false);
+      return;
+    }
+
+    setHasQuota(true);
+    consumeBg();
+  }, [identifier, isAuthenticated, isAdmin, planLimits, planLimitsLoading, authLoading]);
+
+  React.useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+    };
+  }, []);
 
   const handleCloseQuotaModal = () => {
     setShowQuotaModal(false);
@@ -92,7 +144,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
   const handleViewPlans = () => {
     setShowQuotaModal(false);
-    // Navigate to pricing page
+    setQuotaError(null);
     window.location.href = "/pricing";
   };
 
@@ -105,19 +157,42 @@ export const ProjectPublicDetailPage: React.FC = () => {
     (user.titularId && project.registradoPor?.titularId === user.titularId)
   );
 
-  if (loading)
+  // If we don't have quota, we can't render the details.
+  if (loading || hasQuota === null)
     return (
-      <div className="min-h-screen bg-secondary flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white/40 font-black uppercase tracking-[0.4em] text-xs">Descifrando Expediente...</p>
-        </div>
+      <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4 text-sm font-bold text-slate-400 uppercase tracking-widest">
+          {hasQuota === null ? "Verificando acceso..." : "Cargando proyecto..."}
+        </p>
       </div>
     );
 
-  // If we don't have a project, we can't render the details.
-  // We show the error screen (and the quota modal if applicable).
-  if (!project)
+  if (hasQuota === false)
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-10">
+        <div className="vf-card !p-12 text-center max-w-md">
+          <AlertTriangle className="w-16 h-16 text-error mx-auto mb-6" />
+          <h2 className="text-3xl font-display font-black text-secondary mb-4 tracking-tighter uppercase italic">Error de Acceso</h2>
+          <p className="text-on-surface-variant font-medium mb-12">Límite de consultas alcanzado. Mejora tu plan para continuar.</p>
+          <Link to="/projects" className="vf-btn-primary w-full h-14 !rounded-2xl">
+            <ArrowLeft className="w-5 h-5 mr-3" /> VOLVER AL DIRECTORIO
+          </Link>
+        </div>
+        
+        {/* Consultation Limit Modal */}
+        <LimitReachedModal
+          isOpen={showQuotaModal}
+          onClose={handleCloseQuotaModal}
+          onViewPlans={handleViewPlans}
+          limitType="consultations"
+          used={quotaError?.used}
+          max={quotaError?.max}
+        />
+      </div>
+    );
+
+  if (!project || error)
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-10">
         <div className="vf-card !p-12 text-center max-w-md">
@@ -128,16 +203,6 @@ export const ProjectPublicDetailPage: React.FC = () => {
             <ArrowLeft className="w-5 h-5 mr-3" /> VOLVER AL DIRECTORIO
           </Link>
         </div>
-        
-        {/* Consultation Limit Modal (rendered here if project failed to load due to quota) */}
-        <LimitReachedModal
-          isOpen={showQuotaModal}
-          onClose={handleCloseQuotaModal}
-          onViewPlans={handleViewPlans}
-          limitType="consultations"
-          used={quotaError?.used}
-          max={quotaError?.max}
-        />
       </div>
     );
 

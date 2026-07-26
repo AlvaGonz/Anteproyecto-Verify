@@ -38,16 +38,38 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   registradoPor: apiProj.registradoPor || null,
 });
 
-export const useProjects = (page = 1, pageSize = 50) =>
-  useQuery({
+interface PaginatedProjectsResponse {
+  items: ApiProyectoDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export const useProjects = (page = 1, pageSize = 50) => {
+  const query = useQuery({
     queryKey: projectKeys.list(page, pageSize),
     queryFn: () =>
       apiClient
-        .get<ApiProyectoDto[]>("/projects", { params: { page, pageSize } })
-        .then((res) => res.data.map(mapApiProject)),
+        .get<PaginatedProjectsResponse>("/projects", { params: { page, pageSize } })
+        .then((res) => ({
+          projects: res.data.items.map(mapApiProject),
+          totalCount: res.data.totalCount,
+        })),
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
   });
+
+  return {
+    data: query.data?.projects ?? [],
+    totalCount: query.data?.totalCount ?? 0,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+    isSuccess: query.isSuccess,
+    isFetching: query.isFetching,
+    refetch: query.refetch,
+  };
+};
 
 export const useProject = (id: string) =>
   useQuery({
