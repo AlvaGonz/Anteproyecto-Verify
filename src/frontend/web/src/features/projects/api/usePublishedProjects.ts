@@ -128,40 +128,5 @@ export function getDefaultProjectImage(categoryId?: number): string {
   }
 }
 
-export const PROVINCIAS = [
-  "Distrito Nacional",
-  "Azua",
-  "Baoruco",
-  "Barahona",
-  "Dajabón",
-  "Duarte",
-  "El Seibo",
-  "Elías Piña",
-  "Espaillat",
-  "Hato Mayor",
-  "Hermanas Mirabal",
-  "Independencia",
-  "La Altagracia",
-  "La Romana",
-  "La Vega",
-  "María Trinidad Sánchez",
-  "Monseñor Nouel",
-  "Monte Cristi",
-  "Monte Plata",
-  "Pedernales",
-  "Peravia",
-  "Puerto Plata",
-  "Samaná",
-  "San Cristóbal",
-  "San José de Ocoa",
-  "San Juan",
-  "San Pedro de Macorís",
-  "Sánchez Ramírez",
-  "Santiago",
-  "Santiago Rodríguez",
-  "Santo Domingo",
-  "Valverde",
-];
-
 export const PRICE_STEPS = 100_000;
 export const PRICE_MAX = 15_000_000;

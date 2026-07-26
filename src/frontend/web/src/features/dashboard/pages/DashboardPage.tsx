@@ -30,23 +30,22 @@ export const DashboardPage: React.FC = () => {
 
   const loading = isAdmin ? loadingStats : loadingProjects;
 
-  const { totalProjects, inReview, observed, verified, recentProjects } = useMemo(() => {
+  const { totalProjects, inReview, verified, offers, recentProjects } = useMemo(() => {
     let totalProjects = 0;
     let inReview = 0;
-    let observed = 0;
     let verified = 0;
+    let offers = 0;
     let recentProjects: ProyectoRecienteDto[] = [];
 
   if (isAdmin && statsData) {
     totalProjects = statsData.totalProyectos || 0;
     inReview = statsData.proyectosPendientes || 0;
-    observed = statsData.proyectosRechazados || 0;
     verified = statsData.proyectosAprobados || 0;
+    offers = statsData.totalOfertas || 0;
     recentProjects = statsData.proyectosRecientes || [];
   } else if (!isAdmin && projectsData) {
     totalProjects = projectsData.length;
     inReview = projectsData.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
-    observed = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Observed).length;
     verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Validated).length;
     recentProjects = [...projectsData]
       .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
@@ -59,7 +58,7 @@ export const DashboardPage: React.FC = () => {
       }));
   }
 
-    return { totalProjects, inReview, observed, verified, recentProjects };
+    return { totalProjects, inReview, verified, offers, recentProjects };
   }, [isAdmin, statsData, projectsData]);
 
   const stats = useMemo(() => [
@@ -76,18 +75,18 @@ export const DashboardPage: React.FC = () => {
       bgColor: "bg-primary",
     },
     {
-      name: "Rechazados",
-      stat: loading ? "..." : observed.toString(),
-      icon: AlertCircle,
-      bgColor: "bg-error",
-    },
-    {
-      name: "Aprobados",
+      name: "Publicados",
       stat: loading ? "..." : verified.toString(),
       icon: TrendingUp,
       bgColor: "bg-success",
     },
-  ], [loading, totalProjects, inReview, observed, verified]);
+    {
+      name: "Ofertas",
+      stat: loading ? "..." : offers.toString(),
+      icon: AlertCircle,
+      bgColor: "bg-warning",
+    },
+  ], [loading, totalProjects, inReview, verified, offers]);
 
   const recentSubscriptions = statsData?.suscripcionesRecientes || [];
 

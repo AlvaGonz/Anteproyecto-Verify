@@ -27,14 +27,22 @@ public class ProyectoRepository : IProyectoRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Proyecto>> GetAllAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Proyecto>> GetAllAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        return await _context.Proyectos
+        var query = _context.Proyectos
             .AsNoTracking()
             .AsSplitQuery()
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .AsQueryable();
+
+        if (usuarioId.HasValue)
+        {
+            query = query.Where(p => p.UsuarioCreadorId == usuarioId.Value);
+        }
+
+        return await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

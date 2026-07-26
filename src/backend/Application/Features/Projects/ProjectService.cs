@@ -40,9 +40,9 @@ public class ProjectService : IProjectService
         return proyectos.Select(MapToDto);
     }
 
-    public async Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        var proyectos = await _proyectoRepository.GetAllAsync(page, pageSize, cancellationToken);
+        var proyectos = await _proyectoRepository.GetAllAsync(usuarioId, page, pageSize, cancellationToken);
         return proyectos.Select(MapToDto);
     }
 

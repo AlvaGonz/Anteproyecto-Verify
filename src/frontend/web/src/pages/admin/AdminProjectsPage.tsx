@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ProjectStatus } from "../../features/projects/types";
 import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
+import { useDashboardStats } from "../../features/dashboard/api/useDashboardStats";
 import { Plus, Building, FileCheck, Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
 import { AdminPublishedProjectsView } from "./AdminPublishedProjectsView";
@@ -40,15 +41,17 @@ export const AdminProjectsPage: React.FC = () => {
   const { data: rawProjects = [], isLoading } = useProjects(page, pageSize);
   const projects = rawProjects;
 
+  const { data: dashboardStats } = useDashboardStats();
+
   const [selectedStatuses, setSelectedStatuses] = useState<ProjectStatus[]>([]);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { mutate: deleteProject } = useDeleteProject();
   const { mutate: updateStatus } = useUpdateProjectStatus();
 
   const stats = {
-    total: projects.length,
-    published: projects.filter(p => p.estadoProyecto === ProjectStatus.Published).length,
-    pending: projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length
+    total: dashboardStats?.totalProyectos ?? projects.length,
+    published: dashboardStats?.proyectosAprobados ?? projects.filter(p => p.estadoProyecto === ProjectStatus.Published).length,
+    pending: dashboardStats?.proyectosPendientes ?? projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length
   };
 
   const totalValue = stats.total || 1;

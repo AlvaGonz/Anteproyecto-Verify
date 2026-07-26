@@ -70,6 +70,7 @@ namespace Infrastructure.Persistence.Repositories
                 .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);
 
             var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
+            var totalOfertas = await _context.Set<ProyectoInteresado>().CountAsync(cancellationToken);
 
             return new DashboardStatsDto
             {
@@ -84,7 +85,8 @@ namespace Infrastructure.Persistence.Repositories
                 ProyectosRecientes = proyectosRecientes,
                 UsuariosPorPlan = usuariosPorPlan,
                 TotalConsultasRealizadas = totalConsultas,
-                TotalProyectosRegistrados = totalProyectos
+                TotalProyectosRegistrados = totalProyectos,
+                TotalOfertas = totalOfertas
             };
         }
     }
