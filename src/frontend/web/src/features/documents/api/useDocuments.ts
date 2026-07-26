@@ -28,6 +28,7 @@ const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   certificadoTituloExtraction: apiDoc.certificadoTituloExtraction,
   planoMensuraExtraction: apiDoc.planoMensuraExtraction,
   estadoJuridicoExtraction: apiDoc.estadoJuridicoExtraction,
+  certificacionIPIExtraction: apiDoc.certificacionIPIExtraction,
   resultadoOcrJson: apiDoc.resultadoOcrJson,
   fileUrl: apiDoc.fileUrl,
 });
@@ -85,18 +86,31 @@ export const useUpdateDocumentType = (projectId: string) => {
   });
 };
 
+export const useUpdateDocumentFieldReview = (projectId: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useUpdateDocumentFieldReview'],
+    mutationFn: (data: { documentId: string; fieldName: string; reviewState: number; correctedValue: string | null }) =>
+      apiClient.patch(`/projects/${projectId}/documents/${data.documentId}/fields/${data.fieldName}`, {
+        reviewState: data.reviewState,
+        correctedValue: data.correctedValue
+      }).then(res => res.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
+  });
+};
+
 export const useDownloadDocument = (projectId: string) => {
   // eslint-disable-next-line react-doctor/query-mutation-missing-invalidation
   return useMutation({
     mutationKey: ['useDownloadDocument'],
-    mutationFn: (documentId: string) =>
-      apiClient.get(`/projects/${projectId}/documents/${documentId}/download`, { responseType: "blob" }).then(res => res.data),
-    onSuccess: (data: any) => {
+    mutationFn: (data: { id: string, fileName: string }) =>
+      apiClient.get(`/projects/${projectId}/documents/${data.id}/download`, { responseType: "blob" }).then(res => ({ blob: res.data, fileName: data.fileName })),
+    onSuccess: ({ blob, fileName }) => {
       // Create object URL and trigger download (simplistic approach for now)
-      const url = window.URL.createObjectURL(new Blob([data]));
+      const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "documento.pdf"); // Forced to PDF as requested
+      link.setAttribute("download", fileName || "documento.pdf");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

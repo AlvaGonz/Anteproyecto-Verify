@@ -15,7 +15,7 @@ import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCa
 
 interface ProjectDocumentsListProps {
   documents: DocumentDto[];
-  onDownload: (documentId: string) => Promise<void>;
+  onDownload: (documentId: string, fileName: string) => Promise<void>;
   onToggleStatus: (documentId: string, isActive: boolean) => Promise<void>;
 }
 
@@ -27,24 +27,18 @@ const DOCUMENT_TYPE_NAMES: Record<string, string> = {
   [DocumentType.NOTARIAL_POWER]: "Poder Notarial",
   [DocumentType.CertificadoTitulo]: "Certificado de Título",
   [DocumentType.CertificacionEstadoJuridico]: "Estado Jurídico",
-  [DocumentType.PlanosArquitectonicos]: "Planos Arquitectónicos",
-  [DocumentType.PlanoMensuraCatastral]: "Plano Mensura",
-  [DocumentType.PermisoConstruccion]: "Permiso de Construcción",
+  [DocumentType.PlanoMensuraCatastral]: "Mensura Catastral",
+  [DocumentType.PermisoConstruccion]: "Permiso Const.",
   [DocumentType.CertificadoUsoSuelo]: "Uso de Suelo",
-  [DocumentType.FormularioFIDVB009]: "FI-DVB-009",
-  [DocumentType.CertificacionIPI]: "IPI",
+  [DocumentType.CertificacionIPI]: "Cert. IPI",
   [DocumentType.RegistroMercantil]: "Reg. Mercantil",
-  [DocumentType.ActaConstitutiva]: "Acta Constitutiva",
   [DocumentType.PoderNotarial]: "Poder Notarial",
   [DocumentType.RNC]: "RNC",
-  [DocumentType.EstadosFinancieros]: "Estados Fin.",
+  [DocumentType.EstadosFinancieros]: "Est. Financieros",
   [DocumentType.CertificacionesBancarias]: "Cert. Bancarias",
-  [DocumentType.FormularioKYCAML]: "KYC/AML",
-  [DocumentType.DeclaracionPEP]: "Declaración PEP",
   [DocumentType.CertificadoEIA]: "EIA",
   [DocumentType.NoObjecionINAPACAASD]: "INAPA/CAASD",
-  [DocumentType.DocumentosNotariales]: "Doc. Notariales",
-  [DocumentType.DocumentosSupletorios]: "Doc. Supletorios",
+  [DocumentType.CopiaCedulaIdentidad]: "Copia Cédula",
   [DocumentType.Other]: "Otro",
 };
 
@@ -125,7 +119,7 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
 
               <div className="flex items-center gap-2 self-end md:self-center w-full md:w-auto">
                 <button type="button"
-                  onClick={() => onDownload(doc.id)}
+                  onClick={() => onDownload(doc.id, doc.nombreArchivoOriginal)}
                   className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-surface-container-high hover:bg-primary hover:text-white text-secondary font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2"
                 >
                   <Download className="w-3.5 h-3.5" />

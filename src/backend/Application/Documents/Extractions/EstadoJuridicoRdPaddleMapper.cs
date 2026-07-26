@@ -63,19 +63,6 @@ public static class EstadoJuridicoRdPaddleMapper
                 new[] { @"(?:viene de)\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([\w\.\-]{2,30})" })
         };
 
-        // Determine if Free of Liens
-        bool isFreeOfLiens = false;
-        if (!string.IsNullOrWhiteSpace(extraction.DeclaracionEstadoLegal.RawValue))
-        {
-            var rawLower = extraction.DeclaracionEstadoLegal.RawValue.ToLower();
-            if (rawLower.Contains("libre de derechos") || rawLower.Contains("libre de cargas") || rawLower.Contains("sin gravamen"))
-            {
-                isFreeOfLiens = true;
-            }
-        }
-
-        extraction = extraction with { IsFreeOfLiens = isFreeOfLiens };
-
         // Extraction Status Classification
         var warnings = new List<string>();
 

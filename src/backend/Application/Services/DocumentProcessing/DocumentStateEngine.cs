@@ -76,6 +76,12 @@ public class DocumentStateEngine : IDocumentStateEngine
                 var envelope = new { schemaVersion = "1.0", documentType = "EstadoJuridico", payload = extraction };
                 ocrResult.CanonicalDataJson = JsonSerializer.Serialize(envelope, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             }
+            else if (document.TipoDocumento == DocumentType.CertificacionIPI)
+            {
+                var extraction = Application.Documents.Extractions.CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+                var envelope = new { schemaVersion = "1.0", documentType = "CertificacionIPI", payload = extraction };
+                ocrResult.CanonicalDataJson = JsonSerializer.Serialize(envelope, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            }
 
             var options = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var enrichedJson = JsonSerializer.Serialize(ocrResult, options);

@@ -17,22 +17,15 @@ public static class RequiredDocumentsPolicy
             DocumentType.NOTARIAL_POWER,
             DocumentType.CertificadoTitulo,
             DocumentType.CertificacionEstadoJuridico,
-            DocumentType.PlanosArquitectonicos,
             DocumentType.PlanoMensuraCatastral,
             DocumentType.PermisoConstruccion,
             DocumentType.CertificadoUsoSuelo,
-            DocumentType.FormularioFIDVB009,
             DocumentType.CertificacionIPI,
             DocumentType.RegistroMercantil,
-            DocumentType.ActaConstitutiva,
             DocumentType.PoderNotarial,
             DocumentType.RNC,
             DocumentType.CertificacionesBancarias,
-            DocumentType.FormularioKYCAML,
-            DocumentType.DeclaracionPEP,
-            DocumentType.NoObjecionINAPACAASD,
-            DocumentType.DocumentosNotariales,
-            DocumentType.DocumentosSupletorios
+            DocumentType.NoObjecionINAPACAASD
         };
 
         if (category == ProjectCategory.Comercial || category == ProjectCategory.Turistico || category == ProjectCategory.Mixto)

@@ -39,10 +39,12 @@ import { z } from "zod";
 import { planoMensuraExtractionSchema } from "./schemas/planoMensura.schema";
 import { certificadoTituloExtractionSchema } from "./schemas/certificadoTitulo.schema";
 import { estadoJuridicoExtractionSchema } from "./schemas/estadoJuridico.schema";
+import { certificacionIPIExtractionSchema } from "./schemas/certificacionIPI.schema";
 
 export type PlanoMensuraCatastralRdExtractionV1 = z.infer<typeof planoMensuraExtractionSchema>;
 export type CertificadoTituloRdExtractionV1 = z.infer<typeof certificadoTituloExtractionSchema>;
 export type EstadoJuridicoRdExtractionV1 = z.infer<typeof estadoJuridicoExtractionSchema>;
+export type CertificacionIPIExtraction = z.infer<typeof certificacionIPIExtractionSchema>;
 
 export interface DocumentDto {
   id: string;
@@ -65,6 +67,7 @@ export interface DocumentDto {
   certificadoTituloExtraction?: CertificadoTituloRdExtractionV1;
   planoMensuraExtraction?: PlanoMensuraCatastralRdExtractionV1;
   estadoJuridicoExtraction?: EstadoJuridicoRdExtractionV1;
+  certificacionIPIExtraction?: CertificacionIPIExtraction;
   resultadoOcrJson?: string;
   fileUrl?: string;
 }
@@ -76,23 +79,16 @@ export enum DocumentType {
   ID = 4,
   NOTARIAL_POWER = 5,
   CertificadoUsoSuelo = 6,
-  FormularioFIDVB009 = 7,
   CertificacionIPI = 8,
   RegistroMercantil = 9,
-  ActaConstitutiva = 10,
   PoderNotarial = 11,
   RNC = 12,
   EstadosFinancieros = 13,
   CertificacionesBancarias = 14,
-  FormularioKYCAML = 15,
-  DeclaracionPEP = 16,
   CertificadoEIA = 17,
   NoObjecionINAPACAASD = 18,
-  DocumentosNotariales = 19,
-  DocumentosSupletorios = 20,
   CertificadoTitulo = 21,
   CertificacionEstadoJuridico = 22,
-  PlanosArquitectonicos = 23,
   PlanoMensuraCatastral = 24,
   PermisoConstruccion = 25,
   CopiaCedulaIdentidad = 26, // Adding this to match frontend needs if missing in backend

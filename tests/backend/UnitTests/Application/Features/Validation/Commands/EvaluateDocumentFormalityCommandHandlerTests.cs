@@ -41,7 +41,7 @@ public class EvaluateDocumentFormalityCommandHandlerTests
         var userId = Guid.NewGuid();
         var project = new Proyecto("Test", "Loc", userId);
         
-        var doc = new Documento(projectId, DocumentType.PlanosArquitectonicos, "test.pdf", "test.pdf", "/path", "application/pdf", ".pdf", 100, userId, 1, DateTime.UtcNow.AddMonths(-1), "Inst");
+        var doc = new Documento(projectId, DocumentType.PlanoMensuraCatastral, "test.pdf", "test.pdf", "/path", "application/pdf", ".pdf", 100, userId, 1, DateTime.UtcNow.AddMonths(-1), "Inst");
 
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);

@@ -57,11 +57,7 @@ namespace Application.Documents.Extractions
 
                 SuperficieARegistrarParcelaM2 = ExtractField(lines, fullText, "SuperficieM2",
                     new[] { @"SUPERFICIE\s*(?:A\s*REGISTRAR\s*)?PARCELA:?", @"SUPERFICIE\s*A\s*REGISTRAR:?", @"SUPERFICIE:?", @"FICIEAREGISTRAR" },
-                    new[] { @"(?:SUPERFICIE(?: A REGISTRAR)? PARCELA:?)\s*([\d,.]+)", @"(?:SUPERFICIE A REGISTRAR|FICIEAREGISTRAR) PARCELA:?\s*([\d,.]+)", @"([\d,.]+)\s*m2", @"([\d,.]+)\s*m\b" }),
-
-                Escala = ExtractField(lines, fullText, "Escala",
-                    new[] { @"ESCALA" },
-                    new[] { @"ESCALA:?\s*([\d:,\s]+)", @"ESCALA:?\s*(1\s*:\s*[\d,]+)" })
+                    new[] { @"(?:SUPERFICIE(?: A REGISTRAR)? PARCELA:?)\s*([\d,.]+)", @"(?:SUPERFICIE A REGISTRAR|FICIEAREGISTRAR) PARCELA:?\s*([\d,.]+)", @"([\d,.]+)\s*m2", @"([\d,.]+)\s*m\b" })
             };
 
             var warnings = new List<string>();
@@ -141,7 +137,7 @@ namespace Application.Documents.Extractions
                         if ((string.IsNullOrWhiteSpace(rawValue) || rawValue.Length < 3) && i + 1 < lines.Count)
                         {
                             var nextLine = lines[i + 1];
-                            if (!Regex.IsMatch(nextLine, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|ESCALA|HOJA|LAMINA|DESIGNACION)", RegexOptions.IgnoreCase))
+                            if (!Regex.IsMatch(nextLine, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|HOJA|LAMINA|DESIGNACION)", RegexOptions.IgnoreCase))
                             {
                                 rawValue = nextLine;
                             }
@@ -178,7 +174,7 @@ namespace Application.Documents.Extractions
                     // If rawValue is already stripped, matching PROVINCIA on it will fail.
                     // Let's match against fullText using regexPatterns, but only if the refined match is contained in or overlapping?
                     // Even simpler: just strip known trailing labels from rawValue.
-                    rawValue = Regex.Replace(rawValue, @"(?=\s*(?:1\s*No\.|ESCALA|MUNICIPIO|SECCI[OÓ]N|LUGAR|SUPERFICIE)).*", "", RegexOptions.IgnoreCase).Trim();
+                    rawValue = Regex.Replace(rawValue, @"(?=\s*(?:1\s*No\.|MUNICIPIO|SECCI[OÓ]N|LUGAR|SUPERFICIE)).*", "", RegexOptions.IgnoreCase).Trim();
                     break; // Just run the strip once
                 }
             }
@@ -198,9 +194,6 @@ namespace Application.Documents.Extractions
                         break;
                     case "SuperficieM2":
                         normalizedValue = SharedFieldNormalizer.NormalizeSuperficie(rawValue);
-                        break;
-                    case "Escala":
-                        normalizedValue = SharedFieldNormalizer.NormalizeEscala(rawValue);
                         break;
                     case "Operacion":
                         normalizedValue = SharedFieldNormalizer.NormalizeOperacion(rawValue);

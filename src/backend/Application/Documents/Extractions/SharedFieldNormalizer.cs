@@ -45,25 +45,6 @@ public static class SharedFieldNormalizer
         return string.Empty;
     }
 
-    public static string NormalizeEscala(string raw)
-    {
-        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
-        var clean = raw.Replace(" ", "");
-        var match = Regex.Match(clean, @"\d+:[\d,]+");
-        if (match.Success)
-        {
-            var parts = match.Value.Split(':');
-            if (parts.Length == 2)
-            {
-                var p1 = parts[0];
-                if (p1.Length > 1 && p1.StartsWith("1")) p1 = "1";
-                var p2 = parts[1].Replace(",", "");
-                return $"{p1}:{p2}";
-            }
-        }
-        return string.Empty;
-    }
-
     public static string NormalizeOperacion(string raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;

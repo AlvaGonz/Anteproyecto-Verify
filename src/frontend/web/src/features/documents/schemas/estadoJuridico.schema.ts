@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ExtractionStatus, FieldStatus } from "../types";
+import { ExtractionStatus } from "../types";
 import { extractedFieldSchema } from "./planoMensura.schema";
 
 export const estadoJuridicoExtractionSchema = z.object({
@@ -19,7 +19,5 @@ export const estadoJuridicoExtractionSchema = z.object({
   superficieMetrosCuadrados: extractedFieldSchema,
   designacionCatastral: extractedFieldSchema,
   vieneDe: extractedFieldSchema,
-  declaracionEstadoLegal: extractedFieldSchema,
-  
-  isFreeOfLiens: z.boolean()
+declaracionEstadoLegal: extractedFieldSchema
 });

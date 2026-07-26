@@ -52,7 +52,6 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.Warnings.Should().Contain("El campo VieneDe fue detectado pero no contiene valor");
 
             extraction.DeclaracionEstadoLegal.RawValue.Should().Contain("libre de derechos reales");
-            extraction.IsFreeOfLiens.Should().BeTrue();
 
             extraction.ExtractionStatus.Should().Be(ExtractionStatus.Completed);
         }

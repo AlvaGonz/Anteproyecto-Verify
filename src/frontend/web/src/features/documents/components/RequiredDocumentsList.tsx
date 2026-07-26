@@ -1,11 +1,14 @@
 import React from "react";
 import { DocumentType } from "../types";
 import { useDocuments, useUpdateDocumentType } from "../api/useDocuments";
+import { useUpdateDocumentFieldReview } from "../api/useDocumentMutations";
+import { OcrFieldReviewState } from "../types";
 import { RequirementUploadRow } from "./RequirementUploadRow";
 import { CedulaExtractionCard } from "./CedulaExtractionCard";
 import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
 import { PlanoMensuraExtractionCard } from "./PlanoMensuraExtractionCard";
 import { EstadoJuridicoExtractionCard } from "./EstadoJuridicoExtractionCard";
+import { CertificacionIPIExtractionCard } from "./CertificacionIPIExtractionCard";
 import { FileCheck2 } from "lucide-react";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 
@@ -16,12 +19,28 @@ const REQUIRED_DOCUMENTS = [
   { id: "mensura", label: "Plano de Mensura", category: DocumentType.PlanoMensuraCatastral, categoryLabel: "MENSURA", description: "Plano catastral aprobado por autoridad competente" },
   { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.ID, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
   { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
+  { id: "certificacion_ipi", label: "Certificación IPI", category: DocumentType.CertificacionIPI, categoryLabel: "CATASTRO", description: "Certificación de Impuesto sobre la Propiedad Inmobiliaria" },
 ];
 
 export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ projectId }) => {
   const { data: documents = [] } = useDocuments(projectId);
   const typeMutation = useUpdateDocumentType(projectId);
+  const { mutateAsync: updateField } = useUpdateDocumentFieldReview(projectId);
   const { addToast } = useToast();
+
+  const handleEditField = async (documentId: string, fieldName: string, value: string) => {
+    try {
+      await updateField({
+        documentId,
+        fieldName,
+        data: { reviewState: OcrFieldReviewState.Corrected, correctedValue: value }
+      });
+      addToast("Campo actualizado correctamente", "success");
+    } catch (err) {
+      addToast("Error al actualizar el campo", "error");
+      throw err;
+    }
+  };
 
   const handleUnassignDocument = async (documentId: string) => {
     try {
@@ -88,22 +107,27 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
               />
               {doc.id === "cedula" && uploadedDoc?.cedulaExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <CedulaExtractionCard extraction={uploadedDoc.cedulaExtraction} />
+                  <CedulaExtractionCard extraction={uploadedDoc.cedulaExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
                 </div>
               )}
               {doc.id === "titulo" && uploadedDoc?.certificadoTituloExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <CertificadoTituloExtractionCard extraction={uploadedDoc.certificadoTituloExtraction} />
+                  <CertificadoTituloExtractionCard extraction={uploadedDoc.certificadoTituloExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
                 </div>
               )}
               {doc.id === "mensura" && uploadedDoc?.planoMensuraExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <PlanoMensuraExtractionCard extraction={uploadedDoc.planoMensuraExtraction} />
+                  <PlanoMensuraExtractionCard extraction={uploadedDoc.planoMensuraExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
                 </div>
               )}
               {doc.id === "estado_juridico" && uploadedDoc?.estadoJuridicoExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <EstadoJuridicoExtractionCard extraction={uploadedDoc.estadoJuridicoExtraction} />
+                  <EstadoJuridicoExtractionCard extraction={uploadedDoc.estadoJuridicoExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
+                </div>
+              )}
+              {doc.id === "certificacion_ipi" && uploadedDoc?.certificacionIPIExtraction && (
+                <div className="pl-4 sm:pl-12">
+                  <CertificacionIPIExtractionCard extraction={uploadedDoc.certificacionIPIExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
                 </div>
               )}
             </div>

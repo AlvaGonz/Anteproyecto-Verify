@@ -65,9 +65,7 @@ const AdminShell = () => (
 // Project Manage Shell — wraps project edit sub-routes
 const ProjectManageShell = () => (
   <AuthGuard>
-    <ProjectManageLayout>
-      <Outlet />
-    </ProjectManageLayout>
+    <ProjectManageLayout />
   </AuthGuard>
 );
 

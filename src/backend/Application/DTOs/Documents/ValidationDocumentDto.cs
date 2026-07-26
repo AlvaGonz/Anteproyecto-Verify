@@ -24,5 +24,6 @@ public record ValidationDocumentDto(
     CedulaRdExtractionV1? CedulaExtraction = null,
     CertificadoTituloRdExtractionV1? CertificadoTituloExtraction = null,
     PlanoMensuraCatastralRdExtractionV1? PlanoMensuraExtraction = null,
-    EstadoJuridicoRdExtractionV1? EstadoJuridicoExtraction = null
+    EstadoJuridicoRdExtractionV1? EstadoJuridicoExtraction = null,
+    CertificacionIPIRdExtractionV1? CertificacionIPIExtraction = null
 );

@@ -170,11 +170,10 @@ public class ProjectDocumentsController : ControllerBase
                     tipoDocumento = DocumentType.PoderNotarial;
                     break;
                 case "IPI":
+                case "CERTIFICACION_IPI":
                     tipoDocumento = DocumentType.CertificacionIPI;
                     break;
-                case "ESTATUTOS":
-                    tipoDocumento = DocumentType.ActaConstitutiva;
-                    break;
+
                 case "RNC":
                     tipoDocumento = DocumentType.RNC;
                     break;
@@ -363,6 +362,7 @@ public class ProjectDocumentsController : ControllerBase
         Application.Documents.Extractions.CertificadoTituloRdExtractionV1? tituloExtraction = null;
         Application.Documents.Extractions.PlanoMensuraCatastralRdExtractionV1? mensuraExtraction = null;
         Application.Documents.Extractions.EstadoJuridicoRdExtractionV1? estadoJuridicoExtraction = null;
+        Application.Documents.Extractions.CertificacionIPIRdExtractionV1? certificacionIPIExtraction = null;
 
         if (!string.IsNullOrEmpty(d.ResultadoOcrJson))
         {
@@ -396,6 +396,10 @@ public class ProjectDocumentsController : ControllerBase
                             {
                                 estadoJuridicoExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.EstadoJuridicoRdExtractionV1>(payloadElement.GetRawText(), options);
                             }
+                            else if (docType == "CertificacionIPI")
+                            {
+                                certificacionIPIExtraction = System.Text.Json.JsonSerializer.Deserialize<Application.Documents.Extractions.CertificacionIPIRdExtractionV1>(payloadElement.GetRawText(), options);
+                            }
                         }
                     }
                     else
@@ -417,6 +421,10 @@ public class ProjectDocumentsController : ControllerBase
                         {
                             estadoJuridicoExtraction = Application.Documents.Extractions.EstadoJuridicoRdPaddleMapper.MapFromOcrResult(ocrResult);
                         }
+                        else if (d.TipoDocumento == DocumentType.CertificacionIPI)
+                        {
+                            certificacionIPIExtraction = Application.Documents.Extractions.CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+                        }
                     }
                 }
             }
@@ -429,7 +437,7 @@ public class ProjectDocumentsController : ControllerBase
         return new ValidationDocumentDto(
             d.Id, d.ProyectoId, d.TipoDocumento, d.NombreArchivoOriginal, d.ContentType, d.Extension,
             d.TamanoBytes, d.EstadoDocumento, d.Activo, d.Version, d.FechaEmision, d.InstitucionEmisora,
-            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction, mensuraExtraction, estadoJuridicoExtraction
+            d.UsuarioCargaId, d.Observaciones, d.CreatedAtUtc, d.UpdatedAtUtc, cedulaExtraction, tituloExtraction, mensuraExtraction, estadoJuridicoExtraction, certificacionIPIExtraction
         );
     }
 }

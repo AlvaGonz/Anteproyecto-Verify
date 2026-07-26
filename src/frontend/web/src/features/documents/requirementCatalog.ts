@@ -109,16 +109,7 @@ export const BASE_REQUIREMENTS: RequirementDefinition[] = [
     required: false,
     optional: true,
   },
-  {
-    code: "CONSENTIMIENTO_DIGITAL",
-    label: "Formulario de Consentimiento KYC",
-    description: "Formulario debidamente firmado",
-    documentType: DocumentType.FormularioKYCAML,
-    acceptedMimeTypes: "application/pdf",
-    maxSizeBytes: DEFAULT_MAX_SIZE,
-    required: false,
-    optional: true,
-  },
+
 ];
 
 export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {

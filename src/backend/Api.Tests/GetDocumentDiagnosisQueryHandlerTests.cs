@@ -58,7 +58,7 @@ public class GetDocumentDiagnosisQueryHandlerTests
             .Returns(Task.FromResult<Proyecto?>(project));
 
         var doc1 = new Documento(projectId, "titulo.pdf", "application/pdf", 1024, "/docs/titulo.pdf", DocumentType.CertificadoTitulo);
-        var doc2 = new Documento(projectId, "planos.pdf", "application/pdf", 2048, "/docs/planos.pdf", DocumentType.PlanosArquitectonicos);
+        var doc2 = new Documento(projectId, "planos.pdf", "application/pdf", 2048, "/docs/planos.pdf", DocumentType.PlanoMensuraCatastral);
         var docs = new List<Documento> { doc1, doc2 };
         _fakeDocumentoRepository.GetByProyectoIdAsync(projectId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IEnumerable<Documento>>(docs));

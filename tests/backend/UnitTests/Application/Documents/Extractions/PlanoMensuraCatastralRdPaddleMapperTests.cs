@@ -53,7 +53,6 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.Seccion.RawValue.Should().Be("BAIGUA");
             extraction.Lugar.RawValue.Should().Be("JUANILLO");
             extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("12130.07");
-            extraction.Escala.NormalizedValue.Should().Be("1:400");
         }
 
         [Fact]
@@ -116,7 +115,6 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.DesignacionCatastralPosicional.RawValue.Should().Be("42022121591_11_1");
             extraction.Seccion.RawValue.Should().Be("JINASARAGU");
             extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("927.30");
-            extraction.Escala.NormalizedValue.Should().Be("1:40");
         }
 
         [Fact]
@@ -172,7 +170,6 @@ namespace UnitTests.Application.Documents.Extractions
             // Assert
             extraction.Should().NotBeNull();
             extraction!.Provincia.NormalizedValue.Should().Be("LA VEGA");
-            extraction.Escala.NormalizedValue.Should().Be("1:2500");
             extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("156222.44");
             extraction.Municipio.NormalizedValue.Should().Be("CONCEPCIÓN DE LA VEGA");
             extraction.Seccion.NormalizedValue.Should().Be(string.Empty);

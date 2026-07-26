@@ -66,9 +66,9 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
   const statusMutation = useUpdateDocumentStatus(projectId || "");
   const { addToast } = useToast();
 
-  const handleDownload = async (documentId: string) => {
+  const handleDownload = async (documentId: string, fileName: string) => {
     try {
-      await downloadMutation.mutateAsync(documentId);
+      await downloadMutation.mutateAsync({ id: documentId, fileName });
     } catch (err: any) {
       addToast("Error al obtener la descarga segura", "error");
     }

@@ -61,13 +61,13 @@ public static class CertificadoTituloRdPaddleMapper
         if (extraction.DesignacionCatastral.Status == FieldStatus.Missing || extraction.Matricula.Status == FieldStatus.Missing)
         {
             extraction = extraction with { ExtractionStatus = ExtractionStatus.Incomplete };
-            warnings.Add("Required field Matricula or DesignacionCatastral is missing.");
+            warnings.Add("No se pudo detectar el número de matrícula ni la designación catastral.");
         }
 
-        if (extraction.SuperficieM2.Status == FieldStatus.Missing) warnings.Add("SuperficieM2 is missing.");
-        if (extraction.FechaYHoraInscripcion.Status == FieldStatus.Missing) warnings.Add("Fecha is missing.");
-        if (extraction.VieneDe.Status == FieldStatus.Missing) warnings.Add("VieneDe is missing.");
-        if (extraction.Oficina.Status == FieldStatus.Missing) warnings.Add("Oficina is missing.");
+        if (extraction.SuperficieM2.Status == FieldStatus.Missing) warnings.Add("Falta la superficie del inmueble (m²).");
+        if (extraction.FechaYHoraInscripcion.Status == FieldStatus.Missing) warnings.Add("Falta la fecha de inscripción del documento.");
+        if (extraction.VieneDe.Status == FieldStatus.Missing) warnings.Add("No se encontró la referencia de origen (Viene de).");
+        if (extraction.Oficina.Status == FieldStatus.Missing) warnings.Add("No se detectó la oficina de registro.");
 
         if (warnings.Any())
         {
