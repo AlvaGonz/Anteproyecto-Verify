@@ -12,6 +12,7 @@ public interface IProyectoRepository
     Task<Proyecto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> GetAllAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> GetVisibleAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Proyecto>> GetFeaturedAsync(int count, CancellationToken cancellationToken = default);
     Task<ProyectoEstado?> GetEstadoByStatusAsync(ProjectStatus status, CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default);
     Task<int> CountByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);

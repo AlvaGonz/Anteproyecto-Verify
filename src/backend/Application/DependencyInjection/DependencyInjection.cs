@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Auth.Commands.ResetPassword.ResetPasswordCommandHandler>();
         services.AddScoped<Application.Features.PublicConsulta.Queries.GetPublicProjectStatus.GetPublicProjectStatusQueryHandler>();
         services.AddScoped<Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler>();
+        services.AddScoped<Application.Features.PublicConsulta.Queries.GetFeaturedProjects.GetFeaturedProjectsQueryHandler>();
 
 // Subscription Queries
         services.AddScoped<Application.Features.Subscriptions.Queries.GetMySubscriptionStatus.GetMySubscriptionStatusQueryHandler>();

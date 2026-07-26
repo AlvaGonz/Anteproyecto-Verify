@@ -64,6 +64,28 @@ public class ProyectoRepository : IProyectoRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Proyecto>> GetFeaturedAsync(int count = 5, CancellationToken cancellationToken = default)
+    {
+        var draftCode = ProjectStatus.Creado.ToCodigoUnico();
+        var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+        var conObservacionCode = ProjectStatus.ConObservacion.ToCodigoUnico();
+        var revisionCode = ProjectStatus.Revision.ToCodigoUnico();
+
+        return await _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
+            .Include(p => p.Estado)
+            .Where(p => p.Estado.CodigoUnico != draftCode
+                && p.EstadoIntegridad == IntegrityStatus.Valid
+                && p.EstadoJuridico == EstadoJuridico.Valido
+                && (p.Estado.CodigoUnico == publicadoCode || p.Estado.CodigoUnico == conObservacionCode || p.Estado.CodigoUnico == revisionCode))
+            .OrderByDescending(p => p.UpdatedAtUtc ?? p.CreatedAtUtc)
+            .Take(count)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<ProyectoEstado?> GetEstadoByStatusAsync(ProjectStatus status, CancellationToken cancellationToken = default)
     {
         var codigo = status.ToCodigoUnico();

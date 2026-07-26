@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { CheckCircle2, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
-import { useSearchPublicProjects } from "../../projects/api/useSearchPublicProjects";
+import { useSuspenseFeaturedProjects } from "../../projects/api/useFeaturedProjects";
 import { getDefaultProjectImage } from "../../projects/api/usePublishedProjects";
 import { ProjectStatus, LegalStatus, IntegrityStatus } from "../../projects/types";
 
@@ -17,18 +17,6 @@ interface Project {
   totalDocs: number;
 }
 
-const FALLBACK_PROJECTS: Project[] = [
-  {
-    name: "Blue Forest Residences",
-    location: "Las Terrenas, Samaná",
-    image: getDefaultProjectImage(1),
-    status: "Auditado",
-    risk: "Bajo",
-    deliveredDocs: 10,
-    totalDocs: 12,
-  }
-];
-
 export const FeaturedProjectsSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isMouseDownRef = useRef(false);
@@ -39,31 +27,31 @@ export const FeaturedProjectsSection: React.FC = () => {
   const scrollLeftValRef = useRef(0);
   const hasDraggedRef = useRef(false);
 
-  const { data: searchResults = [] } = useSearchPublicProjects("");
+  const { data: featuredProjects = [] } = useSuspenseFeaturedProjects(5);
 
-  const publicProjects = Array.isArray(searchResults) ? searchResults : [];
+  const publicProjects = Array.isArray(featuredProjects) ? featuredProjects : [];
 
   const formattedProjects: Project[] = publicProjects
     .filter(p =>
       p.estadoJuridico === LegalStatus.Valid &&
-      (p.estadoProyecto === ProjectStatus.Published || p.estadoProyecto === ProjectStatus.Validated) &&
+      (p.estadoProyecto === ProjectStatus.Published || 
+       p.estadoProyecto === ProjectStatus.Validated ||
+       p.estadoProyecto === ProjectStatus.InReview) &&
       p.estadoIntegridad === IntegrityStatus.Verified
     )
     .map(p => ({
       name: p.nombreProyecto,
       location: p.ubicacionTexto || "Ubicación no especificada",
       image: p.imagenUrl || getDefaultProjectImage(p.categoria),
-      status: "Validado",
+      status: "Verificado",
       risk: "Calculando",
       deliveredDocs: 8,
       totalDocs: 10,
     }));
 
-  const projectsToUse = formattedProjects.length > 0 ? formattedProjects : FALLBACK_PROJECTS;
-
-  const filteredProjects = projectsToUse.filter(
-    (p) => (p.deliveredDocs / p.totalDocs) >= 0.8
-  ).slice(0, 12);
+  const filteredProjects = formattedProjects
+    .filter((p) => (p.deliveredDocs / p.totalDocs) >= 0.8)
+    .slice(0, 12);
 
   // Triple items for seamless marquee wrap-around
   const carouselItems = [...filteredProjects, ...filteredProjects, ...filteredProjects];
