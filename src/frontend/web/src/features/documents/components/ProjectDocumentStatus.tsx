@@ -33,7 +33,7 @@ const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string
   [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88", categories: [1, 2, 3, 4, 99] },
   [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02", categories: [1, 2, 3, 4, 99] },
   [DocumentType.PoderNotarial]: { name: "Poder Notarial del Representante Legal", entity: "Notaría Pública", norm: "Ley 301 Notarial", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.RNC]: { name: "RNC activo + estatus fiscal", entity: "DGII", norm: "-", categories: [1, 2, 3, 4, 99] },
+  [DocumentType.RNC]: { name: "RNC activo", entity: "DGII", norm: "-", categories: [1, 2, 3, 4, 99] },
   [DocumentType.EstadosFinancieros]: { name: "Estados Financieros Auditados", entity: "Firma Auditora Certificada", norm: "-", categories: [2, 3, 4] },
   [DocumentType.CertificacionesBancarias]: { name: "Certificaciones bancarias / origen de fondos", entity: "Banco / Institución Financiera", norm: "-", categories: [1, 2, 3, 4, 99] },
   [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00", categories: [2, 3, 4] },
