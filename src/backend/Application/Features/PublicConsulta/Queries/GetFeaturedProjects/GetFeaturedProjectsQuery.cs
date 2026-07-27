@@ -100,10 +100,6 @@ public class GetFeaturedProjectsQueryHandler
             [9] = new[] { 1, 2, 3, 4, 99 },   // REGISTRO_MERCANTIL
             [11] = new[] { 1, 2, 3, 4, 99 },  // NOTARIAL_POWER
             [12] = new[] { 1, 2, 3, 4, 99 },  // RNC
-            [13] = new[] { 2, 3, 4 },         // ESTADOS_FINANCIEROS
-            [14] = new[] { 1, 2, 3, 4, 99 },  // CERTIFICACIONES_BANCARIAS
-            [17] = new[] { 2, 3, 4 },         // CERTIFICADO_EIA
-            [18] = new[] { 1, 2, 3, 4, 99 },  // NO_OBJECION_INAPA_CAASD
             [21] = new[] { 1, 2, 3, 4, 99 },  // CERTIFICADO_TITULO
             [22] = new[] { 1, 2, 3, 4, 99 },  // CERTIFICACION_ESTADO_JURIDICO
             [24] = new[] { 1, 2, 3, 4, 99 },  // PLANO_MENSURA_CATASTRAL

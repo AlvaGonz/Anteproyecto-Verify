@@ -70,8 +70,6 @@ public class DocumentServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Contains(result, d => d.TipoDocumento == DocumentType.EstadosFinancieros);
-        Assert.Contains(result, d => d.TipoDocumento == DocumentType.CertificadoEIA);
     }
 
     [Fact]

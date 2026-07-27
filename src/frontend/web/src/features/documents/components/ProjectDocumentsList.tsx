@@ -34,10 +34,6 @@ const DOCUMENT_TYPE_NAMES: Record<string, string> = {
   [DocumentType.RegistroMercantil]: "Reg. Mercantil",
   [DocumentType.PoderNotarial]: "Poder Notarial",
   [DocumentType.RNC]: "RNC",
-  [DocumentType.EstadosFinancieros]: "Est. Financieros",
-  [DocumentType.CertificacionesBancarias]: "Cert. Bancarias",
-  [DocumentType.CertificadoEIA]: "EIA",
-  [DocumentType.NoObjecionINAPACAASD]: "INAPA/CAASD",
   [DocumentType.CopiaCedulaIdentidad]: "Copia Cédula",
   [DocumentType.Other]: "Otro",
 };
