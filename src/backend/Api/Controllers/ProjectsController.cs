@@ -394,6 +394,118 @@ public class ProjectsController : ControllerBase
         return Ok(intereses);
     }
 
+    [HttpGet("interests/export")]
+    public async Task<IActionResult> ExportIntereses([FromQuery] string type, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var intereses = await _projectService.GetProyectosInteresesAsync(userId, cancellationToken);
+        var list = intereses.ToList();
+
+        var userObj = await _dbContext.Set<Usuario>().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var userName = userObj?.NombreCompleto ?? "Usuario";
+
+        if (type == "Interesados")
+        {
+            list = list.Where(x => x.Tipo == "Interesados").ToList();
+        }
+        else if (type == "Mis Intereses")
+        {
+            list = list.Where(x => x.Tipo == "Mis Intereses").ToList();
+        }
+
+        string templateFileName = type == "Interesados"
+            ? "Reporte solicitudes de interes.xlsx"
+            : "Reporte proyecto de interes.xlsx";
+
+        string basePath = "/src";
+        string templatePath = System.IO.Path.Combine(basePath, templateFileName);
+        if (!System.IO.File.Exists(templatePath))
+        {
+            templatePath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), templateFileName);
+        }
+
+        if (!System.IO.File.Exists(templatePath))
+        {
+            return NotFound("Plantilla de reporte no encontrada.");
+        }
+
+        using var workbook = new ClosedXML.Excel.XLWorkbook(templatePath);
+        var worksheet = workbook.Worksheet(1);
+
+        string titleText = "";
+        if (type == "Todos")
+        {
+            titleText = "Reporte de Solicitud de interesado y mis interes";
+        }
+        else if (type == "Interesados")
+        {
+            titleText = "Reporte de Solicitud de interesado";
+        }
+        else
+        {
+            titleText = "Reporte de mis interes";
+        }
+        worksheet.Cell("E2").Value = titleText;
+
+        if (type == "Todos")
+        {
+            worksheet.Cell("H4").Value = "Nombre de usuario (Publica/Interesado)";
+        }
+
+        int startRow = 5;
+        for (int i = 0; i < list.Count; i++)
+        {
+            var item = list[i];
+            int currentRow = startRow + i;
+
+            worksheet.Cell(currentRow, 3).Value = i + 1; // No.
+            worksheet.Cell(currentRow, 4).Value = userName; // Usuario
+            worksheet.Cell(currentRow, 5).Value = item.NombreProyecto;
+            worksheet.Cell(currentRow, 6).Value = item.Provincia;
+            worksheet.Cell(currentRow, 7).Value = item.Fecha.ToString("dd/MM/yyyy HH:mm");
+
+            string displayUser = item.NombreUsuario;
+            if (type == "Todos")
+            {
+                displayUser = $"[{item.Tipo}] {displayUser}";
+            }
+            worksheet.Cell(currentRow, 8).Value = displayUser;
+
+            worksheet.Cell(currentRow, 9).Value = item.Rnc;
+            worksheet.Cell(currentRow, 10).Value = item.Direccion;
+            worksheet.Cell(currentRow, 11).Value = item.Telefono;
+            worksheet.Cell(currentRow, 12).Value = item.Email;
+
+            // Apply font to match template
+            for (int col = 3; col <= 12; col++)
+            {
+                var cell = worksheet.Cell(currentRow, col);
+                cell.Style.Font.FontName = "Aptos Narrow";
+                cell.Style.Font.FontSize = 11;
+                cell.Style.Border.BottomBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                cell.Style.Border.BottomBorderColor = ClosedXML.Excel.XLColor.FromHtml("#E8E8E8");
+                cell.Style.Border.TopBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                cell.Style.Border.TopBorderColor = ClosedXML.Excel.XLColor.FromHtml("#E8E8E8");
+                cell.Style.Border.LeftBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                cell.Style.Border.LeftBorderColor = ClosedXML.Excel.XLColor.FromHtml("#E8E8E8");
+                cell.Style.Border.RightBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                cell.Style.Border.RightBorderColor = ClosedXML.Excel.XLColor.FromHtml("#E8E8E8");
+            }
+        }
+
+        using var stream = new System.IO.MemoryStream();
+        workbook.SaveAs(stream);
+        var content = stream.ToArray();
+
+        var now = DateTime.Now;
+        string fileTypeLabel = type == "Todos" ? "Todos" : (type == "Interesados" ? "Interesados" : "Mis_Intereses");
+        string filename = $"Reporte_{fileTypeLabel}_{now.Day}-{now.Month}-{now.Year} {now.Hour}_{now.Minute}.xlsx";
+
+        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+    }
+
     [HttpGet("saved")]
     public async Task<IActionResult> GetGuardados(CancellationToken cancellationToken)
     {

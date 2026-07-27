@@ -12,6 +12,7 @@ import {
   ChevronsRight,
   MapPin,
   Search,
+  LayoutGrid,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
@@ -47,7 +48,7 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
     transition={{ duration: 0.3, delay: Math.min(idx * 0.03, 0.3) }}
     className="group bg-white rounded-[32px] overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col"
   >
-    <div className="relative aspect-video overflow-hidden">
+    <div className="relative aspect-[16/10] overflow-hidden">
       <img
         src={project.imagenUrl || getDefaultProjectImage(project.categoria as unknown as number)}
         alt={project.nombreProyecto}
@@ -70,7 +71,7 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
       </div>
 
       <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">
-        {project.constructora ? `Desarrollado por ${project.constructora}.` : ""} Proyecto en estado {project.estadoProyecto || "activo"}.
+        {project.constructora ? `Desarrollado por ${project.constructora}.` : "Proyecto verificado bajo estrictos estándares de transparencia institucional."}
       </p>
 
       <div className="mt-auto space-y-4">
@@ -121,6 +122,7 @@ const ProjectsPublicListContent: React.FC = () => {
   const pageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: searchResults } = useSuspensePublishedProjects();
+  const { data: provincias } = useProvinces();
 
   const filteredProjects = useMemo(() => {
     return filterPublishedProjects(searchResults, filters);
@@ -186,230 +188,205 @@ const ProjectsPublicListContent: React.FC = () => {
             <p className="text-slate-500 font-medium">Explore proyectos que han pasado por nuestro riguroso proceso de validación.</p>
           </div>
 
-        </div>
-
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-slate-600 font-medium">
-            <span className="font-black text-primary">{filteredProjects.length}</span> proyectos publicados
-            {hasActiveFilters && (
-              <span className="ml-2 text-sm text-slate-400">(con filtros)</span>
-            )}
-          </p>
-          <button
-            type="button"
-            onClick={() => setFiltersVisible(!filtersVisible)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors lg:hidden ${filtersVisible ? "bg-primary text-white border-primary" : "bg-slate-50 text-slate-600 border-slate-200"
-              }`}
-          >
-            <Filter className="w-3.5 h-3.5" />
-            Filtros
-          </button>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className={`w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6 ${!filtersVisible ? 'hidden lg:block' : ''}`}>
-            {/* Blue Box: Search + Project Types */}
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                <span className="text-primary">●</span> Búsqueda
-              </label>
-              <input
-                placeholder="RNC, Cédula, Nombre..."
-                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-                type="text"
-                value={filters.searchQuery}
-                onChange={e => updateFilter("searchQuery", e.target.value)}
-              />
-
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
-                <span className="text-primary">●</span> Tipo (acumulativo)
-              </label>
-              <div className="flex flex-col gap-1.5">
-                {PROJECT_CATEGORIES.map(cat => (
-                  <label key={cat.value} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-all ${filters.projectTypes.includes(cat.value)
-                      ? "bg-primary text-white border-primary"
-                      : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}>
-                    <input
-                      className="w-3 h-3 accent-primary"
-                      type="checkbox"
-                      checked={filters.projectTypes.includes(cat.value)}
-                      onChange={() => toggleProjectType(cat.value)}
-                    />
-                    {cat.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Red Box: Price Filter */}
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                <span className="text-rose-500">●</span> Precio (DOP)
-              </label>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold text-slate-600">
-                  <span>RD$ {filters.priceRange[0] >= 1000000 ? `${(filters.priceRange[0] / 1000000).toFixed(1)}M` : filters.priceRange[0].toLocaleString()}</span>
-                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? '15M+' : `${(filters.priceRange[1] / 1000000).toFixed(1)}M`}</span>
-                </div>
-                <div className="relative h-6">
-                  <input min="0" max={PRICE_MAX} step={PRICE_STEPS} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary absolute top-2 left-0" type="range" value={filters.priceRange[0]} onChange={e => handlePriceChange([parseInt(e.target.value), filters.priceRange[1]])} />
-                  <input min="0" max={PRICE_MAX} step={PRICE_STEPS} className="w-full h-1.5 bg-transparent appearance-none cursor-pointer accent-rose-500 absolute top-2 left-0" type="range" value={filters.priceRange[1]} onChange={e => handlePriceChange([filters.priceRange[0], parseInt(e.target.value)])} style={{ pointerEvents: 'auto' }} />
-                </div>
-                <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                  <span>0</span>
-                  <span className="text-center">7.5M</span>
-                  <span className="text-right">15M+</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Purple Box: Province + LatLng */}
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                <span className="text-purple-500">●</span> Provincia
-              </label>
-              <select
-                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-                value={filters.province}
-                onChange={e => updateFilter("province", e.target.value)}
+          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
+            <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl">
+              <button type="button"
+                className="p-2 rounded-lg transition-all bg-white shadow-sm text-primary"
               >
-                <option value="">Todas</option>
-                {provincias?.map((p) => (
-                  <option key={p.id} value={p.nombre}>{p.nombre}</option>
+                <LayoutGrid size={20} />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 border-l border-slate-100 pl-4">
+              <Filter size={18} className="text-slate-400" />
+              <select
+                value={filters.projectTypes[0] || "ALL"}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "ALL") {
+                    setFilters(prev => ({ ...prev, projectTypes: [] }));
+                  } else {
+                    setFilters(prev => ({ ...prev, projectTypes: [parseInt(val)] }));
+                  }
+                  setCurrentPage(1);
+                }}
+                className="bg-transparent text-sm font-bold text-slate-700 focus:outline-none"
+              >
+                <option value="ALL">TODOS LOS TIPOS</option>
+                {PROJECT_CATEGORIES.map(cat => (
+                  <option key={cat.value} value={cat.value}>{cat.label}</option>
                 ))}
               </select>
 
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
-                <span className="text-purple-500">●</span> Coordenadas (Lat, Lng)
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                <input
-                  placeholder="Ej: 18.47186, -69.93988"
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-                  type="text"
-                  value={filters.latLng}
-                  onChange={handleLatLngChange}
-                />
-              </div>
-            </div>
-
-            {hasActiveFilters && (
               <button
                 type="button"
-                onClick={clearAllFilters}
-                className="w-full px-3 py-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 bg-white rounded-xl border border-slate-100 shadow-sm transition-colors uppercase tracking-widest"
+                onClick={() => setFiltersVisible(!filtersVisible)}
+                className={`ml-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${filtersVisible ? 'bg-primary text-white border-primary' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
               >
-                Limpiar filtros
+                Búsqueda Avanzada
               </button>
-            )}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-              <AnimatePresence mode="popLayout">
-                {paginatedProjects.map((project, idx) => (
-                  <ProjectCard key={project.id} project={project} idx={idx} />
-                ))}
-              </AnimatePresence>
-
-              {/* Empty slots for grid consistency */}
-              {paginatedProjects.length > 0 && paginatedProjects.length < itemsPerPage && (
-                Array.from({ length: itemsPerPage - paginatedProjects.length }).map((_, i) => (
-                  <div key={`empty-${i}`} className="invisible p-6 rounded-[32px] border border-transparent flex flex-col" />
-                ))
-              )}
             </div>
+          </div>
+        </div>
 
-            {filteredProjects.length === 0 && (
-              <m.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-[40px] border border-dashed border-slate-200 mt-6 shadow-sm"
-              >
-                <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-6">
-                  <AlertCircle size={32} />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
-                <p className="text-slate-500 max-w-xs mx-auto font-medium text-sm">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
-                <button type="button"
-                  onClick={clearAllFilters}
-                  className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
-                >
-                  Limpiar filtros
-                </button>
-              </m.div>
-            )}
-
-            {totalPages > 1 && (
-              <div className="px-6 py-4 bg-white border border-slate-100 rounded-3xl shadow-sm flex items-center justify-between mt-8">
-                <span className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-                  Mostrando <span className="font-bold text-primary">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
-                  <span className="font-bold text-primary">{Math.min(currentPage * itemsPerPage, filteredProjects.length)}</span> de{' '}
-                  <span className="font-bold text-primary">{filteredProjects.length}</span>
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentPage(1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronsLeft size={16} />
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-
-                  <div className="flex items-center gap-1.5 mx-2">
-                    <span className="text-sm font-medium text-slate-500">Página</span>
+        <AnimatePresence>
+          {filtersVisible && (
+            <m.div
+              initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+              animate={{ height: "auto", opacity: 1, marginBottom: 48 }}
+              exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6">
+                <div className="flex-1">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Búsqueda</label>
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                     <input
-                      ref={pageInputRef}
-                      type="number"
-                      min="1"
-                      max={totalPages}
-                      value={currentPage}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value);
-                        if (!isNaN(val) && val >= 1 && val <= totalPages) {
-                          setCurrentPage(val);
-                        }
-                      }}
-                      onBlur={() => setCurrentPage(currentPage)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          pageInputRef.current?.blur();
-                        }
-                      }}
-                      className="w-14 h-8 text-center font-bold text-primary bg-white border border-slate-100 rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      type="text"
+                      placeholder="RNC, Nombre..."
+                      value={filters.searchQuery}
+                      onChange={e => updateFilter("searchQuery", e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium"
                     />
-                    <span className="text-sm font-medium text-slate-500">de {totalPages}</span>
                   </div>
-
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Provincia</label>
+                  <select
+                    className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium"
+                    value={filters.province}
+                    onChange={e => updateFilter("province", e.target.value)}
                   >
-                    <ChevronRight size={16} />
-                  </button>
+                    <option value="">Todas las provincias</option>
+                    {provincias?.map((p) => (
+                      <option key={p.id} value={p.nombre}>{p.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Precio Máximo</label>
+                  <div className="relative pt-2">
+                    <input 
+                      min="0" max={PRICE_MAX} step={PRICE_STEPS} 
+                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" 
+                      type="range" 
+                      value={filters.priceRange[1]} 
+                      onChange={e => handlePriceChange([0, parseInt(e.target.value)])} 
+                    />
+                    <div className="mt-2 text-xs font-bold text-slate-500 text-right">
+                      Hasta {filters.priceRange[1] >= PRICE_MAX ? '15M+ DOP' : `${(filters.priceRange[1] / 1000000).toFixed(1)}M DOP`}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-end pb-1">
                   <button
-                    onClick={() => setCurrentPage(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    type="button"
+                    onClick={clearAllFilters}
+                    className="px-4 py-3 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest"
                   >
-                    <ChevronsRight size={16} />
+                    Limpiar
                   </button>
                 </div>
               </div>
-            )}
-          </div>
+            </m.div>
+          )}
+        </AnimatePresence>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <AnimatePresence mode="popLayout">
+            {paginatedProjects.map((project, idx) => (
+              <ProjectCard key={project.id} project={project} idx={idx} />
+            ))}
+          </AnimatePresence>
         </div>
+
+        {filteredProjects.length === 0 && (
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-[40px] border border-dashed border-slate-200 mt-6 shadow-sm"
+          >
+            <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-6">
+              <AlertCircle size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
+            <p className="text-slate-500 max-w-xs mx-auto font-medium text-sm">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
+            <button type="button"
+              onClick={clearAllFilters}
+              className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
+            >
+              Limpiar filtros
+            </button>
+          </m.div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="px-6 py-4 bg-white border border-slate-100 rounded-3xl shadow-sm flex items-center justify-between mt-8">
+            <span className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
+              Mostrando <span className="font-bold text-primary">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
+              <span className="font-bold text-primary">{Math.min(currentPage * itemsPerPage, filteredProjects.length)}</span> de{' '}
+              <span className="font-bold text-primary">{filteredProjects.length}</span>
+            </span>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronsLeft size={16} />
+              </button>
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              <div className="flex items-center gap-1.5 mx-2">
+                <span className="text-sm font-medium text-slate-500">Página</span>
+                <input
+                  ref={pageInputRef}
+                  type="number"
+                  min="1"
+                  max={totalPages}
+                  value={currentPage}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val) && val >= 1 && val <= totalPages) {
+                      setCurrentPage(val);
+                    }
+                  }}
+                  onBlur={() => setCurrentPage(currentPage)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      pageInputRef.current?.blur();
+                    }
+                  }}
+                  className="w-14 h-8 text-center font-bold text-primary bg-white border border-slate-100 rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <span className="text-sm font-medium text-slate-500">de {totalPages}</span>
+              </div>
+
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronsRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </section>
     </>
   );

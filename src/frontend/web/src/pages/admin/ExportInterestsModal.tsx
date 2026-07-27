@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { X, Download, FileSpreadsheet } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
-import * as XLSX from "xlsx";
-import { useAuth } from "../../shared/context/AuthContext";
+import { apiClient } from "../../infrastructure/api/client";
 
 interface InterestRecord {
   tipo: string;
@@ -28,124 +27,46 @@ interface ExportInterestsModalProps {
 export const ExportInterestsModal: React.FC<ExportInterestsModalProps> = ({
   isOpen,
   onClose,
-  intereses,
 }) => {
-  const { user } = useAuth();
   const [exportType, setExportType] = useState<"Todos" | "Interesados" | "Mis Intereses">("Todos");
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     setIsExporting(true);
     try {
-      // Filter records according to the selection
-      const filtered = exportType === "Todos" 
-        ? intereses 
-        : intereses.filter(i => i.tipo === exportType);
-
-      // Create sheet
-      const wb = XLSX.utils.book_new();
-      const rows: any[][] = [];
-
-      // Row 1 (empty)
-      rows.push([]);
-
-      // Row 2: Title in E2 (which is index 4: empty string, empty string, etc.)
-      // Todos: "Reporte de Solicitud de interesado y mis interes"
-      // Interesados: "Reporte de Solicitud de interesado"
-      // Mis Intereses: "Reporte de mis interes"
-      let titleText = "";
-      if (exportType === "Todos") {
-        titleText = "Reporte de Solicitud de interesado y mis interes";
-      } else if (exportType === "Interesados") {
-        titleText = "Reporte de Solicitud de interesado";
-      } else {
-        titleText = "Reporte de mis interes";
-      }
-
-      rows.push(["", "", "", "", titleText]);
-
-      // Row 3 (empty)
-      rows.push([]);
-
-      // Row 4: Column Headers starting at Column C
-      const headers = [
-        "No.",
-        "Usuario",
-        "Nombre del Proyecto",
-        "Provincia(Proyecto)",
-        "Fecha solicitud",
-        exportType === "Todos"
-          ? "Tipo de Interés"
-          : (exportType === "Interesados" ? "Nombre de usuario interesado" : "Nombre de usuario que publica el proyecto"),
-        "RNC",
-        "Dirreción", // matching spelling of template "Dirreción"
-        "Teléfono",
-        "Correo electrónico"
-      ];
-      rows.push(["", "", ...headers]);
-
-      // Data Rows
-      filtered.forEach((item, index) => {
-        // Date format: D/M/Y H:M
-        const dateObj = new Date(item.fecha);
-        const formattedDate = !isNaN(dateObj.getTime())
-          ? `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`
-          : item.fecha;
-
-        const row = [
-          "", // A
-          "", // B
-          index + 1, // C: No.
-          user?.nombreCompleto || "", // D: Usuario
-          item.nombreProyecto, // E: Nombre del Proyecto
-          item.provincia || "", // F: Provincia(Proyecto)
-          formattedDate, // G: Fecha solicitud
-          exportType === "Todos" 
-            ? `${item.tipo} - ${item.nombreUsuario}`
-            : item.nombreUsuario, // H: related user name
-          item.rnc || "", // I: RNC
-          item.direccion || "", // J: Dirreción
-          item.telefono || "", // K: Teléfono
-          item.email || "" // L: Correo electrónico
-        ];
-        rows.push(row);
+      // Call backend export endpoint which loads the real templates, populates data, and retains styles & logo
+      const response = await apiClient.get("/projects/interests/export", {
+        params: { type: exportType },
+        responseType: "blob",
       });
 
-      const ws = XLSX.utils.aoa_to_sheet(rows);
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-      // Set column widths
-      ws["!cols"] = [
-        { wch: 3 }, // A
-        { wch: 3 }, // B
-        { wch: 6 }, // C: No.
-        { wch: 25 }, // D: Usuario
-        { wch: 30 }, // E: Nombre del Proyecto
-        { wch: 25 }, // F: Provincia(Proyecto)
-        { wch: 20 }, // G: Fecha solicitud
-        { wch: 35 }, // H: User relation
-        { wch: 15 }, // I: RNC
-        { wch: 30 }, // J: Dirreción
-        { wch: 15 }, // K: Teléfono
-        { wch: 25 }  // L: Correo electrónico
-      ];
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
 
-      XLSX.utils.book_append_sheet(wb, ws, exportType === "Todos" ? "General" : exportType);
-
-      // Filename date suffix format: D-M-Y H-Min
+      // Construct filename to match requested: Reporte_{Tipo}_D-M-Y H_Min.xlsx
       const now = new Date();
       const d = now.getDate();
       const m = now.getMonth() + 1;
       const y = now.getFullYear();
-      const h = String(now.getHours()).padStart(2, '0');
-      const min = String(now.getMinutes()).padStart(2, '0');
+      const h = String(now.getHours()).padStart(2, "0");
+      const min = String(now.getMinutes()).padStart(2, "0");
       const fileTypeLabel = exportType === "Todos"
         ? "Todos"
         : (exportType === "Interesados" ? "Interesados" : "Mis_Intereses");
-      const filename = `Reporte_${fileTypeLabel}_${d}-${m}-${y} ${h}_${min}.xlsx`;
-
-      XLSX.writeFile(wb, filename);
+      
+      a.download = `Reporte_${fileTypeLabel}_${d}-${m}-${y} ${h}_${min}.xlsx`;
+      
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
-      console.error("Error al exportar:", error);
+      console.error("Error al exportar intereses:", error);
     } finally {
       setIsExporting(false);
       onClose();

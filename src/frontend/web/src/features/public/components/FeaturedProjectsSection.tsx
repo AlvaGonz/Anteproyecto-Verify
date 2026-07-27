@@ -32,7 +32,7 @@ export const FeaturedProjectsSection: React.FC = () => {
       image: p.imagenUrl || getDefaultProjectImage(p.categoria),
       status: p.estadoValidacion,
       completionRate: p.completionRate ?? 80,
-    })
+    }))
     .slice(0, 12);
 
   // Triple for seamless infinite scroll
