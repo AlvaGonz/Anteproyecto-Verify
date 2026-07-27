@@ -24,9 +24,8 @@ describe("requirementCatalog", () => {
 
     it("returns base requirements plus Turistico requirements for category 3", () => {
       const reqs = getRequirementsForCategory(3);
-      expect(reqs.length).toBe(BASE_REQUIREMENTS.length + 2);
+      expect(reqs.length).toBe(BASE_REQUIREMENTS.length + 1);
       expect(reqs.find((r) => r.code === "RESOLUCION_CONFOTUR")).toBeDefined();
-      expect(reqs.find((r) => r.code === "LICENCIA_AMBIENTAL")).toBeDefined();
     });
 
     it("returns base requirements plus Mixto requirements for category 4", () => {

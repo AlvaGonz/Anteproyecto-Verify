@@ -320,10 +320,6 @@ public class ProyectoRepository : IProyectoRepository
             { DocumentType.RegistroMercantil, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
             { DocumentType.PoderNotarial, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
             { DocumentType.RNC, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.EstadosFinancieros, new List<ProjectCategory> { ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto } },
-            { DocumentType.CertificacionesBancarias, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificadoEIA, new List<ProjectCategory> { ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto } },
-            { DocumentType.NoObjecionINAPACAASD, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
         };
 
         var result = new List<DocumentType>();

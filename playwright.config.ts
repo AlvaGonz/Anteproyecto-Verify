@@ -39,5 +39,13 @@ export default defineConfig({
         baseURL: process.env.FRONTEND_URL ?? "http://localhost:3000",
       },
     },
+    {
+      name: "performance",
+      testDir: "./e2e/performance",
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: process.env.FRONTEND_URL ?? "http://localhost:3000",
+      },
+    },
   ],
 });

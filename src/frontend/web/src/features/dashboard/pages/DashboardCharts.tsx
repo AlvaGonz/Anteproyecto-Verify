@@ -20,7 +20,6 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = React.memo(({ tot
           <h3 className="text-lg font-display font-black tracking-tight">
             Salud del <span className="text-[#F98513]">Sistema</span>
           </h3>
-          <div className="px-2 py-0.5 rounded bg-[#F98513]/20 text-[#F98513] text-[8px] font-black uppercase tracking-widest">En Vivo</div>
         </div>
         <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-6">Proyectos aprobados vs total</p>
       </div>

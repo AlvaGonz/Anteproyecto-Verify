@@ -27,6 +27,7 @@ public class PublicProjectController : ControllerBase
     }
 
     [HttpGet("featured")]
+    [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "count" })]
     public async Task<IActionResult> GetFeatured([FromQuery] int count = 5, CancellationToken ct = default)
     {
         var query = new GetFeaturedProjectsQuery
@@ -41,6 +42,7 @@ public class PublicProjectController : ControllerBase
     }
 
     [HttpGet("search")]
+    [ResponseCache(Duration = 120, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "q" })]
     public async Task<IActionResult> Search([FromQuery] string? q, CancellationToken ct)
     {
         var query = new Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQuery
@@ -55,6 +57,7 @@ public class PublicProjectController : ControllerBase
     }
 
     [HttpGet("{codigoPublico}")]
+    [ResponseCache(Duration = 120, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> GetByCodigo(string codigoPublico, CancellationToken ct)
     {
         var query = new GetPublicProjectStatusQuery
@@ -74,6 +77,7 @@ public class PublicProjectController : ControllerBase
     }
 
     [HttpGet("qr/{qrToken}")]
+    [ResponseCache(Duration = 120, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> GetByQrToken(string qrToken, CancellationToken ct)
     {
         var query = new GetPublicProjectStatusQuery

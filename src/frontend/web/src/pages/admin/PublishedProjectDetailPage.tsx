@@ -188,10 +188,12 @@ export const PublishedProjectDetailPage: React.FC = () => {
         const result = await projectsApi.consumeQuota({ projectId: id || "" });
         if (result._tag === 'Success') {
           queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
-        } else if (result._tag === 'LimitReached') {
-          setQuotaError({ used: result.used, max: result.max });
+        } else if (result._tag === 'Failure' && result.error._tag === 'LimitReached') {
+          setQuotaError({ used: result.error.used, max: result.error.max });
           setShowQuotaModal(true);
           setHasQuota(false);
+        } else if (result._tag === 'Failure') {
+          console.error("Error consumiendo cuota:", result.error);
         }
       } catch (e) {
         console.error("Error consumiendo cuota (no bloqueante):", e);
@@ -229,7 +231,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
     setHasQuota(true);
     consumeBg();
-  }, [id, fromSaved, isAuthenticated, isAdmin, planLimits, planLimitsLoading, authLoading]);
+  }, [id, location.state?.fromSaved, isAuthenticated, isAdmin, planLimits, planLimitsLoading, authLoading]);
 
   React.useEffect(() => {
     return () => {

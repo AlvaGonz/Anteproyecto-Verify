@@ -31,11 +31,7 @@ public class RequiredDocumentsRule : IValidationRule
             DocumentType.CertificacionIPI,
             DocumentType.RegistroMercantil,
             DocumentType.PoderNotarial,
-            DocumentType.RNC,
-            DocumentType.EstadosFinancieros,
-            DocumentType.CertificacionesBancarias,
-            DocumentType.CertificadoEIA,
-            DocumentType.NoObjecionINAPACAASD
+            DocumentType.RNC
         };
 
         var activeDocs = context.Documentos.Where(d => d.Activo).ToList();

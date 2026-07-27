@@ -10,11 +10,8 @@ export type RequirementCode =
   | "REGISTRO_MERCANTIL"
   | "CERTIFICACION_IPI"
   | "RNC"
-  | "ESTADOS_FINANCIEROS"
-  | "CERT_BANCARIAS"
   | "CONSENTIMIENTO_DIGITAL"
   | "RESOLUCION_CONFOTUR"
-  | "LICENCIA_AMBIENTAL"
   | "REGISTRO_SANITARIO"
   | "IMPACTO_TRAFICO"
   | "REGIMEN_CONDOMINIO"
@@ -89,27 +86,6 @@ export const BASE_REQUIREMENTS: RequirementDefinition[] = [
     maxSizeBytes: DEFAULT_MAX_SIZE,
     required: true,
   },
-  {
-    code: "ESTADOS_FINANCIEROS",
-    label: "Estados Financieros",
-    description: "Estados financieros auditados del último período",
-    documentType: DocumentType.EstadosFinancieros,
-    acceptedMimeTypes: "application/pdf",
-    maxSizeBytes: DEFAULT_MAX_SIZE,
-    required: false,
-    optional: true,
-  },
-  {
-    code: "CERT_BANCARIAS",
-    label: "Certificaciones Bancarias",
-    description: "Referencias bancarias actualizadas",
-    documentType: DocumentType.CertificacionesBancarias,
-    acceptedMimeTypes: "application/pdf",
-    maxSizeBytes: DEFAULT_MAX_SIZE,
-    required: false,
-    optional: true,
-  },
-
 ];
 
 export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
@@ -154,15 +130,6 @@ export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
       maxSizeBytes: DEFAULT_MAX_SIZE,
       required: true,
     },
-    {
-      code: "LICENCIA_AMBIENTAL",
-      label: "Licencia Ambiental",
-      description: "Emitida por el Ministerio de Medio Ambiente",
-      documentType: DocumentType.CertificadoEIA,
-      acceptedMimeTypes: "application/pdf",
-      maxSizeBytes: DEFAULT_MAX_SIZE,
-      required: true,
-    }
   ],
   4: [ // Mixto
     {

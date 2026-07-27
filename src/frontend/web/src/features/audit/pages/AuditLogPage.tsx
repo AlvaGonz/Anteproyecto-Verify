@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { 
-  Download, 
-  Search, 
-  Calendar, 
-  User as UserIcon, 
-  ChevronLeft, 
+import {
+  Download,
+  Search,
+  Calendar,
+  User as UserIcon,
+  ChevronLeft,
   ChevronRight,
-  ShieldCheck,
   Activity
 } from "lucide-react";
 import { useGlobalAuditTrail, useExportGlobalAudit } from "../api/useAudit";
@@ -62,7 +61,7 @@ export const AuditLogPage: React.FC = () => {
     })) as unknown as AuditDto[];
 
     if (searchQuery) {
-      filtered = filtered.filter(l => 
+      filtered = filtered.filter(l =>
         (l.detalle || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (l.usuarioId || "").toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -82,16 +81,12 @@ export const AuditLogPage: React.FC = () => {
             <h1 className="text-3xl font-display font-black tracking-tight text-secondary">
               Registro de Auditoría
             </h1>
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-100">
-              <ShieldCheck className="w-3 h-3" />
-              Sistema Protegido
-            </div>
           </div>
           <p className="text-text-secondary font-medium">
             Historial completo de eventos críticos y acciones administrativas del sistema.
           </p>
         </div>
-        <button type="button" 
+        <button type="button"
           onClick={handleExport}
           disabled={exportMutation.isPending}
           className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-xl font-sans font-bold text-sm text-secondary hover:bg-surface-raised transition-all shadow-raised hover:shadow-floating disabled:opacity-50"
@@ -107,7 +102,7 @@ export const AuditLogPage: React.FC = () => {
           <label htmlFor="audit-search" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Búsqueda</label>
           <div className="relative group">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary w-4 h-4 group-focus-within:text-primary transition-colors" />
-            <input 
+            <input
               id="audit-search"
               type="text"
               aria-label="Buscar por detalle"
@@ -121,11 +116,11 @@ export const AuditLogPage: React.FC = () => {
 
         <div className="space-y-2">
           <label htmlFor="audit-tipo" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Tipo de Evento</label>
-          <select 
+          <select
             id="audit-tipo"
             aria-label="Filtrar por tipo de evento"
             className="w-full px-4 py-2.5 text-sm bg-surface-raised border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none"
-            onChange={(e) => setFilters({...filters, tipoEvento: e.target.value})}
+            onChange={(e) => setFilters({ ...filters, tipoEvento: e.target.value })}
           >
             <option value="">Todos los eventos</option>
             <option value="ProjectCreated">Creación de Proyecto</option>
@@ -138,12 +133,12 @@ export const AuditLogPage: React.FC = () => {
           <label htmlFor="audit-fecha-desde" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Fecha Desde</label>
           <div className="relative group">
             <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary w-4 h-4" />
-            <input 
+            <input
               id="audit-fecha-desde"
               type="date"
               aria-label="Fecha desde"
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-surface-raised border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              onChange={(e) => setFilters({...filters, fromDate: e.target.value})}
+              onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
             />
           </div>
         </div>
@@ -152,12 +147,12 @@ export const AuditLogPage: React.FC = () => {
           <label htmlFor="audit-fecha-hasta" className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary px-1">Fecha Hasta</label>
           <div className="relative group">
             <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary w-4 h-4" />
-            <input 
+            <input
               id="audit-fecha-hasta"
               type="date"
               aria-label="Fecha hasta"
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-surface-raised border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              onChange={(e) => setFilters({...filters, toDate: e.target.value})}
+              onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
             />
           </div>
         </div>

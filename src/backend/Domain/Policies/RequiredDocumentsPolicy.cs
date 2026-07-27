@@ -23,16 +23,12 @@ public static class RequiredDocumentsPolicy
             DocumentType.CertificacionIPI,
             DocumentType.RegistroMercantil,
             DocumentType.PoderNotarial,
-            DocumentType.RNC,
-            DocumentType.CertificacionesBancarias,
-            DocumentType.NoObjecionINAPACAASD
+            DocumentType.RNC
         };
 
         if (category == ProjectCategory.Comercial || category == ProjectCategory.Turistico || category == ProjectCategory.Mixto)
         {
             baseDocuments.Add(DocumentType.OTHER);
-            baseDocuments.Add(DocumentType.EstadosFinancieros);
-            baseDocuments.Add(DocumentType.CertificadoEIA);
         }
 
         return baseDocuments.Distinct();
