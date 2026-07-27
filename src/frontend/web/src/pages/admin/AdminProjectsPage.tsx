@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ProjectStatus } from "../../features/projects/types";
 import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
 import { useDashboardStats } from "../../features/dashboard/api/useDashboardStats";
-import { Plus, Building, FileCheck, Activity, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Building, FileCheck, Activity } from "lucide-react";
 import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
 import { AdminPublishedProjectsView } from "./AdminPublishedProjectsView";
 import { AdminInterestsView } from "./AdminInterestsView";

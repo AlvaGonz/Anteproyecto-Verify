@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
-import { Search, Users, Building2, X, AlertCircle, RefreshCw, BarChart3 } from "lucide-react";
+import { Search, Users, Building2, X, BarChart3 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 
 interface InterestRecord {
@@ -14,7 +14,7 @@ interface InterestRecord {
 }
 
 export const AdminInterestsView: React.FC = () => {
-  const { data: intereses = [], isLoading, isError, refetch } = useInterests();
+  const { data: intereses = [] } = useInterests();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"Todos" | "Interesados" | "Mis Intereses">("Todos");
   const [selectedInterest, setSelectedInterest] = useState<InterestRecord | null>(null);
@@ -153,7 +153,7 @@ export const AdminInterestsView: React.FC = () => {
           {filteredIntereses.length > 0 ? (
             <div className="flex flex-col gap-3">
               {filteredIntereses.map((interes: InterestRecord, idx: number) => {
-                const isMisIntereses = interes.tipo === "Mis Intereses";
+
                 const isInteresados = interes.tipo === "Interesados";
                 
                 return (

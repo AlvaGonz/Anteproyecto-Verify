@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  MapPin,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
@@ -11,16 +10,10 @@ import {
   Plus,
   Minus,
   Maximize,
-  DollarSign,
   Building2,
-  User,
-  Mail,
   Phone,
-  Globe,
   MapIcon,
-  ShieldCheck,
   CheckCircle2,
-  ArrowRight,
   Camera,
   AlertCircle,
   X,
@@ -181,7 +174,6 @@ export const PublishedProjectDetailPage: React.FC = () => {
   const [hasQuota, setHasQuota] = useState<boolean | null>(null);
   const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [quotaError, setQuotaError] = useState<{ used?: number; max?: number } | null>(null);
-  const fromSaved = !!location.state?.fromSaved;
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
   const quotaHandledRef = useRef(false);
@@ -191,8 +183,12 @@ export const PublishedProjectDetailPage: React.FC = () => {
       try {
         const { projectsApi } = await import("../../features/projects/api/projectsApi");
         const result = await projectsApi.consumeQuota({ projectId: id || "" });
-        if (result._tag === 'success') {
-          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+        if (result._tag === 'Success') {
+          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
+        } else if (result._tag === 'LimitReached') {
+          setQuotaError({ used: result.used, max: result.max });
+          setShowQuotaModal(true);
+          setHasQuota(false);
         }
       } catch (e) {
         console.error("Error consumiendo cuota (no bloqueante):", e);
@@ -202,7 +198,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
     if (authLoading) return;
     if (quotaHandledRef.current) return;
 
-    if (isAdmin || fromSaved || !isAuthenticated) {
+    const isSaved = location.state?.fromSaved === id;
+    if (isAdmin || isSaved || !isAuthenticated) {
       setHasQuota(true);
       quotaHandledRef.current = true;
       return;
@@ -233,7 +230,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   React.useEffect(() => {
     return () => {
-      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
     };
   }, []);
   const [localSaved, setLocalSaved] = useState(false);
@@ -245,7 +242,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   React.useEffect(() => {
     if (isAuthenticated && savedProjectsList && id) {
-      setLocalSaved(savedProjectsList.some(p => p.id?.toLowerCase() === id.toLowerCase() || p.proyectoId?.toLowerCase() === id.toLowerCase()));
+      setLocalSaved(savedProjectsList.some(p => p.id?.toLowerCase() === id.toLowerCase() || (p as any).proyectoId?.toLowerCase() === id.toLowerCase()));
     } else {
       setLocalSaved(false);
     }
@@ -253,7 +250,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   React.useEffect(() => {
     if (isAuthenticated && interestsList && id) {
-      setLocalInterested(interestsList.some(i => i.id?.toLowerCase() === id.toLowerCase() || i.proyectoId?.toLowerCase() === id.toLowerCase()));
+      setLocalInterested(interestsList.some(i => i.id?.toLowerCase() === id.toLowerCase() || (i as any).proyectoId?.toLowerCase() === id.toLowerCase()));
     } else {
       setLocalInterested(false);
     }
@@ -452,13 +449,12 @@ export const PublishedProjectDetailPage: React.FC = () => {
           <div className="pb-6 border-b border-slate-100">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-slate-700">Estado: <span className="font-bold">{project.estado === 1 ? "Activo" : "Inactivo"}</span></p>
+                <p className="text-sm font-semibold text-slate-700">Estado: <span className="font-bold">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{project.categoria === 1 ? "Construcción" : project.categoria === 2 ? "Comercio" : project.categoria === 3 ? "Turismo" : "N/D"}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Integridad: <span className="font-bold">{getIntegrityLabel()}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Ubicación: <span className="font-bold">{project.ubicacionTexto || "N/D"}</span></p>
               </div>
               <button 
-                type="button"
                 onClick={() => {
                   if (!isAuthenticated) {
                     navigate("/login");
@@ -545,7 +541,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
                 </div>
                 <div className="flex border-b border-slate-200 pb-1">
                   <span className="font-bold text-slate-700 w-1/2">Estado:</span>
-                  <span className="text-slate-600 w-1/2">{project.estado === 1 ? "Activo" : "Inactivo"}</span>
+                  <span className="text-slate-600 w-1/2">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span>
                 </div>
                 <div className="flex border-b border-slate-200 pb-1">
                   <span className="font-bold text-slate-700 w-1/2">Integridad:</span>

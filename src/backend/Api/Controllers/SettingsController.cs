@@ -221,6 +221,7 @@ public class SettingsController : ControllerBase
             if (plan != null)
             {
                 user.AsignarPlan(plan.Idsuscripcion);
+                user.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
             }
         }
 
@@ -233,8 +234,8 @@ public class SettingsController : ControllerBase
 
         var notification = new Notificacion(
             usuarioId: user.Id,
-            mensaje: "Tu cuenta fue creada con una contraseña temporal. Por favor, cámbiala en tu perfil.",
-            tipo: "Warning",
+            mensaje: $"Tu cuenta fue creada con el plan {request.PlanNombre ?? "sin asignar"}. Por favor, cámbiala en tu perfil.",
+            tipo: "Info",
             enlaceRelacionado: "/profile"
         );
         _context.Notificaciones.Add(notification);
@@ -250,9 +251,9 @@ public class SettingsController : ControllerBase
             var html = Infrastructure.Email.EmailTemplates.GetAccountCreatedByAdminEmail(nombre, request.Email, finalPassword);
             await _emailService.SendEmailAsync(request.Email, "Cuenta Creada — VeriFinca", html);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // If email sending fails, we don't fail the user creation
+            _logger.LogWarning(ex, "Error sending welcome email to {Email} for plan {Plan}", request.Email, request.PlanNombre);
         }
 
         return Ok(new { Message = "Usuario creado exitosamente.", Id = user.Id });

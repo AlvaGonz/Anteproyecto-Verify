@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo, useRef, useEffect, Suspense } from "react";
+import React, { useState, useMemo, memo, useRef, Suspense, FC } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Filter,
@@ -12,7 +12,6 @@ import {
   ChevronsRight,
   MapPin,
   Search,
-  DollarSign,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
@@ -24,13 +23,14 @@ import {
   filterPublishedProjects,
   PublishedProjectFilters,
   PROJECT_CATEGORIES,
-  PROVINCIAS,
   PRICE_MAX,
   PRICE_STEPS,
   getDefaultProjectImage,
   PublicProjectSearchResultDto,
 } from "../../features/projects/api/usePublishedProjects";
 import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
+
+import { useProvinces } from "../../features/provinces/api/useProvinces";
 
 interface ProjectCardProps {
   project: PublicProjectSearchResultDto;
@@ -49,71 +49,33 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
   >
     <div className="relative aspect-video overflow-hidden">
       <img
-        src={project.imagenUrl || getDefaultProjectImage(project.categoria)}
+        src={project.imagenUrl || getDefaultProjectImage(project.categoria as unknown as number)}
         alt={project.nombreProyecto}
-        width="800"
-        height="500"
-        loading="lazy"
-        decoding="async"
-        fetchPriority={idx < 3 ? "high" : "low"}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-6 left-6">
         <ProjectStatusBadge status={project.estadoIntegridad === 1 ? "Verificado" : "Procesando"} />
-      </div>
-      <div className="absolute bottom-4 right-4">
-        <span className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 flex items-center gap-1">
-          <DollarSign size={10} />
-          {project.valorEstimado ? (project.valorEstimado / 1_000_000).toFixed(1) + "M" : "—"}
-        </span>
       </div>
     </div>
 
-    <div className="p-6 flex flex-col flex-1">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div className="min-w-0">
-          <h3 className="text-lg font-black text-slate-900 truncate group-hover:text-primary transition-colors">
-            {project.nombreProyecto}
-          </h3>
-          <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wide mt-1">
-            <MapPin size={12} />
+    <div className="p-8 flex flex-col flex-1">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h3 className="text-xl font-black text-slate-900 mb-1 group-hover:text-primary transition-colors">{project.nombreProyecto}</h3>
+          <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wide">
+            <Building2 size={12} />
             {project.ubicacionTexto || "Ubicación no especificada"}
           </div>
         </div>
       </div>
 
-      {project.designacionCatastral ? (
-        <div className="flex items-center gap-1.5 font-mono bg-slate-50 px-3 py-1.5 rounded-md mb-3">
-          <span className="text-xs font-bold text-slate-500">Catastral:</span>
-          <span className="text-xs font-bold text-slate-700">{project.designacionCatastral}</span>
-        </div>
-      ) : (
-        <div className="flex items-center gap-1.5 font-mono bg-slate-50 px-3 py-1.5 rounded-md mb-3">
-          <span className="text-xs font-bold text-slate-500">Catastral:</span>
-          <span className="text-xs font-bold text-slate-700">—</span>
-        </div>
-      )}
+      <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">
+        {project.constructora ? `Desarrollado por ${project.constructora}.` : ""} Proyecto en estado {project.estadoProyecto || "activo"}.
+      </p>
 
-      {project.matricula ? (
-        <div className="flex items-center gap-1.5 font-mono bg-blue-50/50 text-blue-600 px-3 py-1.5 rounded-md mb-3">
-          <span className="text-xs font-bold">Matrícula:</span>
-          <span className="text-xs font-bold">{project.matricula}</span>
-        </div>
-      ) : (
-        <div className="flex items-center gap-1.5 font-mono bg-blue-50/50 text-blue-600 px-3 py-1.5 rounded-md mb-3">
-          <span className="text-xs font-bold">Matrícula:</span>
-          <span className="text-xs font-bold">—</span>
-        </div>
-      )}
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className="flex items-center gap-1.5 font-mono bg-slate-50 px-2 py-1 rounded-md text-[10px] font-bold text-slate-600">
-          <Building2 size={10} /> RNC: {project.rncDesarrollador || "—"}
-        </span>
-      </div>
-
-      <div className="mt-auto pt-4 border-t border-slate-100">
-        <div className="space-y-1.5 mb-4">
+      <div className="mt-auto space-y-4">
+        {/* Integrity Progress */}
+        <div className="space-y-1.5">
           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
             <span>Integridad Validada</span>
             <span className="text-primary">
@@ -144,7 +106,6 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
 const ProjectsPublicListContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
-
   const [filtersVisible, setFiltersVisible] = useState(true);
 
   const [filters, setFilters] = useState<PublishedProjectFilters>({
@@ -314,8 +275,8 @@ const ProjectsPublicListContent: React.FC = () => {
                 onChange={e => updateFilter("province", e.target.value)}
               >
                 <option value="">Todas</option>
-                {PROVINCIAS.map((p) => (
-                  <option key={p} value={p}>{p}</option>
+                {provincias?.map((p) => (
+                  <option key={p.id} value={p.nombre}>{p.nombre}</option>
                 ))}
               </select>
 

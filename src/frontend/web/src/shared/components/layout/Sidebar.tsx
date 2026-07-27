@@ -155,7 +155,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
           }}
         >
-          {NAVIGATION.map((item, idx) => {
+          {NAVIGATION.map((item) => {
             const isActive = location.pathname.startsWith(item.href);
             return (
               <motion.div

@@ -1,11 +1,7 @@
 import React from "react";
 import { DocumentType, DocumentStatus } from "../types";
 import { useDocuments, useDownloadDocument } from "../api/useDocuments";
-import { OcrReviewPanel } from "./OcrReviewPanel";
-import { CedulaExtractionCard } from "./CedulaExtractionCard";
-import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
-import { PlanoMensuraExtractionCard } from "./PlanoMensuraExtractionCard";
-import { CertificacionIPIExtractionCard } from "./CertificacionIPIExtractionCard";
+
 import {
   AlertTriangle,
   Clock,

@@ -16,7 +16,6 @@ const statusLabels: Record<string, string> = {
   [ProjectStatus.InReview]: "En Revisión",
   [ProjectStatus.Observed]: "Observado",
   [ProjectStatus.Published]: "Publicado",
-  [ProjectStatus.Validated]: "Publicado",
   [ProjectStatus.Rejected]: "Rechazado",
 };
 
@@ -59,7 +58,7 @@ export const DashboardPage: React.FC = () => {
   } else if (!isAdmin && projectsData) {
     totalProjects = userTotal;
     inReview = projectsData.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
-    verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Published || p.estadoProyecto === ProjectStatus.Validated).length;
+    verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Published).length;
     recentProjects = [...projectsData]
       .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
       .slice(0, 5)

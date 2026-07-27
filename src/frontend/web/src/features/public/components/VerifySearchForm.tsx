@@ -154,8 +154,8 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
       const { projectsApi } = await import("../../projects/api/projectsApi");
       const result = await projectsApi.consumeQuota({ codigo: code.trim() });
       
-      if (result._tag === 'failure') {
-        if (result.error._tag === 'LimitReached') {
+      if (result._tag === 'Failure') {
+        if ((result as any).error?._tag === 'LimitReached') {
           addToast("Límite de consultas alcanzado. Mejora tu plan para continuar.", "error");
         } else {
           addToast("Error al procesar la consulta del proyecto.", "error");
