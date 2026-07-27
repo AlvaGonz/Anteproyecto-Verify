@@ -56,6 +56,8 @@ public class Usuario : EntityBase, IEffectivePlanUser
     public bool SocialLogin { get; private set; }
     public string? GoogleId { get; private set; }
 
+    public bool AceptoDescargo { get; private set; }
+
     // Post-verify checkout flow: plan selected before registration, completed after verification
     // ponytail: PendingPlanCode holds the plan key (profesional/empresa/corporativo), PendingBillingCycle holds monthly/yearly
     public string? PendingPlanCode { get; private set; }
@@ -152,6 +154,12 @@ public class Usuario : EntityBase, IEffectivePlanUser
     public void UpdateAccountStatus(UserAccountStatus status)
     {
         AccountStatus = status;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AceptarDescargo()
+    {
+        AceptoDescargo = true;
         UpdatedAtUtc = DateTime.UtcNow;
     }
     

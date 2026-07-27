@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { DisclaimerModal } from "./DisclaimerModal";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -19,6 +20,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FFF8F3]">
+      <DisclaimerModal />
       {/* Mobile sidebar — animated via AnimatePresence */}
       <AnimatePresence>
         {sidebarOpen && (

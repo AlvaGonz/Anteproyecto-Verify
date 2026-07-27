@@ -131,4 +131,36 @@ public class AccountController : ControllerBase
 
         return Ok(new { Message = "Cuenta recuperada exitosamente." });
     }
+
+    [HttpPost("descargo")]
+    public async Task<IActionResult> AcceptDisclaimer(CancellationToken cancellationToken)
+    {
+        Guid userId;
+        try
+        {
+            userId = GetCurrentUserId();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        var user = await _context.Set<Usuario>().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user == null)
+            return NotFound(new { Message = "Usuario no encontrado." });
+
+        user.AceptarDescargo();
+        _usuarioRepository.Update(user);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        await _auditLogger.AppendAsync(new AuditEntryDto
+        {
+            UsuarioId = user.Id,
+            TipoOperacion = TipoOperacion.General,
+            Accion = "Aceptación de descargo de responsabilidad",
+            Resultado = "Éxito"
+        }, cancellationToken);
+
+        return Ok(new { Success = true, Message = "Descargo de responsabilidad aceptado." });
+    }
 }

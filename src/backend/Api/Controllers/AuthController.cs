@@ -200,6 +200,7 @@ public class AuthController : ControllerBase
                 avatarUrl = responseData.User.AvatarUrl,
                 subscriptionStatus = responseData.User.SubscriptionStatus,
                 pendingPlanCode = responseData.User.PendingPlanCode,
+                aceptoDescargo = responseData.User.AceptoDescargo,
                 isGuest = responseData.User.IsGuest,
                 inviterPlan = responseData.User.InviterPlan,
                 inviteesList = responseData.User.InviteesList
@@ -376,6 +377,7 @@ public class AuthController : ControllerBase
             PendingPlanCode = user.PendingPlanCode,
             PendingBillingCycle = user.PendingBillingCycle,
             MaxUsuariosSecundarios = user.Plan?.MaxUsuariosSecundarios ?? 0,
+            AceptoDescargo = user.AceptoDescargo,
             IsGuest = user.TitularId.HasValue,
             TitularId = user.TitularId,
             InviterPlan = user.Titular?.Plan?.NombrePlan,
