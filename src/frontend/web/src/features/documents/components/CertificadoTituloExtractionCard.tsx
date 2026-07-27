@@ -1,5 +1,5 @@
 import React from "react";
-import { CertificadoTituloRdExtractionV1, ExtractionStatus, FieldStatus, ExtractedField } from "../types";
+import { CertificadoTituloRdExtractionV1, ExtractionStatus, FieldStatus } from "../types";
 import { AlertTriangle, FileText, Loader2, Info, Pencil, Check, X } from "lucide-react";
 
 interface CertificadoTituloExtractionCardProps {
@@ -58,7 +58,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
     setEditingField(null);
   };
 
-  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false) => {
+  const renderField = (label: string, fieldKey: string, field?: any, isPrimary = false) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
     const isMissing = safeField.status === FieldStatus.Missing && !displayValue;

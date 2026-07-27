@@ -19,7 +19,7 @@ export function useRoutePrefetch() {
       // Force load the lazy element by accessing it
       Promise.resolve().then(() => {
         // This triggers the lazy import when the route is matched
-        router.loadRoute(route.id);
+        (router as any).loadRoute?.(route.id);
       });
     }
   }, []);

@@ -52,7 +52,7 @@ export const FeaturedProjectsSection: React.FC = () => {
     .map(p => ({
       name: p.nombreProyecto,
       location: p.ubicacionTexto || "Ubicación no especificada",
-      image: p.imagenUrl || getDefaultProjectImage(p.categoria),
+      image: p.imagenUrl || getDefaultProjectImage((p as any).categoria || 1),
       status: "Validado",
       risk: "Calculando",
       deliveredDocs: 8,

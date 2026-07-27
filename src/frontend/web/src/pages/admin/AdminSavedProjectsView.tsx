@@ -128,7 +128,7 @@ export const AdminSavedProjectsView: React.FC = () => {
                 <div className="mt-auto pt-4 border-t border-slate-100">
                   <Link
                     to={`/admin/projects/${project.id}/publicado`}
-                    state={{ fromSaved: true }}
+                    state={{ fromSaved: project.id }}
                     className="flex items-center justify-center gap-2 w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all group/btn"
                   >
                     Ver Detalles <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />

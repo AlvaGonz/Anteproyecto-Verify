@@ -68,13 +68,13 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
   
   const queryClient = useQueryClient();
-  const { registerInterest, isRegisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
+  const { registerInterest, isRegisteringInterest } = useProjectsInteractions();
   const { data: interestsList } = useInterests(isAuthenticated);
   const { addToast } = useToast();
 
   React.useEffect(() => {
     if (isAuthenticated && interestsList && identifier) {
-      setIsInterested(interestsList.some(i => i.id?.toLowerCase() === identifier.toLowerCase() || i.proyectoId?.toLowerCase() === identifier.toLowerCase()));
+      setIsInterested(interestsList.some(i => i.id?.toLowerCase() === identifier.toLowerCase() || (i as any).proyectoId?.toLowerCase() === identifier.toLowerCase()));
     } else {
       setIsInterested(false);
     }
@@ -91,7 +91,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
       try {
         const { projectsApi } = await import("../../features/projects/api/projectsApi");
         const result = await projectsApi.consumeQuota({ projectId: identifier });
-        if (result._tag === 'success') {
+        if (result._tag === 'Success') {
           queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
         }
       } catch (e) {

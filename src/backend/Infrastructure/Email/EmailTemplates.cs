@@ -3,21 +3,21 @@ namespace Infrastructure.Email;
 public static class EmailTemplates
 {
     // ── Brand tokens ────────────────────────────────────────────────────────
-    private const string Navy       = "#1E3A5F";
-    private const string NavyDark   = "#152D4A";
-    private const string Orange     = "#E87B2B";
-    private const string OrangeDark = "#D36C22";
-    private const string BgPage     = "#F0F4F8";
+    private const string Navy       = "#0f172a";
+    private const string NavyDark   = "#020617";
+    private const string Orange     = "#f97316";
+    private const string OrangeDark = "#ea580c";
+    private const string BgPage     = "#f1f5f9";
     private const string BgCard     = "#FFFFFF";
-    private const string BgMuted    = "#F8FAFC";
-    private const string TextBody   = "#2D3748";
-    private const string TextMuted  = "#64748B";
-    private const string BorderLine = "#E2E8F0";
+    private const string BgMuted    = "#f8fafc";
+    private const string TextBody   = "#334155";
+    private const string TextMuted  = "#64748b";
+    private const string BorderLine = "#e2e8f0";
 
     // ── Logo Image (ISOTIPO.png) ────────────────────────────────────────────────
     // Nota: Cambiar http://localhost:3000 por el dominio de producción cuando se despliegue.
     private const string LogoImg = @"
-        <img src=""http://localhost:3000/brand/isotipo/ISOTIPO.png"" width=""36"" height=""36"" alt=""VeriFinca Logo"" style=""display:inline-block;vertical-align:middle;border-radius:8px;background-color:#FFFFFF;padding:4px;box-sizing:border-box;"" />";
+        <img src=""http://localhost:3000/brand/isotipo/ISOTIPO.png"" width=""48"" height=""48"" alt=""VeriFinca Logo"" style=""display:block;margin:0 auto;border-radius:12px;background-color:#FFFFFF;"" />";
 
     // ── Wrapper ──────────────────────────────────────────────────────────────
     private static string BuildEmailWrapper(string title, string preHeader, string contentHtml)
@@ -66,31 +66,10 @@ public static class EmailTemplates
 
     <!-- Header -->
     <tr>
-      <td style=""background-color:{Navy};padding:0;"">
-        <!-- Top accent bar -->
-        <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
-          <tr>
-            <td style=""background-color:{Orange};height:4px;font-size:0;line-height:0;"">&nbsp;</td>
-          </tr>
-        </table>
-        <!-- Logo row -->
-        <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
-          <tr>
-            <td style=""padding:28px 32px 24px 32px;"">
-              <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"">
-                <tr>
-                  <td style=""padding-right:12px;vertical-align:middle;"">
-                    {LogoImg}
-                  </td>
-                  <td style=""vertical-align:middle;"">
-                    <span style=""font-family:'Manrope',Arial,sans-serif;font-size:26px;font-weight:700;color:#FFFFFF;letter-spacing:1px;line-height:1;"">Veri<span style=""color:{Orange};"">Finca</span></span>
-                    <div style=""font-family:'Inter',Arial,sans-serif;font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:3px;"">Plataforma de Certificación</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+      <td style=""background-color:{BgCard};padding:32px 0 16px 0;text-align:center;border-bottom:1px solid {BorderLine};"">
+        {LogoImg}
+        <div style=""margin-top:12px;font-family:'Manrope',Arial,sans-serif;font-size:24px;font-weight:800;color:{Navy};letter-spacing:0.5px;"">Veri<span style=""color:{Orange};"">Finca</span></div>
+        <div style=""font-family:'Inter',Arial,sans-serif;font-size:12px;color:{TextMuted};letter-spacing:1px;text-transform:uppercase;margin-top:4px;"">Plataforma de Certificación</div>
       </td>
     </tr>
 

@@ -17,7 +17,7 @@ export function useProjectsInteractions() {
       }
       return result.value;
     },
-    onSuccess: (_, projectId) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects", "interests"] });
       addToast(
         "El Proyecto ha sido agregado a su seccion de Intereses con exito!",
@@ -98,7 +98,7 @@ export function useInterests(enabled: boolean = true) {
     queryFn: async () => {
       const result = await projectsApi.getInterests();
       if (!isSuccess(result)) {
-        throw new Error(result.error?.message || "Error al cargar intereses");
+        throw new Error((result.error as any)?.message || "Error al cargar intereses");
       }
       return result.value;
     },
@@ -113,7 +113,7 @@ export function useSavedProjects(enabled: boolean = true) {
     queryKey: ["projects", "saved"],
     queryFn: async () => {
       const result = await projectsApi.getSavedProjects();
-      if (!isSuccess(result)) throw new Error(result.error?.message || "Error al cargar proyectos guardados");
+      if (!isSuccess(result)) throw new Error((result.error as any)?.message || "Error al cargar proyectos guardados");
       return result.value;
     },
     enabled,

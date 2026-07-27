@@ -10,36 +10,12 @@ interface AdminLayoutProps {
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   // Close mobile sidebar on route change
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
-
-  const getPageTitle = () => {
-    const path = location.pathname;
-    if (path.includes("/dashboard")) return "Dashboard";
-    if (path.includes("/projects/new")) return "Nuevo Expediente";
-    if (path.includes("/projects") && path.includes("/edit")) return "Editar Expediente";
-    if (path.includes("/projects") && path.includes("/documents")) return "Gestion de Documentos";
-    if (path.includes("/projects") && path.includes("/validations")) return "Validacion de Datos";
-    if (path.includes("/projects") && path.includes("/audit")) return "Auditoria del Sistema";
-    if (path.includes("/projects") && path.includes("/reports")) return "Reportes y Estadisticas";
-    if (path.includes("/projects")) return "Gestion de Expedientes";
-    if (path.includes("/rules")) return "Reglas de Validacion";
-    if (path.includes("/admin/audit-log")) return "Registro de Auditoria";
-    if (path.includes("/settings")) return "Configuracion";
-    return "Administracion";
-  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FFF8F3]">
