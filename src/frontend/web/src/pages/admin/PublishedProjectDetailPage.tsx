@@ -28,6 +28,7 @@ import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { usePlanLimits } from "../../features/settings/api/useSettings";
+import { DocumentosModal } from "../../features/documents/components/DocumentosModal";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -173,8 +174,10 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   const [hasQuota, setHasQuota] = useState<boolean | null>(null);
   const [showQuotaModal, setShowQuotaModal] = useState(false);
+  const [showDocumentos, setShowDocumentos] = useState(false);
   const [quotaError, setQuotaError] = useState<{ used?: number; max?: number } | null>(null);
   const isAdmin = user?.role === "admin" || user?.role === "owner";
+  const fromSaved = (location.state as any)?.fromSaved;
   const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
   const quotaHandledRef = useRef(false);
 
@@ -506,23 +509,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* "Cuotas desde" / Integrity Block */}
-          <div className="flex justify-between items-center bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div>
-              <p className="text-xs font-semibold text-slate-500">Score de Validación</p>
-              <p className="text-lg font-black text-secondary">
-                <span className="border-b-2 border-emerald-500 pb-0.5">
-                  {project.integrityScore !== undefined ? `${project.integrityScore}% Completado` : "Pendiente"}
-                </span>
-              </p>
-            </div>
-            <button 
-              type="button"
-              className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded shadow-sm hover:bg-emerald-700 transition-colors"
-            >
-              ¡Verificar!
-            </button>
-          </div>
+
 
           {/* Datos Generales Table */}
           <div>
@@ -697,10 +684,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
                   <span>Contactar Responsable</span>
                 )}
               </button>
-              <button type="button" className="w-full bg-[#E63946] hover:bg-red-700 text-white py-2.5 rounded text-sm font-bold transition-colors">
-                Solicitar Validación
-              </button>
-              <button type="button" className="w-full bg-[#E63946] hover:bg-red-700 text-white py-2.5 rounded text-sm font-bold transition-colors">
+              <button type="button" onClick={() => setShowDocumentos(true)} className="w-full bg-[#E63946] hover:bg-red-700 text-white py-2.5 rounded text-sm font-bold transition-colors">
                 Ver Documentos
               </button>
             </div>
@@ -721,6 +705,9 @@ export const PublishedProjectDetailPage: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Documentos Modal */}
+      <DocumentosModal projectId={project.id} isOpen={showDocumentos} onClose={() => setShowDocumentos(false)} />
 
       {/* Lightbox Modal via Portal */}
       {isLightboxOpen && uniqueImgs.length > 0 && createPortal(

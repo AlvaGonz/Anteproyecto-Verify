@@ -30,10 +30,12 @@ import {
   Info,
   User,
   ArrowRight,
+  FileText,
 } from "lucide-react";
 import { m } from "framer-motion";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { usePlanLimits } from "../../features/settings/api/useSettings";
+import { DocumentosModal } from "../../features/documents/components/DocumentosModal";
 
 const getCategoryLabel = (cat: ProjectCategory) => {
   switch (cat) {
@@ -64,6 +66,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [isInterested, setIsInterested] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [showDocumentos, setShowDocumentos] = React.useState(false);
   const [hasQuota, setHasQuota] = React.useState<boolean | null>(null);
 
   
@@ -576,6 +579,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
       {/* Institutional Footer */}
       <LandingFooter />
     
+    {/* Documentos Modal */}
+    <DocumentosModal projectId={project.id} isOpen={showDocumentos} onClose={() => setShowDocumentos(false)} />
+
     {/* Consultation Limit Modal */}
     <LimitReachedModal
       isOpen={showQuotaModal}

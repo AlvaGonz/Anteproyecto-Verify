@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { FolderKanban, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlertCircle } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
 import { ProjectCoverImage } from "../../projects/components/ProjectCoverImage";
@@ -35,12 +35,18 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = React.m
     transition={{ delay: 0.4 }}
     className="xl:col-span-2 bg-white border border-border rounded-2xl overflow-hidden flex flex-col shadow-sm"
   >
-    <div className="px-8 py-6 border-b border-border flex items-center justify-between bg-surface-raised/20">
+    <div className="px-8 py-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-raised/20">
       <div>
         <h3 className="text-xl font-display font-black text-[#223382] tracking-tight">
           Proyectos <span className="text-[#F98513]">Recientes</span>
         </h3>
         <p className="text-xs text-text-secondary font-medium mt-0.5">Últimas actualizaciones en el sistema</p>
+      </div>
+      <div className="max-w-3xl flex-1 bg-amber-50/70 border border-amber-200/60 rounded-xl px-4 py-2 text-[11px] text-amber-900 leading-snug flex items-center gap-3 shadow-sm font-medium">
+        <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+        <div>
+          <span className="font-bold">Aviso de Vigencia:</span> Los documentos y validaciones de estos proyectos tienen una vigencia máxima de 3 meses para fines del sistema. Posteriormente, VeriFinca actualiza periódicamente las bases de datos registrales y fiscales para garantizar la integridad y validez del expediente frente a terceros.
+        </div>
       </div>
     </div>
 

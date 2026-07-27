@@ -1,3 +1,22 @@
+# Progress: Exportación de Intereses a Excel
+
+- Se agregó un botón **"Exportar"** en la cabecera de la sección **Expedientes -> Intereses**.
+- Se implementó el modal `ExportInterestsModal.tsx` con opciones para exportar: **Todos (ambos casos)**, **Interesados** y **Mis Intereses**.
+- Se programó la lógica de generación del libro de Excel mediante la librería `xlsx` (SheetJS), formateando el título en la fila 2 de acuerdo con el tipo de reporte seleccionado:
+  - Reporte Mixto (Todos): `"Reporte de Solicitud de interesado y mis interes"`
+  - Reporte de Interesados: `"Reporte de Solicitud de interesado"`
+  - Reporte de Mis Intereses: `"Reporte de mis interes"`
+- Se configuraron las cabeceras en la fila 4 a partir de la columna C (`No.`, `Usuario`, `Nombre del Proyecto`, `Provincia(Proyecto)`, `Fecha solicitud`, `Nombre de usuario...`, `RNC`, `Dirreción`, `Teléfono`, `Correo electrónico`).
+- Se amplió la respuesta de la API backend en `ProjectService.cs` (`GetProyectosInteresesAsync`) para retornar todos los campos de contacto necesarios.
+- Se configuró la descarga con nombre de archivo con sufijo de fecha seguro: `Reporte_{Tipo}_{D}-{M}-{Y} {H}_{Min}.xlsx`.
+- Status: **Complete**.
+
+# Progress: Add Legal Disclaimer to Dashboard Header
+
+- Added a legal warning banner about document validity (3 months) in the header of the "Proyectos Recientes" list inside `DashboardProjectList.tsx`.
+- Integrated Lucide's `AlertCircle` icon and styled it matching the design tokens (`bg-amber-50`, `border border-amber-200/80`, `text-amber-900`) for consistency and responsiveness.
+- Status: **Complete**.
+
 # Progress: Debug Session 404 Not Found on OCR Field Update
 
 - Investigated 404 error when frontend tries to update an OCR field using `useUpdateDocumentFieldReview`.

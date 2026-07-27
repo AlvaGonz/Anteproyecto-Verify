@@ -270,37 +270,47 @@ public class ProjectService : IProjectService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<dynamic>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Application.DTOs.Projects.ProyectoInteresDto>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
         var misIntereses = await _proyectoRepository.GetInteresesByUsuarioAsync(usuarioId, cancellationToken);
         var interesadosEnMisProyectos = await _proyectoRepository.GetInteresadosInUserProjectsAsync(usuarioId, cancellationToken);
 
-        var result = new List<dynamic>();
+        var result = new List<Application.DTOs.Projects.ProyectoInteresDto>();
 
         foreach (var i in misIntereses)
         {
-            result.Add(new {
-                Tipo = "Mis Intereses",
-                ProyectoId = i.ProjectId,
-                NombreProyecto = i.Project.Nombre,
-                UsuarioId = i.CreatorId,
-                NombreUsuario = i.Project.UsuarioCreador.NombreCompleto,
-                AvatarUrl = i.Project.UsuarioCreador.AvatarUrl,
-                Fecha = i.CreatedAtUtc
-            });
+            result.Add(new Application.DTOs.Projects.ProyectoInteresDto(
+                "Mis Intereses",
+                i.ProjectId,
+                i.Project.Nombre,
+                i.CreatorId,
+                i.Project.UsuarioCreador.NombreCompleto,
+                i.Project.UsuarioCreador.AvatarUrl,
+                i.CreatedAtUtc,
+                i.Project.UsuarioCreador.Rnc ?? "",
+                i.Project.UsuarioCreador.Direccion ?? "",
+                i.Project.UsuarioCreador.Telefono ?? "",
+                i.Project.UsuarioCreador.CorreoElectronico ?? "",
+                i.Project.UsuarioCreador.Provincia ?? i.Project.UbicacionTexto ?? ""
+            ));
         }
 
         foreach (var i in interesadosEnMisProyectos)
         {
-            result.Add(new {
-                Tipo = "Interesados",
-                ProyectoId = i.ProjectId,
-                NombreProyecto = i.Project.Nombre,
-                UsuarioId = i.InterestedUserId,
-                NombreUsuario = i.InterestedUser.NombreCompleto,
-                AvatarUrl = i.InterestedUser.AvatarUrl,
-                Fecha = i.CreatedAtUtc
-            });
+            result.Add(new Application.DTOs.Projects.ProyectoInteresDto(
+                "Interesados",
+                i.ProjectId,
+                i.Project.Nombre,
+                i.InterestedUserId,
+                i.InterestedUser.NombreCompleto,
+                i.InterestedUser.AvatarUrl,
+                i.CreatedAtUtc,
+                i.InterestedUser.Rnc ?? "",
+                i.InterestedUser.Direccion ?? "",
+                i.InterestedUser.Telefono ?? "",
+                i.InterestedUser.CorreoElectronico ?? "",
+                i.Project.UsuarioCreador.Provincia ?? i.Project.UbicacionTexto ?? ""
+            ));
         }
 
         return result.OrderByDescending(x => x.Fecha);
