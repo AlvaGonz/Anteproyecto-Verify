@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node scripts/perf-budget-guard.js",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
@@ -15,6 +15,7 @@
     "test:e2e": "playwright test",
     "test:perf": "playwright test e2e/performance/ --reporter=list",
     "test:perf:prod": "cd src/frontend/web && pnpm run build && pnpm exec vite preview --port 4173 & sleep 3 && PERF_MODE=production FRONTEND_URL=http://localhost:4173 npx playwright test e2e/performance/ --reporter=list",
+    "perf:budget": "node scripts/perf-budget-guard.js",
     "doctor": "npx react-doctor@latest"
   },
   "dependencies": {

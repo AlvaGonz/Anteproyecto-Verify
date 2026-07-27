@@ -42,6 +42,8 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
           subscriptionStatus: "active"
         })
       });
+    });
+
     await page.route('**/api/v1/subscriptions/my-status', async (route) => {
       await route.fulfill({
         status: 200,
@@ -74,7 +76,6 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
         })
       });
     });
-    });
 
     await page.route("**/api/notifications*", async (route) => {
       await route.fulfill({
@@ -85,6 +86,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
     });
 
     await page.route("**/api/auth/refresh", async (route) => {
+      console.log(`MOCK: Intercepting ${route.request().url()}`);
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -93,14 +95,20 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
     });
 
 
-
     // 2. Default projects mock list and creation POST route
     await page.route("**/api/projects", async (route) => {
+      console.log(`MOCK PROJECTS: Intercepting ${route.request().url()} ${route.request().method()}`);
       if (route.request().method() === "GET") {
+        console.log(`MOCK PROJECTS: Returning mock data`);
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify([projectDb])
+          body: JSON.stringify({
+            items: [projectDb],
+            totalCount: 1,
+            page: 1,
+            pageSize: 50
+          })
         });
       } else if (route.request().method() === "POST") {
         const payload = route.request().postDataJSON();
@@ -161,13 +169,22 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
         });
       }
     });
+
+    // Catch-all to see what other requests are made
+    await page.route("**", async (route) => {
+      const url = route.request().url();
+      if (url.includes("api/")) {
+        console.log(`ALL API REQUEST: ${route.request().method()} ${url}`);
+      }
+      await route.continue();
+    });
   });
 
   // ── CREATE ──────────────────────────────────────────────────────────────────
 
   test("CREATE — renderiza el formulario en /admin/projects/new", async ({ page }) => {
     await page.goto("/#/admin/projects/new");
-    await expect(page.getByText(/Crear Nuevo Proyecto/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Nuevo Expediente/i })).toBeVisible();
     await expect(page.getByLabel(/Nombre del Proyecto/i)).toBeVisible();
     await expect(page.getByLabel(/Ubicación/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /Guardar/i })).toBeVisible();
@@ -204,7 +221,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
     await page.goto("/#/admin/projects");
 
     // Espera a que desaparezca cualquier spinner/loading
-
+    await expect(page.getByRole("heading", { name: /Gestión de Expedientes/i })).toBeVisible({ timeout: 10000 });
 
     // Debe haber al menos un proyecto visible (mock data)
     const projectCard = page.getByRole("heading", { name: "Residencial Las Palmas" }).first();

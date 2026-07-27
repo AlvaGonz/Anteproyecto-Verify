@@ -6,7 +6,6 @@ import {
   User as UserIcon,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
   Activity
 } from "lucide-react";
 import { useGlobalAuditTrail, useExportGlobalAudit } from "../api/useAudit";

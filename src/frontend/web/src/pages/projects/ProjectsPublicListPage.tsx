@@ -10,7 +10,6 @@ import {
   AlertCircle,
   ChevronsLeft,
   ChevronsRight,
-  MapPin,
   Search,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";

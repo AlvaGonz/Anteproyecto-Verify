@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useRoutePrefetch } from "../../hooks/useRoutePrefetch";
 
 const NAV_LINKS = [
   { label: "Proyectos", href: "/projects" },
@@ -13,6 +14,7 @@ export const LandingNav: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
+  const { prefetchRoute } = useRoutePrefetch();
 
   const [prevPath, setPrevPath] = useState(location.pathname);
 
@@ -65,7 +67,17 @@ export const LandingNav: React.FC = () => {
         <div className="hidden lg:flex items-center gap-2">
           {NAV_LINKS.map((item) => {
             if (item.href.startsWith("/")) {
-              return <Link key={item.label} to={item.href} className={linkClassName}>{item.label}</Link>;
+              return (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className={linkClassName}
+                  onMouseEnter={() => prefetchRoute(item.href)}
+                  onFocus={() => prefetchRoute(item.href)}
+                >
+                  {item.label}
+                </Link>
+              );
             }
             return <a key={item.label} href={item.href} className={linkClassName}>{item.label}</a>;
           })}

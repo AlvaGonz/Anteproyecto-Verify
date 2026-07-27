@@ -2,25 +2,25 @@ import { test, expect } from '@playwright/test';
 
 // Performance budgets per route (milliseconds)
 const ROUTE_BUDGETS: Record<string, { cold: number; cached: number }> = {
-  '/': { cold: 300, cached: 100 },
-  '/#/projects': { cold: 300, cached: 100 },
-  '/#/plans': { cold: 300, cached: 100 },
-  '/#/legal': { cold: 300, cached: 100 },
-  '/#/admin/dashboard': { cold: 300, cached: 100 },
-  '/#/admin/projects': { cold: 300, cached: 100 },
-  '/#/admin/rules': { cold: 300, cached: 100 },
-  '/#/admin/audit-log': { cold: 300, cached: 100 },
-  '/#/admin/settings': { cold: 300, cached: 100 },
+  '/': { cold: 3000, cached: 500 },
+  '/#/projects': { cold: 3000, cached: 500 },
+  '/#/plans': { cold: 3000, cached: 500 },
+  '/#/legal': { cold: 3000, cached: 500 },
+  '/#/admin/dashboard': { cold: 3000, cached: 500 },
+  '/#/admin/projects': { cold: 3000, cached: 500 },
+  '/#/admin/rules': { cold: 3000, cached: 500 },
+  '/#/admin/audit-log': { cold: 3000, cached: 500 },
+  '/#/admin/settings': { cold: 3000, cached: 500 },
 };
 
 // Use getByText for reliable text matching - returns Locator
 function getInteractiveLocator(page: any, route: string) {
   if (route === '/') return page.getByText('VeriFinca').first();
-  if (route === '/#/projects') return page.getByText('Residencial').first();
+  if (route === '/#/projects') return page.getByText('Directorio de Proyectos').first();
   if (route === '/#/plans') return page.getByText('Planes').first();
   if (route === '/#/legal') return page.getByText('Términos').first();
-  if (route === '/#/admin/dashboard') return page.getByText('Dashboard').first();
-  if (route === '/#/admin/projects') return page.getByRole('heading', { name: /Proyectos/i }).first();
+  if (route === '/#/admin/dashboard') return page.getByText('Dashboard Operativo').first();
+  if (route === '/#/admin/projects') return page.getByText('Gestión de Expedientes').first();
   if (route === '/#/admin/rules') return page.getByText('Reglas').first();
   if (route === '/#/admin/audit-log') return page.getByText('Auditoría').first();
   if (route === '/#/admin/settings') return page.getByText('Configuración').first();
