@@ -122,7 +122,6 @@ const ProjectsPublicListContent: React.FC = () => {
 
   const { data: provincias } = useProvinces();
   const { data: searchResults } = useSuspensePublishedProjects();
-  const { data: provincias } = useProvinces();
 
   const filteredProjects = useMemo(() => {
     return filterPublishedProjects(searchResults, filters);
@@ -267,12 +266,12 @@ const ProjectsPublicListContent: React.FC = () => {
                 <div className="flex-1">
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Precio Máximo</label>
                   <div className="relative pt-2">
-                    <input 
-                      min="0" max={PRICE_MAX} step={PRICE_STEPS} 
-                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" 
-                      type="range" 
-                      value={filters.priceRange[1]} 
-                      onChange={e => handlePriceChange([0, parseInt(e.target.value)])} 
+                    <input
+                      min="0" max={PRICE_MAX} step={PRICE_STEPS}
+                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                      type="range"
+                      value={filters.priceRange[1]}
+                      onChange={e => handlePriceChange([0, parseInt(e.target.value)])}
                     />
                     <div className="mt-2 text-xs font-bold text-slate-500 text-right">
                       Hasta {filters.priceRange[1] >= PRICE_MAX ? '15M+ DOP' : `${(filters.priceRange[1] / 1000000).toFixed(1)}M DOP`}
