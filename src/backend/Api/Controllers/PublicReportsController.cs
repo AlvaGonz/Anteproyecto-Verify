@@ -18,6 +18,7 @@ public class PublicReportsController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> GetPublicReport(Guid projectId, CancellationToken cancellationToken)
     {
         var result = await _getHandler.HandleAsync(projectId, cancellationToken);

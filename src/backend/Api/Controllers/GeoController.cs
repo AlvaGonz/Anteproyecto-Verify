@@ -22,6 +22,7 @@ public class GeoController : ControllerBase
     }
 
     [HttpGet("provincias")]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProvincias()
     {
@@ -36,6 +37,7 @@ public class GeoController : ControllerBase
     }
 
     [HttpGet("municipios")]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "provinciaId" })]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMunicipios([FromQuery] Guid? provinciaId)
     {

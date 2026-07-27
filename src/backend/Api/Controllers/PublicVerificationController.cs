@@ -17,6 +17,7 @@ public class PublicVerificationController : ControllerBase
     }
 
     [HttpGet("{code}")]
+    [ResponseCache(Duration = 30, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> VerifyCode(string code, CancellationToken cancellationToken)
     {
         var result = await _getHandler.HandleAsync(code, cancellationToken);

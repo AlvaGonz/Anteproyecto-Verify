@@ -12,6 +12,7 @@ public static class ApplicationBuilderExtensions
 
 
         app.UseExceptionHandler(opt => { }); // Minimal config to satisfy the middleware if ProblemDetails handles it
+        app.UseResponseCaching();
 
         app.UseSwagger();
         app.UseSwaggerUI();

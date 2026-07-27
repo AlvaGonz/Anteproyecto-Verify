@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
         services.AddMemoryCache();
+        services.AddResponseCaching();
         
         // Register MediatR with Application assembly marker
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.DependencyInjection.DependencyInjection).Assembly));

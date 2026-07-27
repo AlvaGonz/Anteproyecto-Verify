@@ -13,6 +13,8 @@
     "agent:session": "node scripts/session-init.mjs session-init",
     "agent:session:list": "ls .agents/sessions/",
     "test:e2e": "playwright test",
+    "test:perf": "playwright test e2e/performance/ --reporter=list",
+    "test:perf:prod": "cd src/frontend/web && pnpm run build && pnpm exec vite preview --port 4173 & sleep 3 && PERF_MODE=production FRONTEND_URL=http://localhost:4173 npx playwright test e2e/performance/ --reporter=list",
     "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
