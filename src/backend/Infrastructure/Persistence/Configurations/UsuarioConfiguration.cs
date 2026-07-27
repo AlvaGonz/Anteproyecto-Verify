@@ -32,6 +32,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.AvatarUrl).IsRequired(false);
         builder.Property(u => u.SocialLogin).IsRequired().HasDefaultValue(false);
         builder.Property(u => u.GoogleId).HasMaxLength(100).IsRequired(false);
+        builder.Property(u => u.AceptoDescargo).IsRequired().HasDefaultValue(false);
 
         // Optimistic concurrency token
         builder.Property(u => u.RowVersion).IsRowVersion().IsConcurrencyToken();

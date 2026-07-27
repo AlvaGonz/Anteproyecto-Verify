@@ -79,6 +79,7 @@ public class LoginUserCommandHandler
             user.SubscriptionStatus,
             user.PendingPlanCode,
             user.PendingBillingCycle,
+            AceptoDescargo: user.AceptoDescargo,
             IsGuest: user.TitularId.HasValue,
             TitularId: user.TitularId,
             InviterPlan: inviterPlan,

@@ -27,6 +27,7 @@ public record LoginUserUserDto(
     string? SubscriptionStatus = null,
     string? PendingPlanCode = null,
     string? PendingBillingCycle = null,
+    bool AceptoDescargo = false,
     bool IsGuest = false,
     Guid? TitularId = null,
     string? InviterPlan = null,
