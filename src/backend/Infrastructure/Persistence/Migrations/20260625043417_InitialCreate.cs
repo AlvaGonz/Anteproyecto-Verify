@@ -87,7 +87,7 @@ namespace Infrastructure.Persistence.Migrations
                     Cedula = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Rol = table.Column<int>(type: "int", nullable: false),
                     Activo = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    EmailVerificado = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    EmailVerificado = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     TokenVerificacion = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     TokenVerificacionExpiraUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
