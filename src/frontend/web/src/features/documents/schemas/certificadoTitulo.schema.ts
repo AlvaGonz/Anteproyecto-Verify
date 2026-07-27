@@ -50,3 +50,4 @@ export const certificadoTituloExtractionSchema = z.object({
 });
 
 export type CertificadoTituloExtraction = z.infer<typeof certificadoTituloExtractionSchema>;
+export type GeographicResolutionResult = z.infer<typeof geographicResolutionSchema>;

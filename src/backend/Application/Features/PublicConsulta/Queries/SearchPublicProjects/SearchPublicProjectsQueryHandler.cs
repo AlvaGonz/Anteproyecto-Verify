@@ -9,6 +9,7 @@ using Application.Abstractions.Persistence;
 using Domain.Entities;
 using Domain.Enums;
 
+
 public class SearchPublicProjectsQueryHandler
 {
     private readonly IProyectoRepository _proyectoRepository;
@@ -29,10 +30,10 @@ public class SearchPublicProjectsQueryHandler
     {
         IEnumerable<Domain.Entities.Proyecto> proyectos;
 
-if (string.IsNullOrWhiteSpace(request.Query))
-            {
-                proyectos = await _proyectoRepository.GetVisibleAsync(1, 50, cancellationToken);
-            }
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            proyectos = await _proyectoRepository.GetVisibleAsync(1, 50, cancellationToken);
+        }
         else
         {
             proyectos = await _proyectoRepository.SearchAsync(request.Query, cancellationToken);
@@ -44,10 +45,14 @@ if (string.IsNullOrWhiteSpace(request.Query))
         var sellos = await _selloRepository.GetByProyectoIdsAsync(proyectoIds, cancellationToken);
         var sellosPorProyecto = sellos.ToDictionary(s => s.ProyectoId);
 
-        var results = proyectoList.Select(p =>
+        var results = new List<PublicProjectSearchResultDto>();
+
+        foreach (var p in proyectoList)
         {
             var sello = sellosPorProyecto.GetValueOrDefault(p.Id);
-            return new PublicProjectSearchResultDto
+            var completionRate = await _proyectoRepository.GetDocumentCompletionRateAsync(p.Id, p.Categoria, cancellationToken);
+
+            results.Add(new PublicProjectSearchResultDto
             {
                 Id = p.Id,
                 NombreProyecto = p.Nombre,
@@ -66,9 +71,10 @@ if (string.IsNullOrWhiteSpace(request.Query))
                 DesignacionCatastral = p.DesignacionCatastral,
                 Matricula = p.Matricula,
                 RncDesarrollador = p.RncDesarrollador,
-                CedulaRncPropietario = p.CedulaRncPropietario
-            };
-        }).ToList();
+                CedulaRncPropietario = p.CedulaRncPropietario,
+                CompletionRate = completionRate
+            });
+        }
 
         await _auditLogger.AppendAsync(new AuditEntryDto
         {

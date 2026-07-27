@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VeriFinca — Proyectos Destacados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #F98513;
+  --secondary: #223382;
+  --tertiary: #9BACD8;
+  --neutral: #DAD1C8;
+  --card-w: 400px;
+  --card-gap: 32px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f8f7f4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  padding: 2rem 0;
+}
+
+.section-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--secondary);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  gap: var(--card-gap);
+  width: max-content;
+  will-change: transform;
+  cursor: grab;
+  user-select: none;
+}
+
+.carousel-track.dragging { cursor: grabbing; }
+
+.card {
+  flex-shrink: 0;
+  width: var(--card-w);
+  background: #fff;
+  border-radius: 40px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: box-shadow 0.4s, transform 0.4s;
+}
+
+.card:hover {
+  box-shadow: 0 20px 40px -12px rgba(34,51,130,0.12);
+  transform: translateY(-4px);
+}
+
+.card-img-wrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s;
+  pointer-events: none;
+}
+
+.card:hover .card-img-wrap img { transform: scale(1.1); }
+
+.card-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(8px);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--secondary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card-body { padding: 32px; display: flex; flex-direction: column; gap: 24px; }
+
+.card-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--secondary);
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.card-location svg { width: 14px; height: 14px; color: var(--primary); flex-shrink: 0; }
+
+.card-divider { border: none; border-top: 1px solid #f3f4f6; }
+
+.card-footer {
+  padding-top: 24px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-label {
+  font-size: 10px;
+  font-weight: 900;
+  color: #d1d5db;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+
+.card-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 900;
+  color: var(--secondary);
+}
+
+.card-stat svg { width: 16px; height: 16px; color: #22c55e; }
+
+.card-arrow {
+  width: 48px;
+  height: 48px;
+  background: #f9fafb;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s, color 0.3s;
+  color: var(--secondary);
+}
+
+.card:hover .card-arrow {
+  background: var(--primary);
+  color: #fff;
+}
+
+.card-arrow svg { width: 24px; height: 24px; }
+
+.card-progress {
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.card-progress-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  width: 0%;
+  transition: width 1s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-track { animation: none !important; }
+  .card-img-wrap img { transition: none !important; }
+  .card { transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<h2 class="section-title">Proyectos Destacados</h2>
+
+<div class="carousel-wrapper" role="region" aria-label="Proyectos destacados">
+  <div class="carousel-track" id="track" role="list"></div>
+</div>
+
+<script>
+const projects = [
+  {
+    name: "Torre Playa Dorada Beach",
+    location: "Piedra Blanca, Monseñor Nouel",
+    img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Viviendas La Julia Metropolitano",
+    location: "Santo Domingo Oeste, Santo Domingo",
+    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Centro La Julia",
+    location: "Haina, San Cristóbal",
+    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Palacio Samaná Oeste",
+    location: "Miches, El Seibo",
+    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Condominio Oasis",
+    location: "Bávaro, Punta Cana",
+    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Portales Las Terrenas",
+    location: "Sabana de la Mar, Hato Mayor",
+    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Paseo Arroyo Hondo Suites",
+    location: "El Cercado, San Juan",
+    img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Residencial Altos del Mar",
+    location: "Puerto Plata",
+    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Condominio Vista Bella",
+    location: "La Vega",
+    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Edificio Playa Dorada Turístico",
+    location: "Haina, San Cristóbal",
+    img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Bosque Playa Dorada Club",
+    location: "Las Terrenas, Samaná",
+    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  },
+  {
+    name: "Villa Costa Marina",
+    location: "Samaná",
+    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop",
+    badge: "Verificado",
+    pct: 0
+  }
+];
+
+function cardHTML(p) {
+  return `<div class="card" role="listitem">
+    <div class="card-img-wrap">
+      <img src="${p.img}" alt="${p.name}" loading="lazy" draggable="false">
+      <span class="card-badge">${p.badge}</span>
+    </div>
+    <div class="card-body">
+      <div>
+        <h3 class="card-title">${p.name}</h3>
+        <p class="card-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          ${p.location}
+        </p>
+      </div>
+      <div class="card-footer">
+        <div>
+          <p class="card-label">Documentación</p>
+          <div class="card-stat">
+            <span>${p.pct}%</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+        </div>
+        <div class="card-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+      </div>
+      <div class="card-progress">
+        <div class="card-progress-bar" style="width:${p.pct}%"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---- BUILD ----
+const track = document.getElementById('track');
+const cards = projects.map(p => cardHTML(p)).join('');
+track.innerHTML = cards + cards; // clone for seamless loop
+
+// ---- VARIABLES ----
+const wrapper = document.querySelector('.carousel-wrapper');
+const gap = 32; // px, match CSS
+let pos = 0;
+let speed = 0.6; // px per frame (~36px/s at 60fps)
+let isPaused = false;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartPos = 0;
+let rafId = null;
+
+function getCardWidth() {
+  if (cards.length === 0) return 400;
+  const first = track.querySelector('.card');
+  return first ? first.offsetWidth : 400;
+}
+function getUnitWidth() { return getCardWidth() + gap; }
+function getSetWidth() { const u = getUnitWidth(); return u * projects.length; }
+
+function tick() {
+  if (!isPaused && !isDragging) {
+    pos += speed;
+    const setW = getSetWidth();
+    if (pos >= setW) { pos = 0; }
+    track.style.transform = `translateX(${-pos}px)`;
+  }
+  rafId = requestAnimationFrame(tick);
+}
+rafId = requestAnimationFrame(tick);
+
+// ---- HOVER PAUSE ----
+wrapper.addEventListener('mouseenter', () => { isPaused = true; });
+wrapper.addEventListener('mouseleave', () => { isPaused = false; });
+wrapper.addEventListener('touchstart', () => { isPaused = true; }, { passive: true });
+
+// ---- DRAG ----
+track.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  dragStartX = e.clientX;
+  dragStartPos = pos;
+  track.classList.add('dragging');
+});
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - dragStartX;
+  pos = Math.max(0, Math.min(getSetWidth(), dragStartPos - dx));
+  track.style.transform = `translateX(${-pos}px)`;
+});
+window.addEventListener('mouseup', () => {
+  if (!isDragging) return;
+  isDragging = false;
+  track.classList.remove('dragging');
+});
+
+// ---- TOUCH DRAG ----
+let touchStartX = 0;
+let touchStartPos = 0;
+let isTouching = false;
+
+track.addEventListener('touchstart', (e) => {
+  isTouching = true;
+  touchStartX = e.touches[0].clientX;
+  touchStartPos = pos;
+}, { passive: true });
+
+track.addEventListener('touchmove', (e) => {
+  if (!isTouching) return;
+  const dx = e.touches[0].clientX - touchStartX;
+  pos = Math.max(0, Math.min(getSetWidth(), touchStartPos - dx));
+  track.style.transform = `translateX(${-pos}px)`;
+}, { passive: true });
+
+track.addEventListener('touchend', () => {
+  isTouching = false;
+  isPaused = false;
+}, { passive: true });
+
+// ---- SPEED CONTROL ----
+wrapper.addEventListener('wheel', (e) => {
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+  e.preventDefault();
+  pos += e.deltaY * 0.5;
+  const setW = getSetWidth();
+  if (pos < 0) pos = 0;
+  if (pos > setW) pos = setW;
+  track.style.transform = `translateX(${-pos}px)`;
+}, { passive: false });
+
+// ---- RESIZE ----
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const setW = getSetWidth();
+    if (pos > setW) pos = setW;
+  }, 100);
+});
+</script>
+</body>
+</html>
