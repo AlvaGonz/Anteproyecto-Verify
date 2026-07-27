@@ -40,21 +40,29 @@ export const FeaturedProjectsSection: React.FC = () => {
 
   // Auto-scroll with pause support
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
     let animationFrameId: number;
     let isDragging = false;
     let dragStartX = 0;
     let dragStartScroll = 0;
+    let lastTime = 0;
 
-    const autoScroll = () => {
+    const SPEED = 120;
+
+    const autoScroll = (time: number) => {
       const container = containerRef.current;
       if (container && !isPaused && !isDragging) {
-        container.scrollLeft += 1.5;
+        const delta = lastTime ? ((time - lastTime) / 16.67) : 1;
+        container.scrollLeft += SPEED * delta * 0.016;
         const singleSetWidth = container.scrollWidth / 3;
         if (singleSetWidth > 0) {
           if (container.scrollLeft >= singleSetWidth * 2) container.scrollLeft -= singleSetWidth;
           else if (container.scrollLeft <= 0) container.scrollLeft += singleSetWidth;
         }
       }
+      lastTime = time;
       animationFrameId = requestAnimationFrame(autoScroll);
     };
     animationFrameId = requestAnimationFrame(autoScroll);
@@ -116,10 +124,13 @@ export const FeaturedProjectsSection: React.FC = () => {
   return (
     <section id="proyectos" className="py-32 bg-[#F4F1EC] overflow-hidden">
       <style>{`
-        .carousel { scroll-snap-type: x mandatory; }
+        .carousel { scroll-snap-type: x proximity; }
         .carousel > * { scroll-snap-align: start; flex: 0 0 400px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media (prefers-reduced-motion: reduce) {
+          .carousel { scroll-behavior: auto; }
+        }
       `}</style>
       <div className="max-w-7xl mx-auto px-6 mb-20 space-y-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
