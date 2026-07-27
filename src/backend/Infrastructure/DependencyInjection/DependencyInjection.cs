@@ -2,13 +2,15 @@ namespace Infrastructure.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Resend;
 using Configuration;
 using Application.Abstractions;
 using Application.Abstractions.Storage;
+using Application.Contracts.Geo;
+using Application.Documents.Extractions;
 using Storage;
 using Persistence;
-using Microsoft.EntityFrameworkCore;
-using Resend;
 
 public static class DependencyInjection
 {
@@ -61,6 +63,9 @@ public static class DependencyInjection
 
         // External Validation Mocks
         services.Configure<ExternalValidation.Configuration.ExternalValidationOptions>(configuration.GetSection("ExternalValidation"));
+        
+        // Geo Resolution Service
+        services.AddScoped<IGeoResolutionService, global::Infrastructure.Persistence.Services.GeoResolutionService>();
         
         services.AddScoped<Application.Abstractions.ExternalValidation.IExternalValidationProvider, ExternalValidation.Mocks.MockDgriValidationProvider>();
         services.AddScoped<Application.Abstractions.ExternalValidation.IExternalValidationProvider, ExternalValidation.Mocks.MockCatastroValidationProvider>();

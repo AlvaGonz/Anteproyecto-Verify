@@ -29,4 +29,5 @@ public class PublicProjectSearchResultDto
     public string? Matricula { get; set; }
     public string? RncDesarrollador { get; set; }
     public string? CedulaRncPropietario { get; set; }
+    public int CompletionRate { get; set; }
 }

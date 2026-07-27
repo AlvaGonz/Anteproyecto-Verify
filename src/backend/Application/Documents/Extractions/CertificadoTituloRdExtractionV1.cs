@@ -19,4 +19,18 @@ public record CertificadoTituloRdExtractionV1
     public List<string> Warnings { get; init; } = new();
     public string ProcessorName { get; init; } = "PaddleOCR";
     public string ProcessorVersion { get; init; } = "1.0";
+
+    /// <summary>
+    /// Canonical resolution result for the Provincia field.
+    /// Populated by GeoResolutionService in DocumentService after OCR extraction.
+    /// Null when resolution has not yet been performed.
+    /// </summary>
+    public GeographicResolutionResult? ProvinceResolution { get; init; }
+
+    /// <summary>
+    /// Canonical resolution result for the Municipio field, scoped to resolved province.
+    /// Null when resolution has not yet been performed or province is unresolved.
+    /// </summary>
+    public GeographicResolutionResult? MunicipalityResolution { get; init; }
 }
+

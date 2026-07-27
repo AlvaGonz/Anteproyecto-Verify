@@ -51,13 +51,23 @@ export const useProjects = (page = 1, pageSize = 50) => {
     queryFn: () =>
       apiClient
         .get<PaginatedProjectsResponse>("/projects", { params: { page, pageSize } })
-        .then((res) => ({
-          projects: res.data.items.map(mapApiProject),
-          totalCount: res.data.totalCount,
-        })),
-    staleTime: 30_000,
-    gcTime: 5 * 60 * 1000,
-  });
+        .then((res) => {
+          const data = res.data as any;
+          // Handle different response structures
+          let items: any[] = [];
+          if (Array.isArray(data)) {
+            items = data;
+          } else {
+            items = data?.items || data?.Items || data?.data || [];
+          }
+          return {
+            projects: items.map(mapApiProject),
+            totalCount: data?.totalCount || data?.TotalCount || (Array.isArray(data) ? data.length : 0),
+          };
+        }),
+      staleTime: 30_000,
+      gcTime: 5 * 60 * 1000,
+    });
 
   return {
     data: query.data?.projects ?? [],

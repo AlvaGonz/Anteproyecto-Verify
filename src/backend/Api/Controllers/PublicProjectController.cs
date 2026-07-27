@@ -2,6 +2,7 @@ namespace Api.Controllers;
 
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Features.PublicConsulta.Queries.GetFeaturedProjects;
 using Application.Features.PublicConsulta.Queries.GetPublicProjectStatus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,30 @@ public class PublicProjectController : ControllerBase
 {
     private readonly GetPublicProjectStatusQueryHandler _handler;
     private readonly Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler _searchHandler;
+    private readonly GetFeaturedProjectsQueryHandler _featuredHandler;
 
     public PublicProjectController(
         GetPublicProjectStatusQueryHandler handler,
-        Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler searchHandler)
+        Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQueryHandler searchHandler,
+        GetFeaturedProjectsQueryHandler featuredHandler)
     {
         _handler = handler;
         _searchHandler = searchHandler;
+        _featuredHandler = featuredHandler;
+    }
+
+    [HttpGet("featured")]
+    public async Task<IActionResult> GetFeatured([FromQuery] int count = 5, CancellationToken ct = default)
+    {
+        var query = new GetFeaturedProjectsQuery
+        {
+            Count = count,
+            IpOrigen = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            UserAgent = Request.Headers["User-Agent"].ToString()
+        };
+
+        var result = await _featuredHandler.Handle(query, ct);
+        return Ok(result);
     }
 
     [HttpGet("search")]

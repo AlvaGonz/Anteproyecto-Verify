@@ -51,8 +51,9 @@ test.describe('Título de Propiedad - UI Smoke Test', () => {
     await expect(page.getByRole('heading', { name: 'Extracción de Certificado de Título' }).first()).toBeVisible({ timeout: 45000 });
     
     // Basic assertions for the UI rendering the extraction panel
-    await expect(page.locator('text=Designación Catastral')).toBeVisible();
-    await expect(page.locator('text=Matrícula').first()).toBeVisible();
+    await expect(page.locator('[data-testid="certificado-titulo-extraction-card"]')).toBeVisible();
+    await expect(page.locator('[data-testid="certificado-titulo-extraction-card"]').getByText('Designación Catastral', { exact: true })).toBeVisible();
+    await expect(page.locator('[data-testid="certificado-titulo-extraction-card"]').getByText('Matrícula', { exact: true })).toBeVisible();
     
     // Because it's a dummy document, the status should be missing/incomplete
     await expect(page.locator('text=Missing').first()).toBeVisible();

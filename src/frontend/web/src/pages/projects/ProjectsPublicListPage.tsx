@@ -6,10 +6,11 @@ import {
   Building2,
   ChevronRight,
   ChevronLeft,
-  ChevronsLeft,
-  ChevronsRight,
   CheckCircle2,
   AlertCircle,
+  ChevronsLeft,
+  ChevronsRight,
+  MapPin,
   Search,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
@@ -105,9 +106,6 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
 const ProjectsPublicListContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
-  
-  const { data: provincias } = useProvinces();
-  
   const [filtersVisible, setFiltersVisible] = useState(true);
 
   const [filters, setFilters] = useState<PublishedProjectFilters>({
@@ -197,12 +195,11 @@ const ProjectsPublicListContent: React.FC = () => {
               <span className="ml-2 text-sm text-slate-400">(con filtros)</span>
             )}
           </p>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => setFiltersVisible(!filtersVisible)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors lg:hidden ${
-              filtersVisible ? "bg-primary text-white border-primary" : "bg-slate-50 text-slate-600 border-slate-200"
-            }`}
+            className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors lg:hidden ${filtersVisible ? "bg-primary text-white border-primary" : "bg-slate-50 text-slate-600 border-slate-200"
+              }`}
           >
             <Filter className="w-3.5 h-3.5" />
             Filtros
@@ -216,12 +213,12 @@ const ProjectsPublicListContent: React.FC = () => {
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                 <span className="text-primary">●</span> Búsqueda
               </label>
-              <input 
-                placeholder="RNC, Cédula, Nombre..." 
-                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm" 
-                type="text" 
-                value={filters.searchQuery} 
-                onChange={e => updateFilter("searchQuery", e.target.value)} 
+              <input
+                placeholder="RNC, Cédula, Nombre..."
+                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                type="text"
+                value={filters.searchQuery}
+                onChange={e => updateFilter("searchQuery", e.target.value)}
               />
 
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
@@ -229,14 +226,13 @@ const ProjectsPublicListContent: React.FC = () => {
               </label>
               <div className="flex flex-col gap-1.5">
                 {PROJECT_CATEGORIES.map(cat => (
-                  <label key={cat.value} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-all ${
-                    filters.projectTypes.includes(cat.value)
+                  <label key={cat.value} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-all ${filters.projectTypes.includes(cat.value)
                       ? "bg-primary text-white border-primary"
                       : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                  }`}>
-                    <input 
-                      className="w-3 h-3 accent-primary" 
-                      type="checkbox" 
+                    }`}>
+                    <input
+                      className="w-3 h-3 accent-primary"
+                      type="checkbox"
                       checked={filters.projectTypes.includes(cat.value)}
                       onChange={() => toggleProjectType(cat.value)}
                     />
@@ -253,8 +249,8 @@ const ProjectsPublicListContent: React.FC = () => {
               </label>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold text-slate-600">
-                  <span>RD$ {filters.priceRange[0] >= 1000000 ? `${(filters.priceRange[0]/1000000).toFixed(1)}M` : filters.priceRange[0].toLocaleString()}</span>
-                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? '15M+' : `${(filters.priceRange[1]/1000000).toFixed(1)}M`}</span>
+                  <span>RD$ {filters.priceRange[0] >= 1000000 ? `${(filters.priceRange[0] / 1000000).toFixed(1)}M` : filters.priceRange[0].toLocaleString()}</span>
+                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? '15M+' : `${(filters.priceRange[1] / 1000000).toFixed(1)}M`}</span>
                 </div>
                 <div className="relative h-6">
                   <input min="0" max={PRICE_MAX} step={PRICE_STEPS} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary absolute top-2 left-0" type="range" value={filters.priceRange[0]} onChange={e => handlePriceChange([parseInt(e.target.value), filters.priceRange[1]])} />
@@ -273,7 +269,7 @@ const ProjectsPublicListContent: React.FC = () => {
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                 <span className="text-purple-500">●</span> Provincia
               </label>
-              <select 
+              <select
                 className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
                 value={filters.province}
                 onChange={e => updateFilter("province", e.target.value)}
@@ -289,10 +285,10 @@ const ProjectsPublicListContent: React.FC = () => {
               </label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                <input 
-                  placeholder="Ej: 18.47186, -69.93988" 
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm" 
-                  type="text" 
+                <input
+                  placeholder="Ej: 18.47186, -69.93988"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                  type="text"
                   value={filters.latLng}
                   onChange={handleLatLngChange}
                 />
@@ -491,7 +487,7 @@ export const ProjectsPublicListPage: React.FC = () => {
               </div>
             </div>
           </section>
-          
+
           <ProjectsPublicListContent />
 
           {/* Final CTA */}
@@ -529,7 +525,7 @@ export const ProjectsPublicListPage: React.FC = () => {
             </div>
           </section>
         </main>
-        
+
         <LandingFooter />
       </div>
     </Suspense>

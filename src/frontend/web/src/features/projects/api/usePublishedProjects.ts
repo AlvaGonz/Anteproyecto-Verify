@@ -19,6 +19,7 @@ export interface PublicProjectSearchResultDto {
   matricula?: string;
   rncDesarrollador?: string;
   cedulaRncPropietario?: string;
+  completionRate: number;
 }
 
 export const usePublishedProjects = () =>
@@ -56,6 +57,7 @@ export function filterPublishedProjects(
   filters: PublishedProjectFilters
 ): PublicProjectSearchResultDto[] {
   return projects.filter((p) => {
+
     // Search query: RNC, Cedula, Project Name, Cadastral Designation
     if (filters.searchQuery) {
       const q = filters.searchQuery.toLowerCase();
@@ -130,3 +132,38 @@ export function getDefaultProjectImage(categoryId?: number): string {
 
 export const PRICE_STEPS = 100_000;
 export const PRICE_MAX = 15_000_000;
+
+export const PROVINCIAS = [
+  "Distrito Nacional",
+  "Santo Domingo",
+  "Santiago",
+  "La Altagracia",
+  "San Pedro de Macoris",
+  "La Romana",
+  "Puerto Plata",
+  "Duarte",
+  "San Cristobal",
+  "La Vega",
+  "Espaillat",
+  "Monsenor Nouel",
+  "Peravia",
+  "San Juan",
+  "Barahona",
+  "Samana",
+  "Monte Plata",
+  "Azua",
+  "Bahoruco",
+  "Dajabon",
+  "El Seibo",
+  "Elias Pina",
+  "Hato Mayor",
+  "Hermanas Mirabal",
+  "Independencia",
+  "Maria Trinidad Sanchez",
+  "Monte Cristi",
+  "Pedernales",
+  "Sanchez Ramirez",
+  "Santiago Rodriguez",
+  "Valverde",
+  "San Jose de Ocoa",
+];
