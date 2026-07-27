@@ -357,6 +357,16 @@ public class ProjectsController : ControllerBase
         }
     }
 
+    [HttpDelete("{id:guid}/interest")]
+    public async Task<IActionResult> QuitarInteresProyecto(Guid id, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        await _projectService.QuitarInteresProyectoAsync(id, userId, cancellationToken);
+        return NoContent();
+    }
+
     [HttpPost("{id:guid}/save")]
     public async Task<IActionResult> GuardarProyecto(Guid id, CancellationToken cancellationToken)
     {

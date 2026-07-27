@@ -32,6 +32,31 @@ export function useProjectsInteractions() {
     }
   });
 
+  const unregisterInterestMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const result = await projectsApi.unregisterInterest(projectId);
+      if (!isSuccess(result)) {
+        const err = result.error as any;
+        const msg = err?.message || err?.errors?.[0] || err?.original?.message || "Error al procesar la solicitud.";
+        throw new Error(msg);
+      }
+      return result.value;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects", "interests"] });
+      addToast(
+        "El Proyecto ha sido removido de su sección de Intereses.",
+        "info"
+      );
+    },
+    onError: (error) => {
+      addToast(
+        error.message || "Error al procesar la solicitud.",
+        "error"
+      );
+    }
+  });
+
   const saveMutation = useMutation({
     mutationFn: async (projectId: string) => {
       const result = await projectsApi.saveProject(projectId);
@@ -85,6 +110,8 @@ export function useProjectsInteractions() {
   return {
     registerInterest: (projectId: string, options?: any) => registerInterestMutation.mutate(projectId, options),
     isRegisteringInterest: registerInterestMutation.isPending,
+    unregisterInterest: (projectId: string, options?: any) => unregisterInterestMutation.mutate(projectId, options),
+    isUnregisteringInterest: unregisterInterestMutation.isPending,
     saveProject: (projectId: string, options?: any) => saveMutation.mutate(projectId, options),
     isSaving: saveMutation.isPending,
     unsaveProject: (projectId: string, options?: any) => unsaveMutation.mutate(projectId, options),

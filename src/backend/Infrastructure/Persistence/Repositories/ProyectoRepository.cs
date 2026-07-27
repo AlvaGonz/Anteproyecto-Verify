@@ -224,6 +224,11 @@ public class ProyectoRepository : IProyectoRepository
         _context.ProyectosGuardados.Remove(guardado);
     }
 
+    public void RemoveInteres(ProyectoInteresado interes)
+    {
+        _context.ProyectosInteresados.Remove(interes);
+    }
+
     public async Task<ProyectoInteresado?> GetInteresAsync(Guid proyectoId, Guid usuarioId, CancellationToken cancellationToken = default)
     {
         return await _context.ProyectosInteresados

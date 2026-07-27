@@ -241,7 +241,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
   const [localSaved, setLocalSaved] = useState(false);
   const [localInterested, setLocalInterested] = useState(false);
 
-  const { registerInterest, isRegisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
+  const { registerInterest, isRegisteringInterest, unregisterInterest, isUnregisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
   const { data: savedProjectsList } = useSavedProjects(isAuthenticated);
   const { data: interestsList } = useInterests(isAuthenticated);
 
@@ -660,17 +660,25 @@ export const PublishedProjectDetailPage: React.FC = () => {
                     addToast("Esta acción no es posible porque usted es el vendedor de este proyecto", "error");
                     return;
                   }
-                  setLocalInterested(true);
-                  registerInterest(id, {
-                    onError: () => setLocalInterested(false)
-                  });
+                  
+                  if (interested) {
+                    setLocalInterested(false);
+                    unregisterInterest(id, {
+                      onError: () => setLocalInterested(true)
+                    });
+                  } else {
+                    setLocalInterested(true);
+                    registerInterest(id, {
+                      onError: () => setLocalInterested(false)
+                    });
+                  }
                 }}
-                disabled={isRegisteringInterest || interested}
+                disabled={isRegisteringInterest || isUnregisteringInterest}
                 className={`w-full py-2.5 rounded text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-                  interested ? "bg-emerald-600 text-white shadow-[0_0_10px_rgba(5,150,105,0.4)]" : "bg-[#E63946] text-white hover:bg-red-700"
+                  interested ? "bg-emerald-600 text-white shadow-[0_0_10px_rgba(5,150,105,0.4)] hover:bg-emerald-700" : "bg-[#E63946] text-white hover:bg-red-700"
                 } disabled:opacity-70`}
               >
-                {isRegisteringInterest ? (
+                {isRegisteringInterest || isUnregisteringInterest ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
                     <span>Procesando...</span>

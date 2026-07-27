@@ -240,6 +240,19 @@ public class ProjectService : IProjectService
         }
     }
 
+    public async Task QuitarInteresProyectoAsync(Guid proyectoId, Guid usuarioInteresadoId, CancellationToken cancellationToken = default)
+    {
+        var existing = await _proyectoRepository.GetInteresAsync(proyectoId, usuarioInteresadoId, cancellationToken);
+        if (existing == null) return;
+
+        _proyectoRepository.RemoveInteres(existing);
+
+        var log = new LogProyecto(usuarioInteresadoId, proyectoId, "Interés removido del proyecto.");
+        await _proyectoRepository.AddLogProyectoAsync(log, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task GuardarProyectoAsync(Guid proyectoId, Guid usuarioGuardadorId, CancellationToken cancellationToken = default)
     {
         var proyecto = await _proyectoRepository.GetByIdAsync(proyectoId, cancellationToken);

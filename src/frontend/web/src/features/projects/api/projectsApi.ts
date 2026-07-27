@@ -135,6 +135,15 @@ export const projectsApi = {
     }
   },
 
+  async unregisterInterest(id: string): Promise<Result<void, ProjectError>> {
+    try {
+      await apiClient.delete(`/projects/${id}/interest`);
+      return success(undefined);
+    } catch (error: any) {
+      return failure(mapError(error, id));
+    }
+  },
+
   async saveProject(id: string): Promise<Result<void, ProjectError>> {
     try {
       await apiClient.post(`/projects/${id}/save`);
