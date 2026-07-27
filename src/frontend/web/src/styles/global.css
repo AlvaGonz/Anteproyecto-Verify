@@ -94,19 +94,8 @@
 }
 
 /* ===== Infinite marquee carousel ===== */
-@keyframes vf-marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
 .vf-track {
   display: flex;
-  will-change: transform;
-  animation: vf-marquee 35s linear infinite;
-}
-
-.vf-viewport:hover .vf-track {
-  animation-play-state: paused;
 }
 
 /* Animation Classes */

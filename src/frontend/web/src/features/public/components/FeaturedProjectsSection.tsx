@@ -1,15 +1,19 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2, MapPin, ChevronRight } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { motion, useMotionValue } from "framer-motion";
 
 import { useSuspensePublishedProjects, getDefaultProjectImage } from "../../projects/api/usePublishedProjects";
 
 
 const ITEM_WIDTH = 400;
-const GAP = 32;
+const GAP = 60;
 
 export const FeaturedProjectsSection: React.FC = () => {
   const { data: searchResults = [] } = useSuspensePublishedProjects();
-
+  const x = useMotionValue(0);
+  const dragging = useRef(false);
+  const hovering = useRef(false);
 
   // Use ALL published projects for the carousel (API already filters PUBLICADO)
   const projects = searchResults
@@ -31,6 +35,16 @@ export const FeaturedProjectsSection: React.FC = () => {
 
   // Each item: width + gap. Track is 2x single set.
   const trackWidth = carouselItems.length * (ITEM_WIDTH + GAP);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (dragging.current || hovering.current) return;
+      let next = x.get() - 2.5;
+      if (next <= -(trackWidth / 2)) next += trackWidth / 2;
+      x.set(next);
+    }, 50);
+    return () => clearInterval(id);
+  }, [trackWidth]);
 
   return (
     <section id="proyectos" className="py-32 bg-surface-raised overflow-hidden">
@@ -71,11 +85,16 @@ export const FeaturedProjectsSection: React.FC = () => {
           style={{ background: "linear-gradient(to left, var(--color-surface-raised, #f8f8f8), transparent)" }}
         />
 
-        <div
+        <motion.div
           className="vf-track gap-8 py-4"
-          style={{
-            width: `${trackWidth}px`,
-          }}
+          style={{ x, width: trackWidth, cursor: dragging.current ? 'grabbing' : hovering.current ? 'grab' : 'grab' }}
+          drag="x"
+          dragElastic={0}
+          dragMomentum={false}
+          onDragStart={() => { dragging.current = true; }}
+          onDragEnd={() => { dragging.current = false; }}
+          onMouseEnter={() => { hovering.current = true; }}
+          onMouseLeave={() => { hovering.current = false; }}
           role="region"
           aria-roledescription="carousel"
           aria-label="Proyectos destacados verificados"
@@ -100,7 +119,7 @@ export const FeaturedProjectsSection: React.FC = () => {
                 />
                 {project.isVerified && (
                   <div className="absolute top-6 left-6">
-                    <span className="bg-white/90 backdrop-blur shadow-floating px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-secondary tracking-widest">
+                    <span className="bg-white/90 shadow-floating px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-secondary tracking-widest">
                       Verificado
                     </span>
                   </div>
@@ -149,7 +168,7 @@ export const FeaturedProjectsSection: React.FC = () => {
               </div>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

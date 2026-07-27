@@ -12,6 +12,23 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/react-dom')) return 'vendor-react';
+            if (id.includes('node_modules/react')) return 'vendor-react';
+            if (id.includes('node_modules/framer-motion')) return 'vendor-animation';
+            if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
+            if (id.includes('node_modules/leaflet')) return 'vendor-map';
+            if (id.includes('node_modules/i18next')) return 'vendor-i18n';
+            if (id.includes('node_modules/@tanstack/react-query')) return 'vendor-query';
+            if (id.includes('node_modules/axios')) return 'vendor-http';
+            if (id.includes('node_modules')) return 'vendor-other';
+          },
+        },
+      },
+    },
     publicDir: 'src/frontend/web/public',
     resolve: {
       alias: {

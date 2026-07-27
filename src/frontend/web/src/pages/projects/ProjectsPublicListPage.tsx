@@ -120,6 +120,7 @@ const ProjectsPublicListContent: React.FC = () => {
   const [itemsPerPage] = useState(20);
   const pageInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: provincias } = useProvinces();
   const { data: searchResults } = useSuspensePublishedProjects();
 
   const filteredProjects = useMemo(() => {
