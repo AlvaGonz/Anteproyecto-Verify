@@ -92,7 +92,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
         const { projectsApi } = await import("../../features/projects/api/projectsApi");
         const result = await projectsApi.consumeQuota({ projectId: identifier });
         if (result._tag === 'success') {
-          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
         }
       } catch (e) {
         console.error("Error consumiendo cuota (no bloqueante):", e);
@@ -133,7 +133,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
   React.useEffect(() => {
     return () => {
-      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
     };
   }, []);
 

@@ -192,7 +192,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
         const { projectsApi } = await import("../../features/projects/api/projectsApi");
         const result = await projectsApi.consumeQuota({ projectId: id || "" });
         if (result._tag === 'success') {
-          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+          queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
         }
       } catch (e) {
         console.error("Error consumiendo cuota (no bloqueante):", e);
@@ -233,7 +233,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   React.useEffect(() => {
     return () => {
-      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
+      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
     };
   }, []);
   const [localSaved, setLocalSaved] = useState(false);
