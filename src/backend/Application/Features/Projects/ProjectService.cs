@@ -286,7 +286,12 @@ public class ProjectService : IProjectService
                 UsuarioId = i.CreatorId,
                 NombreUsuario = i.Project.UsuarioCreador.NombreCompleto,
                 AvatarUrl = i.Project.UsuarioCreador.AvatarUrl,
-                Fecha = i.CreatedAtUtc
+                Fecha = i.CreatedAtUtc,
+                Rnc = i.Project.UsuarioCreador.Rnc ?? "",
+                Direccion = i.Project.UsuarioCreador.Direccion ?? "",
+                Telefono = i.Project.UsuarioCreador.Telefono ?? "",
+                Email = i.Project.UsuarioCreador.CorreoElectronico ?? "",
+                Provincia = i.Project.UsuarioCreador.Provincia ?? i.Project.UbicacionTexto ?? ""
             });
         }
 
@@ -299,7 +304,12 @@ public class ProjectService : IProjectService
                 UsuarioId = i.InterestedUserId,
                 NombreUsuario = i.InterestedUser.NombreCompleto,
                 AvatarUrl = i.InterestedUser.AvatarUrl,
-                Fecha = i.CreatedAtUtc
+                Fecha = i.CreatedAtUtc,
+                Rnc = i.InterestedUser.Rnc ?? "",
+                Direccion = i.InterestedUser.Direccion ?? "",
+                Telefono = i.InterestedUser.Telefono ?? "",
+                Email = i.InterestedUser.CorreoElectronico ?? "",
+                Provincia = i.Project.UsuarioCreador.Provincia ?? i.Project.UbicacionTexto ?? ""
             });
         }
 

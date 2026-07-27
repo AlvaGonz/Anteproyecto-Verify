@@ -11,6 +11,9 @@ import { AdminInterestsView } from "./AdminInterestsView";
 import { AdminSavedProjectsView } from "./AdminSavedProjectsView";
 import { toUtcDate } from "../../shared/utils/dates";
 import { useAuth } from "../../shared/context/AuthContext";
+import { Download } from "lucide-react";
+import { useInterests } from "../../features/projects/api/useProjectsInteractions";
+import { ExportInterestsModal } from "./ExportInterestsModal";
 
 type TabType = "proyectos" | "publicados" | "intereses" | "guardados";
 
@@ -27,6 +30,8 @@ export const AdminProjectsPage: React.FC = () => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(1000);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const { data: intereses = [] } = useInterests(activeTab === "intereses");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -116,6 +121,16 @@ export const AdminProjectsPage: React.FC = () => {
             Nuevo Expediente
           </Link>
         )}
+        {activeTab === "intereses" && (
+          <button
+            type="button"
+            onClick={() => setIsExportModalOpen(true)}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+          >
+            <Download className="w-5 h-5" />
+            Exportar
+          </button>
+        )}
       </div>
 
       <div className="flex overflow-x-auto border-b border-slate-200">
@@ -203,6 +218,11 @@ export const AdminProjectsPage: React.FC = () => {
       ) : (
         <AdminSavedProjectsView />
       )}
+      <ExportInterestsModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        intereses={intereses}
+      />
     </div>
   );
 };
