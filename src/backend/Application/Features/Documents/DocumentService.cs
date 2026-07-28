@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
@@ -474,15 +475,45 @@ try
     {
         try
         {
-            // Deserialize the current OCR result
+            // Deserialize the current OCR result as the FULL OcrResult (not just the extraction record).
+            // Previously this method deserialized ResultadoOcrJson directly as CertificadoTituloRdExtractionV1,
+            // which silently produced an all-default extraction (System.Text.Json ignores unknown properties)
+            // and overwrote ResultadoOcrJson with just the extraction, losing OCR text/lines/rawJson forever.
             var ocrJson = document.ResultadoOcrJson;
             if (string.IsNullOrWhiteSpace(ocrJson)) return;
 
-            var extraction = System.Text.Json.JsonSerializer.Deserialize<CertificadoTituloRdExtractionV1>(ocrJson, new System.Text.Json.JsonSerializerOptions
+            var options = new System.Text.Json.JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
-            });
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            };
 
+            var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(ocrJson, options);
+            if (ocrResult == null) return;
+
+            // Extract the existing CertificadoTitulo extraction from CanonicalDataJson (envelope: { payload = extraction })
+            // so we can update ProvinceResolution / MunicipalityResolution while preserving the rest of the OCR data.
+            CertificadoTituloRdExtractionV1? extraction = null;
+            if (!string.IsNullOrEmpty(ocrResult.CanonicalDataJson))
+            {
+                try
+                {
+                    var root = JsonNode.Parse(ocrResult.CanonicalDataJson);
+                    var payload = root?["payload"];
+                    if (payload != null)
+                    {
+                        var payloadJson = payload.ToJsonString();
+                        extraction = System.Text.Json.JsonSerializer.Deserialize<CertificadoTituloRdExtractionV1>(payloadJson, options);
+                    }
+                }
+                catch
+                {
+                    // Fall through to re-extraction from current ocrResult
+                }
+            }
+
+            // If CanonicalDataJson is missing or unreadable, re-run the mapper to restore the extraction.
+            extraction ??= Application.Documents.Extractions.CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
             if (extraction == null) return;
 
             // Resolve Provincia
@@ -500,11 +531,18 @@ try
                 extraction = extraction with { MunicipalityResolution = municipalityResolution };
             }
 
-            // Serialize back to JSON
-            var updatedJson = System.Text.Json.JsonSerializer.Serialize(extraction, new System.Text.Json.JsonSerializerOptions
+            // Persist the updated envelope back into ocrResult.CanonicalDataJson
+            var envelope = new
             {
-                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-            });
+                schemaVersion = "1.0",
+                documentType = "CertificadoTitulo",
+                payload = extraction
+            };
+            ocrResult.CanonicalDataJson = System.Text.Json.JsonSerializer.Serialize(envelope, options);
+
+            // Serialize the FULL OcrResult back so the controller can still recover extractedText / lines
+            // and re-run the mapper if needed.
+            var updatedJson = System.Text.Json.JsonSerializer.Serialize(ocrResult, options);
 
             document.SetOcrResult(updatedJson, document.EstadoDocumento);
         }

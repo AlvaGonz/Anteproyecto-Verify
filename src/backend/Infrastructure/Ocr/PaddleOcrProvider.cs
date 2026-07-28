@@ -73,11 +73,13 @@ public class PaddleOcrProvider : IOcrProvider
                     }
                 }
                 
-                // Fallback: if RawJson parsing produced no lines, split ExtractedText by spaces
-                // This ensures we have lines for the label+proximity extraction logic
+                // Fallback: if RawJson parsing produced no lines, split ExtractedText by newlines only.
+                // Splitting by SPACES (as previously done) destroys the visual line structure that
+                // the mapper relies on for label+proximity extraction, causing all fields to be
+                // missed on real PDFs. Newlines preserve the visual structure.
                 if (lines.Count == 0 && !string.IsNullOrWhiteSpace(text))
                 {
-                    var splitLines = text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                    var splitLines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var line in splitLines)
                     {
                         var trimmed = line.Trim();

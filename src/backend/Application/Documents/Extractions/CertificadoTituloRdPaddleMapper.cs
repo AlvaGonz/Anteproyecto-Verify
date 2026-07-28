@@ -7,6 +7,36 @@ using System.Text.RegularExpressions;
 
 public static class CertificadoTituloRdPaddleMapper
 {
+    /// <summary>
+    /// Spanish stopwords/articles that must never be accepted as extracted "values".
+    /// Defensive filter to prevent word-split OCR text (e.g. "superficie de 168.00 m2"
+    /// becomes lines ["superficie", "de", "168.00", "m2"]) from grabbing "de" as a value
+    /// when the SUPERFICIE label matches "superficie".
+    ///</summary>
+    private static readonly HashSet<string> SpanishStopwords = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "de", "del", "la", "las", "los", "el",
+        "y", "e", "o", "u",
+        "en", "con", "por", "para", "a", "al",
+        "un", "una", "uno",
+        "es", "son", "ser", "estar",
+        "que", "se", "no", "si", "su",
+        "este", "esta", "estos", "estas",
+        "ese", "esa", "esos", "esas",
+        "aquel", "aquella",
+        "como", "le", "lo",
+        "sobre", "entre", "hasta", "desde",
+    };
+
+    private static bool IsValueLike(string? candidate)
+    {
+        if (string.IsNullOrWhiteSpace(candidate)) return false;
+        var trimmed = candidate.Trim();
+        if (trimmed.Length < 2) return false;
+        if (SpanishStopwords.Contains(trimmed)) return false;
+        return true;
+    }
+
     public static CertificadoTituloRdExtractionV1? MapFromOcrResult(OcrResult ocrResult)
     {
         if (ocrResult == null) return null;
@@ -32,14 +62,16 @@ public static class CertificadoTituloRdPaddleMapper
                     @"(?:REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)" 
                 }),
             
-            DesignacionCatastral = ExtractField(lines, fullText, "DesignacionCatastral", 
-                new[] { @"DESIGNACI[OÓ]N\s+CATASTRAL", @"PARCELA", @"SOLAR" }, 
-                new[] { 
-                    @"(?:DESIGNACI[OÓ]N\s+CATASTRAL\s*(?:S\s*)?)([\d\-]+)", 
-                    @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.]+(?:\s+\d+)?)", 
+            DesignacionCatastral = ExtractField(lines, fullText, "DesignacionCatastral",
+                new[] { @"DESIGNACI[OÓ]N\s+CATASTRAL", @"PARCELA", @"SOLAR" },
+                new[] {
+                    @"(?:DESIGNACI[OÓ]N\s+CATASTRAL\s*(?:S\s*)?)([\d\-]+)",
+                    @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.]+(?:\s+\d+)?)",
                     @"(?:Parce[l]?a\s+)([\d\.]+(?:\s+\d+)?)",
                     @"(?:Solar\s+[\d\.]+\.?manzana[\d\.]+\.?dei?\s*Distrio?\s*Catastral\s*No\.?\s*[\d\.]+)",
-                    @"(?:manzana[\d\.]+\.?dei?\s*Distrio?\s*Catastral\s*No\.?\s*[\d\.]+)"
+                    @"(?:manzana[\d\.]+\.?dei?\s*Distrio?\s*Catastral\s*No\.?\s*[\d\.]+)",
+                    // Noisy OCR: "como Parcela" / "Parcela dl DoCra Ha.1" / "Parcela No.<digits>"
+                    @"(?:como\s+)?[Pp]arcela\s+(?:dl\s+)?(?:DoCra\s+|de[il]\s+)?(?:Distrito\s+|Distrio\s+|Drito\s+)?(?:Catastral\s+)?(?:Ha\.|No\.?\s*)?([\d][\d\.\s]{0,15})",
                 }),
             
             FechaYHoraInscripcion = ExtractField(lines, fullText, "Fecha", 
@@ -57,13 +89,17 @@ public static class CertificadoTituloRdPaddleMapper
                 new[] { @"CANCELA\s+LA\s+ANTERIOR", @"VIENE\s+DE" }, 
                 new[] { @"(?:cancela la anterior|viene de)\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([\w\.\-]{2,30})" }),
             
-            Matricula = ExtractField(lines, fullText, "Matricula", 
-                new[] { @"MATR[IÍ]CULA", @"MATRICUL", @"MATR[IÍ]CUL" }, 
-                new[] { 
-                    @"(?:MATR[IÍ]CULA(?:\s*No\.?)?|MATR[IÍ]CULA|MATRICULA|MATRICUL|MATR[IÍ]CUL)\s*[:\-]?\s*([\d]+)", 
+            Matricula = ExtractField(lines, fullText, "Matricula",
+                new[] { @"MATR[IÍ]CULA", @"MATRICUL", @"MATR[IÍ]CUL", @"[Mm]atric\b" },
+                new[] {
+                    @"(?:MATR[IÍ]CULA(?:\s*No\.?)?|MATR[IÍ]CULA|MATRICULA|MATRICUL|MATR[IÍ]CUL)\s*[:\-]?\s*([\d]+)",
                     @"(?:MATR[IÍ]CULA|MATRICUL|MATR[IÍ]CUL)\s*(?:No\.?\s*)?([\d]{8,})",
                     @"(?:VImatricul\s*No\.?\s*)([\d]+)",
-                    @"(?:matricul\s*No\.?\s*)([\d]+)"
+                    @"(?:matricul\s*No\.?\s*)([\d]+)",
+                    // Noisy OCR: truncated "matric" (PaddleOCR drops "ula") — match label + nearby digit cluster.
+                    // Captures digits that follow within ~30 chars.
+                    @"[Mm]atric\s*(?:[A-Za-z\.\s]{0,12}?)([\d]{4,})",
+                    @"[Mm]atric[\w\.\s]{0,15}?([\d]{4,})",
                 }),
             
             Municipio = ExtractField(lines, fullText, "Municipio", 
@@ -84,14 +120,17 @@ public static class CertificadoTituloRdPaddleMapper
                     @"(?:Distrito\s+Nacional|Distrito\s+Naconal|Distro\s+Naconal|Distrio\s*Catastral\s*No\.?\s*[\d\.]+)"
                 }),
             
-            SuperficieM2 = ExtractField(lines, fullText, "SuperficieM2", 
-                new[] { @"SUPERFICIE", @"METROS\s*CUADRADOS", @"M2", @"SUPERFICIE" }, 
-                new[] { 
-                    @"(?:SUPERFICIE\s*EN\s*METROS\s*CUADRADOS|SUPERFICIE\s*M2|SUPERFICIE|SUPERFICIE|METROS\s*CUADRADOS|METR[OA]S\s*CUADRADOS)\s*([\d]+(?:[,.\s\']\d+)*)", 
-                    @"([\d]+(?:[,.\s\']\d+)*)\s*(?:m2|m²|m\b|mtros\.cuadrados|metros cuadrados|MTS2|metrs\s*cuadrados)", 
+            SuperficieM2 = ExtractField(lines, fullText, "SuperficieM2",
+                new[] { @"SUPERFICIE", @"METROS\s*CUADRADOS", @"M2", @"SUPERFICIE" },
+                new[] {
+                    @"(?:SUPERFICIE\s*EN\s*METROS\s*CUADRADOS|SUPERFICIE\s*M2|SUPERFICIE|SUPERFICIE|METROS\s*CUADRADOS|METR[OA]S\s*CUADRADOS)\s*([\d]+(?:[,.\s\']\d+)*)",
+                    @"([\d]+(?:[,.\s\']\d+)*)\s*(?:m2|m²|m\b|mtros\.cuadrados|metros cuadrados|MTS2|metrs\s*cuadrados)",
                     @"(?:supeicie|superficie)\s+de\s*([\d]+(?:[.,]\d+)?)",
                     @"(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?)\s*(?:m2|m²|metrs?\s*cuadrados?|metros\s*cuadrados?|mtros\.cuadrados?)",
-                    @"(?:168\.00\.?)\s*(?:m2|m²|metrs?\s*cuadrados?|metros\s*cuadrados?)"
+                    @"(?:168\.00\.?)\s*(?:m2|m²|metrs?\s*cuadrados?|metros\s*cuadrados?)",
+                    // Noisy OCR: truncated "mtros.cuadrados" (missing "me"), "de2.17mtros.cuadrados"
+                    @"([\d]+(?:[.,]\d+)?)\s*mtr?os\.?\s*cuadrados",
+                    @"([\d]+(?:[.,]\d+)?)\s*metr[oa]?s?\s*cuadrados?",
                 })
         };
 
@@ -170,8 +209,12 @@ public static class CertificadoTituloRdPaddleMapper
                         break;
                     }
                     
-                    // Check next line for proximity block
-                    if (i + 1 < lines.Count && !Regex.IsMatch(lines[i + 1], @"^[A-Z\s]+$")) // If next line is not another all-caps label
+                    // Check next line for proximity block.
+                    // Reject if next line is all-caps (likely another label) or a Spanish stopword
+                    // or a non-value-like fragment (defensive guard against word-split Lines).
+                    if (i + 1 < lines.Count
+                        && !Regex.IsMatch(lines[i + 1], @"^[A-Z\s]+$")
+                        && IsValueLike(lines[i + 1]))
                     {
                         rawValue = lines[i + 1];
                         break;
