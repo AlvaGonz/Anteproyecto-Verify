@@ -92,10 +92,10 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
 
         {/* Tabs */}
         {isAdmin && (
-          <div className="flex border-b border-border mt-4">
+          <div className="flex flex-nowrap border-b border-border mt-4 overflow-x-auto no-scrollbar pb-1">
             <button type="button"
               onClick={() => setActiveTab("projects")}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap ${
                 activeTab === "projects"
                   ? "border-[#223382] text-[#223382]"
                   : "border-transparent text-text-secondary hover:text-text-primary"
@@ -107,7 +107,7 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
 
             <button type="button"
               onClick={() => setActiveTab("subscriptions")}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap ${
                 activeTab === "subscriptions"
                   ? "border-[#223382] text-[#223382]"
                   : "border-transparent text-text-secondary hover:text-text-primary"

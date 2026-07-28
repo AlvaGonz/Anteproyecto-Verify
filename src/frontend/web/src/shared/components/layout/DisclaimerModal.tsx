@@ -46,7 +46,7 @@ export const DisclaimerModal: React.FC = () => {
   return (
     <AnimatePresence>
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-hidden">
           {/* Overlay - clicking does NOT close */}
           <motion.div
             initial={{ opacity: 0 }}

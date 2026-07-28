@@ -63,7 +63,7 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
       <div className="vf-card p-6 flex flex-col space-y-4 bg-white/90 backdrop-blur-md w-full">
 
         {/* Tab Selectors */}
-        <div className="flex bg-[var(--color-surface-raised)] p-1 rounded-xl border border-[var(--color-border)]/20 shadow-inner">
+        <div className="flex flex-col sm:flex-row bg-[var(--color-surface-raised)] p-1 rounded-xl border border-[var(--color-border)]/20 shadow-inner gap-1 sm:gap-0">
           <button
             type="button"
             onClick={() => setActiveMapTab("leaflet")}
@@ -160,19 +160,19 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
 
     {/* ── Action Buttons (hidden when ProjectActionBarProvider wraps us) ── */}
     {!actionBarCtx && (
-      <div className="flex justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
         {initialData && onDelete && (
-          <button type="button" onClick={onDelete} className="vf-btn-danger mr-auto">
+          <button type="button" onClick={onDelete} className="vf-btn-danger w-full sm:w-auto sm:mr-auto">
             Eliminar Expediente
           </button>
         )}
-        <button type="button" onClick={onCancel} className="vf-btn-secondary">
+        <button type="button" onClick={onCancel} className="vf-btn-secondary w-full sm:w-auto">
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSaveDisabled}
-          className={`vf-btn-primary min-w-[140px] ${
+          className={`vf-btn-primary w-full sm:w-auto sm:min-w-[140px] ${
             isSaveDisabled ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400 hover:shadow-none" : ""
           }`}
         >

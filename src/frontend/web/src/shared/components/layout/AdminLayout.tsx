@@ -57,7 +57,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none scroll-smooth">
+        <main className="flex-1 relative overflow-y-auto focus:outline-none scroll-smooth">
           <div className="py-8">
             <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
               {children}

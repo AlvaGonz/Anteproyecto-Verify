@@ -1,7 +1,6 @@
 import React from "react";
 import { FieldStatus, ExtractedField, GeographicResolutionResult } from "../../types";
-import { ResolutionAction } from "../../schemas/certificadoTitulo.schema";
-import { Info, Pencil, Check, X, BadgeCheck, AlertCircle, MinusCircle } from "lucide-react";
+import { Pencil, Check, X } from "lucide-react";
 
 
 
@@ -50,7 +49,7 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
   isCedula = false,
   testId,
   displayValue,
-  resolution,
+  // resolution prop removed for unused variable fix
   isEditing = false,
   editValue = "",
   isSaving = false,
@@ -108,8 +107,10 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
       
       <div className="flex items-center justify-between gap-2 min-h-[24px]">
         {isCustomContent ? (
-          <div className="flex items-center justify-between w-full gap-2">
-            {children}
+          <div className="flex items-center justify-between w-full gap-2 min-w-0">
+            <div className="flex-1 min-w-0">
+              {children}
+            </div>
             <div className="flex items-center gap-2 shrink-0">
               {!isMissing && (
                 <div className={`w-2 h-2 rounded-full ${isLowConfidence ? 'bg-warning' : 'bg-success'}`} title={`Confianza: ${(safeField.confidence * 100).toFixed(0)}%`} />

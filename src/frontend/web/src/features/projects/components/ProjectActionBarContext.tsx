@@ -113,20 +113,20 @@ export const ProjectActionBar: React.FC = () => {
   const showDelete = ctx?.showDelete ?? false;
 
   return (
-    <div className="flex justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
+    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-[var(--color-border)]/20">
       {showDelete && (
-        <button type="button" onClick={ctx?.onDelete} className="vf-btn-danger mr-auto">
+        <button type="button" onClick={ctx?.onDelete} className="vf-btn-danger w-full sm:w-auto sm:mr-auto">
           Eliminar Expediente
         </button>
       )}
-      <button type="button" onClick={() => navigate("/admin/projects")} className="vf-btn-secondary">
+      <button type="button" onClick={() => navigate("/admin/projects")} className="vf-btn-secondary w-full sm:w-auto">
         Cancelar
       </button>
       <button
         type="button"
         onClick={submitProjectForm}
         disabled={isSaveDisabled}
-        className={`vf-btn-primary min-w-[140px] ${
+        className={`vf-btn-primary w-full sm:w-auto sm:min-w-[140px] ${
           isSaveDisabled ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400 hover:shadow-none" : ""
         }`}
       >

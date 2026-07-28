@@ -171,13 +171,13 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
         <ProjectPhotosSection projectId={project.id} />
       </div>
 
-      <div className="flex gap-3 justify-end pt-2">
+      <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-2">
         <button type="button" onClick={() => navigate(-1)}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 transition-colors">
+          className="w-full sm:w-auto rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 transition-colors">
           Cancelar
         </button>
         <button type="submit" disabled={isPending}
-          className="rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50 transition-colors">
+          className="w-full sm:w-auto rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50 transition-colors">
           {isPending ? "Guardando..." : "Guardar cambios"}
         </button>
       </div>

@@ -157,7 +157,7 @@ export const DocumentRequirementRow: React.FC<DocumentRequirementRowProps> = ({
                       await onChangeDocument(newId, undefined);
                     }
                   }}
-                  className="text-xs font-medium text-secondary bg-surface border border-border/50 rounded-lg p-2 max-w-[200px] truncate outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full"
+                  className="text-xs font-medium text-secondary bg-surface border border-border/50 rounded-lg p-2 max-w-full sm:max-w-[200px] truncate outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full"
                 >
                   <option value="">O asignar existente...</option>
                   {availableDocuments.map(doc => (
@@ -180,7 +180,7 @@ export const DocumentRequirementRow: React.FC<DocumentRequirementRowProps> = ({
                     await onChangeDocument(newId, uploadedDocumentId);
                   }
                 }}
-                className="text-xs font-medium text-secondary bg-surface-container border border-border/50 rounded-lg p-2 max-w-[200px] truncate outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full"
+                className="text-xs font-medium text-secondary bg-surface-container border border-border/50 rounded-lg p-2 max-w-full sm:max-w-[200px] truncate outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full"
               >
                 <option value="">-- Quitar asignación --</option>
                 {uploadedDocumentId && fileName && (

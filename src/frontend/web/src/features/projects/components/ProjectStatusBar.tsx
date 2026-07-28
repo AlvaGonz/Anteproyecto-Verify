@@ -61,8 +61,8 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = ({ projectId, c
   ];
 
   return (
-    <div className="w-full max-w-4xl mx-auto my-6 px-4">
-      <div className="relative flex items-center justify-between">
+    <div className="w-full max-w-4xl mx-auto my-6 px-4 overflow-x-auto no-scrollbar pb-2">
+      <div className="relative flex items-center justify-between min-w-max gap-4 sm:gap-8">
         {/* Background connecting line */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
 

@@ -79,7 +79,7 @@ export const NotificationBell: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-xl shadow-2xl bg-surface border border-border z-[100] overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+        <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-xl shadow-2xl bg-surface border border-border z-[60] overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
           <div className="py-3 px-4 border-b border-border/50 flex justify-between items-center bg-surface">
             <h3 className="text-sm font-bold text-text-primary">Notificaciones</h3>
             <div className="flex items-center gap-3">

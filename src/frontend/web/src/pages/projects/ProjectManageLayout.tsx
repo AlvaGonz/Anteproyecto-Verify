@@ -62,7 +62,7 @@ export const ProjectManageLayout: React.FC = () => {
 
       {/* Navigation tabs - Only shown if editing an existing project */}
       {isEditing && (
-        <div className="flex flex-wrap border-b border-border mb-8 overflow-x-auto">
+        <div className="flex flex-nowrap border-b border-border mb-8 overflow-x-auto no-scrollbar pb-1">
           <NavLink
             to={`/admin/projects/${id}/edit`}
             className={({ isActive }) =>

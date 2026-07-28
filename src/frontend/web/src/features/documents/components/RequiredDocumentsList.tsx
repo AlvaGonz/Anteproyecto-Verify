@@ -66,8 +66,8 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
   };
 
   return (
-    <div className="vf-card p-6 bg-surface-container-low/30 overflow-hidden relative group">
-      <div className="flex items-center gap-3 mb-6 relative z-10">
+    <div className="vf-card p-4 sm:p-6 bg-surface-container-low/30 overflow-hidden relative group">
+      <div className="flex items-center gap-3 mb-4 sm:mb-6 relative z-10">
         <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
           <FileCheck2 className="w-5 h-5" />
         </div>

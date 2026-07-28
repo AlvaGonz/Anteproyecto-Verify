@@ -41,46 +41,46 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
     <div className="max-w-7xl mx-auto">
 
       {/* Header Premium */}
-      <div className="mb-10 p-8 rounded-[32px] bg-secondary relative overflow-hidden shadow-2xl group">
+      <div className="mb-6 sm:mb-10 p-5 sm:p-8 lg:p-10 rounded-[24px] sm:rounded-[32px] bg-secondary relative overflow-hidden shadow-2xl group">
         <div className="absolute inset-0 bg-noise opacity-20 mix-blend-overlay pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-black/40 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-black/60 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-primary/20 blur-[80px] sm:blur-[100px] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
         
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-8">
-          <div className="flex items-center gap-8">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
+          <div className="flex items-center gap-4 sm:gap-8">
             <Link 
               to={`/admin/projects/${id}/edit`}
-              className="w-14 h-14 rounded-2xl bg-white/10 text-white flex items-center justify-center hover:bg-primary transition-all duration-300 hover:shadow-premium hover:-translate-x-1 backdrop-blur-sm border border-white/10 shrink-0"
+              className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-white/10 text-white flex items-center justify-center hover:bg-primary transition-all duration-300 hover:shadow-premium hover:-translate-x-1 backdrop-blur-sm border border-white/10 shrink-0"
             >
-              <ArrowLeft className="w-6 h-6" />
+              <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </Link>
             
-            <div className="flex items-center gap-6">
-              <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 items-center justify-center backdrop-blur-md shadow-inner relative">
-                 <ShieldCheck className="w-8 h-8 text-white relative z-10" />
+            <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+              <div className="hidden sm:flex w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 items-center justify-center backdrop-blur-md shadow-inner relative shrink-0">
+                 <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-white relative z-10" />
                  <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
-                 <div className="absolute top-2 right-2 flex items-center justify-center">
+                 <div className="absolute top-1 right-1 sm:top-2 sm:right-2 flex items-center justify-center">
                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                  </div>
               </div>
-              <div>
-                <h1 className="display-lg text-white mb-1 leading-none">CENTRO DE VALIDACIÓN</h1>
-                <div className="flex items-center gap-4 text-white/60 font-mono text-[10px] tracking-[0.2em] uppercase">
-                  <span>Protocolo: VERIFINCA-ALPHA-98</span>
-                  <span className="w-1 h-1 rounded-full bg-white/30" />
-                  <span>Hash: {id?.substring(0, 8).toUpperCase()}...</span>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-black text-white mb-1 sm:mb-2 leading-tight truncate">CENTRO DE VALIDACIÓN</h1>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-white/70 font-mono text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] uppercase">
+                  <span>Prot: VERIFINCA-ALPHA</span>
+                  <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-white/30" />
+                  <span className="truncate">Hash: {id?.substring(0, 8).toUpperCase()}...</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto mt-2 lg:mt-0">
             {!isEvaluating && (
               <button type="button"
                 onClick={handleRunValidation}
-                className="h-14 px-8 rounded-xl bg-white text-secondary font-black text-xs uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all duration-300 flex items-center gap-3 active:scale-95"
+                className="h-12 sm:h-14 px-6 sm:px-8 rounded-xl bg-white text-secondary font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 active:scale-95 w-full sm:w-auto"
               >
-                <RefreshCw className="w-4 h-4" /> Ejecutar Auditoría Integral
+                <RefreshCw className="w-4 h-4 shrink-0" /> <span className="truncate">Auditoría Integral</span>
               </button>
             )}
           </div>
@@ -104,7 +104,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
 
       {/* Tabs Navigation Premium */}
       {!isEvaluating && (
-        <div className="flex flex-wrap items-center gap-2 mb-10 p-1.5 bg-white rounded-[20px] w-fit border border-border/30 shadow-raised shadow-transparent hover:shadow-floating transition-all duration-500">
+        <div className="flex flex-nowrap items-center gap-2 mb-10 p-1.5 bg-white rounded-[20px] w-full md:w-fit border border-border/30 shadow-raised shadow-transparent hover:shadow-floating transition-all duration-500 overflow-x-auto no-scrollbar">
           <button type="button"
             onClick={() => setActiveTab('analysis')}
             className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'analysis' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
