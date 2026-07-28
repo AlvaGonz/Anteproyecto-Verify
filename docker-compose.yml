@@ -97,6 +97,8 @@ services:
       dockerfile: docker/azurite.Dockerfile
     ports:
       - "10000:10000"
+    volumes:
+      - azurite-data:/data
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -140,3 +142,4 @@ services:
 volumes:
   mssql-data:
   api_uploads:
+  azurite-data:

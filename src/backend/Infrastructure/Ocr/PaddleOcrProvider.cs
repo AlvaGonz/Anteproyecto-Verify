@@ -3,6 +3,7 @@ namespace Infrastructure.Ocr;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Ocr;
@@ -54,12 +55,46 @@ public class PaddleOcrProvider : IOcrProvider
                 var text = result.TryGetProperty("ExtractedText", out var textProp) ? textProp.GetString() : string.Empty;
                 var rawJson = result.TryGetProperty("RawJson", out var rawProp) ? rawProp.GetString() : responseString;
                 
+                // Parse RawJson into OcrLine objects for better field extraction
+                var lines = new List<OcrLine>();
+                if (!string.IsNullOrWhiteSpace(rawJson) && rawJson.Contains("('"))
+                {
+                    var matches = Regex.Matches(rawJson.Replace("\\\"", "\""), @"\('(.*?)',\s*(\d+\.\d+)");
+                    foreach (Match m in matches)
+                    {
+                        if (m.Groups.Count > 1 && !string.IsNullOrWhiteSpace(m.Groups[1].Value))
+                        {
+                            lines.Add(new OcrLine 
+                            { 
+                                Text = m.Groups[1].Value,
+                                Confidence = double.TryParse(m.Groups[2].Value, out var c) ? c : 0.9
+                            });
+                        }
+                    }
+                }
+                
+                // Fallback: if RawJson parsing produced no lines, split ExtractedText by spaces
+                // This ensures we have lines for the label+proximity extraction logic
+                if (lines.Count == 0 && !string.IsNullOrWhiteSpace(text))
+                {
+                    var splitLines = text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in splitLines)
+                    {
+                        var trimmed = line.Trim();
+                        if (!string.IsNullOrWhiteSpace(trimmed))
+                        {
+                            lines.Add(new OcrLine { Text = trimmed, Confidence = 0.9 });
+                        }
+                    }
+                }
+
                 return new OcrResult
                 {
                     Success = success,
                     ExtractedText = text ?? string.Empty,
                     RawJson = rawJson ?? string.Empty,
-                    Confidence = 0.9 // PaddleOCR returns confidence per line, we can average it later
+                    Confidence = 0.9,
+                    Lines = lines
                 };
             }
             

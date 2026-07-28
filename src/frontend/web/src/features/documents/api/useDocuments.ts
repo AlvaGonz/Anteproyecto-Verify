@@ -106,7 +106,6 @@ export const useDownloadDocument = (projectId: string) => {
     mutationFn: (data: { id: string, fileName: string }) =>
       apiClient.get(`/projects/${projectId}/documents/${data.id}/download`, { responseType: "blob" }).then(res => ({ blob: res.data, fileName: data.fileName })),
     onSuccess: ({ blob, fileName }) => {
-      // Create object URL and trigger download (simplistic approach for now)
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
@@ -114,7 +113,17 @@ export const useDownloadDocument = (projectId: string) => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }
+      // Free memory after browser picks up the download
+      setTimeout(() => window.URL.revokeObjectURL(url), 100);
+    },
+    onError: (error: unknown) => {
+      const axiosErr = error as { response?: { status?: number; data?: { error?: string } } };
+      if (axiosErr.response?.status === 404) {
+        alert("El archivo no está disponible. Es posible que haya sido eliminado o que el servidor haya sido reiniciado. Por favor, vuelva a subir el documento.");
+      } else {
+        alert("Error al descargar el documento. Por favor intente de nuevo.");
+      }
+    },
   });
 };
 

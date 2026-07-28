@@ -5,7 +5,7 @@ import {
   ProjectCategory,
 } from "../../features/projects/types";
 import { useProject } from "../../features/projects/api/useProjects";
-import { useProjectsInteractions, useInterests } from "../../features/projects/api/useProjectsInteractions";
+import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -71,8 +71,10 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
   
   const queryClient = useQueryClient();
-  const { registerInterest, isRegisteringInterest } = useProjectsInteractions();
+  const { registerInterest, isRegisteringInterest, unregisterInterest, isUnregisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
   const { data: interestsList } = useInterests(isAuthenticated);
+  const { data: savedList } = useSavedProjects(isAuthenticated);
+  const [localSaved, setLocalSaved] = React.useState(false);
   const { addToast } = useToast();
 
   React.useEffect(() => {
@@ -82,6 +84,14 @@ export const ProjectPublicDetailPage: React.FC = () => {
       setIsInterested(false);
     }
   }, [isAuthenticated, interestsList, identifier]);
+
+  React.useEffect(() => {
+    if (isAuthenticated && savedList && project) {
+      setLocalSaved(savedList.some((s: any) => s.id?.toLowerCase() === project.id?.toLowerCase() || s.proyectoId?.toLowerCase() === project.id?.toLowerCase()));
+    } else {
+      setLocalSaved(false);
+    }
+  }, [isAuthenticated, savedList, project]);
 
   const [showQuotaModal, setShowQuotaModal] = React.useState(false);
   const [quotaError, setQuotaError] = React.useState<{ used?: number; max?: number } | null>(null);
@@ -480,10 +490,10 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Me Interesa Button */}
+                        {/* Me Interesa / Guardado Button */}
                         <button
                           type="button"
-                          disabled={isRegisteringInterest || isInterested}
+                          disabled={isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving}
                           onClick={() => {
                             if (!isAuthenticated) {
                               addToast("Debe iniciar sesión para registrar su interés en el proyecto.", "info");
@@ -493,23 +503,44 @@ export const ProjectPublicDetailPage: React.FC = () => {
                               addToast("Esta acción no es posible porque usted es el vendedor o representante de este proyecto.", "error");
                               return;
                             }
-                            setIsInterested(true);
-                            registerInterest(project.id, {
-                              onError: () => setIsInterested(false)
-                            });
+                            if (isInterested) {
+                              // Toggle off: unregister interest + unsave
+                              setIsInterested(false);
+                              setLocalSaved(false);
+                              unregisterInterest(project.id, {
+                                onError: () => { setIsInterested(true); setLocalSaved(true); }
+                              });
+                              unsaveProject(project.id, {
+                                onError: () => setLocalSaved(true)
+                              });
+                            } else {
+                              setIsInterested(true);
+                              setLocalSaved(true);
+                              registerInterest(project.id, {
+                                onError: () => { setIsInterested(false); setLocalSaved(false); }
+                              });
+                              saveProject(project.id, {
+                                onError: () => setLocalSaved(false)
+                              });
+                            }
                           }}
-                          className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
-                            ? "bg-primary text-white shadow-[0_0_40px_-10px_rgba(249,133,19,0.5)] scale-[1.02]"
-                            : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
-                            } disabled:opacity-70 disabled:cursor-not-allowed`}
+                          className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${
+                            isInterested
+                              ? "bg-emerald-600 text-white shadow-[0_0_40px_-10px_rgba(5,150,105,0.5)] scale-[1.02] hover:bg-emerald-700"
+                              : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
+                          } disabled:opacity-70 disabled:cursor-not-allowed`}
                         >
                           {!isInterested && !isRegisteringInterest && (
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                           )}
                           <span className="relative z-10 text-center leading-tight">
-                            {isRegisteringInterest ? "Procesando..." : isInterested ? "El proyecto se ha guardado en tus registros" : "Me interesa el proyecto"}
+                            {(isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving)
+                              ? "Procesando..."
+                              : isInterested
+                              ? "Guardado en tus registros"
+                              : "Me interesa el proyecto"}
                           </span>
-                          {isRegisteringInterest ? (
+                          {(isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving) ? (
                             <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0 relative z-10" />
                           ) : isInterested ? (
                             <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />

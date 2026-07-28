@@ -11,6 +11,7 @@ using Application.Abstractions.Storage;
 using Application.Contracts.Projects;
 using Application.Common.Exceptions;
 using Application.DTOs;
+using Application.DTOs.Common;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
@@ -129,8 +130,8 @@ namespace UnitTests.Api.Controllers
             };
 
             _mockProjectService
-                .Setup(s => s.GetAllProjectsAsync(1, 50, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(allProjects);
+                .Setup(s => s.GetAllProjectsWithCountAsync(developerId, 1, 50, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PaginatedResult<ProyectoDto>(allProjects, allProjects.Count, 1, 50));
 
             _mockUsuarioRepository
                 .Setup(r => r.GetByIdAsync(developerId, It.IsAny<CancellationToken>()))

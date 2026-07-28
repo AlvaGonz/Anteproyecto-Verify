@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Application.Contracts.Documents;
 using Application.DTOs.Documents;
 using Application.Features.Documents.GetDocumentDiagnosis;
+using Azure;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -230,6 +231,7 @@ public class ProjectDocumentsController : ControllerBase
     [HttpGet("{documentId}/download")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DownloadDocument(Guid projectId, Guid documentId)
     {
         try
@@ -240,6 +242,14 @@ public class ProjectDocumentsController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             return NotFound(ex.Message);
+        }
+        catch (RequestFailedException ex) when (ex.ErrorCode == "BlobNotFound")
+        {
+            return NotFound(new { error = "El archivo del documento no se encontró en el almacenamiento. Es posible que haya sido eliminado o que el servidor haya sido reiniciado.", errorCode = "BLOB_NOT_FOUND" });
+        }
+        catch (RequestFailedException ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Error al acceder al almacenamiento de archivos.", detail = ex.Message });
         }
     }
 

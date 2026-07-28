@@ -23,36 +23,76 @@ public static class CertificadoTituloRdPaddleMapper
         extraction = extraction with 
         {
             Oficina = ExtractField(lines, fullText, "Oficina", 
-                new[] { @"REGISTRO\s+DE\s+T[IÍ]TULOS", @"OFICINA\s+DE\s+REGISTRO" }, 
-                new[] { @"(Registro\s*de\s*T[ií]tulos\s*(?:de|del)?\s*[\wñÑ\s]{1,30}?)(?:\s*\d|\s*$|\s*Zunda|\s*DESIGNACI[OÓ]N|\s*CERTIFICACION|\s*MATR[IÍ]CULA)", @"(REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)" }),
+                new[] { @"REGISTRO\s+DE\s+T[IÍ]TULOS", @"OFICINA\s+DE\s+REGISTRO", @"REGISTRO\s+DE\s+TITULOS", @"REGISTRO\s+DE\s+T[IÍ]TULOS", @"REGISTRO\s*DE\s*T[IÍ]TULOS" }, 
+                new[] { 
+                    @"(?:Registro\s*de\s*T[ií]tulos\s*(?:de|del)?\s*[\wñÑ\s]{1,30}?)(?:\s*\d|\s*$|\s*Zunda|\s*DESIGNACI[OÓ]N|\s*CERTIFICACION|\s*MATR[IÍ]CULA)", 
+                    @"(REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)", 
+                    @"(?:REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)",
+                    @"(?:REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)",
+                    @"(?:REGISTRO\s+DE\s+T[ií]TULOS\s+(?:DE\s+)?[a-zA-ZñÑ\s]+)" 
+                }),
             
             DesignacionCatastral = ExtractField(lines, fullText, "DesignacionCatastral", 
                 new[] { @"DESIGNACI[OÓ]N\s+CATASTRAL", @"PARCELA", @"SOLAR" }, 
-                new[] { @"(?:DESIGNACI[OÓ]N\s+CATASTRAL\s*(?:S\s*)?)([\d\-]+)", @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.]+(?:\s+\d+)?)", @"(?:Parce[l]?a\s+)([\d\.]+(?:\s+\d+)?)" }),
+                new[] { 
+                    @"(?:DESIGNACI[OÓ]N\s+CATASTRAL\s*(?:S\s*)?)([\d\-]+)", 
+                    @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.]+(?:\s+\d+)?)", 
+                    @"(?:Parce[l]?a\s+)([\d\.]+(?:\s+\d+)?)",
+                    @"(?:Solar\s+[\d\.]+\.?manzana[\d\.]+\.?dei?\s*Distrio?\s*Catastral\s*No\.?\s*[\d\.]+)",
+                    @"(?:manzana[\d\.]+\.?dei?\s*Distrio?\s*Catastral\s*No\.?\s*[\d\.]+)"
+                }),
             
             FechaYHoraInscripcion = ExtractField(lines, fullText, "Fecha", 
-                new[] { @"FECHA\s+Y\s+HORA", @"INSCRITO\s+A\s+LAS" }, 
-                new[] { @"(?:Inscrito a las.*?el\s*)(\d{1,2}/[a-zA-Z]+/\d{4})", @"(?:FECHA Y HORA DE INSCRIPCION.*?)(?:\d{1,2}/\d{1,2}/\d{4})", @"(?:Em[a-zA-Z]*do\s*el|Emitido\s*el)\s*(\d{1,2}\s*de\s*[a-zA-Z]+\s*del\s*\d{4})", @"(?:fecha\s*)([0-9]{1,2}\s*de[a-zA-Z\s]+del\s*[0-9]{4})" }),
+                new[] { @"FECHA\s+Y\s+HORA", @"INSCRITO\s+A\s+LAS", @"EMITIDO\s+EL", @"EMITIDO\s+EL" }, 
+                new[] { 
+                    @"(?:Inscrito a las.*?el\s*)(\d{1,2}/[a-zA-Z]+/\d{4})", 
+                    @"(?:FECHA Y HORA DE INSCRIPCION.*?)(?:\d{1,2}/\d{1,2}/\d{4})", 
+                    @"(?:Em[a-zA-Z]*do\s*el|Emitido\s*el)\s*(\d{1,2}\s*de\s*[a-zA-Z]+\s*de[il]\s*\d{4})", 
+                    @"(?:fecha\s*)([0-9]{1,2}\s*de[a-zA-Z\s]+de[il]\s*[0-9]{4})",
+                    @"(?:Emitido\s+el\s*)(\d{1,2}\s*de\s*[a-zA-Z]+\s*de[il]\s*\d{4})",
+                    @"(?:Emitido\s+el\s*)(\d{1,2}\s*de\s*[a-zA-Z]+\s*de[il]\s*\d{4})"
+                }),
             
             VieneDe = ExtractField(lines, fullText, "VieneDe", 
                 new[] { @"CANCELA\s+LA\s+ANTERIOR", @"VIENE\s+DE" }, 
                 new[] { @"(?:cancela la anterior|viene de)\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([\w\.\-]{2,30})" }),
             
             Matricula = ExtractField(lines, fullText, "Matricula", 
-                new[] { @"MATR[IÍ]CULA" }, 
-                new[] { @"(?:MATR[IÍ]CULA(?:\s*No\.?)?|MATR[IÍ]CULA|MATRICULA)\s*([\d-]+)" }),
+                new[] { @"MATR[IÍ]CULA", @"MATRICUL", @"MATR[IÍ]CUL" }, 
+                new[] { 
+                    @"(?:MATR[IÍ]CULA(?:\s*No\.?)?|MATR[IÍ]CULA|MATRICULA|MATRICUL|MATR[IÍ]CUL)\s*[:\-]?\s*([\d]+)", 
+                    @"(?:MATR[IÍ]CULA|MATRICUL|MATR[IÍ]CUL)\s*(?:No\.?\s*)?([\d]{8,})",
+                    @"(?:VImatricul\s*No\.?\s*)([\d]+)",
+                    @"(?:matricul\s*No\.?\s*)([\d]+)"
+                }),
             
             Municipio = ExtractField(lines, fullText, "Municipio", 
-                new[] { @"MUNICIPIO" }, 
-                new[] { @"MUNICIPIO\s*(?:PODER\s*JUDICIAL\s*:\s*REPUBLICA\s*DOMINICANA\s*)?([a-zA-Z\s]+?)(?=\s*PROVINCIA|\s*OFICINA|\s*SUPERFICIE|$)", @"(?:ubicado en)\s*([a-zA-Z\s]+?)(?:,)", @"(Santo Domingo de Guzm[aá]n|Santo Domingo|Bonao)" }),
+                new[] { @"MUNICIPIO", @"DISTRITO\s+NACIONAL" }, 
+                new[] { 
+                    @"MUNICIPIO\s*(?:PODER\s*JUDICIAL\s*:\s*REPUBLICA\s*DOMINICANA\s*)?([a-zA-Z\s]+?)(?=\s*PROVINCIA|\s*OFICINA|\s*SUPERFICIE|$)", 
+                    @"(?:ubicado en)\s*([a-zA-Z\s]+?)(?:,)", 
+                    @"(Santo Domingo de Guzm[aá]n|Santo Domingo|Bonao|Distrito Nacional)",
+                    @"(?:Distrito\s+Nacional|Distro\s+Naconal|Distrio\s*Catastral\s*No\.?\s*[\d\.]+\.?\s*ubicado\s+en\s*e?\s*Drito\s*Nacional)",
+                    @"(?:Drito\s+Nacional|Distrito\s+Nacional|Distro\s+Naconal)"
+                }),
             
             Provincia = ExtractField(lines, fullText, "Provincia", 
-                new[] { @"PROVINCIA" }, 
-                new[] { @"PROVINCIA\s*([a-zA-Z\s]+?)(?=\s*OFICINA|\s*SUPERFICIE|$)", @"PROVINCIA\s*(?:OFICINA\s*)?([a-zA-Z]+)" }),
+                new[] { @"PROVINCIA", @"DISTRITO\s+NACIONAL" }, 
+                new[] { 
+                    @"PROVINCIA\s*([a-zA-Z\s]+?)(?=\s*OFICINA|\s*SUPERFICIE|$)", 
+                    @"PROVINCIA\s*(?:OFICINA\s*)?([a-zA-Z]+)",
+                    @"(?:Distrito\s+Nacional|Distrito\s+Naconal|Distro\s+Naconal|Distrio\s*Catastral\s*No\.?\s*[\d\.]+)"
+                }),
             
             SuperficieM2 = ExtractField(lines, fullText, "SuperficieM2", 
-                new[] { @"SUPERFICIE" }, 
-                new[] { @"(?:SUPERFICIE\s*EN\s*METROS\s*CUADRADOS|SUPERFICIE\s*M2|SUPERFICIE|SUPERFICIE)\s*([\d]+(?:[,.\s\']\d+)*)", @"([\d]+(?:[,.\s\']\d+)*)\s*(?:m2|m²|m\b|mtros\.cuadrados|metros cuadrados|MTS2)" })
+                new[] { @"SUPERFICIE", @"METROS\s*CUADRADOS", @"M2", @"SUPERFICIE" }, 
+                new[] { 
+                    @"(?:SUPERFICIE\s*EN\s*METROS\s*CUADRADOS|SUPERFICIE\s*M2|SUPERFICIE|SUPERFICIE|METROS\s*CUADRADOS|METR[OA]S\s*CUADRADOS)\s*([\d]+(?:[,.\s\']\d+)*)", 
+                    @"([\d]+(?:[,.\s\']\d+)*)\s*(?:m2|m²|m\b|mtros\.cuadrados|metros cuadrados|MTS2|metrs\s*cuadrados)", 
+                    @"(?:supeicie|superficie)\s+de\s*([\d]+(?:[.,]\d+)?)",
+                    @"(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?)\s*(?:m2|m²|metrs?\s*cuadrados?|metros\s*cuadrados?|mtros\.cuadrados?)",
+                    @"(?:168\.00\.?)\s*(?:m2|m²|metrs?\s*cuadrados?|metros\s*cuadrados?)"
+                })
         };
 
         // Extraction Status Classification
@@ -80,22 +120,33 @@ public static class CertificadoTituloRdPaddleMapper
     private static List<string> ExtractLines(OcrResult ocrResult)
     {
         var lines = new List<string>();
-        if (!string.IsNullOrWhiteSpace(ocrResult.RawJson) && ocrResult.RawJson.Contains("('"))
+        
+        // Priority 1: Use pre-parsed Lines from OCR provider (most reliable)
+        if (ocrResult.Lines != null && ocrResult.Lines.Any())
+        {
+            lines.AddRange(ocrResult.Lines.Select(l => l.Text));
+        }
+        // Priority 2: Parse from RawJson (PaddleOCR format)
+        else if (!string.IsNullOrWhiteSpace(ocrResult.RawJson) && ocrResult.RawJson.Contains("('"))
         {
             var matches = Regex.Matches(ocrResult.RawJson.Replace("\\\"", "\""), @"\('(.*?)',\s*(\d+\.\d+)");
             foreach (Match m in matches)
             {
                 lines.Add(m.Groups[1].Value);
             }
+            
+            // Fallback to ExtractedText if regex found no matches
+            if (lines.Count == 0 && !string.IsNullOrWhiteSpace(ocrResult.ExtractedText))
+            {
+                lines.AddRange(ocrResult.ExtractedText.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries));
+            }
         }
-        else if (ocrResult.Lines != null && ocrResult.Lines.Any())
-        {
-            lines.AddRange(ocrResult.Lines.Select(l => l.Text));
-        }
-        else
+        // Priority 3: Split ExtractedText
+        else if (!string.IsNullOrWhiteSpace(ocrResult.ExtractedText))
         {
             lines.AddRange(ocrResult.ExtractedText.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries));
         }
+        
         return lines;
     }
 

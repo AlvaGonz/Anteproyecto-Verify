@@ -14,6 +14,7 @@ using Xunit;
 using global::Application.Abstractions.Storage;
 using global::Application.Abstractions.DocumentIntelligence;
 using global::Application.Contracts.Documents;
+using global::Application.Contracts.Geo;
 
 public class DocumentServiceTests
 {
@@ -27,6 +28,7 @@ public class DocumentServiceTests
     private readonly Mock<IAuditoriaRepository> _auditoriaRepositoryMock;
     private readonly Mock<global::Application.Abstractions.Ocr.IOcrProvider> _ocrProviderMock;
     private readonly Mock<global::Application.Services.DocumentProcessing.IDocumentStateEngine> _documentStateEngineMock;
+    private readonly Mock<IGeoResolutionService> _geoResolutionServiceMock;
     private readonly DocumentService _documentService;
 
     public DocumentServiceTests()
@@ -41,6 +43,7 @@ public class DocumentServiceTests
         _auditoriaRepositoryMock = new Mock<IAuditoriaRepository>();
         _ocrProviderMock = new Mock<global::Application.Abstractions.Ocr.IOcrProvider>();
         _documentStateEngineMock = new Mock<global::Application.Services.DocumentProcessing.IDocumentStateEngine>();
+        _geoResolutionServiceMock = new Mock<IGeoResolutionService>();
 
         _documentService = new DocumentService(
             _documentoRepositoryMock.Object,
@@ -52,7 +55,8 @@ public class DocumentServiceTests
             _validacionRepositoryMock.Object,
             _auditoriaRepositoryMock.Object,
             _ocrProviderMock.Object,
-            _documentStateEngineMock.Object
+            _documentStateEngineMock.Object,
+            _geoResolutionServiceMock.Object
         );
     }
 
