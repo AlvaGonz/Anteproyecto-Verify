@@ -1,1 +1,0 @@
-codebase-memory-mcp cli query_graph '{"project": "C-Users-Admin-Desktop-Anteproyecto-Verify", "query": "MATCH (f:Function) WHERE NOT EXISTS { (f)<-[:CALLS]-() } AND f.is_entry_point = false AND NOT f.name =~ \'^use[A-Z].*\' AND NOT f.name =~ \'^handle[A-Z].*\' AND NOT f.name =~ \'^on[A-Z].*\' RETURN f.name, f.file, f.in_degree ORDER BY f.file LIMIT 100"}'
