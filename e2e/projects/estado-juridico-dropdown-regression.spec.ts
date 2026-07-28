@@ -51,7 +51,7 @@ test.describe('Estado Jurídico - Dropdown migration regression', () => {
 
     // 3) Navigate and upload PDF
     await page.goto(`${FRONTEND_BASE}/#/admin/projects/${projectId}/validations`);
-    const panel = page.locator('[data-testid="requirement-status-estado_juridico"]');
+    const panel = page.locator('[data-testid="requirement-row-estado_juridico"]');
     await panel.waitFor({ state: 'visible', timeout: 15000 });
     const fileInput = panel.locator('[data-testid="inline-file-upload"]');
     await fileInput.setInputFiles(PDF_PATH);
