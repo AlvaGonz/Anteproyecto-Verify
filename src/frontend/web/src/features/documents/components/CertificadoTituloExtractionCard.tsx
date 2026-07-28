@@ -8,6 +8,26 @@ import {
 } from "../types";
 import { ResolutionAction } from "../schemas/certificadoTitulo.schema";
 import { AlertTriangle, FileText, Loader2, Info, Pencil, Check, X, BadgeCheck, AlertCircle, MinusCircle } from "lucide-react";
+import { formatMatricula, formatSuperficieM2 } from "../utils/numericFormatter";
+
+type NumericKind = "matricula" | "superficieM2";
+
+const NUMERIC_FIELDS: Record<string, NumericKind> = {
+  matricula: "matricula",
+  superficieM2: "superficieM2",
+};
+
+const formatNumeric = (fieldKey: string, raw: string): string => {
+  switch (NUMERIC_FIELDS[fieldKey]) {
+    case "matricula":
+      return formatMatricula(raw);
+    case "superficieM2":
+      return formatSuperficieM2(raw);
+    default:
+      return raw;
+  }
+};
+
 
 interface CertificadoTituloExtractionCardProps {
   extraction: CertificadoTituloRdExtractionV1;
@@ -213,10 +233,12 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
 
   const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
-    const displayValue = safeField.normalizedValue || safeField.rawValue || '';
+    const rawValue = safeField.normalizedValue || safeField.rawValue || '';
+    const displayValue = NUMERIC_FIELDS[fieldKey] ? formatNumeric(fieldKey, rawValue) : rawValue;
     const isMissing = safeField.status === FieldStatus.Missing && !displayValue;
     const isLowConfidence = safeField.status === FieldStatus.LowConfidence || safeField.confidence < 0.8;
     const isEditing = editingField === fieldKey;
+    const isNumeric = !!NUMERIC_FIELDS[fieldKey];
     
     // Get resolution for this field
     const resolution = fieldKey === 'provincia' ? extraction.provinceResolution : 
@@ -295,11 +317,31 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
         <div className="flex items-center justify-between gap-2">
           {isEditing ? (
             <div className="flex items-center gap-1 w-full">
-               <input 
-                 type="text" 
-                 className="flex-1 text-sm border-b border-primary outline-none px-1 py-0.5 bg-transparent" 
-                 value={editValue} 
-                 onChange={(e) => setEditValue(e.target.value)}
+               <input
+                 type={isNumeric ? "number" : "text"}
+                 inputMode={isNumeric ? "numeric" : undefined}
+                 pattern={isNumeric ? "[0-9.]*" : undefined}
+                 step={fieldKey === "superficieM2" ? "0.01" : "1"}
+                 min={isNumeric ? "0" : undefined}
+                 data-testid={`field-input-${fieldKey}`}
+                 className="flex-1 text-sm border-b border-primary outline-none px-1 py-0.5 bg-transparent"
+                 value={editValue}
+                 onChange={(e) => {
+                    const next = e.target.value;
+                    if (!isNumeric) {
+                      setEditValue(next);
+                      return;
+                    }
+                    const filtered = next.replace(/[^0-9.]/g, "");
+                    const sanitized = fieldKey === "superficieM2"
+                      ? (() => {
+                          const firstDot = filtered.indexOf(".");
+                          if (firstDot === -1) return filtered;
+                          return filtered.slice(0, firstDot + 1) + filtered.slice(firstDot + 1).replace(/\./g, "");
+                        })()
+                      : filtered;
+                    setEditValue(sanitized);
+                 }}
                  autoFocus
                  disabled={isSaving}
                  onKeyDown={(e) => {
@@ -321,7 +363,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
                  )}
                  {resolution && <ResolutionBadge resolution={resolution} />}
                  {onEditField && (
-                   <button onClick={() => handleEditClick(fieldKey, displayValue)} className="opacity-0 group-hover:opacity-100 text-text-secondary hover:text-primary transition-opacity p-0.5" title="Editar campo">
+                   <button onClick={() => handleEditClick(fieldKey, rawValue)} className="opacity-0 group-hover:opacity-100 text-text-secondary hover:text-primary transition-opacity p-0.5" title="Editar campo">
                      <Pencil className="w-3 h-3" />
                    </button>
                  )}
