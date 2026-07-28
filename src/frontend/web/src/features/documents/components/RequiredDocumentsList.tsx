@@ -3,7 +3,7 @@ import { DocumentType } from "../types";
 import { useDocuments, useUpdateDocumentType } from "../api/useDocuments";
 import { useUpdateDocumentFieldReview } from "../api/useDocumentMutations";
 import { OcrFieldReviewState } from "../types";
-import { RequirementUploadRow } from "./RequirementUploadRow";
+import { DocumentRequirementRow } from "./reusable/DocumentRequirementRow";
 import { CedulaExtractionCard } from "./CedulaExtractionCard";
 import { CertificadoTituloExtractionCard } from "./CertificadoTituloExtractionCard";
 import { PlanoMensuraExtractionCard } from "./PlanoMensuraExtractionCard";
@@ -88,7 +88,7 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
 
           return (
             <div key={doc.id} className="space-y-2">
-              <RequirementUploadRow
+              <DocumentRequirementRow
                 projectId={projectId}
                 requirementCode={doc.id}
                 label={doc.label}

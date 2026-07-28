@@ -177,7 +177,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
   const [showDocumentos, setShowDocumentos] = useState(false);
   const [quotaError, setQuotaError] = useState<{ used?: number; max?: number } | null>(null);
   const isAdmin = user?.role === "admin" || user?.role === "owner";
-  const fromSaved = (location.state as any)?.fromSaved;
+  // const _fromSaved = (location.state as any)?.fromSaved;
   const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
   const quotaHandledRef = useRef(false);
 

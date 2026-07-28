@@ -30,7 +30,6 @@ import {
   Info,
   User,
   ArrowRight,
-  FileText,
 } from "lucide-react";
 import { m } from "framer-motion";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
@@ -74,7 +73,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const { registerInterest, isRegisteringInterest, unregisterInterest, isUnregisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
   const { data: interestsList } = useInterests(isAuthenticated);
   const { data: savedList } = useSavedProjects(isAuthenticated);
-  const [localSaved, setLocalSaved] = React.useState(false);
+  const [, setLocalSaved] = React.useState(false);
   const { addToast } = useToast();
 
   React.useEffect(() => {

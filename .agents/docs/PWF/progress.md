@@ -133,3 +133,8 @@
 - Add province-scoped municipality resolution tests
 - Add OCR-noise normalization tests with realistic bad inputs
 - Seed requires: exact source file/version, reproducible snapshot, transformation script, FK validation, Human Gate before write
+
+## 📄 Completed Tasks (UI Improvements)
+- Refactored document extraction UI components (`DocumentExtractionPanel`, `ExtractionFieldCard`) to unify layout and eliminate overlapping text.
+- Added expand/collapse functionality to extraction panels to keep the UI clean (using local `isExpanded` state with `ChevronDown` and `ChevronUp` icons).
+- Validated via `tsc` that TypeScript constraints (`noUnusedLocals`) remain respected.

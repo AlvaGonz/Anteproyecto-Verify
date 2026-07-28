@@ -92,6 +92,10 @@ export enum DocumentType {
   PlanoMensuraCatastral = 24,
   PermisoConstruccion = 25,
   CopiaCedulaIdentidad = 26, // Adding this to match frontend needs if missing in backend
+  EstadosFinancieros = 27,
+  CertificacionesBancarias = 28,
+  CertificadoEIA = 29,
+  NoObjecionINAPACAASD = 30,
   Other = 99,
 }
 

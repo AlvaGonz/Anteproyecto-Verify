@@ -9,7 +9,6 @@ import { ValidationSummary as InternalValidationSummary } from "../../features/v
 import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
 import { FindingsPanel } from "../../features/validations/components/findings/FindingsPanel";
 import { AuditLogList } from "../../features/validations/components/audit/AuditLogList";
-import { CertificationSection } from "../../features/certifications/components/CertificationSection";
 import type { ValidationExecutionResult, FindingDto, AuditLogDto } from "../../features/validations/types";
 import { RequiredDocumentsList } from "../../features/documents/components/RequiredDocumentsList";
 
@@ -128,10 +127,10 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
       )}
 
 {!isEvaluating && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className={`grid grid-cols-1 ${result ? 'lg:grid-cols-4' : ''} gap-8`}>
 
           {/* Main Area */}
-          <div className="lg:col-span-3 space-y-12">
+          <div className={`${result ? 'lg:col-span-3' : ''} space-y-12`}>
             {activeTab === 'analysis' && (
               <>
                 <RequiredDocumentsList projectId={id || ""} />
@@ -210,16 +209,6 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
           {/* Side Info Panel */}
           <div className="space-y-8">
             <section className="sticky top-8 space-y-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-1.5 h-6 bg-primary rounded-full" />
-                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Certificación Digital</h2>
-              </div>
-              <div className="p-1.5 bg-gradient-to-br from-primary via-secondary to-[#0F172A] rounded-[24px] shadow-premium group">
-                <div className="bg-white rounded-[20px] p-2 hover:scale-[1.02] transition-transform duration-500">
-                  <CertificationSection projectId={id!} />
-                </div>
-              </div>
-
               {/* Dynamic Status Display */}
               {result && (
                 <div className="vf-card bg-surface overflow-hidden relative border-none shadow-premium ring-1 ring-border/30">

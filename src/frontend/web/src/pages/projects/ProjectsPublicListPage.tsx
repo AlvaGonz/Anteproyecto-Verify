@@ -139,23 +139,23 @@ const ProjectsPublicListContent: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const toggleProjectType = (type: number) => {
-    setFilters((prev) => ({
-      ...prev,
-      projectTypes: prev.projectTypes.includes(type)
-        ? prev.projectTypes.filter((t) => t !== type)
-        : [...prev.projectTypes, type],
-    }));
-    setCurrentPage(1);
-  };
+  // const _toggleProjectType = (type: number) => {
+  //   setFilters((prev) => ({
+  //     ...prev,
+  //     projectTypes: prev.projectTypes.includes(type)
+  //       ? prev.projectTypes.filter((t) => t !== type)
+  //       : [...prev.projectTypes, type],
+  //   }));
+  //   setCurrentPage(1);
+  // };
 
   const handlePriceChange = (range: [number, number]) => {
     updateFilter("priceRange", range);
   };
 
-  const handleLatLngChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateFilter("latLng", e.target.value);
-  };
+  // const _handleLatLngChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   updateFilter("latLng", e.target.value);
+  // };
 
   const clearAllFilters = () => {
     setSearchParams({});
@@ -169,13 +169,13 @@ const ProjectsPublicListContent: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const hasActiveFilters =
-    filters.searchQuery ||
-    filters.projectTypes.length > 0 ||
-    filters.priceRange[0] > 0 ||
-    filters.priceRange[1] < PRICE_MAX ||
-    filters.province ||
-    filters.latLng;
+  // const _hasActiveFilters =
+  //   filters.searchQuery ||
+  //   filters.projectTypes.length > 0 ||
+  //   filters.priceRange[0] > 0 ||
+  //   filters.priceRange[1] < PRICE_MAX ||
+  //   filters.province ||
+  //   filters.latLng;
 
   return (
     <>
