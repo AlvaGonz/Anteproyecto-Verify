@@ -176,7 +176,8 @@ def get_db_connection():
 
 # Yield generator to parse lines of the text file one by one
 def parse_dgii_file(file_path):
-    seen_rncs = set()
+    from datetime import datetime
+    best = {}
     with open(file_path, "r", encoding="latin-1") as f:
         for line in f:
             line_str = line.strip()
@@ -185,15 +186,12 @@ def parse_dgii_file(file_path):
             parts = line_str.split("|")
             if len(parts) < 2:
                 continue
-            
+
             rnc = parts[0].strip()
             # Clean and validate RNC: must be numeric and either 9 or 11 digits
             if not rnc.isdigit() or len(rnc) not in [9, 11]:
                 continue
-            if rnc in seen_rncs:
-                continue
-            seen_rncs.add(rnc)
-            
+
             nombre = parts[1].strip()
             comercial = parts[2].strip() if len(parts) > 2 else ""
             actividad = parts[3].strip() if len(parts) > 3 else ""
@@ -201,19 +199,31 @@ def parse_dgii_file(file_path):
             regimen = parts[5].strip() if len(parts) > 5 else ""
             admin = parts[6].strip() if len(parts) > 6 else ""
             facturador = parts[7].strip() if len(parts) > 7 else ""
-            
+
             fecha_mod = None
             if len(parts) > 8 and parts[8].strip():
                 try:
-                    from datetime import datetime
                     fecha_mod = datetime.strptime(parts[8].strip(), "%d/%m/%Y")
                 except:
                     pass
-            
+
             estado = parts[9].strip() if len(parts) > 9 else ""
             licencias = parts[10].strip() if len(parts) > 10 else ""
-            
-            yield (rnc, nombre, comercial, categoria, regimen, estado, actividad, admin, facturador, licencias, fecha_mod)
+
+            record = (rnc, nombre, comercial, categoria, regimen, estado, actividad, admin, facturador, licencias, fecha_mod)
+
+            if rnc in best:
+                existing = best[rnc]
+                existing_fecha = existing[10] if isinstance(existing[10], datetime) else datetime.min
+                new_fecha = fecha_mod if isinstance(fecha_mod, datetime) else datetime.min
+                if new_fecha > existing_fecha:
+                    best[rnc] = record
+            else:
+                best[rnc] = record
+
+    print(f"[Parse] DGII file loaded: {len(best)} unique RNCs (kept most recent by FechaModificacion)")
+    for record in best.values():
+        yield record
 
 def is_transient_error(e):
     err_msg = str(e).lower()

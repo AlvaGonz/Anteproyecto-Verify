@@ -567,6 +567,54 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Invitaciones", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.LicenciaConstruccion", b =>
+                {
+                    b.Property<Guid>("MivedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime?>("FechaEmision")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaEntrada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("LocalesComerciales")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Municipio")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NombreProyecto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("NumeroPermiso")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Provincia")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Tipologia")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("UnidadesHabitacionales")
+                        .HasColumnType("int");
+
+                    b.HasKey("MivedId");
+
+                    b.HasIndex("NumeroPermiso");
+
+                    b.ToTable("LicenciaConstruccion", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.LogConsulta", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1745,6 +1793,41 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("ValidacionesDgii");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Verificacion2FA", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NumeroVerificable")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<string>("SesionId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Verificacion2FA", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Acceso", b =>
                 {
                     b.HasOne("Domain.Entities.Perfil", "Perfil")
@@ -2193,6 +2276,17 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Proyecto");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Verificacion2FA", b =>
+                {
+                    b.HasOne("Domain.Entities.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Domain.Entities.Documento", b =>
