@@ -73,20 +73,6 @@ export const AdminProjectContextMenu: React.FC<AdminProjectContextMenuProps> = (
 
           <div className="my-1 border-t border-gray-100"></div>
 
-          {project.estadoProyecto === ProjectStatus.Draft && (
-            <button type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                updateStatus({ id: project.id, status: ProjectStatus.InReview });
-                onClose();
-              }}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 transition-colors w-full"
-            >
-              <Activity className="w-4 h-4" />
-              Enviar a Revisión
-            </button>
-          )}
-
           {project.estadoProyecto === ProjectStatus.InReview && (
             <>
               <button type="button"
