@@ -22,4 +22,7 @@ public record EstadoJuridicoRdExtractionV1
     public List<string> Warnings { get; init; } = new();
     public string ProcessorName { get; init; } = "PaddleOCR";
     public string ProcessorVersion { get; init; } = "1.0";
+
+    public GeographicResolutionResult? ProvinceResolution { get; init; }
+    public GeographicResolutionResult? MunicipalityResolution { get; init; }
 }

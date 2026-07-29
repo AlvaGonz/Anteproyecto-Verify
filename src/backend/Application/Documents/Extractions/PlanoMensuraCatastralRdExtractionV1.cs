@@ -23,5 +23,8 @@ namespace Application.Documents.Extractions
         public ExtractedField Seccion { get; init; } = new();
         public ExtractedField Lugar { get; init; } = new();
         public ExtractedField SuperficieARegistrarParcelaM2 { get; init; } = new();
+
+        public GeographicResolutionResult? ProvinceResolution { get; init; }
+        public GeographicResolutionResult? MunicipalityResolution { get; init; }
     }
 }

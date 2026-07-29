@@ -187,8 +187,11 @@ try
                 var ocrResult = await _ocrProvider.ProcessDocumentAsync(fileStream, fileName, cancellationToken);
                 _documentStateEngine.ApplyOcrResult(document, ocrResult);
 
-                // Geographic resolution for CertificadoTitulo documents (Provincia + Municipio)
-                if (document.TipoDocumento == DocumentType.CertificadoTitulo)
+                // Geographic resolution for documents with Provincia + Municipio fields
+                // (CertificadoTitulo, EstadoJuridico, PlanoMensuraCatastral).
+                if (document.TipoDocumento == DocumentType.CertificadoTitulo
+                    || document.TipoDocumento == DocumentType.CertificacionEstadoJuridico
+                    || document.TipoDocumento == DocumentType.PlanoMensuraCatastral)
                 {
                     await ApplyGeographicResolutionAsync(document, cancellationToken);
                 }
@@ -278,8 +281,10 @@ try
                     document.UpdateStatus(DocumentStatus.Processing);
                     _documentStateEngine.ApplyOcrResult(document, ocrResult);
 
-                    // Re-apply geographic resolution for CertificadoTitulo
-                    if (document.TipoDocumento == DocumentType.CertificadoTitulo)
+                    // Re-apply geographic resolution for documents with Provincia + Municipio fields
+                    if (document.TipoDocumento == DocumentType.CertificadoTitulo
+                        || document.TipoDocumento == DocumentType.CertificacionEstadoJuridico
+                        || document.TipoDocumento == DocumentType.PlanoMensuraCatastral)
                     {
                         await ApplyGeographicResolutionAsync(document, cancellationToken);
                     }
@@ -531,11 +536,32 @@ try
                 extraction = extraction with { MunicipalityResolution = municipalityResolution };
             }
 
-            // Persist the updated envelope back into ocrResult.CanonicalDataJson
+            // Persist the updated envelope back into ocrResult.CanonicalDataJson.
+            // PRESERVE the original envelope documentType (CertificadoTitulo, EstadoJuridico,
+            // PlanoMensuraCatastral) — do not hardcode "CertificadoTitulo", otherwise
+            // ProjectDocumentsController.MapToValidationDto will deserialize the payload
+            // as the wrong extraction record and the UI dropdowns (Provincia / Municipio)
+            // will remain empty.
+            string envelopeDocumentType = "CertificadoTitulo";
+            if (!string.IsNullOrEmpty(ocrResult.CanonicalDataJson))
+            {
+                try
+                {
+                    var existingEnvelope = JsonNode.Parse(ocrResult.CanonicalDataJson);
+                    var existingType = existingEnvelope?["documentType"]?.GetValue<string>();
+                    if (!string.IsNullOrWhiteSpace(existingType))
+                        envelopeDocumentType = existingType;
+                }
+                catch
+                {
+                    // keep default if existing envelope is unreadable
+                }
+            }
+
             var envelope = new
             {
                 schemaVersion = "1.0",
-                documentType = "CertificadoTitulo",
+                documentType = envelopeDocumentType,
                 payload = extraction
             };
             ocrResult.CanonicalDataJson = System.Text.Json.JsonSerializer.Serialize(envelope, options);
