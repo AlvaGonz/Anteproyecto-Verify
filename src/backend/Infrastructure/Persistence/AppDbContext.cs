@@ -51,6 +51,12 @@ public class AppDbContext : DbContext
     public DbSet<ProyectoInteresado> ProyectosInteresados => Set<ProyectoInteresado>();
     public DbSet<ProyectoGuardado> ProyectosGuardados => Set<ProyectoGuardado>();
 
+    // External Data
+    public DbSet<LicenciaConstruccion> LicenciasConstruccion => Set<LicenciaConstruccion>();
+
+    // 2FA
+    public DbSet<Verificacion2FA> Verificaciones2FA => Set<Verificacion2FA>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

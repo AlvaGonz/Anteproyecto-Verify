@@ -37,8 +37,12 @@ public static class AppDbContextSeeder
                 contrasenaHash: passwordHasher.HashPassword("AdminVerifinca2026!"),
                 rol: UserRole.Administrator,
                 telefono: "809-555-1000",
-                cedula: "001-1234567-8");
+                cedula: "001-1234567-8",
+                genero: "M",
+                logger: logger);
             adminUser.AsignarPlan(Guid.Parse("99999999-9999-9999-9999-999999999999"));
+            adminUser.UpdateProfileExtension("Calle El Conde 102, Zona Colonial", "Distrito Nacional", "admin_vf");
+            adminUser.UpdateRnc("131-000001-2", "VeriFinca RD SRL", "VeriFinca", "Servicios inmobiliarios");
 
             var freemiumUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -48,9 +52,13 @@ public static class AppDbContextSeeder
                 contrasenaHash: passwordHasher.HashPassword("FreemiumVerifinca2026!"),
                 rol: UserRole.User,
                 telefono: "809-555-2001",
-                cedula: "402-0000001-1");
+                cedula: "402-0000001-1",
+                genero: "F",
+                logger: logger);
             freemiumUser.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
             freemiumUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
+            freemiumUser.UpdateProfileExtension("Av. Independencia 55", "Santo Domingo", "freemium_usr");
+            freemiumUser.UpdateRnc("131-000007-2");
 
             var consultorUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -60,9 +68,13 @@ public static class AppDbContextSeeder
                 contrasenaHash: passwordHasher.HashPassword("ConsultorVerifinca2026!"),
                 rol: UserRole.User,
                 telefono: "809-555-2002",
-                cedula: "402-0000002-1");
+                cedula: "402-0000002-1",
+                genero: "M",
+                logger: logger);
             consultorUser.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2")); // Consultor plan
             consultorUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
+            consultorUser.UpdateProfileExtension("Calle Las Palmas 12, Naco", "Distrito Nacional", "consultor_usr");
+            consultorUser.UpdateRnc("131-000002-3", "Consultoría Legal RD", "Consultoría Legal");
 
             var profesionalUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -72,9 +84,13 @@ public static class AppDbContextSeeder
                 contrasenaHash: passwordHasher.HashPassword("ProfesionalVerifinca2026!"),
                 rol: UserRole.User,
                 telefono: "809-555-2003",
-                cedula: "402-0000003-1");
+                cedula: "402-0000003-1",
+                genero: "M",
+                logger: logger);
             profesionalUser.AsignarPlan(Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"));
             profesionalUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
+            profesionalUser.UpdateProfileExtension("Av. Abraham Lincoln 305", "Distrito Nacional", "profe_usr");
+            profesionalUser.UpdateRnc("131-000003-5", "Arquitectura & Desarrollo Pro", "ArquiPro", "Arquitectura");
 
             var empresaUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -84,9 +100,13 @@ public static class AppDbContextSeeder
                 contrasenaHash: passwordHasher.HashPassword("EmpresaVerifinca2026!"),
                 rol: UserRole.User,
                 telefono: "809-555-2004",
-                cedula: "402-0000004-1");
+                cedula: "402-0000004-1",
+                genero: "F",
+                logger: logger);
             empresaUser.AsignarPlan(Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"));
             empresaUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
+            empresaUser.UpdateProfileExtension("Av. 27 de Febrero 555, Ens. Ozama", "Santo Domingo Este", "empresa_usr");
+            empresaUser.UpdateRnc("131-000004-7", "Constructora del Este SRL", "ConstrEste", "Construcción inmobiliaria");
 
             var corporativoUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -96,9 +116,13 @@ public static class AppDbContextSeeder
                 contrasenaHash: passwordHasher.HashPassword("CorporativoVerifinca2026!"),
                 rol: UserRole.User,
                 telefono: "809-555-2005",
-                cedula: "402-0000005-1");
+                cedula: "402-0000005-1",
+                genero: "M",
+                logger: logger);
             corporativoUser.AsignarPlan(Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"));
             corporativoUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
+            corporativoUser.UpdateProfileExtension("Calle Gustavo Mejía Ricart 88, Piantini", "Distrito Nacional", "corpo_usr");
+            corporativoUser.UpdateRnc("131-000005-9", "Corporación Inmobiliaria RD S.A.", "Corporativo Inmobiliario", "Desarrollo inmobiliario");
 
             await context.SaveChangesAsync();
 
@@ -119,6 +143,10 @@ public static class AppDbContextSeeder
                 context.Usuarios.Add(testUser);
                 context.Entry(testUser).Property("EmailVerificado").CurrentValue = true;
                 context.Entry(testUser).Property("Activo").CurrentValue = true;
+                var testAvatar = GetRandomProfilePhoto("M", logger);
+                if (testAvatar != null) testUser.UpdateAvatarUrl(testAvatar);
+                testUser.UpdateProfileExtension("Calle Test 123, Zona Universitaria", "Distrito Nacional", "test_user");
+                testUser.UpdateRnc("131-000006-0", "Test Developer Solutions", "TestDev", "Testing inmobiliario");
                 testUser.AsignarPlan(Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F")); // Profesional plan
                 testUser.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
                 await context.SaveChangesAsync();
@@ -556,6 +584,63 @@ public static class AppDbContextSeeder
         }
     }
 
+    /// <summary>
+    /// Picks a random profile photo from the seed folder. Returns null gracefully when:
+    /// - The folder doesn't exist at any known path
+    /// - The folder is empty or has no .jpg files
+    /// - A file can't be read (corrupt, permissions, etc.)
+    /// </summary>
+    private static string? GetRandomProfilePhoto(string genero, ILogger? logger = null)
+    {
+        var subfolder = genero == "M" ? "Hombres" : "Mujeres";
+
+        var possiblePaths = new[]
+        {
+            // Published output (Docker): content items maintain relative path from project
+            Path.Combine(AppContext.BaseDirectory, "Persistence", "SeedData", "ProfilePhotos", subfolder),
+            Path.Combine(Directory.GetCurrentDirectory(), "Persistence", "SeedData", "ProfilePhotos", subfolder),
+            // Alternative without Persistence prefix (some publish configs strip it)
+            Path.Combine(AppContext.BaseDirectory, "SeedData", "ProfilePhotos", subfolder),
+            Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "ProfilePhotos", subfolder),
+            // Local dev from the Infrastructure project root
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Infrastructure", "Persistence", "SeedData", "ProfilePhotos", subfolder),
+            Path.Combine(Directory.GetCurrentDirectory(), "Infrastructure", "Persistence", "SeedData", "ProfilePhotos", subfolder),
+        };
+
+        string? resolvedFolder = null;
+        foreach (var p in possiblePaths)
+        {
+            if (Directory.Exists(p)) { resolvedFolder = p; break; }
+        }
+
+        if (resolvedFolder == null)
+        {
+            logger?.LogWarning("ProfilePhotos folder not found for {Genero}. Tried:\n  {Paths}",
+                subfolder, string.Join("\n  ", possiblePaths));
+            return null;
+        }
+
+        var files = Directory.GetFiles(resolvedFolder, "*.jpg");
+        if (files.Length == 0)
+        {
+            logger?.LogWarning("No .jpg files found in {Folder}", resolvedFolder);
+            return null;
+        }
+
+        try
+        {
+            var random = new Random();
+            var selected = files[random.Next(files.Length)];
+            var bytes = File.ReadAllBytes(selected);
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(bytes)}";
+        }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(ex, "Failed to read profile photo from {Folder}", resolvedFolder);
+            return null;
+        }
+    }
+
     private static async Task<Usuario> GetOrCreateUsuarioAsync(
         AppDbContext context,
         string nombre,
@@ -564,7 +649,9 @@ public static class AppDbContextSeeder
         string contrasenaHash,
         UserRole rol,
         string telefono,
-        string cedula)
+        string cedula,
+        string? genero = null,
+        ILogger? logger = null)
     {
         var existing = await context.Usuarios.FirstOrDefaultAsync(u => u.CorreoElectronico == correoElectronico);
         Usuario returnUser;
@@ -578,6 +665,12 @@ public static class AppDbContextSeeder
             context.Entry(existing).Property("ContrasenaHash").CurrentValue = contrasenaHash;
             context.Entry(existing).Property("EmailVerificado").CurrentValue = true;
             context.Entry(existing).Property("Activo").CurrentValue = true;
+
+            if (!string.IsNullOrEmpty(genero) && existing.AvatarUrl == null)
+            {
+                var avatar = GetRandomProfilePhoto(genero, logger);
+                if (avatar != null) existing.UpdateAvatarUrl(avatar);
+            }
             
             await context.SaveChangesAsync();
             returnUser = existing;
@@ -586,6 +679,12 @@ public static class AppDbContextSeeder
         {
             var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
             context.Usuarios.Add(user);
+
+            if (!string.IsNullOrEmpty(genero))
+            {
+                var avatar = GetRandomProfilePhoto(genero, logger);
+                if (avatar != null) user.UpdateAvatarUrl(avatar);
+            }
             
             // Ensure user is marked as verified and active for seeding purposes
             context.Entry(user).Property("EmailVerificado").CurrentValue = true;

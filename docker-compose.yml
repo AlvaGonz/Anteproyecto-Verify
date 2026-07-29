@@ -122,7 +122,7 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
-    command: sh -c "pip install pymssql && python -u Bots/DGII/code/up_DGII.py && python -u generador_entidades_gubernamentales.py"
+    command: sh -c "pip install pymssql openpyxl && python -u Bots/DGII/code/up_DGII.py && python -u 'Bots/Mived Licencias/code/up_Licencias.py' && python -u generador_entidades_gubernamentales.py"
 
   paddleocr-api:
     build:

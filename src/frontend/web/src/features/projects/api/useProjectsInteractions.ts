@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectsApi } from "./projectsApi";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { isSuccess } from "@/shared/utils/functional";
+import { projectKeys } from "./useProjects";
 
 export function useProjectsInteractions() {
   const queryClient = useQueryClient();
@@ -18,6 +19,7 @@ export function useProjectsInteractions() {
       return result.value;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
       queryClient.invalidateQueries({ queryKey: ["projects", "interests"] });
       addToast(
         "El Proyecto ha sido agregado a su seccion de Intereses con exito!",
@@ -68,6 +70,7 @@ export function useProjectsInteractions() {
       return result.value;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
       queryClient.invalidateQueries({ queryKey: ["projects", "saved"] });
       addToast(
         "El Proyecto ha sido agregado a su seccion de Proy. Guardados con exito!",
@@ -93,6 +96,7 @@ export function useProjectsInteractions() {
       return result.value;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
       queryClient.invalidateQueries({ queryKey: ["projects", "saved"] });
       addToast(
         "El Proyecto ha sido removido de su sección de Proy. Guardados.",

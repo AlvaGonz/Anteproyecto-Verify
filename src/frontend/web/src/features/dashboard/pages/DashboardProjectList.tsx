@@ -45,7 +45,7 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = React.m
       <div className="max-w-3xl flex-1 bg-amber-50/70 border border-amber-200/60 rounded-xl px-4 py-2 text-[11px] text-amber-900 leading-snug flex items-center gap-3 shadow-sm font-medium">
         <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
         <div>
-          <span className="font-bold">Aviso de Vigencia:</span> Los documentos y validaciones de estos proyectos tienen una vigencia máxima de 3 meses para fines del sistema. Posteriormente, VeriFinca actualiza periódicamente las bases de datos registrales y fiscales para garantizar la integridad y validez del expediente frente a terceros.
+          <span className="font-bold">Aviso de Vigencia:</span> Los documentos y validaciones de estos proyectos tienen una vigencia máxima de 3 meses para fines del sistema. Posteriormente, VeriFinca actualiza periódicamente las bases de datos registrales y fiscales para garantizar la integridad y validez del expediente frente a terceros.<br /><span className="text-[10px] text-amber-700/70">Última actualización: 15/07/2026</span>
         </div>
       </div>
     </div>

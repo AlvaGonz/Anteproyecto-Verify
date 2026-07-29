@@ -26,7 +26,10 @@ export const useCreateProject = () => {
       }
       return result.value;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: projectKeys.all });
+      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
+    },
   });
 };
 
