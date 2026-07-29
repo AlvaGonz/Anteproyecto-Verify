@@ -74,6 +74,9 @@ namespace UnitTests.Application.Documents.Extractions
         [InlineData("PODER JUDICIAL REPUBLICA DOMINICANA SANTO DOMINGO", "SANTO DOMINGO")]
         [InlineData("PODERJUDICIAL  REPUBLICA  DOMINICANA  LA VEGA", "LA VEGA")]
         [InlineData("PODERJUDICIALREPUBLICA   DOMINICANA   MOCA", "MOCA")]
+        [InlineData("PODER JUDICIALREPUBLICADOMINICANA HIGUEY", "HIGUEY")]
+        [InlineData("PODER JUDICIALREPUBLICADOMINICANA", "")]
+        [InlineData("PODERJUDICIAL  REPUBLICA  DOMINICANA  ", "")]
         public void Normalize_StripsOcrPollutedPoderJudicialHeader_RegardlessOfInternalWhitespace(string input, string expected)
         {
             var result = GeoTextNormalizer.Normalize(input);

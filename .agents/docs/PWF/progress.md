@@ -144,3 +144,8 @@
 - Created a robust JS script to cross-reference extracted SQL Server tables with usage in C# Application/Infrastructure layers (`AppDbContext`, Repositories, Services).
 - Successfully generated `DB_AUDIT_REPORT.md` showing 19 active tables, 21 at-risk tables (partial usage), and 16 orphaned tables.
 - Placed on hold before executing DROP TABLE scripts until human approval is provided per `AGENTS.md` constraints.
+
+## 📄 Completed Tasks (Schema Alignment)
+- Replaced Build-Database-Sql.sql to align with the provided schema in paste.txt.
+- Fixed EmailVerificado default value bug in EF Core Migrations (InitialCreate.cs) which caused failing E2E tests for verification logic.
+- Rebuilt the backend Docker container to apply the corrected schema, passing all 36 E2E tests successfully.

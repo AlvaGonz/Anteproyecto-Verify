@@ -28,10 +28,14 @@ public class VerifyEmailCommandHandler
         
         if (user == null)
         {
+            System.Console.WriteLine($"[DEBUG] VerifyEmail: Token '{request.Token}' NOT FOUND in DB.");
             return new VerifyEmailResultDto(false, "El token de verificación es inválido o no existe.");
         }
+        
+        System.Console.WriteLine($"[DEBUG] VerifyEmail: Found user {user.Id}. EmailVerificado={user.EmailVerificado}, TokenVerificacion='{user.TokenVerificacion}'.");
 
         var isSuccess = user.VerificarEmail(request.Token);
+        System.Console.WriteLine($"[DEBUG] VerifyEmail: user.VerificarEmail() returned {isSuccess}. TokenVerificacion is now '{user.TokenVerificacion}'.");
         
         if (!isSuccess)
         {
@@ -40,6 +44,7 @@ public class VerifyEmailCommandHandler
 
         _usuarioRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        System.Console.WriteLine($"[DEBUG] VerifyEmail: SaveChangesAsync completed.");
 
         // Compute next step based on user's pending plan and subscription status
         // ponytail: centralize routing decision — frontend just navigates where told
