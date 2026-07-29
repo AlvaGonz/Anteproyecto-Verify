@@ -287,6 +287,28 @@ public class DocumentServiceTests
             Assert.False(string.IsNullOrEmpty(ocrResult.CanonicalDataJson));
             var envelope = System.Text.Json.JsonDocument.Parse(ocrResult.CanonicalDataJson);
             Assert.Equal(envelopeType, envelope.RootElement.GetProperty("documentType").GetString());
+
+            // REGRESSION GUARD: the payload must be re-serialized using the same
+            // extraction record type that was set by DocumentStateEngine.ApplyOcrResult.
+            // For PlanoMensuraCatastral uploads the payload must NOT contain
+            // CertificadoTitulo-specific fields (fechaYHoraInscripcion, vieneDe,
+            // matricula, superficieM2) which would mean ApplyGeographicResolutionAsync
+            // collapsed the payload to a CertificadoTituloRdExtractionV1 record.
+            // Otherwise ProjectDocumentsController.MapToValidationDto deserializes
+            // the payload as PlanoMensuraCatastralRdExtractionV1, all the actual
+            // extracted fields (departamento, operacion, designacionCatastralPosicional,
+            // designacionCatastralOrigen, seccion, lugar, superficieARegistrarParcelaM2)
+            // are silently dropped, and the UI shows blank cards for every field.
+            if (documentType == DocumentType.PlanoMensuraCatastral)
+            {
+                var payloadJson = envelope.RootElement.GetProperty("payload").GetRawText();
+                Assert.False(payloadJson.Contains("fechaYHoraInscripcion"),
+                    "Payload was re-serialized with CertificadoTitulo fields instead of PlanoMensuraCatastral fields");
+                Assert.False(payloadJson.Contains("vieneDe"),
+                    "Payload was re-serialized with CertificadoTitulo fields instead of PlanoMensuraCatastral fields");
+                Assert.False(payloadJson.Contains("superficieM2"),
+                    "Payload was re-serialized with CertificadoTitulo fields instead of PlanoMensuraCatastral fields");
+            }
         }
         else
         {

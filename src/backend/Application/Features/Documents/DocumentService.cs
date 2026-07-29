@@ -496,75 +496,47 @@ try
             var ocrResult = System.Text.Json.JsonSerializer.Deserialize<Application.Abstractions.Ocr.OcrResult>(ocrJson, options);
             if (ocrResult == null) return;
 
-            // Extract the existing CertificadoTitulo extraction from CanonicalDataJson (envelope: { payload = extraction })
-            // so we can update ProvinceResolution / MunicipalityResolution while preserving the rest of the OCR data.
-            CertificadoTituloRdExtractionV1? extraction = null;
-            if (!string.IsNullOrEmpty(ocrResult.CanonicalDataJson))
+            if (string.IsNullOrEmpty(ocrResult.CanonicalDataJson)) return;
+
+            // Read the canonical envelope as a generic JSON tree so we never collapse
+            // the payload to the wrong extraction record type. This method is called
+            // for CertificadoTitulo, EstadoJuridico AND PlanoMensuraCatastral; each
+            // type has a different extraction schema, and we must preserve the original
+            // shape of the payload verbatim.
+            JsonNode? envelope;
+            try
             {
-                try
-                {
-                    var root = JsonNode.Parse(ocrResult.CanonicalDataJson);
-                    var payload = root?["payload"];
-                    if (payload != null)
-                    {
-                        var payloadJson = payload.ToJsonString();
-                        extraction = System.Text.Json.JsonSerializer.Deserialize<CertificadoTituloRdExtractionV1>(payloadJson, options);
-                    }
-                }
-                catch
-                {
-                    // Fall through to re-extraction from current ocrResult
-                }
+                envelope = JsonNode.Parse(ocrResult.CanonicalDataJson);
             }
-
-            // If CanonicalDataJson is missing or unreadable, re-run the mapper to restore the extraction.
-            extraction ??= Application.Documents.Extractions.CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
-            if (extraction == null) return;
-
-            // Resolve Provincia
-            if (extraction.Provincia != null && !string.IsNullOrWhiteSpace(extraction.Provincia.RawValue))
+            catch
             {
-                var provinceResolution = await _geoResolutionService.ResolveProvinciaAsync(extraction.Provincia.RawValue, ct);
-                extraction = extraction with { ProvinceResolution = provinceResolution };
+                return;
             }
+            if (envelope == null) return;
 
-            // Resolve Municipio (scoped to resolved province if available)
-            if (extraction.Municipio != null && !string.IsNullOrWhiteSpace(extraction.Municipio.RawValue))
-            {
-                var provinciaId = extraction.ProvinceResolution?.ResolvedId;
-                var municipalityResolution = await _geoResolutionService.ResolveMunicipioAsync(extraction.Municipio.RawValue, provinciaId, ct);
-                extraction = extraction with { MunicipalityResolution = municipalityResolution };
-            }
+            var payload = envelope["payload"] as JsonObject;
+            if (payload == null) return;
 
-            // Persist the updated envelope back into ocrResult.CanonicalDataJson.
-            // PRESERVE the original envelope documentType (CertificadoTitulo, EstadoJuridico,
-            // PlanoMensuraCatastral) — do not hardcode "CertificadoTitulo", otherwise
-            // ProjectDocumentsController.MapToValidationDto will deserialize the payload
-            // as the wrong extraction record and the UI dropdowns (Provincia / Municipio)
-            // will remain empty.
-            string envelopeDocumentType = "CertificadoTitulo";
-            if (!string.IsNullOrEmpty(ocrResult.CanonicalDataJson))
+            // Resolve Provincia (if payload has a "provincia" ExtractedField)
+            var provinciaNode = payload["provincia"] as JsonObject;
+            var provinciaRawValue = provinciaNode?["rawValue"]?.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(provinciaRawValue))
             {
-                try
+                var provinceResolution = await _geoResolutionService.ResolveProvinciaAsync(provinciaRawValue, ct);
+                payload["provinceResolution"] = JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(provinceResolution, options));
+
+                // Resolve Municipio (scoped to resolved province if available)
+                var municipioNode = payload["municipio"] as JsonObject;
+                var municipioRawValue = municipioNode?["rawValue"]?.GetValue<string>();
+                if (!string.IsNullOrWhiteSpace(municipioRawValue))
                 {
-                    var existingEnvelope = JsonNode.Parse(ocrResult.CanonicalDataJson);
-                    var existingType = existingEnvelope?["documentType"]?.GetValue<string>();
-                    if (!string.IsNullOrWhiteSpace(existingType))
-                        envelopeDocumentType = existingType;
-                }
-                catch
-                {
-                    // keep default if existing envelope is unreadable
+                    var provinciaId = provinceResolution.ResolvedId;
+                    var municipalityResolution = await _geoResolutionService.ResolveMunicipioAsync(municipioRawValue, provinciaId, ct);
+                    payload["municipalityResolution"] = JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(municipalityResolution, options));
                 }
             }
 
-            var envelope = new
-            {
-                schemaVersion = "1.0",
-                documentType = envelopeDocumentType,
-                payload = extraction
-            };
-            ocrResult.CanonicalDataJson = System.Text.Json.JsonSerializer.Serialize(envelope, options);
+            ocrResult.CanonicalDataJson = envelope.ToJsonString(options);
 
             // Serialize the FULL OcrResult back so the controller can still recover extractedText / lines
             // and re-run the mapper if needed.
