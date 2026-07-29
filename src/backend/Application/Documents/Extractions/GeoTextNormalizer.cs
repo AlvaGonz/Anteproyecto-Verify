@@ -34,6 +34,14 @@ public static class GeoTextNormalizer
         (@"\bDGO\.\b", "DOMINGO"),
     };
 
+    // OCR-polluted "PODER JUDICIAL ... REPUBLICA DOMINICANA" header.
+    // PaddleOCR concatenates PODER+JUDICIAL+REPUBLICA but leaves a space before DOMINICANA.
+    // Handles forms like "PODERJUDICIALREPUBLICA DOMINICANA", "PODER JUDICIAL REPUBLICA DOMINICANA",
+    // "PODERJUDICIAL  REPUBLICA  DOMINICANA", "PODERJUDICIALREPUBLICA   DOMINICANA   ", etc.
+    private static readonly Regex _poderJudicialNoisePrefix = new(
+        @"^\s*(?:PODER\s*JUDICIAL(?:\s*(?:[:\-]\s*)?REPUBLICA\s*DOMINICANA)?|REPUBLICA\s*DOMINICANA)\s*",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     /// <summary>
     /// Normalizes a raw OCR geographic value to a canonical uppercase ASCII key.
     /// Pipeline: NFC ? uppercase ? strip diacritics ? expand abbreviations ? strip noise prefixes ? collapse whitespace ? trim.
@@ -72,6 +80,16 @@ public static class GeoTextNormalizer
                 result = result.Substring(prefix.Length).TrimStart();
                 break; // apply only the first matching prefix
             }
+        }
+
+        // 5b. Defense-in-depth strip: PaddleOCR-polluted "PODER JUDICIAL ... REPUBLICA DOMINICANA"
+        // header regardless of internal whitespace between the four words. The exact-string
+        // prefix list above only handles fully-concatenated ("PODERJUDICIALREPUBLICADOMINICANA")
+        // or fully-spaced ("PODER JUDICIAL REPUBLICA DOMINICANA") forms. The regex below also
+        // handles the mixed forms PaddleOCR actually emits: "PODERJUDICIALREPUBLICA DOMINICANA".
+        if (_poderJudicialNoisePrefix.IsMatch(result))
+        {
+            result = _poderJudicialNoisePrefix.Replace(result, string.Empty).TrimStart();
         }
 
 // 6. Collapse all whitespace (spaces, tabs, newlines) to single space

@@ -58,6 +58,28 @@ namespace UnitTests.Application.Documents.Extractions
             result.Should().Be(expected);
         }
 
+        // ── RED: real PaddleOCR layout for "Título de Propiedad" produces ────────
+        // ── PODERJUDICIALREPUBLICA DOMINICANA HIGUEY with a space between   ────────
+        // ── REPUBLICA and DOMINICANA (PaddleOCR concatenates PODER+JUDICIAL+  ────────
+        // ── REPUBLICA but leaves a space before DOMINICANA). The current prefix  ────────
+        // ── list "PODERJUDICIALREPUBLICADOMINICANA" (no space) does not match, ────────
+        // ── so the polluted header leaks into the municipio field and breaks  ────────
+        // ── dropdown resolution (the frontend dropdown for municipio stays empty ────────
+        // ── because MatchMunicipio returns ResolvedId=null on "PODERJUDICIALREPUBLICA ────
+        // ── DOMINICANA HIGUEY"). Fix: GeoTextNormalizer must strip the OCR-polluted ────────
+        // ── PODER JUDICIAL header regardless of internal whitespace.           ────────
+        [Theory]
+        [InlineData("PODERJUDICIALREPUBLICA DOMINICANA HIGUEY", "HIGUEY")]
+        [InlineData("PODERJUDICIALREPUBLICA DOMINICANA SANTIAGO", "SANTIAGO")]
+        [InlineData("PODER JUDICIAL REPUBLICA DOMINICANA SANTO DOMINGO", "SANTO DOMINGO")]
+        [InlineData("PODERJUDICIAL  REPUBLICA  DOMINICANA  LA VEGA", "LA VEGA")]
+        [InlineData("PODERJUDICIALREPUBLICA   DOMINICANA   MOCA", "MOCA")]
+        public void Normalize_StripsOcrPollutedPoderJudicialHeader_RegardlessOfInternalWhitespace(string input, string expected)
+        {
+            var result = GeoTextNormalizer.Normalize(input);
+            result.Should().Be(expected);
+        }
+
         [Fact]
         public void Normalize_HandlesMixedNoiseAndAbbreviation()
         {
