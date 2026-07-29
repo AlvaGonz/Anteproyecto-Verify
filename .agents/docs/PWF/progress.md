@@ -45,6 +45,7 @@
 
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - Human action required: confirm schema via MCP before proceeding with EF Core migrations.
+- **[DB Audit]**: `DB_AUDIT_REPORT.md` was generated via custom cross-referencing audit script. 16 tables marked as Orphane/candidates for DROP. **Awaiting explicit human approval (Adrian) before executing any DROP TABLE operations.**
 
 ## 🚫 Known Constraints
 - None
@@ -138,3 +139,8 @@
 - Refactored document extraction UI components (`DocumentExtractionPanel`, `ExtractionFieldCard`) to unify layout and eliminate overlapping text.
 - Added expand/collapse functionality to extraction panels to keep the UI clean (using local `isExpanded` state with `ChevronDown` and `ChevronUp` icons).
 - Validated via `tsc` that TypeScript constraints (`noUnusedLocals`) remain respected.
+
+## 📄 Completed Tasks (Database Audit)
+- Created a robust JS script to cross-reference extracted SQL Server tables with usage in C# Application/Infrastructure layers (`AppDbContext`, Repositories, Services).
+- Successfully generated `DB_AUDIT_REPORT.md` showing 19 active tables, 21 at-risk tables (partial usage), and 16 orphaned tables.
+- Placed on hold before executing DROP TABLE scripts until human approval is provided per `AGENTS.md` constraints.

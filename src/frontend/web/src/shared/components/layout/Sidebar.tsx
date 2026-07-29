@@ -83,19 +83,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         mass: 0.9,
       }}
     >
-      {/* Background decorative glow */}
-      <div
-        className={clsx(
-          "absolute top-0 right-0 bg-primary/5 blur-[100px] rounded-full transition-all duration-700",
-          isCollapsed ? "w-32 h-32 -mr-16 -mt-16" : "w-64 h-64 -mr-32 -mt-32"
-        )}
-      ></div>
-
       {/* Logo Section */}
       <div
         className={clsx(
-          "relative flex flex-col transition-all duration-500",
-          isCollapsed ? "px-3 pt-6 pb-4 items-center" : "px-8 pt-10 pb-8"
+          "relative flex flex-col transition-all duration-500 shrink-0",
+          isCollapsed ? "px-3 pt-6 pb-4 items-center" : "px-8 pt-10 pb-6"
         )}
       >
         <Link
@@ -135,10 +127,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* Navigation Section */}
-      <div className="relative flex-1 flex flex-col py-6">
+      <div className="relative flex-1 min-h-0 flex flex-col py-2 sm:py-4 overflow-hidden">
         <div
           className={clsx(
-            "px-4 mb-4 overflow-hidden transition-all duration-500",
+            "px-4 mb-2 sm:mb-4 overflow-hidden transition-all duration-500 shrink-0",
             isCollapsed ? "opacity-0 h-0" : "opacity-100 h-auto"
           )}
         >
@@ -148,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </div>
 
         <motion.nav
-          className={clsx("space-y-1.5 flex-1", isCollapsed ? "px-2" : "px-4")}
+          className={clsx("flex flex-col gap-1 sm:gap-1.5 flex-1 min-h-0 overflow-hidden justify-center", isCollapsed ? "px-2" : "px-4")}
           initial={shouldReduceMotion ? false : "hidden"}
           animate="visible"
           variants={{
@@ -164,6 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                   hidden: { opacity: 0, x: -12 },
                   visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
                 }}
+                className="shrink"
               >
                 <Link
                   to={item.href}
@@ -173,7 +166,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                     isActive
                       ? "text-white bg-white/10 shadow-inner"
                       : "text-white/50 hover:text-white/80 hover:bg-white/5",
-                    isCollapsed ? "justify-center px-0 py-3.5" : "px-4 py-3.5 text-sm font-bold"
+                    isCollapsed ? "justify-center px-0 py-2.5 sm:py-3.5" : "px-4 py-2.5 sm:py-3.5 text-sm font-bold"
                   )}
                 >
                   {isActive && (
@@ -229,16 +222,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </motion.nav>
 
         {/* Global Action Button */}
-        <div className={clsx("transition-all duration-500", isCollapsed ? "px-2 mt-4" : "mt-8 px-2")}>
+        <div className={clsx("transition-all duration-500 shrink-0", isCollapsed ? "px-2 mt-2 sm:mt-4" : "mt-4 sm:mt-8 px-2")}>
           <Link
             to="/admin/projects/new"
             className={clsx(
               "flex items-center bg-primary hover:bg-primary-hover text-white rounded-2xl font-display font-black text-xs uppercase tracking-widest transition-all shadow-premium hover:shadow-premium-lg group",
-              isCollapsed ? "justify-center py-3.5" : "justify-center gap-3 w-full py-4"
+              isCollapsed ? "justify-center py-2.5 sm:py-3.5" : "justify-center gap-3 w-full py-3 sm:py-4"
             )}
             title="Nuevo Expediente"
           >
-            <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
+            <Plus className="w-5 h-5 transition-transform group-hover:rotate-90 shrink-0" />
             <span
               className={clsx(
                 "overflow-hidden whitespace-nowrap transition-all duration-500",
@@ -253,8 +246,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         {/* Footer Links */}
         <div
           className={clsx(
-            "mt-auto space-y-4 transition-all duration-500",
-            isCollapsed ? "px-2 pb-4" : "px-4 pb-4"
+            "mt-auto space-y-3 transition-all duration-500 shrink-0",
+            isCollapsed ? "px-2 pb-2 sm:pb-4" : "px-4 pb-2 sm:pb-4"
           )}
         >
           <div className={clsx("h-px bg-white/10 transition-all duration-500", isCollapsed ? "mx-0" : "w-full")} />
@@ -279,41 +272,41 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </div>
       </div>
 
-      {/* Collapse Toggle - Desktop only */}
-      <div className="hidden md:block px-4 mt-4">
-        <button
-          type="button"
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className={clsx(
-            "flex items-center w-full text-[10px] font-black text-white/30 hover:text-white transition-all duration-300 rounded-xl hover:bg-white/5",
-            isCollapsed ? "justify-center py-2" : "px-2 py-2 gap-2"
-          )}
-          title={isCollapsed ? "Expandir panel" : "Colapsar panel"}
-        >
-          <ChevronLeft
-            className={clsx(
-              "w-4 h-4 transition-all duration-500",
-              isCollapsed && "rotate-180"
-            )}
-          />
-          <span
-            className={clsx(
-              "overflow-hidden whitespace-nowrap transition-all duration-500 uppercase tracking-widest",
-              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
-            )}
-          >
-            Colapsar
-          </span>
-        </button>
-      </div>
-
-      {/* User Section */}
+      {/* User Section (Persistent Footer) */}
       <div
         className={clsx(
-          "relative transition-all duration-500 bg-white/[0.03] border-t border-white/5",
+          "relative shrink-0 transition-all duration-500 bg-white/[0.03] border-t border-white/5 flex flex-col gap-2",
           isCollapsed ? "p-3" : "p-6"
         )}
       >
+        {/* Collapse Toggle - Desktop only */}
+        <div className="hidden md:block mb-2">
+          <button
+            type="button"
+            onClick={() => setIsCollapsed((prev) => !prev)}
+            className={clsx(
+              "flex items-center w-full text-[10px] font-black text-white/30 hover:text-white transition-all duration-300 rounded-xl hover:bg-white/5",
+              isCollapsed ? "justify-center py-2" : "px-2 py-2 gap-2"
+            )}
+            title={isCollapsed ? "Expandir panel" : "Colapsar panel"}
+          >
+            <ChevronLeft
+              className={clsx(
+                "w-4 h-4 transition-all duration-500",
+                isCollapsed && "rotate-180"
+              )}
+            />
+            <span
+              className={clsx(
+                "overflow-hidden whitespace-nowrap transition-all duration-500 uppercase tracking-widest",
+                isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+              )}
+            >
+              Colapsar
+            </span>
+          </button>
+        </div>
+
         <div
           className={clsx(
             "flex items-center gap-3 hover:bg-white/5 rounded-xl transition-colors cursor-pointer",
@@ -378,8 +371,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           type="button"
           onClick={handleLogout}
           className={clsx(
-            "flex items-center w-full text-[10px] font-black text-white/30 hover:text-red-400 transition-all duration-300 uppercase tracking-widest rounded-xl hover:bg-white/5",
-            isCollapsed ? "justify-center py-2 mt-1" : "px-2 py-2 gap-2 mt-3"
+            "flex items-center w-full text-[10px] font-black text-white/30 hover:text-red-400 transition-all duration-300 uppercase tracking-widest rounded-xl hover:bg-white/5 min-h-[44px]",
+            isCollapsed ? "justify-center mt-1" : "px-3 gap-3 mt-2"
           )}
           title="Cerrar Sesión"
         >

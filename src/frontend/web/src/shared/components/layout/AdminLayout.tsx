@@ -19,7 +19,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   }, [location.pathname]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#FFF8F3]">
+    <div className="flex h-[100dvh] overflow-hidden bg-[#FFF8F3]">
       <DisclaimerModal />
       {/* Mobile sidebar — animated via AnimatePresence */}
       <AnimatePresence>

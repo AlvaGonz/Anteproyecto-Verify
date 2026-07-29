@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 w-full h-16 shrink-0 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-4 sm:px-8">
+    <header className="sticky top-0 z-10 w-full h-16 shrink-0 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-4 sm:px-8">
       <div className="flex items-center gap-4">
         {onMenuClick && (
           <button type="button"
