@@ -4,7 +4,6 @@ import { ProjectStatus } from "../../features/projects/types";
 import {
   FolderKanban,
   CheckCircle2,
-  AlertTriangle,
   MoreVertical,
   Activity,
   FileCheck,
@@ -72,33 +71,6 @@ export const AdminProjectContextMenu: React.FC<AdminProjectContextMenuProps> = (
           </Link>
 
           <div className="my-1 border-t border-gray-100"></div>
-
-          {project.estadoProyecto === ProjectStatus.InReview && (
-            <>
-              <button type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  updateStatus({ id: project.id, status: ProjectStatus.Validated });
-                  onClose();
-                }}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 transition-colors w-full"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                Aprobar (Validado)
-              </button>
-              <button type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  updateStatus({ id: project.id, status: ProjectStatus.Observed });
-                  onClose();
-                }}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 transition-colors w-full"
-              >
-                <AlertTriangle className="w-4 h-4" />
-                Observar
-              </button>
-            </>
-          )}
 
           {project.estadoProyecto === ProjectStatus.Validated && (
             <button type="button"
