@@ -38,14 +38,8 @@ test.describe("Public Directory Filter — E2E", () => {
     { id: "3", nombre: "La Altagracia", latitud: 18.5800, longitud: -68.7200 },
   ];
 
-  async function setupMocks(page: Page, projects = MOCK_PROJECTS) {
-    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(projects),
-      });
-    });
+  async function setupMocks(page: Page) {
+    // Don't register search route here - let each test register its own
     await page.route("**/api/provinces", async (route) => {
       await route.fulfill({
         status: 200,
@@ -65,17 +59,34 @@ test.describe("Public Directory Filter — E2E", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("about:blank");
     await setupMocks(page);
-    await page.goto("/#/projects");
-    await expect(page.getByText("Directorio de Proyectos")).toBeVisible();
   });
 
   test("renders project count and Filtros button", async ({ page }) => {
+    // Register search route
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_PROJECTS),
+      });
+    });
+    await page.goto("/#/projects");
+    await expect(page.getByText("Directorio de Proyectos")).toBeVisible();
     await expect(page.getByText(/4 proyectos publicados/)).toBeVisible();
     const filtrosBtn = page.getByRole("button", { name: /Filtros/i });
     await expect(filtrosBtn).toBeVisible();
   });
 
   test("filter sidebar is visible by default and contains search input", async ({ page }) => {
+    // Register search route
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_PROJECTS),
+      });
+    });
+    await page.goto("/#/projects");
     const searchInput = page.locator('input[placeholder="RNC, Cédula, Nombre..."]');
     await expect(searchInput).toBeVisible();
     await searchInput.fill("Terra");
@@ -83,6 +94,15 @@ test.describe("Public Directory Filter — E2E", () => {
   });
 
   test("province select filters projects", async ({ page }) => {
+    // Register search route
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_PROJECTS),
+      });
+    });
+    await page.goto("/#/projects");
     const select = page.locator("select").first();
     await select.selectOption("Santiago");
     await expect(page.getByText("Torre San Gerónimo")).toBeVisible();
@@ -90,6 +110,15 @@ test.describe("Public Directory Filter — E2E", () => {
   });
 
   test("cumulative type checkboxes filter correctly", async ({ page }) => {
+    // Register search route
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_PROJECTS),
+      });
+    });
+    await page.goto("/#/projects");
     await page.getByText("Comercial").first().click();
     await expect(page.getByText("Torre San Gerónimo")).toBeVisible();
     await expect(page.getByText("Plaza Central Mall")).toBeVisible();
@@ -99,6 +128,15 @@ test.describe("Public Directory Filter — E2E", () => {
   });
 
   test("price range filters projects", async ({ page }) => {
+    // Register search route
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_PROJECTS),
+      });
+    });
+    await page.goto("/#/projects");
     const priceSliders = page.locator('input[type="range"]');
     await priceSliders.first().fill("10000000");
     await expect(page.getByText("Torre San Gerónimo")).toBeVisible();
@@ -106,6 +144,15 @@ test.describe("Public Directory Filter — E2E", () => {
   });
 
 test("clear all filters resets to full list", async ({ page }) => {
+    // Register search route
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_PROJECTS),
+      });
+    });
+    await page.goto("/#/projects");
     await page.locator('input[placeholder="RNC, Cédula, Nombre..."]').fill("NonExistent");
     await expect(page.getByText(/No se encontraron proyectos/)).toBeVisible();
     await page.getByRole("button", { name: /Limpiar filtros/i }).first().click();
@@ -114,6 +161,15 @@ test("clear all filters resets to full list", async ({ page }) => {
   });
 
   test("Filtros button toggles sidebar visibility", async ({ page }) => {
+    // Register search route
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_PROJECTS),
+      });
+    });
+    await page.goto("/#/projects");
     const searchInput = page.locator('input[placeholder="RNC, Cédula, Nombre..."]');
     await expect(searchInput).toBeVisible();
     await page.getByRole("button", { name: /Filtros/i }).click();
@@ -128,8 +184,7 @@ test("clear all filters resets to full list", async ({ page }) => {
       id: `${i + 10}`,
       nombreProyecto: `Proyecto ${i + 1}`,
     }));
-    // Override the route with the larger dataset
-    await page.unroute(/\/api\/public\/projects\/search(\?.*)?$/);
+    // Register search route with larger dataset BEFORE navigation
     await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
       await route.fulfill({
         status: 200,
@@ -139,8 +194,10 @@ test("clear all filters resets to full list", async ({ page }) => {
     });
     await page.goto("/#/projects");
     await expect(page.getByText(/Mostrando/)).toBeVisible();
-    await page.locator('input[type="number"]').first().fill("2");
-    await page.locator('input[type="number"]').first().press("Enter");
-    await expect(page.getByText("Proyecto 21")).toBeVisible();
+    // Use blur to trigger the page change (onBlur handler)
+    const pageInput = page.locator('input[type="number"]').first();
+    await pageInput.fill("2");
+    await pageInput.blur();
+    await expect(page.getByText("Proyecto 21")).toBeVisible({ timeout: 5000 });
   });
 });

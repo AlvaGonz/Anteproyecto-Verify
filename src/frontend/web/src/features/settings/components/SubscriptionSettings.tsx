@@ -307,14 +307,7 @@ export const SubscriptionSettings: React.FC = () => {
                  </button>
                 )}
 
-                {limits.accesoApi && (
-                  <div
-                    data-testid="api-access-section"
-                    className="px-4 py-2 rounded-lg border font-semibold text-sm bg-white text-text-primary inline-flex items-center gap-2"
-                  >
-                    API Access
-                 </div>
-                )}
+                
 
                 <button
                   type="button"

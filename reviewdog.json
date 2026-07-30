@@ -1,0 +1,25 @@
+{
+  "source": {
+    "name": "agent-firewall",
+    "url": ""
+  },
+  "diagnostics": [
+    {
+      "message": "[LOW] PR description too short. Add context for reviewers.",
+      "location": {
+        "path": "PR",
+        "range": {
+          "start": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      },
+      "severity": "INFO",
+      "code": {
+        "value": "DangerPolicy:NoPRBody",
+        "url": "https://owasp.org/www-project-top-ten/"
+      }
+    }
+  ]
+}

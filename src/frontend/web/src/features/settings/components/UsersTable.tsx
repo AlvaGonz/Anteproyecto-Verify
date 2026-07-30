@@ -12,9 +12,10 @@ interface UsersTableProps {
   onEdit: (user: UserSettings) => void;
   onDelete: (userId: string) => void;
   onAddNew: () => void;
+  onRefresh?: () => void;
 }
 
-export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, onDelete, onAddNew }) => {
+export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, onDelete, onAddNew, onRefresh }) => {
   const { addToast } = useToast();
   const updateUserPlanMutation = useUpdateUserPlan();
 
@@ -316,11 +317,18 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
               className="w-full h-10 pl-9 pr-4 bg-gray-50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-[#223382]/20 transition-all outline-none"
             />
           </div>
-          <button type="button" onClick={onAddNew} className="vf-btn-primary flex items-center justify-center gap-2 text-sm px-4 h-10 shrink-0">
+          <div className="flex gap-2">
+          {onRefresh && (
+            <button type="button" onClick={onRefresh} className="vf-btn flex items-center gap-2 bg-white border border-border text-text-secondary hover:text-text-primary hover:bg-surface-raised transition-colors" title="Refrescar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21v-5h5"/></svg>
+            </button>
+          )}
+          <button type="button" onClick={onAddNew} className="vf-btn vf-btn-primary flex items-center justify-center gap-2 text-sm px-4 h-10 shrink-0">
             <Plus className="w-4 h-4" /> Nuevo Usuario
           </button>
         </div>
       </div>
+    </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
         {/* TABS HEADER */}

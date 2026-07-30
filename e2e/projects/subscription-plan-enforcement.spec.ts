@@ -178,23 +178,6 @@ test.describe('Subscription Plan Enforcement E2E', () => {
     await expect(page.locator('[data-testid="export-pdf-btn"]')).not.toBeVisible();
   });
 
-  test('User with Professional plan (accesoApi=true) sees API access section', async ({ page }) => {
-    await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
-
-    await expect(page.locator('[data-testid="api-access-section"]')).toBeVisible();
-    await expect(page.locator('[data-testid="api-access-section"]')).toContainText('API');
-  });
-
-  test('User with Consultor plan (accesoApi=false) does not see API access section', async ({ page }) => {
-    await setupSubscription(page, 'consultor');
-    
-    await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
-
-    await expect(page.locator('[data-testid="api-access-section"]')).not.toBeVisible();
-  });
-
   test('User with Professional plan (presentacionPublica=true) can publish project', async ({ page }) => {
     await page.goto('/#/admin/settings');
     await page.getByRole('button', { name: /suscripci/i }).click();
