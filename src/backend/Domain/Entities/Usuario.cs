@@ -449,7 +449,7 @@ public class Usuario : EntityBase, IEffectivePlanUser
 
     public void Confirm2FAEnrollment(string recoveryCodesHashJson)
     {
-        if (string.IsNullOrWhiteSpace(secretForEnrollment: TwoFactorSecretEncrypted))
+        if (string.IsNullOrWhiteSpace(TwoFactorSecretEncrypted))
             throw new InvalidOperationException("No hay un enrollment pendiente de 2FA.");
         if (TwoFactorEnabled)
             throw new InvalidOperationException("2FA ya está activado.");
