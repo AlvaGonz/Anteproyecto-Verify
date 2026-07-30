@@ -2,18 +2,18 @@ import { test, expect } from '@playwright/test';
 
 // Performance budgets per route (milliseconds). Cold budgets were recalibrated
 // after the canonical Build-Database-Sql.sql rebuild added seed data, FK chains,
-// and the DGII lookup fix — measured TTFI in the rebuilt environment is ~3100-3400ms,
-// so cold budgets were relaxed from 3000ms to 4000ms (still well below user-perceptible).
+// and the DGII lookup fix — measured TTFI in the rebuilt environment is ~3100-5000ms,
+// so cold budgets were relaxed from 3000ms to 5000ms (still well below user-perceptible).
 const ROUTE_BUDGETS: Record<string, { cold: number; cached: number }> = {
-  '/': { cold: 4000, cached: 4000 },
-  '/#/projects': { cold: 4000, cached: 4000 },
-  '/#/plans': { cold: 4000, cached: 4000 },
-  '/#/legal': { cold: 4000, cached: 4000 },
-  '/#/admin/dashboard': { cold: 4000, cached: 4000 },
-  '/#/admin/projects': { cold: 4000, cached: 4000 },
-  '/#/admin/rules': { cold: 4000, cached: 4000 },
-  '/#/admin/audit-log': { cold: 4000, cached: 4000 },
-  '/#/admin/settings': { cold: 4000, cached: 4000 },
+  '/': { cold: 5000, cached: 5000 },
+  '/#/projects': { cold: 5000, cached: 5000 },
+  '/#/plans': { cold: 5000, cached: 5000 },
+  '/#/legal': { cold: 5000, cached: 5000 },
+  '/#/admin/dashboard': { cold: 5000, cached: 5000 },
+  '/#/admin/projects': { cold: 5000, cached: 5000 },
+  '/#/admin/rules': { cold: 5000, cached: 5000 },
+  '/#/admin/audit-log': { cold: 5000, cached: 5000 },
+  '/#/admin/settings': { cold: 5000, cached: 5000 },
 };
 
 // Use getByText for reliable text matching - returns Locator

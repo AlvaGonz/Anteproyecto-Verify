@@ -12,7 +12,7 @@ test.describe('Settings Page - Profile Extension', () => {
           apellido: 'User',
           email: 'test@example.com',
           role: '', aceptoDescargo: true,
-          cedula: '12345678901',
+          cedula: '',
           telefono: '8095551234',
           rnc: '101000000',
           razonSocial: 'Test Company SRL',
@@ -111,7 +111,7 @@ test.describe('Settings Page - Profile Extension', () => {
             apellido: 'User',
             email: 'test@example.com',
             role: '', aceptoDescargo: true,
-            cedula: '12345678901',
+            cedula: '',
             telefono: '8095551234',
             rnc: '101000000',
             razonSocial: 'Test Company SRL',
@@ -164,7 +164,7 @@ test.describe('Settings Page - Profile Extension', () => {
             apellido: 'User',
             email: 'test@example.com',
             role: '', aceptoDescargo: true,
-            cedula: '12345678901',
+            cedula: '',
             telefono: '8095551234',
             rnc: '101000000',
             direccion: '',
@@ -204,7 +204,7 @@ test.describe('Settings Page - Profile Extension', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           id: 'test-user-id', nombre: 'Test', apellido: 'User', email: 'test@example.com',
-          role: '', aceptoDescargo: true, cedula: '12345678901', telefono: '8095551234',
+          role: '', aceptoDescargo: true, cedula: '', telefono: '8095551234',
           rnc: '131000000', razonSocial: 'Verified Company SRL',
           direccion: '', provincia: '', nickname: '',
         })
@@ -256,7 +256,7 @@ test.describe('Settings Page - Profile Extension', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           id: 'test-user-id', nombre: 'Test', apellido: 'User', email: 'test@example.com',
-          role: '', aceptoDescargo: true, cedula: '12345678901', telefono: '8095551234',
+          role: '', aceptoDescargo: true, cedula: '', telefono: '8095551234',
           rnc: null, razonSocial: null,
           direccion: '', provincia: '', nickname: '',
         })

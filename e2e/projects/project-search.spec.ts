@@ -25,6 +25,27 @@ test.describe("Public Project Search E2E Test", () => {
       });
     });
 
+    // Mock the project fetch for the verify page (/projects/verify/{id})
+    // The verify page calls useProject(identifier) which fetches /api/projects/{id}
+    await page.route(/\/api\/projects\/VF-2026-ABC123XYZ(\?.*)?$/, async (route) => {
+      console.log(`[MOCK] Intercepted /api/projects/VF-2026-ABC123XYZ`);
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "VF-2026-ABC123XYZ",
+          codigoInterno: "VF-2026-ABC123XYZ",
+          nombre: "Torre Bella Vista Piantini",
+          ubicacionTexto: "Santo Domingo, RD",
+          categoria: 1,
+          estadoProyecto: 1,
+          estadoIntegridad: 0,
+          usuarioCreadorId: "user-001",
+          createdAtUtc: "2026-01-01T00:00:00Z",
+        }),
+      });
+    });
+
     // This is the public search page
     await page.goto("/#/projects");
     await page.waitForLoadState("networkidle");

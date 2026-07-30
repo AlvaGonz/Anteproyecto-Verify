@@ -105,10 +105,10 @@ test.describe("Public Directory Filter — E2E", () => {
     await expect(page.getByText("Plaza Central Mall")).not.toBeVisible();
   });
 
-  test("clear all filters resets to full list", async ({ page }) => {
+test("clear all filters resets to full list", async ({ page }) => {
     await page.locator('input[placeholder="RNC, Cédula, Nombre..."]').fill("NonExistent");
     await expect(page.getByText(/No se encontraron proyectos/)).toBeVisible();
-    await page.getByRole("button", { name: /Limpiar filtros/i }).click();
+    await page.getByRole("button", { name: /Limpiar filtros/i }).first().click();
     await expect(page.getByText("Residencial Terra Noble")).toBeVisible();
     await expect(page.getByText("Torre San Gerónimo")).toBeVisible();
   });
@@ -128,7 +128,7 @@ test.describe("Public Directory Filter — E2E", () => {
       id: `${i + 10}`,
       nombreProyecto: `Proyecto ${i + 1}`,
     }));
-    await page.route("**/api/public/projects/search", async (route) => {
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -136,7 +136,7 @@ test.describe("Public Directory Filter — E2E", () => {
       });
     });
     await page.goto("/#/projects");
-    await expect(page.getByText(/Página/)).toBeVisible();
+    await expect(page.getByText(/Mostrando/)).toBeVisible();
     await page.locator('input[type="number"]').first().fill("2");
     await page.locator('input[type="number"]').first().press("Enter");
     await expect(page.getByText("Proyecto 21")).toBeVisible();

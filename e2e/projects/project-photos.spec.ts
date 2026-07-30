@@ -90,7 +90,7 @@ test.describe("Renderizado de Fotos de Proyecto — E2E con Mock", () => {
     });
 
     // 2. Default projects mock list
-    await page.route("**/api/projects", async (route) => {
+    await page.route(/\/api\/projects(\?.*)?$/, async (route) => {
       if (route.request().method() === "GET") {
         await route.fulfill({
           status: 200,
