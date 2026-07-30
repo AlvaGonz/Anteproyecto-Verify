@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { 
-  PlanoMensuraCatastralRdExtractionV1, 
-  ExtractionStatus, 
-  FieldStatus, 
-  ExtractedField 
+import {
+  PlanoMensuraCatastralRdExtractionV1,
+  ExtractionStatus,
+  FieldStatus,
+  ExtractedField
 } from "../types";
 import { ResolutionAction } from "../schemas/planoMensura.schema";
 import { Loader2 } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const matchesCatalogId = (value: string | null | undefined, options: Array<{ id: string }>): string | null => {
+  if (!value || !UUID_REGEX.test(value)) return null;
+  return options.some(o => o.id === value) ? value : null;
+};
 
 interface PlanoMensuraExtractionCardProps {
   extraction: PlanoMensuraCatastralRdExtractionV1;
@@ -48,13 +55,16 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       try {
         const response = await fetch('/api/geo/provincias');
         if (!response.ok) throw new Error('Failed to fetch provinces');
-        const data = await response.json();
+        const data: Province[] = await response.json();
         setProvinces(data);
-        
-        // If there's a province resolution, select it
-        if (extraction.provinceResolution?.resolvedId) {
-          setSelectedProvinceId(extraction.provinceResolution.resolvedId);
-        }
+
+        // Prefer OCR-derived provinceResolution; fall back to the persisted
+        // normalizedValue (where DocumentService.UpdateDocumentFieldReviewAsync
+        // stores user-selected UUIDs) so dropdowns rehydrate across reloads
+        // even when the OCR pipeline could not resolve provincia/municipio.
+        const resolvedFromOcr = extraction.provinceResolution?.resolvedId ?? null;
+        const resolvedFromNormalized = matchesCatalogId(extraction.provincia?.normalizedValue, data);
+        setSelectedProvinceId(resolvedFromOcr ?? resolvedFromNormalized);
       } catch (error) {
         setProvinceError('Error al cargar provincias');
         console.error('Error fetching provinces:', error);
@@ -63,7 +73,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       }
     };
     fetchProvinces();
-  }, [extraction.provinceResolution?.resolvedId]);
+  }, [extraction.provinceResolution?.resolvedId, extraction.provincia?.normalizedValue]);
 
   // Fetch municipalities when province is selected
   useEffect(() => {
@@ -79,13 +89,12 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       try {
         const response = await fetch(`/api/geo/municipios?provinciaId=${selectedProvinceId}`);
         if (!response.ok) throw new Error('Failed to fetch municipalities');
-        const data = await response.json();
+        const data: Municipality[] = await response.json();
         setMunicipalities(data);
-        
-        // If there's a municipality resolution, select it
-        if (extraction.municipalityResolution?.resolvedId) {
-          setSelectedMunicipalityId(extraction.municipalityResolution.resolvedId);
-        }
+
+        const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
+        const resolvedFromNormalized = matchesCatalogId(extraction.municipio?.normalizedValue, data);
+        setSelectedMunicipalityId(resolvedFromOcr ?? resolvedFromNormalized);
       } catch (error) {
         setMunicipalityError('Error al cargar municipios');
         console.error('Error fetching municipalities:', error);
@@ -94,7 +103,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       }
     };
     fetchMunicipalities();
-  }, [selectedProvinceId, extraction.municipalityResolution?.resolvedId]);
+  }, [selectedProvinceId, extraction.municipalityResolution?.resolvedId, extraction.municipio?.normalizedValue]);
 
   // Auto-emit suggestion when resolution is ready and action is AutoApply
   useEffect(() => {
@@ -141,10 +150,17 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     const value = e.target.value;
     setSelectedProvinceId(value || null);
     setSelectedMunicipalityId(null); // Reset municipality when province changes
+    if (value && onEditField) {
+      void onEditField('provincia', value);
+    }
   };
 
   const handleMunicipalityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMunicipalityId(e.target.value || null);
+    const value = e.target.value;
+    setSelectedMunicipalityId(value || null);
+    if (value && onEditField) {
+      void onEditField('municipio', value);
+    }
   };
 
   const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string) => {
