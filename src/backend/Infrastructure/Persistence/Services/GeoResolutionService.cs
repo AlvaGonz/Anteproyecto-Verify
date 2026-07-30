@@ -29,6 +29,33 @@ public class GeoResolutionService : IGeoResolutionService
         return GeoToleranceMatcher.MatchProvincia(rawOcrValue, catalog);
     }
 
+    public async Task<GeographicResolutionResult> ResolveProvinciaFromTextAsync(
+        string ocrText, CancellationToken ct = default)
+    {
+        var catalog = await LoadCatalogAsync("SELECT IdProvincia, NombreProvincia FROM Provincia ORDER BY NombreProvincia", null, ct);
+        return GeoToleranceMatcher.MatchProvinciaFromText(ocrText, catalog);
+    }
+
+    public async Task<GeographicResolutionResult> ResolveMunicipioFromTextAsync(
+        string ocrText,
+        Guid? resolvedProvinciaId,
+        CancellationToken ct = default)
+    {
+        string sql;
+        object? param = null;
+        if (resolvedProvinciaId.HasValue)
+        {
+            sql = "SELECT IdMunicipio, NombreMunicipio FROM Municipio WHERE IdProvincia = @p0 ORDER BY NombreMunicipio";
+            param = resolvedProvinciaId.Value;
+        }
+        else
+        {
+            sql = "SELECT IdMunicipio, NombreMunicipio FROM Municipio ORDER BY NombreMunicipio";
+        }
+        var catalog = await LoadCatalogAsync(sql, param, ct);
+        return GeoToleranceMatcher.MatchProvinciaFromText(ocrText, catalog);
+    }
+
     public async Task<GeographicResolutionResult> ResolveMunicipioAsync(
         string rawOcrValue, Guid? resolvedProvinciaId, CancellationToken ct = default)
     {

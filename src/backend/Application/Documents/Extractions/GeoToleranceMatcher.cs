@@ -112,7 +112,7 @@ public static class GeoToleranceMatcher
     /// <summary>
     /// Province-scoped municipality matcher.
     /// resolvedProvinciaId is used to scope the catalog; pass Guid.Empty to skip province filter.
-    /// </summary>
+    ///</summary>
     public static GeographicResolutionResult MatchMunicipio(
         string rawInput,
         IReadOnlyList<(Guid Id, string Name)> catalog,
@@ -121,6 +121,101 @@ public static class GeoToleranceMatcher
         // ponytail: reuse MatchProvincia logic � catalog is already filtered by caller
         // Province-scope filtering is performed by GeoResolutionService before calling this method
         return MatchProvincia(rawInput, catalog);
+    }
+
+    /// <summary>
+    /// Scans full OCR text (or any block of tokens) for any 1-3 token window that matches
+    /// a catalog entry. Used as a fallback when the per-field rawValue is empty/missing
+    /// (e.g. PDFs without explicit "PROVINCIA:" / "MUNICIPIO:" labels).
+    /// Returns the BEST (highest confidence) resolution across all candidates.
+    ///</summary>
+    public static GeographicResolutionResult MatchProvinciaFromText(
+        string ocrText,
+        IReadOnlyList<(Guid Id, string Name)> catalog)
+    {
+        if (string.IsNullOrWhiteSpace(ocrText) || catalog == null || catalog.Count == 0)
+            return GeographicResolutionResult.Unresolved(string.Empty, string.Empty);
+
+        // Candidate length windows that DR province/municipio names fall within:
+        // e.g. "SAN CRISTOBAL" (12), "LA ALTAGRACIA" (12), "HIGUEY" (6), "LA VEGA" (7)
+        const int MinTokens = 1;
+        const int MaxTokens = 4;
+        // Hard-cap total candidates per call so pathological OCRs don't OOM the matcher
+        const int MaxCandidates = 256;
+
+        var tokens = TokenizeForScan(ocrText);
+        if (tokens.Count == 0)
+            return GeographicResolutionResult.Unresolved(string.Empty, string.Empty);
+
+        var candidates = new List<string>(Math.Min(MaxCandidates, tokens.Count * 2));
+        for (var start = 0; start < tokens.Count && candidates.Count < MaxCandidates; start++)
+        {
+            for (var len = MinTokens; len <= MaxTokens && start + len <= tokens.Count; len++)
+            {
+                if (candidates.Count >= MaxCandidates) break;
+                var candidate = string.Join(' ', tokens.GetRange(start, len));
+                // Filter: skip empty / pure-numeric / single-char noise
+                if (candidate.Length < 4) continue;
+                if (IsAllDigits(candidate)) continue;
+                candidates.Add(candidate);
+            }
+        }
+
+        var best = GeographicResolutionResult.Unresolved(string.Empty, string.Empty);
+        var bestScore = 0.0;
+
+        foreach (var candidate in candidates)
+        {
+            // Skip exact pre-filter: skip if normalized candidate has length < 3
+            var normalizedCandidate = GeoTextNormalizer.Normalize(candidate);
+            if (normalizedCandidate.Length < 3) continue;
+
+            var result = MatchProvincia(candidate, catalog);
+            if (result.ResolvedId != null
+                && (result.Confidence > bestScore
+                    || (result.Confidence == bestScore
+                        && (best.ResolvedId == null || result.ResolvedId != best.ResolvedId))))
+            {
+                best = result;
+                bestScore = result.Confidence;
+            }
+        }
+
+        // Only return a non-unresolved result if we found something
+        if (best.ResolvedId == null)
+            return GeographicResolutionResult.Unresolved(string.Empty, string.Empty);
+
+        return best;
+    }
+
+    private static List<string> TokenizeForScan(string text)
+    {
+        // Split on whitespace and basic punctuation; keep alphabetic/digit runs.
+        // Strips noise like ":", ",", "_" that PaddleOCR inserts between field parts.
+        var tokens = new List<string>();
+        var current = new System.Text.StringBuilder();
+        foreach (var ch in text)
+        {
+            if (char.IsLetterOrDigit(ch))
+                current.Append(ch);
+            else
+            {
+                if (current.Length > 0)
+                {
+                    tokens.Add(current.ToString());
+                    current.Clear();
+                }
+            }
+        }
+        if (current.Length > 0)
+            tokens.Add(current.ToString());
+        return tokens;
+    }
+
+    private static bool IsAllDigits(string s)
+    {
+        foreach (var c in s) if (!char.IsDigit(c)) return false;
+        return s.Length > 0;
     }
 
     // -- Jaro-Winkler distance ---------------------------------------------------
