@@ -45,8 +45,8 @@ public class StripeService : IStripeService
         string priceId,
         CancellationToken ct = default)
     {
-        var _customers = new CustomerService();
-        var _subscriptions = new SubscriptionService();
+        var _customers = new Stripe.CustomerService();
+        var _subscriptions = new Stripe.SubscriptionService();
         
         // Crear Customer
         var customer = await _customers.CreateAsync(new CustomerCreateOptions
@@ -70,8 +70,7 @@ public class StripeService : IStripeService
         return new StripeSubscriptionResult(
             customer.Id,
             subscription.Id,
-            DateTimeOffset.FromUnixTimeSeconds(
-                subscription.CurrentPeriodEnd.ToUnixTimeSeconds()).UtcDateTime
+            subscription.Items?.Data?.FirstOrDefault()?.CurrentPeriodEnd ?? DateTime.UtcNow.AddMonths(1)
         );
     }
 }
