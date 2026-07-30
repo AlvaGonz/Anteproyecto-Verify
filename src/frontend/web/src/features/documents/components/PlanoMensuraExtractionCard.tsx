@@ -11,10 +11,33 @@ import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const norm = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-const matchesCatalogId = (value: string | null | undefined, options: Array<{ id: string }>): string | null => {
-  if (!value || !UUID_REGEX.test(value)) return null;
-  return options.some(o => o.id === value) ? value : null;
+const matchesCatalogId = (value: string | null | undefined, options: Array<{ id: string; nombre: string }>): string | null => {
+  if (!value) return null;
+  // ponytail: 1-char OCR noise tolerance (e.g. "CONCEPCION DE LA VEGS" -> "Concepcion de La Vega").
+  // Upgrade path: server-side fuzzy via GeoToleranceMatcher when an HTTP endpoint exists.
+  if (UUID_REGEX.test(value)) {
+    return options.some(o => o.id === value) ? value : null;
+  }
+  const target = norm(value);
+  const match = options.find(o => {
+    const n = norm(o.nombre);
+    if (n === target) return true;
+    if (Math.abs(n.length - target.length) <= 1) {
+      let diffs = 0;
+      const len = Math.min(n.length, target.length);
+      for (let i = 0; i < len; i++) {
+        if (n[i] !== target[i]) {
+          diffs++;
+          if (diffs > 1) return false;
+        }
+      }
+      return diffs <= 1;
+    }
+    return false;
+  });
+  return match?.id ?? null;
 };
 
 interface PlanoMensuraExtractionCardProps {
@@ -75,35 +98,65 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     fetchProvinces();
   }, [extraction.provinceResolution?.resolvedId, extraction.provincia?.normalizedValue]);
 
-  // Fetch municipalities when province is selected
+  // Fetch municipalities: scoped to selectedProvinceId when known, otherwise
+  // load the whole catalog if municipio data exists (orphan municipio case:
+  // OCR picked up "MUNICIPIO: ..." but could not find the PROVINCIA label).
   useEffect(() => {
-    if (!selectedProvinceId) {
-      setMunicipalities([]);
-      setSelectedMunicipalityId(null);
+    const municipioData =
+      extraction.municipio?.rawValue || extraction.municipalityResolution?.resolvedId || extraction.municipio?.normalizedValue;
+
+    if (selectedProvinceId) {
+      const fetchMunicipalities = async () => {
+        setLoadingMunicipalities(true);
+        setMunicipalityError(null);
+        try {
+          const response = await fetch(`/api/geo/municipios?provinciaId=${selectedProvinceId}`);
+          if (!response.ok) throw new Error('Failed to fetch municipalities');
+          const data: Municipality[] = await response.json();
+          setMunicipalities(data);
+
+          const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
+          const resolvedFromNormalized = matchesCatalogId(extraction.municipio?.normalizedValue, data);
+          setSelectedMunicipalityId(resolvedFromOcr ?? resolvedFromNormalized);
+        } catch (error) {
+          setMunicipalityError('Error al cargar municipios');
+          console.error('Error fetching municipalities:', error);
+        } finally {
+          setLoadingMunicipalities(false);
+        }
+      };
+      fetchMunicipalities();
       return;
     }
 
-    const fetchMunicipalities = async () => {
-      setLoadingMunicipalities(true);
-      setMunicipalityError(null);
-      try {
-        const response = await fetch(`/api/geo/municipios?provinciaId=${selectedProvinceId}`);
-        if (!response.ok) throw new Error('Failed to fetch municipalities');
-        const data: Municipality[] = await response.json();
-        setMunicipalities(data);
+    if (municipioData) {
+      const fetchAllMunicipalities = async () => {
+        setLoadingMunicipalities(true);
+        setMunicipalityError(null);
+        try {
+          const response = await fetch('/api/geo/municipios');
+          if (!response.ok) throw new Error('Failed to fetch municipalities');
+          const data: Municipality[] = await response.json();
+          setMunicipalities(data);
 
-        const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
-        const resolvedFromNormalized = matchesCatalogId(extraction.municipio?.normalizedValue, data);
-        setSelectedMunicipalityId(resolvedFromOcr ?? resolvedFromNormalized);
-      } catch (error) {
-        setMunicipalityError('Error al cargar municipios');
-        console.error('Error fetching municipalities:', error);
-      } finally {
-        setLoadingMunicipalities(false);
-      }
-    };
-    fetchMunicipalities();
-  }, [selectedProvinceId, extraction.municipalityResolution?.resolvedId, extraction.municipio?.normalizedValue]);
+          const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
+          const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
+          const resolvedFromNormalized = matchesCatalogId(extraction.municipio?.normalizedValue, data);
+          setSelectedMunicipalityId(resolvedFromOcr ?? resolvedFromNormalized ?? resolvedFromRaw);
+        } catch (error) {
+          setMunicipalityError('Error al cargar municipios');
+          console.error('Error fetching municipalities:', error);
+        } finally {
+          setLoadingMunicipalities(false);
+        }
+      };
+      fetchAllMunicipalities();
+      return;
+    }
+
+    setMunicipalities([]);
+    setSelectedMunicipalityId(null);
+  }, [selectedProvinceId, extraction.municipalityResolution?.resolvedId, extraction.municipio?.normalizedValue, extraction.municipio?.rawValue]);
 
   // Auto-emit suggestion when resolution is ready and action is AutoApply
   useEffect(() => {
@@ -180,7 +233,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       const errorMsg = isProvincia ? provinceError : municipalityError;
       const options = isProvincia ? provinces : municipalities;
       const onChange = isProvincia ? handleProvinceChange : handleMunicipalityChange;
-      const disabled = isSaving || loading || (!isProvincia && !selectedProvinceId);
+      const disabled = isSaving || loading || (!isProvincia && options.length === 0);
       const defaultOptionText = isProvincia ? "-- Seleccionar Provincia --" : "-- Seleccionar Municipio --";
       
       return (
