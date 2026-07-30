@@ -6,8 +6,8 @@ test.describe('Admin crea usuario con suscripción Stripe', () => {
     // Auth como admin
     const loginRes = await request.post('/api/auth/login', {
       data: {
-        email: process.env.ADMIN_TEST_EMAIL,
-        password: process.env.ADMIN_TEST_PASSWORD
+        email: process.env.ADMIN_TEST_EMAIL || 'admin@verifinca.do',
+        password: process.env.ADMIN_TEST_PASSWORD || 'AdminVerifinca2026!'
       }
     });
     expect(loginRes.status()).toBe(200);
@@ -34,6 +34,7 @@ test.describe('Admin crea usuario con suscripción Stripe', () => {
     // To check the db state, we might need to query the user, or rely on the response
     // SettingsController returns { Message, Id }
     const body = await createRes.json();
+    console.log(body);
     expect(body.id).toBeDefined();
     
     // The instructions say: "expect(body.stripeCustomerId).toMatch(/^cus_/)"

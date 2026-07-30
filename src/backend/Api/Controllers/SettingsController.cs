@@ -232,11 +232,11 @@ public class SettingsController : ControllerBase
                 {
                     user.AsignarPlan(plan.Idsuscripcion);
                     // PriceId would usually come from Plan, but we use fallback if not available
-                    priceId = _config["Stripe:DefaultPriceId"];
+                    priceId = _config["Stripe:Prices:ProfesionalMonthly"];
                 }
             }
             
-            priceId ??= _config["Stripe:DefaultPriceId"];
+            priceId ??= _config["Stripe:Prices:ProfesionalMonthly"];
 
             // Si Stripe está habilitado, creamos el customer
             if (!string.IsNullOrWhiteSpace(priceId))
