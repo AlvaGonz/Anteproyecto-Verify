@@ -63,5 +63,14 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .WithMany(u => u.MiembrosEquipo)
             .HasForeignKey(u => u.TitularId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Two-Factor Authentication columns (additive migration)
+        builder.Property(u => u.TwoFactorEnabled).IsRequired().HasDefaultValue(false);
+        builder.Property(u => u.TwoFactorSecretEncrypted).HasMaxLength(500).IsRequired(false);
+        builder.Property(u => u.RecoveryCodesHashJson).HasMaxLength(2000).IsRequired(false);
+        builder.Property(u => u.Failed2FAAttempts).IsRequired().HasDefaultValue(0);
+        builder.Property(u => u.Lockout2FAUntilUtc).IsRequired(false);
+        builder.Property(u => u.Last2FAVerifiedUtc).IsRequired(false);
+        builder.Property(u => u.EmailOtpLastSentUtc).IsRequired(false);
     }
 }

@@ -401,4 +401,117 @@ public class Usuario : EntityBase, IEffectivePlanUser
         EmailVerificado = true; // Google verifies the email
         UpdatedAtUtc = DateTime.UtcNow;
     }
+
+    // ── Two-Factor Authentication (TOTP + Recovery Codes) ──
+
+    public bool TwoFactorEnabled { get; private set; }
+    public string? TwoFactorSecretEncrypted { get; private set; }
+    public string? RecoveryCodesHashJson { get; private set; }
+    public int Failed2FAAttempts { get; private set; }
+    public DateTime? Lockout2FAUntilUtc { get; private set; }
+    public DateTime? Last2FAVerifiedUtc { get; private set; }
+    public DateTime? EmailOtpLastSentUtc { get; private set; }
+
+    public const int TwoFactorMaxFailedAttempts = 5;
+    public static readonly TimeSpan TwoFactorLockoutDuration = TimeSpan.FromMinutes(5);
+
+    public bool Is2FALockedOut
+    {
+        get
+        {
+            if (!Lockout2FAUntilUtc.HasValue) return false;
+            if (DateTime.UtcNow >= Lockout2FAUntilUtc.Value)
+            {
+                Lockout2FAUntilUtc = null;
+                Failed2FAAttempts = 0;
+                return false;
+            }
+            return true;
+        }
+    }
+
+    public DateTime? Lockout2FARemaining => Is2FALockedOut ? Lockout2FAUntilUtc : null;
+
+    public void Begin2FAEnrollment(string secretEncrypted)
+    {
+        if (string.IsNullOrWhiteSpace(secretEncrypted))
+            throw new ArgumentException("Secret requerido para activar 2FA.", nameof(secretEncrypted));
+        if (TwoFactorEnabled)
+            throw new InvalidOperationException("2FA ya está activado.");
+
+        TwoFactorSecretEncrypted = secretEncrypted;
+        RecoveryCodesHashJson = null;
+        Failed2FAAttempts = 0;
+        Lockout2FAUntilUtc = null;
+        EmailOtpLastSentUtc = null;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void Confirm2FAEnrollment(string recoveryCodesHashJson)
+    {
+        if (string.IsNullOrWhiteSpace(secretForEnrollment: TwoFactorSecretEncrypted))
+            throw new InvalidOperationException("No hay un enrollment pendiente de 2FA.");
+        if (TwoFactorEnabled)
+            throw new InvalidOperationException("2FA ya está activado.");
+        if (string.IsNullOrWhiteSpace(recoveryCodesHashJson))
+            throw new ArgumentException("Recovery codes requeridos.", nameof(recoveryCodesHashJson));
+
+        TwoFactorEnabled = true;
+        RecoveryCodesHashJson = recoveryCodesHashJson;
+        Failed2FAAttempts = 0;
+        Lockout2FAUntilUtc = null;
+        Last2FAVerifiedUtc = DateTime.UtcNow;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void Register2FASuccess()
+    {
+        Failed2FAAttempts = 0;
+        Lockout2FAUntilUtc = null;
+        Last2FAVerifiedUtc = DateTime.UtcNow;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void Register2FAFailure()
+    {
+        Failed2FAAttempts++;
+        if (Failed2FAAttempts >= TwoFactorMaxFailedAttempts)
+        {
+            Lockout2FAUntilUtc = DateTime.UtcNow.Add(TwoFactorLockoutDuration);
+        }
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void Disable2FA()
+    {
+        if (!TwoFactorEnabled)
+            throw new InvalidOperationException("2FA no está activado.");
+        TwoFactorEnabled = false;
+        TwoFactorSecretEncrypted = null;
+        RecoveryCodesHashJson = null;
+        Failed2FAAttempts = 0;
+        Lockout2FAUntilUtc = null;
+        Last2FAVerifiedUtc = null;
+        EmailOtpLastSentUtc = null;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void ReplaceRecoveryCodes(string newRecoveryCodesHashJson)
+    {
+        if (!TwoFactorEnabled)
+            throw new InvalidOperationException("2FA debe estar activado para regenerar códigos.");
+        if (string.IsNullOrWhiteSpace(newRecoveryCodesHashJson))
+            throw new ArgumentException("Recovery codes requeridos.", nameof(newRecoveryCodesHashJson));
+        RecoveryCodesHashJson = newRecoveryCodesHashJson;
+        Failed2FAAttempts = 0;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void MarkEmailOtpSent()
+    {
+        EmailOtpLastSentUtc = DateTime.UtcNow;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    private string? secretForEnrollment => TwoFactorSecretEncrypted;
 }
