@@ -149,3 +149,17 @@
 - Replaced Build-Database-Sql.sql to align with the provided schema in paste.txt.
 - Fixed EmailVerificado default value bug in EF Core Migrations (InitialCreate.cs) which caused failing E2E tests for verification logic.
 - Rebuilt the backend Docker container to apply the corrected schema, passing all 36 E2E tests successfully.
+
+## 📄 Completed Task: Plano de Mensura — Full-Text Fallback for Label-Less PDFs (2026-07-30)
+- **Bug**: `PLANO 505483687149.pdf` and `PLANO RP 60.pdf` produced `departamento=ESTE` but `provincia.rawValue`, `municipio.rawValue`, `lugar.rawValue` were all empty — the dropdowns never populated because the OCR mapper requires the literal `PROVINCIA:` / `MUNICIPIO:` label and these PDFs emit `AAALTAGRACIA` (PaddleOCR corruption: extra leading `A`, space removed) with no label.
+- **Root cause**: `PlanoMensuraCatastralRdPaddleMapper.ExtractField` Layer 1+2 needs `PROVINCIA` regex hit on a line; Layer 3 fallback requires the same label in `fullText`. Both fail when the label is missing.
+- **GREEN fix** (commit `da840f4b` on `feature/stripe-admin-subscription`):
+  1. Added `GeoToleranceMatcher.MatchProvinciaFromText(ocrText, catalog)` — tokenizes the OCR text into alphabetic/digit runs, builds 1-4 token windows (max 256 candidates), runs each through the existing 3-tier `exact`/`alias`/`fuzzy` pipeline, returns the best resolution.
+  2. Extended `IGeoResolutionService` + `GeoResolutionService` with `ResolveProvinciaFromTextAsync` and `ResolveMunicipioFromTextAsync` (the latter scoped to the resolved provincia).
+  3. `DocumentService.ApplyGeographicResolutionAsync` now calls the full-text fallback when per-field `rawValue` is empty/missing — both for provincia and municipio.
+  4. Added `AAALTAGRACIA` alias (and `AA ALTAGRACIA`) in `ProvinciaAliasRegistry` for the observed PaddleOCR corruption pattern (the alias alone would not have been enough: Jaro-Winkler scores `AAALTAGRACIA` vs `LA ALTAGRACIA` at 0.785 which is below the 0.80 Review threshold, so it needed explicit alias mapping).
+- **Unrelated build break fixed** (commit `9d6582a1`): removed invalid named argument `secretForEnrollment:` in `Domain/Entities/Usuario.cs:452` introduced by the recent 2FA commit — `IsNullOrWhiteSpace` takes a single positional parameter, the named arg broke the entire Domain build. Also added missing 2FA columns to `Usuario` table (`TwoFactorEnabled`, `TwoFactorSecretEncrypted`, `RecoveryCodesHashJson`, `Failed2FAAttempts`, `Lockout2FAUntilUtc`, `Last2FAVerifiedUtc`, `EmailOtpLastSentUtc`) via direct ALTER TABLE — the migration `20260729021120_AddLicenciaConstruccionAndVerificacion2FA` was recorded in `__EFMigrationsHistory` but never actually applied the column adds.
+- **Tests**:
+  - RED spec `e2e/projects/plano-mensura-label-less-fallback.spec.ts` — real PDF upload of `PLANO 505483687149.pdf`, polls API until `provinceResolution.resolvedName === 'La Altagracia'` with `suggestedAction === AutoApply (0)`, asserts UI dropdown enabled + pre-selected to the La Altagracia UUID + has 'La Altagracia' option.
+  - Verified: **94/94** `e2e/projects/**` tests pass serially in 8.8m. New spec + orphan-municipio + dropdown-hydrate + plano-mensura-dropdown-regression + titulo-dropdown-regression + estado-juridico-dropdown-regression all green. Parallel runs occasionally flake on isolation but every test passes when run alone or in `--workers=1`.
+- **Status**: **Complete**.
