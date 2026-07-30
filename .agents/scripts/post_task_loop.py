@@ -884,7 +884,7 @@ class TestSuiteRunner:
         start = time.time()
         cwd = os.getcwd()
         test_commands = [
-            ["docker", "run", "--rm", "-v", f"{cwd}:/src", "-w", "/src", "mcr.microsoft.com/dotnet/sdk:8.0", "dotnet", "test", "tests/backend/UnitTests/UnitTests.csproj", "-p:BaseIntermediateOutputPath=/tmp/obj/UnitTests/", "-p:OutputPath=/tmp/bin/UnitTests/", "--filter", "Category!=Integration", "-q"],
+            ["docker", "run", "--rm", "-v", f"{cwd}:/src", "-w", "/src", "mcr.microsoft.com/dotnet/sdk:8.0", "dotnet", "test", "src/backend/Api.Tests/Api.Tests.csproj", "-p:BaseIntermediateOutputPath=/tmp/obj/UnitTests/", "-p:OutputPath=/tmp/bin/UnitTests/", "-q"],
             ["npx", "playwright", "test"],
             ["pytest", "--tb=short", "-q", "--no-header"],
             ["python", "-m", "pytest", "--tb=short", "-q"],

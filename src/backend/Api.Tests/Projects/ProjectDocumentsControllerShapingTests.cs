@@ -22,7 +22,7 @@ namespace Api.Tests.Projects
         {
             // Arrange
             var mockDocumentService = Substitute.For<IDocumentService>();
-            var mockDiagnosisHandler = Substitute.For<GetDocumentDiagnosisQueryHandler>(null, null, null);
+            GetDocumentDiagnosisQueryHandler mockDiagnosisHandler = null!;
             var mockConfig = Substitute.For<IConfiguration>();
 
             var controller = new ProjectDocumentsController(
