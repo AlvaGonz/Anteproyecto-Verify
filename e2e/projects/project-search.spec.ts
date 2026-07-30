@@ -14,12 +14,29 @@ test.describe("Public Project Search E2E Test", () => {
   };
 
   test.beforeEach(async ({ page }) => {
+    // Mock the consume-quota endpoint so the search form can navigate after submit.
+    // Without this mock, an unknown seal/cédula/RNC would fail quota check and never
+    // navigate to the verify page.
+    await page.route("**/api/projects/consume-quota", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ allowed: true }),
+      });
+    });
+
     // This is the public search page
     await page.goto("/#/projects");
-    
-    // Wait for the form to be visible before starting tests
-    // for the search form dropdown button
-    await expect(page.locator('button', { hasText: 'Tipo:' })).toBeVisible();
+    await page.waitForLoadState("networkidle");
+    // Small grace period for the lazy-loaded chunk to mount the form.
+    await page.waitForTimeout(500);
+
+    // Wait for the search input (unique placeholder) to be ready before tests run.
+    // The page is lazy-loaded; checking just for "Tipo:" is flaky because the
+    // form below the hero section may not be rendered yet.
+    await expect(
+      page.getByPlaceholder(/Ej: VF-2026-X83L|Ej: 001-02-003|Ej: 1-01-99999-9|Ej: 1-01-23456-7|Ej: 402-1234567-8/i)
+    ).toBeVisible({ timeout: 20000 });
   });
 
   const searchAndVerify = async (page: any, searchType: string, query: string, expectedProject: string) => {
@@ -33,8 +50,9 @@ test.describe("Public Project Search E2E Test", () => {
     else if (searchType === "rnc") await page.getByRole('button', { name: 'RNC', exact: true }).click();
     else if (searchType === "cedula") await page.getByRole('button', { name: 'Cédula', exact: true }).click();
 
-    // Enter the search query
-    const searchInput = page.locator('input[type="text"]');
+    // Enter the search query - use the unique placeholder from VerifySearchForm to avoid
+    // colliding with other inputs on the page (RNC/Cédula/Coords).
+    const searchInput = page.getByPlaceholder(/Ej: VF-2026-X83L|Ej: 001-02-003|Ej: 1-01-99999-9|Ej: 1-01-23456-7|Ej: 402-1234567-8/i);
     await searchInput.fill(query);
 
     // Submit the form
@@ -85,7 +103,7 @@ test.describe("Public Project Search E2E Test", () => {
     // Select cert
     await page.getByRole('button', { name: 'Sello VeriFinca', exact: true }).click();
 
-    const searchInput = page.locator('input[type="text"]');
+    const searchInput = page.getByPlaceholder(/Ej: VF-2026-X83L|Ej: 001-02-003|Ej: 1-01-99999-9|Ej: 1-01-23456-7|Ej: 402-1234567-8/i);
     await searchInput.fill("VF-2099-XXXX");
 
     const submitBtn = page.locator("button[type='submit']");

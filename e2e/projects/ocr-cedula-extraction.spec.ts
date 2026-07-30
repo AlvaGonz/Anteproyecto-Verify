@@ -58,7 +58,7 @@ test.describe('Real OCR Extraction Flow - Cédula', () => {
     await page.waitForLoadState('networkidle');
     
     // Locate the hidden file input for the "cedula" requirement
-    const fileInput = page.locator('data-testid=requirement-status-cedula').locator('data-testid=inline-file-upload');
+    const fileInput = page.locator('data-testid=requirement-row-cedula').locator('data-testid=inline-file-upload');
     
     // Upload the file directly using setInputFiles
     await fileInput.setInputFiles(testFileCedula);

@@ -13,7 +13,7 @@ test.describe('Settings Page - Destructive Action Flow', () => {
           apellido: 'User',
           email: 'test@example.com',
           cedula: '123-4567890-1',
-          role: 'DEVELOPER',
+          role: '', aceptoDescargo: true,
           telefono: '8095551234',
           rnc: '101000000',
           razonSocial: 'Test Company SRL',

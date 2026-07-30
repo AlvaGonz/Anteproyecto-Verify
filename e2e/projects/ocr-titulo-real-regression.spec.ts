@@ -55,7 +55,7 @@ test.describe('Título de Propiedad - Real PDF Extraction Regression', () => {
       // 4. Navigate to validations page
       await page.goto(`${FRONTEND_BASE}/#/admin/projects/${projectId}/validations`);
 
-      const requirementPanel = page.locator('[data-testid="requirement-status-titulo"]');
+      const requirementPanel = page.locator('[data-testid="requirement-row-titulo"]');
       await requirementPanel.waitFor({ state: 'visible', timeout: 15000 });
 
       // 5. Upload the PDF
@@ -132,7 +132,7 @@ test.describe('Título de Propiedad - Real PDF Extraction Regression', () => {
     const projectId = (await projRes.json()).id;
 
     await page.goto(`${FRONTEND_BASE}/#/admin/projects/${projectId}/validations`);
-    const panel = page.locator('[data-testid="requirement-status-titulo"]');
+    const panel = page.locator('[data-testid="requirement-row-titulo"]');
     await panel.waitFor({ state: 'visible', timeout: 15000 });
     const file = panel.locator('[data-testid="inline-file-upload"]');
     await file.setInputFiles(path.join(TEST_DOCS_DIR, 'Título de Propiedad A2.pdf'));

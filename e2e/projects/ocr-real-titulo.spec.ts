@@ -42,7 +42,7 @@ test.describe('Título de Propiedad - UI Smoke Test', () => {
     }
     fs.writeFileSync(dummyPdfPath, '%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\nfake content');
 
-    const requirementPanel = page.locator('data-testid=requirement-status-titulo');
+    const requirementPanel = page.locator('data-testid=requirement-row-titulo');
     await requirementPanel.waitFor({ state: 'visible', timeout: 15000 });
     const fileInput = requirementPanel.locator('data-testid=inline-file-upload');
     await fileInput.setInputFiles(dummyPdfPath);

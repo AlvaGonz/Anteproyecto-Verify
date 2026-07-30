@@ -7,7 +7,7 @@ test.describe('OCR Review Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Setup basic mock routes for project and auth
     await page.route("**/api/auth/me", async (route) => {
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin", role: "ADMIN" }) });
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin", role: "admin", aceptoDescargo: true}) });
     await page.route('**/api/v1/subscriptions/my-status', async (route) => {
       await route.fulfill({
         status: 200,

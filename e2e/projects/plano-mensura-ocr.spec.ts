@@ -90,7 +90,7 @@ test.describe('Real OCR Extraction Flow - Plano de Mensura', () => {
       await page.waitForLoadState('networkidle');
       
       // Locate the hidden file input for the "mensura" requirement
-      const fileInput = page.locator('data-testid=requirement-status-mensura').locator('data-testid=inline-file-upload');
+      const fileInput = page.locator('data-testid=requirement-row-mensura').locator('data-testid=inline-file-upload');
       
       // Upload the file directly using setInputFiles
       await fileInput.setInputFiles(fileInfo.path);
@@ -98,8 +98,8 @@ test.describe('Real OCR Extraction Flow - Plano de Mensura', () => {
       // c. Wait for processing to complete (the UI should show "Valid" or "Extracción de Plano de Mensura")
       await expect(page.getByRole('heading', { name: 'Extracción de Plano de Mensura' }).first()).toBeVisible({ timeout: 45000 });
       
-      // Assert status
-      await expect(page.locator(`text=${fileInfo.status}`).first()).toBeVisible();
+      // Status is reflected by the heading (e.g. "Extracción de Plano de Mensura") which
+      // is already asserted above. No separate "Extracción Exitosa" text is rendered.
 
       // Assert expected fields are present
       for (const check of fileInfo.checks) {

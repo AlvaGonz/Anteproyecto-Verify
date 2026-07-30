@@ -20,7 +20,7 @@ test.describe('Subscription Cancellation and Reactivation UX', () => {
           id: 'test-user-id',
           nombre: 'Test',
           apellido: 'User',
-          role: 'DEVELOPER'
+          role: '', aceptoDescargo: true
         })
       });
     });

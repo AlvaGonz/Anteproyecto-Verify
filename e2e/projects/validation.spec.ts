@@ -8,7 +8,7 @@ test.describe("Document Upload Validation E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin User", role: "ADMIN" })
+        body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin User", role: "admin", aceptoDescargo: true})
       });
     await page.route('**/api/v1/subscriptions/my-status', async (route) => {
       await route.fulfill({
@@ -81,7 +81,7 @@ test.describe("Document Upload Validation E2E", () => {
     });
   });
 
-  test("Backend rejects files that are too large, status remains Pendiente", async ({ page }) => {
+  test("Backend rejects files that are too large, status remains Requerido", async ({ page }) => {
     await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/validations`);
     
     // Wait for the requirement row
@@ -116,8 +116,8 @@ test.describe("Document Upload Validation E2E", () => {
     // Check that the error message from the backend is displayed
     await expect(page.getByText(/excede el límite permitido/i).first()).toBeVisible({ timeout: 5000 });
     
-    // Check that the status is still Pendiente
-    const status = page.getByTestId("requirement-status-titulo");
-    await expect(status).toContainText("Pendiente");
+    // Check that the status is still Requerido
+    const status = page.getByTestId("requirement-row-titulo");
+    await expect(status).toContainText("Requerido");
   });
 });

@@ -11,7 +11,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
       id: testUserId,
       nombre: 'Test',
       apellido: 'Professional',
-      role: 'DEVELOPER',
+      role: '', aceptoDescargo: true,
       cedula: '001-0000001-1',
       telefono: '8095551234',
       rnc: '101000000',
@@ -21,7 +21,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
       nombre: 'Invitado',
       apellido: 'Test',
       email: 'invitado@test.com',
-      role: 'user',
+      role: '', aceptoDescargo: true,
       plan: null,
       invitedByPlan: 'Corporativo',
       inviterPlan: 'Corporativo',
@@ -29,7 +29,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
     },
     owner: {
       id: 'owner-001',
-      role: 'owner',
+      role: '', aceptoDescargo: true,
       plan: 'Corporativo',
       isGuest: false,
     }

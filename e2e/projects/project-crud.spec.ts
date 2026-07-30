@@ -35,7 +35,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
           email: "test@example.com",
           nombre: "Test",
           apellido: "User",
-          role: "admin",
+          role: "admin", aceptoDescargo: true,
           cedula: "",
           telefono: "",
           plan: "Profesional",
@@ -91,6 +91,18 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({ accessToken: "mock-token" })
+      });
+    });
+
+    // Dashboard stats are required on /admin/* routes; mock with empty stats so the
+    // AdminLayout does not redirect to /login when the real backend returns 401.
+    await page.route("**/api/admin/dashboard/**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          totalProjects: 0, publishedProjects: 0, pendingValidations: 0, activeUsers: 0,
+        }),
       });
     });
 
@@ -176,7 +188,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
       if (url.includes("api/")) {
         console.log(`ALL API REQUEST: ${route.request().method()} ${url}`);
       }
-      await route.continue();
+      await route.fallback();
     });
   });
 
@@ -184,7 +196,8 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
 
   test("CREATE — renderiza el formulario en /admin/projects/new", async ({ page }) => {
     await page.goto("/#/admin/projects/new");
-    await expect(page.getByRole("heading", { name: /Nuevo Expediente/i })).toBeVisible();
+    // ProjectManageLayout renders the page title as h1; for /new it is "Crear Nuevo Proyecto".
+    await expect(page.getByRole("heading", { name: /Crear Nuevo Proyecto/i })).toBeVisible();
     await expect(page.getByLabel(/Nombre del Proyecto/i)).toBeVisible();
     await expect(page.getByLabel(/Ubicación/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /Guardar/i })).toBeVisible();
@@ -224,8 +237,10 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
     await expect(page.getByRole("heading", { name: /Gestión de Expedientes/i })).toBeVisible({ timeout: 10000 });
 
     // Debe haber al menos un proyecto visible (mock data)
-    const projectCard = page.getByRole("heading", { name: "Residencial Las Palmas" }).first();
-    await expect(projectCard).toBeVisible({ timeout: 5000 });
+    // The mock returns the project under any of these names; match flexibly.
+    await expect(
+      page.getByRole("heading").filter({ hasText: /Residencial Las Palmas/ }).first()
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test("READ — detalle de proyecto carga en public /p/:slug", async ({ page }) => {

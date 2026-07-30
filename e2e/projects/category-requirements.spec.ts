@@ -8,7 +8,7 @@ test.describe("Category Specific Requirements E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin User", role: "ADMIN" })
+        body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin User", role: "admin", aceptoDescargo: true})
       });
     await page.route('**/api/v1/subscriptions/my-status', async (route) => {
       await route.fulfill({

@@ -11,7 +11,7 @@ test.describe('Settings Page - Profile Extension', () => {
           nombre: 'Test',
           apellido: 'User',
           email: 'test@example.com',
-          role: 'DEVELOPER',
+          role: '', aceptoDescargo: true,
           cedula: '12345678901',
           telefono: '8095551234',
           rnc: '101000000',
@@ -90,6 +90,10 @@ test.describe('Settings Page - Profile Extension', () => {
     await expect(saveButton).toBeEnabled({ timeout: 2000 });
     await saveButton.click();
 
+    const confirmButton = page.getByRole('button', { name: /Confirmar y Guardar/i });
+    await expect(confirmButton).toBeVisible({ timeout: 5000 });
+    await confirmButton.click();
+
     await expect(page.locator('text=Perfil actualizado correctamente')).toBeVisible({ timeout: 5000 });
   });
 
@@ -106,7 +110,7 @@ test.describe('Settings Page - Profile Extension', () => {
             nombre: 'Test',
             apellido: 'User',
             email: 'test@example.com',
-            role: 'DEVELOPER',
+            role: '', aceptoDescargo: true,
             cedula: '12345678901',
             telefono: '8095551234',
             rnc: '101000000',
@@ -159,7 +163,7 @@ test.describe('Settings Page - Profile Extension', () => {
             nombre: 'Test',
             apellido: 'User',
             email: 'test@example.com',
-            role: 'DEVELOPER',
+            role: '', aceptoDescargo: true,
             cedula: '12345678901',
             telefono: '8095551234',
             rnc: '101000000',
@@ -186,6 +190,10 @@ test.describe('Settings Page - Profile Extension', () => {
     const saveButton = page.locator('button[type="submit"]:has-text("Guardar Cambios")');
     await saveButton.click();
 
+    const confirmButton = page.getByRole('button', { name: /Confirmar y Guardar/i });
+    await expect(confirmButton).toBeVisible({ timeout: 5000 });
+    await confirmButton.click();
+
     await expect(page.locator('text=Perfil actualizado correctamente')).toBeVisible({ timeout: 5000 });
   });
 
@@ -196,7 +204,7 @@ test.describe('Settings Page - Profile Extension', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           id: 'test-user-id', nombre: 'Test', apellido: 'User', email: 'test@example.com',
-          role: 'DEVELOPER', cedula: '12345678901', telefono: '8095551234',
+          role: '', aceptoDescargo: true, cedula: '12345678901', telefono: '8095551234',
           rnc: '131000000', razonSocial: 'Verified Company SRL',
           direccion: '', provincia: '', nickname: '',
         })
@@ -248,7 +256,7 @@ test.describe('Settings Page - Profile Extension', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           id: 'test-user-id', nombre: 'Test', apellido: 'User', email: 'test@example.com',
-          role: 'DEVELOPER', cedula: '12345678901', telefono: '8095551234',
+          role: '', aceptoDescargo: true, cedula: '12345678901', telefono: '8095551234',
           rnc: null, razonSocial: null,
           direccion: '', provincia: '', nickname: '',
         })
@@ -308,6 +316,10 @@ test.describe('Settings Page - Profile Extension', () => {
 
     const saveButton = page.locator('button[type="submit"]:has-text("Guardar Cambios")');
     await saveButton.click();
+
+    const confirmButton = page.getByRole('button', { name: /Confirmar y Guardar/i });
+    await expect(confirmButton).toBeVisible({ timeout: 5000 });
+    await confirmButton.click();
 
     await expect(page.locator('text=El apodo ya está en uso por otro usuario.')).toBeVisible({ timeout: 5000 });
   });
