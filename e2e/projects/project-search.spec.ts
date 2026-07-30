@@ -25,24 +25,47 @@ test.describe("Public Project Search E2E Test", () => {
       });
     });
 
-    // Mock the project fetch for the verify page (/projects/verify/{id})
-    // The verify page calls useProject(identifier) which fetches /api/projects/{id}
-    await page.route(/\/api\/projects\/VF-2026-ABC123XYZ(\?.*)?$/, async (route) => {
-      console.log(`[MOCK] Intercepted /api/projects/VF-2026-ABC123XYZ`);
+    // Mock the public verification endpoint for the verify page (/projects/verify/{code})
+    // The verify page calls usePublicVerification which fetches /public/projects/{code}
+    await page.route("**/public/projects/VF-2026-ABC123XYZ*", async (route) => {
+      console.log(`[MOCK] Intercepted /public/projects/VF-2026-ABC123XYZ`);
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
           id: "VF-2026-ABC123XYZ",
           codigoInterno: "VF-2026-ABC123XYZ",
-          nombre: "Torre Bella Vista Piantini",
-          ubicacionTexto: "Santo Domingo, RD",
+          nombreProyecto: "Torre Bella Vista Piantini",
+          ubicacion: "Santo Domingo, RD",
           categoria: 1,
           estadoProyecto: 1,
           estadoIntegridad: 0,
           usuarioCreadorId: "user-001",
           createdAtUtc: "2026-01-01T00:00:00Z",
         }),
+      });
+    });
+
+// Mock the search API for non-cert searches (suelo, ipi, rnc, cedula)
+    // The search results page calls /api/public/projects/search with query params
+    await page.route("**/api/public/projects/search*", async (route) => {
+      console.log(`[MOCK] Intercepted search API`);
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([
+          {
+            id: "VF-2026-ABC123XYZ",
+            codigoInterno: "VF-2026-ABC123XYZ",
+            nombreProyecto: "Torre Bella Vista Piantini",
+            ubicacion: "Santo Domingo, RD",
+            categoria: 1,
+            estadoProyecto: "PUBLICADO",
+            estadoIntegridad: 0,
+            usuarioCreadorId: "user-001",
+            createdAtUtc: "2026-01-01T00:00:00Z",
+          },
+        ]),
       });
     });
 

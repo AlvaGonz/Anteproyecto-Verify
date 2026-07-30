@@ -197,9 +197,13 @@ export const DocumentRequirementRow: React.FC<DocumentRequirementRowProps> = ({
               <button
                 type="button"
                 disabled={isAssigning}
-                onClick={onUnassignDocument}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onUnassignDocument();
+                }}
                 className="h-10 w-10 shrink-0 rounded-lg bg-surface-container border border-border/50 text-error hover:bg-error/10 hover:border-error/30 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Quitar asignación"
+                title="Archivar"
               >
                 <Trash2 className="w-4 h-4" />
               </button>

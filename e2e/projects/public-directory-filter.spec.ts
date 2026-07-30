@@ -38,12 +38,12 @@ test.describe("Public Directory Filter — E2E", () => {
     { id: "3", nombre: "La Altagracia", latitud: 18.5800, longitud: -68.7200 },
   ];
 
-  async function setupMocks(page: Page) {
-    await page.route("**/api/public/projects/search", async (route) => {
+  async function setupMocks(page: Page, projects = MOCK_PROJECTS) {
+    await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(projects),
       });
     });
     await page.route("**/api/provinces", async (route) => {
@@ -128,6 +128,8 @@ test("clear all filters resets to full list", async ({ page }) => {
       id: `${i + 10}`,
       nombreProyecto: `Proyecto ${i + 1}`,
     }));
+    // Override the route with the larger dataset
+    await page.unroute(/\/api\/public\/projects\/search(\?.*)?$/);
     await page.route(/\/api\/public\/projects\/search(\?.*)?$/, async (route) => {
       await route.fulfill({
         status: 200,

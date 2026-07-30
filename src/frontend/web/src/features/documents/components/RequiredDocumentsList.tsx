@@ -1,6 +1,6 @@
 import React from "react";
 import { DocumentType } from "../types";
-import { useDocuments, useUpdateDocumentType } from "../api/useDocuments";
+import { useDocuments, useUpdateDocumentType, useUpdateDocumentStatus } from "../api/useDocuments";
 import { useUpdateDocumentFieldReview } from "../api/useDocumentMutations";
 import { OcrFieldReviewState } from "../types";
 import { DocumentRequirementRow } from "./reusable/DocumentRequirementRow";
@@ -25,6 +25,7 @@ const REQUIRED_DOCUMENTS = [
 export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ projectId }) => {
   const { data: documents = [] } = useDocuments(projectId);
   const typeMutation = useUpdateDocumentType(projectId);
+  const statusMutation = useUpdateDocumentStatus(projectId);
   const { mutateAsync: updateField } = useUpdateDocumentFieldReview(projectId);
   const { addToast } = useToast();
 
@@ -42,12 +43,24 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
     }
   };
 
+  const handleAutoSelectField = async (documentId: string, fieldName: string, resolvedId: string) => {
+    try {
+      await updateField({
+        documentId,
+        fieldName,
+        data: { reviewState: OcrFieldReviewState.Corrected, correctedValue: resolvedId }
+      });
+    } catch (err) {
+      console.error("Error auto-selecting field:", err);
+    }
+  };
+
   const handleUnassignDocument = async (documentId: string) => {
     try {
-      await typeMutation.mutateAsync({ documentId, tipoDocumento: DocumentType.Other });
-      addToast("Documento desasignado", "info");
+      await statusMutation.mutateAsync({ documentId, activo: false });
+      addToast("Documento archivado exitosamente", "info");
     } catch (err: any) {
-      addToast("Error al desasignar el documento", "error");
+      addToast("Error al archivar el documento", "error");
     }
   };
 
@@ -107,27 +120,45 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
               />
               {doc.id === "cedula" && uploadedDoc?.cedulaExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <CedulaExtractionCard extraction={uploadedDoc.cedulaExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
+                  <CedulaExtractionCard 
+                    extraction={uploadedDoc.cedulaExtraction} 
+                    onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} 
+                  />
                 </div>
               )}
               {doc.id === "titulo" && uploadedDoc?.certificadoTituloExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <CertificadoTituloExtractionCard extraction={uploadedDoc.certificadoTituloExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
+                  <CertificadoTituloExtractionCard 
+                    extraction={uploadedDoc.certificadoTituloExtraction} 
+                    onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} 
+                    onAutoSelectField={(f, v) => handleAutoSelectField(uploadedDoc.id, f, v)}
+                  />
                 </div>
               )}
               {doc.id === "mensura" && uploadedDoc?.planoMensuraExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <PlanoMensuraExtractionCard extraction={uploadedDoc.planoMensuraExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
+                  <PlanoMensuraExtractionCard 
+                    extraction={uploadedDoc.planoMensuraExtraction} 
+                    onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} 
+                    onAutoSelectField={(f, v) => handleAutoSelectField(uploadedDoc.id, f, v)}
+                  />
                 </div>
               )}
               {doc.id === "estado_juridico" && uploadedDoc?.estadoJuridicoExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <EstadoJuridicoExtractionCard extraction={uploadedDoc.estadoJuridicoExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
+                  <EstadoJuridicoExtractionCard 
+                    extraction={uploadedDoc.estadoJuridicoExtraction} 
+                    onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} 
+                    onAutoSelectField={(f, v) => handleAutoSelectField(uploadedDoc.id, f, v)}
+                  />
                 </div>
               )}
               {doc.id === "certificacion_ipi" && uploadedDoc?.certificacionIPIExtraction && (
                 <div className="pl-4 sm:pl-12">
-                  <CertificacionIPIExtractionCard extraction={uploadedDoc.certificacionIPIExtraction} onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} />
+                  <CertificacionIPIExtractionCard 
+                    extraction={uploadedDoc.certificacionIPIExtraction} 
+                    onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)} 
+                  />
                 </div>
               )}
             </div>

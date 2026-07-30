@@ -70,8 +70,8 @@ function buildExtraction() {
     operacion: { rawValue: "PLANO CATASTRAL", normalizedValue: "PLANO CATASTRAL", confidence: 0.8, status: 0, sourcePage: 1 },
     designacionCatastralPosicional: { rawValue: "L8493574592", normalizedValue: "L8493574592", confidence: 0.8, status: 0, sourcePage: 1 },
     designacionCatastralOrigen: { rawValue: "NOSPN36-ADC05", normalizedValue: "NOSPN36-ADC05", confidence: 0.8, status: 0, sourcePage: 1 },
-    provincia: { rawValue: provinciaRaw, normalizedValue: provinciaRaw, confidence: 0, status: 1, sourcePage: 0 },
-    municipio: { rawValue: municipioRaw, normalizedValue: municipioRaw, confidence: 0, status: 1, sourcePage: 0 },
+    provincia: { rawValue: provinciaRaw, normalizedValue: persistedProvinciaId ?? provinciaRaw, confidence: 0, status: 1, sourcePage: 0 },
+    municipio: { rawValue: municipioRaw, normalizedValue: persistedMunicipioId ?? municipioRaw, confidence: 0, status: 1, sourcePage: 0 },
     seccion: emptyField(),
     lugar: { rawValue: "TERRERO", normalizedValue: "TERRERO", confidence: 0.8, status: 0, sourcePage: 1 },
     superficieARegistrarParcelaM2: { rawValue: "32.74", normalizedValue: "32.74", confidence: 0.8, status: 0, sourcePage: 1 },
@@ -110,6 +110,11 @@ function buildExtraction() {
   };
 }
 
+let mockExtractionOverride: any = null;
+function getExtraction() {
+  return mockExtractionOverride ?? buildExtraction();
+}
+
 function emptyField() {
   return { rawValue: "", normalizedValue: "", confidence: 0, status: 1, sourcePage: 0 };
 }
@@ -135,7 +140,7 @@ function buildDocuments() {
       updatedAtUtc: "2026-07-30T00:00:00Z",
       cedulaExtraction: null,
       certificadoTituloExtraction: null,
-      planoMensuraExtraction: buildExtraction(),
+      planoMensuraExtraction: getExtraction(),
       estadoJuridicoExtraction: null,
       certificacionIPIExtraction: null,
     },
@@ -147,6 +152,7 @@ test.describe("Plano de Mensura - dropdown hydrate + save", () => {
     // Reset persisted state for each test
     persistedProvinciaId = null;
     persistedMunicipioId = null;
+    mockExtractionOverride = null;
 
     await page.route("**/api/auth/me", async route => {
       await route.fulfill({
@@ -305,7 +311,48 @@ test.describe("Plano de Mensura - dropdown hydrate + save", () => {
 
     // Verify final state
     await expect(provinciaSelect).toHaveValue(LA_ALTAGRACIA_ID);
-    await expect(municipioSelect).toHaveValue(HIGUEY_ID);
+    await expect(page.getByTestId("municipio-select")).toHaveValue(HIGUEY_ID);
+  });
+
+  test("auto-populates and saves provincia and municipio from OCR raw values even without backend resolution", async ({ page }) => {
+    const patchCalls: Array<{ field: string; body: { reviewState: number; correctedValue?: string } }> = [];
+
+    await page.route(
+      `**/api/projects/${MOCK_PROJECT_ID}/documents/${MOCK_DOCUMENT_ID}/fields/*`,
+      async route => {
+        if (route.request().method() === "PATCH") {
+          const url = new URL(route.request().url());
+          const field = url.pathname.split("/").pop()!;
+          const body = JSON.parse(route.request().postData() || "{}");
+          patchCalls.push({ field, body });
+          await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ success: true }) });
+        } else {
+          await route.continue();
+        }
+      }
+    );
+
+    // Override the extraction so OCR found raw values, but the backend did not resolve them (no recommendations)
+    mockExtractionOverride = buildExtraction();
+    mockExtractionOverride.provincia.rawValue = "La Altagracia";
+    mockExtractionOverride.provincia.normalizedValue = "";
+    mockExtractionOverride.provinceResolution = null;
+    
+    mockExtractionOverride.municipio.rawValue = "Higüey";
+    mockExtractionOverride.municipio.normalizedValue = "";
+    mockExtractionOverride.municipalityResolution = null;
+
+    await page.goto(`/#/admin/projects/${MOCK_PROJECT_ID}/validations`);
+
+    // The component should mount, fetch catalogs, realize that "La Altagracia" matches LA_ALTAGRACIA_ID,
+    // and automatically select it AND send a PATCH request.
+    await expect(page.getByTestId("provincia-select")).toHaveValue(LA_ALTAGRACIA_ID);
+    await expect(page.getByTestId("municipio-select")).toHaveValue(HIGUEY_ID);
+
+    // Verify it sent PATCH requests for both
+    await expect.poll(() => patchCalls.length).toBeGreaterThanOrEqual(2);
+    expect(patchCalls.some(call => call.field === "provincia" && call.body.correctedValue === LA_ALTAGRACIA_ID)).toBeTruthy();
+    expect(patchCalls.some(call => call.field === "municipio" && call.body.correctedValue === HIGUEY_ID)).toBeTruthy();
   });
 
   test("dropdowns hydrate from persisted normalizedValue when no resolution is present", async ({ page }) => {
