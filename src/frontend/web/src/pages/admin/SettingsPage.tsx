@@ -107,6 +107,9 @@ export const SettingsPage: React.FC = () => {
     }
 
     try {
+      setIsModalOpen(false);
+      setEditingUser(null);
+
       if (editingUser) {
         await updateUserMutation.mutateAsync({ userId: editingUser.id, data: formData });
         addToast("Usuario actualizado exitosamente", "success");
@@ -114,9 +117,6 @@ export const SettingsPage: React.FC = () => {
         await createUserMutation.mutateAsync(formData);
         addToast("Usuario creado exitosamente", "success");
       }
-      setIsModalOpen(false);
-      setEditingUser(null);
-      await refetchUsers();
     } catch (error: any) {
       console.error("API Error Response:", error?.response?.data);
       let errorMsg = "Error al guardar el usuario";

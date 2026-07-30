@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { m } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 
@@ -31,6 +31,8 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
       update({ telefono: digits });
     }
   );
+  
+  const [showPassword, setShowPassword] = useState(false);
 
   if (!isOpen) return null;
 
@@ -170,14 +172,25 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               
               <div>
                 <label htmlFor="uf-password" className="block text-xs font-bold text-text-secondary uppercase mb-1">Contraseña Temporal (Opcional)</label>
-                <input
-                  id="uf-password"
-                  type="text"
-                  value={formData.password || ""}
-                  onChange={e => update({ password: e.target.value })}
-                  className="vf-input w-full"
-                  placeholder="Dejar en blanco para usar clave por defecto"
-                />
+                <div className="relative">
+                  <input
+                    id="uf-password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password || ""}
+                    onChange={e => update({ password: e.target.value })}
+                    className="vf-input w-full pr-10"
+                    placeholder="Dejar en blanco para usar clave por defecto"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary focus:outline-none"
+                    title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
                 <p className="text-[10px] text-text-secondary mt-1">El usuario recibirá una alerta para cambiar esta contraseña al iniciar sesión.</p>
               </div>
             </>
