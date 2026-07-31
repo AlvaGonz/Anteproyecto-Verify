@@ -76,17 +76,24 @@ public class TwoFactorController : ControllerBase
     }
 
     [HttpPost("verify")]
+    [AllowAnonymous]
     public async Task<IActionResult> Verify([FromBody] VerifyRequest req, CancellationToken ct)
     {
         var result = await _verifyCode.Handle(new VerifyTwoFactorCodeCommand(req.ChallengeToken, req.Code), ct);
-        if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        if (!result.IsSuccess)
+        {
+            if (result.ErrorMessage?.Contains("Demasiados intentos", StringComparison.OrdinalIgnoreCase) == true)
+                return StatusCode(StatusCodes.Status423Locked, new { succeeded = false, message = result.ErrorMessage, lockedOut = true });
+            return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        }
         return WriteSessionCookies(result.Token!);
     }
 
     [HttpPost("recovery-code")]
     public async Task<IActionResult> RecoveryCode([FromBody] RecoveryRequest req, CancellationToken ct)
     {
-        var result = await _consumeRecoveryCode.Handle(new ConsumeRecoveryCodeCommand(req.ChallengeToken, req.RecoveryCode), ct);
+        var code = req.Code ?? req.RecoveryCode ?? req.EffectiveCode ?? string.Empty;
+        var result = await _consumeRecoveryCode.Handle(new ConsumeRecoveryCodeCommand(req.ChallengeToken, code), ct);
         if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
         return WriteSessionCookies(result.Token!);
     }
@@ -100,6 +107,7 @@ public class TwoFactorController : ControllerBase
     }
 
     [HttpPost("email-otp/request")]
+    [AllowAnonymous]
     public async Task<IActionResult> RequestEmailOtp([FromBody] EmailOtpRequest req, CancellationToken ct)
     {
         var result = await _emailOtp.Handle(new RequestEmailOtpCommand(req.ChallengeToken), ct);
@@ -108,10 +116,16 @@ public class TwoFactorController : ControllerBase
     }
 
     [HttpPost("email-otp/verify")]
+    [AllowAnonymous]
     public async Task<IActionResult> VerifyEmailOtp([FromBody] VerifyEmailOtpRequest req, CancellationToken ct)
     {
         var result = await _emailOtp.HandleVerify(new VerifyEmailOtpCommand(req.ChallengeToken, req.Code), ct);
-        if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        if (!result.IsSuccess)
+        {
+            if (result.ErrorMessage?.Contains("Demasiados intentos", StringComparison.OrdinalIgnoreCase) == true)
+                return StatusCode(StatusCodes.Status423Locked, new { succeeded = false, message = result.ErrorMessage, lockedOut = true });
+            return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        }
         return WriteSessionCookies(result.Token!);
     }
 
@@ -124,7 +138,10 @@ public class TwoFactorController : ControllerBase
 
     public sealed record ConfirmEnrollmentRequest(int Code);
     public sealed record VerifyRequest(string ChallengeToken, int Code);
-    public sealed record RecoveryRequest(string ChallengeToken, string RecoveryCode);
+    public sealed record RecoveryRequest(string ChallengeToken, string? RecoveryCode, string? Code)
+    {
+        public string EffectiveCode => RecoveryCode ?? Code ?? string.Empty;
+    }
     public sealed record DisableRequest(string Password, int Code);
     public sealed record EmailOtpRequest(string ChallengeToken);
     public sealed record VerifyEmailOtpRequest(string ChallengeToken, string? Code, string? Otp)
