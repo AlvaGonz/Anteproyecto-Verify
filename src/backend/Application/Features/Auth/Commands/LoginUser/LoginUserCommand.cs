@@ -15,7 +15,10 @@ public record LoginUserResultDto(
 
 public record LoginUserResponseDto(
     LoginUserUserDto User,
-    string Token
+    string Token,
+    bool Requires2fa = false,
+    string? ChallengeToken = null,
+    string? EmailMasked = null
 );
 
 public record LoginUserUserDto(

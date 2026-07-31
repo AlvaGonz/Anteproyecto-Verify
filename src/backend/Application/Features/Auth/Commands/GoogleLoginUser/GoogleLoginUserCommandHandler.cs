@@ -15,19 +15,22 @@ public class GoogleLoginUserCommandHandler
     private readonly IGoogleAuthService _googleAuthService;
     private readonly IPlanSuscripcionRepository _planRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITwoFactorChallengeStore _challengeStore;
 
     public GoogleLoginUserCommandHandler(
         IUsuarioRepository usuarioRepository,
         IJwtTokenGenerator jwtTokenGenerator,
         IGoogleAuthService googleAuthService,
         IPlanSuscripcionRepository planRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ITwoFactorChallengeStore challengeStore)
     {
         _usuarioRepository = usuarioRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
         _googleAuthService = googleAuthService;
         _planRepository = planRepository;
         _unitOfWork = unitOfWork;
+        _challengeStore = challengeStore;
     }
 
     public async Task<LoginUserResultDto> Handle(GoogleLoginUserCommand request, CancellationToken cancellationToken)
@@ -91,6 +94,23 @@ public class GoogleLoginUserCommandHandler
             }
         }
 
+        // 2FA parity with password login
+        if (user.TwoFactorEnabled)
+        {
+            var challenge = await _challengeStore.CreateAsync(user.Id, cancellationToken);
+            var placeholderUser = new LoginUserUserDto(
+                user.Id, user.Email, user.NombreCompleto,
+                user.Rol == UserRole.Administrator ? "admin" : "user",
+                user.AvatarUrl);
+            var challengeResponse = new LoginUserResponseDto(
+                User: placeholderUser,
+                Token: string.Empty,
+                Requires2fa: true,
+                ChallengeToken: challenge.ChallengeToken,
+                EmailMasked: MaskEmail(user.Email));
+            return new LoginUserResultDto(true, null, challengeResponse);
+        }
+
         var roleStr = user.Rol == UserRole.Administrator ? "admin" : "user";
         var userDto = new LoginUserUserDto(
             user.Id,
@@ -121,5 +141,14 @@ public class GoogleLoginUserCommandHandler
         var response = new LoginUserResponseDto(userDto, token);
 
         return new LoginUserResultDto(true, null, response);
+    }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@');
+        if (parts.Length != 2) return email;
+        var local = parts[0];
+        var masked = local.Length <= 2 ? new string('*', local.Length) : local[0] + new string('*', local.Length - 2) + local[^1];
+        return $"{masked}@{parts[1]}";
     }
 }
