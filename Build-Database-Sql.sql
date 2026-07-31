@@ -9,6 +9,113 @@ IF DB_ID(N'verifinca-spm-uce-2026') IS NULL
 GO
 
 USE [verifinca-spm-uce-2026];
+
+-- ============================================================
+-- EF MIGRATIONS HISTORY (MOVED TO TOP TO PREVENT RACE CONDITIONS)
+-- ============================================================
+IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+CREATE TABLE [__EFMigrationsHistory] (
+    [MigrationId]   nvarchar(150) NOT NULL,
+    [ProductVersion] nvarchar(32) NOT NULL,
+    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+);
+GO
+
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES ('20260625043417_InitialCreate', '8.0.6');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260629151626_Add_ImagenUrl_To_Proyecto', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260629191121_Baseline', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630024820_Add_AvatarUrl_To_Usuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630130218_AddSubscriptionLimitsAndTeamSupport', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630145810_AddDgiiTable', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630151900_MakeAvatarUrlMax', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630154200_AddLogsAuditoria', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630163528_Add_Stripe_Fields_To_Usuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630195243_AddStripeFieldsToUsuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260630195722_AddLegacyProfilesAndPermissions', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260704162709_AddAccountLifecycleColumns', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260705040519_Add_RNC_To_Usuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260706170900_Add_Propietario_IPI_To_Proyectos', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260708173000_Add_DGII_Fields_To_Usuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260709034014_Add_GoogleAuth_To_Usuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260710000344_Add_CancelAt_To_Usuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260712173705_Add_CodigoReferencia_To_Notificaciones', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260712204727_Add_Invitacion_Table', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260713115949_AddPasswordResetToken', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260713164614_AddEstatusIpiToProjects', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260713170059_AddDelegatedLimitsToUsuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260713173829_AddSuperficieM2ToProjects', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260713205731_AddAdditionalProjectImages', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260716181609_AddProyectoEstadosAndMigrateData', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260717001730_Add_Hash_Ocr_Fields_To_Documento', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260719041340_AddProfileExtensionToUsuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260723015859_Add_Proyectos_Interesados_Guardados', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260723204400_AddSesionesUsuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260727203205_AddAceptoDescargoToUsuario', N'8.0.2');
+GO
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260729021120_AddLicenciaConstruccionAndVerificacion2FA', N'8.0.2');
+GO
+
 GO
 
 -- ============================================================
@@ -28,6 +135,10 @@ CREATE TABLE Usuario (
     Cedula                      VARCHAR(15)   NOT NULL,
     Rol                         INT           NOT NULL DEFAULT 2,
     Activo                      BIT           NOT NULL DEFAULT 1,
+    Direccion                   VARCHAR(200)  NULL,
+    Nickname                    VARCHAR(30)   NULL,
+    Provincia                   VARCHAR(50)   NULL,
+    AceptoDescargo              BIT           NOT NULL DEFAULT 0,
     EmailVerificado             BIT           NOT NULL DEFAULT 0,
     TokenVerificacion           VARCHAR(MAX)  NULL,
     TokenVerificacionExpiraUtc  DATETIME2     NULL,
@@ -109,10 +220,10 @@ BEGIN
         ('Azua',              18.45320, -70.73490),
         ('Baoruco',           18.50000, -71.30000),
         ('Barahona',          18.20850, -71.10080),
-        ('Dajabón',           19.54000, -71.70000),
+        ('DajabÃ³n',           19.54000, -71.70000),
         ('Duarte',            19.30000, -70.25000),
         ('El Seibo',          18.76000, -69.04000),
-        ('Elías Piña',        18.88000, -71.68000),
+        ('ElÃ­as PiÃ±a',        18.88000, -71.68000),
         ('Espaillat',         19.50000, -70.50000),
         ('Hato Mayor',        18.76000, -69.25000),
         ('Hermanas Mirabal',  19.38000, -70.35000),
@@ -120,21 +231,21 @@ BEGIN
         ('La Altagracia',     18.61890, -68.70830),
         ('La Romana',         18.42730, -68.97280),
         ('La Vega',           19.22000, -70.53000),
-        ('María Trinidad Sánchez', 19.38000, -69.95000),
-        ('Monseñor Nouel',    18.91000, -70.43000),
+        ('MarÃ­a Trinidad SÃ¡nchez', 19.38000, -69.95000),
+        ('MonseÃ±or Nouel',    18.91000, -70.43000),
         ('Monte Cristi',      19.72000, -71.58000),
         ('Monte Plata',       18.80700, -69.78900),
         ('Pedernales',        18.03000, -71.74000),
         ('Peravia',           18.28000, -70.33000),
         ('Puerto Plata',      19.79340, -70.68840),
-        ('Samaná',            19.20000, -69.33000),
-        ('San Cristóbal',     18.41667, -70.10000),
-        ('San José de Ocoa',  18.55000, -70.50000),
+        ('SamanÃ¡',            19.20000, -69.33000),
+        ('San CristÃ³bal',     18.41667, -70.10000),
+        ('San JosÃ© de Ocoa',  18.55000, -70.50000),
         ('San Juan',          18.80580, -71.22990),
-        ('San Pedro de Macorís', 18.45390, -69.30820),
-        ('Sánchez Ramírez',   19.00160, -70.14920),
+        ('San Pedro de MacorÃ­s', 18.45390, -69.30820),
+        ('SÃ¡nchez RamÃ­rez',   19.00160, -70.14920),
         ('Santiago',          19.45170, -70.69703),
-        ('Santiago Rodríguez',19.48000, -71.34000),
+        ('Santiago RodrÃ­guez',19.48000, -71.34000),
         ('Santo Domingo',     18.54118, -69.83988),
         ('Valverde',          19.58000, -71.07000);
 END
@@ -266,7 +377,6 @@ CREATE TABLE PlanSuscripcion (
     AccesoApi          BIT NOT NULL DEFAULT 0,
     MaxConsultas       INT NOT NULL DEFAULT 0,
     MaxProyectos       INT NOT NULL DEFAULT 0,
-    MultiUsuario       BIT NOT NULL DEFAULT 0,
     PresentacionPublica BIT NOT NULL DEFAULT 0,
     QrIncluido         BIT NOT NULL DEFAULT 0
 );
@@ -296,7 +406,6 @@ CREATE TABLE ProyectosInmobiliarios (
     Matricula           VARCHAR(100) NULL,
     Categoria           INT NOT NULL,
     DesignacionCatastral VARCHAR(200) NULL,
-    Status              INT NOT NULL,
     EstadoIntegridad    INT NOT NULL,
     EstadoJuridico      INT NOT NULL DEFAULT 0,
     SelladoBloqueado    BIT NOT NULL DEFAULT 0,
@@ -353,14 +462,17 @@ CREATE TABLE SelloIntegridad (
 GO
 
 IF OBJECT_ID(N'[LogProyectos]', 'U') IS NULL
-CREATE TABLE LogProyectos (
-    IdLog      UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    IdUsuario  UNIQUEIDENTIFIER,
-    IdProyecto UNIQUEIDENTIFIER,
-    FechaHora  DATETIME DEFAULT GETDATE(),
-    Accion     VARCHAR(100),
-    FOREIGN KEY (IdUsuario)   REFERENCES Usuario(IdUsuario),
-    FOREIGN KEY (IdProyecto)  REFERENCES ProyectosInmobiliarios(IdProyecto)
+CREATE TABLE [LogProyectos] (
+    [Id] uniqueidentifier NOT NULL,
+    [UsuarioId] uniqueidentifier NOT NULL,
+    [ProyectoId] uniqueidentifier NOT NULL,
+    [FechaCreacion] datetime2 NOT NULL,
+    [Detalle] nvarchar(500) NULL,
+    [CreatedAtUtc] datetime2 NOT NULL,
+    [UpdatedAtUtc] datetime2 NULL,
+    CONSTRAINT [PK_LogProyectos] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_LogProyectos_Proyectos_ProyectoId] FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE NO ACTION,
+    CONSTRAINT [FK_LogProyectos_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
 );
 GO
 
@@ -535,13 +647,21 @@ CREATE TABLE FremiunProyectos_Log (
 GO
 
 IF OBJECT_ID(N'[LogConsultas]', 'U') IS NULL
-CREATE TABLE LogConsultas (
-    IdLog         UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-    IdUsuario     UNIQUEIDENTIFIER,
-    IdResultado   UNIQUEIDENTIFIER,
-    FechaConsulta DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
-);
+BEGIN
+    CREATE TABLE [LogConsultas] (
+        [Id] uniqueidentifier NOT NULL,
+        [UsuarioId] uniqueidentifier NOT NULL,
+        [FechaConsulta] datetime2 NOT NULL,
+        [Exitoso] bit NOT NULL,
+        [Detalle] nvarchar(500) NULL,
+        [CreatedAtUtc] datetime2 NOT NULL,
+        [UpdatedAtUtc] datetime2 NULL,
+        CONSTRAINT [PK_LogConsultas] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_LogConsultas_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
+    );
+    CREATE INDEX [IX_LogConsultas_FechaConsulta] ON [LogConsultas] ([FechaConsulta]);
+    CREATE INDEX [IX_LogConsultas_UsuarioId] ON [LogConsultas] ([UsuarioId]);
+END
 GO
 
 IF OBJECT_ID(N'[Notificaciones]', 'U') IS NULL
@@ -559,7 +679,7 @@ CREATE TABLE Notificaciones (
 GO
 
 -- ============================================================
--- ALTER TABLE ADD COLUMN — each column guarded individually
+-- ALTER TABLE ADD COLUMN â€” each column guarded individually
 -- ============================================================
 
 -- TipoInmoviliario.IdProyecto
@@ -658,16 +778,8 @@ GO
 
 -- ============================================================
 -- EF Core tables + migration history
--- (All guarded — EF Core may have already created these)
+-- (All guarded â€” EF Core may have already created these)
 -- ============================================================
-
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-CREATE TABLE [__EFMigrationsHistory] (
-    [MigrationId]   nvarchar(150) NOT NULL,
-    [ProductVersion] nvarchar(32) NOT NULL,
-    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-);
-GO
 
 IF OBJECT_ID(N'[Auditorias]', 'U') IS NULL
 CREATE TABLE [Auditorias] (
@@ -819,39 +931,6 @@ CREATE TABLE [SellosIntegridad] (
 );
 GO
 
--- UsuarioLegacy: EF Core creates this as a TABLE; only create it here if absent
-IF OBJECT_ID(N'[UsuarioLegacy]', 'U') IS NULL
-CREATE TABLE [UsuarioLegacy] (
-    [IdUsuario]      uniqueidentifier NOT NULL,
-    [Nombre]         nvarchar(100)    NOT NULL,
-    [Apellido]       nvarchar(100)    NOT NULL,
-    [NombreCompleto] AS [Nombre] + ' ' + [Apellido] PERSISTED,
-    [Email]          nvarchar(100)    NOT NULL,
-    [ContrasenaHash] nvarchar(255)    NOT NULL,
-    [Telefono]       nvarchar(15)     NOT NULL,
-    [Cedula]         nvarchar(15)     NOT NULL,
-    [Rnc]            varchar(20)      NULL,
-    CONSTRAINT [PK_UsuarioLegacy] PRIMARY KEY ([IdUsuario])
-);
-GO
-
-IF OBJECT_ID(N'[ValidacionesAyuntamiento]', 'U') IS NULL
-CREATE TABLE [ValidacionesAyuntamiento] (
-    [Id] uniqueidentifier NOT NULL,
-    [ProyectoId] uniqueidentifier NOT NULL,
-    [Municipio] nvarchar(max) NOT NULL,
-    [Result] int NOT NULL,
-    [Detalle] nvarchar(max) NULL,
-    [FechaConsulta] datetime2 NOT NULL,
-    [DisponibilidadServicio] bit NOT NULL,
-    [CreatedAtUtc] datetime2 NOT NULL,
-    [UpdatedAtUtc] datetime2 NULL,
-    CONSTRAINT [PK_ValidacionesAyuntamiento] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_ValidacionesAyuntamiento_ProyectosInmobiliarios_ProyectoId]
-        FOREIGN KEY ([ProyectoId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE CASCADE
-);
-GO
-
 IF OBJECT_ID(N'[ValidacionesDgii]', 'U') IS NULL
 CREATE TABLE [ValidacionesDgii] (
     [Id] uniqueidentifier NOT NULL,
@@ -1000,26 +1079,8 @@ CREATE TABLE [Hallazgos] (
 );
 GO
 
-IF OBJECT_ID(N'[ResultadosRegla]', 'U') IS NULL
-CREATE TABLE [ResultadosRegla] (
-    [Id] uniqueidentifier NOT NULL,
-    [ValidacionId] uniqueidentifier NOT NULL,
-    [RuleCode] nvarchar(50) NOT NULL,
-    [RuleName] nvarchar(200) NOT NULL,
-    [Status] int NOT NULL,
-    [Message] nvarchar(1000) NOT NULL,
-    [Severity] int NULL,
-    [RelatedDocumentId] uniqueidentifier NULL,
-    [CreatedAtUtc] datetime2 NOT NULL,
-    [UpdatedAtUtc] datetime2 NULL,
-    CONSTRAINT [PK_ResultadosRegla] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_ResultadosRegla_Validaciones_ValidacionId]
-        FOREIGN KEY ([ValidacionId]) REFERENCES [Validaciones] ([Id]) ON DELETE CASCADE
-);
-GO
-
 -- ============================================================
--- Indexes — each wrapped in IF NOT EXISTS
+-- Indexes â€” each wrapped in IF NOT EXISTS
 -- ============================================================
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_AlertasValidacion_DocumentoId'   AND object_id = OBJECT_ID(N'[AlertasValidacion]'))
@@ -1079,9 +1140,6 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ResultadosCrediticios_ProyectoId' AND object_id = OBJECT_ID(N'[ResultadosCrediticios]'))
     CREATE INDEX [IX_ResultadosCrediticios_ProyectoId] ON [ResultadosCrediticios] ([ProyectoId]);
 GO
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ResultadosRegla_ValidacionId'     AND object_id = OBJECT_ID(N'[ResultadosRegla]'))
-    CREATE INDEX [IX_ResultadosRegla_ValidacionId]    ON [ResultadosRegla] ([ValidacionId]);
-GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_SellosIntegridad_ProyectoId'      AND object_id = OBJECT_ID(N'[SellosIntegridad]'))
     CREATE INDEX [IX_SellosIntegridad_ProyectoId]     ON [SellosIntegridad] ([ProyectoId]);
 GO
@@ -1094,9 +1152,6 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Validaciones_SelloId'             AND object_id = OBJECT_ID(N'[Validaciones]'))
     CREATE INDEX [IX_Validaciones_SelloId]            ON [Validaciones] ([SelloId]);
 GO
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ValidacionesAyuntamiento_ProyectoId' AND object_id = OBJECT_ID(N'[ValidacionesAyuntamiento]'))
-    CREATE INDEX [IX_ValidacionesAyuntamiento_ProyectoId] ON [ValidacionesAyuntamiento] ([ProyectoId]);
-GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ValidacionesDgii_ProyectoId'      AND object_id = OBJECT_ID(N'[ValidacionesDgii]'))
     CREATE INDEX [IX_ValidacionesDgii_ProyectoId]     ON [ValidacionesDgii] ([ProyectoId]);
 GO
@@ -1105,10 +1160,341 @@ GO
 -- Migration history seed row
 -- ============================================================
 
-IF NOT EXISTS (
-    SELECT 1 FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = '20260625043417_InitialCreate'
-)
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES ('20260625043417_InitialCreate', '8.0.6');
+
+
+-- ============================================================
+-- ADDED NEW TABLES FROM SCHEMA DIFF
+-- ============================================================
+
+IF OBJECT_ID(N'[Invitaciones]', 'U') IS NULL
+BEGIN
+    CREATE TABLE [Invitaciones] (
+        [Id] uniqueidentifier NOT NULL,
+        [EmisorId] uniqueidentifier NOT NULL,
+        [Email] nvarchar(200) NOT NULL,
+        [Nombre] nvarchar(100) NOT NULL,
+        [Apellido] nvarchar(100) NOT NULL,
+        [Telefono] nvarchar(15) NOT NULL,
+        [Cedula] nvarchar(15) NOT NULL,
+        [FechaInvitacion] datetime2 NOT NULL,
+        [Aceptada] bit NOT NULL DEFAULT CAST(0 AS bit),
+        CONSTRAINT [PK_Invitaciones] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Invitaciones_Usuario_EmisorId] FOREIGN KEY ([EmisorId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Invitaciones_EmisorId' AND object_id = OBJECT_ID(N'[Invitaciones]'))
+BEGIN
+    CREATE INDEX [IX_Invitaciones_EmisorId] ON [Invitaciones] ([EmisorId]);
+END
+GO
+
+IF OBJECT_ID(N'[LicenciaConstruccion]', 'U') IS NULL
+BEGIN
+    CREATE TABLE [LicenciaConstruccion] (
+        [MivedId] uniqueidentifier NOT NULL DEFAULT (NEWID()),
+        [NumeroPermiso] nvarchar(50) NOT NULL,
+        [NombreProyecto] nvarchar(500) NOT NULL,
+        [Tipologia] nvarchar(100) NULL,
+        [FechaEntrada] datetime2 NULL,
+        [FechaEmision] datetime2 NULL,
+        [Provincia] nvarchar(100) NULL,
+        [Municipio] nvarchar(100) NULL,
+        [UnidadesHabitacionales] int NULL,
+        [LocalesComerciales] int NULL,
+        CONSTRAINT [PK_LicenciaConstruccion] PRIMARY KEY ([MivedId])
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_LicenciaConstruccion_NumeroPermiso' AND object_id = OBJECT_ID(N'[LicenciaConstruccion]'))
+BEGIN
+    CREATE INDEX [IX_LicenciaConstruccion_NumeroPermiso] ON [LicenciaConstruccion] ([NumeroPermiso]);
+END
+GO
+
+IF OBJECT_ID(N'[ProyectoGuardado]', 'U') IS NULL
+BEGIN
+    CREATE TABLE [ProyectoGuardado] (
+        [Id] uniqueidentifier NOT NULL,
+        [ProjectId] uniqueidentifier NOT NULL,
+        [CreatorId] uniqueidentifier NOT NULL,
+        [SaverId] uniqueidentifier NOT NULL,
+        [CreatedAtUtc] datetime2 NOT NULL,
+        [UpdatedAtUtc] datetime2 NULL,
+        CONSTRAINT [PK_ProyectoGuardado] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ProyectoGuardado_ProyectosInmobiliarios_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_ProyectoGuardado_Usuario_CreatorId] FOREIGN KEY ([CreatorId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_ProyectoGuardado_Usuario_SaverId] FOREIGN KEY ([SaverId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectoGuardado_CreatorId' AND object_id = OBJECT_ID(N'[ProyectoGuardado]'))
+BEGIN
+    CREATE INDEX [IX_ProyectoGuardado_CreatorId] ON [ProyectoGuardado] ([CreatorId]);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectoGuardado_ProjectId' AND object_id = OBJECT_ID(N'[ProyectoGuardado]'))
+BEGIN
+    CREATE INDEX [IX_ProyectoGuardado_ProjectId] ON [ProyectoGuardado] ([ProjectId]);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectoGuardado_SaverId' AND object_id = OBJECT_ID(N'[ProyectoGuardado]'))
+BEGIN
+    CREATE INDEX [IX_ProyectoGuardado_SaverId] ON [ProyectoGuardado] ([SaverId]);
+END
+GO
+
+IF OBJECT_ID(N'[ProyectoInteres]', 'U') IS NULL
+BEGIN
+    CREATE TABLE [ProyectoInteres] (
+        [Id] uniqueidentifier NOT NULL,
+        [ProjectId] uniqueidentifier NOT NULL,
+        [CreatorId] uniqueidentifier NOT NULL,
+        [InterestedUserId] uniqueidentifier NOT NULL,
+        [CreatedAtUtc] datetime2 NOT NULL,
+        [UpdatedAtUtc] datetime2 NULL,
+        CONSTRAINT [PK_ProyectoInteres] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ProyectoInteres_ProyectosInmobiliarios_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [ProyectosInmobiliarios] ([IdProyecto]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_ProyectoInteres_Usuario_CreatorId] FOREIGN KEY ([CreatorId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_ProyectoInteres_Usuario_InterestedUserId] FOREIGN KEY ([InterestedUserId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectoInteres_CreatorId' AND object_id = OBJECT_ID(N'[ProyectoInteres]'))
+BEGIN
+    CREATE INDEX [IX_ProyectoInteres_CreatorId] ON [ProyectoInteres] ([CreatorId]);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectoInteres_InterestedUserId' AND object_id = OBJECT_ID(N'[ProyectoInteres]'))
+BEGIN
+    CREATE INDEX [IX_ProyectoInteres_InterestedUserId] ON [ProyectoInteres] ([InterestedUserId]);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectoInteres_ProjectId' AND object_id = OBJECT_ID(N'[ProyectoInteres]'))
+BEGIN
+    CREATE INDEX [IX_ProyectoInteres_ProjectId] ON [ProyectoInteres] ([ProjectId]);
+END
+GO
+
+IF OBJECT_ID(N'[ProyectosEstados]', 'U') IS NULL
+BEGIN
+    CREATE TABLE [ProyectosEstados] (
+        [Id] uniqueidentifier NOT NULL,
+        [CodigoUnico] nvarchar(50) NOT NULL,
+        [Nombre] nvarchar(100) NOT NULL,
+        [Descripcion] nvarchar(500) NOT NULL,
+        [Condiciones] nvarchar(1000) NOT NULL,
+        [ColorHex] nvarchar(20) NOT NULL,
+        [Activo] bit NOT NULL DEFAULT CAST(1 AS bit),
+        [CreatedAtUtc] datetime2 NOT NULL,
+        [UpdatedAtUtc] datetime2 NULL,
+        CONSTRAINT [PK_ProyectosEstados] PRIMARY KEY ([Id])
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectosEstados_CodigoUnico' AND object_id = OBJECT_ID(N'[ProyectosEstados]'))
+BEGIN
+    CREATE UNIQUE INDEX [IX_ProyectosEstados_CodigoUnico] ON [ProyectosEstados] ([CodigoUnico]);
+END
+GO
+
+IF OBJECT_ID(N'[SesionUsuario]', 'U') IS NULL
+BEGIN
+    CREATE TABLE [SesionUsuario] (
+        [Id] uniqueidentifier NOT NULL,
+        [UsuarioId] uniqueidentifier NOT NULL,
+        [RefreshToken] nvarchar(max) NOT NULL,
+        [CreatedAtUtc] datetime2 NOT NULL,
+        [ExpiresAtUtc] datetime2 NOT NULL,
+        [IsRevoked] bit NOT NULL,
+        [IpAddress] nvarchar(max) NULL,
+        [UserAgent] nvarchar(max) NULL,
+        CONSTRAINT [PK_SesionUsuario] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_SesionUsuario_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE CASCADE
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_SesionUsuario_UsuarioId' AND object_id = OBJECT_ID(N'[SesionUsuario]'))
+BEGIN
+    CREATE INDEX [IX_SesionUsuario_UsuarioId] ON [SesionUsuario] ([UsuarioId]);
+END
+GO
+
+IF OBJECT_ID(N'[Verificacion2FA]', 'U') IS NULL
+BEGIN
+    CREATE TABLE [Verificacion2FA] (
+        [Id] uniqueidentifier NOT NULL,
+        [UsuarioId] uniqueidentifier NOT NULL,
+        [SesionId] nvarchar(200) NOT NULL,
+        [NumeroVerificable] nvarchar(6) NOT NULL,
+        [FechaCreacion] datetime2 NOT NULL,
+        [CreatedAtUtc] datetime2 NOT NULL,
+        [UpdatedAtUtc] datetime2 NULL,
+        CONSTRAINT [PK_Verificacion2FA] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Verificacion2FA_Usuario_UsuarioId] FOREIGN KEY ([UsuarioId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE CASCADE
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Verificacion2FA_UsuarioId' AND object_id = OBJECT_ID(N'[Verificacion2FA]'))
+BEGIN
+    CREATE INDEX [IX_Verificacion2FA_UsuarioId] ON [Verificacion2FA] ([UsuarioId]);
+END
+GO
+
+-- ============================================================
+-- ADDED MIGRATIONS HISTORY AND INDEXES
+-- ============================================================
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UQ_Usuario_Nickname' AND object_id = OBJECT_ID(N'[Usuario]'))
+    CREATE UNIQUE INDEX [UQ_Usuario_Nickname] ON [Usuario] ([Nickname]) WHERE [Nickname] IS NOT NULL;
+GO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- ============================================================
+-- ADDED ALTER TABLES FROM MIGRATIONS
+-- ============================================================
+ALTER TABLE [PlanSuscripcion] ADD [AlertasTiempoRealDisponible] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [PlanSuscripcion] ADD [ExportacionExcelDisponible] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [PlanSuscripcion] ADD [ExportacionPdfDisponible] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [PlanSuscripcion] ADD [IntegracionCrmDisponible] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [PlanSuscripcion] ADD [MaxAlmacenamientoMb] int NOT NULL DEFAULT 0;
+GO
+ALTER TABLE [PlanSuscripcion] ADD [MaxUsuariosSecundarios] int NOT NULL DEFAULT 0;
+GO
+ALTER TABLE [PlanSuscripcion] ADD [ModeloLmDisponible] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [PlanSuscripcion] ADD [SoporteTipo] nvarchar(50) NOT NULL DEFAULT N'Comunidad';
+GO
+ALTER TABLE [PlanSuscripcion] ADD [ValidacionLoteDisponible] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [Usuario] ADD [ProyectosCreados] int NOT NULL DEFAULT 0;
+GO
+ALTER TABLE [Usuario] ADD [TitularId] uniqueidentifier NULL;
+GO
+ALTER TABLE [Usuario] ADD [CurrentPeriodEnd] datetime2 NULL;
+GO
+ALTER TABLE [Usuario] ADD [StripeCustomerId] nvarchar(max) NULL;
+GO
+ALTER TABLE [Usuario] ADD [StripeSubscriptionId] nvarchar(max) NULL;
+GO
+ALTER TABLE [Usuario] ADD [SubscriptionStatus] nvarchar(max) NULL;
+GO
+ALTER TABLE [Usuario] ADD [AccountStatus] int NOT NULL DEFAULT 0;
+GO
+ALTER TABLE [Usuario] ADD [DeletedAtUtc] datetime2 NULL;
+GO
+ALTER TABLE [Usuario] ADD [DeletionReason] nvarchar(max) NULL;
+GO
+ALTER TABLE [Usuario] ADD [PendingBillingCycle] nvarchar(max) NULL;
+GO
+ALTER TABLE [Usuario] ADD [PendingPlanCode] nvarchar(max) NULL;
+GO
+ALTER TABLE [Usuario] ADD [PurgeAtUtc] datetime2 NULL;
+GO
+ALTER TABLE [Usuario] ADD [RecoverUntilUtc] datetime2 NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [CedulaRncPropietario] nvarchar(50) NULL;
+GO
+ALTER TABLE [Usuario] ADD [GoogleId] nvarchar(100) NULL;
+GO
+ALTER TABLE [Usuario] ADD [SocialLogin] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [Usuario] ADD [CancelAtPeriodEnd] bit NOT NULL DEFAULT CAST(0 AS bit);
+GO
+ALTER TABLE [Usuario] ADD [PasswordResetTokenExpiraUtc] datetime2 NULL;
+GO
+ALTER TABLE [Usuario] ADD [MaxConsultasDelegadas] int NULL;
+GO
+ALTER TABLE [Usuario] ADD [MaxProyectosDelegados] int NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [ImagenAdicional1] nvarchar(2048) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [ImagenAdicional2] nvarchar(2048) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [ImagenAdicional3] nvarchar(2048) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [ImagenAdicional4] nvarchar(2048) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [ImagenAdicional5] nvarchar(2048) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [EstadoId] uniqueidentifier NOT NULL DEFAULT 'cb57fee5-98ce-4abb-838b-14f4f0eb52fc';
+GO
+ALTER TABLE [Documentos] ADD [HashSHA256] nvarchar(max) NULL;
+GO
+ALTER TABLE [Documentos] ADD [ResultadoOcrJson] nvarchar(max) NULL;
+GO
+ALTER TABLE [Usuario] ADD CONSTRAINT [FK_Usuario_Usuario_TitularId] FOREIGN KEY ([TitularId]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE NO ACTION;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD CONSTRAINT [FK_ProyectosInmobiliarios_ProyectosEstados_EstadoId] FOREIGN KEY ([EstadoId]) REFERENCES [ProyectosEstados] ([Id]) ON DELETE NO ACTION;
+GO
+ALTER TABLE [Usuario] ADD [CancelAt] datetime2 NULL;
+GO
+ALTER TABLE [Usuario] ADD [NombreComercial] nvarchar(200) NULL;
+GO
+ALTER TABLE [Usuario] ADD [PasswordResetToken] nvarchar(500) NULL;
+GO
+ALTER TABLE [Usuario] ADD [RazonSocial] nvarchar(200) NULL;
+GO
+ALTER TABLE [Usuario] ADD [Rnc] nvarchar(50) NULL;
+GO
+ALTER TABLE [Usuario] ADD [ActividadEconomica] nvarchar(200) NULL;
+GO
+ALTER TABLE [Usuario] ADD [AvatarUrl] nvarchar(max) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [EstatusIpi] nvarchar(100) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [ImagenUrl] nvarchar(2048) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [Ipi] nvarchar(50) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [Propietario] nvarchar(200) NULL;
+GO
+ALTER TABLE [ProyectosInmobiliarios] ADD [SuperficieM2] decimal(18,2) NULL;
+GO
+ALTER TABLE [Notificaciones] ADD [CodigoReferencia] nvarchar(max) NOT NULL DEFAULT N'';
 GO

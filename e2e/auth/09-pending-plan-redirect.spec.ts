@@ -13,6 +13,7 @@ test.describe('09 - Pending Plan Redirect Fix', () => {
       subscriptionStatus: null,
       pendingPlanCode: 'profesional',
       pendingBillingCycle: 'monthly',
+      aceptoDescargo: true,
       ...overrides,
     };
     await page.route('**/api/auth/me', async route => {

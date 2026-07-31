@@ -1,7 +1,6 @@
 import React, { useState, useMemo, memo, useRef, Suspense, FC } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  Filter,
   ArrowRight,
   Building2,
   ChevronRight,
@@ -11,7 +10,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Search,
-  LayoutGrid,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
@@ -139,23 +137,23 @@ const ProjectsPublicListContent: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // const _toggleProjectType = (type: number) => {
-  //   setFilters((prev) => ({
-  //     ...prev,
-  //     projectTypes: prev.projectTypes.includes(type)
-  //       ? prev.projectTypes.filter((t) => t !== type)
-  //       : [...prev.projectTypes, type],
-  //   }));
-  //   setCurrentPage(1);
-  // };
+  const toggleProjectType = (type: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      projectTypes: prev.projectTypes.includes(type)
+        ? prev.projectTypes.filter((t) => t !== type)
+        : [...prev.projectTypes, type],
+    }));
+    setCurrentPage(1);
+  };
 
   const handlePriceChange = (range: [number, number]) => {
     updateFilter("priceRange", range);
   };
 
-  // const _handleLatLngChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   updateFilter("latLng", e.target.value);
-  // };
+  const handleLatLngChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateFilter("latLng", e.target.value);
+  };
 
   const clearAllFilters = () => {
     setSearchParams({});
@@ -169,130 +167,179 @@ const ProjectsPublicListContent: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // const _hasActiveFilters =
-  //   filters.searchQuery ||
-  //   filters.projectTypes.length > 0 ||
-  //   filters.priceRange[0] > 0 ||
-  //   filters.priceRange[1] < PRICE_MAX ||
-  //   filters.province ||
-  //   filters.latLng;
+  const hasActiveFilters =
+    filters.searchQuery ||
+    filters.projectTypes.length > 0 ||
+    filters.priceRange[0] > 0 ||
+    filters.priceRange[1] < PRICE_MAX ||
+    filters.province ||
+    filters.latLng;
 
   return (
     <>
       {/* Directory Section */}
       <section className="py-20 px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+        {/* Header with counter + filter toggle */}
+        <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-black text-slate-900 mb-2">Directorio de Proyectos</h2>
-            <p className="text-slate-500 font-medium">Explore proyectos que han pasado por nuestro riguroso proceso de validación.</p>
+            <p className="text-slate-500 font-medium flex items-center gap-2">
+              <span className="font-black text-primary">{filteredProjects.length}</span> proyecto{filteredProjects.length !== 1 ? "s" : ""} publicado{filteredProjects.length !== 1 ? "s" : ""}
+              {hasActiveFilters && (
+                <span className="text-sm text-slate-400">(con filtros)</span>
+              )}
+            </p>
           </div>
+          <button
+            type="button"
+            onClick={() => setFiltersVisible(!filtersVisible)}
+            className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors ${
+              filtersVisible
+                ? "bg-primary text-white border-primary"
+                : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+            }`}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filtros
+          </button>
+        </div>
 
-          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
-            <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl">
-              <button type="button"
-                className="p-2 rounded-lg transition-all bg-white shadow-sm text-primary"
-              >
-                <LayoutGrid size={20} />
-              </button>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Sidebar - Filters */}
+          {filtersVisible && (
+          <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
+            {/* Blue Box: Search + Project Types */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <span className="text-primary">●</span> Búsqueda
+              </label>
+              <input
+                type="text"
+                placeholder="RNC, Cédula, Nombre..."
+                value={filters.searchQuery}
+                onChange={(e) => updateFilter("searchQuery", e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+              />
+
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
+                <span className="text-primary">●</span> Tipo (acumulativo)
+              </label>
+              <div className="flex flex-col gap-1.5">
+                {PROJECT_CATEGORIES.map((cat) => (
+                  <label
+                    key={cat.value}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-all ${
+                      filters.projectTypes.includes(cat.value)
+                        ? "bg-primary text-white border-primary"
+                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.projectTypes.includes(cat.value)}
+                      onChange={() => toggleProjectType(cat.value)}
+                      className="w-3 h-3 accent-primary"
+                    />
+                    {cat.label}
+                  </label>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 border-l border-slate-100 pl-4">
-              <Filter size={18} className="text-slate-400" />
+            {/* Red Box: Price Filter */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <span className="text-rose-500">●</span> Precio (DOP)
+              </label>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold text-slate-600">
+                  <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
+                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "15M+" : filters.priceRange[1].toLocaleString()}</span>
+                </div>
+                <div className="relative h-6">
+                  <input
+                    type="range"
+                    min="0"
+                    max={PRICE_MAX}
+                    step={PRICE_STEPS}
+                    value={filters.priceRange[0]}
+                    onChange={(e) => handlePriceChange([parseInt(e.target.value), filters.priceRange[1]])}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max={PRICE_MAX}
+                    step={PRICE_STEPS}
+                    value={filters.priceRange[1]}
+                    onChange={(e) => handlePriceChange([filters.priceRange[0], parseInt(e.target.value)])}
+                    className="absolute top-0 left-0 w-full h-1.5 bg-transparent appearance-none cursor-pointer accent-rose-500"
+                    style={{ pointerEvents: "auto" }}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  <span>0</span>
+                  <span>7.5M</span>
+                  <span>15M+</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Purple Box: Province + Lat/Lng */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <span className="text-purple-500">●</span> Provincia
+              </label>
               <select
-                value={filters.projectTypes[0] || "ALL"}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "ALL") {
-                    setFilters(prev => ({ ...prev, projectTypes: [] }));
-                  } else {
-                    setFilters(prev => ({ ...prev, projectTypes: [parseInt(val)] }));
-                  }
-                  setCurrentPage(1);
-                }}
-                className="bg-transparent text-sm font-bold text-slate-700 focus:outline-none"
+                value={filters.province}
+                onChange={(e) => updateFilter("province", e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
               >
-                <option value="ALL">TODOS LOS TIPOS</option>
-                {PROJECT_CATEGORIES.map(cat => (
-                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                <option value="">Todas</option>
+                {provincias?.map((p) => (
+                  <option key={p.nombre} value={p.nombre}>{p.nombre}</option>
                 ))}
               </select>
 
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
+                <span className="text-purple-500">●</span> Coordenadas (Lat, Lng)
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Ej: 18.47186, -69.93988"
+                  value={filters.latLng}
+                  onChange={handleLatLngChange}
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                />
+              </div>
+
+              {filters.latLng && (
+                <div className="text-[9px] font-bold text-purple-600 bg-purple-50 px-2 py-1.5 rounded-lg border border-purple-100 mt-2">
+                  Se auto-asignará la provincia más cercana
+                </div>
+              )}
+            </div>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
               <button
                 type="button"
-                onClick={() => setFiltersVisible(!filtersVisible)}
-                className={`ml-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${filtersVisible ? 'bg-primary text-white border-primary' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                onClick={clearAllFilters}
+                className="w-full px-3 py-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 bg-white rounded-xl border border-slate-100 shadow-sm transition-colors uppercase tracking-widest"
               >
-                Búsqueda Avanzada
+                Limpiar filtros
               </button>
-            </div>
+            )}
           </div>
-        </div>
-
-        <AnimatePresence>
-          {filtersVisible && (
-            <m.div
-              initial={{ height: 0, opacity: 0, marginBottom: 0 }}
-              animate={{ height: "auto", opacity: 1, marginBottom: 48 }}
-              exit={{ height: 0, opacity: 0, marginBottom: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6">
-                <div className="flex-1">
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Búsqueda</label>
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="RNC, Nombre..."
-                      value={filters.searchQuery}
-                      onChange={e => updateFilter("searchQuery", e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium"
-                    />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Provincia</label>
-                  <select
-                    className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium"
-                    value={filters.province}
-                    onChange={e => updateFilter("province", e.target.value)}
-                  >
-                    <option value="">Todas las provincias</option>
-                    {provincias?.map((p) => (
-                      <option key={p.id} value={p.nombre}>{p.nombre}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Precio Máximo</label>
-                  <div className="relative pt-2">
-                    <input
-                      min="0" max={PRICE_MAX} step={PRICE_STEPS}
-                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                      type="range"
-                      value={filters.priceRange[1]}
-                      onChange={e => handlePriceChange([0, parseInt(e.target.value)])}
-                    />
-                    <div className="mt-2 text-xs font-bold text-slate-500 text-right">
-                      Hasta {filters.priceRange[1] >= PRICE_MAX ? '15M+ DOP' : `${(filters.priceRange[1] / 1000000).toFixed(1)}M DOP`}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-end pb-1">
-                  <button
-                    type="button"
-                    onClick={clearAllFilters}
-                    className="px-4 py-3 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest"
-                  >
-                    Limpiar
-                  </button>
-                </div>
-              </div>
-            </m.div>
           )}
-        </AnimatePresence>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Right - Grid + Pagination */}
+          <div className="flex-1 min-w-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence mode="popLayout">
             {paginatedProjects.map((project, idx) => (
               <ProjectCard key={project.id} project={project} idx={idx} />
@@ -386,6 +433,8 @@ const ProjectsPublicListContent: React.FC = () => {
             </div>
           </div>
         )}
+          </div>{/* /.flex-1 */}
+        </div>{/* /.flex-row */}
       </section>
     </>
   );

@@ -26,6 +26,10 @@ public static class ProvinciaAliasRegistry
         { "ALTAGRACIA", "La Altagracia" },
         { "LA ALTAGRACIA", "La Altagracia" },
         { "LAALTAGRACIA", "La Altagracia" },
+        // PaddleOCR corruption observed in PLANO 505483687149: emits "AAALTAGRACIA"
+        // (extra leading "A", space removed) instead of "LA ALTAGRACIA".
+        { "AAALTAGRACIA", "La Altagracia" },
+        { "AA ALTAGRACIA", "La Altagracia" },
 
         // Santiago
         { "SANTIAGO", "Santiago" },

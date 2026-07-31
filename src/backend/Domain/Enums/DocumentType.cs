@@ -11,7 +11,6 @@ public enum DocumentType
     CertificadoTitulo = 21,
     CertificacionEstadoJuridico = 22,
     PlanoMensuraCatastral = 24,
-    PermisoConstruccion = 25,
     CertificadoUsoSuelo = 6,
     CertificacionIPI = 8,
     RegistroMercantil = 9,

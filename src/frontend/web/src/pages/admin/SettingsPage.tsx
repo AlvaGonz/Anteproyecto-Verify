@@ -50,7 +50,13 @@ export const SettingsPage: React.FC = () => {
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const isManagementTier = user?.plan === "Corporativo" || user?.plan === "Empresa";
 
-  const { data: users = [], isLoading: isLoadingUsers } = useUsers(1, 50, isAdmin);
+  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin);
+
+  useEffect(() => {
+    if (activeTab === "users") {
+      refetchUsers();
+    }
+  }, [activeTab, refetchUsers]);
 
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans(isAdmin);
 
@@ -101,6 +107,9 @@ export const SettingsPage: React.FC = () => {
     }
 
     try {
+      setIsModalOpen(false);
+      setEditingUser(null);
+
       if (editingUser) {
         await updateUserMutation.mutateAsync({ userId: editingUser.id, data: formData });
         addToast("Usuario actualizado exitosamente", "success");
@@ -108,8 +117,6 @@ export const SettingsPage: React.FC = () => {
         await createUserMutation.mutateAsync(formData);
         addToast("Usuario creado exitosamente", "success");
       }
-      setIsModalOpen(false);
-      setEditingUser(null);
     } catch (error: any) {
       console.error("API Error Response:", error?.response?.data);
       let errorMsg = "Error al guardar el usuario";
@@ -171,10 +178,10 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Navigation tabs */}
-      <div className="flex border-b border-border">
+      <div className="flex overflow-x-auto border-b border-border hide-scrollbar">
         <button type="button"
           onClick={() => setActiveTab("profile")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "profile"
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "profile"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
@@ -185,7 +192,7 @@ export const SettingsPage: React.FC = () => {
 
         <button type="button"
           onClick={() => setActiveTab("subscription")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "subscription"
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "subscription"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
@@ -198,7 +205,7 @@ export const SettingsPage: React.FC = () => {
           <>
             <button type="button"
               onClick={() => setActiveTab("users")}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "users"
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "users"
                 ? "border-[#223382] text-[#223382]"
                 : "border-transparent text-text-secondary hover:text-text-primary"
                 }`}
@@ -214,7 +221,7 @@ export const SettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab("invitees")}
-            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "invitees"
+            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "invitees"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-text-secondary hover:text-text-primary"
               }`}
@@ -228,7 +235,7 @@ export const SettingsPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab("security")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "security"
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "security"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
@@ -279,6 +286,7 @@ export const SettingsPage: React.FC = () => {
                 onEdit={handleEditClick}
                 onDelete={(id) => setDeleteId(id)}
                 onAddNew={handleAddNewClick}
+                onRefresh={refetchUsers}
               />
             </m.div>
           )}

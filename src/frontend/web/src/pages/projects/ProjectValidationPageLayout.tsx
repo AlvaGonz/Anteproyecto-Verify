@@ -38,7 +38,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
   handleScanComplete,
 }) => {
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
 
       {/* Header Premium */}
       <div className="mb-6 sm:mb-10 p-5 sm:p-8 lg:p-10 rounded-[24px] sm:rounded-[32px] bg-secondary relative overflow-hidden shadow-2xl group">
@@ -47,7 +47,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
         <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-primary/20 blur-[80px] sm:blur-[100px] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
         
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
-          <div className="flex items-center gap-4 sm:gap-8">
+          <div className="flex items-center gap-4 sm:gap-8 min-w-0 flex-1">
             <Link 
               to={`/admin/projects/${id}/edit`}
               className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-white/10 text-white flex items-center justify-center hover:bg-primary transition-all duration-300 hover:shadow-premium hover:-translate-x-1 backdrop-blur-sm border border-white/10 shrink-0"
@@ -74,13 +74,13 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto mt-2 lg:mt-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto mt-2 lg:mt-0 shrink-0">
             {!isEvaluating && (
               <button type="button"
                 onClick={handleRunValidation}
                 className="h-12 sm:h-14 px-6 sm:px-8 rounded-xl bg-white text-secondary font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 active:scale-95 w-full sm:w-auto"
               >
-                <RefreshCw className="w-4 h-4 shrink-0" /> <span className="truncate">Auditoría Integral</span>
+                <RefreshCw className="w-4 h-4 shrink-0" /> <span className="whitespace-nowrap">Auditoría Integral</span>
               </button>
             )}
           </div>

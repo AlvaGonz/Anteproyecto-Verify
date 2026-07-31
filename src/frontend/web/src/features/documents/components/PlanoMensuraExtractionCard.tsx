@@ -1,14 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { 
-  PlanoMensuraCatastralRdExtractionV1, 
-  ExtractionStatus, 
-  FieldStatus, 
-  ExtractedField 
+import {
+  PlanoMensuraCatastralRdExtractionV1,
+  ExtractionStatus,
+  FieldStatus,
+  ExtractedField
 } from "../types";
 import { ResolutionAction } from "../schemas/planoMensura.schema";
 import { Loader2 } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const norm = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+const matchesCatalogId = (value: string | null | undefined, options: Array<{ id: string; nombre: string }>): string | null => {
+  if (!value) return null;
+  // ponytail: 1-char OCR noise tolerance (e.g. "CONCEPCION DE LA VEGS" -> "Concepcion de La Vega").
+  // Upgrade path: server-side fuzzy via GeoToleranceMatcher when an HTTP endpoint exists.
+  if (UUID_REGEX.test(value)) {
+    return options.some(o => o.id === value) ? value : null;
+  }
+  const target = norm(value);
+  const match = options.find(o => {
+    const n = norm(o.nombre);
+    if (n === target) return true;
+    if (Math.abs(n.length - target.length) <= 1) {
+      let diffs = 0;
+      const len = Math.min(n.length, target.length);
+      for (let i = 0; i < len; i++) {
+        if (n[i] !== target[i]) {
+          diffs++;
+          if (diffs > 1) return false;
+        }
+      }
+      return diffs <= 1;
+    }
+    return false;
+  });
+  return match?.id ?? null;
+};
 
 interface PlanoMensuraExtractionCardProps {
   extraction: PlanoMensuraCatastralRdExtractionV1;
@@ -48,12 +78,24 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       try {
         const response = await fetch('/api/geo/provincias');
         if (!response.ok) throw new Error('Failed to fetch provinces');
-        const data = await response.json();
+        const data: Province[] = await response.json();
         setProvinces(data);
+
+        // Prefer persisted normalizedValue (user-selected UUID or explicitly cleared "") over OCR-derived provinceResolution
+        const resolvedFromOcr = extraction.provinceResolution?.resolvedId ?? null;
+        const resolvedFromRaw = matchesCatalogId(extraction.provincia?.rawValue, data);
         
-        // If there's a province resolution, select it
-        if (extraction.provinceResolution?.resolvedId) {
-          setSelectedProvinceId(extraction.provinceResolution.resolvedId);
+        let initialProvinceId = resolvedFromOcr ?? resolvedFromRaw;
+        if (extraction.provincia?.normalizedValue) {
+          const matched = matchesCatalogId(extraction.provincia.normalizedValue, data);
+          if (matched) initialProvinceId = matched;
+        }
+        
+        setSelectedProvinceId(initialProvinceId);
+
+        // Auto-apply if we found a local match from OCR raw text and it hasn't been saved yet
+        if (!resolvedFromOcr && resolvedFromRaw && !extraction.provincia?.normalizedValue && onAutoSelectField) {
+          onAutoSelectField('provincia', resolvedFromRaw, ResolutionAction.AutoApply);
         }
       } catch (error) {
         setProvinceError('Error al cargar provincias');
@@ -63,53 +105,110 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       }
     };
     fetchProvinces();
-  }, [extraction.provinceResolution?.resolvedId]);
+  }, [extraction.provinceResolution?.resolvedId, extraction.provincia?.normalizedValue, extraction.provincia?.rawValue]);
 
-  // Fetch municipalities when province is selected
+  // Fetch municipalities: scoped to selectedProvinceId when known, otherwise
+  // load the whole catalog if municipio data exists (orphan municipio case:
+  // OCR picked up "MUNICIPIO: ..." but could not find the PROVINCIA label).
   useEffect(() => {
-    if (!selectedProvinceId) {
-      setMunicipalities([]);
-      setSelectedMunicipalityId(null);
+    const municipioData =
+      extraction.municipio?.rawValue || extraction.municipalityResolution?.resolvedId || extraction.municipio?.normalizedValue;
+
+    if (selectedProvinceId) {
+      const fetchMunicipalities = async () => {
+        setLoadingMunicipalities(true);
+        setMunicipalityError(null);
+        try {
+          const response = await fetch(`/api/geo/municipios?provinciaId=${selectedProvinceId}`);
+          if (!response.ok) throw new Error('Failed to fetch municipalities');
+          const data: Municipality[] = await response.json();
+          setMunicipalities(data);
+
+          const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
+          const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
+          
+          let initialMunicipalityId = resolvedFromOcr ?? resolvedFromRaw;
+          if (extraction.municipio?.normalizedValue) {
+            const matched = matchesCatalogId(extraction.municipio.normalizedValue, data);
+            if (matched) initialMunicipalityId = matched;
+          }
+          
+          setSelectedMunicipalityId(initialMunicipalityId);
+
+          // Auto-apply if we found a local match from OCR raw text and it hasn't been saved yet
+          if (!resolvedFromOcr && resolvedFromRaw && !extraction.municipio?.normalizedValue && onAutoSelectField) {
+            onAutoSelectField('municipio', resolvedFromRaw, ResolutionAction.AutoApply);
+          }
+        } catch (error) {
+          setMunicipalityError('Error al cargar municipios');
+          console.error('Error fetching municipalities:', error);
+        } finally {
+          setLoadingMunicipalities(false);
+        }
+      };
+      fetchMunicipalities();
       return;
     }
 
-    const fetchMunicipalities = async () => {
-      setLoadingMunicipalities(true);
-      setMunicipalityError(null);
-      try {
-        const response = await fetch(`/api/geo/municipios?provinciaId=${selectedProvinceId}`);
-        if (!response.ok) throw new Error('Failed to fetch municipalities');
-        const data = await response.json();
-        setMunicipalities(data);
-        
-        // If there's a municipality resolution, select it
-        if (extraction.municipalityResolution?.resolvedId) {
-          setSelectedMunicipalityId(extraction.municipalityResolution.resolvedId);
+    if (municipioData) {
+      const fetchAllMunicipalities = async () => {
+        setLoadingMunicipalities(true);
+        setMunicipalityError(null);
+        try {
+          const response = await fetch('/api/geo/municipios');
+          if (!response.ok) throw new Error('Failed to fetch municipalities');
+          const data: Municipality[] = await response.json();
+          setMunicipalities(data);
+
+          const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
+          const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
+          
+          let initialMunicipalityId = resolvedFromOcr ?? resolvedFromRaw;
+          if (extraction.municipio?.normalizedValue) {
+            const matched = matchesCatalogId(extraction.municipio.normalizedValue, data);
+            if (matched) initialMunicipalityId = matched;
+          }
+          
+          setSelectedMunicipalityId(initialMunicipalityId);
+        } catch (error) {
+          setMunicipalityError('Error al cargar municipios');
+          console.error('Error fetching municipalities:', error);
+        } finally {
+          setLoadingMunicipalities(false);
         }
-      } catch (error) {
-        setMunicipalityError('Error al cargar municipios');
-        console.error('Error fetching municipalities:', error);
-      } finally {
-        setLoadingMunicipalities(false);
-      }
-    };
-    fetchMunicipalities();
-  }, [selectedProvinceId, extraction.municipalityResolution?.resolvedId]);
+      };
+      fetchAllMunicipalities();
+      return;
+    }
+
+    setMunicipalities([]);
+    setSelectedMunicipalityId(null);
+  }, [selectedProvinceId, extraction.municipalityResolution?.resolvedId, extraction.municipio?.normalizedValue, extraction.municipio?.rawValue]);
 
   // Auto-emit suggestion when resolution is ready and action is AutoApply
   useEffect(() => {
     if (!onAutoSelectField) return;
     
     // Check province resolution
-    if (extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply && extraction.provinceResolution?.resolvedId) {
+    if (
+      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.provinceResolution?.resolvedId &&
+      extraction.provincia?.normalizedValue !== extraction.provinceResolution.resolvedId
+    ) {
       onAutoSelectField('provincia', extraction.provinceResolution.resolvedId, ResolutionAction.AutoApply);
+      return; // Wait for refetch to avoid backend race condition
     }
     
     // Check municipality resolution
-    if (extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply && extraction.municipalityResolution?.resolvedId) {
+    if (
+      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.municipalityResolution?.resolvedId &&
+      extraction.municipio?.normalizedValue !== extraction.municipalityResolution.resolvedId
+    ) {
       onAutoSelectField('municipio', extraction.municipalityResolution.resolvedId, ResolutionAction.AutoApply);
     }
-  }, [extraction.provinceResolution, extraction.municipalityResolution, onAutoSelectField]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [extraction.provinceResolution, extraction.municipalityResolution, extraction.provincia, extraction.municipio]);
    
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
@@ -141,10 +240,17 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     const value = e.target.value;
     setSelectedProvinceId(value || null);
     setSelectedMunicipalityId(null); // Reset municipality when province changes
+    if (onEditField) {
+      void onEditField('provincia', value || '');
+    }
   };
 
   const handleMunicipalityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMunicipalityId(e.target.value || null);
+    const value = e.target.value;
+    setSelectedMunicipalityId(value || null);
+    if (onEditField) {
+      void onEditField('municipio', value || '');
+    }
   };
 
   const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string) => {
@@ -164,7 +270,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       const errorMsg = isProvincia ? provinceError : municipalityError;
       const options = isProvincia ? provinces : municipalities;
       const onChange = isProvincia ? handleProvinceChange : handleMunicipalityChange;
-      const disabled = isSaving || loading || (!isProvincia && !selectedProvinceId);
+      const disabled = isSaving || loading || (!isProvincia && options.length === 0);
       const defaultOptionText = isProvincia ? "-- Seleccionar Provincia --" : "-- Seleccionar Municipio --";
       
       return (

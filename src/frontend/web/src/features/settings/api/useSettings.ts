@@ -31,10 +31,15 @@ export const usePlans = (enabled = true) =>
 export const useUpdateUserRole = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationKey: ['useUsers'],
+    mutationKey: ['useUpdateUserRole'],
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       apiClient.patch<void>(`/admin/users/${userId}/role`, { role }).then(res => res.data),
-    onSuccess: () => {
+    onMutate: async ({ userId, role }) => {
+      qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
+        old?.map((u: any) => u.id === userId ? { ...u, role } : u)
+      );
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
     },
   });
@@ -46,7 +51,12 @@ export const useUpdateUserPlan = () => {
     mutationKey: ['useUpdateUserPlan'],
     mutationFn: ({ userId, planId }: { userId: string; planId: string }) =>
       apiClient.patch<void>(`/admin/users/${userId}/plan`, { planId }).then(res => res.data),
-    onSuccess: () => {
+    onMutate: async ({ userId, planId }) => {
+      qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
+        old?.map((u: any) => u.id === userId ? { ...u, planId } : u)
+      );
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
     },
   });
@@ -58,7 +68,12 @@ export const useCreateUser = () => {
     mutationKey: ['useCreateUser'],
     mutationFn: (data: CreateUserDto) =>
       apiClient.post<UserSettings>(`/admin/users`, data).then(res => res.data),
-    onSuccess: () => {
+    onMutate: async (data) => {
+      qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
+        old ? [{ id: "temp-" + Date.now(), ...data, planCreatedAt: new Date().toISOString() }, ...old] : old
+      );
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
     },
   });
@@ -70,7 +85,12 @@ export const useUpdateUser = () => {
     mutationKey: ['useUpdateUser'],
     mutationFn: ({ userId, data }: { userId: string; data: UpdateUserDto }) =>
       apiClient.put<UserSettings>(`/admin/users/${userId}`, data).then(res => res.data),
-    onSuccess: () => {
+    onMutate: async ({ userId, data }) => {
+      qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
+        old?.map((u: any) => u.id === userId ? { ...u, ...data } : u)
+      );
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
     },
   });
@@ -82,7 +102,12 @@ export const useDeleteUser = () => {
     mutationKey: ['useDeleteUser'],
     mutationFn: (userId: string) =>
       apiClient.delete<void>(`/admin/users/${userId}`).then(res => res.data),
-    onSuccess: () => {
+    onMutate: async (userId) => {
+      qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
+        old?.filter((u: any) => u.id !== userId)
+      );
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ["settings", "users"] });
     },
   });

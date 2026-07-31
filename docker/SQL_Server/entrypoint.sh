@@ -46,8 +46,6 @@ else
     echo "[Init] Restarted container — skipping SQL initialisation (schema already exists)."
 fi
 
-# Signal to the healthcheck that SQL Server itself is accepting connections
-touch /tmp/db_ready
 echo "[Init] SQL Server is ready."
 echo "================================================"
 echo "   Container is Running                         "
@@ -55,52 +53,19 @@ echo "================================================"
 
 # ── 4. Background: wait for EF Core migrations, then run seed data ───────────────────
 (
-    echo "[Seed] Waiting for EF Core to apply migrations to '$DB_NAME'..."
-    for j in $(seq 1 120); do
-        # Wait until at least 12 migrations have been applied
-        MIG_COUNT=$(
-            $SQLCMD $SQLCMD_OPTS \
-                -d "$DB_NAME" -h -1 \
-                -Q "SET NOCOUNT ON;
-                    IF OBJECT_ID('[__EFMigrationsHistory]') IS NOT NULL
-                        SELECT COUNT(*) FROM [__EFMigrationsHistory]
-                    ELSE
-                        SELECT 0" \
-                2>/dev/null | tr -d ' \r\n'
-        )
+    echo "[Seed] Running canonical schema rebuild (Build-Database-Sql.sql)..."
+    $SQLCMD $SQLCMD_OPTS -i "$SQL_FILE" || echo "[Seed] Warning: Build-Database-Sql.sql had errors."
 
-        # Treat empty/non-numeric result (DB not yet available) as 0
-        if ! echo "$MIG_COUNT" | grep -qE '^[0-9]+$'; then
-            MIG_COUNT=0
-        fi
-
-        if [ "$MIG_COUNT" -ge 12 ]; then
-            echo "[Seed] $MIG_COUNT migration(s) detected. Running seed data scripts..."
-
-            # NOTE: The user requested Build-Database-Sql.sql to be run as an SOS fallback
-            # to ensure any missing legacy or utility tables (like Provincia, ApiGobernanza) are present.
-            echo "[Seed] Running SOS Schema fallback (Build-Database-Sql.sql)..."
-            $SQLCMD $SQLCMD_OPTS -d "$DB_NAME" -i "$SQL_FILE" || echo "[Seed] Warning: Build-Database-Sql.sql had errors."
-
-            echo "[Seed] Running seed files..."
-            for seed_file in /usr/config/seeds/*.sql; do
-                [ -f "$seed_file" ] || continue
-                echo "[Seed]  -> $seed_file"
-                $SQLCMD $SQLCMD_OPTS -d "$DB_NAME" -i "$seed_file" \
-                    || echo "[Seed] Warning: $seed_file completed with errors."
-            done
-
-            echo "[Seed] All seeds complete."
-            break
-        fi
-
-        echo "[Seed] Waiting for migrations... ($MIG_COUNT/12 applied, attempt $j/120)"
-        sleep 3
+    echo "[Seed] Running seed files..."
+    for seed_file in /usr/config/seeds/*.sql; do
+        [ -f "$seed_file" ] || continue
+        echo "[Seed]  -> $seed_file"
+        $SQLCMD $SQLCMD_OPTS -d "$DB_NAME" -i "$seed_file" \
+            || echo "[Seed] Warning: $seed_file completed with errors."
     done
 
-    if [ "$MIG_COUNT" -lt 12 ] 2>/dev/null; then
-        echo "[Seed] WARNING: Gave up waiting for EF Core migrations after 6 minutes."
-    fi
+    echo "[Seed] All seeds complete."
+    touch /tmp/db_ready
 ) &
 
 # ── 5. Keep the container alive ───────────────────────────────────────────────

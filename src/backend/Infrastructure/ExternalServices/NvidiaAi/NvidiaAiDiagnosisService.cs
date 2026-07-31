@@ -51,7 +51,7 @@ Tu tarea es diagnosticar el expediente de un proyecto de construcción/titulaci�
 Debes analizar la lista proporcionada por el usuario y evaluar:
 1. Puntuación general de integridad (Score del 0 al 100):
    - Un expediente con 0 documentos válidos debe tener 0.
-   - La presencia de documentos obligatorios como 'CertificadoTitulo' y 'PermisoConstruccion' con estado 'Valid' aumenta significativamente la puntuación.
+   - La presencia de documentos obligatorios como 'CertificadoTitulo' con estado 'Valid' aumenta significativamente la puntuación.
    - Documentos con estado 'Invalid' o faltantes penalizan la puntuación.
 2. Identificar documentos obligatorios faltantes.
 3. Generar recomendaciones claras para el usuario en español.
@@ -61,7 +61,7 @@ Debes retornar ÚNICAMENTE un objeto JSON estructurado exactamente con el siguie
   ""score"": 75,
   ""summary"": ""Resumen profesional del estado del expediente aquí..."",
   ""missingDocuments"": [""TipoDocumentoFaltante1"", ""TipoDocumentoFaltante2""],
-  ""recommendations"": [""Subir el plano catastral firmado."", ""Corregir el permiso de construcción vencido.""]
+  ""recommendations"": [""Subir el plano catastral firmado."", ""Renovar el registro mercantil.""]
 }";
 
             var userPromptBuilder = new StringBuilder();

@@ -18,7 +18,6 @@ public static class RequiredDocumentsPolicy
             DocumentType.CertificadoTitulo,
             DocumentType.CertificacionEstadoJuridico,
             DocumentType.PlanoMensuraCatastral,
-            DocumentType.PermisoConstruccion,
             DocumentType.CertificadoUsoSuelo,
             DocumentType.CertificacionIPI,
             DocumentType.RegistroMercantil,

@@ -11,11 +11,11 @@ async function stubSettingsApis(page: import('@playwright/test').Page, overrides
       nombre: 'Invitado',
       apellido: 'Test',
       email: 'invitado@test.com',
-      role: 'user',
+      role: 'user', aceptoDescargo: true,
       plan: null,
       invitedByPlan: 'Corporativo',
       inviterPlan: 'Corporativo',
-      isGuest: true,
+      isGuest: true, aceptoDescargo: true,
       ...overrides?.auth,
     }})
   );
@@ -23,7 +23,7 @@ async function stubSettingsApis(page: import('@playwright/test').Page, overrides
     route.fulfill({ json: {
       subscriptionStatus: null,
       plan: null,
-      isGuest: true,
+      isGuest: true, aceptoDescargo: true,
       inviterPlan: 'Corporativo',
       planPrice: 500,
       ...overrides?.subscription,
@@ -102,7 +102,7 @@ test.describe('Settings > Subscription tab > Owner user', () => {
     await stubSettingsApis(page, {
       auth: {
         id: 'owner-001',
-        role: 'owner',
+        role: 'user', aceptoDescargo: true,
         plan: 'Corporativo',
         isGuest: false,
       },

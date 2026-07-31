@@ -132,6 +132,35 @@ namespace UnitTests.Application.Documents.Extractions
             result.Should().NotBeNull();
         }
 
+        // ── RED: real PaddleOCR output for "Título de Propiedad" has the        ──
+        // ── PODER JUDICIAL header concatenated with a space between REPUBLICA  ──
+        // ── and DOMINICANA, leaving a polluted municipio raw value. The dropdown ──
+        // ── for municipio stays empty because ResolvedId is null. After the     ──
+        // ── GeoTextNormalizer fix, MatchMunicipio must resolve HIGUEY→Higüey   ──
+        // ── via Tier 1 exact match on the normalized key "HIGUEY".            ──
+        [Fact]
+        public void MatchMunicipio_Higuey_WithPoderJudicialNoiseHeaderAndSpaces_ResolvesToHiguey()
+        {
+            var higueyId = System.Guid.Parse("22222222-0000-0000-0000-000000000001");
+            var municipioCatalog = new List<(System.Guid Id, string Name)>
+            {
+                (higueyId, "Higüey"),
+                (System.Guid.NewGuid(), "La Romana"),
+                (System.Guid.NewGuid(), "San Pedro de Macorís"),
+            };
+            var result = GeoToleranceMatcher.MatchMunicipio(
+                rawInput: "PODERJUDICIALREPUBLICA DOMINICANA HIGUEY",
+                catalog: municipioCatalog,
+                resolvedProvinciaId: System.Guid.Empty);
+
+            result.ResolutionMethod.Should().Be("exact",
+                "the polluted OCR header must be stripped by GeoTextNormalizer so HIGUEY matches Higüey");
+            result.ResolvedId.Should().Be(higueyId);
+            result.ResolvedName.Should().Be("Higüey");
+            result.SuggestedAction.Should().Be(ResolutionAction.AutoApply);
+            result.Confidence.Should().Be(1.0);
+        }
+
         // ── Resolution policy boundary tests ─────────────────────────────────────
         [Theory]
         [InlineData("exact", 1.0, ResolutionAction.AutoApply)]

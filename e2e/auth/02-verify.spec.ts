@@ -11,7 +11,7 @@ test.describe('02 - Verify Flow', () => {
     uniqueEmail = `verify_test_${Date.now()}@example.com`;
     const password = 'Password123!';
     
-    await request.post(`${API_URL}/auth/register`, {
+    const registerResponse = await request.post(`${API_URL}/auth/register`, {
       data: {
         nombre: 'Verify',
         apellidos: 'Tester',
@@ -20,9 +20,20 @@ test.describe('02 - Verify Flow', () => {
         confirmPassword: password
       }
     });
+    
+    if (!registerResponse.ok()) {
+      const errorText = await registerResponse.text();
+      console.error(`Registration failed: ${registerResponse.status()} - ${errorText}`);
+    }
+    expect(registerResponse.ok()).toBeTruthy();
 
     // Fetch the token using the dev endpoint
     const devResponse = await request.get(`${API_URL}/dev/last-verification-token?email=${uniqueEmail}`);
+    
+    if (!devResponse.ok()) {
+      const devError = await devResponse.text();
+      console.error(`Dev token fetch failed: ${devResponse.status()} - ${devError}`);
+    }
     expect(devResponse.ok()).toBeTruthy();
     const devData = await devResponse.json();
     verificationToken = devData.token;

@@ -15,7 +15,6 @@ const DOCUMENTOS_PRINCIPALES: { type: DocumentType; label: string; entity: strin
   { type: DocumentType.CertificacionEstadoJuridico, label: "Estado Jurídico", entity: "Registro de Títulos", norm: "Ley 108-05" },
   { type: DocumentType.PlanoMensuraCatastral, label: "Plano de Mensura", entity: "Tribunal de Tierras", norm: "Ley 108-05" },
   { type: DocumentType.CopiaCedulaIdentidad, label: "Cédula / Identidad del Titular", entity: "Junta Central Electoral", norm: "Ley 8-04" },
-  { type: DocumentType.PoderNotarial, label: "Poder Notarial (si aplica)", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
   { type: DocumentType.CertificacionIPI, label: "Certificación IPI", entity: "DGII", norm: "Ley 18-88" },
 ];
 
@@ -23,11 +22,8 @@ const ANEXOS: { type: DocumentType; label: string; entity: string; norm: string 
   { type: DocumentType.CertificadoUsoSuelo, label: "Uso de Suelo / No Objeción Municipal", entity: "Ayuntamiento", norm: "Ordenanzas" },
   { type: DocumentType.RegistroMercantil, label: "Registro Mercantil", entity: "Cámara de Comercio", norm: "Ley 3-02" },
   { type: DocumentType.RNC, label: "RNC activo", entity: "DGII", norm: "-" },
-  { type: DocumentType.PermisoConstruccion, label: "Permiso de Construcción", entity: "Ayuntamiento Municipal", norm: "Ordenanzas" },
-  { type: DocumentType.EstadosFinancieros, label: "Estados Financieros Auditados", entity: "Firma Auditora Certificada", norm: "-" },
-  { type: DocumentType.CertificacionesBancarias, label: "Certificaciones bancarias / origen de fondos", entity: "Banco / Institución Financiera", norm: "-" },
   { type: DocumentType.CertificadoEIA, label: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
-  { type: DocumentType.NoObjecionINAPACAASD, label: "No objeción INAPA/CAASD", entity: "INAPA / CAASD", norm: "-" },
+  { type: DocumentType.PoderNotarial, label: "Poder Notarial (si aplica)", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
 ];
 
 const getDocStatus = (doc: any) => {

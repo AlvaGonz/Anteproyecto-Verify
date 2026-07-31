@@ -28,7 +28,6 @@ const DOCUMENT_TYPE_NAMES: Record<string, string> = {
   [DocumentType.CertificadoTitulo]: "Certificado de Título",
   [DocumentType.CertificacionEstadoJuridico]: "Estado Jurídico",
   [DocumentType.PlanoMensuraCatastral]: "Mensura Catastral",
-  [DocumentType.PermisoConstruccion]: "Permiso Const.",
   [DocumentType.CertificadoUsoSuelo]: "Uso de Suelo",
   [DocumentType.CertificacionIPI]: "Cert. IPI",
   [DocumentType.RegistroMercantil]: "Reg. Mercantil",

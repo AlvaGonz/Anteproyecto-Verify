@@ -304,8 +304,10 @@ export const SubscriptionSettings: React.FC = () => {
                 {limits.exportacionPdf && (
                   <button type="button" data-testid="export-pdf-btn" className="px-4 py-2 rounded-lg border font-semibold text-sm bg-white text-text-primary hover:bg-slate-50 transition-colors">
                     PDF
-                  </button>
+                 </button>
                 )}
+
+                
 
                 <button
                   type="button"
@@ -315,7 +317,7 @@ export const SubscriptionSettings: React.FC = () => {
                   className="px-4 py-2 rounded-lg border font-semibold text-sm bg-white text-text-primary hover:bg-slate-50 transition-colors disabled:opacity-50"
                 >
                   Presentación Pública
-                </button>
+               </button>
               </div>
             </div>
             </>

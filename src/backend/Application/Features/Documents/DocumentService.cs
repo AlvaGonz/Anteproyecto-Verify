@@ -520,20 +520,50 @@ try
             // Resolve Provincia (if payload has a "provincia" ExtractedField)
             var provinciaNode = payload["provincia"] as JsonObject;
             var provinciaRawValue = provinciaNode?["rawValue"]?.GetValue<string>();
-            if (!string.IsNullOrWhiteSpace(provinciaRawValue))
+            var provinceResolution = !string.IsNullOrWhiteSpace(provinciaRawValue)
+                ? await _geoResolutionService.ResolveProvinciaAsync(provinciaRawValue, ct)
+                : null;
+
+            // Full-text fallback: when per-field rawValue is empty (e.g. PDFs without
+            // explicit "PROVINCIA:" label), scan the entire OCR text for any province-like
+            // substring. PDFs like PLANO 505483687149 have "AAALTAGRACIA" (corrupted
+            // "LA ALTAGRACIA") with no label - the matcher will resolve via Jaro-Winkler.
+            if (provinceResolution == null || provinceResolution.ResolvedId == null)
             {
-                var provinceResolution = await _geoResolutionService.ResolveProvinciaAsync(provinciaRawValue, ct);
+                if (!string.IsNullOrWhiteSpace(ocrResult.ExtractedText))
+                {
+                    var textFallback = await _geoResolutionService.ResolveProvinciaFromTextAsync(
+                        ocrResult.ExtractedText, ct);
+                    if (textFallback.ResolvedId != null)
+                        provinceResolution = textFallback;
+                }
+            }
+
+            if (provinceResolution != null)
+            {
                 payload["provinceResolution"] = JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(provinceResolution, options));
 
                 // Resolve Municipio (scoped to resolved province if available)
                 var municipioNode = payload["municipio"] as JsonObject;
                 var municipioRawValue = municipioNode?["rawValue"]?.GetValue<string>();
-                if (!string.IsNullOrWhiteSpace(municipioRawValue))
+                var provinciaId = provinceResolution.ResolvedId;
+
+                var municipalityResolution = !string.IsNullOrWhiteSpace(municipioRawValue)
+                    ? await _geoResolutionService.ResolveMunicipioAsync(municipioRawValue, provinciaId, ct)
+                    : null;
+
+                // Full-text fallback for municipio too.
+                if ((municipalityResolution == null || municipalityResolution.ResolvedId == null)
+                    && !string.IsNullOrWhiteSpace(ocrResult.ExtractedText))
                 {
-                    var provinciaId = provinceResolution.ResolvedId;
-                    var municipalityResolution = await _geoResolutionService.ResolveMunicipioAsync(municipioRawValue, provinciaId, ct);
-                    payload["municipalityResolution"] = JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(municipalityResolution, options));
+                    var muniFallback = await _geoResolutionService.ResolveMunicipioFromTextAsync(
+                        ocrResult.ExtractedText, provinciaId, ct);
+                    if (muniFallback.ResolvedId != null)
+                        municipalityResolution = muniFallback;
                 }
+
+                if (municipalityResolution != null)
+                    payload["municipalityResolution"] = JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(municipalityResolution, options));
             }
 
             ocrResult.CanonicalDataJson = envelope.ToJsonString(options);

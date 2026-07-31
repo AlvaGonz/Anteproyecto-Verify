@@ -8,7 +8,7 @@ test.describe("Upload Edge Cases E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin User", role: "ADMIN" })
+        body: JSON.stringify({ id: "user-001", email: "admin@verifinca.do", name: "Admin User", role: "admin", aceptoDescargo: true})
       });
     await page.route('**/api/v1/subscriptions/my-status', async (route) => {
       await route.fulfill({
@@ -117,8 +117,8 @@ test.describe("Upload Edge Cases E2E", () => {
     // Wait for the error toast
     await expect(page.getByText(/Error/i).first()).toBeVisible({ timeout: 5000 });
 
-    // The status should remain Pendiente (the row still shows the "Subir" button alongside the text)
-    const status = page.getByTestId("requirement-status-titulo");
-    await expect(status).toContainText("Pendiente");
+    // The status should remain Requerido (the row still shows the "Subir" button alongside the text)
+    const status = page.getByTestId("requirement-row-titulo");
+    await expect(status).toContainText("Requerido");
   });
 });

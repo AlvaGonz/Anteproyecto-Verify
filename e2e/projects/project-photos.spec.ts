@@ -37,8 +37,7 @@ test.describe("Renderizado de Fotos de Proyecto — E2E con Mock", () => {
           id: "user-001",
           email: "admin@verifinca.do",
           name: "Admin User",
-          role: "ADMIN"
-        })
+          role: "admin", aceptoDescargo: true})
       });
     await page.route('**/api/v1/subscriptions/my-status', async (route) => {
       await route.fulfill({
@@ -91,7 +90,7 @@ test.describe("Renderizado de Fotos de Proyecto — E2E con Mock", () => {
     });
 
     // 2. Default projects mock list
-    await page.route("**/api/projects", async (route) => {
+    await page.route(/\/api\/projects(\?.*)?$/, async (route) => {
       if (route.request().method() === "GET") {
         await route.fulfill({
           status: 200,

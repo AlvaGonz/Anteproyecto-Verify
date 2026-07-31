@@ -16,6 +16,13 @@ interface EstadoJuridicoExtractionCardProps {
   onAutoSelectField?: (fieldName: string, resolvedId: string, action: ResolutionAction) => void;
 }
 
+// Helper to find a catalog item by name (useful when OCR provides a name but we need the UUID)
+const matchesCatalogId = (value: string | undefined, catalog: { id: string; nombre: string }[]) => {
+  if (!value) return null;
+  const match = catalog.find(item => item.id === value || item.nombre.toLowerCase() === value.toLowerCase());
+  return match ? match.id : null;
+};
+
 interface Province {
   id: string;
   nombre: string;
@@ -82,9 +89,22 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         const data = await response.json();
         setMunicipalities(data);
         
-        // If there's a municipality resolution, select it
-        if (extraction.municipalityResolution?.resolvedId) {
-          setSelectedMunicipalityId(extraction.municipalityResolution.resolvedId);
+        const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
+        const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
+        
+        let initialMunicipalityId = resolvedFromOcr ?? resolvedFromRaw;
+        if (extraction.municipio?.normalizedValue === '') {
+          initialMunicipalityId = null;
+        } else if (extraction.municipio?.normalizedValue) {
+          const matched = matchesCatalogId(extraction.municipio.normalizedValue, data);
+          if (matched) initialMunicipalityId = matched;
+        }
+        
+        setSelectedMunicipalityId(initialMunicipalityId);
+
+        // Auto-apply if we found a local match from OCR raw text and it hasn't been saved yet
+        if (!resolvedFromOcr && resolvedFromRaw && !extraction.municipio?.normalizedValue && onAutoSelectField) {
+          onAutoSelectField('municipio', resolvedFromRaw, ResolutionAction.AutoApply);
         }
       } catch (error) {
         setMunicipalityError('Error al cargar municipios');
@@ -101,15 +121,25 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
     if (!onAutoSelectField) return;
     
     // Check province resolution
-    if (extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply && extraction.provinceResolution?.resolvedId) {
+    if (
+      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.provinceResolution?.resolvedId &&
+      extraction.provincia?.normalizedValue !== extraction.provinceResolution.resolvedId
+    ) {
       onAutoSelectField('provincia', extraction.provinceResolution.resolvedId, ResolutionAction.AutoApply);
+      return; // Wait for refetch to avoid backend race condition
     }
     
     // Check municipality resolution
-    if (extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply && extraction.municipalityResolution?.resolvedId) {
+    if (
+      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.municipalityResolution?.resolvedId &&
+      extraction.municipio?.normalizedValue !== extraction.municipalityResolution.resolvedId
+    ) {
       onAutoSelectField('municipio', extraction.municipalityResolution.resolvedId, ResolutionAction.AutoApply);
     }
-  }, [extraction.provinceResolution, extraction.municipalityResolution, onAutoSelectField]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [extraction.provinceResolution, extraction.municipalityResolution, extraction.provincia, extraction.municipio]);
    
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = useState("");

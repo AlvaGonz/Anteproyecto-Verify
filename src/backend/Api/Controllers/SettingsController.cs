@@ -68,17 +68,23 @@ public class SettingsController : ControllerBase
     private readonly Application.Abstractions.Security.IPasswordHasher _passwordHasher;
     private readonly Application.Abstractions.Notifications.IEmailService _emailService;
     private readonly ILogger<SettingsController> _logger;
+    private readonly Application.Abstractions.IStripeService _stripeService;
+    private readonly IConfiguration _config;
 
     public SettingsController(
         AppDbContext context, 
         Application.Abstractions.Security.IPasswordHasher passwordHasher,
         Application.Abstractions.Notifications.IEmailService emailService,
-        ILogger<SettingsController> logger)
+        ILogger<SettingsController> logger,
+        Application.Abstractions.IStripeService stripeService,
+        IConfiguration config)
     {
         _context = context;
         _passwordHasher = passwordHasher;
         _emailService = emailService;
         _logger = logger;
+        _stripeService = stripeService;
+        _config = config;
     }
 
     [HttpGet("users")]
@@ -123,7 +129,10 @@ public class SettingsController : ControllerBase
                     };
 
         var totalCount = await query.CountAsync(cancellationToken);
-        var rawItems = await query.ToListAsync(cancellationToken);
+        var rawItems = await query.OrderByDescending(x => x.PlanCreatedAt)
+                                  .Skip((page - 1) * pageSize)
+                                  .Take(pageSize)
+                                  .ToListAsync(cancellationToken);
 
         var itemIds = rawItems.Select(x => x.Id).ToList();
         var allInvitees = await _context.Usuarios
@@ -203,60 +212,100 @@ public class SettingsController : ControllerBase
         string finalPassword = string.IsNullOrWhiteSpace(request.Password) ? "Temporal123!" : request.Password;
         string hashedPassword = _passwordHasher.HashPassword(finalPassword);
 
-        var user = new Usuario(
-            nombre: nombre,
-            apellido: apellido,
-            correoElectronico: request.Email,
-            contrasenaHash: hashedPassword,
-            rol: role,
-            telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
-            cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
-        );
-
-        user.ForzarVerificacionEmail();
-
-        if (!string.IsNullOrWhiteSpace(request.PlanNombre))
-        {
-            var plan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == request.PlanNombre, cancellationToken);
-            if (plan != null)
-            {
-                user.AsignarPlan(plan.Idsuscripcion);
-                user.UpdateStripeSubscription(null, "active", DateTime.UtcNow.AddYears(1));
-            }
-        }
-
-        _context.Usuarios.Add(user);
-
-        // Save the new user first so that its ID exists in the database.
-        // This prevents foreign key conflicts when inserting Acceso and Pagos
-        // which depend on the user's ID.
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var notification = new Notificacion(
-            usuarioId: user.Id,
-            mensaje: $"Tu cuenta fue creada con el plan {request.PlanNombre ?? "sin asignar"}. Por favor, cámbiala en tu perfil.",
-            tipo: "Info",
-            enlaceRelacionado: "/profile"
-        );
-        _context.Notificaciones.Add(notification);
-
-        // Sync legacy (inserts Acceso and Pagos)
-        await SyncUserLegacyAsync(user, cancellationToken);
-
-        // Second SaveChangesAsync for notifications and legacy tables
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
-            var html = Infrastructure.Email.EmailTemplates.GetAccountCreatedByAdminEmail(nombre, request.Email, finalPassword);
-            await _emailService.SendEmailAsync(request.Email, "Cuenta Creada — VeriFinca", html);
+            var user = new Usuario(
+                nombre: nombre,
+                apellido: apellido,
+                correoElectronico: request.Email,
+                contrasenaHash: hashedPassword,
+                rol: role,
+                telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
+                cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
+            );
+
+            user.ForzarVerificacionEmail();
+
+            string? priceId = null;
+            if (!string.IsNullOrWhiteSpace(request.PlanNombre))
+            {
+                var plan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == request.PlanNombre, cancellationToken);
+                if (plan != null)
+                {
+                    user.AsignarPlan(plan.Idsuscripcion);
+                    // PriceId would usually come from Plan, but we use fallback if not available
+                    priceId = _config["Stripe:Prices:ProfesionalMonthly"];
+                }
+            }
+            
+            priceId ??= _config["Stripe:Prices:ProfesionalMonthly"];
+
+            // Si Stripe está habilitado, creamos el customer
+            if (!string.IsNullOrWhiteSpace(priceId))
+            {
+                try
+                {
+                    var stripeResult = await _stripeService.CreateCustomerWithSubscriptionAsync(
+                        email: request.Email,
+                        name: $"{nombre} {apellido}",
+                        userId: user.Id.ToString(),
+                        priceId: priceId,
+                        ct: cancellationToken
+                    );
+
+                    user.SetStripeCustomerId(stripeResult.CustomerId);
+                    user.UpdateStripeSubscription(stripeResult.SubscriptionId, "active", stripeResult.CurrentPeriodEnd);
+                }
+                catch (Stripe.StripeException stripeEx)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    _logger.LogError(stripeEx, "Stripe failed during admin user creation for {Email}", request.Email);
+                    return StatusCode(502, new { Message = "Payment provider error. User was not created." });
+                }
+            }
+
+            _context.Usuarios.Add(user);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var notification = new Notificacion(
+                usuarioId: user.Id,
+                mensaje: $"Tu cuenta fue creada con el plan {request.PlanNombre ?? "sin asignar"}. Por favor, cámbiala en tu perfil.",
+                tipo: "Info",
+                enlaceRelacionado: "/profile"
+            );
+            _context.Notificaciones.Add(notification);
+
+            await SyncUserLegacyAsync(user, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+
+            try
+            {
+                var html = Infrastructure.Email.EmailTemplates.GetAccountCreatedByAdminEmail(nombre, request.Email, finalPassword);
+                await _emailService.SendEmailAsync(request.Email, "Cuenta Creada — VeriFinca", html);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error sending welcome email to {Email} for plan {Plan}", request.Email, request.PlanNombre);
+            }
+
+            return Ok(new 
+            { 
+                Message = "Usuario creado exitosamente.", 
+                Id = user.Id,
+                StripeCustomerId = user.StripeCustomerId,
+                StripeSubscriptionId = user.StripeSubscriptionId,
+                NextBillingDate = user.CurrentPeriodEnd
+            });
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error sending welcome email to {Email} for plan {Plan}", request.Email, request.PlanNombre);
+            await transaction.RollbackAsync(cancellationToken);
+            _logger.LogError(ex, "Unexpected error during admin user creation");
+            return StatusCode(500, new { Message = "Internal error. User was not created." });
         }
-
-        return Ok(new { Message = "Usuario creado exitosamente.", Id = user.Id });
     }
 
     [HttpPut("users/{id}")]
