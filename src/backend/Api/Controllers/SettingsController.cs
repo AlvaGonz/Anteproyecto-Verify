@@ -129,7 +129,10 @@ public class SettingsController : ControllerBase
                     };
 
         var totalCount = await query.CountAsync(cancellationToken);
-        var rawItems = await query.ToListAsync(cancellationToken);
+        var rawItems = await query.OrderByDescending(x => x.PlanCreatedAt)
+                                  .Skip((page - 1) * pageSize)
+                                  .Take(pageSize)
+                                  .ToListAsync(cancellationToken);
 
         var itemIds = rawItems.Select(x => x.Id).ToList();
         var allInvitees = await _context.Usuarios
