@@ -175,7 +175,7 @@
   - Verified: **94/94** `e2e/projects/**` tests pass serially in 8.8m. New spec + orphan-municipio + dropdown-hydrate + plano-mensura-dropdown-regression + titulo-dropdown-regression + estado-juridico-dropdown-regression all green. Parallel runs occasionally flake on isolation but every test passes when run alone or in `--workers=1`.
 - **Status**: **Complete**.
 
-## Session 2026-07-31 � W3 backend GREEN complete + W4 next
+## Session 2026-07-31 � W3 backend GREEN complete + W4 next
 - 22/22 Playwright e2e GREEN (was 18/22).
 - Fixes applied:
   - [RequireTwoFactor] checks DB (TwoFactorEnabled) AND accepts both mr and http://schemas.microsoft.com/claims/authnmethodsreferences (ASP.NET's mapped alias).
@@ -184,23 +184,23 @@
   - [AllowAnonymous] on verify endpoints (since they ARE the auth flow, not protected by it).
   - enableTwoFactor helper now ends with /auth/logout so the test's later amr=2fa cookie is unambiguous.
 - Unit tests: 37/37 2FA-related pass (TotpService, RecoveryCodeService, TwoFactorSecretProtector, InMemoryTwoFactorChallengeStore, Usuario2FA).
-- 7 pre-existing unit tests in Quota/Subscriptions/Validation projects still fail � unrelated to 2FA.
+- 7 pre-existing unit tests in Quota/Subscriptions/Validation projects still fail � unrelated to 2FA.
 - Commits this session: e0e4598b (test cleanup), c5f89c06 (RequireTwoFactor amr mapping), 5c7dc0ea (EmailOtp lockout-before-lookup), 784fca24 (423 + AllowAnonymous), 8335e728 (dev TOTP endpoints in specs), 61e12b52 (PeekAsync + dev endpoints + recovery code hardening).
 
-## Next: W4 PHASE 3 GREEN � frontend
+## Next: W4 PHASE 3 GREEN � frontend
 - TwoFactorService.ts with eginEnrollment/confirmEnrollment/erifyCode/disable/status/equestEmailOtp/erifyEmailOtp/consumeRecoveryCode.
 - <TwoFactorSection /> for #/admin/settings security tab.
 - <EnrollmentWizard /> (QR code from otpAuthUri, confirm field, surface recovery codes once).
 - <ChallengeScreen /> (6-digit TOTP OR email OR recovery code).
 - AuthContext.tsx + AuthService.ts: discriminated-union login() return.
 
-## Session 2026-07-31 � W4 frontend GREEN complete
+## Session 2026-07-31 � W4 frontend GREEN complete
 - **TwoFactorService.ts** with 8 API methods (status, beginEnrollment, confirmEnrollment, verifyChallenge, requestEmailOtp, verifyEmailOtp, consumeRecoveryCode, disable).
 - **AuthService** migrated to LoginResult discriminated union: { succeeded: true, user, token } | { succeeded: false, requires2fa: true, challenge } | { succeeded: false, requires2fa: false, error }.
 - **AuthContext** exposes pendingChallenge + clearChallenge(); sets challenge when login returns equires2fa: true.
-- **ChallengeScreen** � 6-digit TOTP input + email OTP fallback + recovery code path; locks to lockout-status on 423/429.
-- **EnrollmentWizard** � 3-step flow (QR + secret, verify TOTP, show recovery codes once with confirmation gate).
-- **DisableTwoFactorDialog** � password + current TOTP step-up.
+- **ChallengeScreen** � 6-digit TOTP input + email OTP fallback + recovery code path; locks to lockout-status on 423/429.
+- **EnrollmentWizard** � 3-step flow (QR + secret, verify TOTP, show recovery codes once with confirmation gate).
+- **DisableTwoFactorDialog** � password + current TOTP step-up.
 - **TwoFactorSection** in admin/settings security tab (alongside DeleteAccountSection).
 - **LoginPage** conditionally renders <ChallengeScreen /> when pendingChallenge is set.
 - 8 LoginPage + AuthContext unit tests pass.
@@ -212,9 +212,36 @@
 - **New spec**: `e2e/projects/settings-users-crud.spec.ts` (runnable location; the old `e2e/settings/destructive-action.spec.ts` is NOT in any project testDir -> dead). 6 tests, 60s spec timeout for Vite cold-compile spikes.
 - **Phase 1A RED->GREEN**: plan-change tests confirmed existing `useUpdateUserPlan` onSettled invalidation works (no prod change needed). Commit `ad81c40c`.
 - **Phase 2A RED found real bugs**:
-  1. `SettingsPage.tsx` rejected edit submits for users with legacy c�dulas (check-digit re-validation on an immutable field). Fix: guard now `!editingUser && formData.cedula` (validate only on create). Commit `8c62f693`.
+  1. `SettingsPage.tsx` rejected edit submits for users with legacy c�dulas (check-digit re-validation on an immutable field). Fix: guard now `!editingUser && formData.cedula` (validate only on create). Commit `8c62f693`.
   2. `UserFormModal` / `DeleteModal` lacked dialog semantics + Escape close. Fix: `role=dialog`, `aria-modal`, `aria-labelledby` + document-level keydown Escape listener (overlay onKeyDown does NOT fire when focus stays on the trigger button). Commit `8c62f693`.
 - **Pre-existing blocker fixed** (commit `4bacfe73`): `EnrollmentWizard.tsx` had 2 unterminated JSX expressions (`<span>{error</span>`, `<code>{c}</code>`) that made Vite HMR fail the whole SettingsPage graph after any edit -> Vite error overlay blocked every settings E2E. Commit also swept in an uncommitted error-mapping refactor (toTwoFactorError/safeMessageFor) that was already in the dirty tree.
 - **Results**: settings-users-crud 6/6, settings-extension + settings-destructive-action + dashboard 22/22 serial. Frontend full-suite failures are parallel-run flakes (documented pattern; all pass --workers=1).
 - **post_task_loop.py**: BLOCK remains because `npx playwright test` (full suite) fails on 7 auth/api specs (09-pending-plan-redirect, 2fa-enroll-qr x2, 2fa-safe-errors x3, 12-resend-email) + route-performance budgets. Root cause: the UNCOMMITTED W5 refactor in the working tree (router/index.tsx, TwoFactorController.cs, TwoFactorLoginBranch.cs, BeginEnrollment.cs, ConfirmEnrollment.cs, dashboard files...) - not caused by OE-3 commits. OE-3 scope is green; full-suite BLOCK will clear once W5 work lands.
   - Added create-user flow test (POST /admin/users mock, card lands on plan tab) - GREEN first run, no prod fix needed (commit f6289391). Spec now 7/7 covering full users CRUD.
+
+## Session 2026-07-31 - OE-3 2FA Enrollment by QR + Standardized Safe Errors (W7 GREEN)
+- **Backend** (commit `f7965927`):
+  - `Application/Common/Errors/TwoFactorErrorCode.cs` — stable error-code constants (16 codes).
+  - `Api/Common/ErrorEnvelope.cs` — `{ succeeded, code, message, correlationId, lockedOut }` response shape.
+  - `Api/Common/CorrelationIdMiddleware.cs` — `X-Correlation-Id` propagation (request/response headers + `HttpContext.Items`).
+  - `BeginEnrollment` / `ConfirmEnrollment` handlers — emit `ErrorCode` (+ `LockedOut`) instead of free-text `ErrorMessage`.
+  - `TwoFactorController` — every failure returns `ErrorEnvelope` with safe Spanish message + correlation id.
+  - `GlobalExceptionHandler` — overrides `Detail` with safe Spanish strings; logs full exception with correlation id for audit.
+- **Frontend** (commit `52f979b0`):
+  - `features/auth/errors/twoFactorErrorCodes.ts` — mirror of backend enum.
+  - `features/auth/errors/twoFactorErrorMap.ts` — `ERROR_CATALOG` (16 safe Spanish messages) + `safeMessageFor(code)` + `toTwoFactorError(err)` axios-error mapper that NEVER returns backend `message` to UI.
+  - `EnrollmentWizard.tsx` — `<QRCode value={otpAuthUri}/>` rendered inside React `ErrorBoundary` (falls back to manual secret copy); wizard catches every error and renders `safeMessageFor(mapped.code)` in `<div role="alert">`.
+- **Tests added** (RED first, then GREEN):
+  - `features/auth/errors/__tests__/twoFactorErrorMap.test.ts` — 10/10 unit tests (safe mapping, no-leak guarantees).
+  - `features/settings/components/__tests__/EnrollmentWizard.test.tsx` — 7/7 RTL tests (QR render + fallback + 423 lockout safe msg + invalid code safe msg + unknown error safe msg).
+  - `e2e/auth/2fa-enroll-qr.spec.ts` — 3/3 (otpauth URI shape, status no-leak, invalid-code safe envelope).
+  - `e2e/auth/2fa-safe-errors.spec.ts` — 4/4 (envelope contract, no internal strings, already-active, no-pending, status contract).
+- **Quality gates green**: 37 backend 2FA unit + 17 frontend Vitest + 29/29 Playwright + Vite build OK.
+- **SECURITY**: User never sees stack traces, SQL exceptions, JWT/secret internals, framework diagnostic messages — all routed through `ERROR_CATALOG`. Backend keeps full exception detail in logs with correlation id only.
+- **OWASP MFA**: lockout after 5 attempts → safe "Demasiados intentos" message; recovery codes shown exactly once.
+
+## Session 2026-07-31 - OE-3 2FA ErrorEnvelope Refactor (W8 GREEN)
+- **Backend** (commit pending):
+  - `Api/Common/ErrorEnvelopeFactory.cs` — new static helper `BadRequest(HttpContext, code, message)` / `Locked(HttpContext, code, message)` returning `ObjectResult` with the envelope + correlation id.
+  - `TwoFactorController.cs` — replaced 10 inline `Envelope(...)` calls with `ErrorEnvelopeFactory.BadRequest/Locked`. Same wire format, less duplication. Ready for adoption by `AuthController` / `AccountController` / other endpoints in a follow-up.
+- **Quality gates**: 29/29 e2e GREEN after refactor (no regression).
