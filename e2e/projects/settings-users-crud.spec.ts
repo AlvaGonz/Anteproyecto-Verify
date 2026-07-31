@@ -86,6 +86,14 @@ async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStat
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Usuario eliminado exitosamente.' }) });
       return;
     }
+    if (req.method() === 'POST') {
+      const body = req.postDataJSON();
+      const plan = plans.find(p => p.name === body.planNombre);
+      const created = { id: 'u-new', ...body, planId: plan?.planId ?? 'pl-consult', planName: body.planNombre ?? 'Consultor', planCreatedAt: '2026-07-31T00:00:00Z' };
+      users.unshift(created);
+      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(created) });
+      return;
+    }
     if (req.method() === 'GET') {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: users, totalCount: users.length, page: 1, pageSize: 50 }) });
       return;
@@ -226,5 +234,28 @@ test.describe('Settings - Users Table CRUD', () => {
 
     await page.keyboard.press('Escape');
     await expect(page.getByRole('heading', { name: '¿Eliminar Usuario?' })).not.toBeVisible();
+  });
+
+  test('create user adds card to its plan tab', async ({ page }) => {
+    const users = seedUsers();
+    await mockAuth(page);
+    await mockAdminUsers(page, users);
+    await openUsersTab(page);
+
+    await page.getByRole('button', { name: 'Nuevo Usuario' }).click();
+    await expect(page.getByRole('heading', { name: 'Nuevo Usuario' })).toBeVisible();
+
+    await page.locator('#uf-nombre').fill('Lucía');
+    await page.locator('#uf-apellido').fill('Fernández');
+    await page.locator('#uf-email').fill('lucia@test.com');
+    await page.locator('#uf-telefono').fill('8095550109');
+    await page.locator('#uf-cedula').fill('00100000009');
+    await page.locator('#uf-plan').selectOption('Profesional');
+    await page.getByRole('button', { name: 'Guardar Usuario' }).click();
+
+    await expect(page.getByText('Usuario creado exitosamente')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Profesional 2' })).toBeVisible();
+    await page.getByRole('button', { name: 'Profesional 2' }).click();
+    await expect(page.getByRole('heading', { name: 'Lucía Fernández' })).toBeVisible();
   });
 });
