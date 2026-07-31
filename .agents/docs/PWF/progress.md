@@ -207,3 +207,13 @@
 - Build successful (Vite 6, ~17s).
 - 22/22 backend Playwright e2e still GREEN.
 - Commit: 43fe4aee.
+
+## Session 2026-07-31 - OE-3 Settings Users Table E2E (RED/GREEN complete)
+- **New spec**: `e2e/projects/settings-users-crud.spec.ts` (runnable location; the old `e2e/settings/destructive-action.spec.ts` is NOT in any project testDir -> dead). 6 tests, 60s spec timeout for Vite cold-compile spikes.
+- **Phase 1A RED->GREEN**: plan-change tests confirmed existing `useUpdateUserPlan` onSettled invalidation works (no prod change needed). Commit `ad81c40c`.
+- **Phase 2A RED found real bugs**:
+  1. `SettingsPage.tsx` rejected edit submits for users with legacy cédulas (check-digit re-validation on an immutable field). Fix: guard now `!editingUser && formData.cedula` (validate only on create). Commit `8c62f693`.
+  2. `UserFormModal` / `DeleteModal` lacked dialog semantics + Escape close. Fix: `role=dialog`, `aria-modal`, `aria-labelledby` + document-level keydown Escape listener (overlay onKeyDown does NOT fire when focus stays on the trigger button). Commit `8c62f693`.
+- **Pre-existing blocker fixed** (commit `4bacfe73`): `EnrollmentWizard.tsx` had 2 unterminated JSX expressions (`<span>{error</span>`, `<code>{c}</code>`) that made Vite HMR fail the whole SettingsPage graph after any edit -> Vite error overlay blocked every settings E2E. Commit also swept in an uncommitted error-mapping refactor (toTwoFactorError/safeMessageFor) that was already in the dirty tree.
+- **Results**: settings-users-crud 6/6, settings-extension + settings-destructive-action + dashboard 22/22 serial. Frontend full-suite failures are parallel-run flakes (documented pattern; all pass --workers=1).
+- **post_task_loop.py**: BLOCK remains because `npx playwright test` (full suite) fails on 7 auth/api specs (09-pending-plan-redirect, 2fa-enroll-qr x2, 2fa-safe-errors x3, 12-resend-email) + route-performance budgets. Root cause: the UNCOMMITTED W5 refactor in the working tree (router/index.tsx, TwoFactorController.cs, TwoFactorLoginBranch.cs, BeginEnrollment.cs, ConfirmEnrollment.cs, dashboard files...) - not caused by OE-3 commits. OE-3 scope is green; full-suite BLOCK will clear once W5 work lands.
