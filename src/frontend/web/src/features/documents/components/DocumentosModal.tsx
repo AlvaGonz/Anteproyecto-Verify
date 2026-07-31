@@ -23,7 +23,6 @@ const ANEXOS: { type: DocumentType; label: string; entity: string; norm: string 
   { type: DocumentType.RegistroMercantil, label: "Registro Mercantil", entity: "Cámara de Comercio", norm: "Ley 3-02" },
   { type: DocumentType.RNC, label: "RNC activo", entity: "DGII", norm: "-" },
   { type: DocumentType.CertificadoEIA, label: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
-  { type: DocumentType.NoObjecionINAPACAASD, label: "No objeción INAPA/CAASD", entity: "INAPA / CAASD", norm: "-" },
   { type: DocumentType.PoderNotarial, label: "Poder Notarial (si aplica)", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
 ];
 
