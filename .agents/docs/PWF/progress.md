@@ -193,3 +193,17 @@
 - <EnrollmentWizard /> (QR code from otpAuthUri, confirm field, surface recovery codes once).
 - <ChallengeScreen /> (6-digit TOTP OR email OR recovery code).
 - AuthContext.tsx + AuthService.ts: discriminated-union login() return.
+
+## Session 2026-07-31 — W4 frontend GREEN complete
+- **TwoFactorService.ts** with 8 API methods (status, beginEnrollment, confirmEnrollment, verifyChallenge, requestEmailOtp, verifyEmailOtp, consumeRecoveryCode, disable).
+- **AuthService** migrated to LoginResult discriminated union: { succeeded: true, user, token } | { succeeded: false, requires2fa: true, challenge } | { succeeded: false, requires2fa: false, error }.
+- **AuthContext** exposes pendingChallenge + clearChallenge(); sets challenge when login returns equires2fa: true.
+- **ChallengeScreen** — 6-digit TOTP input + email OTP fallback + recovery code path; locks to lockout-status on 423/429.
+- **EnrollmentWizard** — 3-step flow (QR + secret, verify TOTP, show recovery codes once with confirmation gate).
+- **DisableTwoFactorDialog** — password + current TOTP step-up.
+- **TwoFactorSection** in admin/settings security tab (alongside DeleteAccountSection).
+- **LoginPage** conditionally renders <ChallengeScreen /> when pendingChallenge is set.
+- 8 LoginPage + AuthContext unit tests pass.
+- Build successful (Vite 6, ~17s).
+- 22/22 backend Playwright e2e still GREEN.
+- Commit: 43fe4aee.
