@@ -21,7 +21,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _jwtOptions = jwtOptions.Value;
     }
 
-    public string GenerateToken(Usuario user)
+    public string GenerateToken(Usuario user, bool mfaAuthenticated = false)
     {
         var roleStr = user.Rol switch
         {
@@ -37,7 +37,9 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.Name, user.NombreCompleto),
             new Claim(ClaimTypes.Role, roleStr),
             new Claim("cedula", user.Cedula ?? string.Empty),
-            new Claim("telefono", user.Telefono ?? string.Empty)
+            new Claim("telefono", user.Telefono ?? string.Empty),
+            new Claim("two_factor_enabled", user.TwoFactorEnabled ? "true" : "false"),
+            new Claim("amr", mfaAuthenticated ? "2fa" : "pwd")
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
