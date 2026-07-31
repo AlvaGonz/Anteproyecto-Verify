@@ -3,6 +3,7 @@ namespace Api.Common;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Abstractions.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -14,25 +15,41 @@ using Microsoft.AspNetCore.Mvc.Filters;
 ///</summary>
 public sealed class RequireTwoFactorAttribute : Attribute, IAsyncAuthorizationFilter
 {
-    public Task OnAuthorizationAsync(AuthorizationFilterContext context)
+    // ASP.NET Core's JWT middleware maps the standard "amr" claim to its
+    // namespaced URI, so check both keys for portability.
+    private const string AmrClaimOriginal = "amr";
+    private const string AmrClaimMapped = "http://schemas.microsoft.com/claims/authnmethodsreferences";
+
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        var user = context.HttpContext.User;
+        var http = context.HttpContext;
+        var user = http.User;
         if (user?.Identity?.IsAuthenticated != true)
         {
             context.Result = new ChallengeResult();
-            return Task.CompletedTask;
+            return;
         }
 
-        var twoFactorEnabled = user.FindFirst("two_factor_enabled")?.Value == "true";
-        if (!twoFactorEnabled)
+        var id = user.FindFirst("sub")?.Value ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var userId))
         {
-            return Task.CompletedTask;
+            context.Result = new ChallengeResult();
+            return;
         }
 
-        var amr = user.FindFirst("amr")?.Value;
+        var repo = http.RequestServices.GetService<IUsuarioRepository>();
+        var dbUser = repo is null ? null : await repo.GetByIdAsync(userId, http.RequestAborted);
+
+        if (dbUser?.TwoFactorEnabled != true)
+        {
+            return;
+        }
+
+        var amr = user.FindFirst(AmrClaimOriginal)?.Value
+                  ?? user.FindFirst(AmrClaimMapped)?.Value;
         if (amr == "2fa")
         {
-            return Task.CompletedTask;
+            return;
         }
 
         context.Result = new ObjectResult(new
@@ -44,6 +61,5 @@ public sealed class RequireTwoFactorAttribute : Attribute, IAsyncAuthorizationFi
         {
             StatusCode = StatusCodes.Status403Forbidden
         };
-        return Task.CompletedTask;
     }
 }
