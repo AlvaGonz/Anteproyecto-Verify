@@ -41,7 +41,7 @@ public sealed class VerifyTwoFactorCodeCommandHandler
 
     public async Task<VerifyTwoFactorCodeResult> Handle(VerifyTwoFactorCodeCommand request, CancellationToken cancellationToken)
     {
-        var challenge = await _challengeStore.ConsumeAsync(request.ChallengeToken, cancellationToken);
+        var challenge = await _challengeStore.PeekAsync(request.ChallengeToken, cancellationToken);
         if (challenge is null)
             return new VerifyTwoFactorCodeResult(false, "Desafío inválido o expirado.", null, null);
 
@@ -67,6 +67,7 @@ public sealed class VerifyTwoFactorCodeCommandHandler
             return new VerifyTwoFactorCodeResult(false, "Código TOTP inválido.", null, null);
         }
 
+        await _challengeStore.ConsumeAsync(request.ChallengeToken, cancellationToken);
         user.Register2FASuccess();
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -43,6 +43,16 @@ public class InMemoryTwoFactorChallengeStore : ITwoFactorChallengeStore
         return Task.FromResult<TwoFactorChallenge?>(null);
     }
 
+    public Task<TwoFactorChallenge?> PeekAsync(string challengeToken, CancellationToken cancellationToken = default)
+    {
+        var key = KeyPrefix + challengeToken;
+        if (_cache.TryGetValue(key, out TwoFactorChallenge? challenge))
+        {
+            return Task.FromResult<TwoFactorChallenge?>(challenge);
+        }
+        return Task.FromResult<TwoFactorChallenge?>(null);
+    }
+
     private static string NewToken()
     {
         Span<byte> bytes = stackalloc byte[32];

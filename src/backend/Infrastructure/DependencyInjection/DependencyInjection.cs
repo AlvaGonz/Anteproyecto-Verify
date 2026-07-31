@@ -180,6 +180,7 @@ public static class DependencyInjection
             new Security.TwoFactorSecretProtector(sp.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtector>()));
         services.AddMemoryCache();
         services.AddSingleton<Application.Abstractions.Security.ITwoFactorChallengeStore, Security.InMemoryTwoFactorChallengeStore>();
+        services.AddScoped<global::Infrastructure.Services.EmailOtpService>();
 
         services.AddScoped<IStripeService, Services.StripeService>();
         services.AddScoped<Application.Contracts.Subscriptions.ISubscriptionService, Services.SubscriptionService>();
