@@ -112,7 +112,7 @@
 
 ## 📋 Current Task: OCR Geographic Resolver — Provincia & Municipio (Título de Propiedad)
 
-### Status: RED PHASE — Writing failing tests
+### Status: **COMPLETE** ✅
 
 **Decisions APPROVED:**
 1. **Q1 — Human Gate ✅**: Create `15_Municipios.sql` (not 02) with 158 DR municipalities. Source: ONE División Territorial 2021 publication, reproducible CSV snapshot with checksum, transformation script documented, FK validated against existing 32 provinces.
@@ -134,6 +134,17 @@
 - Add province-scoped municipality resolution tests
 - Add OCR-noise normalization tests with realistic bad inputs
 - Seed requires: exact source file/version, reproducible snapshot, transformation script, FK validation, Human Gate before write
+
+**Implemented & Verified:**
+- `GeoTextNormalizer.cs` — added `_poderJudicialNoisePrefix` regex (step 5b) to strip `PODERJUDICIALREPUBLICADOMINICANA` header pollution
+- `CertificadoTituloRdPaddleMapper` — uses normalizer, extracts provincia/municipio correctly
+- `DocumentService.ApplyGeographicResolutionAsync` — calls `GeoResolutionService.ResolveProvinciaAsync`/`ResolveMunicipioAsync` after mapping
+- `GeoToleranceMatcher` — 3-tier exact/alias/fuzzy with Jaro-Winkler, thresholds as per Q3
+- `ProvinciaAliasRegistry` — handles known OCR corruptions (`LAALTAGRACIA`, `SAN CRISTOBAL`, etc.)
+- E2E test `e2e/projects/titulo-dropdown-regression.spec.ts` — real PDF upload, polls until `municipio.rawValue` contains `HIGUEY`, verifies `resolvedName = 'Higüey'` with `exact` method, asserts UI card renders with dropdowns populated
+- All 94 `e2e/projects/**` tests pass serially
+
+**Status**: **Complete** (2026-07-30).
 
 ## 📄 Completed Tasks (UI Improvements)
 - Refactored document extraction UI components (`DocumentExtractionPanel`, `ExtractionFieldCard`) to unify layout and eliminate overlapping text.
