@@ -174,3 +174,22 @@
   - RED spec `e2e/projects/plano-mensura-label-less-fallback.spec.ts` â€” real PDF upload of `PLANO 505483687149.pdf`, polls API until `provinceResolution.resolvedName === 'La Altagracia'` with `suggestedAction === AutoApply (0)`, asserts UI dropdown enabled + pre-selected to the La Altagracia UUID + has 'La Altagracia' option.
   - Verified: **94/94** `e2e/projects/**` tests pass serially in 8.8m. New spec + orphan-municipio + dropdown-hydrate + plano-mensura-dropdown-regression + titulo-dropdown-regression + estado-juridico-dropdown-regression all green. Parallel runs occasionally flake on isolation but every test passes when run alone or in `--workers=1`.
 - **Status**: **Complete**.
+
+## Session 2026-07-31 — W3 backend GREEN complete + W4 next
+- 22/22 Playwright e2e GREEN (was 18/22).
+- Fixes applied:
+  - [RequireTwoFactor] checks DB (TwoFactorEnabled) AND accepts both mr and http://schemas.microsoft.com/claims/authnmethodsreferences (ASP.NET's mapped alias).
+  - EmailOtpService checks Is2FALockedOut BEFORE OTP lookup so the 6th attempt returns 423 (not 400 'No hay OTP').
+  - TOTP/Email-OTP verify endpoints now return 423 Locked on lockout; otherwise 400.
+  - [AllowAnonymous] on verify endpoints (since they ARE the auth flow, not protected by it).
+  - enableTwoFactor helper now ends with /auth/logout so the test's later amr=2fa cookie is unambiguous.
+- Unit tests: 37/37 2FA-related pass (TotpService, RecoveryCodeService, TwoFactorSecretProtector, InMemoryTwoFactorChallengeStore, Usuario2FA).
+- 7 pre-existing unit tests in Quota/Subscriptions/Validation projects still fail — unrelated to 2FA.
+- Commits this session: e0e4598b (test cleanup), c5f89c06 (RequireTwoFactor amr mapping), 5c7dc0ea (EmailOtp lockout-before-lookup), 784fca24 (423 + AllowAnonymous), 8335e728 (dev TOTP endpoints in specs), 61e12b52 (PeekAsync + dev endpoints + recovery code hardening).
+
+## Next: W4 PHASE 3 GREEN — frontend
+- TwoFactorService.ts with eginEnrollment/confirmEnrollment/erifyCode/disable/status/equestEmailOtp/erifyEmailOtp/consumeRecoveryCode.
+- <TwoFactorSection /> for #/admin/settings security tab.
+- <EnrollmentWizard /> (QR code from otpAuthUri, confirm field, surface recovery codes once).
+- <ChallengeScreen /> (6-digit TOTP OR email OR recovery code).
+- AuthContext.tsx + AuthService.ts: discriminated-union login() return.
