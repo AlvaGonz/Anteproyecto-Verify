@@ -8,6 +8,7 @@ interface UserFormModalProps {
   isOpen: boolean;
   editingUser: UserSettings | null;
   formData: CreateUserDto;
+  error?: string | null;
   isProcessing: boolean;
   onChange: (data: CreateUserDto) => void;
   onSubmit: (e: React.FormEvent) => Promise<void>;
@@ -18,6 +19,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   isOpen,
   editingUser,
   formData,
+  error,
   isProcessing,
   onChange,
   onSubmit,
@@ -69,6 +71,11 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
         </div>
 
         <form onSubmit={onSubmit} className="p-6 space-y-4">
+          {error && (
+            <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-3 py-2">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="uf-nombre" className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre</label>

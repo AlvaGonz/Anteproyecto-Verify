@@ -46,6 +46,7 @@ export const SettingsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
@@ -109,9 +110,6 @@ export const SettingsPage: React.FC = () => {
     }
 
     try {
-      setIsModalOpen(false);
-      setEditingUser(null);
-
       if (editingUser) {
         await updateUserMutation.mutateAsync({ userId: editingUser.id, data: formData });
         addToast("Usuario actualizado exitosamente", "success");
@@ -119,8 +117,10 @@ export const SettingsPage: React.FC = () => {
         await createUserMutation.mutateAsync(formData);
         addToast("Usuario creado exitosamente", "success");
       }
+      setIsModalOpen(false);
+      setEditingUser(null);
+      setFormError(null);
     } catch (error: any) {
-      console.error("API Error Response:", error?.response?.data);
       let errorMsg = "Error al guardar el usuario";
       if (error?.response?.data) {
         const d = error.response.data;
@@ -131,18 +131,21 @@ export const SettingsPage: React.FC = () => {
           errorMsg = Object.values(d.errors).flat().join(' ');
         }
       }
-      addToast(errorMsg, "error");
+      // ponytail: keep the modal open so the admin can fix the field; error shown inside the form
+      setFormError(errorMsg);
     }
   };
 
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
+    setFormError(null);
     setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "dev", "validator", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
     setIsModalOpen(true);
   };
 
   const handleAddNewClick = () => {
     setEditingUser(null);
+    setFormError(null);
     setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Consultor" });
     setIsModalOpen(true);
   };
@@ -334,10 +337,11 @@ export const SettingsPage: React.FC = () => {
         isOpen={isModalOpen}
         editingUser={editingUser}
         formData={formData}
+        error={formError}
         isProcessing={isProcessing}
-        onChange={setFormData}
+        onChange={(data) => { setFormError(null); setFormData(data); }}
         onSubmit={handleSaveUser}
-        onClose={() => { setIsModalOpen(false); setEditingUser(null); }}
+        onClose={() => { setIsModalOpen(false); setEditingUser(null); setFormError(null); }}
       />
 
       {/* Delete Confirmation Modal */}
