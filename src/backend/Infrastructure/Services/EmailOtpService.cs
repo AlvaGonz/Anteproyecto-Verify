@@ -50,7 +50,8 @@ public sealed class EmailOtpService
 
     public async Task<RequestEmailOtpResult> Handle(RequestEmailOtpCommand request, CancellationToken cancellationToken)
     {
-        var challenge = await _challengeStore.ConsumeAsync(request.ChallengeToken, cancellationToken);
+        // Peek the challenge without consuming it — resend must keep the same challenge live.
+        var challenge = await _challengeStore.PeekAsync(request.ChallengeToken, cancellationToken);
         if (challenge is null)
             return new RequestEmailOtpResult(false, "Desafío inválido o expirado.");
 
@@ -58,9 +59,8 @@ public sealed class EmailOtpService
         if (user is null)
             return new RequestEmailOtpResult(false, "Usuario no encontrado.");
 
-        // Replace any existing Verificacion2FA for this user (single active per challenge)
         var existing = await _db.Verificaciones2FA
-            .Where(v => v.UsuarioId == user.Id)
+            .Where(v => v.SesionId == request.ChallengeToken)
             .ToListAsync(cancellationToken);
         if (existing.Count > 0)
         {
@@ -75,7 +75,7 @@ public sealed class EmailOtpService
         }
 
         var code = NewCode(OtpLength);
-        var v = new Verificacion2FA(user.Id, challenge.ChallengeToken, code);
+        var v = new Verificacion2FA(user.Id, request.ChallengeToken, code);
         _db.Verificaciones2FA.Add(v);
         user.MarkEmailOtpSent();
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -93,13 +93,16 @@ public sealed class EmailOtpService
 
     public async Task<VerifyEmailOtpResult> HandleVerify(VerifyEmailOtpCommand request, CancellationToken cancellationToken)
     {
-        var challenge = await _challengeStore.ConsumeAsync(request.ChallengeToken, cancellationToken);
+        var challenge = await _challengeStore.PeekAsync(request.ChallengeToken, cancellationToken);
         if (challenge is null)
             return new VerifyEmailOtpResult(false, "Desafío inválido o expirado.", null, null);
 
         var user = await _usuarioRepository.GetByIdAsync(challenge.UsuarioId, cancellationToken);
         if (user is null)
             return new VerifyEmailOtpResult(false, "Usuario no encontrado.", null, null);
+
+        if (user.Is2FALockedOut)
+            return new VerifyEmailOtpResult(false, "Demasiados intentos. Intente más tarde.", null, null);
 
         var active = await _db.Verificaciones2FA
             .Where(v => v.UsuarioId == user.Id && v.SesionId == challenge.ChallengeToken)
@@ -118,6 +121,8 @@ public sealed class EmailOtpService
 
         if (string.IsNullOrEmpty(request.Code) || !string.Equals(active.NumeroVerificable, request.Code, StringComparison.Ordinal))
         {
+            user.Register2FAFailure();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _audit.AppendAsync(new AuditEntryDto
             {
                 UsuarioId = user.Id,
@@ -128,6 +133,8 @@ public sealed class EmailOtpService
             return new VerifyEmailOtpResult(false, "Código inválido.", null, null);
         }
 
+        // Consume challenge on success
+        await _challengeStore.ConsumeAsync(request.ChallengeToken, cancellationToken);
         _db.Verificaciones2FA.Remove(active);
         user.Register2FASuccess();
         await _unitOfWork.SaveChangesAsync(cancellationToken);
