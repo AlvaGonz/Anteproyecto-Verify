@@ -263,8 +263,8 @@ public static class AppDbContextSeeder
                 await GetOrCreateHallazgoAsync(
                     context,
                     proyectoId: p3.Id,
-                    titulo: "Permiso de construcción rechazado",
-                    descripcion: "Falta firma del director de planeamiento urbano",
+                    titulo: "Plano de mensura rechazado",
+                    descripcion: "Falta firma del agrimensor",
                     severidad: FindingSeverity.Critical,
                     fuente: "Ayuntamiento");
 

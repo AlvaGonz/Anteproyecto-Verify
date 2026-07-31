@@ -26,7 +26,6 @@ public class RequiredDocumentsRule : IValidationRule
             DocumentType.CertificadoTitulo, 
             DocumentType.CertificacionEstadoJuridico, 
             DocumentType.PlanoMensuraCatastral,
-            DocumentType.PermisoConstruccion,
             DocumentType.CertificadoUsoSuelo,
             DocumentType.CertificacionIPI,
             DocumentType.RegistroMercantil,

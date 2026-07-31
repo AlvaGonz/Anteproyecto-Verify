@@ -319,7 +319,6 @@ public class ProyectoRepository : IProyectoRepository
             { DocumentType.CertificadoTitulo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
             { DocumentType.CertificacionEstadoJuridico, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
             { DocumentType.PlanoMensuraCatastral, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.PermisoConstruccion, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
             { DocumentType.CertificadoUsoSuelo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
             { DocumentType.CertificacionIPI, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
             { DocumentType.RegistroMercantil, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
