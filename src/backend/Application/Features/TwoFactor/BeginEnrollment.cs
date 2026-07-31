@@ -10,7 +10,7 @@ using Application.Features.Auth.Commands.LoginUser;
 using Domain.Enums;
 
 public sealed record BeginEnrollmentCommand(Guid UsuarioId);
-public sealed record BeginEnrollmentResult(bool IsSuccess, string? ErrorMessage, string? Secret, string? OtpAuthUri);
+public sealed record BeginEnrollmentResult(bool IsSuccess, string? ErrorMessage, string ErrorCode, string? Secret, string? OtpAuthUri);
 
 public sealed class BeginEnrollmentCommandHandler
 {
@@ -35,10 +35,10 @@ public sealed class BeginEnrollmentCommandHandler
     {
         var user = await _usuarioRepository.GetByIdAsync(request.UsuarioId, cancellationToken);
         if (user is null)
-            return new BeginEnrollmentResult(false, "Usuario no encontrado.", null, null);
+            return new BeginEnrollmentResult(false, null, Application.Common.Errors.TwoFactorErrorCode.Unknown, null, null);
 
         if (user.TwoFactorEnabled)
-            return new BeginEnrollmentResult(false, "El usuario ya tiene 2FA activado. Cancele la inscripción actual primero.", null, null);
+            return new BeginEnrollmentResult(false, null, Application.Common.Errors.TwoFactorErrorCode.EnrollmentAlreadyActive, null, null);
 
         var plainSecret = _totpService.GenerateSecret();
         var encrypted = _secretProtector.Protect(plainSecret);
@@ -47,6 +47,6 @@ public sealed class BeginEnrollmentCommandHandler
 
         var issuer = "VeriFinca";
         var uri = _totpService.BuildOtpAuthUri(user.Email, plainSecret, issuer);
-        return new BeginEnrollmentResult(true, null, plainSecret, uri);
+        return new BeginEnrollmentResult(true, null, Application.Common.Errors.TwoFactorErrorCode.Unknown, plainSecret, uri);
     }
 }

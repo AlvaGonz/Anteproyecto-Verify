@@ -9,7 +9,7 @@ using Application.Abstractions.Security;
 using Domain.Enums;
 
 public sealed record ConfirmEnrollmentCommand(Guid UsuarioId, int Code);
-public sealed record ConfirmEnrollmentResult(bool IsSuccess, string? ErrorMessage, IReadOnlyList<string>? RecoveryCodes);
+public sealed record ConfirmEnrollmentResult(bool IsSuccess, string ErrorCode, bool LockedOut, IReadOnlyList<string>? RecoveryCodes);
 
 public sealed class ConfirmEnrollmentCommandHandler
 {
@@ -40,16 +40,16 @@ public sealed class ConfirmEnrollmentCommandHandler
     {
         var user = await _usuarioRepository.GetByIdAsync(request.UsuarioId, cancellationToken);
         if (user is null)
-            return new ConfirmEnrollmentResult(false, "Usuario no encontrado.", null);
+            return new ConfirmEnrollmentResult(false, Application.Common.Errors.TwoFactorErrorCode.Unknown, false, null);
 
         if (user.TwoFactorEnabled)
-            return new ConfirmEnrollmentResult(false, "El usuario ya tiene 2FA activado.", null);
+            return new ConfirmEnrollmentResult(false, Application.Common.Errors.TwoFactorErrorCode.EnrollmentAlreadyActive, false, null);
 
         if (string.IsNullOrWhiteSpace(user.TwoFactorSecretEncrypted))
-            return new ConfirmEnrollmentResult(false, "No hay una inscripción pendiente. Inicie una inscripción primero.", null);
+            return new ConfirmEnrollmentResult(false, Application.Common.Errors.TwoFactorErrorCode.NoPendingEnrollment, false, null);
 
         if (user.Is2FALockedOut)
-            return new ConfirmEnrollmentResult(false, "Demasiados intentos fallidos. Intente más tarde.", null);
+            return new ConfirmEnrollmentResult(false, Application.Common.Errors.TwoFactorErrorCode.TotpLockedOut, true, null);
 
         var plainSecret = _secretProtector.Unprotect(user.TwoFactorSecretEncrypted);
         if (!_totpService.ValidateCode(plainSecret, request.Code))
@@ -63,7 +63,7 @@ public sealed class ConfirmEnrollmentCommandHandler
                 Accion = "Código TOTP inválido durante confirmación de inscripción",
                 Resultado = "Fallido"
             }, cancellationToken);
-            return new ConfirmEnrollmentResult(false, "Código TOTP inválido.", null);
+            return new ConfirmEnrollmentResult(false, Application.Common.Errors.TwoFactorErrorCode.TotpInvalidCode, false, null);
         }
 
         var set = _recoveryCodes.Generate(10);
@@ -78,6 +78,6 @@ public sealed class ConfirmEnrollmentCommandHandler
             Resultado = "Éxito"
         }, cancellationToken);
 
-        return new ConfirmEnrollmentResult(true, null, set.PlainCodes);
+        return new ConfirmEnrollmentResult(true, Application.Common.Errors.TwoFactorErrorCode.Unknown, false, set.PlainCodes);
     }
 }

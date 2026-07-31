@@ -4,7 +4,9 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Common.Errors;
 using Application.Features.TwoFactor;
+using Api.Common;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,11 +61,24 @@ public class TwoFactorController : ControllerBase
         return Ok(new { succeeded = true });
     }
 
+    private ErrorEnvelope Envelope(string code, string message, bool lockedOut = false)
+    {
+        return new ErrorEnvelope
+        {
+            Succeeded = false,
+            Code = code,
+            Message = message,
+            CorrelationId = HttpContext.GetCorrelationId(),
+            LockedOut = lockedOut,
+        };
+    }
+
     [HttpPost("enrollment/begin")]
     public async Task<IActionResult> BeginEnrollment(CancellationToken ct)
     {
         var result = await _beginEnrollment.Handle(new BeginEnrollmentCommand(GetUserId()), ct);
-        if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        if (!result.IsSuccess)
+            return BadRequest(Envelope(result.ErrorCode, result.ErrorMessage ?? string.Empty));
         return Ok(new { succeeded = true, secret = result.Secret, otpAuthUri = result.OtpAuthUri });
     }
 
@@ -71,7 +86,12 @@ public class TwoFactorController : ControllerBase
     public async Task<IActionResult> ConfirmEnrollment([FromBody] ConfirmEnrollmentRequest req, CancellationToken ct)
     {
         var result = await _confirmEnrollment.Handle(new ConfirmEnrollmentCommand(GetUserId(), req.Code), ct);
-        if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        if (!result.IsSuccess)
+        {
+            if (result.LockedOut)
+                return StatusCode(StatusCodes.Status423Locked, Envelope(result.ErrorCode, "Demasiados intentos. Espere unos minutos antes de intentar nuevamente.", true));
+            return BadRequest(Envelope(result.ErrorCode, "Código inválido o vencido. Intente de nuevo."));
+        }
         return Ok(new { succeeded = true, recoveryCodes = result.RecoveryCodes });
     }
 
@@ -83,8 +103,8 @@ public class TwoFactorController : ControllerBase
         if (!result.IsSuccess)
         {
             if (result.ErrorMessage?.Contains("Demasiados intentos", StringComparison.OrdinalIgnoreCase) == true)
-                return StatusCode(StatusCodes.Status423Locked, new { succeeded = false, message = result.ErrorMessage, lockedOut = true });
-            return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+                return StatusCode(StatusCodes.Status423Locked, Envelope(TwoFactorErrorCode.TotpLockedOut, "Demasiados intentos. Espere unos minutos antes de intentar nuevamente.", true));
+            return BadRequest(Envelope(TwoFactorErrorCode.TotpInvalidCode, "Código inválido o vencido. Intente de nuevo."));
         }
         return WriteSessionCookies(result.Token!);
     }
@@ -94,7 +114,7 @@ public class TwoFactorController : ControllerBase
     {
         var code = req.Code ?? req.RecoveryCode ?? req.EffectiveCode ?? string.Empty;
         var result = await _consumeRecoveryCode.Handle(new ConsumeRecoveryCodeCommand(req.ChallengeToken, code), ct);
-        if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        if (!result.IsSuccess) return BadRequest(Envelope(TwoFactorErrorCode.RecoveryCodeInvalid, "Código de recuperación inválido o ya utilizado."));
         return WriteSessionCookies(result.Token!);
     }
 
@@ -102,7 +122,7 @@ public class TwoFactorController : ControllerBase
     public async Task<IActionResult> Disable([FromBody] DisableRequest req, CancellationToken ct)
     {
         var result = await _disable2FA.Handle(new Disable2FACommand(GetUserId(), req.Password, req.Code), ct);
-        if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        if (!result.IsSuccess) return BadRequest(Envelope(TwoFactorErrorCode.DisableFailed, "No se pudo desactivar la verificación en este momento. Intente nuevamente."));
         return Ok(new { succeeded = true });
     }
 
@@ -111,7 +131,7 @@ public class TwoFactorController : ControllerBase
     public async Task<IActionResult> RequestEmailOtp([FromBody] EmailOtpRequest req, CancellationToken ct)
     {
         var result = await _emailOtp.Handle(new RequestEmailOtpCommand(req.ChallengeToken), ct);
-        if (!result.IsSuccess) return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+        if (!result.IsSuccess) return BadRequest(Envelope(TwoFactorErrorCode.EmailOtpRequestFailed, "No se pudo enviar el código por correo. Intente nuevamente en unos minutos."));
         return Ok(new { succeeded = true });
     }
 
@@ -123,8 +143,8 @@ public class TwoFactorController : ControllerBase
         if (!result.IsSuccess)
         {
             if (result.ErrorMessage?.Contains("Demasiados intentos", StringComparison.OrdinalIgnoreCase) == true)
-                return StatusCode(StatusCodes.Status423Locked, new { succeeded = false, message = result.ErrorMessage, lockedOut = true });
-            return BadRequest(new { succeeded = false, message = result.ErrorMessage });
+                return StatusCode(StatusCodes.Status423Locked, Envelope(TwoFactorErrorCode.EmailOtpLockedOut, "Demasiados intentos. Espere unos minutos antes de intentar nuevamente.", true));
+            return BadRequest(Envelope(TwoFactorErrorCode.EmailOtpInvalid, "Código de correo inválido o vencido. Intente de nuevo."));
         }
         return WriteSessionCookies(result.Token!);
     }

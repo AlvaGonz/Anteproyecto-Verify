@@ -1,6 +1,7 @@
 namespace Api.Extensions;
 
 using Microsoft.AspNetCore.Builder;
+using Api.Common;
 using Api.Health;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,7 @@ public static class ApplicationBuilderExtensions
 
 
         app.UseExceptionHandler(opt => { }); // Minimal config to satisfy the middleware if ProblemDetails handles it
+        app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseResponseCaching();
 
         app.UseSwagger();
