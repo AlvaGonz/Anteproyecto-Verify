@@ -16,7 +16,7 @@ namespace Infrastructure.Services;
 public sealed record RequestEmailOtpCommand(string ChallengeToken);
 public sealed record RequestEmailOtpResult(bool IsSuccess, string? ErrorMessage);
 
-public sealed record VerifyEmailOtpCommand(string ChallengeToken, string Code);
+public sealed record VerifyEmailOtpCommand(string ChallengeToken, string? Code);
 public sealed record VerifyEmailOtpResult(bool IsSuccess, string? ErrorMessage, string? Token, Guid? UsuarioId);
 
 public sealed class EmailOtpService
@@ -116,7 +116,7 @@ public sealed class EmailOtpService
             return new VerifyEmailOtpResult(false, "OTP expirado.", null, null);
         }
 
-        if (!string.Equals(active.NumeroVerificable, request.Code, StringComparison.Ordinal))
+        if (string.IsNullOrEmpty(request.Code) || !string.Equals(active.NumeroVerificable, request.Code, StringComparison.Ordinal))
         {
             await _audit.AppendAsync(new AuditEntryDto
             {

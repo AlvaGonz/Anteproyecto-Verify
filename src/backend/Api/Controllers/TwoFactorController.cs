@@ -127,5 +127,8 @@ public class TwoFactorController : ControllerBase
     public sealed record RecoveryRequest(string ChallengeToken, string RecoveryCode);
     public sealed record DisableRequest(string Password, int Code);
     public sealed record EmailOtpRequest(string ChallengeToken);
-    public sealed record VerifyEmailOtpRequest(string ChallengeToken, string Code);
+    public sealed record VerifyEmailOtpRequest(string ChallengeToken, string? Code, string? Otp)
+    {
+        public string EffectiveCode => Code ?? Otp ?? string.Empty;
+    }
 }

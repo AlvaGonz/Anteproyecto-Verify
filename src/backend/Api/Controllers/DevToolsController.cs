@@ -47,4 +47,30 @@ public class DevToolsController : ControllerBase
 
         return Ok(new { Token = user.TokenVerificacion, Email = user.Email, EmailVerificado = user.EmailVerificado });
     }
+
+    [HttpGet("last-email-otp")]
+    public async Task<IActionResult> GetLastEmailOtp([FromQuery] string challengeToken)
+    {
+        if (!_env.IsDevelopment())
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrWhiteSpace(challengeToken))
+        {
+            return BadRequest(new { Message = "challengeToken is required." });
+        }
+
+        var otp = await _context.Verificaciones2FA
+            .Where(v => v.SesionId == challengeToken)
+            .OrderByDescending(v => v.FechaCreacion)
+            .FirstOrDefaultAsync();
+
+        if (otp is null)
+        {
+            return NotFound(new { Message = "No OTP for that challenge." });
+        }
+
+        return Ok(new { code = otp.NumeroVerificable, challengeToken });
+    }
 }
