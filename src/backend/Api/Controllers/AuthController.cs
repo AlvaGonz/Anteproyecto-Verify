@@ -133,6 +133,17 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage, succeeded = false });
         }
 
+        if (result.Data!.Requires2fa)
+        {
+            return Ok(new
+            {
+                succeeded = false,
+                requires2fa = true,
+                challengeToken = result.Data.ChallengeToken,
+                emailMasked = result.Data.EmailMasked
+            });
+        }
+
         return GenerateSessionCookiesAndResponse(result.Data);
     }
 
@@ -141,10 +152,21 @@ public class AuthController : ControllerBase
     {
         var handler = HttpContext.RequestServices.GetRequiredService<Application.Features.Auth.Commands.GoogleLoginUser.GoogleLoginUserCommandHandler>();
         var result = await handler.Handle(request, cancellationToken);
-        
+
         if (!result.IsSuccess)
         {
             return BadRequest(new { Message = result.ErrorMessage, succeeded = false });
+        }
+
+        if (result.Data!.Requires2fa)
+        {
+            return Ok(new
+            {
+                succeeded = false,
+                requires2fa = true,
+                challengeToken = result.Data.ChallengeToken,
+                emailMasked = result.Data.EmailMasked
+            });
         }
 
         return GenerateSessionCookiesAndResponse(result.Data);
