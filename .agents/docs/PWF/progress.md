@@ -226,6 +226,13 @@
 - **Honest limitation**: mock-based RED verification failed — TanStack v5 "latest fetch wins" already discards superseded responses in the Playwright env (proven via request/response instrumentation: stale GET resolved after fresh data, card did not resurrect). The test guards the race class; if the user still reproduces one-behind against the real API, the remaining suspect is the refetch reading pre-commit DB state (isolation level / slow DELETE transaction interleaving), which needs a HAR/log capture of the next repro.
 - **Results**: spec 8/8 GREEN (`--workers=1`, backend API restarted for the run). post_task_loop.py full-suite BLOCK unchanged (uncommitted W5 refactor, unrelated to OE-3).
 
+## Session 2026-07-31 - OE-3 Create-error keeps modal open (9/9 GREEN)
+- **User report**: submitting the "Nuevo Usuario" form with a duplicate email (400 "El correo electrónico ya está en uso.") closed the modal and lost all typed fields.
+- **Root cause**: `SettingsPage.tsx` `handleSaveUser` closed the modal (`setIsModalOpen(false)`) BEFORE the awaited API call; on error only a transient toast fired.
+- **Fix** (commit `0b64634a`): modal close moved into the success path only; API error message now rendered inside the modal via new `error` prop on `UserFormModal` (`role="alert"` banner above the fields); error clears on typing/close/reopen; removed the noisy `console.error`.
+- **Test** (commit `f977a15e`): mock POST supports a one-shot 400 (duplicate email); test asserts dialog stays open, alert shows the API message, fields preserved, then a corrected retry succeeds (modal closes + card lands on plan tab). RED first (modal closed), GREEN after fix.
+- **Results**: settings-users-crud spec 9/9 GREEN.
+
 ## Session 2026-07-31 - OE-3 2FA Enrollment by QR + Standardized Safe Errors (W7 GREEN)
 - **Backend** (commit `f7965927`):
   - `Application/Common/Errors/TwoFactorErrorCode.cs` — stable error-code constants (16 codes).
