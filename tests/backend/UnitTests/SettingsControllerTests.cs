@@ -9,9 +9,11 @@ using Api.Controllers;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Common;
+using global::Application.Abstractions;
 using global::Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -55,7 +57,9 @@ public class SettingsControllerTests
         var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
         var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
         var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+        var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+        var mockConfig = new Mock<IConfiguration>();
+        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
         SetupControllerContext(controller, null);
 
         // Act
@@ -83,7 +87,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "juan@verifinca.do", "user");
 
             // Act
@@ -134,7 +140,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             // Act
@@ -193,7 +201,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdateRoleRequest { Role = "user" };
@@ -249,7 +259,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdatePlanRequest { PlanId = empresaPlanId };
