@@ -91,7 +91,8 @@ export const SettingsPage: React.FC = () => {
       addToast("La cédula es obligatoria", "error");
       return;
     }
-    if (formData.cedula) {
+    // Cédula is immutable in edit mode, so its check digit is only validated on create
+    if (!editingUser && formData.cedula) {
       const cedDigits = formData.cedula.replace(/\D/g, "");
       if (cedDigits.length > 0 && !validateCedulaCheckDigit(cedDigits)) {
         addToast("Cédula inválida o dígito verificador incorrecto", "error");

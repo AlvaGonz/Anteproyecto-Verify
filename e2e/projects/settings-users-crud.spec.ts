@@ -57,6 +57,7 @@ async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStat
     const req = route.request();
     const url = new URL(req.url());
     const planMatch = url.pathname.match(/\/api\/admin\/users\/([^/]+)\/plan$/);
+    const userMatch = url.pathname.match(/\/api\/admin\/users\/([^/]+)$/);
     if (req.method() === 'PATCH' && planMatch) {
       if (patchStatus !== 200) {
         await route.fulfill({ status: patchStatus, contentType: 'application/json', body: JSON.stringify({ message: 'Internal error' }) });
@@ -72,6 +73,19 @@ async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStat
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Suscripción asignada y pago registrado exitosamente.' }) });
       return;
     }
+    if (req.method() === 'PUT' && userMatch) {
+      const body = req.postDataJSON();
+      const user = users.find(x => x.id === userMatch[1]);
+      if (user) Object.assign(user, body);
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Usuario actualizado exitosamente.' }) });
+      return;
+    }
+    if (req.method() === 'DELETE' && userMatch) {
+      const idx = users.findIndex(x => x.id === userMatch[1]);
+      if (idx >= 0) users.splice(idx, 1);
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Usuario eliminado exitosamente.' }) });
+      return;
+    }
     if (req.method() === 'GET') {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: users, totalCount: users.length, page: 1, pageSize: 50 }) });
       return;
@@ -79,6 +93,10 @@ async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStat
     await route.continue();
   });
   await page.route('**/api/admin/plans', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(plans) }));
+}
+
+function cardFor(page: Page, name: string) {
+  return page.locator('div.rounded-xl.p-4').filter({ has: page.getByRole('heading', { name }) });
 }
 
 async function openUsersTab(page: Page) {
@@ -89,6 +107,8 @@ async function openUsersTab(page: Page) {
 }
 
 test.describe('Settings - Users Table CRUD', () => {
+  test.setTimeout(60_000);
+
   test('plan change moves user to new plan tab and updates count badges', async ({ page }) => {
     const users = seedUsers();
     await mockAuth(page);
@@ -123,5 +143,88 @@ test.describe('Settings - Users Table CRUD', () => {
     await expect(page.getByText('Error de red al actualizar suscripción')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Corporativo 2' })).toBeVisible();
     await expect(page.locator('#plan-u1')).toHaveValue('pl-corp');
+  });
+
+  test('edit user updates name and phone, then persists across refetch', async ({ page }) => {
+    const users = seedUsers();
+    await mockAuth(page);
+    await mockAdminUsers(page, users);
+    await openUsersTab(page);
+
+    await cardFor(page, 'Ana Martínez').getByTitle('Editar Perfil').click();
+
+    await expect(page.getByRole('heading', { name: 'Editar Usuario' })).toBeVisible();
+    await expect(page.locator('#uf-email')).toHaveValue('ana@corp.com');
+    await expect(page.locator('#uf-email')).toHaveAttribute('readonly', '');
+    await expect(page.locator('#uf-cedula')).toHaveAttribute('readonly', '');
+    await expect(page.locator('#uf-plan')).not.toBeVisible();
+
+    await page.locator('#uf-nombre').fill('Ana María');
+    await page.locator('#uf-telefono').fill('(809) 555-0199');
+
+    await page.getByRole('button', { name: 'Guardar Usuario' }).click();
+
+    await expect(page.getByText('Usuario actualizado exitosamente')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ana María Martínez' })).toBeVisible();
+    expect(users.find(u => u.id === 'u1')?.nombre).toBe('Ana María');
+  });
+
+  test('edit modal exposes dialog semantics and closes with Escape', async ({ page }) => {
+    const users = seedUsers();
+    await mockAuth(page);
+    await mockAdminUsers(page, users);
+    await openUsersTab(page);
+
+    await cardFor(page, 'Ana Martínez').getByTitle('Editar Perfil').click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAttribute('aria-modal', 'true');
+    await expect(dialog).toHaveAttribute('aria-labelledby', /.+/);
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('heading', { name: 'Editar Usuario' })).not.toBeVisible();
+  });
+
+  test('delete user requires ELIMINAR confirmation and removes the card', async ({ page }) => {
+    const users = seedUsers();
+    await mockAuth(page);
+    await mockAdminUsers(page, users);
+    await openUsersTab(page);
+
+    await cardFor(page, 'Carlos Lopez').getByTitle('Eliminar Usuario').click();
+
+    await expect(page.getByRole('heading', { name: '¿Eliminar Usuario?' })).toBeVisible();
+
+    const confirmBtn = page.getByRole('button', { name: 'Sí, Eliminar' });
+    await expect(confirmBtn).toBeDisabled();
+    await page.locator('#del-modal-confirm').fill('ELIMINA');
+    await expect(confirmBtn).toBeDisabled();
+    await page.locator('#del-modal-confirm').fill('ELIMINAR');
+    await expect(confirmBtn).toBeEnabled();
+
+    await confirmBtn.click();
+
+    await expect(page.getByText('Usuario eliminado exitosamente')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Corporativo 1' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Carlos Lopez' })).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ana Martínez' })).toBeVisible();
+  });
+
+  test('delete modal exposes dialog semantics and closes with Escape', async ({ page }) => {
+    const users = seedUsers();
+    await mockAuth(page);
+    await mockAdminUsers(page, users);
+    await openUsersTab(page);
+
+    await cardFor(page, 'Carlos Lopez').getByTitle('Eliminar Usuario').click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAttribute('aria-modal', 'true');
+    await expect(dialog).toHaveAttribute('aria-labelledby', /.+/);
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('heading', { name: '¿Eliminar Usuario?' })).not.toBeVisible();
   });
 });

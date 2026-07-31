@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { m } from "framer-motion";
 import { Trash2 } from "lucide-react";
 
@@ -18,11 +18,27 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
     if (!deleteId) setConfirmText("");
   }
 
+  useEffect(() => {
+    if (!deleteId) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [deleteId, onCancel]);
+
   if (!deleteId) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    >
       <m.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center"
@@ -30,7 +46,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ deleteId, isProcessing
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Trash2 className="w-8 h-8 text-red-600" />
         </div>
-        <h3 className="text-lg font-bold text-text-primary mb-2">¿Eliminar Usuario?</h3>
+        <h3 id="delete-modal-title" className="text-lg font-bold text-text-primary mb-2">¿Eliminar Usuario?</h3>
         <p className="text-sm text-text-secondary mb-4">
           Esta acción no se puede deshacer. El usuario perderá acceso al sistema inmediatamente.
         </p>
