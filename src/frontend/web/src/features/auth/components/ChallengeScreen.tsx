@@ -3,6 +3,7 @@ import { m } from "framer-motion";
 import { ShieldCheck, Mail, KeyRound, ArrowLeft, Loader2, AlertCircle, Lock } from "lucide-react";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { TwoFactorService } from "../../auth/services/TwoFactorService";
+import { sanitizeDigits } from "../utils/sanitizeDigits";
 
 type Mode = "totp" | "email" | "recovery";
 
@@ -25,8 +26,7 @@ export const ChallengeScreen: React.FC = () => {
   if (!pendingChallenge) return null;
 
   const handleCodeChange = (value: string) => {
-    const sanitized = value.replace(/\D/g, "").slice(0, CODE_LENGTH);
-    setCode(sanitized);
+    setCode(sanitizeDigits(value, CODE_LENGTH));
     setError(null);
   };
 

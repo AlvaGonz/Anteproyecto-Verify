@@ -95,20 +95,11 @@ public class GoogleLoginUserCommandHandler
         }
 
         // 2FA parity with password login
-        if (user.TwoFactorEnabled)
+        var challenge = await Application.Features.Auth.Shared.TwoFactorLoginBranch
+            .BuildChallengeResponseAsync(user, _challengeStore, cancellationToken);
+        if (challenge is not null)
         {
-            var challenge = await _challengeStore.CreateAsync(user.Id, cancellationToken);
-            var placeholderUser = new LoginUserUserDto(
-                user.Id, user.Email, user.NombreCompleto,
-                user.Rol == UserRole.Administrator ? "admin" : "user",
-                user.AvatarUrl);
-            var challengeResponse = new LoginUserResponseDto(
-                User: placeholderUser,
-                Token: string.Empty,
-                Requires2fa: true,
-                ChallengeToken: challenge.ChallengeToken,
-                EmailMasked: MaskEmail(user.Email));
-            return new LoginUserResultDto(true, null, challengeResponse);
+            return new LoginUserResultDto(true, null, challenge);
         }
 
         var roleStr = user.Rol == UserRole.Administrator ? "admin" : "user";

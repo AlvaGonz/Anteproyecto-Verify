@@ -3,6 +3,7 @@ import { m } from "framer-motion";
 import { Copy, ShieldCheck, AlertCircle, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { TwoFactorService } from "../../auth/services/TwoFactorService";
+import { sanitizeDigits } from "../../auth/utils/sanitizeDigits";
 
 type Phase = "begin" | "verify" | "recovery" | "done";
 
@@ -143,7 +144,7 @@ export const EnrollmentWizard: React.FC<EnrollmentWizardProps> = ({ onCompleted,
             placeholder="000000"
             value={code}
             maxLength={6}
-            onChange={(e) => { setCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setError(null); }}
+            onChange={(e) => { setCode(sanitizeDigits(e.target.value, 6)); setError(null); }}
             className="vf-input w-full text-center tracking-[0.4em] font-mono h-[52px]"
             disabled={isBusy}
           />

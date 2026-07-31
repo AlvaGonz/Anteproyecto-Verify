@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Loader2, ShieldOff, AlertCircle } from "lucide-react";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { TwoFactorService } from "../../auth/services/TwoFactorService";
+import { sanitizeDigits } from "../../auth/utils/sanitizeDigits";
 
 export interface DisableTwoFactorDialogProps {
   onDisabled: () => void;
@@ -75,7 +76,7 @@ export const DisableTwoFactorDialog: React.FC<DisableTwoFactorDialogProps> = ({ 
           placeholder="000000"
           value={code}
           maxLength={6}
-          onChange={(e) => { setCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setError(null); }}
+          onChange={(e) => { setCode(sanitizeDigits(e.target.value, 6)); setError(null); }}
           className="vf-input w-full mt-1 text-center tracking-[0.4em] font-mono h-[44px]"
           disabled={isBusy}
         />
