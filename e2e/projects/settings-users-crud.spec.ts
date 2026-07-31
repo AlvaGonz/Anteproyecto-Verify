@@ -52,8 +52,9 @@ async function mockAuth(page: Page, me = ADMIN_ME) {
   }));
 }
 
-async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStatus = 200, slowSecondGetMs = 0) {
+async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStatus = 200, slowSecondGetMs = 0, createError?: string) {
   let getCount = 0;
+  let firstPostFailed = false;
   await page.route('**/api/admin/users**', async route => {
     const req = route.request();
     const url = new URL(req.url());
@@ -88,6 +89,12 @@ async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStat
       return;
     }
     if (req.method() === 'POST') {
+      // ponytail: optional one-shot 400 (e.g. duplicate email) so the retry path succeeds
+      if (createError && !firstPostFailed) {
+        firstPostFailed = true;
+        await route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: createError }) });
+        return;
+      }
       const body = req.postDataJSON();
       const plan = plans.find(p => p.name === body.planNombre);
       const created = { id: 'u-new', ...body, planId: plan?.planId ?? 'pl-consult', planName: body.planNombre ?? 'Consultor', planCreatedAt: '2026-07-31T00:00:00Z' };
@@ -262,6 +269,35 @@ test.describe('Settings - Users Table CRUD', () => {
 
     await expect(page.getByText('Usuario creado exitosamente')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Profesional 2' })).toBeVisible();
+    await page.getByRole('button', { name: 'Profesional 2' }).click();
+    await expect(page.getByRole('heading', { name: 'Lucía Fernández' })).toBeVisible();
+  });
+
+  test('create error keeps modal open with message and preserves fields', async ({ page }) => {
+    const users = seedUsers();
+    await mockAuth(page);
+    await mockAdminUsers(page, users, PLANS, 200, 0, 'El correo electrónico ya está en uso.');
+    await openUsersTab(page);
+
+    await page.getByRole('button', { name: 'Nuevo Usuario' }).click();
+    await page.locator('#uf-nombre').fill('Lucía');
+    await page.locator('#uf-apellido').fill('Fernández');
+    await page.locator('#uf-email').fill('dup@corp.com');
+    await page.locator('#uf-telefono').fill('8095550109');
+    await page.locator('#uf-cedula').fill('00100000009');
+    await page.locator('#uf-plan').selectOption('Profesional');
+    await page.getByRole('button', { name: 'Guardar Usuario' }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('alert')).toContainText('El correo electrónico ya está en uso.');
+    await expect(page.locator('#uf-email')).toHaveValue('dup@corp.com');
+    await expect(page.locator('#uf-nombre')).toHaveValue('Lucía');
+
+    await page.locator('#uf-email').fill('nueva@corp.com');
+    await page.getByRole('button', { name: 'Guardar Usuario' }).click();
+    await expect(page.getByText('Usuario creado exitosamente')).toBeVisible();
+    await expect(dialog).not.toBeVisible();
     await page.getByRole('button', { name: 'Profesional 2' }).click();
     await expect(page.getByRole('heading', { name: 'Lucía Fernández' })).toBeVisible();
   });
