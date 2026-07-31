@@ -56,8 +56,8 @@ public class TotpServiceTests
     public void ValidateCode_AcceptsCodeFromCurrentStep()
     {
         const string secret = "JBSWY3DPEHPK3PXP";
-        var t = new DateTime(2026, 7, 29, 12, 0, 0, DateTimeKind.Utc);
-        var code = _sut.ComputeCode(secret, t);
+        var now = DateTime.UtcNow;
+        var code = _sut.ComputeCode(secret, now);
 
         Assert.True(_sut.ValidateCode(secret, code, windowSteps: 0));
     }
@@ -66,9 +66,8 @@ public class TotpServiceTests
     public void ValidateCode_AcceptsCodeFromPreviousStep_WithinWindow()
     {
         const string secret = "JBSWY3DPEHPK3PXP";
-        var t = new DateTime(2026, 7, 29, 12, 0, 0, DateTimeKind.Utc);
-        var previousCode = _sut.ComputeCode(secret, t.AddSeconds(-30));
-        var now = t;
+        var now = DateTime.UtcNow;
+        var previousCode = _sut.ComputeCode(secret, now.AddSeconds(-30));
 
         Assert.True(_sut.ValidateCode(secret, previousCode, windowSteps: 1));
     }
@@ -77,9 +76,8 @@ public class TotpServiceTests
     public void ValidateCode_RejectsCodeOutsideWindow()
     {
         const string secret = "JBSWY3DPEHPK3PXP";
-        var t = new DateTime(2026, 7, 29, 12, 0, 0, DateTimeKind.Utc);
-        var ancientCode = _sut.ComputeCode(secret, t.AddSeconds(-120));
-        var now = t;
+        var now = DateTime.UtcNow;
+        var ancientCode = _sut.ComputeCode(secret, now.AddSeconds(-120));
 
         Assert.False(_sut.ValidateCode(secret, ancientCode, windowSteps: 1));
     }

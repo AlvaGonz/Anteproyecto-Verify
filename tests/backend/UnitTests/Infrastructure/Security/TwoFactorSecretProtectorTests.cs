@@ -1,6 +1,6 @@
 using Application.Abstractions.Security;
 using Infrastructure.Security;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.DataProtection;
 using Xunit;
 
 namespace UnitTests;
@@ -9,12 +9,7 @@ public class TwoFactorSecretProtectorTests
 {
     private static ITwoFactorSecretProtector CreateSut()
     {
-        var services = new ServiceCollection();
-        services.AddDataProtection()
-            .SetApplicationName("VeriFinca.Tests")
-            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "dpkeys-" + Guid.NewGuid().ToString("N"))));
-        var sp = services.BuildServiceProvider();
-        var provider = sp.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>();
+        var provider = new EphemeralDataProtectionProvider();
         var protector = provider.CreateProtector("TwoFactorSecret");
         return new TwoFactorSecretProtector(protector);
     }

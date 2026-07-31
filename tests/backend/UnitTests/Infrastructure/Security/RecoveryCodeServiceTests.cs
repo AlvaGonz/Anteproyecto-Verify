@@ -19,17 +19,21 @@ public class RecoveryCodeServiceTests
     }
 
     [Fact]
-    public void Hash_IsDeterministic_ForSameInput()
+    public void Hash_HasRandomSalt_SoSameInputHashesDiffer()
     {
         var a = _sut.Hash("ABCD-1234");
         var b = _sut.Hash("ABCD-1234");
-        Assert.Equal(a, b);
+        Assert.NotEqual(a, b);
+        Assert.True(_sut.Verify(a, "ABCD-1234"));
+        Assert.True(_sut.Verify(b, "ABCD-1234"));
     }
 
     [Fact]
     public void Hash_DiffersForDifferentInputs()
     {
-        Assert.NotEqual(_sut.Hash("A"), _sut.Hash("B"));
+        var a = _sut.Hash("A");
+        var b = _sut.Hash("B");
+        Assert.NotEqual(a, b);
     }
 
     [Fact]
