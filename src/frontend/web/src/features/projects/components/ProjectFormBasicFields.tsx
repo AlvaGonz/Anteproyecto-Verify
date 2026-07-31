@@ -1,9 +1,14 @@
 import React from "react";
 import { ProjectCategory } from "../types";
 
-export function formatCedulaRD(value: string): string {
+export function formatRncCedula(value: string): string {
   const digits = value.replace(/\D/g, '').slice(0, 11);
-  if (digits.length <= 3) return digits;
+  if (digits.length <= 9) {
+    if (digits.length <= 1) return digits;
+    if (digits.length <= 3) return `${digits.slice(0, 1)}-${digits.slice(1)}`;
+    if (digits.length <= 8) return `${digits.slice(0, 1)}-${digits.slice(1, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 1)}-${digits.slice(1, 3)}-${digits.slice(3, 8)}-${digits.slice(8)}`;
+  }
   if (digits.length <= 10) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
   return `${digits.slice(0, 3)}-${digits.slice(3, 10)}-${digits.slice(10)}`;
 }
@@ -148,7 +153,7 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
         <input
           id="rncDesarrollador"
           type="text"
-          value={formatCedulaRD(rncDesarrollador)}
+          value={formatRncCedula(rncDesarrollador)}
           onChange={(e) => {
             const raw = e.target.value.replace(/\D/g, '').slice(0, 11);
             setRncDesarrollador(raw);
