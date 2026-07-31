@@ -219,6 +219,13 @@
 - **post_task_loop.py**: BLOCK remains because `npx playwright test` (full suite) fails on 7 auth/api specs (09-pending-plan-redirect, 2fa-enroll-qr x2, 2fa-safe-errors x3, 12-resend-email) + route-performance budgets. Root cause: the UNCOMMITTED W5 refactor in the working tree (router/index.tsx, TwoFactorController.cs, TwoFactorLoginBranch.cs, BeginEnrollment.cs, ConfirmEnrollment.cs, dashboard files...) - not caused by OE-3 commits. OE-3 scope is green; full-suite BLOCK will clear once W5 work lands.
   - Added create-user flow test (POST /admin/users mock, card lands on plan tab) - GREEN first run, no prod fix needed (commit f6289391). Spec now 7/7 covering full users CRUD.
 
+## Session 2026-07-31 - OE-3 Delete-list stale race fix + regression test (8/8 GREEN)
+- **User report**: deleting a user did not remove the card immediately; list stayed "one deletion behind" (SQL log: full users GET at 19:19:25.476 / 401ms started while the DELETE was still in flight at 19:19:25.040).
+- **Fix** (commit `648dd18b`): `useSettings.ts` — all 5 user mutations (`useUpdateUserRole`, `useUpdateUserPlan`, `useCreateUser`, `useUpdateUser`, `useDeleteUser`) now `await qc.cancelQueries({ queryKey: ["settings", "users"] })` before their optimistic `setQueriesData`, killing any in-flight list fetch whose stale response could land after the optimistic write.
+- **Regression test** (commit `220ce3eb`): 8th test in `settings-users-crud.spec.ts` — mock now snapshots the GET payload at request time and can delay the 2nd GET (refresh); test clicks "Refrescar" (slow GET with pre-delete payload in flight), deletes Carlos, then asserts the card stays gone past the stale-response window (2s).
+- **Honest limitation**: mock-based RED verification failed — TanStack v5 "latest fetch wins" already discards superseded responses in the Playwright env (proven via request/response instrumentation: stale GET resolved after fresh data, card did not resurrect). The test guards the race class; if the user still reproduces one-behind against the real API, the remaining suspect is the refetch reading pre-commit DB state (isolation level / slow DELETE transaction interleaving), which needs a HAR/log capture of the next repro.
+- **Results**: spec 8/8 GREEN (`--workers=1`, backend API restarted for the run). post_task_loop.py full-suite BLOCK unchanged (uncommitted W5 refactor, unrelated to OE-3).
+
 ## Session 2026-07-31 - OE-3 2FA Enrollment by QR + Standardized Safe Errors (W7 GREEN)
 - **Backend** (commit `f7965927`):
   - `Application/Common/Errors/TwoFactorErrorCode.cs` — stable error-code constants (16 codes).
