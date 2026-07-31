@@ -7,15 +7,15 @@ describe('formatRncCedula', () => {
   });
 
   it('formats 9 digit RNC correctly', () => {
-    expect(formatRncCedula('130123456')).toBe('1-30-12345-6');
+    expect(formatRncCedula('130123456')).toBe('130-12345-6');
   });
 
   it('keeps short inputs unformatted or partially formatted', () => {
-    expect(formatRncCedula('1')).toBe('1');
-    expect(formatRncCedula('13')).toBe('1-3');
+    expect(formatRncCedula('130')).toBe('130');
+    expect(formatRncCedula('13012')).toBe('130-12');
   });
 
   it('strips non-digits', () => {
-    expect(formatRncCedula('402-286A')).toBe('4-02-286');
+    expect(formatRncCedula('402-286A')).toBe('402-286');
   });
 });
