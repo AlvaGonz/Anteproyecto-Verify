@@ -23,10 +23,8 @@ export interface User {
   stripeSubscriptionId?: string | null;
   subscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | null | string;
   currentPeriodEnd?: string | null;
-  // ponytail: pendingPlanCode/billingCycle drive the post-registration checkout redirect
   pendingPlanCode?: string | null;
   pendingBillingCycle?: string | null;
-  // ponytail: guest/inviter fields for subscription display
   isGuest?: boolean;
   aceptoDescargo?: boolean;
   titularId?: string | null;
@@ -46,63 +44,37 @@ export interface AuthResponse {
   token: string;
 }
 
-export type AuthError = 
+export interface TwoFactorChallengeInfo {
+  challengeToken: string;
+  emailMasked: string;
+}
+
+export type LoginResult =
+  | { succeeded: true; user: User; token: string }
+  | { succeeded: false; requires2fa: true; challenge: TwoFactorChallengeInfo }
+  | { succeeded: false; requires2fa: false; error: AuthError };
+
+export type AuthError =
   | { _tag: "InvalidCredentials"; message: string }
   | { _tag: "NetworkError"; message: string }
   | { _tag: "UnknownError"; message: string; original: unknown };
 
-
 export const AuthService = {
-  async login(email: string, password: string): Promise<{ data: AuthResponse } | { error: AuthError }> {
+  async login(email: string, password: string): Promise<LoginResult> {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
-      
-      const token = response.data.accessToken ?? null;
-      if (!token) {
-        // Backend must return accessToken. If missing, treat as auth failure.
-        return { error: { _tag: "NetworkError", message: "Token de acceso no recibido del servidor." } };
-      }
-      setAccessToken(token);
-
-      return { data: {
-        user: response.data.user,
-        token: token
-      }};
+      return finalizeAuthResponse(response.data);
     } catch (e: unknown) {
-      const err = e as { response?: { status?: number; data?: { message?: string } } };
-      if (err.response?.status === 401) {
-        return { error: { _tag: "InvalidCredentials", message: "Credenciales inválidas" } };
-      }
-      return { error: { 
-        _tag: "NetworkError", 
-        message: err.response?.data?.message || "Error al iniciar sesión" 
-      }};
+      return { succeeded: false, requires2fa: false, error: toAuthError(e, "Error al iniciar sesión") };
     }
   },
 
-  async googleLogin(credential: string): Promise<{ data: AuthResponse } | { error: AuthError }> {
+  async googleLogin(credential: string): Promise<LoginResult> {
     try {
       const response = await apiClient.post('/auth/google', { credential });
-      
-      const token = response.data.accessToken ?? null;
-      if (!token) {
-        return { error: { _tag: "NetworkError", message: "Token de acceso no recibido del servidor." } };
-      }
-      setAccessToken(token);
-
-      return { data: {
-        user: response.data.user,
-        token: token
-      }};
+      return finalizeAuthResponse(response.data);
     } catch (e: unknown) {
-      const err = e as { response?: { status?: number; data?: { message?: string } } };
-      if (err.response?.status === 401 || err.response?.status === 400) {
-        return { error: { _tag: "InvalidCredentials", message: "Credenciales inválidas" } };
-      }
-      return { error: { 
-        _tag: "NetworkError", 
-        message: err.response?.data?.message || "Error al iniciar sesión con Google" 
-      }};
+      return { succeeded: false, requires2fa: false, error: toAuthError(e, "Error al iniciar sesión con Google") };
     }
   },
 
@@ -179,3 +151,42 @@ export const AuthService = {
     return null;
   }
 };
+
+function finalizeAuthResponse(payload: any): LoginResult {
+  if (payload?.requires2fa) {
+    return {
+      succeeded: false,
+      requires2fa: true,
+      challenge: {
+        challengeToken: payload.challengeToken,
+        emailMasked: payload.emailMasked ?? payload.email ?? "",
+      },
+    };
+  }
+
+  const token = payload?.accessToken ?? null;
+  if (!token) {
+    return {
+      succeeded: false,
+      requires2fa: false,
+      error: { _tag: "NetworkError", message: "Token de acceso no recibido del servidor." },
+    };
+  }
+  setAccessToken(token);
+  return {
+    succeeded: true,
+    user: payload.user,
+    token,
+  };
+}
+
+function toAuthError(e: unknown, fallback: string): AuthError {
+  const err = e as { response?: { status?: number; data?: { message?: string } } };
+  if (err.response?.status === 401 || err.response?.status === 400) {
+    return { _tag: "InvalidCredentials", message: "Credenciales inválidas" };
+  }
+  return {
+    _tag: "NetworkError",
+    message: err.response?.data?.message || fallback,
+  };
+}

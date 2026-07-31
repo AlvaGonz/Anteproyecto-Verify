@@ -41,7 +41,7 @@ const renderPage = (route = "/login") => {
   );
 };
 
-// ponytail: LoginForm checks `if (!user) return` — login mock must return a user object
+// ponytail: LoginForm checks `if (!result.succeeded) return` — login mock must return a successful result
 const defaultUser = {
   id: "u1",
   email: "admin@example.com",
@@ -49,12 +49,18 @@ const defaultUser = {
   rol: "Administrator",
 };
 
+const successResult = (user: any = defaultUser) => ({
+  succeeded: true as const,
+  user,
+  token: "fake-token",
+});
+
 describe("LoginPage", () => {
   let mockLogin: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLogin = vi.fn().mockResolvedValue(defaultUser);
+    mockLogin = vi.fn().mockResolvedValue(successResult());
     (useAuth as any).mockReturnValue({ login: mockLogin });
   });
 
@@ -99,13 +105,13 @@ describe("LoginPage", () => {
   });
 
   it("redirects to dashboard when user has pending plan and no active subscription (no checkout redirect)", async () => {
-    mockLogin = vi.fn().mockResolvedValue({
+    mockLogin = vi.fn().mockResolvedValue(successResult({
       id: "u1",
       email: "user@example.com",
       pendingPlanCode: "profesional",
       pendingBillingCycle: "monthly",
       subscriptionStatus: null,
-    });
+    }));
     (useAuth as any).mockReturnValue({ login: mockLogin });
 
     const user = userEvent.setup();
@@ -121,13 +127,13 @@ describe("LoginPage", () => {
   });
 
   it("redirects to dashboard when user has pending plan but active subscription", async () => {
-    mockLogin = vi.fn().mockResolvedValue({
+    mockLogin = vi.fn().mockResolvedValue(successResult({
       id: "u1",
       email: "user@example.com",
       pendingPlanCode: "profesional",
       pendingBillingCycle: "monthly",
       subscriptionStatus: "active",
-    });
+    }));
     (useAuth as any).mockReturnValue({ login: mockLogin });
 
     const user = userEvent.setup();

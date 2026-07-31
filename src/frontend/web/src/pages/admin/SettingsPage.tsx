@@ -11,6 +11,7 @@ import { MyProfileForm } from "../../features/settings/components/MyProfileForm"
 import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
 import { InviteesSettings } from "../../features/settings/components/InviteesSettings";
 import { DeleteAccountSection } from "../../features/settings/components/DeleteAccountSection";
+import { TwoFactorSection } from "../../features/settings/components/TwoFactorSection";
 import {
   Settings,
   Users,
@@ -310,15 +311,17 @@ export const SettingsPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
+              className="space-y-6"
             >
+              <TwoFactorSection />
               <section className="bg-red-50 border border-red-200 rounded-lg p-6">
                 <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
                 <p className="text-sm text-red-600 mb-4">
                   Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
-                </p>
+               </p>
                 <DeleteAccountSection />
-              </section>
-            </m.div>
+             </section>
+           </m.div>
           )}
 
 
