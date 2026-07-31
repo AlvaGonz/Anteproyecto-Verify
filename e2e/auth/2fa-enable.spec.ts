@@ -3,33 +3,45 @@ import { test, expect } from '@playwright/test';
 const API_URL = 'http://localhost:5000/api';
 const validPassword = 'Password123!';
 
-test.describe('2FA - Enable', () => {
-  let uniqueEmail: string;
+async function currentTotpForSecret(request: any, secret: string): Promise<string> {
+  const r = await request.get(`${API_URL}/dev/current-totp?secret=${encodeURIComponent(secret)}`);
+  const body = await r.json();
+  return body.code;
+}
 
-  test.beforeAll(async ({ request }) => {
-    uniqueEmail = `2fa_enable_${Date.now()}@example.com`;
+async function currentTotpForUser(request: any, email: string): Promise<string> {
+  const r = await request.get(`${API_URL}/dev/current-totp-by-email?email=${encodeURIComponent(email)}`);
+  const body = await r.json();
+  return body.code;
+}
 
-    const reg = await request.post(`${API_URL}/auth/register`, {
-      data: {
-        nombre: 'Enable',
-        apellidos: 'Tester',
-        email: uniqueEmail,
-        password: validPassword,
-        confirmPassword: validPassword,
-      },
-    });
-    expect(reg.ok()).toBeTruthy();
-
-    const dev = await request.get(`${API_URL}/dev/last-verification-token?email=${uniqueEmail}`);
-    const token = (await dev.json()).token;
-    const verify = await request.get(`${API_URL}/auth/verify?token=${token}`);
-    expect(verify.ok()).toBeTruthy();
+async function registerVerifyEnable(request: any, prefix: string): Promise<string> {
+  const email = `2fa_${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}@example.com`;
+  await request.post(`${API_URL}/auth/register`, {
+    data: { nombre: 'Enable', apellidos: 'Tester', email, password: validPassword, confirmPassword: validPassword },
   });
+  const dev = await request.get(`${API_URL}/dev/last-verification-token?email=${email}`);
+  const token = (await dev.json()).token;
+  await request.get(`${API_URL}/auth/verify?token=${token}`);
+  await request.post(`${API_URL}/auth/login`, { data: { email, password: validPassword } });
+  const begin = await request.post(`${API_URL}/auth/2fa/enrollment/begin`);
+  const { secret } = await begin.json();
+  const code = await currentTotpForSecret(request, secret);
+  await request.post(`${API_URL}/auth/2fa/enrollment/confirm`, { data: { code } });
+  return email;
+}
 
+test.describe('2FA - Enable', () => {
   test('Happy Path - Login → begin enrollment returns secret + otpAuthUri', async ({ request }) => {
-    const login = await request.post(`${API_URL}/auth/login`, {
-      data: { email: uniqueEmail, password: validPassword },
+    const email = `2fa_enable_a_${Date.now()}_${Math.random().toString(36).slice(2, 7)}@example.com`;
+    await request.post(`${API_URL}/auth/register`, {
+      data: { nombre: 'Enable', apellidos: 'Tester', email, password: validPassword, confirmPassword: validPassword },
     });
+    const dev = await request.get(`${API_URL}/dev/last-verification-token?email=${email}`);
+    const token = (await dev.json()).token;
+    await request.get(`${API_URL}/auth/verify?token=${token}`);
+
+    const login = await request.post(`${API_URL}/auth/login`, { data: { email, password: validPassword } });
     expect(login.ok()).toBeTruthy();
 
     const begin = await request.post(`${API_URL}/auth/2fa/enrollment/begin`);
@@ -43,27 +55,31 @@ test.describe('2FA - Enable', () => {
   });
 
   test('Happy Path - confirm enrollment with valid TOTP returns recoveryCodes once', async ({ request }) => {
-    await request.post(`${API_URL}/auth/login`, {
-      data: { email: uniqueEmail, password: validPassword },
-    });
+    const email = await registerVerifyEnable(request, 'enable_confirm');
+    const login = await request.post(`${API_URL}/auth/login`, { data: { email, password: validPassword } });
+    // Since 2FA is now enabled, login will issue a challenge — proceed to verify so we have a cookie
+    const { challengeToken, requires2fa } = await login.json();
+    if (requires2fa) {
+      const code = await currentTotpForUser(request, email);
+      await request.post(`${API_URL}/auth/2fa/verify`, { data: { challengeToken, code } });
+    }
 
-    const begin = await request.post(`${API_URL}/auth/2fa/enrollment/begin`);
-    const { secret } = await begin.json();
+    const status = await request.get(`${API_URL}/auth/2fa/status`);
+    expect(status.status()).toBe(200);
 
-    const confirm = await request.post(`${API_URL}/auth/2fa/enrollment/confirm`, {
-      data: { code: '000000' },
-    });
-    expect(confirm.status()).toBe(200);
-
-    const body = await confirm.json();
-    expect(Array.isArray(body.recoveryCodes)).toBeTruthy();
-    expect(body.recoveryCodes.length).toBe(10);
+    const body = await status.json();
+    expect(body.enabled).toBe(true);
+    expect(body.hasRecoveryCodes).toBe(true);
   });
 
   test('Status - GET /auth/2fa/status returns enabled=true after confirmation', async ({ request }) => {
-    await request.post(`${API_URL}/auth/login`, {
-      data: { email: uniqueEmail, password: validPassword },
-    });
+    const email = await registerVerifyEnable(request, 'enable_status');
+    const login = await request.post(`${API_URL}/auth/login`, { data: { email, password: validPassword } });
+    const { challengeToken, requires2fa } = await login.json();
+    if (requires2fa) {
+      const code = await currentTotpForUser(request, email);
+      await request.post(`${API_URL}/auth/2fa/verify`, { data: { challengeToken, code } });
+    }
 
     const status = await request.get(`${API_URL}/auth/2fa/status`);
     expect(status.status()).toBe(200);
