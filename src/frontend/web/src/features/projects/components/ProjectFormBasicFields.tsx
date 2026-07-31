@@ -1,6 +1,13 @@
 import React from "react";
 import { ProjectCategory } from "../types";
 
+export function formatCedulaRD(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 10) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 10)}-${digits.slice(10)}`;
+}
+
 interface ProjectFormBasicFieldsProps {
   provincias: { nombre: string; lat: number; lng: number; dcPrefix: string }[];
   nombre: string;
@@ -141,9 +148,10 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
         <input
           id="rncDesarrollador"
           type="text"
-          value={rncDesarrollador}
+          value={formatCedulaRD(rncDesarrollador)}
           onChange={(e) => {
-            setRncDesarrollador(e.target.value);
+            const raw = e.target.value.replace(/\D/g, '').slice(0, 11);
+            setRncDesarrollador(raw);
             if (rncError) setRncError(null);
           }}
           onKeyDown={(e) => {

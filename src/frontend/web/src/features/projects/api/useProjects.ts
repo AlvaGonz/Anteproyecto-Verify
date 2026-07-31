@@ -114,9 +114,9 @@ export const useCreateProject = () => {
           categoria: data.categoria ?? ProjectCategory.Residencial,
         })
         .then((res) => mapApiProject(res.data)),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: projectKeys.all });
-      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: projectKeys.all });
+      await qc.invalidateQueries({ queryKey: ["dashboardStats"] });
     },
   });
 };
