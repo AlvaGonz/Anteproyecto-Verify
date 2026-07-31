@@ -35,6 +35,7 @@ export const useUpdateUserRole = () => {
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       apiClient.patch<void>(`/admin/users/${userId}/role`, { role }).then(res => res.data),
     onMutate: async ({ userId, role }) => {
+      await qc.cancelQueries({ queryKey: ["settings", "users"] });
       qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
         old?.map((u: any) => u.id === userId ? { ...u, role } : u)
       );
@@ -52,6 +53,7 @@ export const useUpdateUserPlan = () => {
     mutationFn: ({ userId, planId }: { userId: string; planId: string }) =>
       apiClient.patch<void>(`/admin/users/${userId}/plan`, { planId }).then(res => res.data),
     onMutate: async ({ userId, planId }) => {
+      await qc.cancelQueries({ queryKey: ["settings", "users"] });
       qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
         old?.map((u: any) => u.id === userId ? { ...u, planId } : u)
       );
@@ -69,6 +71,7 @@ export const useCreateUser = () => {
     mutationFn: (data: CreateUserDto) =>
       apiClient.post<UserSettings>(`/admin/users`, data).then(res => res.data),
     onMutate: async (data) => {
+      await qc.cancelQueries({ queryKey: ["settings", "users"] });
       qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
         old ? [{ id: "temp-" + Date.now(), ...data, planCreatedAt: new Date().toISOString() }, ...old] : old
       );
@@ -86,6 +89,7 @@ export const useUpdateUser = () => {
     mutationFn: ({ userId, data }: { userId: string; data: UpdateUserDto }) =>
       apiClient.put<UserSettings>(`/admin/users/${userId}`, data).then(res => res.data),
     onMutate: async ({ userId, data }) => {
+      await qc.cancelQueries({ queryKey: ["settings", "users"] });
       qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
         old?.map((u: any) => u.id === userId ? { ...u, ...data } : u)
       );
@@ -103,6 +107,7 @@ export const useDeleteUser = () => {
     mutationFn: (userId: string) =>
       apiClient.delete<void>(`/admin/users/${userId}`).then(res => res.data),
     onMutate: async (userId) => {
+      await qc.cancelQueries({ queryKey: ["settings", "users"] });
       qc.setQueriesData({ queryKey: ["settings", "users"] }, (old: any) => 
         old?.filter((u: any) => u.id !== userId)
       );
