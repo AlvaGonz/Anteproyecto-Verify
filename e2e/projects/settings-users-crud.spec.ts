@@ -52,7 +52,8 @@ async function mockAuth(page: Page, me = ADMIN_ME) {
   }));
 }
 
-async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStatus = 200) {
+async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStatus = 200, slowSecondGetMs = 0) {
+  let getCount = 0;
   await page.route('**/api/admin/users**', async route => {
     const req = route.request();
     const url = new URL(req.url());
@@ -95,7 +96,13 @@ async function mockAdminUsers(page: Page, users: any[], plans = PLANS, patchStat
       return;
     }
     if (req.method() === 'GET') {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: users, totalCount: users.length, page: 1, pageSize: 50 }) });
+      // ponytail: snapshot at request time; slow the 2nd GET (refresh) so its stale
+      // response lands AFTER the invalidation refetch, reproducing the race
+      const body = JSON.stringify({ items: users, totalCount: users.length, page: 1, pageSize: 50 });
+      if (++getCount === 2 && slowSecondGetMs > 0) await new Promise(r => setTimeout(r, slowSecondGetMs));
+      try {
+        await route.fulfill({ status: 200, contentType: 'application/json', body });
+      } catch { /* ponytail: request aborted by cancelQueries - expected */ }
       return;
     }
     await route.continue();
@@ -257,5 +264,23 @@ test.describe('Settings - Users Table CRUD', () => {
     await expect(page.getByRole('button', { name: 'Profesional 2' })).toBeVisible();
     await page.getByRole('button', { name: 'Profesional 2' }).click();
     await expect(page.getByRole('heading', { name: 'Lucía Fernández' })).toBeVisible();
+  });
+
+  test('delete during in-flight refetch does not resurrect the card', async ({ page }) => {
+    const users = seedUsers();
+    await mockAuth(page);
+    await mockAdminUsers(page, users, PLANS, 200, 1500);
+    await openUsersTab(page);
+
+    await page.getByTitle('Refrescar').click();
+    await cardFor(page, 'Carlos Lopez').getByTitle('Eliminar Usuario').click();
+    await page.locator('#del-modal-confirm').fill('ELIMINAR');
+    await page.getByRole('button', { name: 'Sí, Eliminar' }).click();
+
+    await expect(page.getByText('Usuario eliminado exitosamente')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Carlos Lopez' })).not.toBeVisible();
+    // ponytail: stale GET#2 (refresh snapshot pre-delete) lands ~1.5s later - card must stay gone
+    await page.waitForTimeout(2000);
+    await expect(page.getByRole('heading', { name: 'Carlos Lopez' })).not.toBeVisible();
   });
 });
