@@ -19,6 +19,7 @@ using Application.Features.Auth.Commands.ResetPassword;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Xunit;
@@ -42,9 +43,10 @@ public class AuthControllerTests
         var mockEmailService = new Mock<IEmailService>();
         var mockConfig = new Mock<IConfiguration>();
         var mockJwtTokenGenerator = new Mock<global::Application.Abstractions.Security.IJwtTokenGenerator>();
-        mockJwtTokenGenerator.Setup(j => j.GenerateToken(It.IsAny<Usuario>())).Returns("test-jwt-token");
+        mockJwtTokenGenerator.Setup(j => j.GenerateToken(It.IsAny<Usuario>(), It.IsAny<bool>())).Returns("test-jwt-token");
+        var mockChallengeStore = new Mock<ITwoFactorChallengeStore>();
         var verifyHandler = new VerifyEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
-        var loginHandler = new LoginUserCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, mockJwtTokenGenerator.Object, uowMock.Object);
+        var loginHandler = new LoginUserCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, mockJwtTokenGenerator.Object, uowMock.Object, mockChallengeStore.Object);
         var updateProfileHandler = new UpdateProfileCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object);
 
         var registerHandler = new RegisterUserCommandHandler(
@@ -63,9 +65,13 @@ public class AuthControllerTests
         var mockValidatorResetPassword = new Mock<FluentValidation.IValidator<ResetPasswordCommand>>();
         var resetPasswordHandler = new ResetPasswordCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object, mockValidatorResetPassword.Object);
         var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
+        var dbOptions = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<global::Infrastructure.Persistence.AppDbContext>()
+            .UseInMemoryDatabase(databaseName: "AuthControllerTests")
+            .Options;
+        var dbContext = new global::Infrastructure.Persistence.AppDbContext(dbOptions);
 
         _controller = new AuthController(
-            registerHandler, 
+            registerHandler,
             verifyHandler,
             loginHandler,
             updateProfileHandler,
@@ -73,11 +79,11 @@ public class AuthControllerTests
             resendEmailHandler,
             forgotPasswordHandler,
             resetPasswordHandler,
-            _usuarioRepositoryMock.Object, 
+            _usuarioRepositoryMock.Object,
             mockConfig.Object,
             mockJwtTokenGenerator.Object,
             cache,
-            null! // AppDbContext is not directly used in the mocked handlers' tests
+            dbContext
         );
 
         var httpContext = new DefaultHttpContext();
