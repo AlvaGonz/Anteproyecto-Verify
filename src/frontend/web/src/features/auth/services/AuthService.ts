@@ -30,6 +30,7 @@ export interface User {
   titularId?: string | null;
   inviterPlan?: string;
   maxUsuariosSecundarios?: number;
+  maxProyectos?: number;
   inviteesList?: Array<{
     id: string;
     nombre: string;

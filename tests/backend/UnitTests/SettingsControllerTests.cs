@@ -123,7 +123,7 @@ public class SettingsControllerTests
             );
             context.PlanesSuscripcion.AddRange(
                 PlanSuscripcion.Create(freePlanId, "Consultor", 0.00m, 5, 1, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false),
-                PlanSuscripcion.Create(proPlanId, "Profesional", 3500.00m, -1, 5, true, true, 0, 200, false, false, false, false, true, false, "Email", false)
+                PlanSuscripcion.Create(proPlanId, "Profesional", 60.00m, -1, 5, true, true, 0, 200, false, false, false, false, true, false, "Email", false)
             );
             
             // Add legacy view records manually for InMemory testing
@@ -244,7 +244,7 @@ public class SettingsControllerTests
             typeof(EntityBase).GetProperty("Id")?.SetValue(dev, devUserGuid);
 
             context.Usuarios.AddRange(admin, dev);
-            context.PlanesSuscripcion.Add(PlanSuscripcion.Create(empresaPlanId, "Empresa", 10000.00m, -1, -1, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true));
+            context.PlanesSuscripcion.Add(PlanSuscripcion.Create(empresaPlanId, "Empresa", 170.00m, -1, -1, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true));
 
             context.UsuariosLegacy.AddRange(
                 new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
@@ -279,7 +279,7 @@ public class SettingsControllerTests
             var pago = await context.PagosLegacy.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
             Assert.NotNull(pago);
             Assert.Equal(empresaPlanId, pago.Idsuscripcion);
-            Assert.Equal(10000.00m, pago.Monto);
+            Assert.Equal(170.00m, pago.Monto);
         }
     }
 }

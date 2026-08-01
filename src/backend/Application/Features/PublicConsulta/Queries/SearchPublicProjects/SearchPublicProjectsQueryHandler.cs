@@ -32,11 +32,11 @@ public class SearchPublicProjectsQueryHandler
 
         if (string.IsNullOrWhiteSpace(request.Query))
         {
-            proyectos = await _proyectoRepository.GetVisibleAsync(1, 50, cancellationToken);
+            proyectos = await _proyectoRepository.GetPublishedAsync(1, 50, cancellationToken);
         }
         else
         {
-            proyectos = await _proyectoRepository.SearchAsync(request.Query, cancellationToken);
+            proyectos = await _proyectoRepository.SearchPublishedAsync(request.Query, cancellationToken);
         }
 
         var proyectoList = proyectos.ToList();

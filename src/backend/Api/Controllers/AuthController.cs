@@ -399,6 +399,7 @@ public class AuthController : ControllerBase
             PendingPlanCode = user.PendingPlanCode,
             PendingBillingCycle = user.PendingBillingCycle,
             MaxUsuariosSecundarios = user.Plan?.MaxUsuariosSecundarios ?? 0,
+            MaxProyectos = user.Plan?.MaxProyectos ?? 0,
             AceptoDescargo = user.AceptoDescargo,
             IsGuest = user.TitularId.HasValue,
             TitularId = user.TitularId,

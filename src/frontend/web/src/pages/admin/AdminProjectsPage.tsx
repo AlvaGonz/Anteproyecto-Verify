@@ -14,12 +14,23 @@ import { useAuth } from "../../shared/context/AuthContext";
 import { Download } from "lucide-react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
 import { ExportInterestsModal } from "./ExportInterestsModal";
+import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
+import { useNavigate } from "react-router-dom";
+
+const PLAN_LIMITS: Record<string, number> = {
+  "Consultor": 1,
+  "Profesional": 5,
+  "Empresa": 10,
+  "Corporativo": 50,
+  "Administrador": 999999
+};
 
 type TabType = "proyectos" | "publicados" | "intereses" | "guardados";
 
 export const AdminProjectsPage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
 
@@ -45,6 +56,11 @@ export const AdminProjectsPage: React.FC = () => {
 
   const { data: rawProjects = [], totalCount, isLoading } = useProjects(page, pageSize);
   const projects = rawProjects;
+
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const userPlan = user?.plan || "Consultor";
+  const maxProjects = PLAN_LIMITS[userPlan] ?? 1;
+  const isAtLimit = maxProjects !== 999999 && (totalCount ?? projects.length) >= maxProjects;
 
   const { data: dashboardStats } = useDashboardStats();
 
@@ -115,6 +131,12 @@ export const AdminProjectsPage: React.FC = () => {
         {activeTab === "proyectos" && (
           <Link
             to="/admin/projects/new"
+            onClick={(e) => {
+              if (isAtLimit && user?.role !== "admin") {
+                e.preventDefault();
+                setShowLimitModal(true);
+              }
+            }}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
           >
             <Plus className="w-5 h-5" />
@@ -222,6 +244,18 @@ export const AdminProjectsPage: React.FC = () => {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         intereses={intereses}
+      />
+      
+      <LimitReachedModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        onViewPlans={() => {
+          setShowLimitModal(false);
+          navigate("/admin/settings");
+        }}
+        limitType="projects"
+        used={totalCount ?? projects.length}
+        max={maxProjects}
       />
     </div>
   );

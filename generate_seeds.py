@@ -91,9 +91,9 @@ def main():
     # 1. Plans (PlanSuscripcion) - Using DB GUIDs matched with AppDbContextSeeder
     plans = [
         {"id": "5F1F3417-402F-4CAC-AE39-F9802A5E72D2", "name": "Gratuito", "price": 0.0},
-        {"id": "66AFDABF-632E-434C-86F4-6F9060D2656F", "name": "Profesional", "price": 3500.0},
-        {"id": "41037268-58B6-40A3-A8AE-C18EFE00C7D3", "name": "Empresa", "price": 10000.0},
-        {"id": "F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4", "name": "Corporativo", "price": 30000.0}
+        {"id": "66AFDABF-632E-434C-86F4-6F9060D2656F", "name": "Profesional", "price": 60.0},
+        {"id": "41037268-58B6-40A3-A8AE-C18EFE00C7D3", "name": "Empresa", "price": 170.0},
+        {"id": "F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4", "name": "Corporativo", "price": 500.0}
     ]
 
     # Roles / Perfiles

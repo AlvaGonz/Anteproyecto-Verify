@@ -45,6 +45,7 @@ export const useUpdateProject = (projectId: string) => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+      qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] }); // ponytail: status may auto-transition after save
     },
   });
 };

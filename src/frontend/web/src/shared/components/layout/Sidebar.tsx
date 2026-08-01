@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useProjects } from "../../../features/projects/api/useProjects";
 import { useAuth } from "../../context/AuthContext";
+import { LimitReachedModal } from "../../../features/projects/components/LimitReachedModal";
 import { clsx } from "clsx";
 
 interface SidebarProps {
@@ -37,7 +38,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const projectCount = projectsError ? 0 : (projects?.length || 0);
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+
+  const maxProjects = user?.role === "admin" ? 999999 : (user?.maxProyectos ?? 1);
+  const isAtLimit = maxProjects !== 999999 && projectCount >= maxProjects;
 
   useEffect(() => {
     if (projectsError) {
@@ -147,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
           }}
         >
-          {NAVIGATION.map((item) => {
+          {NAVIGATION.filter(item => item.name !== "Reglas de Validacion" || user?.role === "admin").map((item) => {
             const isActive = location.pathname.startsWith(item.href);
             return (
               <motion.div
@@ -225,6 +230,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <div className={clsx("transition-all duration-500 shrink-0", isCollapsed ? "px-2 mt-2 sm:mt-4" : "mt-4 sm:mt-8 px-2")}>
           <Link
             to="/admin/projects/new"
+            onClick={(e) => {
+              if (isAtLimit && user?.role !== "admin") {
+                e.preventDefault();
+                setShowLimitModal(true);
+              } else if (onClose) {
+                onClose();
+              }
+            }}
             className={clsx(
               "flex items-center bg-primary hover:bg-primary-hover text-white rounded-2xl font-display font-black text-xs uppercase tracking-widest transition-all shadow-premium hover:shadow-premium-lg group",
               isCollapsed ? "justify-center py-2.5 sm:py-3.5" : "justify-center gap-3 w-full py-3 sm:py-4"
@@ -387,6 +400,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </span>
         </button>
       </div>
+
+      <LimitReachedModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        onViewPlans={() => {
+          setShowLimitModal(false);
+          navigate("/admin/settings");
+        }}
+        limitType="projects"
+        used={projectCount}
+        max={maxProjects}
+      />
     </motion.div>
   );
 };

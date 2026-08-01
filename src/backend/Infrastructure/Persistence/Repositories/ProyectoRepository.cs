@@ -111,6 +111,42 @@ public class ProyectoRepository : IProyectoRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Proyecto>> GetPublishedAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    {
+        var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+
+        return await _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
+            .Include(p => p.Estado)
+            .Where(p => p.Estado.CodigoUnico == publicadoCode)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Proyecto>> SearchPublishedAsync(string query, CancellationToken cancellationToken = default)
+    {
+        var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+        
+        return await _context.Proyectos
+            .AsNoTracking()
+            .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
+            .Include(p => p.Estado)
+            .Where(p => 
+                (p.CedulaRncPropietario == query ||
+                p.Ipi == query ||
+                p.RncDesarrollador == query ||
+                p.Matricula == query ||
+                _context.SellosIntegridad.Any(s => s.ProyectoId == p.Id && s.CodigoSello == query))
+                && p.Estado.CodigoUnico == publicadoCode
+            )
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<Proyecto>> GetFeaturedAsync(int count = 5, CancellationToken cancellationToken = default)
     {
         var draftCode = ProjectStatus.Creado.ToCodigoUnico();

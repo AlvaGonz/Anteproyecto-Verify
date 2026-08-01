@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.Abstractions.Security;
 using Application.Features.Auth.Commands.LoginUser;
 using Domain.Entities;
+using Domain.Enums;
 
 /// <summary>
 /// Shared 2FA challenge-building logic for password and Google login handlers.

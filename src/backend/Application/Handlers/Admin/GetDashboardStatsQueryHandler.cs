@@ -19,5 +19,10 @@ namespace Application.Handlers.Admin
         {
             return await _dashboardRepository.GetAdminDashboardStatsAsync(cancellationToken);
         }
+
+        public async Task<DashboardStatsDto> HandleForUser(Guid userId, CancellationToken cancellationToken)
+        {
+            return await _dashboardRepository.GetUserDashboardStatsAsync(userId, cancellationToken);
+        }
     }
 }

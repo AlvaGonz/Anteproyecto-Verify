@@ -8,6 +8,8 @@ export const projectKeys = {
   all: ["projects"] as const,
   list: (page?: number, pageSize?: number) => ["projects", "list", page, pageSize] as const,
   detail: (id: string) => ["projects", id] as const,
+  // ponytail: keep raw string keys for statusEligibility/validation/findings/audit
+  // to match existing usage in other files until those files are updated
 };
 
 const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
