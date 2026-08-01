@@ -54,7 +54,7 @@ export const TwoFactorService = {
   },
 
   async consumeRecoveryCode(challengeToken: string, code: string): Promise<void> {
-    await apiClient.post("/auth/2fa/recovery", { challengeToken, recoveryCode: code });
+    await apiClient.post("/auth/2fa/recovery-code", { challengeToken, recoveryCode: code });
   },
 
   async disable(password: string, code: string): Promise<void> {

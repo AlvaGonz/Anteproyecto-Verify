@@ -27,7 +27,7 @@ export const ChallengeScreen: React.FC = () => {
   if (!pendingChallenge) return null;
 
   const handleCodeChange = (value: string) => {
-    setCode(sanitizeDigits(value, CODE_LENGTH));
+    setCode(mode === "recovery" ? value.toUpperCase().replace(/[^A-Z0-9]/g, '') : sanitizeDigits(value, CODE_LENGTH));
     setError(null);
   };
 
@@ -85,7 +85,7 @@ export const ChallengeScreen: React.FC = () => {
   };
 
   const title = mode === "recovery" ? "Código de recuperación" : "Verificación en dos pasos";
-  const placeholder = mode === "recovery" ? "ABCD-EFGH-IJKL" : "000000";
+  const placeholder = mode === "recovery" ? "ABCDEFGHIJ" : "000000";
 
   return (
     <m.div
@@ -97,26 +97,26 @@ export const ChallengeScreen: React.FC = () => {
       <div className="text-center mb-8">
         <div className="inline-flex w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 items-center justify-center mb-4">
           <ShieldCheck className="w-7 h-7 text-primary" />
-       </div>
+        </div>
         <h3 className="text-2xl font-display font-extrabold text-[#223382] tracking-tight">{title}</h3>
         <p className="text-text-secondary mt-1 text-sm">
           {mode === "recovery"
             ? "Ingrese uno de los códigos de recuperación que recibió al activar la verificación."
             : `Hola de nuevo. Confirme su identidad para continuar. Le enviamos un código a ${pendingChallenge.emailMasked}.`}
-       </p>
-     </div>
+        </p>
+      </div>
 
       {error && (
         <div className="mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium flex items-start gap-2" role="alert">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
           <span>{error}</span>
-       </div>
+        </div>
       )}
 
       {info && !error && (
         <div className="mb-4 p-3 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 rounded-r-xl text-sm font-medium" role="status">
           {info}
-       </div>
+        </div>
       )}
 
       <form onSubmit={handleVerify} className="space-y-5">
@@ -149,14 +149,14 @@ export const ChallengeScreen: React.FC = () => {
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin" />
               Verificando…
-           </span>
+            </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
               Verificar <ArrowLeft className="w-4 h-4 rotate-180" />
-           </span>
+            </span>
           )}
-       </button>
-     </form>
+        </button>
+      </form>
 
       <div className="mt-6 flex flex-col gap-2 text-sm">
         {mode !== "email" && (
@@ -168,7 +168,7 @@ export const ChallengeScreen: React.FC = () => {
           >
             <Mail className="w-4 h-4" />
             {emailSent ? "Reenviar código por correo" : "Usar código por correo"}
-         </button>
+          </button>
         )}
         {mode !== "recovery" ? (
           <button
@@ -178,7 +178,7 @@ export const ChallengeScreen: React.FC = () => {
           >
             <KeyRound className="w-4 h-4" />
             Usar código de recuperación
-         </button>
+          </button>
         ) : (
           <button
             type="button"
@@ -187,7 +187,7 @@ export const ChallengeScreen: React.FC = () => {
           >
             <ShieldCheck className="w-4 h-4" />
             Usar código de la app autenticadora
-         </button>
+          </button>
         )}
         <button
           type="button"
@@ -195,9 +195,9 @@ export const ChallengeScreen: React.FC = () => {
           className="text-text-secondary/70 hover:text-rose-500 hover:underline text-xs mt-3"
         >
           Cancelar y volver al inicio de sesión
-       </button>
-     </div>
-   </m.div>
+        </button>
+      </div>
+    </m.div>
   );
 };
 

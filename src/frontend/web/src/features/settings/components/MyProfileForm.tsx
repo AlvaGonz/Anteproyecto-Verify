@@ -31,9 +31,6 @@ export const MyProfileForm: React.FC = () => {
   const { data: provincias } = useProvinces();
   const { addToast } = useToast();
   const updateProfile = useUpdateMyProfile();
-  const [showPasswordSection, setShowPasswordSection] = useState(false);
-  const [showCurrentPwd, setShowCurrentPwd] = useState(false);
-  const [showNewPwd, setShowNewPwd] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingData, setPendingData] = useState<UpdateProfileDto | null>(null);
   const [cedulaDisplay, setCedulaDisplay] = useState(() => user?.cedula ? formatCedula(user.cedula) : "");
@@ -121,19 +118,6 @@ export const MyProfileForm: React.FC = () => {
     }
   }, [user, reset]);
 
-  watch("changePassword");
-
-  const togglePasswordSection = () => {
-    const next = !showPasswordSection;
-    setShowPasswordSection(next);
-    setValue("changePassword", next, { shouldDirty: true });
-    if (!next) {
-      setValue("currentPassword", "");
-      setValue("newPassword", "");
-      setValue("confirmPassword", "");
-    }
-  };
-
   const onSubmit = (data: UpdateProfileDto) => {
     // Store the pending data and show confirmation modal
     setPendingData(data);
@@ -158,15 +142,9 @@ export const MyProfileForm: React.FC = () => {
         direccion: data.direccion,
         provincia: data.provincia,
         nickname: data.nickname,
-        ...(data.changePassword && {
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword,
-        }),
       });
       await refreshUser();
       addToast("Perfil actualizado correctamente", "success");
-      setShowPasswordSection(false);
-      setValue("changePassword", false);
       setShowConfirmModal(false);
       setPendingData(null);
     } catch (err: any) {
@@ -198,19 +176,14 @@ export const MyProfileForm: React.FC = () => {
       }
     });
 
-    // Check password change
-    if (pendingData.changePassword) {
-      changes.push({ field: "Contraseña", current: "********", new: "******** (cambiada)" });
-    }
-
     return changes;
   };
 
   return (
-    <>
+    <React.Fragment>
       <form onSubmit={handleSubmit(onSubmit)} className="w-full">
         {/* Two-column grid: left = avatar+identity, right = editable fields */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch" data-testid="settings-grid">
 
         {/* ═══ LEFT COLUMN: Avatar + Read-only Identity ═══ */}
         <div className="flex flex-col gap-6 h-full">
@@ -497,54 +470,6 @@ export const MyProfileForm: React.FC = () => {
               )}
             </div>
 
-            {/* COLLAPSIBLE password change */}
-            <div className="border border-border rounded-2xl overflow-hidden">
-              <button
-                type="button"
-                onClick={togglePasswordSection}
-                className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-bold text-text-primary hover:bg-surface-raised/20 transition-colors"
-              >
-                <span className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-primary" />
-                  Cambiar Contraseña
-                </span>
-                <ChevronDown
-                  className={`w-4 h-4 text-text-secondary transition-transform ${showPasswordSection ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {showPasswordSection && (
-                <div className="px-5 pb-5 pt-2 space-y-4 border-t border-border bg-surface-raised/10">
-                  {[
-                    { field: "currentPassword" as const, label: "Contraseña Actual", show: showCurrentPwd, toggle: () => setShowCurrentPwd(p => !p) },
-                    { field: "newPassword" as const, label: "Nueva Contraseña", show: showNewPwd, toggle: () => setShowNewPwd(p => !p) },
-                    { field: "confirmPassword" as const, label: "Confirmar Nueva Contraseña", show: showNewPwd, toggle: () => { } },
-                  ].map(({ field, label, show, toggle }) => (
-                    <div key={field}>
-                      <label className="block text-xs font-bold text-text-secondary uppercase mb-1">{label}</label>
-                      <div className="relative">
-                        <input
-                          {...register(field)}
-                          type={show ? "text" : "password"}
-                          className="vf-input w-full pr-9"
-                          autoComplete="new-password"
-                        />
-                        {field !== "confirmPassword" && (
-                          <button type="button" onClick={toggle} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary">
-                            {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        )}
-                      </div>
-                      {errors[field] && (
-                        <p className="text-[10px] text-red-500 mt-1">{errors[field]?.message}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Save button - OUTSIDE danger zone */}
           <button
             type="submit"
@@ -609,6 +534,6 @@ export const MyProfileForm: React.FC = () => {
         </div>
       </div>
     )}
-  </>
+</React.Fragment>
   );
-  };
+};
