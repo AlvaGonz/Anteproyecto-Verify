@@ -467,18 +467,6 @@ public class SettingsController : ControllerBase
                 new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
         } catch {}
 
-        try {
-            await _context.Database.ExecuteSqlRawAsync(
-                "DELETE FROM FremiunConsultas_Log WHERE IdUsuario = @id",
-                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
-        } catch {}
-
-        try {
-            await _context.Database.ExecuteSqlRawAsync(
-                "DELETE FROM FremiunProyectos_Log WHERE IdUsuario = @id",
-                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
-        } catch {}
-
         _context.Usuarios.Remove(user);
         
         // Do not remove from UsuariosLegacy since it is a view over Usuarios

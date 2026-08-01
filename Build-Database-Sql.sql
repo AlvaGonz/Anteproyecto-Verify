@@ -1246,54 +1246,6 @@ GO
 
 
 
-IF OBJECT_ID(N'[FremiunConsultas_Log]', 'U') IS NULL
-
-CREATE TABLE FremiunConsultas_Log (
-
-    IdConsultaLog  UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-
-    IdProyecto     UNIQUEIDENTIFIER,
-
-    IdConsulta     UNIQUEIDENTIFIER,
-
-    IdUsuario      UNIQUEIDENTIFIER,
-
-    FechaConsulta  DATETIME DEFAULT GETDATE(),
-
-    FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmobiliarios(IdProyecto),
-
-    FOREIGN KEY (IdConsulta) REFERENCES Consultas(IdConsulta),
-
-    FOREIGN KEY (IdUsuario)  REFERENCES Usuario(IdUsuario)
-
-);
-
-GO
-
-
-
-IF OBJECT_ID(N'[FremiunProyectos_Log]', 'U') IS NULL
-
-CREATE TABLE FremiunProyectos_Log (
-
-    IdProyectoLog UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
-
-    IdProyecto    UNIQUEIDENTIFIER,
-
-    IdUsuario     UNIQUEIDENTIFIER,
-
-    FechaAcceso   DATETIME DEFAULT GETDATE(),
-
-    FOREIGN KEY (IdProyecto) REFERENCES ProyectosInmobiliarios(IdProyecto),
-
-    FOREIGN KEY (IdUsuario)  REFERENCES Usuario(IdUsuario)
-
-);
-
-GO
-
-
-
 IF OBJECT_ID(N'[LogConsultas]', 'U') IS NULL
 
 BEGIN
