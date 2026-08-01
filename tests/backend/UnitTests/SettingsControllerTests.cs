@@ -276,7 +276,7 @@ public class SettingsControllerTests
             var legacyUser = await context.UsuariosLegacy.FirstOrDefaultAsync(lu => lu.Email == "dev@verifinca.do");
             Assert.NotNull(legacyUser);
 
-            var pago = await context.PagosLegacy.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
+            var pago = await context.Pagos.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
             Assert.NotNull(pago);
             Assert.Equal(empresaPlanId, pago.Idsuscripcion);
             Assert.Equal(170.00m, pago.Monto);

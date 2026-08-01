@@ -2,29 +2,17 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ChallengeScreen } from "../ChallengeScreen";
+import { TwoFactorService } from "../../services/TwoFactorService";
+import { useAuth } from "../../../../shared/context/AuthContext";
 
 vi.mock("../../../../shared/context/AuthContext", () => ({
-  useAuth: vi.fn(() => ({
-    pendingChallenge: {
-      challengeToken: "ch-test-tok",
-      emailMasked: "e***@example.com",
-    },
-    clearChallenge: vi.fn(),
-    refreshUser: vi.fn(),
-  })),
+  useAuth: vi.fn(),
 }));
 
-const mocks = vi.hoisted(() => ({
-  requestEmailOtpMock: vi.fn(),
-  verifyEmailOtpMock: vi.fn(),
-}));
-const requestEmailOtpMock = mocks.requestEmailOtpMock;
-const verifyEmailOtpMock = mocks.verifyEmailOtpMock;
-
-vi.mock("../../auth/services/TwoFactorService", () => ({
+vi.mock("../../services/TwoFactorService", () => ({
   TwoFactorService: {
-    requestEmailOtp: mocks.requestEmailOtpMock,
-    verifyEmailOtp: mocks.verifyEmailOtpMock,
+    requestEmailOtp: vi.fn(),
+    verifyEmailOtp: vi.fn(),
     verifyChallenge: vi.fn(),
     consumeRecoveryCode: vi.fn(),
     getStatus: vi.fn(),
@@ -48,12 +36,23 @@ vi.mock("framer-motion", async () => {
   };
 });
 
+const requestEmailOtpMock = vi.mocked(TwoFactorService.requestEmailOtp);
+const verifyEmailOtpMock = vi.mocked(TwoFactorService.verifyEmailOtp);
+
 const FORBIDDEN_INTERNALS_REGEX =
   /resend|provider|sdk|exception|\bstack\b|\bef\b|sql|\b500\b|EMAIL_OTP/i;
 
 describe("ChallengeScreen — Usar código por correo", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (useAuth as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      pendingChallenge: {
+        challengeToken: "ch-test-tok",
+        emailMasked: "e***@example.com",
+      },
+      clearChallenge: vi.fn(),
+      refreshUser: vi.fn(),
+    });
   });
 
   it("clicking the button fires TwoFactorService.requestEmailOtp with the challenge token", async () => {
@@ -84,12 +83,12 @@ describe("ChallengeScreen — Usar código por correo", () => {
     const info = await screen.findByText(/Código enviado a e\*\*\*@example\.com/i);
     expect(info).toBeTruthy();
 
+    // No alert on success
     expect(screen.queryByRole("alert")).toBeNull();
 
-    const reenviar = screen.getByRole("button", {
-      name: /reenviar código por correo/i,
-    });
-    expect(reenviar).toBeTruthy();
+    // The success-state UI is the email-mode input form.
+    const codeInput = screen.getByPlaceholderText("000000");
+    expect(codeInput).toBeTruthy();
   });
 
   it("on failure, renders the safe catalogued error in an alert — never raw axios nor backend ErrorCode", async () => {

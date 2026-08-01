@@ -94,6 +94,8 @@ public class LoginUserCommandHandler
             IsGuest: user.TitularId.HasValue,
             TitularId: user.TitularId,
             InviterPlan: inviterPlan,
+            MaxProyectos: user.Plan?.MaxProyectos,
+            MaxUsuariosSecundarios: user.Plan?.MaxUsuariosSecundarios,
             InviteesList: user.MiembrosEquipo
                 .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
                 .Select(m => new {

@@ -3,9 +3,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import apiClient from '../../../infrastructure/api/client';
+import { ensureLegalResources } from '../../../legalResources';
 
 import { SubscriptionConsentCheckbox } from '../components/SubscriptionConsentCheckbox';
 import { useTranslation } from 'react-i18next';
+
+ensureLegalResources();
 
 // Load Stripe outside component to avoid recreating it
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');

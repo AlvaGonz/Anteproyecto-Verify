@@ -416,8 +416,8 @@ public class SettingsController : ControllerBase
         var access = await _context.Accesos.Where(a => a.IdUsuario == user.Id).ToListAsync(cancellationToken);
         if (access.Any()) _context.Accesos.RemoveRange(access);
         
-        var pagos = await _context.PagosLegacy.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
-        if (pagos.Any()) _context.PagosLegacy.RemoveRange(pagos);
+        var pagos = await _context.Pagos.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
+        if (pagos.Any()) _context.Pagos.RemoveRange(pagos);
 
         try {
             var sesiones = await _context.SesionesUsuario.Where(s => s.UsuarioId == user.Id).ToListAsync(cancellationToken);
@@ -589,7 +589,7 @@ public class SettingsController : ControllerBase
             Monto = plan.Precio,
             FechaPago = DateTime.UtcNow
         };
-        _context.PagosLegacy.Add(nuevoPago);
+        _context.Pagos.Add(nuevoPago);
 
         // Single SaveChangesAsync for entire operation
         await _context.SaveChangesAsync(cancellationToken);
@@ -883,7 +883,7 @@ public class SettingsController : ControllerBase
             }
         }
 
-        var hasPagos = await _context.PagosLegacy.AnyAsync(p => p.IdUsuario == u.Id, cancellationToken);
+        var hasPagos = await _context.Pagos.AnyAsync(p => p.IdUsuario == u.Id, cancellationToken);
         if (!hasPagos)
         {
             var freePlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Gratuito", cancellationToken);
@@ -892,7 +892,7 @@ public class SettingsController : ControllerBase
             var targetPlan = u.Rol == UserRole.Administrator ? proPlan : freePlan;
             if (targetPlan != null)
             {
-                _context.PagosLegacy.Add(new Pago
+                _context.Pagos.Add(new Pago
                 {
                     IdUsuario = u.Id,
                     Idsuscripcion = targetPlan.Idsuscripcion,

@@ -54,6 +54,8 @@ public class ProjectsController : ControllerBase
     public async Task<ActionResult<PaginatedResult<ProyectoDto>>> GetProjects(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
+        [FromQuery] string? q = null,
+        [FromQuery] string? estados = null,
         CancellationToken cancellationToken = default)
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -65,7 +67,7 @@ public class ProjectsController : ControllerBase
                 if (loggedInUser != null)
                 {
                     Guid? filterUserId = loggedInUser.Rol != UserRole.Administrator ? userId : null;
-                    var result = await _projectService.GetAllProjectsWithCountAsync(filterUserId, page, pageSize, cancellationToken);
+                    var result = await _projectService.GetAllProjectsWithCountAsync(filterUserId, page, pageSize, q, estados, cancellationToken);
                     
                     return Ok(result);
                 }

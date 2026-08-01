@@ -759,7 +759,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UsuarioLegacyIdUsuario");
 
-                    b.ToTable("PagosLegacy");
+                    b.ToTable("Pagos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Perfil", b =>

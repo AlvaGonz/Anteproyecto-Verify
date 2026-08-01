@@ -4,6 +4,7 @@ import { ShieldCheck, Mail, KeyRound, ArrowLeft, Loader2, AlertCircle, Lock } fr
 import { useAuth } from "../../../shared/context/AuthContext";
 import { TwoFactorService } from "../../auth/services/TwoFactorService";
 import { sanitizeDigits } from "../utils/sanitizeDigits";
+import { toTwoFactorError } from "../errors/twoFactorErrorMap";
 
 type Mode = "totp" | "email" | "recovery";
 
@@ -52,9 +53,8 @@ export const ChallengeScreen: React.FC = () => {
       await refreshUser();
       window.location.hash = "#/admin/dashboard";
     } catch (err: any) {
-      const status = err?.response?.status;
-      const msg = err?.response?.data?.message ?? err?.message ?? "No se pudo verificar el código.";
-      setError(status === 423 || status === 429 ? "Demasiados intentos. Espere unos minutos." : msg);
+      const twoFactorError = toTwoFactorError(err);
+      setError(twoFactorError.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -72,7 +72,8 @@ export const ChallengeScreen: React.FC = () => {
       setMode("email");
       setCode("");
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? "No se pudo enviar el código.");
+      const twoFactorError = toTwoFactorError(err);
+      setError(twoFactorError.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -108,7 +109,7 @@ export const ChallengeScreen: React.FC = () => {
       {error && (
         <div className="mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium flex items-start gap-2" role="alert">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-          <span>{"error"}</span>
+          <span>{error}</span>
        </div>
       )}
 

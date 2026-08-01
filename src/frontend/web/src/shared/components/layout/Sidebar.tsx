@@ -34,8 +34,7 @@ const NAVIGATION = [
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: projects, error: projectsError } = useProjects(1, 500);
-  const projectCount = projectsError ? 0 : (projects?.length || 0);
+  const { totalCount: projectCount, error: projectsError } = useProjects(1, 1);
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -55,17 +54,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     navigate("/login");
   };
 
-  const fullName = user ? `${user.nombre || ""} ${user.apellido || ""}`.trim() : "";
-  const firstName = fullName ? fullName.split(" ")[0] : "Usuario";
-  const initials = fullName
-    ? fullName
-      .split(" ")
-      .filter(Boolean)
-      .map((n: string) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase()
-    : "US";
+  const fullName = user
+    ? `${user.nombre || ""} ${user.apellido || ""}`.trim() || (user.name || "").trim()
+    : "";
+  const nameParts = fullName.split(" ").filter(Boolean);
+  const firstName = nameParts[0] || "Usuario";
+  const initials = nameParts
+    .map((n: string) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "US";
   const roleLabel = {
     admin: "Administrador",
     dev: "Desarrollador",
@@ -337,11 +335,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
               {user?.avatarUrl ? (
                 <img
                   data-testid="sidebar-avatar-img"
-                  src={
-                    /^(data|blob|http)/.test(user.avatarUrl)
-                      ? user.avatarUrl
-                      : `http://localhost:5000${user.avatarUrl}`
-                  }
+                  loading="lazy"
+                  decoding="async"
+                  src={user.avatarUrl}
                   alt="Avatar"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"

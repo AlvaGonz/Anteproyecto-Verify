@@ -1,30 +1,52 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2, MapPin, ChevronRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 
-import { useSuspensePublishedProjects, getDefaultProjectImage } from "../../projects/api/usePublishedProjects";
+import { useSuspenseFeaturedProjects } from "../../projects/api/useFeaturedProjects";
+import { useSuspensePublishedProjects } from "../../projects/api/usePublishedProjects";
+import { getDefaultProjectImage } from "../../projects/api/usePublishedProjects";
 
 
 const ITEM_WIDTH = 400;
 const GAP = 60;
+// Speed in px/second — tuned so the marquee feels slow and calm.
+// EDIT HERE: increase to make the carousel move faster, decrease for slower.
+const MARQUEE_SPEED_PX_PER_SEC = 60;
 
 export const FeaturedProjectsSection: React.FC = () => {
-  const { data: searchResults = [] } = useSuspensePublishedProjects();
+  const { data: featured = [] } = useSuspenseFeaturedProjects(12);
+  const { data: published = [] } = useSuspensePublishedProjects();
   const x = useMotionValue(0);
   const dragging = useRef(false);
   const hovering = useRef(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [inView, setInView] = useState(true);
 
-  // Use ALL published projects for the carousel (API already filters PUBLICADO)
-  const projects = searchResults
+  // Only animate while the section is visible on screen
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.05 }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  // Fallback to published projects if featured is empty
+  const sourceProjects = featured.length > 0 ? featured : published;
+
+  const projects = sourceProjects
     .map((p: any) => ({
       id: p.id,
-      codigoPublico: p.codigoPublico,
-      name: p.nombreProyecto,
+      codigoPublico: p.codigoPublico ?? p.codigoInterno,
+      name: p.nombreProyecto ?? p.nombre,
       location: p.ubicacionTexto || "Ubicación no especificada",
       image: p.imagenUrl || getDefaultProjectImage(p.categoria),
       completionRate: p.completionRate ?? 80,
-      isVerified: p.estadoValidacion === "Verificado",
+      isVerified: p.estadoValidacion === "Verificado" || p.estadoProyecto === "Publicado",
     }))
     .slice(0, 12);
 
@@ -36,18 +58,27 @@ export const FeaturedProjectsSection: React.FC = () => {
   // Each item: width + gap. Track is 2x single set.
   const trackWidth = carouselItems.length * (ITEM_WIDTH + GAP);
 
+  // rAF loop: renders at display refresh rate (60fps+) while keeping the
+  // linear speed constant (MARQUEE_SPEED_PX_PER_SEC), so it still feels slow.
   useEffect(() => {
-    const id = window.setInterval(() => {
-      if (dragging.current || hovering.current) return;
-      let next = x.get() - 2.5;
-      if (next <= -(trackWidth / 2)) next += trackWidth / 2;
-      x.set(next);
-    }, 50);
-    return () => clearInterval(id);
-  }, [trackWidth]);
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      if (!dragging.current && !hovering.current && inView) {
+        const dt = Math.min(now - last, 100);
+        let next = x.get() - (MARQUEE_SPEED_PX_PER_SEC * dt) / 1000;
+        if (next <= -(trackWidth / 2)) next += trackWidth / 2;
+        x.set(next);
+      }
+      last = now;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [trackWidth, inView, x]);
 
   return (
-    <section id="proyectos" className="py-32 bg-surface-raised overflow-hidden">
+    <section id="proyectos" ref={sectionRef} className="py-32 bg-surface-raised overflow-hidden">
       {/* ── Header ── */}
       <div className="max-w-7xl mx-auto px-6 mb-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">

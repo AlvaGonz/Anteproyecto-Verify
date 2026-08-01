@@ -7,8 +7,15 @@ if (BASE_URL && !BASE_URL.endsWith("/api") && !BASE_URL.endsWith("/api/")) {
 
 const instance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+  withCredentials: false,
   timeout: 15000, // 15 second timeout to prevent hanging requests
+});
+
+// Separate instance for authenticated requests that need cookies (refresh token)
+const authInstance: AxiosInstance = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true,
+  timeout: 15000,
 });
 
 // Request interceptor — attach JWT from memory (NOT localStorage)
@@ -59,11 +66,10 @@ export const refreshAuthToken = (): Promise<string | null> => {
   isRefreshing = true;
   return new Promise(async (resolve, reject) => {
     try {
-      const { data } = await instance.post(
+      const { data } = await authInstance.post(
         '/auth/refresh',
         {},
         { 
-          withCredentials: true,
           headers: { 'X-Skip-Retry': '1' } 
         }
       );
@@ -88,8 +94,21 @@ instance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-    
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== "/auth/refresh" && originalRequest.url !== "/auth/me" && originalRequest.url !== "/auth/logout" && !originalRequest.headers?.['X-Skip-Retry']) {
+
+    const isPublicEndpoint = originalRequest?.url?.startsWith("/public/");
+    const isAuthEndpoint =
+      originalRequest?.url === "/auth/refresh" ||
+      originalRequest?.url === "/auth/me" ||
+      originalRequest?.url === "/auth/logout";
+    const shouldRetryOn401 =
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthEndpoint &&
+      !isPublicEndpoint &&
+      !originalRequest.headers?.['X-Skip-Retry'];
+
+    if (shouldRetryOn401) {
       originalRequest._retry = true;
       try {
         const token = await refreshAuthToken();

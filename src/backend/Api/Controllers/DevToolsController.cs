@@ -149,6 +149,23 @@ public class DevToolsController : ControllerBase
         return (binary % 1000000).ToString("D6");
     }
 
+[HttpGet("resend-config")]
+        public IActionResult GetResendConfig()
+        {
+            var config = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            var env = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
+            var section = config.GetSection("Resend");
+            var apiToken = section.GetValue<string>("ApiToken") ?? "NOT_FOUND";
+            var fromEmail = section.GetValue<string>("FromEmail") ?? "NOT_FOUND";
+            var fromName = section.GetValue<string>("FromName") ?? "NOT_FOUND";
+            var envName = env.EnvironmentName;
+
+            return Ok(new { apiToken, fromEmail, fromName, envName });
+        }
+
+    [HttpGet("ping")]
+    public IActionResult Ping([FromQuery] string? test = null) => Ok(new { pong = true, time = DateTime.UtcNow, test });
+
     private static byte[] ConvertFromBase32(string s)
     {
         const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";

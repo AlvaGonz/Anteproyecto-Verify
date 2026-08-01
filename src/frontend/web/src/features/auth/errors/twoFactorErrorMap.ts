@@ -26,6 +26,8 @@ export const ERROR_CATALOG: Record<TwoFactorErrorCodeValue, string> = {
   EMAIL_OTP_INVALID: "Código de correo inválido o vencido. Intente de nuevo.",
   EMAIL_OTP_LOCKED_OUT:
     "Demasiados intentos. Espere unos minutos antes de intentar nuevamente.",
+  EMAIL_OTP_RESEND_THROTTLED:
+    "Debes esperar un momento antes de solicitar otro código.",
   DISABLE_FAILED:
     "No se pudo desactivar la verificación en este momento. Intente nuevamente.",
   QR_RENDER_FAILED:

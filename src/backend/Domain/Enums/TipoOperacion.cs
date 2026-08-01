@@ -20,5 +20,8 @@ public enum TipoOperacion
     TwoFactorFallido = 15,
     EmailOtpSolicitado = 16,
     EmailOtpUsado = 17,
-    CodigoRecuperacionUsado = 18
+    CodigoRecuperacionUsado = 18,
+    EmailOtpResendThrottled = 19,
+    EmailOtpFalloEnvio = 20
 }
+

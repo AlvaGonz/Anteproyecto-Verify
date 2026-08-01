@@ -527,6 +527,36 @@ public static class EmailTemplates
             "Instrucciones para restablecer tu contraseña en VeriFinca.",
             content);
     }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // 8. 2FA Email OTP Challenge
+    // ════════════════════════════════════════════════════════════════════════
+    public static string GetEmailOtpEmail(string userName, string code)
+    {
+        // The code is the only thing the user needs to act on. We render it
+        // as a large, letter-spaced monospaced block — high contrast, no
+        // background image, easy to copy.
+        string content = $@"
+            <h2 style=""margin:0 0 8px 0;font-family:'Manrope',Arial,sans-serif;font-size:22px;font-weight:700;color:{Navy};"">¡Hola, {userName}! 👋</h2>
+            <p style=""margin:0 0 16px 0;font-size:15px;color:{TextMuted};"">Tu código de verificación</p>
+
+            <p style=""margin:0 0 20px 0;"">Recibimos una solicitud de inicio de sesión en tu cuenta de <strong>VeriFinca</strong>. Ingresa este código en la pantalla de verificación para continuar. El código caduca en 10 minutos</p>
+
+            <div style=""text-align:center;margin:24px 0;"">
+              <div style=""display:inline-block;background:{BgMuted};border:1px dashed {BorderLine};border-radius:10px;padding:18px 28px;font-family:'JetBrains Mono','Courier New',monospace;font-size:32px;font-weight:700;letter-spacing:8px;color:{Navy};"">
+                {code}
+             </div>
+           </div>
+
+            <p style=""margin:0 0 8px 0;font-size:14px;color:{TextBody};"">Si no reconoces este intento, cambia tu contraseña inmediatamente y contacta a soporte</p>
+
+            <p style=""margin:24px 0 0 0;font-size:13px;color:{TextMuted};"">Nunca compartas este código con nadie. El equipo de VeriFinca jamás te lo solicitará</p>";
+
+        return BuildEmailWrapper(
+            "Tu código de verificación — VeriFinca",
+            "Tu código de verificación de dos pasos en VeriFinca.",
+            content);
+    }
 }
 
 

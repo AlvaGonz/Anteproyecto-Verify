@@ -3,11 +3,10 @@ import { apiClient, setAccessToken, getAccessToken, refreshAuthToken } from "../
 export interface User {
   id: string;
   email: string;
-  nombreCompleto?: string;
   nombre?: string;
   apellido?: string;
+  name?: string;
   role?: string;
-  rol?: string;
   cedula?: string;
   telefono?: string;
   rnc?: string;
@@ -153,13 +152,22 @@ export const AuthService = {
   }
 };
 
-function finalizeAuthResponse(payload: any): LoginResult {
+type _LoginPayload = {
+  accessToken?: string;
+  user?: User;
+  requires2fa?: boolean;
+  challengeToken?: string;
+  emailMasked?: string;
+  email?: string;
+};
+
+function finalizeAuthResponse(payload: _LoginPayload): LoginResult {
   if (payload?.requires2fa) {
     return {
       succeeded: false,
       requires2fa: true,
       challenge: {
-        challengeToken: payload.challengeToken,
+        challengeToken: payload.challengeToken ?? "",
         emailMasked: payload.emailMasked ?? payload.email ?? "",
       },
     };
@@ -176,7 +184,7 @@ function finalizeAuthResponse(payload: any): LoginResult {
   setAccessToken(token);
   return {
     succeeded: true,
-    user: payload.user,
+    user: payload.user ?? ({} as User),
     token,
   };
 }

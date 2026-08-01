@@ -178,6 +178,8 @@ export const AdminInterestsView: React.FC = () => {
                         <img
                           src={interes.avatarUrl}
                           alt={interes.nombreUsuario}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -269,6 +271,8 @@ export const AdminInterestsView: React.FC = () => {
                     <img
                       src={selectedInterest.avatarUrl}
                       alt={selectedInterest.nombreUsuario}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   ) : (

@@ -1,3 +1,21 @@
+# Progress: PagosLegacy → Pagos cleanup (2026-08-01)
+
+- **Finding**: runtime model ALREADY mapped `Pago` → `Pagos` (`PagoConfiguration.cs:11`, restored in `fe49108c`); live DB has no `PagosLegacy` table (only `Pagos`, `LogPagos`, `Recibo`, `ApiGobernanza`, `PagoIPI`). The only stale artifact was the EF model snapshot (`AppDbContextModelSnapshot.cs` still said `ToTable("PagosLegacy")`).
+- **Changes**: renamed DbSet `PagosLegacy` → `Pagos` in `AppDbContext.cs`; 5 usages in `SettingsController.cs` (lines 419/420/592/886/895) and 1 in `SettingsControllerTests.cs:279`; re-synced snapshot to `ToTable("Pagos")`; added defensive `DROP TABLE IF EXISTS [PagosLegacy]` to `Build-Database-Sql.sql` defensive block.
+- **Not touched (historical/immutable)**: `20260801035655_AddTwoFactorToUsuario.Designer.cs` (only adds 2FA columns to Usuario; never renamed Pagos).
+- **Tests**: `PagoModelMappingTests` (asserts `Pagos` mapping — now consistent) + `SettingsControllerTests` → 7/7 passed. Build 0 warnings/0 errors.
+- **Kept per user instruction** (do-not-delete list): ApiGobernanza, AyuntamientoTarifa, CatastroTitulo, CertiMivhed, Consultas, EstudioSuelo, PagoIPI, Pagos, PermisoSuelo, SolvenciaFinanciera, TarifaSueloAyuntamiento, TipoInmoviliario. `PlanCaracteristica` untouched (not in instruction).
+- Status: complete. Uncommitted: `AppDbContext.cs`, `SettingsController.cs`, `SettingsControllerTests.cs`, `AppDbContextModelSnapshot.cs`, `Build-Database-Sql.sql`.
+
+# Progress: Legacy SQL Cleanup (Fremiun + Documento chain) & SQL Audit (2026-08-01)
+
+- **Fremiun tables** (`FremiunConsultas_Log`, `FremiunProyectos_Log`): removal committed by user in `fe49108c`. Added defensive `DROP TABLE IF EXISTS` to top of `Build-Database-Sql.sql` so stale Docker volumes (entrypoint re-runs script each start) can never resurrect them.
+- **Legacy Documento chain**: removed `TipoDocumento` → `Documento` (singular) → `SelloIntegridad` (singular) DDL + `Recibo.IdSello` FK from `Build-Database-Sql.sql` (edit tool) and `old_Build-Database-Sql.sql` (UTF-16LE, PowerShell line-range, 1092→1057). Dropped the 3 tables in the live container DB (`verifinca-spm-uce-2026`) via sqlcmd — only EF-active `Documentos`/`SellosIntegridad` remain. Repo-wide grep: no residual `CREATE TABLE`/`REFERENCES` for the legacy names.
+- **Integration tests**: proven 10/18 failures pre-existing (identical suite at parent `4d993220` in temp worktree, since removed). Root cause: `GlobalExceptionHandler.cs:43-49` maps `ArgumentException`/`InvalidOperationException` → 400 instead of 500/401.
+- **sql-sentinel v1.0.0 audit** (all 12 seeds + DDL): 10×100/A; `15_Municipios.sql` 75/C; `Build-Database-Sql.sql` 63/D. All 3 findings (SQL005 ×2, SQL003 ×1) verified **false positives** on T-SQL dialect — `FROM (VALUES)` table constructor, SQL Server MERGE, migration-history `VALUES` rows. No real anti-patterns.
+- **backend-architect DDL-vs-EF diff**: 13 DDL-only tables with no consumers — see Open Decisions below.
+- Status: cleanup complete. Uncommitted: `Build-Database-Sql.sql` (Documento chain + defensive drops).
+
 # Progress: Exportación de Intereses a Excel
 
 - Se agregó un botón **"Exportar"** en la cabecera de la sección **Expedientes -> Intereses**.
@@ -17,15 +35,67 @@
 - Integrated Lucide's `AlertCircle` icon and styled it matching the design tokens (`bg-amber-50`, `border border-amber-200/80`, `text-amber-900`) for consistency and responsiveness.
 - Status: **Complete**.
 
-# Progress: Debug Session 404 Not Found on OCR Field Update
+# Progress: 2FA Email OTP Challenge Flow Fix (RF-2 / OE-2)
 
-- Investigated 404 error when frontend tries to update an OCR field using `useUpdateDocumentFieldReview`.
-- Traced the `PATCH` route `/fields/{fieldName}` to `ProjectDocumentsController` which delegates to `DocumentService.UpdateDocumentFieldReviewAsync`.
-- Identified that the fields being edited from the frontend (like `oficina`, `superficieM2`) do not exist in the legacy `Fields` dictionary, but instead are located inside `CanonicalDataJson`'s `payload`.
-- **Fix:** Modified `DocumentService.UpdateDocumentFieldReviewAsync` to parse `CanonicalDataJson`, perform a case-insensitive lookup within its `payload`, and update the `status` and `normalizedValue` there. 
-- It also now adds the field to the legacy `Fields` dictionary if it didn't exist, to prevent `KeyNotFoundException`.
-- C# compilation passed. Unit tests exposed pre-existing errors in `PlanoMensuraCatastralRdPaddleMapperTests` and `EstadoJuridicoRdPaddleMapperTests` that are unrelated to this specific change.
-- Status: **Complete**.
+## Summary
+Fixed the "Usar código por correo" button flow so it actually sends the email OTP through the real Resend provider using the project's template system, with proper throttling, safe error messages, observability, and anti-swallow guarantees.
+
+## Root Cause (H1-H8 from systematic debugging)
+- **H1**: `EmailOtpService.Handle(RequestEmailOtpCommand)` never called `IEmailService` — persisted OTP to DB and returned success but **never dispatched email**.
+- **H2**: `ResendEmailService.SendEmailAsync` swallowed provider exceptions (`catch { LogWarning }`), so failures silently looked like success.
+- **H3**: No OTP email template existed in `EmailTemplates.cs` — would have encouraged ad-hoc strings.
+- **H4**: `EmailOtpLastSentUtc` stamped but never checked — no resend throttle.
+- **H5**: Audit "Éxito" recorded BEFORE any provider dispatch.
+- **H6**: ChallengeScreen `<span>{"error"}</span>` rendered literal string "error", not the error variable.
+- **H7**: `requestEmailOtp` catch used raw axios `message` instead of `toTwoFactorError` safe mapping.
+
+## Changes Made
+
+### Backend
+1. **`IEmailService`** — Added `SendEmailOtpAsync(string toEmail, string userName, string code, CancellationToken ct)` contract; must surface provider failures as exceptions.
+2. **`ResendEmailService`** — Implemented `SendEmailOtpAsync` calling `_resend.EmailSendAsync` directly (no swallow); added `_isTestEnvironment` detection (simulates success for mock tokens in dev/testing).
+3. **`NullEmailService`** (integration tests) — Added no-op `SendEmailOtpAsync`.
+4. **`EmailTemplates`** — Added `GetEmailOtpEmail(string userName, string code)` using project template system (6-digit code in styled card, consistent branding).
+5. **`TwoFactorEmailEventLogger`** — In-process ring buffer emitting lifecycle events:
+   - `2fa_email_challenge_requested`
+   - `2fa_email_template_rendered`
+   - `2fa_email_provider_dispatch_started`
+   - `2fa_email_provider_dispatch_succeeded`
+   - `2fa_email_provider_dispatch_failed`
+   - `2fa_email_resend_throttled`
+   - Dev-only `/api/dev/2fa-email-events` and `/api/dev/2fa-email-events/force-fail` endpoints for observability and anti-swallow testing.
+6. **`EmailOtpService`** — Injected `IEmailService`, `ITwoFactorEmailEventLogger`, `IConfiguration`; added throttle check using `user.EmailOtpLastSentUtc` + configurable cooldown (`TwoFactor:EmailOtpResendCooldownSeconds`, default 60s prod / 1s testing); lifecycle events at each stage; force-fail hook for anti-swallow test; audit "Éxito" moved AFTER successful provider dispatch.
+7. **`TwoFactorController`** — Returns `EMAIL_OTP_RESEND_THROTTLED` (new error code) with safe message when throttled.
+8. **`TipoOperacion`** — Added `EmailOtpResendThrottled = 19`, `EmailOtpFalloEnvio = 20`.
+9. **Config** — `appsettings.Development.json`: `TwoFactor:EmailOtpResendCooldownSeconds = 1` (preserves existing `2fa-fallback-email.spec.ts` 1100ms test); `appsettings.json`: 60s production.
+
+### Frontend
+1. **`ChallengeScreen.tsx`** — Fixed `{"error"}` bug → `{error}` (line 111); `requestEmailOtp` catch now uses `toTwoFactorError(err)` for safe message mapping (line 75).
+2. **`twoFactorErrorCodes.ts`** — Added `EMAIL_OTP_RESEND_THROTTLED`.
+3. **`twoFactorErrorMap.ts`** — Added safe Spanish message: "Debes esperar un momento antes de solicitar otro código."
+
+### Tests (RED → GREEN)
+- **Playwright** `e2e/auth/2fa-email-challenge.spec.ts` — 5 new tests: real dispatch via observability, throttle, anti-swallow, template path, end-to-end flow.
+- **Vitest** `ChallengeScreen.test.tsx` — 4 tests: button click fires service, success info banner, failure safe alert (no internal leak), literal "error" bug regression.
+- **All existing 2FA tests pass**: 22/22 Playwright (`2fa-fallback-email`, `2fa-login`, `2fa-enable`, `2fa-disable`, `2fa-recovery`, `2fa-enroll-qr`, `2fa-email-challenge`), 17/17 Vitest auth tests.
+
+## Test Results
+- **Playwright 2FA suite**: 22/22 passed (5 new + 17 existing)
+- **Vitest auth**: 17/17 passed
+- **Backend unit tests** (TwoFactor/EmailOtp): 17/17 passed
+- **Full backend unit suite**: 352/359 passed (7 pre-existing failures in unrelated areas: ProjectsController, InternalValidationEngine, ConsultaSecurity, etc.)
+- **Pre-existing failures**: 4 unrelated Playwright tests in `08-invitation-limits.spec.ts` and `09-pending-plan-redirect.spec.ts`
+
+## Compliance
+- ✅ Uses project email template system (`EmailTemplates.GetEmailOtpEmail`)
+- ✅ Safe UX messages only (no provider/internal details in UI)
+- ✅ Structured observability (lifecycle events, dev endpoints, audit after dispatch)
+- ✅ Anti-swallow: provider failure → non-2xx + lifecycle `dispatch_failed` + audit `FalloEnvio`
+- ✅ Throttle: 60s prod / 1s testing, safe message, lifecycle `resend_throttled`
+- ✅ TDD: all tests written RED first, GREEN after implementation
+- ✅ No secrets/OTPs in logs; correlation via challengeTokenHash (SHA-256)
+
+Status: **Complete** — Ready for commit.
 | Additional Project Images (5 columns) – Migration, API endpoints, Frontend hooks & UI, Unit Test Fixes   | RF-2, OE-1  | ExpedienteRebuild                                    | 2d6adabf   | 2026-07-13 |
 | Corporate Invite Users Flow (Invitacion entity, SettingsController, UI Modal) | N/A | develop | (pending) | 2026-07-12 |
 | Fix Admin Dashboard Stats 403 & potential-invitees 404 | N/A | develop | (pending) | 2026-07-12 |
@@ -46,6 +116,7 @@
 ## ⚠️ Open Decisions (Human-in-the-Loop Required)
 - Human action required: confirm schema via MCP before proceeding with EF Core migrations.
 - **[DB Audit]**: `DB_AUDIT_REPORT.md` was generated via custom cross-referencing audit script. 16 tables marked as Orphane/candidates for DROP. **Awaiting explicit human approval (Adrian) before executing any DROP TABLE operations.**
+- **[SQL Audit 2026-08-01]**: backend-architect diff found 13 DDL-only tables with no EF entity/controller/bot consumers, candidates for same Documento-chain treatment (pending human decision): `ApiGobernanza`, `AyuntamientoTarifa`, `CatastroTitulo`, `CertiMivhed`, `Consultas`, `EstudioSuelo`, `PagoIPI`, `Pagos`, `PermisoSuelo`, `PlanCaracteristica`, `SolvenciaFinanciera`, `TarifaSueloAyuntamiento`, `TipoInmoviliario`. Plus P1 set referenced only by seeds/raw deletes: `LogPagos`, `Recibo`. KEEP (live): `Municipio`, `Provincia`, `DatoValidado` (EF-owned).
 
 ## 🚫 Known Constraints
 - None

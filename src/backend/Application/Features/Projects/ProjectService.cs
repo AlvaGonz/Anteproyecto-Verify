@@ -47,9 +47,9 @@ public class ProjectService : IProjectService
         return proyectos.Select(MapToDto);
     }
 
-    public async Task<PaginatedResult<ProyectoDto>> GetAllProjectsWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<PaginatedResult<ProyectoDto>> GetAllProjectsWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, string? searchTerm = null, string? estados = null, CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await _proyectoRepository.GetAllWithCountAsync(usuarioId, page, pageSize, cancellationToken);
+        var (items, totalCount) = await _proyectoRepository.GetAllWithCountAsync(usuarioId, page, pageSize, searchTerm, estados, cancellationToken);
         return new PaginatedResult<ProyectoDto>(
             items.Select(MapToDto).ToList(),
             totalCount,

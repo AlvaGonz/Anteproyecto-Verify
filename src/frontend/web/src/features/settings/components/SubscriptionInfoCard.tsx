@@ -76,7 +76,6 @@ export const SubscriptionInfoCard: React.FC = () => {
   const formattedDate = currentPeriodEnd ? DATE_FORMATTER.format(currentPeriodEnd) : null;
 
   const billingCycle = data?.billingCycle ?? 'monthly';
-  const isAnnual = billingCycle === 'yearly' || billingCycle === 'annual' || billingCycle === 'year';
 
   let formattedPrice: string | null = null;
   let originalMonthlyPrice: string | null = null;

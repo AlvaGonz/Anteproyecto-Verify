@@ -12,7 +12,7 @@ public interface IProjectService
 {
     Task<IEnumerable<ProyectoDto>> GetVisibleProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default);
     Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default);
-    Task<PaginatedResult<ProyectoDto>> GetAllProjectsWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default);
+    Task<PaginatedResult<ProyectoDto>> GetAllProjectsWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, string? searchTerm = null, string? estados = null, CancellationToken cancellationToken = default);
     Task<PaginatedResult<ProyectoDto>> GetVisibleProjectsWithCountAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default);
     Task<ProyectoDto?> GetProjectByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ProyectoDto> CreateProjectAsync(CreateProyectoDto dto, CancellationToken cancellationToken = default);

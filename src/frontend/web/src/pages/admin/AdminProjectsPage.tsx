@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ProjectStatus } from "../../features/projects/types";
@@ -9,7 +9,6 @@ import { AdminProjectsPageLayout } from "./AdminProjectsPageLayout";
 import { AdminPublishedProjectsView } from "./AdminPublishedProjectsView";
 import { AdminInterestsView } from "./AdminInterestsView";
 import { AdminSavedProjectsView } from "./AdminSavedProjectsView";
-import { toUtcDate } from "../../shared/utils/dates";
 import { useAuth } from "../../shared/context/AuthContext";
 import { Download } from "lucide-react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
@@ -40,7 +39,7 @@ export const AdminProjectsPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(1000);
+  const pageSize = 100;
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { data: intereses = [] } = useInterests(activeTab === "intereses");
 
@@ -54,7 +53,27 @@ export const AdminProjectsPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchParams]);
 
-  const { data: rawProjects = [], totalCount, isLoading } = useProjects(page, pageSize);
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const [selectedStatuses, setSelectedStatuses] = useState<ProjectStatus[]>([]);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+
+  const estadosParam = useMemo(() => {
+    if (selectedStatuses.length > 0) return [...new Set(selectedStatuses)].join(",");
+    if (activeFilter === "published") return ProjectStatus.Published;
+    if (activeFilter === "review") return ProjectStatus.InReview;
+    return undefined;
+  }, [selectedStatuses, activeFilter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, estadosParam]);
+
+  const { data: rawProjects = [], totalCount, isLoading } = useProjects(page, pageSize, debouncedSearch || undefined, estadosParam);
   const projects = rawProjects;
 
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -64,8 +83,6 @@ export const AdminProjectsPage: React.FC = () => {
 
   const { data: dashboardStats } = useDashboardStats();
 
-  const [selectedStatuses, setSelectedStatuses] = useState<ProjectStatus[]>([]);
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { mutate: deleteProject } = useDeleteProject();
   const { mutate: updateStatus } = useUpdateProjectStatus();
 
@@ -82,28 +99,7 @@ export const AdminProjectsPage: React.FC = () => {
     { label: "Publicados", value: stats.published, icon: FileCheck, color: "text-emerald-600", bg: "bg-emerald-50", barColor: "bg-emerald-500", pct: stats.total ? Math.round((stats.published / totalValue) * 100) : 0 },
   ];
 
-  const filtered = projects.filter((p) => {
-    const matchesSearch =
-      p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (p.codigoInterno && p.codigoInterno.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.designacionCatastral && p.designacionCatastral.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.matricula && p.matricula.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.ubicacionTexto && p.ubicacionTexto.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.ubicacionGps && p.ubicacionGps.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.datosDesarrollador && p.datosDesarrollador.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.rncDesarrollador && p.rncDesarrollador.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.createdAtUtc && toUtcDate(p.createdAtUtc)?.toLocaleDateString().includes(searchTerm)) ||
-      (p.valorEstimado && String(p.valorEstimado).includes(searchTerm));
-
-    if (selectedStatuses.length > 0) {
-      return matchesSearch && selectedStatuses.includes(p.estadoProyecto);
-    }
-
-    if (activeFilter === "all") return matchesSearch;
-    if (activeFilter === "published") return matchesSearch && p.estadoProyecto === ProjectStatus.Published;
-    if (activeFilter === "review") return matchesSearch && p.estadoProyecto === ProjectStatus.InReview;
-    return matchesSearch;
-  });
+  const filtered = projects;
 
   const goToPage = useCallback((newPage: number) => {
     setPage(newPage);
@@ -226,6 +222,7 @@ export const AdminProjectsPage: React.FC = () => {
           setOpenMenuId={setOpenMenuId}
           isLoading={isLoading}
           filtered={filtered}
+          totalCount={totalCount ?? projects.length}
           metrics={metrics}
           updateStatus={updateStatus}
           deleteProject={deleteProject}

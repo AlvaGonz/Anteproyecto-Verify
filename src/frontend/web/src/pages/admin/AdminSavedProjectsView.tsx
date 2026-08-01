@@ -83,6 +83,8 @@ export const AdminSavedProjectsView: React.FC = () => {
                 <img
                   src={project.imagenUrl || getDefaultProjectImage(project.categoria)}
                   alt={project.nombre}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute top-4 left-4">

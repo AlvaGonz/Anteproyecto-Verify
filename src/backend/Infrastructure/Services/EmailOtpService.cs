@@ -3,13 +3,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions;
+using Application.Abstractions.Notifications;
 using Application.Abstractions.Persistence;
 using Application.Abstractions.Security;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Application.Abstractions.Notifications;
+using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Services;
 
@@ -27,6 +28,9 @@ public sealed class EmailOtpService
     private readonly ITwoFactorChallengeStore _challengeStore;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IAuditLogger _audit;
+    private readonly IEmailService _emailService;
+    private readonly ITwoFactorEmailEventLogger _eventLogger;
+    private readonly IConfiguration _configuration;
 
     public static readonly TimeSpan OtpTtl = TimeSpan.FromMinutes(10);
     public const int OtpLength = 6;
@@ -38,7 +42,10 @@ public sealed class EmailOtpService
         IUnitOfWork unitOfWork,
         ITwoFactorChallengeStore challengeStore,
         IJwtTokenGenerator jwtTokenGenerator,
-        IAuditLogger audit)
+        IAuditLogger audit,
+        IEmailService emailService,
+        ITwoFactorEmailEventLogger eventLogger,
+        IConfiguration configuration)
     {
         _db = db;
         _usuarioRepository = usuarioRepository;
@@ -46,6 +53,17 @@ public sealed class EmailOtpService
         _challengeStore = challengeStore;
         _jwtTokenGenerator = jwtTokenGenerator;
         _audit = audit;
+        _emailService = emailService;
+        _eventLogger = eventLogger;
+        _configuration = configuration;
+    }
+
+    private TimeSpan ResendCooldown =>
+        TimeSpan.FromSeconds(_configuration.GetValue<int>("TwoFactor:EmailOtpResendCooldownSeconds", 60));
+
+    private void Record(string eventName, string challengeToken, string? outcome = null)
+    {
+        _eventLogger.Record(eventName, challengeToken, outcome);
     }
 
     public async Task<RequestEmailOtpResult> Handle(RequestEmailOtpCommand request, CancellationToken cancellationToken)
@@ -53,11 +71,35 @@ public sealed class EmailOtpService
         // Peek the challenge without consuming it — resend must keep the same challenge live.
         var challenge = await _challengeStore.PeekAsync(request.ChallengeToken, cancellationToken);
         if (challenge is null)
+        {
+            Record("2fa_email_challenge_requested", request.ChallengeToken, "failure:invalid_challenge");
             return new RequestEmailOtpResult(false, "Desafío inválido o expirado.");
+        }
 
         var user = await _usuarioRepository.GetByIdAsync(challenge.UsuarioId, cancellationToken);
         if (user is null)
+        {
+            Record("2fa_email_challenge_requested", request.ChallengeToken, "failure:user_not_found");
             return new RequestEmailOtpResult(false, "Usuario no encontrado.");
+        }
+
+        // Throttle: if the last OTP was sent within the cooldown window, reject.
+        if (user.EmailOtpLastSentUtc.HasValue)
+        {
+            var elapsed = DateTime.UtcNow - user.EmailOtpLastSentUtc.Value;
+            if (elapsed < ResendCooldown)
+            {
+                Record("2fa_email_resend_throttled", request.ChallengeToken, "throttled");
+                await _audit.AppendAsync(new AuditEntryDto
+                {
+                    UsuarioId = user.Id,
+                    TipoOperacion = TipoOperacion.EmailOtpResendThrottled,
+                    Accion = "Solicitud de reenvío OTP dentro del período de espera",
+                    Resultado = "Throttled"
+                }, cancellationToken);
+                return new RequestEmailOtpResult(false, "Debes esperar un momento antes de solicitar otro código.");
+            }
+        }
 
         var existing = await _db.Verificaciones2FA
             .Where(v => v.SesionId == request.ChallengeToken)
@@ -80,6 +122,48 @@ public sealed class EmailOtpService
         user.MarkEmailOtpSent();
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        // Lifecycle: challenge requested → template rendered → dispatch started
+        Record("2fa_email_challenge_requested", request.ChallengeToken, "success");
+        Record("2fa_email_template_rendered", request.ChallengeToken, "success");
+        Record("2fa_email_provider_dispatch_started", request.ChallengeToken);
+
+        // Dev/test hook: force a synthetic provider failure to validate
+        // the anti-swallow contract.
+        if (_eventLogger.ForceFailEnabled)
+        {
+            var synth = new InvalidOperationException("Synthetic provider failure (dev/test force-fail)");
+            Record("2fa_email_provider_dispatch_failed", request.ChallengeToken, "failure");
+            await _audit.AppendAsync(new AuditEntryDto
+            {
+                UsuarioId = user.Id,
+                TipoOperacion = TipoOperacion.EmailOtpFalloEnvio,
+                Accion = "Envío de OTP por correo falló (forzado)",
+                Resultado = "Fallido"
+            }, cancellationToken);
+            return new RequestEmailOtpResult(false, "No se pudo enviar el código por correo. Intente nuevamente en unos minutos.");
+        }
+
+        // Dispatch the OTP email using the project template system.
+        try
+        {
+            await _emailService.SendEmailOtpAsync(user.CorreoElectronico, user.Nombre, code, cancellationToken);
+            Record("2fa_email_provider_dispatch_succeeded", request.ChallengeToken, "success");
+        }
+        catch
+        {
+            // Provider failure must NOT look like success.
+            Record("2fa_email_provider_dispatch_failed", request.ChallengeToken, "failure");
+            await _audit.AppendAsync(new AuditEntryDto
+            {
+                UsuarioId = user.Id,
+                TipoOperacion = TipoOperacion.EmailOtpFalloEnvio,
+                Accion = "Envío de OTP por correo falló en el proveedor",
+                Resultado = "Fallido"
+            }, cancellationToken);
+            return new RequestEmailOtpResult(false, "No se pudo enviar el código por correo. Intente nuevamente en unos minutos.");
+        }
+
+        // Only record audit success AFTER the provider accepted the send.
         await _audit.AppendAsync(new AuditEntryDto
         {
             UsuarioId = user.Id,

@@ -316,6 +316,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
                   <img
                     src={uniqueImgs[selectedImageIndex]}
                     alt={`${project.nombre} foto ${selectedImageIndex + 1}`}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-contain object-center transition-opacity duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
@@ -340,6 +342,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           <img
                             src={url}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover object-center"
                           />
                         </button>
@@ -429,6 +433,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         <img
                           src={project.registradoPor.avatarUrl}
                           alt={`Avatar de ${project.registradoPor.nombreCompleto}`}
+                          loading="lazy"
+                          decoding="async"
                           className="w-14 h-14 rounded-[1.25rem] object-cover border border-white/20 shrink-0"
                         />
                       ) : (

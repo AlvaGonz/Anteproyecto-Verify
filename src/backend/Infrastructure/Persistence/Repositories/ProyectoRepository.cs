@@ -27,7 +27,7 @@ public class ProyectoRepository : IProyectoRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetAllWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetAllWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, string? searchTerm = null, string? estados = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Proyectos
             .AsNoTracking()
@@ -40,6 +40,29 @@ public class ProyectoRepository : IProyectoRepository
         if (usuarioId.HasValue)
         {
             query = query.Where(p => p.UsuarioCreadorId == usuarioId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim().ToLower();
+            query = query.Where(p =>
+                (p.Nombre != null && p.Nombre.ToLower().Contains(term)) ||
+                (p.DesignacionCatastral != null && p.DesignacionCatastral.ToLower().Contains(term)) ||
+                (p.Matricula != null && p.Matricula.ToLower().Contains(term)) ||
+                (p.UbicacionTexto != null && p.UbicacionTexto.ToLower().Contains(term)) ||
+                (p.UbicacionGps != null && p.UbicacionGps.ToLower().Contains(term)) ||
+                (p.DatosDesarrollador != null && p.DatosDesarrollador.ToLower().Contains(term)) ||
+                (p.RncDesarrollador != null && p.RncDesarrollador.ToLower().Contains(term)) ||
+                (p.CedulaRncPropietario != null && p.CedulaRncPropietario.ToLower().Contains(term)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(estados))
+        {
+            var codigos = estados.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (codigos.Length > 0)
+            {
+                query = query.Where(p => p.Estado != null && codigos.Contains(p.Estado.CodigoUnico));
+            }
         }
 
         var totalCount = await query.CountAsync(cancellationToken);

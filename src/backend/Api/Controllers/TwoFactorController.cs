@@ -150,7 +150,12 @@ public class TwoFactorController : ControllerBase
     public async Task<IActionResult> RequestEmailOtp([FromBody] EmailOtpRequest req, CancellationToken ct)
     {
         var result = await _emailOtp.Handle(new RequestEmailOtpCommand(req.ChallengeToken), ct);
-        if (!result.IsSuccess) return ErrorEnvelopeFactory.BadRequest(HttpContext, TwoFactorErrorCode.EmailOtpRequestFailed, "No se pudo enviar el código por correo. Intente nuevamente en unos minutos.");
+        if (!result.IsSuccess)
+        {
+            if (result.ErrorMessage?.Contains("esperar un momento", StringComparison.OrdinalIgnoreCase) == true)
+                return ErrorEnvelopeFactory.BadRequest(HttpContext, TwoFactorErrorCode.EmailOtpResendThrottled, "Debes esperar un momento antes de solicitar otro código.");
+            return ErrorEnvelopeFactory.BadRequest(HttpContext, TwoFactorErrorCode.EmailOtpRequestFailed, "No se pudo enviar el código por correo. Intente nuevamente en unos minutos.");
+        }
         return Ok(new { succeeded = true });
     }
 
@@ -158,7 +163,7 @@ public class TwoFactorController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> VerifyEmailOtp([FromBody] VerifyEmailOtpRequest req, CancellationToken ct)
     {
-        var result = await _emailOtp.HandleVerify(new VerifyEmailOtpCommand(req.ChallengeToken, req.Code), ct);
+        var result = await _emailOtp.HandleVerify(new VerifyEmailOtpCommand(req.ChallengeToken, req.EffectiveCode), ct);
         if (!result.IsSuccess)
         {
             if (result.ErrorMessage?.Contains("Demasiados intentos", StringComparison.OrdinalIgnoreCase) == true)

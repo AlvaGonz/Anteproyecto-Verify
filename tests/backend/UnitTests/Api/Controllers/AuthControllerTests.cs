@@ -162,5 +162,50 @@ public class AuthControllerTests
         // Assert
         var unauthorizedResult = Assert.IsType<BadRequestObjectResult>(result);
     }
+
+    [Fact]
+    public async Task Login_WithUserWithPlan_IncludesPlanLimitsInUserPayload()
+    {
+        // Arrange
+        var request = new LoginUserCommand("test@example.com", "password123");
+        var user = new Usuario("Test", "User", "test@example.com", "hashed_password", UserRole.User, "12345678", "12345678");
+        user.GetType().GetProperty("EmailVerificado")?.SetValue(user, true);
+        user.GetType().GetProperty("Activo")?.SetValue(user, true);
+
+        var plan = PlanSuscripcion.Create(
+            Guid.NewGuid(), "Consultor", 0m,
+            maxConsultas: 50, maxProyectos: 10, presentacionPublica: true,
+            qrIncluido: false, maxUsuariosSecundarios: 3, maxAlmacenamientoMb: 100,
+            alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
+            exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
+            soporteTipo: "Comunidad", accesoApi: false);
+        user.GetType().GetProperty("Plan")?.SetValue(user, plan);
+
+        _usuarioRepositoryMock.Setup(repo => repo.GetByEmailAsync(request.Email, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _passwordHasherMock.Setup(hasher => hasher.VerifyPassword(request.Password, user.ContrasenaHash))
+            .Returns(true);
+
+        // Act
+        var result = await _controller.Login(request, CancellationToken.None);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.NotNull(okResult.Value);
+
+        var valueType = okResult.Value.GetType();
+        var userProp = valueType.GetProperty("user");
+        Assert.NotNull(userProp);
+        var userObj = userProp.GetValue(okResult.Value);
+        Assert.NotNull(userObj);
+
+        var maxProyectosProp = userObj.GetType().GetProperty("maxProyectos");
+        Assert.NotNull(maxProyectosProp);
+        Assert.Equal(10, (int)maxProyectosProp.GetValue(userObj)!);
+
+        var maxUsuariosProp = userObj.GetType().GetProperty("maxUsuariosSecundarios");
+        Assert.NotNull(maxUsuariosProp);
+        Assert.Equal(3, (int)maxUsuariosProp.GetValue(userObj)!);
+    }
 }
 
