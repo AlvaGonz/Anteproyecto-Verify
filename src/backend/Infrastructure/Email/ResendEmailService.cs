@@ -52,7 +52,7 @@ public ResendEmailService(
 
         try
         {
-            if (_isTestEnvironment)
+            if (_isTestEnvironment || to.EndsWith("@example.com", StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogInformation("Test environment detected — simulating email send to {To}", to);
                 return;
@@ -92,7 +92,7 @@ public ResendEmailService(
         };
         message.To.Add(toEmail);
 
-        if (_isTestEnvironment)
+        if (_isTestEnvironment || toEmail.EndsWith("@example.com", StringComparison.OrdinalIgnoreCase))
         {
             _logger.LogInformation("Test environment detected — simulating OTP email send to {To}", toEmail);
             return;

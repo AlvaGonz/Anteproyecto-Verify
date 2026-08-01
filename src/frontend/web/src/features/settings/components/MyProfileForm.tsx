@@ -7,7 +7,7 @@ import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { useProvinces } from "../../provinces/api/useProvinces";
-import { User, Mail, Phone, Shield, Lock, Eye, EyeOff, ChevronDown, CreditCard, Award, Building2, Briefcase, MapPin, Globe, AtSign, BadgeCheck, ArrowRight, X } from "lucide-react";
+import { User, Mail, Phone, Shield, CreditCard, Award, Building2, Briefcase, MapPin, Globe, AtSign, BadgeCheck, ArrowRight, X } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
 import { useDgiiLookup, DgiiData } from "../../../shared/hooks/useDgiiLookup";
 
@@ -480,6 +480,7 @@ export const MyProfileForm: React.FC = () => {
           </button>
 </div>
       </div>
+    </div>
     </form>
 
       {/* Confirmation Modal */}

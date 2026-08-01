@@ -586,7 +586,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
                   Responsable Registral
                 </p>
               </div>
-              <div className="w-16 h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-16 h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden rounded-md">
                 {project.registradoPor?.avatarUrl ? (
                   <img src={project.registradoPor.avatarUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 ) : (
