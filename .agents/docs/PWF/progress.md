@@ -260,6 +260,20 @@
   - `TwoFactorController.cs` — replaced 10 inline `Envelope(...)` calls with `ErrorEnvelopeFactory.BadRequest/Locked`. Same wire format, less duplication. Ready for adoption by `AuthController` / `AccountController` / other endpoints in a follow-up.
 - **Quality gates**: 29/29 e2e GREEN after refactor (no regression).
 
+## Session 2026-07-31 - OE-3 2FA Key-Ring Loss + Disable Recovery (W11 GREEN)
+- **Trigger**: user enabled 2FA before my previous fix shipped. Docker rebuild wiped DataProtection key ring → `CryptographicException: The key {4b43165a...} was not found in the key ring` → 500 leaking internal exception to the UI.
+- **RED tests** (3 unit tests):
+  - `VerifyTwoFactorCodeCommandHandlerTests.UnprotectThrowsCryptographicException_ReturnsSafeFailure_NotThrow` — handler must catch and return safe Spanish error.
+  - `Disable2FACommandHandlerTests.UnprotectThrowsCryptographicException_StillDisables2FA_WithAuditTrail` — disable is the recovery path; password-only succeeds when TOTP cannot be validated.
+  - `Disable2FACommandHandlerTests.UnprotectThrowsCryptographicException_WrongPassword_StillRejects` — password gate is still enforced.
+- **GREEN** (backend):
+  - `VerifyTwoFactorCode.Handle` — wraps `_secretProtector.Unprotect` in try/catch for `CryptographicException`; returns safe failure ("Servicio de autenticación no disponible. Desactive y vuelva a activar la verificación en dos pasos.").
+  - `Disable2FA.Handle` — same wrap + audit-distinct entry ("Desactivación forzada (llave de protección de datos perdida)") so admins see the bypass in the trail.
+  - Controller-side `Envelope` mapping was already safe (uses controller-side Spanish literal, never the handler's `ErrorMessage`).
+- **Verify GREEN**: 30/30 2FA e2e + 10/10 2FA unit tests.
+- **Unblocked**: API now builds + runs. Pre-existing Pago/UsuarioLegacy entity stubs were missing in Domain (removed by previous agent); restored minimal `[Key]`-annotated versions so `AppDbContext`/`SettingsController`/EF migrations align. **No schema change** — existing tables unchanged.
+- **User recovery**: go to `/admin/settings`, click "Desactivar 2FA" with password → re-enroll fresh.
+
 ## Session 2026-07-31 - OE-3 Delete User Resurrection (ROOT CAUSE: backend 500 FK violation)
 - **Bug**: deleting a user in admin Settings made the card vanish (optimistic) then instantly return; counter bounced back.
 - **Root cause (DB-confirmed)**: `SettingsController.DeleteUser` only cleaned Auditorias/Notificaciones/ConsentimientosFinancieros/PagosLegacy. Users with rows in SesionUsuario (2463 rows / 855 users), Verificacion2FA (71), Invitaciones.EmisorId (865), LogConsultas, LogProyectos, ProyectoGuardado, ProyectoInteresado (all NOT NULL FKs, all enforced) OR legacy LogPagos/Recibo/Fremiun*_Log (no EF entities) crashed SaveChanges with a FK violation -> 500 -> frontend invalidate/refetch resurrected the card.
