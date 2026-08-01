@@ -57,6 +57,7 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
                 ["JwtSettings:Issuer"] = "verifinca-test",
                 ["JwtSettings:Audience"] = "verifinca-test-client",
                 ["JwtSettings:ExpirationMinutes"] = "60",
+                ["Stripe:SecretKey"] = "sk_test_dummy_for_integration_tests",
                 ["IsTestingEnvironment"] = "true"
             });
         });

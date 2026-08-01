@@ -419,6 +419,66 @@ public class SettingsController : ControllerBase
         var pagos = await _context.PagosLegacy.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
         if (pagos.Any()) _context.PagosLegacy.RemoveRange(pagos);
 
+        try {
+            var sesiones = await _context.SesionesUsuario.Where(s => s.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (sesiones.Any()) _context.SesionesUsuario.RemoveRange(sesiones);
+        } catch {}
+
+        try {
+            var verificaciones = await _context.Verificaciones2FA.Where(v => v.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (verificaciones.Any()) _context.Verificaciones2FA.RemoveRange(verificaciones);
+        } catch {}
+
+        try {
+            var invitaciones = await _context.Invitaciones.Where(i => i.EmisorId == user.Id).ToListAsync(cancellationToken);
+            if (invitaciones.Any()) _context.Invitaciones.RemoveRange(invitaciones);
+        } catch {}
+
+        try {
+            var logConsultas = await _context.LogConsultas.Where(l => l.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (logConsultas.Any()) _context.LogConsultas.RemoveRange(logConsultas);
+        } catch {}
+
+        try {
+            var logProyectos = await _context.LogProyectos.Where(l => l.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (logProyectos.Any()) _context.LogProyectos.RemoveRange(logProyectos);
+        } catch {}
+
+        try {
+            var guardados = await _context.ProyectosGuardados.Where(p => p.SaverId == user.Id || p.CreatorId == user.Id).ToListAsync(cancellationToken);
+            if (guardados.Any()) _context.ProyectosGuardados.RemoveRange(guardados);
+        } catch {}
+
+        try {
+            var interesados = await _context.ProyectosInteresados.Where(p => p.InterestedUserId == user.Id || p.CreatorId == user.Id).ToListAsync(cancellationToken);
+            if (interesados.Any()) _context.ProyectosInteresados.RemoveRange(interesados);
+        } catch {}
+
+        // Legacy tables with enforced FKs but no EF mappings (same database, raw cleanup)
+        try {
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM LogPagos WHERE IdUsuario = @id",
+                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
+        } catch {}
+
+        try {
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM Recibo WHERE IdUsuario = @id",
+                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
+        } catch {}
+
+        try {
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM FremiunConsultas_Log WHERE IdUsuario = @id",
+                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
+        } catch {}
+
+        try {
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM FremiunProyectos_Log WHERE IdUsuario = @id",
+                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
+        } catch {}
+
         _context.Usuarios.Remove(user);
         
         // Do not remove from UsuariosLegacy since it is a view over Usuarios
