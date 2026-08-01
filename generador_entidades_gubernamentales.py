@@ -467,8 +467,24 @@ def generate_catastro_ps_records(rncs_list):
                     
                 yield cat_record, ps_record
 
-def insert_ipi_chunk(chunk_id, chunk_records):
-    print(f"[IPI Worker {chunk_id}] Inserting {len(chunk_records)} records...")
+TRANSIENT_ERROR_CODES = {1205, 1204, 1222, 3960, 3961, -2, 0, 11, 64, 258, 4060, 40197, 40501, 40613, 42108, 42109}
+TRANSIENT_ERROR_MSGS = ["deadlock", "timeout", "connection", "network", "transport", "refused", "reset", "broken"]
+
+def is_transient_error(e):
+    err_msg = str(e).lower()
+    if hasattr(e, 'args') and e.args:
+        for arg in e.args:
+            if isinstance(arg, (int, float)):
+                if arg in TRANSIENT_ERROR_CODES:
+                    return True
+    for keyword in TRANSIENT_ERROR_MSGS:
+        if keyword in err_msg:
+            return True
+    return False
+
+def insert_ipi_chunk(chunk_id, chunk_records, attempt=1):
+    max_retries = 10
+    print(f"[IPI Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
@@ -489,12 +505,18 @@ def insert_ipi_chunk(chunk_id, chunk_records):
         if conn:
             try: conn.rollback()
             except: pass
+        if attempt < max_retries and is_transient_error(e):
+            wait = (2 ** attempt) + (attempt * 0.5)
+            print(f"[IPI Worker {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
+            time.sleep(wait)
+            return insert_ipi_chunk(chunk_id, chunk_records, attempt + 1)
         raise e
     finally:
         if conn: conn.close()
 
-def insert_catastro_chunk(chunk_id, chunk_records):
-    print(f"[Catastro Worker {chunk_id}] Inserting {len(chunk_records)} records...")
+def insert_catastro_chunk(chunk_id, chunk_records, attempt=1):
+    max_retries = 10
+    print(f"[Catastro Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
@@ -517,13 +539,19 @@ def insert_catastro_chunk(chunk_id, chunk_records):
         if conn:
             try: conn.rollback()
             except: pass
+        if attempt < max_retries and is_transient_error(e):
+            wait = (2 ** attempt) + (attempt * 0.5)
+            print(f"[Catastro Worker {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
+            time.sleep(wait)
+            return insert_catastro_chunk(chunk_id, chunk_records, attempt + 1)
         raise e
     finally:
         if conn: conn.close()
 
-def insert_ps_chunk(chunk_id, chunk_records):
+def insert_ps_chunk(chunk_id, chunk_records, attempt=1):
     if not chunk_records: return 0
-    print(f"[PermisoSuelo Worker {chunk_id}] Inserting {len(chunk_records)} records...")
+    max_retries = 10
+    print(f"[PermisoSuelo Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
@@ -546,6 +574,11 @@ def insert_ps_chunk(chunk_id, chunk_records):
         if conn:
             try: conn.rollback()
             except: pass
+        if attempt < max_retries and is_transient_error(e):
+            wait = (2 ** attempt) + (attempt * 0.5)
+            print(f"[PermisoSuelo Worker {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
+            time.sleep(wait)
+            return insert_ps_chunk(chunk_id, chunk_records, attempt + 1)
         raise e
     finally:
         if conn: conn.close()

@@ -238,7 +238,7 @@ def is_transient_error(e):
     return False
 
 def insert_chunk(chunk_id, chunk_records, attempt=1):
-    max_retries = 3
+    max_retries = 10
     print(f"[Chunk {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
     conn = None
     try:
@@ -262,7 +262,7 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
         for i in range(0, len(chunk_records), batch_size):
             batch = chunk_records[i : i + batch_size]
             placeholders_str = ", ".join([row_placeholder] * len(batch))
-            sql = f"INSERT INTO DGII WITH (TABLOCK) ({cols_str}) VALUES {placeholders_str}"
+            sql = f"INSERT INTO DGII ({cols_str}) VALUES {placeholders_str}"
             
             params = []
             for r in batch:
@@ -284,7 +284,7 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
             try: conn.rollback()
             except: pass
         if attempt < max_retries and is_transient_error(e):
-            wait = 2 ** attempt
+            wait = (2 ** attempt) + (attempt * 0.5)
             print(f"[Chunk {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
             time.sleep(wait)
             return insert_chunk(chunk_id, chunk_records, attempt + 1)
