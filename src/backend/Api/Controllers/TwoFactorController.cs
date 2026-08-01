@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Application.Common.Errors;
 using Application.Features.TwoFactor;
 using Api.Common;
+using Domain.Entities;
+using Infrastructure.Persistence;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +25,7 @@ public class TwoFactorController : ControllerBase
     private readonly Disable2FACommandHandler _disable2FA;
     private readonly EmailOtpService _emailOtp;
     private readonly GetTwoFactorStatusQueryHandler _status;
+    private readonly AppDbContext _context;
 
     public TwoFactorController(
         BeginEnrollmentCommandHandler beginEnrollment,
@@ -31,7 +34,8 @@ public class TwoFactorController : ControllerBase
         ConsumeRecoveryCodeCommandHandler consumeRecoveryCode,
         Disable2FACommandHandler disable2FA,
         EmailOtpService emailOtp,
-        GetTwoFactorStatusQueryHandler status)
+        GetTwoFactorStatusQueryHandler status,
+        AppDbContext context)
     {
         _beginEnrollment = beginEnrollment;
         _confirmEnrollment = confirmEnrollment;
@@ -40,6 +44,7 @@ public class TwoFactorController : ControllerBase
         _disable2FA = disable2FA;
         _emailOtp = emailOtp;
         _status = status;
+        _context = context;
     }
 
     private Guid GetUserId()
@@ -48,7 +53,7 @@ public class TwoFactorController : ControllerBase
         return Guid.TryParse(id, out var g) ? g : Guid.Empty;
     }
 
-    private IActionResult WriteSessionCookies(string token)
+    private IActionResult WriteSessionCookies(string token, Guid usuarioId)
     {
         Response.Cookies.Append("jwt", token, new CookieOptions
         {
@@ -58,7 +63,21 @@ public class TwoFactorController : ControllerBase
             Path = "/",
             MaxAge = TimeSpan.FromDays(1)
         });
-        return Ok(new { succeeded = true });
+
+        var refreshToken = Guid.NewGuid().ToString("N");
+        _context.SesionesUsuario.Add(new SesionUsuario(usuarioId, refreshToken, DateTime.UtcNow.AddDays(30)));
+        _context.SaveChanges();
+
+        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Lax,
+            Path = "/api/auth/refresh",
+            MaxAge = TimeSpan.FromDays(30)
+        });
+
+        return Ok(new { succeeded = true, accessToken = token });
     }
 
     private ErrorEnvelope Envelope(string code, string message, bool lockedOut = false)
@@ -106,7 +125,7 @@ public class TwoFactorController : ControllerBase
                 return ErrorEnvelopeFactory.Locked(HttpContext, TwoFactorErrorCode.TotpLockedOut, "Demasiados intentos. Espere unos minutos antes de intentar nuevamente.");
             return ErrorEnvelopeFactory.BadRequest(HttpContext, TwoFactorErrorCode.TotpInvalidCode, "Código inválido o vencido. Intente de nuevo.");
         }
-        return WriteSessionCookies(result.Token!);
+        return WriteSessionCookies(result.Token!, result.UsuarioId!.Value);
     }
 
     [HttpPost("recovery-code")]
@@ -115,7 +134,7 @@ public class TwoFactorController : ControllerBase
         var code = req.Code ?? req.RecoveryCode ?? req.EffectiveCode ?? string.Empty;
         var result = await _consumeRecoveryCode.Handle(new ConsumeRecoveryCodeCommand(req.ChallengeToken, code), ct);
         if (!result.IsSuccess) return ErrorEnvelopeFactory.BadRequest(HttpContext, TwoFactorErrorCode.RecoveryCodeInvalid, "Código de recuperación inválido o ya utilizado.");
-        return WriteSessionCookies(result.Token!);
+        return WriteSessionCookies(result.Token!, result.UsuarioId!.Value);
     }
 
     [HttpPost("disable")]
@@ -146,7 +165,7 @@ public class TwoFactorController : ControllerBase
                 return ErrorEnvelopeFactory.Locked(HttpContext, TwoFactorErrorCode.EmailOtpLockedOut, "Demasiados intentos. Espere unos minutos antes de intentar nuevamente.");
             return ErrorEnvelopeFactory.BadRequest(HttpContext, TwoFactorErrorCode.EmailOtpInvalid, "Código de correo inválido o vencido. Intente de nuevo.");
         }
-        return WriteSessionCookies(result.Token!);
+        return WriteSessionCookies(result.Token!, result.UsuarioId!.Value);
     }
 
     [HttpGet("status")]
