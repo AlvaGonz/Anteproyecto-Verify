@@ -129,6 +129,7 @@ public class TwoFactorController : ControllerBase
     }
 
     [HttpPost("recovery-code")]
+    [AllowAnonymous]
     public async Task<IActionResult> RecoveryCode([FromBody] RecoveryRequest req, CancellationToken ct)
     {
         var code = req.Code ?? req.RecoveryCode ?? req.EffectiveCode ?? string.Empty;
