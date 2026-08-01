@@ -52,7 +52,17 @@ public sealed class VerifyTwoFactorCodeCommandHandler
         if (user.Is2FALockedOut)
             return new VerifyTwoFactorCodeResult(false, "Demasiados intentos fallidos. Intente más tarde.", null, null);
 
-        var plainSecret = _secretProtector.Unprotect(user.TwoFactorSecretEncrypted);
+        string plainSecret;
+        try
+        {
+            plainSecret = _secretProtector.Unprotect(user.TwoFactorSecretEncrypted);
+        }
+        catch (System.Security.Cryptography.CryptographicException)
+        {
+            // Lost DataProtection key ring (e.g. after container rebuild). User must disable + re-enroll 2FA.
+            // Never leak key id / DataProtection internals to the user.
+            return new VerifyTwoFactorCodeResult(false, "Servicio de autenticación no disponible. Desactive y vuelva a activar la verificación en dos pasos.", null, null);
+        }
         if (!_totpService.ValidateCode(plainSecret, request.Code))
         {
             user.Register2FAFailure();

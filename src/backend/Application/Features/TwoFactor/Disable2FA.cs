@@ -51,9 +51,29 @@ public sealed class Disable2FACommandHandler
         if (!_passwordHasher.VerifyPassword(request.Password, user.ContrasenaHash))
             return new Disable2FAResult(false, "Contraseña incorrecta.");
 
-        var plainSecret = _secretProtector.Unprotect(user.TwoFactorSecretEncrypted);
-        if (!_totpService.ValidateCode(plainSecret, request.Code))
-            return new Disable2FAResult(false, "Código TOTP inválido.");
+        try
+        {
+            var plainSecret = _secretProtector.Unprotect(user.TwoFactorSecretEncrypted);
+            if (!_totpService.ValidateCode(plainSecret, request.Code))
+                return new Disable2FAResult(false, "Código TOTP inválido.");
+        }
+        catch (System.Security.Cryptography.CryptographicException)
+        {
+            // Recovery path: lost DataProtection key ring. We cannot validate the TOTP code against
+            // an unreadable secret, so allow disable with password-only verification. The audit log
+            // makes the forced-disable visible to admins.
+            await _audit.AppendAsync(new AuditEntryDto
+            {
+                UsuarioId = user.Id,
+                TipoOperacion = TipoOperacion.TwoFactorDesactivado,
+                Accion = "Desactivación forzada (llave de protección de datos perdida)",
+                Resultado = "Éxito"
+            }, cancellationToken);
+
+            user.Disable2FA();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return new Disable2FAResult(true, null);
+        }
 
         user.Disable2FA();
         await _unitOfWork.SaveChangesAsync(cancellationToken);
