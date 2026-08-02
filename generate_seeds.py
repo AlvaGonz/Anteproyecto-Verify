@@ -235,17 +235,7 @@ def main():
             f.write(f"IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '{u_id}')\n")
             f.write(f"INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('{u_id}', 'Legacy{i}', 'User{i}', 'legacy{i}@example.com', 'HASH', '809-000-0000', '000-0000000-0');\n")
 
-    # Acceso
-    with open(f"{output_dir}/07_Acceso.sql", "w") as f:
-        f.write("-- Seed for Acceso\n")
-        f.write("SET NOCOUNT ON;\n")
-        f.write("SET QUOTED_IDENTIFIER ON;\n")
-        for u in users:
-            acceso_id = str(uuid.uuid4()).upper()
-            f.write(f"IF NOT EXISTS (SELECT 1 FROM Acceso WHERE IdPerfil = '{u['role']['id']}' AND IdUsuario = '{u['id']}')\n")
-            f.write(f"INSERT INTO Acceso (IdAcceso, IdPerfil, IdUsuario) VALUES ('{acceso_id}', '{u['role']['id']}', '{u['id']}');\n")
-
-    # Pagos & Recibo & LogPagos
+    # Pagos & LogPagos
     api_id = str(uuid.uuid4()).upper()
     with open(f"{output_dir}/08_Pagos.sql", "w") as f:
         f.write("-- Seed for Pagos\n")
@@ -265,12 +255,6 @@ def main():
                     log_id = str(uuid.uuid4()).upper()
                     fl.write(f"IF NOT EXISTS (SELECT 1 FROM LogPagos WHERE Idpago = '{pago_id}')\n")
                     fl.write(f"INSERT INTO LogPagos (IdLog, Idpago, IdUsuario, Idsuscripcion, FechaLog, Estado) VALUES ('{log_id}', '{pago_id}', '{u['id']}', '{u['plan']['id']}', GETDATE(), 'COMPLETADO');\n")
-                
-                # Write to Recibo script here
-                with open(f"{output_dir}/10_Recibo.sql", "a") as fr:
-                    desglose = '{"subtotal":' + str(round(u["plan"]["price"]*0.82, 2)) + ',"tax":' + str(round(u["plan"]["price"]*0.18, 2)) + '}'
-                    fr.write(f"IF NOT EXISTS (SELECT 1 FROM Recibo WHERE IdPago = '{pago_id}')\n")
-                    fr.write(f"INSERT INTO Recibo (IdPago, IdUsuario, Monto, FechaPago, Detalle, Categoria, Desglose) VALUES ('{pago_id}', '{u['id']}', {u['plan']['price']}, GETDATE(), 'Suscripcion {u['plan']['name']}', 'Suscripcion', '{desglose}');\n")
 
     # Notificaciones
     with open(f"{output_dir}/12_Notificaciones.sql", "w") as f:

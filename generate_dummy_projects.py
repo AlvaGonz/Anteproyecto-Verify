@@ -144,7 +144,7 @@ PLAN_CONFIG = [
     ("corporativo@verifinca.do", "Corporativo", 50, False),
 ]
 
-PROJECT_CATEGORIES = [1, 2, 3, 4, 99]
+PROJECT_CATEGORIES = list(range(1, 17))
 
 # ── Load data ────────────────────────────────────────────────────────────
 print("Loading real data...")
@@ -253,7 +253,7 @@ for email, label, max_count, is_freemium in PLAN_CONFIG:
         lines.append(f"        IdProyecto, NombreProyecto, CodigoInterno,")
         lines.append(f"        IdUsuario,")
         lines.append(f"        UbicacionTexto, UbicacionGps, ValorEstimado,")
-        lines.append(f"        DatosDesarrollador, RncDesarrollador, Categoria,")
+        lines.append(f"        DatosDesarrollador, RncDesarrollador, CategoriaId,")
         lines.append(f"        DesignacionCatastral, Matricula,")
         lines.append(f"        EstadoId,")
         lines.append(f"        EstadoIntegridad, EstadoJuridico, SelladoBloqueado,")

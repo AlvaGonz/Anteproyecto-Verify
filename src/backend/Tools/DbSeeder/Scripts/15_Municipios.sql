@@ -51,11 +51,11 @@ INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud)
 
 -- San Pedro de Macorís (5 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('San Pedro de Macorís', 'San Pedro de Macoris', 18.482, -69.26),
-    ('Consuelo', 'San Pedro de Macoris', 18.594, -69.253),
-    ('Ramon Santana', 'San Pedro de Macoris', 18.45, -69.3),
-    ('Quisqueya', 'San Pedro de Macoris', 18.546, -69.423),
-    ('Guayacanes', 'San Pedro de Macoris', 18.447, -69.433);
+    ('San Pedro de Macorís', 'San Pedro de Macorís', 18.482, -69.26),
+    ('Consuelo', 'San Pedro de Macorís', 18.594, -69.253),
+    ('Ramon Santana', 'San Pedro de Macorís', 18.45, -69.3),
+    ('Quisqueya', 'San Pedro de Macorís', 18.546, -69.423),
+    ('Guayacanes', 'San Pedro de Macorís', 18.447, -69.433);
 
 -- La Romana (3 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
@@ -92,12 +92,12 @@ INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud)
 
 -- Elías Piña (6 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('Comendador', 'Elias Pina', 18.919, -71.696),
-    ('Bánica', 'Elias Pina', 19.018, -71.645),
-    ('El Llano', 'Elias Pina', 18.816, -71.672),
-    ('Hondo Valle', 'Elias Pina', 18.711, -71.698),
-    ('Juan Santiago', 'Elias Pina', 18.729, -71.602),
-    ('Pedro Santana', 'Elias Pina', 19.173, -71.479);
+    ('Comendador', 'Elías Piña', 18.919, -71.696),
+    ('Bánica', 'Elías Piña', 19.018, -71.645),
+    ('El Llano', 'Elías Piña', 18.816, -71.672),
+    ('Hondo Valle', 'Elías Piña', 18.711, -71.698),
+    ('Juan Santiago', 'Elías Piña', 18.729, -71.602),
+    ('Pedro Santana', 'Elías Piña', 19.173, -71.479);
 
 -- Espaillat (4 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
@@ -163,11 +163,11 @@ INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud)
 
 -- Dajabón (5 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('Dajabón', 'Dajabon', 19.571, -71.622),
-    ('El Pino', 'Dajabon', 19.406, -71.489),
-    ('Loma de Cabrera', 'Dajabon', 19.433, -71.618),
-    ('Partido', 'Dajabon', 19.506, -71.513),
-    ('Restauración', 'Dajabon', 19.304, -71.633);
+    ('Dajabón', 'Dajabón', 19.571, -71.622),
+    ('El Pino', 'Dajabón', 19.406, -71.489),
+    ('Loma de Cabrera', 'Dajabón', 19.433, -71.618),
+    ('Partido', 'Dajabón', 19.506, -71.513),
+    ('Restauración', 'Dajabón', 19.304, -71.633);
 
 -- Monte Cristi (6 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
@@ -200,20 +200,20 @@ INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud)
 
 -- San Cristóbal (8 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('San Cristóbal', 'San Cristobal', 18.415, -70.11),
-    ('Bajos de Haina', 'San Cristobal', 18.432, -70.031),
-    ('Cambita Garabitos', 'San Cristobal', 18.471, -70.223),
-    ('Los Cacaos', 'San Cristobal', 18.61, -70.326),
-    ('Sabana Grande de Palenque', 'San Cristobal', 18.258, -70.162),
-    ('San Gregorio de Nigua', 'San Cristobal', 18.353, -70.086),
-    ('Villa Altagracia', 'San Cristobal', 18.656, -70.226),
-    ('Yaguate', 'San Cristobal', 18.34, -70.188);
+    ('San Cristóbal', 'San Cristóbal', 18.415, -70.11),
+    ('Bajos de Haina', 'San Cristóbal', 18.432, -70.031),
+    ('Cambita Garabitos', 'San Cristóbal', 18.471, -70.223),
+    ('Los Cacaos', 'San Cristóbal', 18.61, -70.326),
+    ('Sabana Grande de Palenque', 'San Cristóbal', 18.258, -70.162),
+    ('San Gregorio de Nigua', 'San Cristóbal', 18.353, -70.086),
+    ('Villa Altagracia', 'San Cristóbal', 18.656, -70.226),
+    ('Yaguate', 'San Cristóbal', 18.34, -70.188);
 
 -- San José de Ocoa (3 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('San José de Ocoa', 'San Jose de Ocoa', 18.557, -70.439),
-    ('Sabana Larga', 'San Jose de Ocoa', 18.645, -70.559),
-    ('Rancho Arriba', 'San Jose de Ocoa', 18.714, -70.438);
+    ('San José de Ocoa', 'San José de Ocoa', 18.557, -70.439),
+    ('Sabana Larga', 'San José de Ocoa', 18.645, -70.559),
+    ('Rancho Arriba', 'San José de Ocoa', 18.714, -70.438);
 
 -- San Juan (6 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
@@ -226,16 +226,16 @@ INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud)
 
 -- Sánchez Ramírez (4 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('Cotuí', 'Sanchez Ramirez', 18.998, -70.131),
-    ('Fantino', 'Sanchez Ramirez', 19.103, -70.303),
-    ('Cevicos', 'Sanchez Ramirez', 19.007, -69.976),
-    ('La Mata', 'Sanchez Ramirez', 19.069, -70.234);
+    ('Cotuí', 'Sánchez Ramírez', 18.998, -70.131),
+    ('Fantino', 'Sánchez Ramírez', 19.103, -70.303),
+    ('Cevicos', 'Sánchez Ramírez', 19.007, -69.976),
+    ('La Mata', 'Sánchez Ramírez', 19.069, -70.234);
 
 -- Santiago Rodríguez (3 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('San Ignacio de Sabaneta', 'Santiago Rodriguez', 19.369, -71.327),
-    ('Monción', 'Santiago Rodriguez', 19.391, -71.185),
-    ('Villa Los Almácigos', 'Santiago Rodriguez', 19.336, -71.439);
+    ('San Ignacio de Sabaneta', 'Santiago Rodríguez', 19.369, -71.327),
+    ('Monción', 'Santiago Rodríguez', 19.391, -71.185),
+    ('Villa Los Almácigos', 'Santiago Rodríguez', 19.336, -71.439);
 
 -- Valverde (3 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
@@ -245,16 +245,16 @@ INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud)
 
 -- María Trinidad Sánchez (4 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('Nagua', 'Maria Trinidad Sanchez', 19.35, -70.003),
-    ('Cabrera', 'Maria Trinidad Sanchez', 19.58, -69.98),
-    ('El Factor', 'Maria Trinidad Sanchez', 19.294, -69.931),
-    ('Río San Juan', 'Maria Trinidad Sanchez', 19.567, -70.089);
+    ('Nagua', 'María Trinidad Sánchez', 19.35, -70.003),
+    ('Cabrera', 'María Trinidad Sánchez', 19.58, -69.98),
+    ('El Factor', 'María Trinidad Sánchez', 19.294, -69.931),
+    ('Río San Juan', 'María Trinidad Sánchez', 19.567, -70.089);
 
 -- Monseñor Nouel (3 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('Bonao', 'Monsenor Nouel', 18.943, -70.441),
-    ('Maimón', 'Monsenor Nouel', 18.888, -70.27),
-    ('Piedra Blanca', 'Monsenor Nouel', 18.812, -70.331);
+    ('Bonao', 'Monseñor Nouel', 18.943, -70.441),
+    ('Maimón', 'Monseñor Nouel', 18.888, -70.27),
+    ('Piedra Blanca', 'Monseñor Nouel', 18.812, -70.331);
 
 -- La Vega (4 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
@@ -265,9 +265,9 @@ INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud)
 
 -- Samaná (3 municipalities)
 INSERT INTO #MunicipioSeed (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
-    ('Santa Bárbara de Samaná', 'Samana', 19.272, -69.32),
-    ('Sánchez', 'Samana', 19.143, -69.678),
-    ('Las Terrenas', 'Samana', 19.284, -69.566);
+    ('Santa Bárbara de Samaná', 'Samaná', 19.272, -69.32),
+    ('Sánchez', 'Samaná', 19.143, -69.678),
+    ('Las Terrenas', 'Samaná', 19.284, -69.566);
 
 -- MERGE: Insert only municipalities that don't exist yet
 MERGE INTO Municipio AS target

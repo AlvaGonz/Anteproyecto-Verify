@@ -67,7 +67,8 @@ def parse_env():
     return env_vars
 
 env = parse_env()
-conn_str = env.get("ConnectionStrings__DefaultConnection", "")
+# Prefer OS env (Docker injects the correct service-name connection string)
+conn_str = os.environ.get("ConnectionStrings__DefaultConnection", "") or env.get("ConnectionStrings__DefaultConnection", "")
 
 def get_conn_params(conn_str):
     params = {
@@ -138,7 +139,8 @@ def wait_for_database():
     return False
 
 def get_db_connection():
-    hosts_to_try = [conn_params["server"], "localhost", "127.0.0.1", "sqlserver"]
+    # Always try the Docker service name first, then the configured server, then fallbacks
+    hosts_to_try = ["sqlserver", conn_params["server"], "localhost", "127.0.0.1"]
     seen = set()
     hosts_to_try = [x for x in hosts_to_try if x and not (x in seen or seen.add(x))]
     last_ex = None
