@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Contracts.Documents;
 using Application.DTOs.Documents;
-using Application.Features.Documents.GetDocumentDiagnosis;
 using Azure;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -20,16 +19,13 @@ using Microsoft.AspNetCore.Mvc;
 public class ProjectDocumentsController : ControllerBase
 {
     private readonly IDocumentService _documentService;
-    private readonly GetDocumentDiagnosisQueryHandler _diagnosisHandler;
     private readonly IConfiguration _configuration;
 
     public ProjectDocumentsController(
         IDocumentService documentService,
-        GetDocumentDiagnosisQueryHandler diagnosisHandler,
         IConfiguration configuration)
     {
         _documentService = documentService;
-        _diagnosisHandler = diagnosisHandler;
         _configuration = configuration;
     }
 
@@ -335,34 +331,6 @@ public class ProjectDocumentsController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             return NotFound(ex.Message);
-        }
-    }
-
-    [HttpGet("diagnosis")]
-    [Authorize(Roles = "DEVELOPER,VALIDATOR")]
-    [ProducesResponseType(typeof(DocumentDiagnosisDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    public async Task<IActionResult> GetDocumentDiagnosis(Guid projectId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetDocumentDiagnosisQuery { ProjectId = projectId };
-            var result = await _diagnosisHandler.HandleAsync(query, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return StatusCode(StatusCodes.Status429TooManyRequests, new { error = ex.Message });
-        }
-        catch (FluentValidation.ValidationException ex)
-        {
-            return BadRequest(new { errors = ex.Errors.Select(e => e.ErrorMessage) });
         }
     }
 

@@ -6,7 +6,6 @@ using Api.Controllers;
 using Application.Contracts.Documents;
 using Application.Documents.Extractions;
 using Application.DTOs.Documents;
-using Application.Features.Documents.GetDocumentDiagnosis;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -22,12 +21,10 @@ namespace Api.Tests.Projects
         {
             // Arrange
             var mockDocumentService = Substitute.For<IDocumentService>();
-            GetDocumentDiagnosisQueryHandler mockDiagnosisHandler = null!;
             var mockConfig = Substitute.For<IConfiguration>();
 
             var controller = new ProjectDocumentsController(
                 mockDocumentService,
-                mockDiagnosisHandler,
                 mockConfig);
 
             var documentId = Guid.NewGuid();

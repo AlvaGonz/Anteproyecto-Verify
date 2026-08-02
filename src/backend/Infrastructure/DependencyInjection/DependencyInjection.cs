@@ -144,21 +144,6 @@ public static class DependencyInjection
         services.Configure<ExternalServices.Credit.TransUnionOptions>(configuration.GetSection(ExternalServices.Credit.TransUnionOptions.SectionName));
         services.AddScoped<Application.Abstractions.ExternalServices.Credit.ITransUnionService, ExternalServices.Credit.TransUnionServiceMock>();
 
-        // Nvidia AI Document Diagnosis
-        services.Configure<ExternalServices.NvidiaAi.NvidiaAiOptions>(configuration.GetSection(ExternalServices.NvidiaAi.NvidiaAiOptions.SectionName));
-        services.AddHttpClient("nvidia-nim", (serviceProvider, client) =>
-        {
-            var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ExternalServices.NvidiaAi.NvidiaAiOptions>>().Value;
-            client.BaseAddress = new Uri(options.BaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
-            if (!string.IsNullOrEmpty(options.ApiKey))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
-            }
-        });
-        services.AddScoped<Application.Abstractions.DocumentIntelligence.IAiDiagnosisService, ExternalServices.NvidiaAi.NvidiaAiDiagnosisService>();
-        services.AddScoped<Application.Features.Documents.GetDocumentDiagnosis.GetDocumentDiagnosisQueryHandler>();
-
         // Validation Rules
         services.AddScoped<Application.Abstractions.Persistence.IReglaValidacionRepository, Persistence.Repositories.ReglaValidacionRepository>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.CreateRule.CreateRuleCommandHandler>();

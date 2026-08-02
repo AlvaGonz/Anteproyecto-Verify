@@ -38,20 +38,6 @@ public class AuthWallTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task RegularUser_CannotAccessValidatorEndpoint_Returns403()
-    {
-        // Arrange
-        var token = await RegisterAndGetTokenAsync("regular.user@test.com", "Password123!");
-        SetBearerToken(token); // Implicitly regular user
-
-        // Act: Try to access a validation endpoint that requires DEVELOPER,VALIDATOR roles
-        var response = await Client.GetAsync($"/api/projects/{Guid.NewGuid()}/documents/diagnosis");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-    }
-
-    [Fact]
     public async Task AnonymousUser_CanAccessPublicProjects_Returns200()
     {
         // Arrange: clear token

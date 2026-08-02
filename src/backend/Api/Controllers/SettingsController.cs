@@ -863,19 +863,13 @@ public class SettingsController : ControllerBase
         }
 
         // Ensure profiles are loaded (cached for performance)
+        // ponytail: only ADMIN profile matters; DEVELOPER/VALIDATOR profiles don't exist (admin/user roles only per DB)
         var adminLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "ADMIN", cancellationToken);
-        var devLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "DEVELOPER", cancellationToken);
-        var valLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "VALIDATOR", cancellationToken);
 
         var hasAcceso = await _context.Accesos.AnyAsync(a => a.IdUsuario == u.Id, cancellationToken);
         if (!hasAcceso)
         {
-            var targetPerfil = u.Rol switch
-            {
-                UserRole.Administrator => adminLegacyProfile,
-                UserRole.User => devLegacyProfile,
-                _ => devLegacyProfile
-            };
+            var targetPerfil = u.Rol == UserRole.Administrator ? adminLegacyProfile : null;
 
             if (targetPerfil != null)
             {
@@ -953,9 +947,7 @@ public static class RoleProfileMapper
     private static readonly Dictionary<string, (UserRole Role, string ProfileName)> RoleMap = new(StringComparer.OrdinalIgnoreCase)
     {
         ["admin"] = (UserRole.Administrator, "ADMIN"),
-        ["user"] = (UserRole.User, "DEVELOPER"), // Default legacy profile for users
-        ["dev"] = (UserRole.User, "DEVELOPER"),
-        ["validator"] = (UserRole.User, "VALIDATOR")
+        ["user"] = (UserRole.User, "DEVELOPER") // Default legacy profile for users
     };
 
     public static (UserRole? Role, string ProfileName) MapRole(string roleString)
@@ -970,17 +962,5 @@ public static class RoleProfileMapper
 
         return (null, string.Empty);
     }
-
-    public static string MapRoleToProfileName(UserRole role)
-    {
-        return role switch
-        {
-            UserRole.Administrator => "ADMIN",
-            UserRole.User => "DEVELOPER",
-            _ => "DEVELOPER"
-        };
-    }
-
-
 }
 

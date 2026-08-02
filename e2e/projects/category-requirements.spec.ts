@@ -52,12 +52,6 @@ test.describe("Category Specific Requirements E2E", () => {
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents`, async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) });
     });
-    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents/diagnosis`, async (route) => {
-      await route.fulfill({
-        status: 200, contentType: "application/json",
-        body: JSON.stringify({ requirements: [], documents: [] })
-      });
-    });
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}/validation-result`, async (route) => {
       await route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
     });

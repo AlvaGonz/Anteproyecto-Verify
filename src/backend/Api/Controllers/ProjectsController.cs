@@ -226,8 +226,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> CreateProject([FromBody] CreateProyectoDto dto, CancellationToken cancellationToken)
     {
         try
@@ -250,8 +248,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> UpdateProject(Guid id, [FromBody] UpdateProyectoDto dto, CancellationToken cancellationToken)
     {
         try
@@ -270,8 +266,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/status")]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] string statusCode, CancellationToken cancellationToken)
     {
         if (!ProjectStatusCodes.TryParseCodigoUnico(statusCode, out var status))
@@ -303,8 +297,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<IActionResult> DeleteProject(Guid id, CancellationToken cancellationToken)
     {
         try
