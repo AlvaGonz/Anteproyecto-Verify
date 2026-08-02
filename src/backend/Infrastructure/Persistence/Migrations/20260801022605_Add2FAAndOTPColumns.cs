@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -57,15 +57,15 @@ namespace Infrastructure.Persistence.Migrations
                 maxLength: 500,
                 nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Rnc",
-                table: "DGII",
-                type: "varchar(20)",
-                maxLength: 20,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(20)",
-                oldMaxLength: 20);
+//             migrationBuilder.AlterColumn<string>(
+//                 name: "Rnc",
+//                 table: "DGII",
+//                 type: "varchar(20)",
+//                 maxLength: 20,
+//                 nullable: false,
+//                 oldClrType: typeof(string),
+//                 oldType: "nvarchar(20)",
+//                 oldMaxLength: 20);
         }
 
         /// <inheritdoc />

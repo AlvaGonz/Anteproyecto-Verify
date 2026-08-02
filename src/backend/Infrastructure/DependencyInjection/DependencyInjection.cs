@@ -185,6 +185,9 @@ public static class DependencyInjection
 
         services.AddScoped<IStripeService, Services.StripeService>();
         services.AddScoped<Application.Contracts.Subscriptions.ISubscriptionService, Services.SubscriptionService>();
+        
+        // Gobernanza de Datos
+        services.AddScoped<Application.Contracts.Gobernanza.IGobernanzaDeDatosService, Services.GobernanzaDeDatosService>();
 
         // Account Deletion
         services.AddScoped<Application.Features.Account.Commands.RequestAccountDeletion.RequestAccountDeletionCommandHandler>();

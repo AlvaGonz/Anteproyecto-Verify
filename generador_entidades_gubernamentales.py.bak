@@ -324,21 +324,7 @@ def setup_tables():
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PagoIPI')
     BEGIN
-        CREATE TABLE PagoIPI (
-            Rnc VARCHAR(20) PRIMARY KEY, 
-            Cuota_ipi DECIMAL(18,2) NOT NULL, 
-            Estatus VARCHAR(20) NOT NULL, 
-            FechaCreacion DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-            NoCertificacion VARCHAR(50) NULL,
-            NoInmueble VARCHAR(50) NULL,
-            ParcelaNo VARCHAR(50) NULL
-        );
-    END
-    ELSE
-    BEGIN
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PagoIPI') AND name = 'NoCertificacion') ALTER TABLE PagoIPI ADD NoCertificacion VARCHAR(50) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PagoIPI') AND name = 'NoInmueble') ALTER TABLE PagoIPI ADD NoInmueble VARCHAR(50) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PagoIPI') AND name = 'ParcelaNo') ALTER TABLE PagoIPI ADD ParcelaNo VARCHAR(50) NULL;
+        CREATE TABLE PagoIPI (Rnc VARCHAR(20) PRIMARY KEY, Cuota_ipi DECIMAL(18,2) NOT NULL, Estatus VARCHAR(20) NOT NULL, FechaCreacion DATETIME2 NOT NULL DEFAULT GETUTCDATE());
     END
     """)
     conn.commit()
@@ -356,13 +342,7 @@ def setup_tables():
             Latitud DECIMAL(9,6) NULL,
             Longitud DECIMAL(9,6) NULL,
             Superficie DECIMAL(18,2) NULL,
-            Matricula VARCHAR(50) NULL,
-            Oficina VARCHAR(100) NULL,
-            FechaInscripcion DATETIME2 NULL,
-            FechaEmision DATETIME2 NULL,
-            VieneDe VARCHAR(100) NULL,
-            DesignCatastralOrigen VARCHAR(100) NULL,
-            DesigCatastralPosicional VARCHAR(100) NULL
+            Matricula VARCHAR(50) NULL
         );
     END
     ELSE
@@ -376,12 +356,6 @@ def setup_tables():
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Longitud') ALTER TABLE CatastroTitulo ADD Longitud DECIMAL(9,6) NULL;
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Superficie') ALTER TABLE CatastroTitulo ADD Superficie DECIMAL(18,2) NULL;
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Matricula') ALTER TABLE CatastroTitulo ADD Matricula VARCHAR(50) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'Oficina') ALTER TABLE CatastroTitulo ADD Oficina VARCHAR(100) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'FechaInscripcion') ALTER TABLE CatastroTitulo ADD FechaInscripcion DATETIME2 NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'FechaEmision') ALTER TABLE CatastroTitulo ADD FechaEmision DATETIME2 NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'VieneDe') ALTER TABLE CatastroTitulo ADD VieneDe VARCHAR(100) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'DesignCatastralOrigen') ALTER TABLE CatastroTitulo ADD DesignCatastralOrigen VARCHAR(100) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('CatastroTitulo') AND name = 'DesigCatastralPosicional') ALTER TABLE CatastroTitulo ADD DesigCatastralPosicional VARCHAR(100) NULL;
     END
     """)
     conn.commit()
@@ -401,35 +375,13 @@ def setup_tables():
             Longitud DECIMAL(9,6) NULL,
             Superficie DECIMAL(18,2) NULL,
             TienePermiso VARCHAR(10) NULL,
-            Documento VARCHAR(250) NULL,
-            Departamento VARCHAR(100) NULL,
-            Operacion VARCHAR(100) NULL,
-            Seccion VARCHAR(100) NULL,
-            Lugar VARCHAR(100) NULL
+            Documento VARCHAR(250) NULL
         );
     END
     ELSE
     BEGIN
         IF EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'IdProyecto') ALTER TABLE PermisoSuelo DROP COLUMN IdProyecto;
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'NumeroExpediente') ALTER TABLE PermisoSuelo ADD NumeroExpediente VARCHAR(50) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Departamento') ALTER TABLE PermisoSuelo ADD Departamento VARCHAR(100) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Operacion') ALTER TABLE PermisoSuelo ADD Operacion VARCHAR(100) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Seccion') ALTER TABLE PermisoSuelo ADD Seccion VARCHAR(100) NULL;
-        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Lugar') ALTER TABLE PermisoSuelo ADD Lugar VARCHAR(100) NULL;
-    END
-    """)
-    conn.commit()
-    
-    cursor.execute("""
-    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'JCE_Ciudadano')
-    BEGIN
-        CREATE TABLE JCE_Ciudadano (
-            Cedula VARCHAR(11) PRIMARY KEY,
-            Nombres VARCHAR(100) NOT NULL,
-            Apellidos VARCHAR(100) NOT NULL,
-            FechaNacimiento DATE NOT NULL,
-            FechaExpiracion DATE NOT NULL
-        );
     END
     """)
     conn.commit()
@@ -441,15 +393,12 @@ def setup_tables():
     except: pass
     try: cursor.execute("DELETE FROM PermisoSuelo;")
     except: pass
-    try: cursor.execute("DELETE FROM JCE_Ciudadano;")
-    except: pass
     conn.commit()
     conn.close()
     print("Table setup/update complete!")
 
 def get_rncs(file_path):
     rncs = []
-    cedulas = []
     with open(file_path, "r", encoding="latin-1") as f:
         for line in f:
             l = line.strip()
@@ -457,43 +406,27 @@ def get_rncs(file_path):
             parts = l.split("|")
             if parts and parts[0].strip():
                 rnc = parts[0].strip()
-                if rnc.isdigit():
-                    if len(rnc) in [9, 11]:
-                        rncs.append(rnc)
-                    if len(rnc) == 11:
-                        cedulas.append(rnc)
-    return list(set(rncs)), list(set(cedulas))
-
-def generate_jce_records(cedulas_list):
-    import datetime
-    nombres_pool = ["JUAN", "MARIA", "PEDRO", "LUIS", "ANA", "CARMEN", "JOSE", "FRANCISCO", "RAMON", "ALTAGRACIA", "MIGUEL", "ANTONIO", "ROSA", "JUANA"]
-    apellidos_pool = ["PEREZ", "RODRIGUEZ", "SANCHEZ", "GARCIA", "MARTINEZ", "GONZALEZ", "LOPEZ", "FERNANDEZ", "GOMEZ", "SANTANA", "RAMIREZ", "CRUZ"]
-    start_nac = datetime.date(1950, 1, 1)
-    for ced in cedulas_list:
-        nombres = random.choice(nombres_pool) + " " + random.choice(nombres_pool)
-        apellidos = random.choice(apellidos_pool) + " " + random.choice(apellidos_pool)
-        fnac = start_nac + datetime.timedelta(days=random.randint(0, 18000))
-        fexp = datetime.date(2030, 1, 1) + datetime.timedelta(days=random.randint(0, 3650))
-        yield {
-            "cedula": ced, "nombres": nombres, "apellidos": apellidos,
-            "fnac": fnac.strftime("%Y-%m-%d"), "fexp": fexp.strftime("%Y-%m-%d")
-        }
+                if rnc.isdigit() and len(rnc) in [9, 11]:
+                    rncs.append(rnc)
+    return list(set(rncs))
 
 def generate_ipi_records(rncs_list):
-    pass # Replaced by integrated generator
+    for rnc in rncs_list:
+        cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
+        estatus_ipi = random.choice(["Pagado", "No Pagado"])
+        yield {
+            "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi
+        }
 
-def generate_catastro_ps_ipi_records(rncs_list):
+def generate_catastro_ps_records(rncs_list):
     import datetime
     base_matricula = random.randint(1000000000, 2000000000)
     base_titulo = random.randint(1000000000, 2000000000)
     start_date = datetime.date(2026, 7, 1)
     
-    rnc_ipi_generated = set()
-    oficinas = ["D.N.", "SANTO DOMINGO ESTE", "SANTIAGO", "VIRTUAL", "PUERTO PLATA", "LA VEGA"]
-    departamentos = ["NORTE", "SUR", "ESTE", "OESTE", "DISTRITO NACIONAL"]
-    
     for p_idx, provincia in enumerate(PROVINCIA_NAMES):
         coord_info = PROVINCIAS_COORDENADAS[provincia]
+        # Get municipality names from the dict keys
         municipio_names = list(coord_info["municipios"].keys())
         for parcel in range(1, 501):
             base_dc = f"{p_idx+1:02d}{parcel:04d}{random.randint(100000, 999999)}"
@@ -511,17 +444,11 @@ def generate_catastro_ps_ipi_records(rncs_list):
                 cat_record = {
                     "id": str(uuid.uuid4()).upper(), "dc": dc, "titulo": str(base_titulo),
                     "rnc": rnc, "provincia": provincia, "municipio": municipio,
-                    "lat": lat, "lon": lon, "superficie": superficie, "matricula": str(base_matricula),
-                    "oficina": random.choice(oficinas),
-                    "fecha_inscripcion": (datetime.datetime.now() - datetime.timedelta(days=random.randint(1000, 5000))).strftime('%Y-%m-%d %H:%M:%S'),
-                    "fecha_emision": (datetime.datetime.now() - datetime.timedelta(days=random.randint(100, 999))).strftime('%Y-%m-%d %H:%M:%S'),
-                    "viene_de": f"Parcela {random.randint(1,99)}, DC-{random.randint(1,99):02d}",
-                    "desig_catastral_origen": f"Parc. {random.randint(10,99)}, DC-{random.randint(1,99):02d}",
-                    "desig_catastral_posicional": f"Posicional-{random.randint(1000,9999)}"
+                    "lat": lat, "lon": lon, "superficie": superficie, "matricula": str(base_matricula)
                 }
                 
                 ps_record = None
-                if random.random() < 0.4877:
+                if random.random() < 0.4877: # Approx 780,000 / 1,600,000
                     letras = "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=2))
                     nums1 = "".join(random.choices("0123456789", k=2))
                     nums2 = "".join(random.choices("0123456789", k=random.choice([2, 3])))
@@ -536,25 +463,10 @@ def generate_catastro_ps_ipi_records(rncs_list):
                         "num_exp": num_exp, "fecha": fecha_emision.strftime("%Y-%m-%d"),
                         "rnc": rnc, "provincia": provincia, "municipio": municipio,
                         "lat": lat, "lon": lon, "superficie": superficie,
-                        "tiene_permiso": tiene_permiso,
-                        "departamento": random.choice(departamentos),
-                        "operacion": random.choice(["MENSURA", "DESLINDE", "SUBDIVISION", "REFUNDICION"]),
-                        "seccion": "SECCION " + str(random.randint(1, 10)),
-                        "lugar": "LUGAR " + str(random.randint(1, 100))
+                        "tiene_permiso": tiene_permiso
                     }
                     
-                ipi_record = None
-                if rnc not in rnc_ipi_generated:
-                    rnc_ipi_generated.add(rnc)
-                    cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
-                    estatus_ipi = random.choice(["Pagado", "No Pagado"])
-                    num_cert = "CERT" + str(random.randint(10000, 999999)) + "JUICIODEVALOR"
-                    ipi_record = {
-                        "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi,
-                        "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc
-                    }
-                    
-                yield cat_record, ps_record, ipi_record
+                yield cat_record, ps_record
 
 TRANSIENT_ERROR_CODES = {1205, 1204, 1222, 3960, 3961, -2, 0, 11, 64, 258, 4060, 40197, 40501, 40613, 42108, 42109}
 TRANSIENT_ERROR_MSGS = ["deadlock", "timeout", "connection", "network", "transport", "refused", "reset", "broken"]
@@ -582,9 +494,9 @@ def insert_ipi_chunk(chunk_id, chunk_records, attempt=1):
         batch_size = 300
         for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
-            sql_ipi = f"INSERT INTO PagoIPI (Rnc, Cuota_ipi, Estatus, NoCertificacion, NoInmueble, ParcelaNo) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
+            sql_ipi = f"INSERT INTO PagoIPI (Rnc, Cuota_ipi, Estatus) VALUES " + ", ".join([f"({ph}, {ph}, {ph})"] * len(batch))
             params_ipi = []
-            for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"], r.get("no_cert"), r.get("no_inmueble"), r.get("parcela_no")])
+            for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"]])
             cursor.execute(sql_ipi, tuple(params_ipi))
             if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
@@ -615,10 +527,10 @@ def insert_catastro_chunk(chunk_id, chunk_records, attempt=1):
         for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
             
-            sql_cat = f"INSERT INTO CatastroTitulo (IdCatastroTitulo, CodigoDesignacionCatastral, NumeroTitulo, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, Matricula, Oficina, FechaInscripcion, FechaEmision, VieneDe, DesignCatastralOrigen, DesigCatastralPosicional) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
+            sql_cat = f"INSERT INTO CatastroTitulo (IdCatastroTitulo, CodigoDesignacionCatastral, NumeroTitulo, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, Matricula) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
             params_cat = []
             for r in batch: 
-                params_cat.extend([r["id"], r["dc"], r["titulo"], r["rnc"], r["provincia"], r["municipio"], r["lat"], r["lon"], r["superficie"], r["matricula"], r["oficina"], r["fecha_inscripcion"], r["fecha_emision"], r["viene_de"], r["desig_catastral_origen"], r["desig_catastral_posicional"]])
+                params_cat.extend([r["id"], r["dc"], r["titulo"], r["rnc"], r["provincia"], r["municipio"], r["lat"], r["lon"], r["superficie"], r["matricula"]])
             cursor.execute(sql_cat, tuple(params_cat))
             if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
@@ -650,10 +562,10 @@ def insert_ps_chunk(chunk_id, chunk_records, attempt=1):
         for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
             
-            sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento, Departamento, Operacion, Seccion, Lugar) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL, {ph}, {ph}, {ph}, {ph})"] * len(batch))
+            sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL)"] * len(batch))
             params_ps = []
             for p in batch:
-                params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"], p["departamento"], p["operacion"], p["seccion"], p["lugar"]])
+                params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"]])
             cursor.execute(sql_ps, tuple(params_ps))
             if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
@@ -672,39 +584,6 @@ def insert_ps_chunk(chunk_id, chunk_records, attempt=1):
     finally:
         if conn: conn.close()
 
-
-def insert_jce_chunk(chunk_id, chunk_records, attempt=1):
-    if not chunk_records: return 0
-    max_retries = 10
-    print(f"[JCE Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        ph = "%s" if db_lib == "pymssql" else "?"
-        batch_size = 300
-        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
-            batch = chunk_records[i:i+batch_size]
-            sql = f"INSERT INTO JCE_Ciudadano (Cedula, Nombres, Apellidos, FechaNacimiento, FechaExpiracion) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
-            params = []
-            for r in batch: params.extend([r["cedula"], r["nombres"], r["apellidos"], r["fnac"], r["fexp"]])
-            cursor.execute(sql, tuple(params))
-            if (chunk_idx + 1) % 50 == 0:
-                conn.commit()
-        conn.commit()
-        return len(chunk_records)
-    except Exception as e:
-        if conn:
-            try: conn.rollback()
-            except: pass
-        if attempt < max_retries and is_transient_error(e):
-            wait = (2 ** attempt) + (attempt * 0.5)
-            time.sleep(wait)
-            return insert_jce_chunk(chunk_id, chunk_records, attempt + 1)
-        raise e
-    finally:
-        if conn: conn.close()
-
 def main():
     wait_for_database()
     file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Bots", "DGII", "src", "DGII_RNC.TXT"))
@@ -719,7 +598,7 @@ def main():
         cursor.execute("SELECT COUNT(*) FROM CatastroTitulo")
         count = cursor.fetchone()[0]
         conn.close()
-        if count >= 99999999:
+        if count >= 1590000:
             print(f"CatastroTitulo seeds are already fully loaded ({count} records). Skipping.")
             return
     except Exception as e:
@@ -727,92 +606,89 @@ def main():
 
     setup_tables()
     print("Reading RNCs...")
-    rncs_list, cedulas_list = get_rncs(file_path)
-    print(f"Loaded {len(rncs_list)} unique RNCs and {len(cedulas_list)} cedulas.")
+    rncs_list = get_rncs(file_path)
+    print(f"Loaded {len(rncs_list)} unique RNCs.")
     
     t_start = time.time()
     
-    print("Submitting JCE tasks...")
+    # Generate IPI
+    print("Submitting IPI tasks...")
     chunk_size = 150000
-    jce_chunk = []
-    jce_count = 0
-    t_jce_start = time.time()
-    with ThreadPoolExecutor(max_workers=12) as executor:
-        futures_jce = []
-        for rec in generate_jce_records(cedulas_list):
-            jce_chunk.append(rec)
-            if len(jce_chunk) >= chunk_size:
-                jce_count += 1
-                futures_jce.append(executor.submit(insert_jce_chunk, f"JCE_{jce_count}", jce_chunk))
-                jce_chunk = []
-        if jce_chunk:
-            jce_count += 1
-            futures_jce.append(executor.submit(insert_jce_chunk, f"JCE_{jce_count}", jce_chunk))
-        print("Waiting for JCE completion...")
-        for fut in as_completed(futures_jce):
-            try: fut.result()
-            except Exception as e: print(f"Worker error JCE: {e}")
-    t_jce_end = time.time()
+    current_chunk = []
+    chunk_count = 0
+    t_ipi_start = time.time()
     
-    print("Submitting Catastro, PermisoSuelo and IPI tasks simultaneously...")
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        futures_ipi = []
+        for rec in generate_ipi_records(rncs_list):
+            current_chunk.append(rec)
+            if len(current_chunk) >= chunk_size:
+                chunk_count += 1
+                futures_ipi.append(executor.submit(insert_ipi_chunk, f"IPI_{chunk_count}", current_chunk))
+                current_chunk = []
+        if current_chunk:
+            chunk_count += 1
+            futures_ipi.append(executor.submit(insert_ipi_chunk, f"IPI_{chunk_count}", current_chunk))
+            
+        print("Waiting for IPI completion...")
+        for fut in as_completed(futures_ipi):
+            try:
+                fut.result()
+            except Exception as e:
+                print(f"Worker error IPI: {e}")
+                
+    t_ipi_end = time.time()
+            
+    print("Submitting CatastroTitulo and PermisoSuelo tasks simultaneously...")
     catastro_chunk = []
     ps_chunk = []
-    ipi_chunk = []
     c_count = 0
     p_count = 0
-    i_count = 0
     t_cat_ps_start = time.time()
     
     with ThreadPoolExecutor(max_workers=12) as executor:
-        futures_all = []
-        for cat_r, ps_r, ipi_r in generate_catastro_ps_ipi_records(rncs_list):
+        futures_cat_ps = []
+        for cat_r, ps_r in generate_catastro_ps_records(rncs_list):
             catastro_chunk.append(cat_r)
             if ps_r is not None:
                 ps_chunk.append(ps_r)
-            if ipi_r is not None:
-                ipi_chunk.append(ipi_r)
                 
             if len(catastro_chunk) >= chunk_size:
                 c_count += 1
-                futures_all.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
+                futures_cat_ps.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
                 catastro_chunk = []
                 
             if len(ps_chunk) >= chunk_size:
                 p_count += 1
-                futures_all.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
+                futures_cat_ps.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
                 ps_chunk = []
-                
-            if len(ipi_chunk) >= chunk_size:
-                i_count += 1
-                futures_all.append(executor.submit(insert_ipi_chunk, f"IPI_{i_count}", ipi_chunk))
-                ipi_chunk = []
                 
         if catastro_chunk:
             c_count += 1
-            futures_all.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
+            futures_cat_ps.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
+            
         if ps_chunk:
             p_count += 1
-            futures_all.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
-        if ipi_chunk:
-            i_count += 1
-            futures_all.append(executor.submit(insert_ipi_chunk, f"IPI_{i_count}", ipi_chunk))
+            futures_cat_ps.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
             
-        print("Waiting for Catastro, PS, IPI completion...")
-        for fut in as_completed(futures_all):
-            try: fut.result()
-            except Exception as e: print(f"Worker error CAT/PS/IPI: {e}")
+        print("Waiting for Catastro and PermisoSuelo completion...")
+        for fut in as_completed(futures_cat_ps):
+            try:
+                fut.result()
+            except Exception as e:
+                print(f"Worker error CAT/PS: {e}")
                 
     t_cat_ps_end = time.time()
             
     t_total = time.time() - t_start
-    m_jce, s_jce = divmod(t_jce_end - t_jce_start, 60)
+    m_ipi, s_ipi = divmod(t_ipi_end - t_ipi_start, 60)
     m_cat_ps, s_cat_ps = divmod(t_cat_ps_end - t_cat_ps_start, 60)
     m_tot, s_tot = divmod(t_total, 60)
     
     print("\n" + "="*50)
     print("--- Resumen Final de Generación ---")
-    print(f"JCE: {int(m_jce)} minutos {int(s_jce)} segundos")
-    print(f"Catastro, PermisoSuelo e IPI: {int(m_cat_ps)} minutos {int(s_cat_ps)} segundos")
+    print(f"IPI: {int(m_ipi)} minutos {int(s_ipi)} segundos")
+    print(f"Catastro y PermisoSuelo (Simultáneo): {int(m_cat_ps)} minutos {int(s_cat_ps)} segundos")
     print(f"Tiempo Total: {int(m_tot)} minutos {int(s_tot)} segundos")
     print("="*50 + "\n")
 

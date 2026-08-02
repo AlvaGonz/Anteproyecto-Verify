@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260802050250_AddGobernanzaDeDatosMockTables")]
+    partial class AddGobernanzaDeDatosMockTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,18 +183,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("CodigoDesignacionCatastral")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DesigCatastralPosicional")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DesignCatastralOrigen")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FechaEmision")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaInscripcion")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal?>("Latitud")
                         .HasColumnType("decimal(18,2)");
 
@@ -218,9 +209,6 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<decimal?>("Superficie")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("VieneDe")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdCatastroTitulo");
 
