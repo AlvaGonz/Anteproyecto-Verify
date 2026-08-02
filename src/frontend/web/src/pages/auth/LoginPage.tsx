@@ -16,7 +16,7 @@ export const LoginPage: React.FC = () => {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-5xl bg-white border border-border rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative">
         {/* Left Side: Info */}
-        <div className="w-full md:w-[400px] bg-[#223382] p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
+        <div className="w-full md:w-[400px] bg-[#223382] p-6 md:p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
           {/* Subtle geometric pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-64 h-64 border-2 border-white rounded-full" />
@@ -24,8 +24,8 @@ export const LoginPage: React.FC = () => {
          </div>
 
           <div className="relative z-10 flex flex-col h-full justify-between">
-            <div className="mb-10">
-              <Link to="/" className="inline-block mb-10 group transition-transform hover:scale-[1.02]">
+            <div className="mb-6 md:mb-10">
+              <Link to="/" className="inline-block mb-6 md:mb-10 group transition-transform hover:scale-[1.02]">
                 <img
                   src="/brand/logotipo/LOGOTIPO WHITE.optimized.svg"
                   alt="VeriFinca Logo"
@@ -35,7 +35,7 @@ export const LoginPage: React.FC = () => {
               <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-4">
                 Plataforma Certificada
              </div>
-              <h2 className="text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter text-white">
+              <h2 className="text-3xl md:text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter text-white">
                 Integridad <br />
                 <span className="text-primary-light">en cada m²</span>
              </h2>
@@ -45,7 +45,7 @@ export const LoginPage: React.FC = () => {
              </p>
            </div>
 
-            <div className="space-y-8 flex-1">
+            <div className="space-y-8 flex-1 hidden md:block">
               <div className="flex gap-5 group cursor-default">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all duration-300">
                   <ShieldCheck className="w-6 h-6 text-primary-light" />
@@ -67,7 +67,7 @@ export const LoginPage: React.FC = () => {
              </div>
            </div>
 
-            <div className="pt-8 mt-12 border-t border-white/10">
+            <div className="pt-8 mt-12 border-t border-white/10 hidden md:block">
               <div className="flex items-center gap-4">
                 <div className="flex -space-x-4">
                   {[1, 2, 3, 4].map(i => (
@@ -84,7 +84,7 @@ export const LoginPage: React.FC = () => {
        </div>
 
         {/* Right Side: Form or Challenge */}
-        <div className="flex-1 p-12 flex items-center justify-center">
+        <div className="flex-1 p-6 md:p-12 flex items-center justify-center">
           {pendingChallenge ? <ChallengeScreen /> : <LoginForm />}
        </div>
      </m.div>
