@@ -81,7 +81,7 @@ export const AdminSavedProjectsView: React.FC = () => {
                   <X size={16} />
                 </button>
                 <img
-                  src={project.imagenUrl || getDefaultProjectImage(project.categoria)}
+                  src={project.imagenUrl || getDefaultProjectImage(project.categoriaId)}
                   alt={project.nombre}
                   loading="lazy"
                   decoding="async"

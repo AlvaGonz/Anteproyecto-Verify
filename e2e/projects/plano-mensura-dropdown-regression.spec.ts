@@ -43,7 +43,7 @@ test.describe('Plano de Mensura - Dropdown migration + payload preservation', ()
         nombre: 'Plano Mensura dropdown regression',
         ubicacionTexto: 'Santo Domingo',
         usuarioCreadorId: userId,
-        categoria: 3,
+        categoriaId: 12,
       },
     });
     expect(projRes.ok()).toBeTruthy();

@@ -51,8 +51,8 @@ export const AdminPublishedProjectsView: React.FC = () => {
         if (!matches) return false;
       }
 
-      if (filters.projectTypes.length > 0 && p.categoria !== undefined && p.categoria !== null) {
-        if (!filters.projectTypes.includes(p.categoria)) return false;
+      if (filters.projectTypes.length > 0 && p.categoriaId !== undefined && p.categoriaId !== null) {
+        if (!filters.projectTypes.includes(p.categoriaId)) return false;
       }
 
       if (p.valorEstimado !== undefined && p.valorEstimado !== null) {
@@ -326,7 +326,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
                 >
                   <div className="relative aspect-video overflow-hidden">
                     <img
-                      src={project.imagenUrl || getDefaultProjectImage(project.categoria)}
+                      src={project.imagenUrl || getDefaultProjectImage(project.categoriaId)}
                       alt={project.nombreProyecto}
                       loading="lazy"
                       decoding="async"

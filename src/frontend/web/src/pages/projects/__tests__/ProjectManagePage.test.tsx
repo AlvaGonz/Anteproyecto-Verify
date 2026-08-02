@@ -48,6 +48,15 @@ vi.mock("../../../features/auth/services/AuthService", () => ({
 
 vi.mock("../../../features/projects/api/projectsApi");
 
+vi.mock("../../../features/projects/api/useCategories", () => ({
+  useCategories: () => ({
+    data: [
+      { id: 1, nombre: "ALBERGUES", descripcion: null },
+      { id: 16, nombre: "VIVIENDAS", descripcion: null },
+    ],
+  }),
+}));
+
 vi.mock("framer-motion", async () => {
   const actual = await vi.importActual("framer-motion");
   return {

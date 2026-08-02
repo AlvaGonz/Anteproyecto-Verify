@@ -3,7 +3,7 @@ import { test, expect, Page } from "@playwright/test";
 test.describe("Public Directory Filter — E2E", () => {
   const MOCK_PROJECTS = [
     {
-      id: "1", nombreProyecto: "Residencial Terra Noble", categoria: 1,
+      id: "1", nombreProyecto: "Residencial Terra Noble", categoriaId: 16,
       estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo",
       estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO",
       valorEstimado: 8500000, designacionCatastral: "001-02-003",
@@ -12,20 +12,20 @@ test.describe("Public Directory Filter — E2E", () => {
       completionRate: 100, imagenUrl: ""
     },
     {
-      id: "2", nombreProyecto: "Torre San Gerónimo", categoria: 2,
+      id: "2", nombreProyecto: "Torre San Gerónimo",       categoriaId: 8,
       estadoValidacion: "Verificado", ubicacionTexto: "Santiago",
       estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO",
       valorEstimado: 12000000, designacionCatastral: "002-01-005",
       completionRate: 100, imagenUrl: ""
     },
     {
-      id: "3", nombreProyecto: "Plaza Central Mall", categoria: 2,
+      id: "3", nombreProyecto: "Plaza Central Mall",       categoriaId: 8,
       estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo",
       estadoIntegridad: 0, estadoJuridico: 1, estadoProyecto: "PUBLICADO",
       valorEstimado: 4500000, completionRate: 60, imagenUrl: ""
     },
     {
-      id: "4", nombreProyecto: "Complejo Turístico Bahía", categoria: 3,
+      id: "4", nombreProyecto: "Complejo Turístico Bahía", categoriaId: 12,
       estadoValidacion: "Verificado", ubicacionTexto: "La Altagracia",
       estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO",
       valorEstimado: 15000000, completionRate: 100, imagenUrl: ""
@@ -123,7 +123,7 @@ test.describe("Public Directory Filter — E2E", () => {
     await expect(page.getByText("Torre San Gerónimo")).toBeVisible();
     await expect(page.getByText("Plaza Central Mall")).toBeVisible();
     await expect(page.getByText("Residencial Terra Noble")).not.toBeVisible();
-    await page.getByText("Residencial").first().click();
+    await page.getByText("VIVIENDAS").first().click();
     await expect(page.getByText("Residencial Terra Noble")).toBeVisible();
   });
 

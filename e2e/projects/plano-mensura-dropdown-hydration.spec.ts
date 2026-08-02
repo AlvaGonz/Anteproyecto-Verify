@@ -211,7 +211,7 @@ test.describe("Plano de Mensura - dropdown hydrate + save", () => {
           id: MOCK_PROJECT_ID,
           nombre: "Plano Mensura Project",
           estadoProyecto: 1,
-          categoria: 3,
+          categoriaId: 12,
         }),
       });
     });

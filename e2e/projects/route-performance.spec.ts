@@ -67,7 +67,7 @@ async function setupAuthMock(page: any) {
       await route.fulfill({
         status: 200, contentType: "application/json",
         body: JSON.stringify([{ id: "proj-001", codigoInterno: "VF-001-2026", nombre: "Residencial Las Palmas",
-          ubicacionTexto: "La Romana, RD", categoria: 1, estadoProyecto: "PUBLICADO", estadoIntegridad: 0,
+          ubicacionTexto: "La Romana, RD", categoriaId: 16, estadoProyecto: "PUBLICADO", estadoIntegridad: 0,
           usuarioCreadorId: "user-001", createdAtUtc: "2026-01-01T00:00:00Z" }])
       });
     }

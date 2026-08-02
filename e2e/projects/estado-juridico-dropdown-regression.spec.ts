@@ -44,7 +44,7 @@ test.describe('Estado Jurídico - Dropdown migration regression', () => {
         nombre: 'Estado Juridico dropdown regression',
         ubicacionTexto: 'Santo Domingo',
         usuarioCreadorId: userId,
-        categoria: 3, // Turistico to require EstadoJuridico
+        categoriaId: 12, // Hospedaje
       },
     });
     const projectId = (await projRes.json()).id;

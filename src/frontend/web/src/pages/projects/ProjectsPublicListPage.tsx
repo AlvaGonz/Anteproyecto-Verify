@@ -47,7 +47,7 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
   >
     <div className="relative aspect-[16/10] overflow-hidden">
       <img
-        src={project.imagenUrl || getDefaultProjectImage(project.categoria as unknown as number)}
+        src={project.imagenUrl || getDefaultProjectImage(project.categoriaId)}
         alt={project.nombreProyecto}
         loading="lazy"
         decoding="async"

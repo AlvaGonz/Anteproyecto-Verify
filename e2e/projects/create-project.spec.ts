@@ -58,7 +58,7 @@ test.describe('Create Project Flow', () => {
       codigoInterno: "VF-123",
       nombre: "Test Project AutoRefresh",
       ubicacionTexto: "Distrito Nacional",
-      categoria: 1,
+      categoriaId: 16,
       estadoProyecto: "CREADO",
       estadoIntegridad: 0,
       createdAtUtc: "2026-01-01T00:00:00Z"

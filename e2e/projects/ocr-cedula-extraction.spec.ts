@@ -46,7 +46,7 @@ test.describe('Real OCR Extraction Flow - Cédula', () => {
         nombre: `OCR Test Cedula`,
         ubicacionTexto: "Santo Domingo",
         usuarioCreadorId: userId,
-        categoria: 1
+        categoriaId: 16
       }
     });
     if (!projRes.ok()) throw new Error(`Failed to create project: ${projRes.status()} ${await projRes.text()}`);

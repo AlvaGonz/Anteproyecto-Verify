@@ -82,7 +82,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto ?? "");
   const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps ?? "");
   const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado ?? "");
-  const [categoriaId, setCategoriaId] = useState<number>(initialData?.categoriaId ?? 16); // 16 = VIVIENDAS
+  // ponytail: 0 = "no selection" sentinel (matches the disabled placeholder option); category is required, so no magic default
+  const [categoriaId, setCategoriaId] = useState<number>(initialData?.categoriaId ?? categorias[0]?.id ?? 0);
   const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador ?? "");
   const [rncDesarrollador, setRncDesarrollador] = useState(initialData?.rncDesarrollador ?? "");
   const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");

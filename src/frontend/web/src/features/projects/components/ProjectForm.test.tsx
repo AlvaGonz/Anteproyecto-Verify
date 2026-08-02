@@ -37,6 +37,15 @@ vi.mock("leaflet/dist/images/marker-icon-2x.png", () => ({ default: "" }));
 vi.mock("leaflet/dist/images/marker-icon.png", () => ({ default: "" }));
 vi.mock("leaflet/dist/images/marker-shadow.png", () => ({ default: "" }));
 
+vi.mock("../api/useCategories", () => ({
+  useCategories: () => ({
+    data: [
+      { id: 1, nombre: "ALBERGUES", descripcion: null },
+      { id: 16, nombre: "VIVIENDAS", descripcion: null },
+    ],
+  }),
+}));
+
 const queryClient = new QueryClient();
 
 const renderWithAuth = (ui: React.ReactElement) =>

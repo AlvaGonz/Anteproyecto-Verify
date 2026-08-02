@@ -57,7 +57,7 @@ test.describe("Upload Edge Cases E2E", () => {
           id: MOCK_PROJECT_ID,
           nombre: "Residencial Las Palmas",
           estadoProyecto: 1, 
-          categoria: 1 // Residencial
+          categoriaId: 16 // VIVIENDAS
         })
       });
     });
