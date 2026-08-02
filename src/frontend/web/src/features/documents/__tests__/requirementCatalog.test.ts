@@ -9,34 +9,46 @@ import { DocumentDto, DocumentType, DocumentStatus } from "../types";
 
 describe("requirementCatalog", () => {
   describe("getRequirementsForCategory", () => {
-    it("returns base requirements plus Residencial requirements for category 1", () => {
-      const reqs = getRequirementsForCategory(1);
+    it("returns base requirements plus VIVIENDAS (16) requirements", () => {
+      const reqs = getRequirementsForCategory(16);
       expect(reqs.length).toBe(BASE_REQUIREMENTS.length + 1);
       expect(reqs.find((r) => r.code === "REGIMEN_CONDOMINIO")).toBeDefined();
     });
 
-    it("returns base requirements plus Comercial requirements for category 2", () => {
-      const reqs = getRequirementsForCategory(2);
+    it("returns base requirements plus COMERCIAL Y OFICINAS (8) requirements", () => {
+      const reqs = getRequirementsForCategory(8);
       expect(reqs.length).toBe(BASE_REQUIREMENTS.length + 2);
       expect(reqs.find((r) => r.code === "REGISTRO_SANITARIO")).toBeDefined();
       expect(reqs.find((r) => r.code === "IMPACTO_TRAFICO")).toBeDefined();
     });
 
-    it("returns base requirements plus Turistico requirements for category 3", () => {
-      const reqs = getRequirementsForCategory(3);
+    it("returns base requirements plus HOSPEDAJE (12) requirements", () => {
+      const reqs = getRequirementsForCategory(12);
       expect(reqs.length).toBe(BASE_REQUIREMENTS.length + 1);
       expect(reqs.find((r) => r.code === "RESOLUCION_CONFOTUR")).toBeDefined();
     });
 
-    it("returns base requirements plus Mixto requirements for category 4", () => {
-      const reqs = getRequirementsForCategory(4);
+    it("returns base requirements plus COMBINADOS (7) requirements", () => {
+      const reqs = getRequirementsForCategory(7);
       expect(reqs.length).toBe(BASE_REQUIREMENTS.length + 1);
       expect(reqs.find((r) => r.code === "RESOLUCION_ZONIFICACION")).toBeDefined();
     });
 
-    it("returns only base requirements for category 99 (Otro)", () => {
-      const reqs = getRequirementsForCategory(99);
+    it("returns only base requirements for ESTRUCTURAS ESPECIALES (11)", () => {
+      const reqs = getRequirementsForCategory(11);
       expect(reqs.length).toBe(BASE_REQUIREMENTS.length);
+    });
+
+    it("returns only base requirements for unknown category ids", () => {
+      const reqs = getRequirementsForCategory(999);
+      expect(reqs.length).toBe(BASE_REQUIREMENTS.length);
+    });
+
+    it("no longer resolves legacy category ids to special requirements", () => {
+      expect(getRequirementsForCategory(1).find((r) => r.code === "REGIMEN_CONDOMINIO")).toBeUndefined();
+      expect(getRequirementsForCategory(2).find((r) => r.code === "REGISTRO_SANITARIO")).toBeUndefined();
+      expect(getRequirementsForCategory(3).find((r) => r.code === "RESOLUCION_CONFOTUR")).toBeUndefined();
+      expect(getRequirementsForCategory(4).find((r) => r.code === "RESOLUCION_ZONIFICACION")).toBeUndefined();
     });
   });
 
