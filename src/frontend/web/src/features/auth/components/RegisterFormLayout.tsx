@@ -69,6 +69,11 @@ export const RegisterFormLayout: React.FC<RegisterFormLayoutProps> = ({
   modalType,
 }) => (
   <m.div variants={containerVariants} initial="hidden" animate="visible" className="w-full">
+    <m.div variants={itemVariants} className="mb-10 text-center md:text-left">
+      <h3 className="text-2xl font-display font-extrabold text-[#223382] tracking-tight">Registrarse</h3>
+      <p className="text-text-secondary mt-1">Crea tu cuenta para acceder a VeriFinca</p>
+    </m.div>
+
     {error && (
       <m.div variants={itemVariants} className="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl text-sm font-medium" role="alert">
         {(error as Error).message || "Ocurrió un error al crear la cuenta. Intente de nuevo."}

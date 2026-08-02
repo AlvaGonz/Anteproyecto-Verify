@@ -13,7 +13,7 @@ export const RegisterPage: React.FC = () => {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-5xl bg-white border border-border rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative">
         {/* Left Side: Info */}
-        <div className="w-full md:w-[400px] bg-[#223382] p-6 md:p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
+        <div className="w-full md:w-[400px] bg-[#223382] p-5 md:p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
           {/* Subtle geometric pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-64 h-64 border-2 border-white rounded-full" />
@@ -21,23 +21,23 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <div className="relative z-10 flex flex-col h-full justify-between">
-            <div className="mb-6 md:mb-10">
-              <Link to="/" className="inline-block mb-6 md:mb-10 group transition-transform hover:scale-[1.02]">
+            <div className="mb-4 md:mb-10">
+              <Link to="/" className="inline-block mb-4 md:mb-10 group transition-transform hover:scale-[1.02]">
                 <img
                   src="/brand/logotipo/LOGOTIPO WHITE.optimized.svg"
                   alt="VeriFinca Logo"
-                  className="h-10 w-auto"
+                  className="h-9 md:h-10 w-auto"
                 />
               </Link>
-              <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-4">
+              <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-3 md:mb-4">
                 Plataforma Certificada
               </div>
-              <h2 className="text-3xl md:text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter text-white">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-black leading-[1.1] mb-4 md:mb-6 tracking-tighter text-white">
                 Integridad <br />
                 <span className="text-primary-light">en cada m².</span>
               </h2>
 
-              <p className="text-base text-white/70 leading-relaxed font-medium max-w-[280px]">
+              <p className="text-base text-white/70 leading-relaxed font-medium max-w-[280px] hidden sm:block">
                 La solución definitiva para la validación y gestión de proyectos inmobiliarios institucionales.
               </p>
             </div>
