@@ -18,7 +18,7 @@ public class AuthWallTests : IntegrationTestBase
     {
         nombre = "Test Project",
         ubicacionTexto = "Location",
-        categoria = 1,
+        categoriaId = 16,
         datosDesarrollador = "DevData",
         designacionCatastral = "CAT-123",
         usuarioCreadorId = userId

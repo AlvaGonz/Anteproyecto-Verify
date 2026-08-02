@@ -77,13 +77,13 @@ public class DuplicateDetectionTests
         var targetProjectId = Guid.NewGuid();
         var existingProjectId = Guid.NewGuid();
 
-        var targetProject = new Proyecto("Target", "Location", Guid.NewGuid());
+        var targetProject = new Proyecto("Target", "Location", Guid.NewGuid(), 16);
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(targetProject, targetProjectId);
         targetProject.UpdateDetails("Target", "Location", "GPS-123", null, 1, "Developer", "CAT-123");
         targetProject.UpdateRncYMatricula("RNC-123", "MAT-123");
 
         // Partial match: only 2 attributes match (Catastral and Matricula), GPS is different
-        var existingProject = new Proyecto("Existing", "Location", Guid.NewGuid());
+        var existingProject = new Proyecto("Existing", "Location", Guid.NewGuid(), 16);
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(existingProject, existingProjectId);
         existingProject.UpdateDetails("Existing", "Location", "GPS-999", null, 1, "Developer", "CAT-123");
         existingProject.UpdateRncYMatricula("RNC-123", "MAT-123");
@@ -113,7 +113,7 @@ public class DuplicateDetectionTests
         // Arrange
         var targetProjectId = Guid.NewGuid();
         
-        var targetProject = new Proyecto("Target", "Location", Guid.NewGuid());
+        var targetProject = new Proyecto("Target", "Location", Guid.NewGuid(), 16);
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(targetProject, targetProjectId);
         targetProject.UpdateDetails("Target", "Location", "GPS-123", null, 1, "Developer", "CAT-123");
         targetProject.UpdateRncYMatricula("RNC-123", "MAT-123");

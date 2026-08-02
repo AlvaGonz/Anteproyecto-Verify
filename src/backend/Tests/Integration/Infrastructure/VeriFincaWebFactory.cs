@@ -72,7 +72,7 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        await db.Database.EnsureCreatedAsync();
+        await db.Database.MigrateAsync();
         await AppDbContextSeeder.SeedAsync(Services);
     }
 }

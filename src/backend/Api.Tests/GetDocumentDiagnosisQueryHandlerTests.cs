@@ -53,7 +53,7 @@ public class GetDocumentDiagnosisQueryHandlerTests
         _fakeValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(validationResult));
 
-        var project = new Proyecto("Proyecto Residencial", "Santo Domingo", creatorId);
+        var project = new Proyecto("Proyecto Residencial", "Santo Domingo", creatorId, 16);
         _fakeProyectoRepository.GetByIdAsync(projectId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<Proyecto?>(project));
 
@@ -131,7 +131,7 @@ public class GetDocumentDiagnosisQueryHandlerTests
         _fakeValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(validationResult));
 
-        var project = new Proyecto("Proyecto Test", "Ubicación", creatorId);
+        var project = new Proyecto("Proyecto Test", "Ubicación", creatorId, 16);
         _fakeProyectoRepository.GetByIdAsync(projectId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<Proyecto?>(project));
 
@@ -161,7 +161,7 @@ public class GetDocumentDiagnosisQueryHandlerTests
         _fakeValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(validationResult));
 
-        var project = new Proyecto("Proyecto Test", "Ubicación", creatorId);
+        var project = new Proyecto("Proyecto Test", "Ubicación", creatorId, 16);
         _fakeProyectoRepository.GetByIdAsync(projectId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<Proyecto?>(project));
 
@@ -194,7 +194,7 @@ public class GetDocumentDiagnosisQueryHandlerTests
         _fakeValidator.ValidateAsync(query, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(validationResult));
 
-        var project = new Proyecto("Proyecto Test", "Ubicación", creatorId);
+        var project = new Proyecto("Proyecto Test", "Ubicación", creatorId, 16);
         _fakeProyectoRepository.GetByIdAsync(projectId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<Proyecto?>(project));
 

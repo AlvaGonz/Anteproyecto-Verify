@@ -289,7 +289,8 @@ public class ProjectService : IProjectService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Application.DTOs.Projects.ProyectoInteresDto>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default)    {
+    public async Task<IEnumerable<Application.DTOs.Projects.ProyectoInteresDto>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
         var misIntereses = await _proyectoRepository.GetInteresesByUsuarioAsync(usuarioId, cancellationToken);
         var interesadosEnMisProyectos = await _proyectoRepository.GetInteresadosInUserProjectsAsync(usuarioId, cancellationToken);
 
