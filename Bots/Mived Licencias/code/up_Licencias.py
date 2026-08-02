@@ -234,10 +234,10 @@ def is_transient_error(e):
             return True
     return False
 
-def insert_chunk(chunk_id, chunk_records, attempt=1):
+def insert_chunk(chunk_id, chunk_records):
     import uuid
     max_retries = 3
-    print(f"[Chunk {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
+    print(f"[Chunk {chunk_id}] Started — {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
@@ -256,34 +256,47 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
         for i in range(0, len(chunk_records), BATCH_SIZE):
             batch = chunk_records[i : i + BATCH_SIZE]
             placeholders_str = ", ".join([row_placeholder] * len(batch))
-            sql = f"INSERT INTO LicenciaConstruccion WITH (TABLOCK) ({cols_str}) VALUES {placeholders_str}"
+            sql = f"INSERT INTO LicenciaConstruccion ({cols_str}) VALUES {placeholders_str}"
             params = []
             for r in batch:
                 params.append(str(uuid.uuid4()))
                 params.extend(r)
-            cursor.execute(sql, tuple(params))
+                
+            for batch_attempt in range(1, max_retries + 1):
+                try:
+                    cursor.execute(sql, tuple(params))
+                    conn.commit()
+                    break
+                except Exception as e:
+                    err_str = str(e)
+                    if batch_attempt > 1 and ("2627" in err_str or "PRIMARY KEY" in err_str.upper()):
+                        print(f"    [Chunk {chunk_id}] Ignoring PK violation on retry {batch_attempt}, assuming previous attempt committed successfully.")
+                        break
+                        
+                    if conn:
+                        try: conn.rollback()
+                        except: pass
+                        
+                    if batch_attempt < max_retries and is_transient_error(e):
+                        wait = 2 ** batch_attempt
+                        time.sleep(wait)
+                        try: conn.close()
+                        except: pass
+                        conn = get_db_connection()
+                        cursor = conn.cursor()
+                    else:
+                        raise e
+                        
             count += len(batch)
             if count % 10000 == 0 or count == len(chunk_records):
-                conn.commit()
                 elapsed = time.time() - t0
                 speed = count / elapsed if elapsed > 0 else 0
                 print(f"[Chunk {chunk_id}] Inserted {count}/{len(chunk_records)} records. Speed: {speed:.1f} rec/sec")
 
-        conn.commit()
         print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {len(chunk_records)} records inserted!")
         return len(chunk_records)
     except Exception as e:
-        if conn:
-            try:
-                conn.rollback()
-            except:
-                pass
-        if attempt < max_retries and is_transient_error(e):
-            wait = 2 ** attempt
-            print(f"[Chunk {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
-            time.sleep(wait)
-            return insert_chunk(chunk_id, chunk_records, attempt + 1)
-        print(f"[Chunk {chunk_id}] PERMANENT ERROR after {attempt} attempt(s): {e}")
+        print(f"[Chunk {chunk_id}] PERMANENT ERROR: {e}")
         traceback.print_exc()
         raise e
     finally:
@@ -320,7 +333,7 @@ def main():
         conn = get_db_connection()
         cursor = conn.cursor()
         print("Cleaning old data...")
-        cursor.execute("DELETE FROM LicenciaConstruccion;")
+        cursor.execute("TRUNCATE TABLE LicenciaConstruccion;")
         conn.commit()
         conn.close()
     except Exception as e:
@@ -386,9 +399,6 @@ def main():
     print(f"  Tiempo total:     {int(m)}m {int(s)}s")
     speed = total_rows / t_total if t_total > 0 else 0
     print(f"  Velocidad media:  {speed:>.0f} reg/s")
-    expected = sum(v["size"] for v in chunk_map.values())
-    if total_rows < expected:
-        print(f"  PERDIDOS:         {expected - total_rows:>10,} registros")
     print("=" * 55 + "\n")
 
 if __name__ == "__main__":

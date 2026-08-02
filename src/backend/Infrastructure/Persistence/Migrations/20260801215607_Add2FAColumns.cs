@@ -85,6 +85,33 @@ namespace Infrastructure.Persistence.Migrations
             migrationBuilder.DropColumn(
                 name: "TwoFactorSecretEncrypted",
                 table: "Usuario");
+            migrationBuilder.DropColumn(
+                name: "EmailOtpLastSentUtc",
+                table: "Usuario");
+
+            migrationBuilder.DropColumn(
+                name: "Failed2FAAttempts",
+                table: "Usuario");
+
+            migrationBuilder.DropColumn(
+                name: "Last2FAVerifiedUtc",
+                table: "Usuario");
+
+            migrationBuilder.DropColumn(
+                name: "Lockout2FAUntilUtc",
+                table: "Usuario");
+
+            migrationBuilder.DropColumn(
+                name: "RecoveryCodesHashJson",
+                table: "Usuario");
+
+            migrationBuilder.DropColumn(
+                name: "TwoFactorEnabled",
+                table: "Usuario");
+
+            migrationBuilder.DropColumn(
+                name: "TwoFactorSecretEncrypted",
+                table: "Usuario");
         }
     }
 }

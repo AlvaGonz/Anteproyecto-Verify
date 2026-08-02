@@ -117,7 +117,8 @@ def wait_for_database():
 # wait_for_database() called in main()
 
 def get_db_connection():
-    hosts_to_try = [conn_params["server"], "localhost", "127.0.0.1", "sqlserver"]
+    # Try sqlserver first because in Docker that's the hostname, avoids 15s timeout
+    hosts_to_try = ["sqlserver", conn_params["server"], "localhost", "127.0.0.1"]
     seen = set()
     hosts_to_try = [x for x in hosts_to_try if x and not (x in seen or seen.add(x))]
     last_ex = None
