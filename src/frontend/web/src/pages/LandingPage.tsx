@@ -6,6 +6,7 @@ import { FeaturedProjectsSection } from "../features/public/components/FeaturedP
 import { MethodologySection } from "../features/public/components/MethodologySection";
 import { CtaSection } from "../features/public/components/CtaSection";
 import { LandingFooter } from "../features/public/components/LandingFooter";
+import { BackToTopButton } from "../shared/components/ui/BackToTopButton";
 
 export const LandingPage: React.FC = () => {
   return (
@@ -60,6 +61,7 @@ export const LandingPage: React.FC = () => {
       </main>
 
       <LandingFooter />
+      <BackToTopButton />
     </div>
   );
 };

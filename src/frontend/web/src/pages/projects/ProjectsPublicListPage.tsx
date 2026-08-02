@@ -27,6 +27,7 @@ import {
   PublicProjectSearchResultDto,
 } from "../../features/projects/api/usePublishedProjects";
 import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
+import { BackToTopButton } from "../../shared/components/ui/BackToTopButton";
 
 import { useProvinces } from "../../features/provinces/api/useProvinces";
 
@@ -554,6 +555,7 @@ export const ProjectsPublicListPage: React.FC = () => {
         </main>
 
         <LandingFooter />
+        <BackToTopButton />
       </div>
     </Suspense>
   );
