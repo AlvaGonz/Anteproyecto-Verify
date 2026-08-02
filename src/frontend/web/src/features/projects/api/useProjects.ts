@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
 import type { ProyectoDto, CreateProyectoDto, LegalStatus } from "../types";
-import { ProjectCategory } from "../types";
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -20,7 +19,8 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   ubicacionTexto: apiProj.ubicacionTexto || "",
   ubicacionGps: apiProj.ubicacionGps,
   valorEstimado: apiProj.valorEstimado,
-  categoria: apiProj.categoria,
+  categoriaId: apiProj.categoriaId,
+  categoriaNombre: apiProj.categoriaNombre,
   datosDesarrollador: apiProj.datosDesarrollador,
   rncDesarrollador: apiProj.rncDesarrollador,
   designacionCatastral: apiProj.designacionCatastral,
@@ -39,6 +39,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   imagenAdicional5: apiProj.imagenAdicional5,
   planNombre: apiProj.planNombre || null,
   registradoPor: apiProj.registradoPor || null,
+  superficieM2: apiProj.superficieM2,
 });
 
 interface PaginatedProjectsResponse {
@@ -116,7 +117,6 @@ export const useCreateProject = () => {
       apiClient
         .post<ApiProyectoDto>("/projects", {
           ...data,
-          categoria: data.categoria ?? ProjectCategory.Residencial,
         })
         .then((res) => mapApiProject(res.data)),
     onSuccess: async () => {

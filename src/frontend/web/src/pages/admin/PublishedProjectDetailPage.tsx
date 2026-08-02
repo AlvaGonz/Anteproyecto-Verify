@@ -277,7 +277,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   const uniqueImgs = allImgs.length > 0
     ? Array.from(new Set(allImgs))
-    : [getDefaultProjectImage(project?.categoria as unknown as number)];
+    : [getDefaultProjectImage(project?.categoriaId as number)];
 
   // Parse GPS coordinates
   let gpsLat: number | null = null;
@@ -459,7 +459,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-slate-700">Estado: <span className="font-bold">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span></p>
-                <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{project.categoria === 1 ? "Construcción" : project.categoria === 2 ? "Comercio" : project.categoria === 3 ? "Turismo" : "N/D"}</span></p>
+                <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{project.categoriaNombre || "N/D"}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Integridad: <span className="font-bold">{getIntegrityLabel()}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Ubicación: <span className="font-bold">{project.ubicacionTexto || "N/D"}</span></p>
               </div>
@@ -530,7 +530,11 @@ export const PublishedProjectDetailPage: React.FC = () => {
                 </div>
                 <div className="flex border-b border-slate-200 pb-1">
                   <span className="font-bold text-slate-700 w-1/2">Categoría:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.categoria === 1 ? "Construcción" : project.categoria === 2 ? "Comercio" : "Turismo"}</span>
+                  <span className="text-slate-600 w-1/2 truncate">{project.categoriaNombre || "N/D"}</span>
+                </div>
+                <div className="flex border-b border-slate-200 pb-1">
+                  <span className="font-bold text-slate-700 w-1/2">Superficie M²:</span>
+                  <span className="text-slate-600 w-1/2 truncate">{project.superficieM2 != null ? `${project.superficieM2.toLocaleString("es-DO")} m²` : "N/D"}</span>
                 </div>
                 <div className="flex border-b border-slate-200 pb-1">
                   <span className="font-bold text-slate-700 w-1/2">Estado:</span>

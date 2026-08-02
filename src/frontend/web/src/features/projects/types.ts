@@ -19,7 +19,8 @@ export interface ProyectoDto {
   ubicacionTexto: string;
   ubicacionGps?: string;
   valorEstimado?: number;
-  categoria: ProjectCategory;
+  categoriaId: number;
+  categoriaNombre: string;
   datosDesarrollador?: string;
   rncDesarrollador?: string;
   designacionCatastral?: string;
@@ -54,7 +55,7 @@ export interface CreateProyectoDto {
   nombre: string;
   ubicacionTexto: string;
   usuarioCreadorId: string;
-  categoria?: ProjectCategory;
+  categoriaId?: number;
   datosDesarrollador?: string;
   rncDesarrollador?: string;
   designacionCatastral?: string;
@@ -78,7 +79,7 @@ export interface UpdateProyectoDto {
   ubicacionTexto: string;
   ubicacionGps?: string;
   valorEstimado?: number;
-  categoria: ProjectCategory;
+  categoriaId: number;
   datosDesarrollador?: string;
   rncDesarrollador?: string;
   designacionCatastral?: string;
@@ -97,13 +98,7 @@ export interface UpdateProyectoDto {
   imagenAdicional5?: string;
 }
 
-export enum ProjectCategory {
-  Residencial = 1,
-  Comercial = 2,
-  Turistico = 3,
-  Mixto = 4,
-  Otro = 99
-}
+
 
 export enum ProjectStatus {
   Draft = 'CREADO',
@@ -198,4 +193,10 @@ export interface CatastroLookupDto {
   ipi?: string;
   estatusIpi?: string;
   provincia?: string;
+}
+
+export interface CategoriaProyectoDto {
+  id: number;
+  nombre: string;
+  descripcion?: string | null;
 }

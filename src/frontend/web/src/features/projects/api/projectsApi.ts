@@ -8,6 +8,7 @@ import {
   ProjectError,
   CatastroLookupDto,
   StatusEligibility,
+  CategoriaProyectoDto,
 } from "../types";
 import { Result, success, failure } from "@/shared/utils/functional";
 
@@ -45,6 +46,15 @@ export const projectsApi = {
         return failure(mapped);
       }
       return failure({ _tag: "ServerError", message: error.message || "Server Error" });
+    }
+  },
+
+  async getCategories(): Promise<Result<CategoriaProyectoDto[], ProjectError>> {
+    try {
+      const response = await apiClient.get<CategoriaProyectoDto[]>("/projects/categories");
+      return success(response.data);
+    } catch (error: any) {
+      return failure(mapError(error));
     }
   },
 

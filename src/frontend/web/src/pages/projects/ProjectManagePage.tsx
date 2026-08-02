@@ -64,8 +64,8 @@ export const ProjectManagePage: React.FC = () => {
     try {
       validateProjectData(data);
       if (isEditing) {
-        if (data.categoria == null) {
-          throw new Error("Missing required field: categoria");
+        if (data.categoriaId == null) {
+          throw new Error("Missing required field: categoriaId");
         }
         setIsSaving(true);
         await updateMutation.mutateAsync({ id: id as string, payload: data });
@@ -79,7 +79,7 @@ export const ProjectManagePage: React.FC = () => {
         await createMutation.mutateAsync({
           nombre: data.nombre,
           ubicacionTexto: data.ubicacionTexto || "",
-          categoria: data.categoria,
+          categoriaId: data.categoriaId,
           usuarioCreadorId: data.usuarioCreadorId,
           datosDesarrollador: data.datosDesarrollador,
           rncDesarrollador: data.rncDesarrollador,

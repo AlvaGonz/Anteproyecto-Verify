@@ -3,20 +3,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { updateProjectSchema, type UpdateProjectFormValues } from "../schemas";
 import { useUpdateProject } from "../api/useProjectMutations";
-import { ProjectCategory, type ProyectoDto, type UpdateProyectoDto } from "../types";
+import { type ProyectoDto, type UpdateProyectoDto } from "../types";
 import { FormField } from "@/components/ui/FormField";
 import { useCedulaInput } from "@/shared/hooks/useCedulaInput";
 import { ProjectPhotosSection } from "./ProjectPhotosSection";
 import { useDgiiLookup } from "@/shared/hooks/useDgiiLookup";
 import { useEffect } from "react";
 
-const CATEGORY_LABELS: Record<ProjectCategory, string> = {
-  [ProjectCategory.Residencial]: "Residencial",
-  [ProjectCategory.Comercial]: "Comercial",
-  [ProjectCategory.Turistico]: "Turístico",
-  [ProjectCategory.Mixto]: "Mixto",
-  [ProjectCategory.Otro]: "Otro",
-};
+import { useCategories } from "../api/useCategories";
 
 interface EditProjectFormProps {
   project: ProyectoDto;
@@ -26,6 +20,7 @@ interface EditProjectFormProps {
 export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) => {
   const navigate = useNavigate();
   const { mutate: updateProject, isPending, error } = useUpdateProject(project.id);
+  const { data: categorias = [] } = useCategories();
 
   const { register, handleSubmit, formState: { errors }, setValue } =
     useForm<UpdateProjectFormValues>({
@@ -34,7 +29,7 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
         nombre: project.nombre,
         ubicacionTexto: project.ubicacionTexto,
         ubicacionGps: project.ubicacionGps ?? "",
-        categoria: project.categoria,
+        categoriaId: project.categoriaId,
         valorEstimado: project.valorEstimado,
         datosDesarrollador: project.datosDesarrollador ?? "",
         rncDesarrollador: project.rncDesarrollador ?? "",
@@ -103,12 +98,13 @@ export const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) =>
           {...register("ubicacionGps")} />
       </FormField>
 
-      <FormField label="Categoría" htmlFor="categoria" error={errors.categoria?.message} required>
-        <select id="categoria"
+      <FormField label="Categoría" htmlFor="categoriaId" error={errors.categoriaId?.message} required>
+        <select id="categoriaId"
           className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-          {...register("categoria", { valueAsNumber: true })} >
-          {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
-            <option key={val} value={val}>{label}</option>
+          {...register("categoriaId", { valueAsNumber: true })} >
+          <option value="">Seleccione una categoría</option>
+          {categorias.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
           ))}
         </select>
       </FormField>

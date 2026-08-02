@@ -1,4 +1,4 @@
-import { ProjectCategory, ProjectStatus, IntegrityStatus, ProjectRegistrant } from "../types";
+import { ProjectStatus, IntegrityStatus, ProjectRegistrant } from "../types";
 
 export interface ProyectoDto {
   id: string;
@@ -7,7 +7,8 @@ export interface ProyectoDto {
   ubicacionTexto: string;
   ubicacionGps?: string;
   valorEstimado?: number;
-  categoria: ProjectCategory;
+  categoriaId: number;
+  categoriaNombre: string;
   datosDesarrollador?: string;
   rncDesarrollador?: string;
   designacionCatastral?: string;
@@ -25,6 +26,7 @@ export interface ProyectoDto {
   imagenAdicional3?: string;
   imagenAdicional4?: string;
   imagenAdicional5?: string;
+  superficieM2?: number;
   planNombre?: string | null;
   registradoPor?: ProjectRegistrant | null;
 }

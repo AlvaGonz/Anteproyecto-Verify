@@ -4,17 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { createProjectSchema, type CreateProjectFormValues } from "../schemas";
 import { useCreateProject } from "../api/useProjectMutations";
-import { ProjectCategory } from "../types";
+import { useCategories } from "../api/useCategories";
 import { FormField } from "@/components/ui/FormField";
-
-const CATEGORY_LABELS: Record<ProjectCategory, string> = {
-  [ProjectCategory.Residencial]: "Residencial",
-  [ProjectCategory.Comercial]: "Comercial",
-  [ProjectCategory.Turistico]: "Turístico",
-  [ProjectCategory.Mixto]: "Mixto",
-  [ProjectCategory.Otro]: "Otro",
-};
-
 interface CreateProjectFormProps {
   onSuccess?: (id: string) => void;
 }
@@ -22,6 +13,7 @@ interface CreateProjectFormProps {
 export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
   const navigate = useNavigate();
   const { mutate: createProject, isPending, error } = useCreateProject();
+  const { data: categorias = [] } = useCategories();
 
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -68,13 +60,13 @@ export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
           {...register("ubicacionTexto")} />
       </FormField>
 
-      <FormField label="Categoría" htmlFor="categoria" error={errors.categoria?.message} required>
-        <select id="categoria"
+      <FormField label="Categoría" htmlFor="categoriaId" error={errors.categoriaId?.message} required>
+        <select id="categoriaId"
           className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-          {...register("categoria", { valueAsNumber: true })}>
+          {...register("categoriaId", { valueAsNumber: true })}>
           <option value="">Seleccione una categoría</option>
-          {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
-            <option key={val} value={val}>{label}</option>
+          {categorias.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
           ))}
         </select>
       </FormField>

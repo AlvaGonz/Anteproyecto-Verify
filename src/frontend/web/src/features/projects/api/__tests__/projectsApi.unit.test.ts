@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { projectsApi } from "../projectsApi";
-import {
   ProjectStatus,
-  ProjectCategory,
   IntegrityStatus,
 } from "../../types";
 
@@ -62,7 +60,7 @@ const MOCK_PROJECT = {
   codigoInterno: "VF-001-2026",
   nombre: "Residencial Las Palmas",
   ubicacionTexto: "La Romana, RD",
-  categoria: ProjectCategory.Residencial,
+  categoriaId: 1,
   estadoProyecto: ProjectStatus.Draft,
   estadoIntegridad: IntegrityStatus.Pending,
   usuarioCreadorId: "user-001",
@@ -73,13 +71,13 @@ const MOCK_CREATE_DTO = {
   nombre: "Nuevo Proyecto Test",
   ubicacionTexto: "Santo Domingo, RD",
   usuarioCreadorId: "user-001",
-  categoria: ProjectCategory.Comercial,
+  categoriaId: 2,
 };
 
 const MOCK_UPDATE_DTO = {
   nombre: "Proyecto Actualizado",
   ubicacionTexto: "Santiago, RD",
-  categoria: ProjectCategory.Mixto,
+  categoriaId: 4,
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────

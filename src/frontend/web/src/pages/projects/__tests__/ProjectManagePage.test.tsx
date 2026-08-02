@@ -11,7 +11,6 @@ import { ProjectActionBarProvider, ProjectActionBar } from "../../../features/pr
 import { projectsApi } from "../../../features/projects/api/projectsApi";
 import {
   ProjectStatus,
-  ProjectCategory,
   IntegrityStatus,
 } from "../../../features/projects/types";
 
@@ -250,7 +249,7 @@ const MOCK_PROJECT = {
   codigoInterno: "VF-001-2026",
   nombre: "Residencial Las Palmas",
   ubicacionTexto: "La Romana, RD",
-  categoria: ProjectCategory.Residencial,
+  categoriaId: 1,
   estadoProyecto: ProjectStatus.Draft,
   estadoIntegridad: IntegrityStatus.Pending,
   usuarioCreadorId: "user-001",

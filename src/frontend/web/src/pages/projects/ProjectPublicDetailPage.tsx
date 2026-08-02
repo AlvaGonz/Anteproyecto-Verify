@@ -2,7 +2,6 @@ import React from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   IntegrityStatus,
-  ProjectCategory,
 } from "../../features/projects/types";
 import { useProject } from "../../features/projects/api/useProjects";
 import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
@@ -36,15 +35,7 @@ import { LimitReachedModal } from "../../features/projects/components/LimitReach
 import { usePlanLimits } from "../../features/settings/api/useSettings";
 import { DocumentosModal } from "../../features/documents/components/DocumentosModal";
 
-const getCategoryLabel = (cat: ProjectCategory) => {
-  switch (cat) {
-    case ProjectCategory.Residencial: return "Residencial Premium";
-    case ProjectCategory.Comercial: return "Comercial";
-    case ProjectCategory.Turistico: return "Turístico";
-    case ProjectCategory.Mixto: return "Mixto";
-    default: return "Otro";
-  }
-};
+
 
 const getIntegrityInfo = (status: IntegrityStatus) => {
   switch (status) {
@@ -387,9 +378,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     <Layers className="w-3.5 h-3.5" />
                     <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Clasificación de Activo</span>
                   </div>
-                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic">
-                    {getCategoryLabel(project.categoria).toUpperCase()}
-                  </p>
+                    {project.categoriaNombre?.toUpperCase()}
                 </div>
                 <div className="space-y-1 group">
                   <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
@@ -398,6 +387,15 @@ export const ProjectPublicDetailPage: React.FC = () => {
                   </div>
                   <p className="text-lg md:text-xl font-black text-primary leading-none tracking-tight font-display italic">
                     {project.valorEstimado ? `RD$ ${(project.valorEstimado).toLocaleString()}` : "SUJETO A TASACIÓN"}
+                  </p>
+                </div>
+                <div className="space-y-1 group">
+                  <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Superficie M²</span>
+                  </div>
+                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic">
+                    {project.superficieM2 != null ? `${project.superficieM2.toLocaleString()} m²` : "VER EXPEDIENTE"}
                   </p>
                 </div>
               </div>
@@ -409,7 +407,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 <div className="w-2 h-8 bg-primary rounded-full"></div>
                 <h2 className="text-2xl md:text-3xl font-display font-black text-secondary italic tracking-tighter uppercase">Estatus de Expediente</h2>
               </div>
-              <ProjectDocumentStatus projectId={project.id} projectCategory={project.categoria} />
+              <ProjectDocumentStatus projectId={project.id} categoriaId={project.categoriaId} />
             </div>
           </div>
 

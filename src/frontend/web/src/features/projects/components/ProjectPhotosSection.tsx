@@ -22,7 +22,7 @@ const mapToUpdateDto = (project: ProyectoDto): UpdateProyectoDto => ({
   ubicacionTexto: project.ubicacionTexto,
   ubicacionGps: project.ubicacionGps,
   valorEstimado: project.valorEstimado,
-  categoria: project.categoria,
+  categoriaId: project.categoriaId,
   datosDesarrollador: project.datosDesarrollador,
   rncDesarrollador: project.rncDesarrollador,
   designacionCatastral: project.designacionCatastral,

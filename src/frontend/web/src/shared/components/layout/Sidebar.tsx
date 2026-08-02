@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -38,7 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = usePrefersReducedMotion();
 
   const maxProjects = user?.role === "admin" ? 999999 : (user?.maxProyectos ?? 1);
   const isAtLimit = maxProjects !== 999999 && projectCount >= maxProjects;

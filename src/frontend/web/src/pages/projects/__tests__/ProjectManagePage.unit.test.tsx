@@ -100,7 +100,7 @@ vi.mock("../../../features/projects/components/ProjectForm", () => ({
           onSubmit({
             nombre: "Test Project",
             ubicacionTexto: "Santo Domingo",
-            categoria: ProjectCategory.Residencial,
+            categoriaId: 1,
             usuarioCreadorId: "user-123",
           }).catch(() => {})
         }
@@ -113,7 +113,7 @@ vi.mock("../../../features/projects/components/ProjectForm", () => ({
           onSubmit({
             nombre: "Test Project",
             ubicacionTexto: "Santo Domingo",
-            categoria: ProjectCategory.Residencial,
+            categoriaId: 1,
           }).catch(() => {})
         }
       >
@@ -125,7 +125,7 @@ vi.mock("../../../features/projects/components/ProjectForm", () => ({
           onSubmit({
             nombre: "Test Project",
             ubicacionTexto: "Santo Domingo",
-            categoria: null,
+            categoriaId: undefined as any,
           }).catch(() => {})
         }
       >
@@ -138,10 +138,7 @@ vi.mock("../../../features/projects/components/ProjectForm", () => ({
   ),
 }));
 
-// ProjectCategory enum helper since it is imported inside ProjectForm mock
-enum ProjectCategory {
-  Residencial = 1,
-}
+
 
 describe("ProjectManagePage", () => {
   let queryClient: QueryClient;
@@ -200,7 +197,7 @@ describe("ProjectManagePage", () => {
         codigoInterno: "PRJ-new",
         nombre: "Test Project",
         ubicacionTexto: "Santo Domingo",
-        categoria: ProjectCategory.Residencial,
+        categoriaId: 1,
         estadoProyecto: ProjectStatus.Draft,
         estadoIntegridad: IntegrityStatus.Pending,
         usuarioCreadorId: "user-123",
@@ -229,7 +226,7 @@ describe("ProjectManagePage", () => {
         codigoInterno: "PRJ-new",
         nombre: "Test Project",
         ubicacionTexto: "Santo Domingo",
-        categoria: ProjectCategory.Residencial,
+        categoriaId: 1,
         estadoProyecto: ProjectStatus.Draft,
         estadoIntegridad: IntegrityStatus.Pending,
         usuarioCreadorId: "user-123",

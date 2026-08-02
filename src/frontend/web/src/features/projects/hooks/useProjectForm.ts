@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto, ProjectCategory } from "../types";
+import { CreateProyectoDto, UpdateProyectoDto, ProyectoDto } from "../types";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { apiClient } from "../../../infrastructure/api/client";
 import { projectsApi } from "../api/projectsApi";
 import { isSuccess } from "@/shared/utils/functional";
 import { getProjectErrorMessage } from "../types";
 import { useProvinces } from "../../provinces/api/useProvinces";
+import { useCategories } from "../api/useCategories";
 
 // Fix Leaflet default marker icon paths broken by Vite's asset bundler
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -74,12 +75,14 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const provinciasRef = useRef(provincias);
   provinciasRef.current = provincias;
 
+  const { data: categorias = [] } = useCategories();
+
   // ── Fields State ──────────────────────────────────────────────────────────
   const [nombre, setNombre] = useState(initialData?.nombre ?? "");
   const [ubicacionTexto, setUbicacionTexto] = useState(initialData?.ubicacionTexto ?? "");
   const [ubicacionGps, setUbicacionGps] = useState(initialData?.ubicacionGps ?? "");
   const [valorEstimado, setValorEstimado] = useState<number | "">(initialData?.valorEstimado ?? "");
-  const [categoria, setCategoria] = useState<ProjectCategory>(initialData?.categoria ?? ProjectCategory.Residencial);
+  const [categoriaId, setCategoriaId] = useState<number>(initialData?.categoriaId ?? 16); // 16 = VIVIENDAS
   const [datosDesarrollador, setDatosDesarrollador] = useState(initialData?.datosDesarrollador ?? "");
   const [rncDesarrollador, setRncDesarrollador] = useState(initialData?.rncDesarrollador ?? "");
   const [designacionCatastral, setDesignacionCatastral] = useState(initialData?.designacionCatastral ?? "");
@@ -515,7 +518,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           ubicacionTexto,
           ubicacionGps: ubicacionGps || undefined,
           valorEstimado: valorEstimado === "" ? undefined : Number(valorEstimado),
-          categoria,
+          categoriaId,
           datosDesarrollador: datosDesarrollador || undefined,
           rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
@@ -538,7 +541,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           nombre,
           ubicacionTexto,
           usuarioCreadorId: user?.id ?? "00000000-0000-0000-0000-000000000000",
-          categoria,
+          categoriaId,
           datosDesarrollador: datosDesarrollador || undefined,
           rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
@@ -590,7 +593,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       nombre, setNombre, nombreTouched, setNombreTouched,
       ubicacionTexto, setUbicacionTexto, ubicacionTouched, setUbicacionTouched,
       setUbicacionGps, setDesignacionCatastral,
-      categoria, setCategoria,
+      categoriaId, setCategoriaId, categorias,
       rncDesarrollador, setRncDesarrollador, rncError, setRncError,
       isSearchingRnc, handleRncSearch,
       datosDesarrollador, setDatosDesarrollador,

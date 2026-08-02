@@ -1,5 +1,5 @@
 import React from "react";
-import { ProjectCategory } from "../types";
+import { CategoriaProyectoDto } from "../types";
 
 export function formatRncCedula(value: string): string {
   const digits = value.replace(/\D/g, '').slice(0, 11);
@@ -24,8 +24,9 @@ interface ProjectFormBasicFieldsProps {
   setUbicacionTouched: (v: boolean) => void;
   setUbicacionGps: (v: string) => void;
   setDesignacionCatastral: (v: string) => void;
-  categoria: ProjectCategory;
-  setCategoria: (v: ProjectCategory) => void;
+  categoriaId: number;
+  setCategoriaId: (v: number) => void;
+  categorias: CategoriaProyectoDto[];
   rncDesarrollador: string;
   setRncDesarrollador: (v: string) => void;
   rncError: string | null;
@@ -50,8 +51,9 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
   setUbicacionTouched,
   setUbicacionGps,
   setDesignacionCatastral,
-  categoria,
-  setCategoria,
+  categoriaId,
+  setCategoriaId,
+  categorias,
   rncDesarrollador,
   setRncDesarrollador,
   rncError,
@@ -124,22 +126,20 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
       )}
     </div>
 
-    {/* Categoría */}
     <div>
       <label htmlFor="categoria" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
         Categoria del Proyecto
       </label>
       <select
         id="categoria"
-        value={categoria}
-        onChange={(e) => setCategoria(Number(e.target.value) as ProjectCategory)}
+        value={categoriaId}
+        onChange={(e) => setCategoriaId(Number(e.target.value))}
         className="vf-input"
       >
-        <option value={ProjectCategory.Residencial}>Residencial</option>
-        <option value={ProjectCategory.Comercial}>Comercial</option>
-        <option value={ProjectCategory.Turistico}>Turístico</option>
-        <option value={ProjectCategory.Mixto}>Mixto</option>
-        <option value={ProjectCategory.Otro}>Otro</option>
+        <option value={0} disabled>-- Seleccione una categoría --</option>
+        {categorias.map((cat) => (
+          <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+        ))}
       </select>
     </div>
 
