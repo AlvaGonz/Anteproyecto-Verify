@@ -16,6 +16,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
 using Moq;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace UnitTests.Api.Controllers
         private readonly Mock<IUsuarioRepository> _mockUsuarioRepository;
         private readonly Mock<IBlobStorageService> _mockBlobStorageService;
         private readonly Mock<global::Application.Contracts.Documents.IDocumentService> _mockDocumentService;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly AppDbContext _dbContext;
         private readonly ProjectsController _controller;
 
@@ -36,6 +38,7 @@ namespace UnitTests.Api.Controllers
             _mockUsuarioRepository = new Mock<IUsuarioRepository>();
             _mockBlobStorageService = new Mock<IBlobStorageService>();
             _mockDocumentService = new Mock<global::Application.Contracts.Documents.IDocumentService>();
+            _mockMediator = new Mock<IMediator>();
 
             // Use in-memory database for testing
             var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -48,7 +51,8 @@ namespace UnitTests.Api.Controllers
                 _mockUsuarioRepository.Object,
                 _mockBlobStorageService.Object,
                 _mockDocumentService.Object,
-                _dbContext)
+                _dbContext,
+                _mockMediator.Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -89,7 +93,8 @@ private ProyectoDto CreateProyectoDto(Guid id, Guid usuarioCreadorId, string est
                 ImagenAdicional4: null,
                 ImagenAdicional5: null,
                 ValorEstimado: null,
-                Categoria: ProjectCategory.Residencial,
+                CategoriaId: 16,
+                CategoriaNombre: "VIVIENDAS",
                 DatosDesarrollador: "Constructora ABC",
                 RncDesarrollador: "1-01-001",
                 DesignacionCatastral: "CAT-123",

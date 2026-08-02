@@ -51,7 +51,7 @@ public class Proyecto : EntityBase
 
     private Proyecto() { } // For EF Core
 
-    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, int categoriaId = 1, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
+    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, int categoriaId, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -134,6 +134,14 @@ public class Proyecto : EntityBase
     {
         RncDesarrollador = rnc;
         Matricula = matricula;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AsignarCategoria(CategoriaProyecto categoria)
+    {
+        if (categoria == null) throw new ArgumentNullException(nameof(categoria));
+        CategoriaId = categoria.Id;
+        CategoriaProyecto = categoria;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

@@ -37,7 +37,7 @@ public class SealIssuanceTests : IntegrationTestBase
                 "Seal Issuance Test Project", 
                 "Location", 
                 user.Id, 
-                ProjectCategory.Residencial, 
+                16, 
                 "Dev Data", 
                 "CAT-SEAL-ISSUE");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");
@@ -79,7 +79,7 @@ public class SealIssuanceTests : IntegrationTestBase
                 "Duplicate Seal Project", 
                 "Location", 
                 user.Id, 
-                ProjectCategory.Residencial, 
+                16, 
                 "Dev Data", 
                 "CAT-SEAL-DUP");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");

@@ -54,7 +54,7 @@ public class DeleteUserTests : IntegrationTestBase
             db.LogConsultas.Add(new LogConsulta(victimId, true, "test"));
 
             var estado = await db.ProyectoEstados.FirstAsync();
-            var proyecto = new Proyecto("Proyecto Test", "Santo Domingo", adminId, ProjectCategory.Residencial, null, "DC-123");
+            var proyecto = new Proyecto("Proyecto Test", "Santo Domingo", adminId, 16, null, "DC-123");
             proyecto.UpdateEstado(estado.Id);
             db.Proyectos.Add(proyecto);
             await db.SaveChangesAsync();

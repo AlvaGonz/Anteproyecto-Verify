@@ -37,7 +37,7 @@ public class PublicSealVerificationTests : IntegrationTestBase
                 "Test Project for Seal", 
                 "Location", 
                 user.Id, 
-                ProjectCategory.Residencial, 
+                16, 
                 "Dev Data", 
                 "CAT-SEAL");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");

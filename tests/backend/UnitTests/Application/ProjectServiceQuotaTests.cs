@@ -26,7 +26,7 @@ public class ProjectServiceQuotaTests
 
     private static global::Application.DTOs.CreateProyectoDto MakeDto(Guid userId) => new(
         "Test Project", "Santo Domingo", userId,
-        ProjectCategory.Residencial, "Developer SA", "CAT-001");
+        16, "Developer SA", "CAT-001");
 
     [Fact]
     public async Task CreateProject_UserNotFound_ThrowsUnauthorized()

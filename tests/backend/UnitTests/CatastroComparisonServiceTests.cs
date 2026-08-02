@@ -20,8 +20,8 @@ public class CatastroComparisonServiceTests
     public void Compare_ShouldReturnNoDiscrepancies_WhenDataMatches()
     {
         // Arrange
-        var proyecto = new Proyecto("Test", "Loc", Guid.NewGuid(), ProjectCategory.Residencial, null, "DC-123");
-        proyecto.UpdateDetails("Test", "Loc", "18.0,-69.0", null, ProjectCategory.Residencial, null, "DC-123");
+        var proyecto = new Proyecto("Test", "Loc", Guid.NewGuid(), 16, null, "DC-123");
+        proyecto.UpdateDetails("Test", "Loc", "18.0,-69.0", null, 16, null, "DC-123");
 
         var catastroData = new CatastroResponseDto
         {
@@ -43,8 +43,8 @@ public class CatastroComparisonServiceTests
     public void Compare_ShouldReturnDiscrepancies_WhenGpsDiffers()
     {
         // Arrange
-        var proyecto = new Proyecto("Test", "Loc", Guid.NewGuid(), ProjectCategory.Residencial, null, "DC-123");
-        proyecto.UpdateDetails("Test", "Loc", "18.0,-69.0", null, ProjectCategory.Residencial, null, "DC-123");
+        var proyecto = new Proyecto("Test", "Loc", Guid.NewGuid(), 16, null, "DC-123");
+        proyecto.UpdateDetails("Test", "Loc", "18.0,-69.0", null, 16, null, "DC-123");
 
         var catastroData = new CatastroResponseDto
         {
@@ -66,8 +66,8 @@ public class CatastroComparisonServiceTests
     public void Compare_ShouldReturnDiscrepancies_WhenDesignacionDiffers()
     {
         // Arrange
-        var proyecto = new Proyecto("Test", "Loc", Guid.NewGuid(), ProjectCategory.Residencial, null, "DC-123");
-        proyecto.UpdateDetails("Test", "Loc", "18.0,-69.0", null, ProjectCategory.Residencial, null, "DC-123");
+        var proyecto = new Proyecto("Test", "Loc", Guid.NewGuid(), 16, null, "DC-123");
+        proyecto.UpdateDetails("Test", "Loc", "18.0,-69.0", null, 16, null, "DC-123");
 
         var catastroData = new CatastroResponseDto
         {

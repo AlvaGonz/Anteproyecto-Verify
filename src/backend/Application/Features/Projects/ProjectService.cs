@@ -93,6 +93,8 @@ public class ProjectService : IProjectService
                 "Límite de proyectos alcanzado para su plan actual. Considere mejorar su plan.");
         }
 
+        var categoria = await ValidateCategoriaAsync(dto.CategoriaId, cancellationToken);
+
         var estadoCreado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Creado, cancellationToken);
         if (estadoCreado == null)
         {
@@ -101,6 +103,7 @@ public class ProjectService : IProjectService
         }
 
         var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        proyecto.AsignarCategoria(categoria);
         proyecto.UpdateEstado(estadoCreado);
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {
@@ -125,7 +128,10 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
+        var categoria = await ValidateCategoriaAsync(dto.CategoriaId, cancellationToken);
+
         proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        proyecto.AsignarCategoria(categoria);
         proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
 
         // Auto-promote CREADO → EDITADO when the expediente is modified
@@ -283,8 +289,7 @@ public class ProjectService : IProjectService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Application.DTOs.Projects.ProyectoInteresDto>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default)
-    {
+    public async Task<IEnumerable<Application.DTOs.Projects.ProyectoInteresDto>> GetProyectosInteresesAsync(Guid usuarioId, CancellationToken cancellationToken = default)    {
         var misIntereses = await _proyectoRepository.GetInteresesByUsuarioAsync(usuarioId, cancellationToken);
         var interesadosEnMisProyectos = await _proyectoRepository.GetInteresadosInUserProjectsAsync(usuarioId, cancellationToken);
 
@@ -333,6 +338,20 @@ public class ProjectService : IProjectService
     {
         var guardados = await _proyectoRepository.GetGuardadosByUsuarioAsync(usuarioId, cancellationToken);
         return guardados.Select(g => MapToDto(g.Project));
+    }
+
+    private async Task<CategoriaProyecto> ValidateCategoriaAsync(int categoriaId, CancellationToken cancellationToken)
+    {
+        var categorias = await _proyectoRepository.GetCategoriasAsync(cancellationToken);
+        var categoria = categorias.FirstOrDefault(c => c.Id == categoriaId);
+        if (categoria == null || !categoria.Activo)
+        {
+            throw new ArgumentException(
+                "La categoría seleccionada no existe o está inactiva.",
+                nameof(Proyecto.CategoriaId));
+        }
+
+        return categoria;
     }
 
     private static ProyectoDto MapToDto(Proyecto proyecto)

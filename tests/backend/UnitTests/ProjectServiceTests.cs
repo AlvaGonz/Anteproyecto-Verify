@@ -41,7 +41,7 @@ public class ProjectServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var dto = new CreateProyectoDto("Test", "Location", userId, ProjectCategory.Comercial, "DevData", null, "DC-123");
+        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123");
         
         var plan = Tests.Shared.TestPlanFactory.Profesional();
         var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
@@ -51,6 +51,11 @@ public class ProjectServiceTests
         
         _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
         var estadoCreado = new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8");
+        _proyectoRepositoryMock.Setup(r => r.GetCategoriasAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CategoriaProyecto>
+            {
+                new CategoriaProyecto { Id = 8, Nombre = "COMERCIAL Y OFICINAS", Activo = true },
+            });
         _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, It.IsAny<CancellationToken>()))
             .ReturnsAsync(estadoCreado);
         _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
@@ -63,7 +68,8 @@ public class ProjectServiceTests
         Assert.NotNull(result);
         Assert.Equal("Test", result.Nombre);
         Assert.Equal("Location", result.UbicacionTexto);
-        Assert.Equal(ProjectCategory.Comercial, result.Categoria);
+        Assert.Equal(8, result.CategoriaId);
+        Assert.Equal("COMERCIAL Y OFICINAS", result.CategoriaNombre);
         Assert.Equal("DevData", result.DatosDesarrollador);
         Assert.Equal("DC-123", result.DesignacionCatastral);
         Assert.Equal(ProjectStatusCodes.Creado, result.EstadoProyecto);
@@ -76,11 +82,16 @@ public class ProjectServiceTests
         var id = Guid.NewGuid();
         var estadoCreado = new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8");
         var estadoEditado = new ProyectoEstado(ProjectStatusCodes.Editado, "Editado", "desc", "cond", "#F98513");
-        var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
+        var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid(), 12);
         proyecto.UpdateEstado(estadoCreado);
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null, null, null, null, null, null);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, 12, "NewDev", null, "NewDC", null, null, null, null, null, null);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
+        _proyectoRepositoryMock.Setup(r => r.GetCategoriasAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CategoriaProyecto>
+            {
+                new CategoriaProyecto { Id = 12, Nombre = "HOSPEDAJE", Activo = true },
+            });
         _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Editado, It.IsAny<CancellationToken>()))
             .ReturnsAsync(estadoEditado);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -93,7 +104,8 @@ public class ProjectServiceTests
         Assert.Equal("New", result.Nombre);
         Assert.Equal("NewLoc", result.UbicacionTexto);
         Assert.Equal(1000, result.ValorEstimado);
-        Assert.Equal(ProjectCategory.Turistico, result.Categoria);
+        Assert.Equal(12, result.CategoriaId);
+        Assert.Equal("HOSPEDAJE", result.CategoriaNombre);
         Assert.Equal("NewDev", result.DatosDesarrollador);
         Assert.Equal("NewDC", result.DesignacionCatastral);
         Assert.Equal(ProjectStatusCodes.Editado, result.EstadoProyecto);
@@ -105,11 +117,16 @@ public class ProjectServiceTests
     {
         var id = Guid.NewGuid();
         var estadoRevision = new ProyectoEstado(ProjectStatusCodes.Revision, "En Revisión", "desc", "cond", "#EAB308");
-        var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid());
+        var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid(), 12);
         proyecto.UpdateEstado(estadoRevision);
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null, null, null, null, null, null);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, 12, "NewDev", null, "NewDC", null, null, null, null, null, null);
 
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
+        _proyectoRepositoryMock.Setup(r => r.GetCategoriasAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CategoriaProyecto>
+            {
+                new CategoriaProyecto { Id = 12, Nombre = "HOSPEDAJE", Activo = true },
+            });
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var result = await _projectService.UpdateProjectAsync(id, dto);
@@ -125,7 +142,7 @@ public class ProjectServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, ProjectCategory.Turistico, "NewDev", null, "NewDC", null, null, null, null, null, null);
+        var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, 12, "NewDev", null, "NewDC", null, null, null, null, null, null);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Proyecto?)null);
 

@@ -65,7 +65,7 @@ public class DocumentServiceTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), ProjectCategory.Comercial);
+        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), 8);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
 
@@ -81,7 +81,7 @@ public class DocumentServiceTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), ProjectCategory.Residencial);
+        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), 16);
         
         var docs = new List<Documento>
         {
@@ -115,7 +115,7 @@ public class DocumentServiceTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", userId, ProjectCategory.Residencial);
+        var project = new Proyecto("Test", "Loc", userId, 16);
         var usuario = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Profesional, "123", "456");
         var plan = PlanSuscripcion.Create(Guid.NewGuid(), "Profesional", 0m, -1, -1, true, true, 2, 1024, true, true, true, true, true, true, "Comunidad", true);
         typeof(Usuario).GetProperty("Plan")!.SetValue(usuario, plan);
@@ -179,7 +179,7 @@ public class DocumentServiceTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", userId, ProjectCategory.Turistico);
+        var project = new Proyecto("Test", "Loc", userId, 12);
         var usuario = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Profesional, "123", "456");
         var plan = PlanSuscripcion.Create(Guid.NewGuid(), "Profesional", 0m, -1, -1, true, true, 2, 1024, true, true, true, true, true, true, "Comunidad", true);
         typeof(Usuario).GetProperty("Plan")!.SetValue(usuario, plan);

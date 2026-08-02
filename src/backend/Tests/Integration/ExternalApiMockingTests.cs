@@ -77,7 +77,7 @@ public class ExternalApiMockingTests : IntegrationTestBase, IAsyncLifetime
                 "WireMock Project", 
                 "Location", 
                 user.Id, 
-                ProjectCategory.Residencial, 
+                16, 
                 "Dev Data", 
                 "CAT-WIREMOCK");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");

@@ -55,7 +55,7 @@ public record CreateProyectoDto(
     string Nombre,
     string UbicacionTexto,
     Guid UsuarioCreadorId,
-    int CategoriaId = 1,
+    int CategoriaId,
     string? DatosDesarrollador = null,
     string? RncDesarrollador = null,
     string? DesignacionCatastral = null,
