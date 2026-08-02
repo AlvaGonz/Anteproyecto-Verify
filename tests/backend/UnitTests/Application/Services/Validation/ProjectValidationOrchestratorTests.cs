@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Services.Validation;
+﻿namespace UnitTests.Application.Services.Validation;
 
 using System;
 using System.Collections.Generic;
@@ -57,7 +57,7 @@ public class ProjectValidationOrchestratorTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid());
+        var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid(), 16);
         _mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
 
         var internalSummary = new InternalValidationSummaryDto(Guid.NewGuid(), projectId, ValidationStatus.Completed, true, 100.0, "Oro", 5, 0, 0, DateTime.UtcNow, new List<ValidationRuleResultDto>());
@@ -93,7 +93,7 @@ public class ProjectValidationOrchestratorTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid());
+        var proyecto = new Proyecto("Test Project", "Location", Guid.NewGuid(), 16);
         _mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
 
         var internalSummary = new InternalValidationSummaryDto(Guid.NewGuid(), projectId, ValidationStatus.Completed, true, 50.0, null, 3, 0, 2, DateTime.UtcNow, new List<ValidationRuleResultDto>());

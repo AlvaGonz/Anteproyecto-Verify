@@ -40,7 +40,7 @@ public class ProjectDocumentsSecurityApiTests : IntegrationTestBase
             Nombre = "Test Project",
             UbicacionTexto = "Santo Domingo",
             UsuarioCreadorId = userId,
-            Categoria = ProjectCategory.Residencial,
+            CategoriaId = 16,
             DatosDesarrollador = "Developer SA",
             RncDesarrollador = "1-01-00000-1"
         });

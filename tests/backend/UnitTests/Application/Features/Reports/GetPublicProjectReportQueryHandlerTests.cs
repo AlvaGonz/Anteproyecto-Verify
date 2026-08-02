@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Reports;
+﻿namespace UnitTests.Application.Features.Reports;
 
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ public class GetPublicProjectReportQueryHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Loc", userId);
+        var proyecto = new Proyecto("Test Project", "Loc", userId, 16);
 
         var reporte = new Reporte(projectId, userId);
         reporte.MarkAsGenerated("Resumen test");
@@ -55,7 +55,7 @@ public class GetPublicProjectReportQueryHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Loc", userId);
+        var proyecto = new Proyecto("Test Project", "Loc", userId, 16);
 
         var reporte = new Reporte(projectId, userId); // Draft status
 

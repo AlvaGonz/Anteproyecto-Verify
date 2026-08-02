@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Validation.Commands;
+﻿namespace UnitTests.Application.Features.Validation.Commands;
 
 using System;
 using System.Threading;
@@ -43,7 +43,7 @@ public class ExecuteAyuntamientoValidationCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Santo Domingo", userId);
+        var project = new Proyecto("Test", "Santo Domingo", userId, 16);
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);

@@ -28,6 +28,10 @@ public class ProjectServiceQuotaTests
         "Test Project", "Santo Domingo", userId,
         16, "Developer SA", "CAT-001");
 
+    private void SetupCategoriaActiva(int id = 16) =>
+        _proyectoRepo.Setup(r => r.GetCategoriasAsync(default))
+            .ReturnsAsync(new[] { new CategoriaProyecto { Id = id, Nombre = "VIVIENDAS", Activo = true } });
+
     [Fact]
     public async Task CreateProject_UserNotFound_ThrowsUnauthorized()
     {
@@ -78,6 +82,7 @@ public class ProjectServiceQuotaTests
         _uow.Setup(u => u.SaveChangesAsync(default))
             .ReturnsAsync(1);
 
+        SetupCategoriaActiva();
         var sut = CreateSut();
         var result = await sut.CreateProjectAsync(MakeDto(admin.Id));
         Assert.NotNull(result);
@@ -104,6 +109,7 @@ public class ProjectServiceQuotaTests
         _uow.Setup(u => u.SaveChangesAsync(default))
             .ReturnsAsync(1);
 
+        SetupCategoriaActiva();
         var sut = CreateSut();
         await sut.CreateProjectAsync(MakeDto(user.Id));
 
@@ -125,6 +131,7 @@ public class ProjectServiceQuotaTests
         _proyectoRepo.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, default))
             .ReturnsAsync((ProyectoEstado?)null);
 
+        SetupCategoriaActiva();
         var sut = CreateSut();
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => sut.CreateProjectAsync(MakeDto(user.Id)));

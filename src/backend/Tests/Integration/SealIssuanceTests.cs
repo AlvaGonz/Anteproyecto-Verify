@@ -42,6 +42,8 @@ public class SealIssuanceTests : IntegrationTestBase
                 "CAT-SEAL-ISSUE");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");
             projIdProp?.SetValue(project, projectId);
+            var estadoCreado = await db.ProyectoEstados.FirstAsync();
+            project.UpdateEstado(estadoCreado.Id);
             
             db.Proyectos.Add(project);
             await db.SaveChangesAsync();
@@ -75,7 +77,7 @@ public class SealIssuanceTests : IntegrationTestBase
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var user = await db.Usuarios.FirstAsync(u => u.CorreoElectronico == "seal.duplicate@test.com");
             
-            var project = new Proyecto(
+var project = new Proyecto(
                 "Duplicate Seal Project", 
                 "Location", 
                 user.Id, 
@@ -84,6 +86,8 @@ public class SealIssuanceTests : IntegrationTestBase
                 "CAT-SEAL-DUP");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");
             projIdProp?.SetValue(project, projectId);
+            var estadoCreado = await db.ProyectoEstados.FirstAsync();
+            project.UpdateEstado(estadoCreado.Id);
             db.Proyectos.Add(project);
 
             var existingSeal = new SelloIntegridad(

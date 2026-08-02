@@ -61,7 +61,7 @@ public class GetFeaturedProjectsQueryHandler
                 Constructora = p.DatosDesarrollador ?? p.Propietario,
                 Registrante = p.UsuarioCreador?.NombreCompleto,
                 ImagenUrl = p.ImagenUrl,
-                Categoria = p.CategoriaId,
+                CategoriaId = p.CategoriaId,
                 ValorEstimado = p.ValorEstimado,
                 DesignacionCatastral = p.DesignacionCatastral,
                 Matricula = p.Matricula,

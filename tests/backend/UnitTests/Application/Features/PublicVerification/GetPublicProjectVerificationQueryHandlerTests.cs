@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.PublicVerification;
+﻿namespace UnitTests.Application.Features.PublicVerification;
 
 using System;
 using System.Threading;
@@ -28,7 +28,7 @@ public class GetPublicProjectVerificationQueryHandlerTests
         var code = "VF-2026-TEST";
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Test Location", userId);
+        var proyecto = new Proyecto("Test Project", "Test Location", userId, 16);
 
         var cert = new Certificacion(projectId, Guid.NewGuid(), code, "http://test.com", 100, IntegrityStatus.Valid, userId);
         
@@ -72,7 +72,7 @@ public class GetPublicProjectVerificationQueryHandlerTests
         var code = "VF-2026-REVOKED";
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test Project", "Test Location", userId);
+        var proyecto = new Proyecto("Test Project", "Test Location", userId, 16);
         
         var cert = new Certificacion(projectId, Guid.NewGuid(), code, "http://test.com", 100, IntegrityStatus.Valid, userId);
         cert.Revoke("Test Revocation");

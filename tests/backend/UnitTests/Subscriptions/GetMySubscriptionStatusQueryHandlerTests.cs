@@ -308,7 +308,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         }
         for (int i = 0; i < 3; i++)
         {
-            db.Proyectos.Add(new global::Domain.Entities.Proyecto("Test", "Test", user.Id));
+            db.Proyectos.Add(new global::Domain.Entities.Proyecto("Test", "Test", user.Id, 16));
         }
         db.SaveChanges();
         

@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Validation.Commands;
+﻿namespace UnitTests.Application.Features.Validation.Commands;
 
 using System;
 using System.Threading;
@@ -43,7 +43,7 @@ public class ValidarTerritorioCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", userId);
+        var project = new Proyecto("Test", "Loc", userId, 16);
         // UbicacionGps is null by default
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
@@ -66,7 +66,7 @@ public class ValidarTerritorioCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", userId);
+        var project = new Proyecto("Test", "Loc", userId, 16);
         project.UpdateDetails("Test", "Loc", "25.0, -80.0", null, 16, null, null);
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
@@ -92,7 +92,7 @@ public class ValidarTerritorioCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", userId);
+        var project = new Proyecto("Test", "Loc", userId, 16);
         project.UpdateDetails("Test", "Loc", "18.5, -69.9", null, 11, null, null);
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))

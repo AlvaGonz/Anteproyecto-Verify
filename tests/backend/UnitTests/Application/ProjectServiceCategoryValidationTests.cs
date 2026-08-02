@@ -1,4 +1,4 @@
-namespace Tests.Unit.Application;
+﻿namespace Tests.Unit.Application;
 
 using global::Application.Abstractions.Notifications;
 using global::Application.Abstractions.Persistence;

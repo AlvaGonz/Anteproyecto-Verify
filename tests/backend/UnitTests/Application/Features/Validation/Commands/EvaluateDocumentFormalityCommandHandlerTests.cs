@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Validation.Commands;
+﻿namespace UnitTests.Application.Features.Validation.Commands;
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ public class EvaluateDocumentFormalityCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", userId);
+        var project = new Proyecto("Test", "Loc", userId, 16);
         
         var doc = new Documento(projectId, DocumentType.PlanoMensuraCatastral, "test.pdf", "test.pdf", "/path", "application/pdf", ".pdf", 100, userId, 1, DateTime.UtcNow.AddMonths(-1), "Inst");
 

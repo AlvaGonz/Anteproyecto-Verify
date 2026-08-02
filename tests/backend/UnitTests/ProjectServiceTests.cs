@@ -1,4 +1,4 @@
-namespace UnitTests;
+﻿namespace UnitTests;
 
 using System;
 using System.Collections.Generic;
@@ -116,7 +116,7 @@ public class ProjectServiceTests
     public async Task UpdateProject_DoesNotDowngrade_WhenAlreadyInRevision()
     {
         var id = Guid.NewGuid();
-        var estadoRevision = new ProyectoEstado(ProjectStatusCodes.Revision, "En Revisión", "desc", "cond", "#EAB308");
+        var estadoRevision = new ProyectoEstado(ProjectStatusCodes.Revision, "En RevisiÃ³n", "desc", "cond", "#EAB308");
         var proyecto = new Proyecto("Old", "OldLoc", Guid.NewGuid(), 12);
         proyecto.UpdateEstado(estadoRevision);
         var dto = new UpdateProyectoDto("New", "NewLoc", null, 1000, 12, "NewDev", null, "NewDC", null, null, null, null, null, null);
@@ -155,9 +155,9 @@ public class ProjectServiceTests
     {
         // Arrange
         var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
-        var p1 = new Proyecto("P1", "L1", user.Id);
+        var p1 = new Proyecto("P1", "L1", user.Id, 16);
 
-        var p2 = new Proyecto("P2", "L2", user.Id);
+        var p2 = new Proyecto("P2", "L2", user.Id, 16);
 
         _proyectoRepositoryMock.Setup(r => r.GetVisibleAsync(1, 50, It.IsAny<CancellationToken>())).ReturnsAsync(new List<Proyecto> { p1, p2 });
 
@@ -174,7 +174,7 @@ public class ProjectServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var proyecto = new Proyecto("P1", "L1", Guid.NewGuid());
+        var proyecto = new Proyecto("P1", "L1", Guid.NewGuid(), 16);
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
 
         // Act

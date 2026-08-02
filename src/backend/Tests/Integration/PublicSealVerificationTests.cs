@@ -7,6 +7,7 @@ using Domain.Entities;
 using Domain.Enums;
 using FluentAssertions;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Integration.Infrastructure;
 using Xunit;
@@ -42,6 +43,8 @@ public class PublicSealVerificationTests : IntegrationTestBase
                 "CAT-SEAL");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");
             projIdProp?.SetValue(project, Guid.NewGuid());
+            var estadoCreado = await db.ProyectoEstados.FirstAsync();
+            project.UpdateEstado(estadoCreado.Id);
             db.Proyectos.Add(project);
 
             var cert = new Certificacion(

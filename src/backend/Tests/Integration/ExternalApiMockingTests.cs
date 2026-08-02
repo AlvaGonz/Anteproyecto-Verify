@@ -82,6 +82,8 @@ public class ExternalApiMockingTests : IntegrationTestBase, IAsyncLifetime
                 "CAT-WIREMOCK");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");
             projIdProp?.SetValue(project, projectId);
+            var estadoCreado = await db.ProyectoEstados.FirstAsync();
+            project.UpdateEstado(estadoCreado.Id);
             
             db.Proyectos.Add(project);
             await db.SaveChangesAsync();
