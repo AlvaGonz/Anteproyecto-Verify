@@ -30,7 +30,7 @@ interface DashboardPageLayoutProps {
   statsData: DashboardStatsDto | undefined;
 }
 
-export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
+export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = React.memo(({
   showBanner,
   activatedPlan,
   handleDismissBanner,
@@ -158,4 +158,4 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
       </div>
     </div>
   );
-};
+});

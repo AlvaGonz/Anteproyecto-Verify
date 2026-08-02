@@ -8,7 +8,7 @@ import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.
 
 const TAB_STORAGE_KEY = "adminDashboardTab";
 
-export const DashboardPage: React.FC = () => {
+export const DashboardPage: React.FC = React.memo(() => {
   const [activeTab, setActiveTab] = useState<DashboardTab>(() => {
     const stored = localStorage.getItem(TAB_STORAGE_KEY);
     return stored === "subscriptions" ? "subscriptions" : "projects";
@@ -83,4 +83,4 @@ export const DashboardPage: React.FC = () => {
       statsData={statsData}
     />
   );
-};
+});

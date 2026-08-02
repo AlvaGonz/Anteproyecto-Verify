@@ -62,7 +62,7 @@ interface AdminProjectListProps {
   onPageChange: (page: number) => void;
 }
 
-export const AdminProjectList: React.FC<AdminProjectListProps> = ({
+export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
   t,
   isAdmin,
   isLoading,
@@ -125,7 +125,7 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 min-h-[1000px]">
+      <div className="grid grid-cols-1 gap-4">
         {filtered.map((project, idx) => {
           const badge = getStatusBadge(project.estadoProyecto, t);
           return (
@@ -242,5 +242,5 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
       )}
     </div>
   );
-};
+});
 

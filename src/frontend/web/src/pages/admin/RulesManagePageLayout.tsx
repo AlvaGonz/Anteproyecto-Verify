@@ -30,7 +30,7 @@ interface RulesManagePageLayoutProps {
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = ({
+export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = React.memo(({
   showForm,
   setShowForm,
   handleSubmit,
@@ -298,4 +298,4 @@ export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = ({
       </div>
     </div>
   </div>
-);
+));

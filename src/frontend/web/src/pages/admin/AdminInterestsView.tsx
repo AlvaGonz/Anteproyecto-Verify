@@ -13,7 +13,7 @@ interface InterestRecord {
   fecha: string;
 }
 
-export const AdminInterestsView: React.FC = () => {
+export const AdminInterestsView: React.FC = React.memo(() => {
   const { data: intereses = [] } = useInterests();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"Todos" | "Interesados" | "Mis Intereses">("Todos");
@@ -321,4 +321,4 @@ export const AdminInterestsView: React.FC = () => {
       </AnimatePresence>
     </div>
   );
-};
+});

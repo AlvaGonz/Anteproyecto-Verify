@@ -23,7 +23,7 @@ import {
 } from "../../features/projects/api/usePublishedProjects";
 import { useProvinces } from "../../features/provinces/api/useProvinces";
 
-export const AdminPublishedProjectsView: React.FC = () => {
+export const AdminPublishedProjectsView: React.FC = React.memo(() => {
   const { data: provincias } = useProvinces();
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [filters, setFilters] = useState<PublishedProjectFilters>({
@@ -513,4 +513,4 @@ export const AdminPublishedProjectsView: React.FC = () => {
       </div>
     </div>
   );
-};
+});

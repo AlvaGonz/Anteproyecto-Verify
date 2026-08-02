@@ -39,7 +39,7 @@ export const AdminProjectsPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const pageSize = 100;
+  const pageSize = 20;
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { data: intereses = [] } = useInterests(activeTab === "intereses");
 
@@ -86,18 +86,20 @@ export const AdminProjectsPage: React.FC = () => {
   const { mutate: deleteProject } = useDeleteProject();
   const { mutate: updateStatus } = useUpdateProjectStatus();
 
-  const stats = {
+  const stats = useMemo(() => ({
     total: dashboardStats?.totalProyectos ?? totalCount ?? projects.length,
     published: dashboardStats?.proyectosAprobados ?? projects.filter(p => p.estadoProyecto === ProjectStatus.Published).length,
     pending: dashboardStats?.proyectosPendientes ?? projects.filter(p => p.estadoProyecto === ProjectStatus.InReview).length
-  };
+  }), [dashboardStats, totalCount, projects]);
 
-  const totalValue = stats.total || 1;
-  const metrics = [
-    { label: "Total Proyectos", value: stats.total, icon: Building, color: "text-blue-600", bg: "bg-blue-50", barColor: "bg-blue-500", pct: 100 },
-    { label: "En Revisión", value: stats.pending, icon: Activity, color: "text-indigo-600", bg: "bg-indigo-50", barColor: "bg-indigo-500", pct: stats.total ? Math.round((stats.pending / totalValue) * 100) : 0 },
-    { label: "Publicados", value: stats.published, icon: FileCheck, color: "text-emerald-600", bg: "bg-emerald-50", barColor: "bg-emerald-500", pct: stats.total ? Math.round((stats.published / totalValue) * 100) : 0 },
-  ];
+  const metrics = useMemo(() => {
+    const totalValue = stats.total || 1;
+    return [
+      { label: "Total Proyectos", value: stats.total, icon: Building, color: "text-blue-600", bg: "bg-blue-50", barColor: "bg-blue-500", pct: 100 },
+      { label: "En Revisión", value: stats.pending, icon: Activity, color: "text-indigo-600", bg: "bg-indigo-50", barColor: "bg-indigo-500", pct: stats.total ? Math.round((stats.pending / totalValue) * 100) : 0 },
+      { label: "Publicados", value: stats.published, icon: FileCheck, color: "text-emerald-600", bg: "bg-emerald-50", barColor: "bg-emerald-500", pct: stats.total ? Math.round((stats.published / totalValue) * 100) : 0 },
+    ];
+  }, [stats]);
 
   const filtered = projects;
 
@@ -154,10 +156,7 @@ export const AdminProjectsPage: React.FC = () => {
       <div className="flex overflow-x-auto border-b border-slate-200">
         <button
           type="button"
-          onClick={() => {
-            setActiveTab("proyectos");
-            window.history.replaceState(null, '', '/#/admin/projects?tab=proyectos');
-          }}
+          onClick={() => setActiveTab("proyectos")}
           className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "proyectos"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"
@@ -167,10 +166,7 @@ export const AdminProjectsPage: React.FC = () => {
         </button>
         <button
           type="button"
-          onClick={() => {
-            setActiveTab("publicados");
-            window.history.replaceState(null, '', '/#/admin/projects?tab=publicados');
-          }}
+          onClick={() => setActiveTab("publicados")}
           className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "publicados"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"
@@ -180,10 +176,7 @@ export const AdminProjectsPage: React.FC = () => {
         </button>
         <button
           type="button"
-          onClick={() => {
-            setActiveTab("intereses");
-            window.history.replaceState(null, '', '/#/admin/projects?tab=intereses');
-          }}
+          onClick={() => setActiveTab("intereses")}
           className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "intereses"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"
@@ -193,10 +186,7 @@ export const AdminProjectsPage: React.FC = () => {
         </button>
         <button
           type="button"
-          onClick={() => {
-            setActiveTab("guardados");
-            window.history.replaceState(null, '', '/#/admin/projects?tab=guardados');
-          }}
+          onClick={() => setActiveTab("guardados")}
           className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "guardados"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-slate-400 hover:text-slate-600"

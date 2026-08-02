@@ -1,5 +1,5 @@
 // react-doctor-disable no-giant-component
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRules, useCreateRule, useToggleRule, CreateRuleCommand, ReglaValidacionDto } from "../../features/rules/api/useRules";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { RulesManagePageLayout } from "./RulesManagePageLayout";
@@ -20,6 +20,12 @@ export const RulesManagePage: React.FC = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const [formData, setFormData] = useState<CreateRuleCommand>({
     nombre: "", 
@@ -59,8 +65,8 @@ export const RulesManagePage: React.FC = () => {
   };
 
   const filteredRules = rules.filter(r => 
-    r.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
+    r.nombre.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    r.descripcion.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   if (loading) {

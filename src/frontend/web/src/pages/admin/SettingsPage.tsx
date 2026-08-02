@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
@@ -7,23 +7,18 @@ import { CreateUserDto, UserSettings } from "../../features/settings/types/setti
 import { UsersTable } from "../../features/settings/components/UsersTable";
 import { UserFormModal } from "../../features/settings/components/UserFormModal";
 import { DeleteModal } from "../../features/settings/components/DeleteModal";
-import { MyProfileForm } from "../../features/settings/components/MyProfileForm";
-import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
-import { InviteesSettings } from "../../features/settings/components/InviteesSettings";
-import { DeleteAccountSection } from "../../features/settings/components/DeleteAccountSection";
-import { TwoFactorSection } from "../../features/settings/components/TwoFactorSection";
-import { ChangePasswordSection } from "../../features/settings/components/ChangePasswordSection";
-import {
-  Settings,
-  Users,
-  Loader2,
-  User,
-  CreditCard,
-  UserPlus,
-  Shield
-} from "lucide-react";
+import { Settings, Users, Loader2, User, CreditCard, UserPlus, Shield } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
+
+const MyProfileForm = lazy(() => import("../../features/settings/components/MyProfileForm").then(m => ({ default: m.MyProfileForm })));
+const SubscriptionSettings = lazy(() => import("../../features/settings/components/SubscriptionSettings").then(m => ({ default: m.SubscriptionSettings })));
+const InviteesSettings = lazy(() => import("../../features/settings/components/InviteesSettings").then(m => ({ default: m.InviteesSettings })));
+const DeleteAccountSection = lazy(() => import("../../features/settings/components/DeleteAccountSection").then(m => ({ default: m.DeleteAccountSection })));
+const TwoFactorSection = lazy(() => import("../../features/settings/components/TwoFactorSection").then(m => ({ default: m.TwoFactorSection })));
+const ChangePasswordSection = lazy(() => import("../../features/settings/components/ChangePasswordSection").then(m => ({ default: m.ChangePasswordSection })));
+
+const TabFallback = () => <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
 type TabId = "profile" | "subscription" | "users" | "invitees" | "security";
 
@@ -53,14 +48,7 @@ export const SettingsPage: React.FC = () => {
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const isManagementTier = user?.plan === "Corporativo" || user?.plan === "Empresa";
 
-  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin);
-
-  useEffect(() => {
-    if (activeTab === "users") {
-      refetchUsers();
-    }
-  }, [activeTab, refetchUsers]);
-
+  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin && activeTab === "users");
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans(isAdmin);
 
   const createUserMutation = useCreateUser();
@@ -140,7 +128,7 @@ export const SettingsPage: React.FC = () => {
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
     setFormError(null);
-    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "dev", "validator", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
+    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
     setIsModalOpen(true);
   };
 
@@ -253,39 +241,22 @@ export const SettingsPage: React.FC = () => {
 
       {/* Tab Contents */}
       <div className="mt-6">
+        <Suspense fallback={<TabFallback />}>
         <AnimatePresence mode="wait">
           {activeTab === "profile" && (
-            <m.div
-              key="profile"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <MyProfileForm />
             </m.div>
           )}
 
           {activeTab === "subscription" && (
-            <m.div
-              key="subscription"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="subscription" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <SubscriptionSettings />
             </m.div>
           )}
 
           {activeTab === "users" && (
-            <m.div
-              key="users"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="users" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <UsersTable
                 users={users}
                 plans={plans}
@@ -298,26 +269,13 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {activeTab === "invitees" && isManagementTier && (
-            <m.div
-              key="invitees"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="invitees" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <InviteesSettings />
             </m.div>
           )}
 
           {activeTab === "security" && (
-            <m.div
-              key="security"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-6"
-            >
+            <m.div key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
               <TwoFactorSection />
               <ChangePasswordSection />
               <section className="bg-red-50 border border-red-200 rounded-lg p-6">
@@ -330,8 +288,8 @@ export const SettingsPage: React.FC = () => {
            </m.div>
           )}
 
-
         </AnimatePresence>
+        </Suspense>
       </div>
 
       {/* User Form Modal */}

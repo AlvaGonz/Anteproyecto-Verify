@@ -28,7 +28,7 @@ interface AdminProjectsPageLayoutProps {
   onPageChange: (page: number) => void;
 }
 
-export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = ({
+export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = React.memo(({
   t,
   isAdmin,
   searchTerm,
@@ -82,4 +82,4 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
       />
     </div>
   );
-};
+});

@@ -6,7 +6,7 @@ import { useSavedProjects, useProjectsInteractions } from "../../features/projec
 import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
 import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
 
-export const AdminSavedProjectsView: React.FC = () => {
+export const AdminSavedProjectsView: React.FC = React.memo(() => {
   const { data: savedProjects = [], isLoading } = useSavedProjects();
   const { unsaveProject, isUnsaving } = useProjectsInteractions();
   const [searchQuery, setSearchQuery] = useState("");
@@ -217,4 +217,4 @@ export const AdminSavedProjectsView: React.FC = () => {
       </AnimatePresence>
     </div>
   );
-};
+});
