@@ -6,8 +6,11 @@ import { ProjectCategory } from "../types";
 
 export const projectKeys = {
   all: ["projects"] as const,
-  list: (page?: number, pageSize?: number) => ["projects", "list", page, pageSize] as const,
+  list: (page?: number, pageSize?: number, q?: string, estados?: string) =>
+    ["projects", "list", page, pageSize, q ?? "", estados ?? ""] as const,
   detail: (id: string) => ["projects", id] as const,
+  // ponytail: keep raw string keys for statusEligibility/validation/findings/audit
+  // to match existing usage in other files until those files are updated
 };
 
 const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
@@ -45,12 +48,14 @@ interface PaginatedProjectsResponse {
   pageSize: number;
 }
 
-export const useProjects = (page = 1, pageSize = 50) => {
+export const useProjects = (page = 1, pageSize = 50, q?: string, estados?: string) => {
   const query = useQuery({
-    queryKey: projectKeys.list(page, pageSize),
+    queryKey: projectKeys.list(page, pageSize, q, estados),
     queryFn: () =>
       apiClient
-        .get<PaginatedProjectsResponse>("/projects", { params: { page, pageSize } })
+        .get<PaginatedProjectsResponse>("/projects", {
+          params: { page, pageSize, q: q || undefined, estados: estados || undefined },
+        })
         .then((res) => {
           const data = res.data as any;
           // Handle different response structures
@@ -114,9 +119,9 @@ export const useCreateProject = () => {
           categoria: data.categoria ?? ProjectCategory.Residencial,
         })
         .then((res) => mapApiProject(res.data)),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: projectKeys.all });
-      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: projectKeys.all });
+      await qc.invalidateQueries({ queryKey: ["dashboardStats"] });
     },
   });
 };

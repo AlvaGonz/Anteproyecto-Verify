@@ -1645,46 +1645,38 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("IdUsuario")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IdUsuario");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Apellido")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Cedula")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContrasenaHash")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NombreCompleto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Telefono")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdUsuario");
 
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("IX_UsuarioLegacy_Email");
-
-                    b.ToTable("UsuarioLegacy", (string)null);
+                    b.ToTable("UsuariosLegacy");
                 });
 
             modelBuilder.Entity("Domain.Entities.Validacion", b =>
@@ -2024,7 +2016,7 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Pago", b =>
                 {
                     b.HasOne("Domain.Entities.UsuarioLegacy", "UsuarioLegacy")
-                        .WithMany()
+                        .WithMany("Pagos")
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -2344,6 +2336,11 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("MiembrosEquipo");
 
                     b.Navigation("Proyectos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UsuarioLegacy", b =>
+                {
+                    b.Navigation("Pagos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Validacion", b =>

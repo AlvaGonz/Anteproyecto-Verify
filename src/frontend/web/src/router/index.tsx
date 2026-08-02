@@ -37,6 +37,7 @@ const CreateValidationPage = lazy(() => import("../pages/projects/CreateValidati
 
 import { AuthGuard } from "../shared/components/security/AuthGuard";
 import { GuestGuard } from "../shared/components/security/GuestGuard";
+import { useAuth } from "../shared/context/AuthContext";
 import { ErrorBoundary } from "../shared/components/layout/ErrorBoundary";
 import { AdminErrorFallback } from "../components/ui/AdminErrorFallback";
 
@@ -68,6 +69,12 @@ const ProjectManageShell = () => (
     <ProjectManageLayout />
   </AuthGuard>
 );
+
+const AdminRulesGuard = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+  if (user?.role !== "admin") return <Navigate to="/admin/dashboard" replace />;
+  return <>{children}</>;
+};
 
 export const router = createHashRouter([
   {
@@ -281,7 +288,7 @@ export const router = createHashRouter([
           },
           {
             path: "rules",
-            element: <RulesManagePage />,
+            element: <AdminRulesGuard><RulesManagePage /></AdminRulesGuard>,
           },
           {
             path: "settings",

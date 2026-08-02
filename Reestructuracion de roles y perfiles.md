@@ -98,7 +98,7 @@ Control absoluto sobre cualquier expediente.
     - `ESTADO_J`: Certificación de estado jurídico (obligatorio)
     - `MENSURA`: Plano catastral aprobado
     - `CÉDULA`: Documento de identidad del titular
-    - `PODER_NOTARIAL`: Poder notarial (si aplica)
+    - `PODER_NOTARIAL`: Poder notarial
     - `OTROS`
   - Cada registro en `documentos` almacena: tipo, nombre original, ruta, tamaño, tipo MIME, fecha de subida, usuario que cargó.
 - **Proceso de subida de documentos (detallado)**:

@@ -95,18 +95,19 @@ export const SubscriptionSettings: React.FC = () => {
   let originalMonthlyPrice: string | null = null;
   let isDiscountApplied = false;
 
-  if (hasPlan && data) {
-    const basePrice = data.planPrice ?? 0;
-    if (basePrice === 0 && !data.pricing?.monthlyPrice && !data.pricing?.yearlyPrice) {
+    if (hasPlan && data) {
+      const basePrice = data.planPrice ?? 0;
+      const monthlyPrice = data.pricing?.monthlyPrice ?? basePrice;
+
+    if (monthlyPrice === 0 && !data.pricing?.yearlyPrice) {
       formattedPrice = 'Gratis';
     } else {
-      const monthlyPrice = data.pricing?.monthlyPrice ?? basePrice;
       // ponytail: if billing cycle string is unreliable (e.g. defaults to monthly in backend), use daysRemaining > 35 as heuristic
       const isAnnual = ['yearly', 'annual', 'year', 'anual'].includes(String(billingCycle).toLowerCase()) || (daysRemaining ?? 0) > 35;
       
       if (isAnnual) {
-        const yearlyPrice = data.pricing?.yearlyPrice ?? (monthlyPrice * 12 * 0.8);
-        formattedPrice = `${PRICE_FORMATTER.format(yearlyPrice)} USD / año`;
+        const discountedMonthlyPrice = monthlyPrice * 0.8;
+        formattedPrice = `${PRICE_FORMATTER.format(discountedMonthlyPrice)} USD / mes`;
         originalMonthlyPrice = `${PRICE_FORMATTER.format(monthlyPrice)} USD / mes`;
         isDiscountApplied = true;
       } else {

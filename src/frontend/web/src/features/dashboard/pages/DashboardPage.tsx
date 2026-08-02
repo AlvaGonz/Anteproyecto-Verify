@@ -2,34 +2,22 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FolderKanban, FileCheck, AlertCircle, TrendingUp } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useDashboardStats } from "../api/useDashboardStats";
-import { useProjects } from "../../projects/api/useProjects";
 
 import { DashboardPageLayout, DashboardTab } from "./DashboardPageLayout";
-import { useAuth } from "../../../shared/context/AuthContext";
-import { ProjectStatus } from "../../projects/types";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
-import { toUtcDate } from "../../../shared/utils/dates";
 
-const statusLabels: Record<string, string> = {
-  [ProjectStatus.Draft]: "Borrador",
-  [ProjectStatus.Edited]: "Editado",
-  [ProjectStatus.InReview]: "En Revisión",
-  [ProjectStatus.Observed]: "Observado",
-  [ProjectStatus.Published]: "Publicado",
-  [ProjectStatus.Rejected]: "Rechazado",
-};
-
-const getStatusDisplay = (status: ProjectStatus): string =>
-  statusLabels[status] ?? "Desconocido";
+const TAB_STORAGE_KEY = "adminDashboardTab";
 
 export const DashboardPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<DashboardTab>("projects");
+  const [activeTab, setActiveTab] = useState<DashboardTab>(() => {
+    const stored = localStorage.getItem(TAB_STORAGE_KEY);
+    return stored === "subscriptions" ? "subscriptions" : "projects";
+  });
+  useEffect(() => { localStorage.setItem(TAB_STORAGE_KEY, activeTab); }, [activeTab]);
   const location = useLocation();
   const [showBanner, setShowBanner] = useState<boolean>(!!(location.state as any)?.planJustActivated);
   const activatedPlan = (location.state as any)?.activatedPlan as string | undefined;
   const handleDismissBanner = useCallback(() => setShowBanner(false), []);
-  const { user } = useAuth();
-  const isAdmin = user?.role === "admin" || user?.role === "owner";
 
   useEffect(() => {
     if ((location.state as any)?.planJustActivated) {
@@ -37,41 +25,18 @@ export const DashboardPage: React.FC = () => {
     }
   }, [location.state]);
 
-  const { data: projectsData, totalCount: userTotal, isLoading: loadingProjects } = useProjects(1, 500);
-  const { data: statsData, isLoading: loadingStats } = useDashboardStats();
-
-  const loading = isAdmin ? loadingStats : loadingProjects;
+  const { data: statsData, isLoading: loading } = useDashboardStats();
 
   const { totalProjects, inReview, verified, offers, recentProjects } = useMemo(() => {
-    let totalProjects = 0;
-    let inReview = 0;
-    let verified = 0;
-    let offers = 0;
-    let recentProjects: ProyectoRecienteDto[] = [];
-
-  if (isAdmin && statsData) {
-    totalProjects = statsData.totalProyectos || 0;
-    inReview = statsData.proyectosPendientes || 0;
-    verified = statsData.proyectosAprobados || 0;
-    offers = statsData.totalOfertas || 0;
-    recentProjects = statsData.proyectosRecientes || [];
-  } else if (!isAdmin && projectsData) {
-    totalProjects = userTotal;
-    inReview = projectsData.filter(p => p.estadoProyecto === ProjectStatus.InReview).length;
-    verified = projectsData.filter(p => p.estadoProyecto === ProjectStatus.Published).length;
-    recentProjects = [...projectsData]
-      .sort((a, b) => (toUtcDate(b.createdAtUtc)?.getTime() ?? 0) - (toUtcDate(a.createdAtUtc)?.getTime() ?? 0))
-      .slice(0, 5)
-      .map(p => ({
-        fechaRegistro: p.createdAtUtc,
-        nombre: p.nombre,
-        desarrollador: p.rncDesarrollador || "",
-        estado: getStatusDisplay(p.estadoProyecto),
-      }));
-  }
-
-    return { totalProjects, inReview, verified, offers, recentProjects };
-  }, [isAdmin, statsData, projectsData, userTotal]);
+    if (!statsData) return { totalProjects: 0, inReview: 0, verified: 0, offers: 0, recentProjects: [] as ProyectoRecienteDto[] };
+    return {
+      totalProjects: statsData.totalProyectos || 0,
+      inReview: statsData.proyectosPendientes || 0,
+      verified: statsData.proyectosAprobados || 0,
+      offers: statsData.totalOfertas || 0,
+      recentProjects: statsData.proyectosRecientes || [],
+    };
+  }, [statsData]);
 
   const stats = useMemo(() => [
     {

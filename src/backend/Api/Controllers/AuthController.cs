@@ -133,6 +133,17 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage, succeeded = false });
         }
 
+        if (result.Data!.Requires2fa)
+        {
+            return Ok(new
+            {
+                succeeded = false,
+                requires2fa = true,
+                challengeToken = result.Data.ChallengeToken,
+                emailMasked = result.Data.EmailMasked
+            });
+        }
+
         return GenerateSessionCookiesAndResponse(result.Data);
     }
 
@@ -141,10 +152,21 @@ public class AuthController : ControllerBase
     {
         var handler = HttpContext.RequestServices.GetRequiredService<Application.Features.Auth.Commands.GoogleLoginUser.GoogleLoginUserCommandHandler>();
         var result = await handler.Handle(request, cancellationToken);
-        
+
         if (!result.IsSuccess)
         {
             return BadRequest(new { Message = result.ErrorMessage, succeeded = false });
+        }
+
+        if (result.Data!.Requires2fa)
+        {
+            return Ok(new
+            {
+                succeeded = false,
+                requires2fa = true,
+                challengeToken = result.Data.ChallengeToken,
+                emailMasked = result.Data.EmailMasked
+            });
         }
 
         return GenerateSessionCookiesAndResponse(result.Data);
@@ -203,6 +225,8 @@ public class AuthController : ControllerBase
                 aceptoDescargo = responseData.User.AceptoDescargo,
                 isGuest = responseData.User.IsGuest,
                 inviterPlan = responseData.User.InviterPlan,
+                maxProyectos = responseData.User.MaxProyectos,
+                maxUsuariosSecundarios = responseData.User.MaxUsuariosSecundarios,
                 inviteesList = responseData.User.InviteesList
             }
         });
@@ -225,7 +249,7 @@ public class AuthController : ControllerBase
 
         if (result.UserId.HasValue)
         {
-            var user = await _usuarioRepository.GetByIdAsync(result.UserId.Value, cancellationToken);
+            var user = await _usuarioRepository.GetByIdWithPlanAsync(result.UserId.Value, cancellationToken);
             if (user != null)
             {
                 var accessToken = _jwtTokenGenerator.GenerateToken(user);
@@ -275,7 +299,9 @@ public class AuthController : ControllerBase
                         id = user.Id,
                         name = user.Nombre,
                         email = user.CorreoElectronico,
-                        role = roleStr
+                        role = roleStr,
+                        maxProyectos = user.Plan?.MaxProyectos ?? 0,
+                        maxUsuariosSecundarios = user.Plan?.MaxUsuariosSecundarios ?? 0
                     }
                 });
             }
@@ -354,6 +380,22 @@ public class AuthController : ControllerBase
                 .FirstOrDefaultAsync(d => d.Rnc == cleanKey, cancellationToken);
         }
 
+        var members = user.MiembrosEquipo
+            .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
+            .ToList();
+
+        var memberIds = members.Select(m => m.Id).ToList();
+        var proyectosPorUsuario = await _context.Proyectos
+            .Where(p => memberIds.Contains(p.UsuarioCreadorId))
+            .GroupBy(p => p.UsuarioCreadorId)
+            .Select(g => new { UsuarioId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.UsuarioId, x => x.Count, cancellationToken);
+        var consultasPorUsuario = await _context.LogConsultas
+            .Where(lc => memberIds.Contains(lc.UsuarioId))
+            .GroupBy(lc => lc.UsuarioId)
+            .Select(g => new { UsuarioId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.UsuarioId, x => x.Count, cancellationToken);
+
         return Ok(new
         {
             Id = user.Id.ToString(),
@@ -377,24 +419,23 @@ public class AuthController : ControllerBase
             PendingPlanCode = user.PendingPlanCode,
             PendingBillingCycle = user.PendingBillingCycle,
             MaxUsuariosSecundarios = user.Plan?.MaxUsuariosSecundarios ?? 0,
+            MaxProyectos = user.Plan?.MaxProyectos ?? 0,
             AceptoDescargo = user.AceptoDescargo,
             IsGuest = user.TitularId.HasValue,
             TitularId = user.TitularId,
             InviterPlan = user.Titular?.Plan?.NombrePlan,
-            InviteesList = user.MiembrosEquipo
-                .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
-                .Select(m => new {
-                    id = m.Id,
-                    nombre = m.Nombre,
-                    apellido = m.Apellido,
-                    email = m.CorreoElectronico,
-                    estado = m.AccountStatus == Domain.Enums.UserAccountStatus.Invited ? "Pendiente" : 
-                             (!m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")),
-                    maxProyectosDelegados = m.MaxProyectosDelegados,
-                    maxConsultasDelegadas = m.MaxConsultasDelegadas,
-                    proyectosCreados = _context.Proyectos.Count(p => p.UsuarioCreadorId == m.Id),
-                    consultasUsadas = _context.LogConsultas.Count(lc => lc.UsuarioId == m.Id)
-                })
+            InviteesList = members.Select(m => new {
+                id = m.Id,
+                nombre = m.Nombre,
+                apellido = m.Apellido,
+                email = m.CorreoElectronico,
+                estado = m.AccountStatus == Domain.Enums.UserAccountStatus.Invited ? "Pendiente" : 
+                         (!m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo")),
+                maxProyectosDelegados = m.MaxProyectosDelegados,
+                maxConsultasDelegadas = m.MaxConsultasDelegadas,
+                proyectosCreados = proyectosPorUsuario.GetValueOrDefault(m.Id, 0),
+                consultasUsadas = consultasPorUsuario.GetValueOrDefault(m.Id, 0)
+            })
         });
     }
 

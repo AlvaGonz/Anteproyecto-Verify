@@ -57,6 +57,7 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
                 ["JwtSettings:Issuer"] = "verifinca-test",
                 ["JwtSettings:Audience"] = "verifinca-test-client",
                 ["JwtSettings:ExpirationMinutes"] = "60",
+                ["Stripe:SecretKey"] = "sk_test_dummy_for_integration_tests",
                 ["IsTestingEnvironment"] = "true"
             });
         });
@@ -78,7 +79,7 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
 
 /// <summary>
 /// Prevents real emails from being sent during integration tests.
-/// </summary>
+///</summary>
 internal sealed class NullEmailService : Application.Abstractions.Notifications.IEmailService
 {
     public Task SendEmailAsync(string to, string subject, string body, string? fromAddress = null, System.Threading.CancellationToken ct = default)
@@ -103,5 +104,8 @@ internal sealed class NullEmailService : Application.Abstractions.Notifications.
         => Task.CompletedTask;
 
     public Task SendProjectStatusUpdateAsync(string toEmail, string userName, string projectName, string newStatus, System.Threading.CancellationToken ct = default)
+        => Task.CompletedTask;
+
+    public Task SendEmailOtpAsync(string toEmail, string userName, string code, System.Threading.CancellationToken ct = default)
         => Task.CompletedTask;
 }

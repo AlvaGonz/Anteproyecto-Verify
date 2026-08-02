@@ -29,7 +29,7 @@ public class AppDbContext : DbContext
     public DbSet<Permiso> Permisos => Set<Permiso>();
     public DbSet<Acceso> Accesos => Set<Acceso>();
     public DbSet<PlanSuscripcion> PlanesSuscripcion => Set<PlanSuscripcion>();
-    public DbSet<Pago> PagosLegacy => Set<Pago>();
+    public DbSet<Pago> Pagos => Set<Pago>();
     public DbSet<PerfilPermiso> PerfilPermisos => Set<PerfilPermiso>();
 
     // Validation Entities

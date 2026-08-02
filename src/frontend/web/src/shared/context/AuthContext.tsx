@@ -1,17 +1,27 @@
 import { createContext, use, useState, useEffect, useRef, ReactNode, useCallback, useMemo } from "react";
-import { AuthService, User, AuthError } from "../../features/auth/services/AuthService";
+import {
+  AuthService,
+  User,
+  AuthError,
+  type LoginResult,
+  type TwoFactorChallengeInfo,
+} from "../../features/auth/services/AuthService";
 import { queryClient } from "../../infrastructure/api/queryClient";
+
+export type PendingChallenge = TwoFactorChallengeInfo;
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User | null>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   updateUser: (data: Partial<User>) => void;
   error: AuthError | null;
-  googleLogin: (credential: string) => Promise<User | null>;
+  googleLogin: (credential: string) => Promise<LoginResult>;
+  pendingChallenge: PendingChallenge | null;
+  clearChallenge: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AuthError | null>(null);
+  const [pendingChallenge, setPendingChallenge] = useState<PendingChallenge | null>(null);
   const initRef = useRef(false);
 
   useEffect(() => {
@@ -43,6 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const handler = () => {
       queryClient.clear();
       setUser(null);
+      setPendingChallenge(null);
       AuthService.logout();
       window.location.hash = '#/login';
     };
@@ -50,43 +62,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('auth:force-logout', handler);
   }, []);
 
-  const login = useCallback(async (email: string, password: string): Promise<User | null> => {
+  const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     setLoading(true);
     setError(null);
     queryClient.clear();
-    
+
     const result = await AuthService.login(email, password);
-    
-    if ('data' in result) {
-      setUser(result.data.user);
-      setLoading(false);
-      return result.data.user;
+
+    if (result.succeeded) {
+      setUser(result.user);
+      setPendingChallenge(null);
+    } else if (result.requires2fa) {
+      setPendingChallenge(result.challenge);
+      setError(null);
+    } else {
+      setError(result.error);
+      setPendingChallenge(null);
     }
-    setError(result.error);
     setLoading(false);
-    return null;
+    return result;
   }, []);
 
-  const googleLogin = useCallback(async (credential: string): Promise<User | null> => {
+  const googleLogin = useCallback(async (credential: string): Promise<LoginResult> => {
     setLoading(true);
     setError(null);
     queryClient.clear();
-    
+
     const result = await AuthService.googleLogin(credential);
-    
-    if ('data' in result) {
-      setUser(result.data.user);
-      setLoading(false);
-      return result.data.user;
+
+    if (result.succeeded) {
+      setUser(result.user);
+      setPendingChallenge(null);
+    } else if (result.requires2fa) {
+      setPendingChallenge(result.challenge);
+      setError(null);
+    } else {
+      setError(result.error);
+      setPendingChallenge(null);
     }
-    setError(result.error);
     setLoading(false);
-    return null;
+    return result;
+  }, []);
+
+  const clearChallenge = useCallback(() => {
+    setPendingChallenge(null);
+    setError(null);
   }, []);
 
   const logout = useCallback(() => {
     queryClient.clear();
     setUser(null);
+    setPendingChallenge(null);
     AuthService.logout();
   }, []);
 
@@ -103,22 +129,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(prev => prev ? { ...prev, ...data } as User : null);
   }, []);
 
-  const value = useMemo(() => ({ 
-    user, 
-    isAuthenticated: !!user, 
-    loading, 
-    login, 
-    logout, 
-    refreshUser, 
-    updateUser, 
+  const value = useMemo(() => ({
+    user,
+    isAuthenticated: !!user,
+    loading,
+    login,
+    logout,
+    refreshUser,
+    updateUser,
     error,
-    googleLogin
-  }), [user, loading, login, logout, refreshUser, updateUser, error, googleLogin]);
+    googleLogin,
+    pendingChallenge,
+    clearChallenge,
+  }), [user, loading, login, logout, refreshUser, updateUser, error, googleLogin, pendingChallenge, clearChallenge]);
 
   return (
     <AuthContext.Provider value={value}>
       {children}
-    </AuthContext.Provider>
+   </AuthContext.Provider>
   );
 };
 

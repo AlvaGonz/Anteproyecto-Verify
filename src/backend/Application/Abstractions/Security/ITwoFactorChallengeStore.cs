@@ -6,4 +6,5 @@ public interface ITwoFactorChallengeStore
 {
     Task<TwoFactorChallenge> CreateAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<TwoFactorChallenge?> ConsumeAsync(string challengeToken, CancellationToken cancellationToken = default);
+    Task<TwoFactorChallenge?> PeekAsync(string challengeToken, CancellationToken cancellationToken = default);
 }

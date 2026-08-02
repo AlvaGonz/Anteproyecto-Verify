@@ -49,6 +49,8 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
       <img
         src={project.imagenUrl || getDefaultProjectImage(project.categoria as unknown as number)}
         alt={project.nombreProyecto}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
       <div className="absolute top-6 left-6">

@@ -13,17 +13,20 @@ public class LoginUserCommandHandler
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITwoFactorChallengeStore _challengeStore;
 
     public LoginUserCommandHandler(
         IUsuarioRepository usuarioRepository,
         IPasswordHasher passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ITwoFactorChallengeStore challengeStore)
     {
         _usuarioRepository = usuarioRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
         _unitOfWork = unitOfWork;
+        _challengeStore = challengeStore;
     }
 
     public async Task<LoginUserResultDto> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -56,8 +59,16 @@ public class LoginUserCommandHandler
         {
             user.ForzarVerificacionEmail();
             user.UpdateAccountStatus(Domain.Enums.UserAccountStatus.Active);
-            
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        // 2FA branch: password ok, but user has 2FA enabled → issue challenge
+        var challenge = await Application.Features.Auth.Shared.TwoFactorLoginBranch
+            .BuildChallengeResponseAsync(user, _challengeStore, cancellationToken);
+        if (challenge is not null)
+        {
+            return new LoginUserResultDto(true, null, challenge);
         }
 
         var roleStr = user.Rol == UserRole.Administrator ? "admin" : "user";
@@ -83,6 +94,8 @@ public class LoginUserCommandHandler
             IsGuest: user.TitularId.HasValue,
             TitularId: user.TitularId,
             InviterPlan: inviterPlan,
+            MaxProyectos: user.Plan?.MaxProyectos,
+            MaxUsuariosSecundarios: user.Plan?.MaxUsuariosSecundarios,
             InviteesList: user.MiembrosEquipo
                 .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
                 .Select(m => new {
@@ -90,7 +103,7 @@ public class LoginUserCommandHandler
                     nombre = m.Nombre,
                     apellido = m.Apellido,
                     email = m.CorreoElectronico,
-                    estado = m.AccountStatus == Domain.Enums.UserAccountStatus.Invited ? "Pendiente" : 
+                    estado = m.AccountStatus == Domain.Enums.UserAccountStatus.Invited ? "Pendiente" :
                              (!m.EmailVerificado ? "Pendiente" : (m.Activo ? "Activo" : "Inactivo"))
                 })
         );
@@ -99,5 +112,14 @@ public class LoginUserCommandHandler
         var response = new LoginUserResponseDto(userDto, token);
 
         return new LoginUserResultDto(true, null, response);
+    }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@');
+        if (parts.Length != 2) return email;
+        var local = parts[0];
+        var masked = local.Length <= 2 ? new string('*', local.Length) : local[0] + new string('*', local.Length - 2) + local[^1];
+        return $"{masked}@{parts[1]}";
     }
 }

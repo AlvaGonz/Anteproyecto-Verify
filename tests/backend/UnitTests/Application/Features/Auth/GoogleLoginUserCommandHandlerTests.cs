@@ -20,9 +20,10 @@ public class GoogleLoginUserCommandHandlerTests
     private readonly Mock<IJwtTokenGenerator> _jwtGen = new();
     private readonly Mock<IGoogleAuthService> _googleAuth = new();
     private readonly Mock<IUnitOfWork> _uow = new();
+    private readonly Mock<ITwoFactorChallengeStore> _challengeStore = new();
 
     private GoogleLoginUserCommandHandler CreateSut() =>
-        new(_usuarioRepo.Object, _jwtGen.Object, _googleAuth.Object, _planRepo.Object, _uow.Object);
+        new(_usuarioRepo.Object, _jwtGen.Object, _googleAuth.Object, _planRepo.Object, _uow.Object, _challengeStore.Object);
 
     [Fact]
     public async Task Handle_InvalidToken_ReturnsFailure()
@@ -45,7 +46,7 @@ public class GoogleLoginUserCommandHandlerTests
         var profile = new GoogleUserProfile { Sub = "123", Email = "new@test.com", Name = "New User", EmailVerified = true };
         _googleAuth.Setup(g => g.VerifyTokenAsync("valid_token", default)).ReturnsAsync(profile);
         _usuarioRepo.Setup(r => r.GetByEmailAsync("new@test.com", default)).ReturnsAsync((Usuario?)null);
-        _jwtGen.Setup(j => j.GenerateToken(It.IsAny<Usuario>())).Returns("jwt_token");
+        _jwtGen.Setup(j => j.GenerateToken(It.IsAny<Usuario>(), It.IsAny<bool>())).Returns("jwt_token");
 
         Usuario? capturedUser = null;
         _usuarioRepo.Setup(r => r.AddAsync(It.IsAny<Usuario>(), default))
@@ -78,7 +79,7 @@ public class GoogleLoginUserCommandHandlerTests
 
         var existingUser = new Usuario("Existing", "User", "existing@test.com", "hash", UserRole.User, "8090000000", "00100000000");
         _usuarioRepo.Setup(r => r.GetByEmailAsync("existing@test.com", default)).ReturnsAsync(existingUser);
-        _jwtGen.Setup(j => j.GenerateToken(It.IsAny<Usuario>())).Returns("jwt_token");
+        _jwtGen.Setup(j => j.GenerateToken(It.IsAny<Usuario>(), It.IsAny<bool>())).Returns("jwt_token");
 
         var cmd = new GoogleLoginUserCommand("valid_token");
         var sut = CreateSut();

@@ -416,8 +416,56 @@ public class SettingsController : ControllerBase
         var access = await _context.Accesos.Where(a => a.IdUsuario == user.Id).ToListAsync(cancellationToken);
         if (access.Any()) _context.Accesos.RemoveRange(access);
         
-        var pagos = await _context.PagosLegacy.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
-        if (pagos.Any()) _context.PagosLegacy.RemoveRange(pagos);
+        var pagos = await _context.Pagos.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
+        if (pagos.Any()) _context.Pagos.RemoveRange(pagos);
+
+        try {
+            var sesiones = await _context.SesionesUsuario.Where(s => s.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (sesiones.Any()) _context.SesionesUsuario.RemoveRange(sesiones);
+        } catch {}
+
+        try {
+            var verificaciones = await _context.Verificaciones2FA.Where(v => v.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (verificaciones.Any()) _context.Verificaciones2FA.RemoveRange(verificaciones);
+        } catch {}
+
+        try {
+            var invitaciones = await _context.Invitaciones.Where(i => i.EmisorId == user.Id).ToListAsync(cancellationToken);
+            if (invitaciones.Any()) _context.Invitaciones.RemoveRange(invitaciones);
+        } catch {}
+
+        try {
+            var logConsultas = await _context.LogConsultas.Where(l => l.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (logConsultas.Any()) _context.LogConsultas.RemoveRange(logConsultas);
+        } catch {}
+
+        try {
+            var logProyectos = await _context.LogProyectos.Where(l => l.UsuarioId == user.Id).ToListAsync(cancellationToken);
+            if (logProyectos.Any()) _context.LogProyectos.RemoveRange(logProyectos);
+        } catch {}
+
+        try {
+            var guardados = await _context.ProyectosGuardados.Where(p => p.SaverId == user.Id || p.CreatorId == user.Id).ToListAsync(cancellationToken);
+            if (guardados.Any()) _context.ProyectosGuardados.RemoveRange(guardados);
+        } catch {}
+
+        try {
+            var interesados = await _context.ProyectosInteresados.Where(p => p.InterestedUserId == user.Id || p.CreatorId == user.Id).ToListAsync(cancellationToken);
+            if (interesados.Any()) _context.ProyectosInteresados.RemoveRange(interesados);
+        } catch {}
+
+        // Legacy tables with enforced FKs but no EF mappings (same database, raw cleanup)
+        try {
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM LogPagos WHERE IdUsuario = @id",
+                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
+        } catch {}
+
+        try {
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM Recibo WHERE IdUsuario = @id",
+                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
+        } catch {}
 
         _context.Usuarios.Remove(user);
         
@@ -541,7 +589,7 @@ public class SettingsController : ControllerBase
             Monto = plan.Precio,
             FechaPago = DateTime.UtcNow
         };
-        _context.PagosLegacy.Add(nuevoPago);
+        _context.Pagos.Add(nuevoPago);
 
         // Single SaveChangesAsync for entire operation
         await _context.SaveChangesAsync(cancellationToken);
@@ -835,7 +883,7 @@ public class SettingsController : ControllerBase
             }
         }
 
-        var hasPagos = await _context.PagosLegacy.AnyAsync(p => p.IdUsuario == u.Id, cancellationToken);
+        var hasPagos = await _context.Pagos.AnyAsync(p => p.IdUsuario == u.Id, cancellationToken);
         if (!hasPagos)
         {
             var freePlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Gratuito", cancellationToken);
@@ -844,7 +892,7 @@ public class SettingsController : ControllerBase
             var targetPlan = u.Rol == UserRole.Administrator ? proPlan : freePlan;
             if (targetPlan != null)
             {
-                _context.PagosLegacy.Add(new Pago
+                _context.Pagos.Add(new Pago
                 {
                     IdUsuario = u.Id,
                     Idsuscripcion = targetPlan.Idsuscripcion,

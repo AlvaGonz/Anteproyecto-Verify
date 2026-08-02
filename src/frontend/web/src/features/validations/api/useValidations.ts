@@ -37,7 +37,9 @@ export const useRunFullValidation = (projectId: string) => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["validations", "result", projectId] });
       qc.invalidateQueries({ queryKey: ["findings", projectId] });
-      // Invalidate audit logs if needed
+      qc.invalidateQueries({ queryKey: ["projects", projectId] }); // ponytail: detail may depend on validation status
+      qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] }); // ponytail: eligibility may change after validation
+      qc.invalidateQueries({ queryKey: ["audit", projectId] }); // ponytail: audit may record validation execution
     },
   });
 };

@@ -54,6 +54,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("delete")]
+    [Api.Common.RequireTwoFactor]
     public async Task<IActionResult> RequestDeletion([FromBody] DeleteAccountRequest request, CancellationToken cancellationToken)
     {
         if (request.Confirmation != "ELIMINAR")

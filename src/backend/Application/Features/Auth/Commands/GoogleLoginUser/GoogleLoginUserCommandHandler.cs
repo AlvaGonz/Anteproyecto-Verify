@@ -15,19 +15,22 @@ public class GoogleLoginUserCommandHandler
     private readonly IGoogleAuthService _googleAuthService;
     private readonly IPlanSuscripcionRepository _planRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITwoFactorChallengeStore _challengeStore;
 
     public GoogleLoginUserCommandHandler(
         IUsuarioRepository usuarioRepository,
         IJwtTokenGenerator jwtTokenGenerator,
         IGoogleAuthService googleAuthService,
         IPlanSuscripcionRepository planRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ITwoFactorChallengeStore challengeStore)
     {
         _usuarioRepository = usuarioRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
         _googleAuthService = googleAuthService;
         _planRepository = planRepository;
         _unitOfWork = unitOfWork;
+        _challengeStore = challengeStore;
     }
 
     public async Task<LoginUserResultDto> Handle(GoogleLoginUserCommand request, CancellationToken cancellationToken)
@@ -91,6 +94,14 @@ public class GoogleLoginUserCommandHandler
             }
         }
 
+        // 2FA parity with password login
+        var challenge = await Application.Features.Auth.Shared.TwoFactorLoginBranch
+            .BuildChallengeResponseAsync(user, _challengeStore, cancellationToken);
+        if (challenge is not null)
+        {
+            return new LoginUserResultDto(true, null, challenge);
+        }
+
         var roleStr = user.Rol == UserRole.Administrator ? "admin" : "user";
         var userDto = new LoginUserUserDto(
             user.Id,
@@ -105,6 +116,8 @@ public class GoogleLoginUserCommandHandler
             IsGuest: user.TitularId.HasValue,
             TitularId: user.TitularId,
             InviterPlan: user.Titular?.Plan?.NombrePlan,
+            MaxProyectos: user.Plan?.MaxProyectos,
+            MaxUsuariosSecundarios: user.Plan?.MaxUsuariosSecundarios,
             InviteesList: user.MiembrosEquipo
                 .Where(m => m.AccountStatus != Domain.Enums.UserAccountStatus.Purged && m.AccountStatus != Domain.Enums.UserAccountStatus.PendingDeletion)
                 .Select(m => new {
@@ -121,5 +134,14 @@ public class GoogleLoginUserCommandHandler
         var response = new LoginUserResponseDto(userDto, token);
 
         return new LoginUserResultDto(true, null, response);
+    }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@');
+        if (parts.Length != 2) return email;
+        var local = parts[0];
+        var masked = local.Length <= 2 ? new string('*', local.Length) : local[0] + new string('*', local.Length - 2) + local[^1];
+        return $"{masked}@{parts[1]}";
     }
 }

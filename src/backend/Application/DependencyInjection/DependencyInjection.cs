@@ -44,6 +44,14 @@ public static class DependencyInjection
 // Subscription Queries
         services.AddScoped<Application.Features.Subscriptions.Queries.GetMySubscriptionStatus.GetMySubscriptionStatusQueryHandler>();
 
+        // 2FA Handlers
+        services.AddScoped<Application.Features.TwoFactor.BeginEnrollmentCommandHandler>();
+        services.AddScoped<Application.Features.TwoFactor.ConfirmEnrollmentCommandHandler>();
+        services.AddScoped<Application.Features.TwoFactor.VerifyTwoFactorCodeCommandHandler>();
+        services.AddScoped<Application.Features.TwoFactor.ConsumeRecoveryCodeCommandHandler>();
+        services.AddScoped<Application.Features.TwoFactor.Disable2FACommandHandler>();
+        services.AddScoped<Application.Features.TwoFactor.GetTwoFactorStatusQueryHandler>();
+
         return services;
     }
 }

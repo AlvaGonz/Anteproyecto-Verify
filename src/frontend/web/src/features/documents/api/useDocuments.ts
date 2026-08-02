@@ -48,7 +48,11 @@ export const useUploadDocument = (projectId: string) => {
     mutationKey: ['documentKeys'],
     mutationFn: (formData: FormData) =>
       apiClient.post<ApiDocumentoDto>(`/projects/${projectId}/documents`, formData).then(res => mapApiDocument(res.data)),
-    onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });
+      qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] }); // ponytail: doc count may trigger auto-transition
+      qc.invalidateQueries({ queryKey: ["projects", projectId] }); // ponytail: detail depends on status
+    },
   });
 };
 
@@ -62,7 +66,11 @@ export const useUploadRequirementDocument = (projectId: string) => {
       // Ensure we hit the v1 endpoint explicitly
       return apiClient.post<ApiDocumentoDto>(`v1/projects/${projectId}/documents/requirements/${requirementCode}/upload`, formData).then(res => mapApiDocument(res.data));
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });
+      qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] }); // ponytail: doc count may trigger auto-transition
+      qc.invalidateQueries({ queryKey: ["projects", projectId] }); // ponytail: detail depends on status
+    },
   });
 };
 

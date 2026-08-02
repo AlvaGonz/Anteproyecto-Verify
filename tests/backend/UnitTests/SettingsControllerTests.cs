@@ -9,9 +9,11 @@ using Api.Controllers;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Common;
+using global::Application.Abstractions;
 using global::Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -55,7 +57,9 @@ public class SettingsControllerTests
         var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
         var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
         var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+        var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+        var mockConfig = new Mock<IConfiguration>();
+        var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
         SetupControllerContext(controller, null);
 
         // Act
@@ -83,7 +87,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "juan@verifinca.do", "user");
 
             // Act
@@ -117,7 +123,7 @@ public class SettingsControllerTests
             );
             context.PlanesSuscripcion.AddRange(
                 PlanSuscripcion.Create(freePlanId, "Consultor", 0.00m, 5, 1, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false),
-                PlanSuscripcion.Create(proPlanId, "Profesional", 3500.00m, -1, 5, true, true, 0, 200, false, false, false, false, true, false, "Email", false)
+                PlanSuscripcion.Create(proPlanId, "Profesional", 60.00m, -1, 5, true, true, 0, 200, false, false, false, false, true, false, "Email", false)
             );
             
             // Add legacy view records manually for InMemory testing
@@ -134,7 +140,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             // Act
@@ -193,7 +201,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdateRoleRequest { Role = "user" };
@@ -234,7 +244,7 @@ public class SettingsControllerTests
             typeof(EntityBase).GetProperty("Id")?.SetValue(dev, devUserGuid);
 
             context.Usuarios.AddRange(admin, dev);
-            context.PlanesSuscripcion.Add(PlanSuscripcion.Create(empresaPlanId, "Empresa", 10000.00m, -1, -1, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true));
+            context.PlanesSuscripcion.Add(PlanSuscripcion.Create(empresaPlanId, "Empresa", 170.00m, -1, -1, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true));
 
             context.UsuariosLegacy.AddRange(
                 new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
@@ -249,7 +259,9 @@ public class SettingsControllerTests
             var mockHasher = new Mock<global::Application.Abstractions.Security.IPasswordHasher>();
             var mockEmail = new Mock<global::Application.Abstractions.Notifications.IEmailService>();
             var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<global::Api.Controllers.SettingsController>>();
-            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object);
+            var mockStripe = new Mock<global::Application.Abstractions.IStripeService>();
+            var mockConfig = new Mock<IConfiguration>();
+            var controller = new global::Api.Controllers.SettingsController(context, mockHasher.Object, mockEmail.Object, mockLogger.Object, mockStripe.Object, mockConfig.Object);
             SetupControllerContext(controller, "admin@verifinca.do", "admin");
 
             var request = new global::Api.Controllers.UpdatePlanRequest { PlanId = empresaPlanId };
@@ -264,10 +276,10 @@ public class SettingsControllerTests
             var legacyUser = await context.UsuariosLegacy.FirstOrDefaultAsync(lu => lu.Email == "dev@verifinca.do");
             Assert.NotNull(legacyUser);
 
-            var pago = await context.PagosLegacy.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
+            var pago = await context.Pagos.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
             Assert.NotNull(pago);
             Assert.Equal(empresaPlanId, pago.Idsuscripcion);
-            Assert.Equal(10000.00m, pago.Monto);
+            Assert.Equal(170.00m, pago.Monto);
         }
     }
 }

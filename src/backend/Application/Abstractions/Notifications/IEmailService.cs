@@ -13,4 +13,12 @@ public interface IEmailService
     Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, string interval, CancellationToken ct = default);
     Task SendProjectStatusUpdateAsync(string toEmail, string userName, string projectName, string newStatus, CancellationToken ct = default);
     Task SendPasswordResetAsync(string toEmail, string userName, string resetToken, string? returnUrl = null, CancellationToken ct = default);
+
+    /// <summary>
+    /// Sends the 2FA email-OTP challenge to the user. Implementations MUST
+    /// surface provider failures as exceptions so callers can detect a
+    /// swallowed request. Contract: returning normally = provider accepted.
+    ///</summary>
+    Task SendEmailOtpAsync(string toEmail, string userName, string code, CancellationToken ct = default);
 }
+

@@ -135,7 +135,7 @@ test.describe("Checkout Flow — E2E con Mock", () => {
 
     // We expect it to redirect to the dashboard
     await expect(page).toHaveURL(/\/admin\/dashboard/, { timeout: 15000 });
-    
+
     // Verify toast or dashboard plan info
     await expect(page.getByText(/¡Bienvenido! Tu plan/i).or(page.getByRole('heading', { name: 'Dashboard' }).first())).toBeVisible();
   });
@@ -166,7 +166,7 @@ test.describe("Checkout Flow — E2E con Mock", () => {
         contentType: "application/json",
         body: JSON.stringify({
           plan: "Profesional",
-          planPrice: 3500,
+          planPrice: 60,
           subscriptionStatus: "active",
           currentPeriodEnd: "2026-12-31T23:59:59Z",
           stripeSubscriptionId: "sub_123456",

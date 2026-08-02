@@ -412,6 +412,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
                 <img
                   src={uniqueImgs[0]}
                   alt={`${project.nombre} - Foto principal`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
@@ -432,6 +434,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
                       <img
                         src={url}
                         alt=""
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     </button>
@@ -582,9 +586,9 @@ export const PublishedProjectDetailPage: React.FC = () => {
                   Responsable Registral
                 </p>
               </div>
-              <div className="w-16 h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-16 h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden rounded-md">
                 {project.registradoPor?.avatarUrl ? (
-                  <img src={project.registradoPor.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  <img src={project.registradoPor.avatarUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 ) : (
                   <Building2 size={24} className="text-slate-300" />
                 )}
@@ -747,6 +751,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
             <img
               src={uniqueImgs[selectedImageIndex]}
               alt={`${project.nombre} - Foto ampliada`}
+              loading="lazy"
+              decoding="async"
               className="max-w-full max-h-full object-contain"
             />
 
@@ -774,7 +780,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
                     i === selectedImageIndex ? "border-2 border-primary scale-110 shadow-[0_0_15px_rgba(249,133,19,0.5)] z-10" : "opacity-40 hover:opacity-100 border border-slate-700"
                   }`}
                 >
-                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <img src={url} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

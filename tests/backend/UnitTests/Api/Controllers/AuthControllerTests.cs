@@ -19,6 +19,7 @@ using Application.Features.Auth.Commands.ResetPassword;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Xunit;
@@ -42,9 +43,10 @@ public class AuthControllerTests
         var mockEmailService = new Mock<IEmailService>();
         var mockConfig = new Mock<IConfiguration>();
         var mockJwtTokenGenerator = new Mock<global::Application.Abstractions.Security.IJwtTokenGenerator>();
-        mockJwtTokenGenerator.Setup(j => j.GenerateToken(It.IsAny<Usuario>())).Returns("test-jwt-token");
+        mockJwtTokenGenerator.Setup(j => j.GenerateToken(It.IsAny<Usuario>(), It.IsAny<bool>())).Returns("test-jwt-token");
+        var mockChallengeStore = new Mock<ITwoFactorChallengeStore>();
         var verifyHandler = new VerifyEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
-        var loginHandler = new LoginUserCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, mockJwtTokenGenerator.Object, uowMock.Object);
+        var loginHandler = new LoginUserCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, mockJwtTokenGenerator.Object, uowMock.Object, mockChallengeStore.Object);
         var updateProfileHandler = new UpdateProfileCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object);
 
         var registerHandler = new RegisterUserCommandHandler(
@@ -63,9 +65,13 @@ public class AuthControllerTests
         var mockValidatorResetPassword = new Mock<FluentValidation.IValidator<ResetPasswordCommand>>();
         var resetPasswordHandler = new ResetPasswordCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object, mockValidatorResetPassword.Object);
         var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
+        var dbOptions = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<global::Infrastructure.Persistence.AppDbContext>()
+            .UseInMemoryDatabase(databaseName: "AuthControllerTests")
+            .Options;
+        var dbContext = new global::Infrastructure.Persistence.AppDbContext(dbOptions);
 
         _controller = new AuthController(
-            registerHandler, 
+            registerHandler,
             verifyHandler,
             loginHandler,
             updateProfileHandler,
@@ -73,11 +79,11 @@ public class AuthControllerTests
             resendEmailHandler,
             forgotPasswordHandler,
             resetPasswordHandler,
-            _usuarioRepositoryMock.Object, 
+            _usuarioRepositoryMock.Object,
             mockConfig.Object,
             mockJwtTokenGenerator.Object,
             cache,
-            null! // AppDbContext is not directly used in the mocked handlers' tests
+            dbContext
         );
 
         var httpContext = new DefaultHttpContext();
@@ -155,6 +161,51 @@ public class AuthControllerTests
 
         // Assert
         var unauthorizedResult = Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Login_WithUserWithPlan_IncludesPlanLimitsInUserPayload()
+    {
+        // Arrange
+        var request = new LoginUserCommand("test@example.com", "password123");
+        var user = new Usuario("Test", "User", "test@example.com", "hashed_password", UserRole.User, "12345678", "12345678");
+        user.GetType().GetProperty("EmailVerificado")?.SetValue(user, true);
+        user.GetType().GetProperty("Activo")?.SetValue(user, true);
+
+        var plan = PlanSuscripcion.Create(
+            Guid.NewGuid(), "Consultor", 0m,
+            maxConsultas: 50, maxProyectos: 10, presentacionPublica: true,
+            qrIncluido: false, maxUsuariosSecundarios: 3, maxAlmacenamientoMb: 100,
+            alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
+            exportacionExcelDisponible: false, exportacionPdfDisponible: false, integracionCrmDisponible: false,
+            soporteTipo: "Comunidad", accesoApi: false);
+        user.GetType().GetProperty("Plan")?.SetValue(user, plan);
+
+        _usuarioRepositoryMock.Setup(repo => repo.GetByEmailAsync(request.Email, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _passwordHasherMock.Setup(hasher => hasher.VerifyPassword(request.Password, user.ContrasenaHash))
+            .Returns(true);
+
+        // Act
+        var result = await _controller.Login(request, CancellationToken.None);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.NotNull(okResult.Value);
+
+        var valueType = okResult.Value.GetType();
+        var userProp = valueType.GetProperty("user");
+        Assert.NotNull(userProp);
+        var userObj = userProp.GetValue(okResult.Value);
+        Assert.NotNull(userObj);
+
+        var maxProyectosProp = userObj.GetType().GetProperty("maxProyectos");
+        Assert.NotNull(maxProyectosProp);
+        Assert.Equal(10, (int)maxProyectosProp.GetValue(userObj)!);
+
+        var maxUsuariosProp = userObj.GetType().GetProperty("maxUsuariosSecundarios");
+        Assert.NotNull(maxUsuariosProp);
+        Assert.Equal(3, (int)maxUsuariosProp.GetValue(userObj)!);
     }
 }
 

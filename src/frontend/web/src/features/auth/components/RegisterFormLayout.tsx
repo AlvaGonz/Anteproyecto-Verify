@@ -39,7 +39,7 @@ interface RegisterFormLayoutProps {
   formErrors: FieldErrors<RegisterFormValues>;
   password: string;
   checks: Array<{ label: string; passed: boolean }>;
-  phone: { value: string; handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void };
+  telefonoOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   blockNonDigits: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   cedulaOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   openModal: (type: "terms" | "privacy") => void;
@@ -58,7 +58,7 @@ export const RegisterFormLayout: React.FC<RegisterFormLayoutProps> = ({
   formErrors,
   password,
   checks,
-  phone,
+  telefonoOnChange,
   blockNonDigits,
   cedulaOnChange,
   openModal,
@@ -138,12 +138,10 @@ export const RegisterFormLayout: React.FC<RegisterFormLayoutProps> = ({
           <input
             id="telefono"
             type="text"
-            {...register("telefono")}
+            {...register("telefono", { onChange: telefonoOnChange })}
             placeholder="Teléfono"
             maxLength={14}
             inputMode="numeric"
-            value={phone.value}
-            onChange={phone.handleChange}
             onKeyDown={blockNonDigits}
             className="vf-input w-full pl-12 h-[52px]"
           />

@@ -13,6 +13,8 @@ export const FindingsVisualInsight = ({ summary, locationName }: FindingsVisualI
         <div className="absolute inset-0 grayscale opacity-40 group-hover:opacity-60 transition-opacity duration-700">
           <img 
             className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-10000"
+            loading="lazy"
+            decoding="async"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqZE_FVPB2DqWk8DwPX0B-qPzbX-EIk3HlkeHL8jXf-VNmQ3nwQzl3MrFhzXhd3WCiAEwj68pSmQht3PW4c4IZIxvwlAa1AIa5rhc6B5pLDFVLRBDo7l7u1u3s8zxeB2bfKfKj3BmKs4zQy6u8vG2dD6plMlafxhCRsYkkz0gPquaxzG7olMKLqal1hiZunwgdLPAyJFNz7EamlJANe9cBdWfcBllRRVA6EPFBWF1y8DvP2dKURpMFnysNnfe8d1Yz833YQM83Qcs"
             alt="Site location context"
           />

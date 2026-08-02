@@ -11,6 +11,8 @@ import { MyProfileForm } from "../../features/settings/components/MyProfileForm"
 import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
 import { InviteesSettings } from "../../features/settings/components/InviteesSettings";
 import { DeleteAccountSection } from "../../features/settings/components/DeleteAccountSection";
+import { TwoFactorSection } from "../../features/settings/components/TwoFactorSection";
+import { ChangePasswordSection } from "../../features/settings/components/ChangePasswordSection";
 import {
   Settings,
   Users,
@@ -45,6 +47,7 @@ export const SettingsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
@@ -90,7 +93,8 @@ export const SettingsPage: React.FC = () => {
       addToast("La cédula es obligatoria", "error");
       return;
     }
-    if (formData.cedula) {
+    // Cédula is immutable in edit mode, so its check digit is only validated on create
+    if (!editingUser && formData.cedula) {
       const cedDigits = formData.cedula.replace(/\D/g, "");
       if (cedDigits.length > 0 && !validateCedulaCheckDigit(cedDigits)) {
         addToast("Cédula inválida o dígito verificador incorrecto", "error");
@@ -107,9 +111,6 @@ export const SettingsPage: React.FC = () => {
     }
 
     try {
-      setIsModalOpen(false);
-      setEditingUser(null);
-
       if (editingUser) {
         await updateUserMutation.mutateAsync({ userId: editingUser.id, data: formData });
         addToast("Usuario actualizado exitosamente", "success");
@@ -117,8 +118,10 @@ export const SettingsPage: React.FC = () => {
         await createUserMutation.mutateAsync(formData);
         addToast("Usuario creado exitosamente", "success");
       }
+      setIsModalOpen(false);
+      setEditingUser(null);
+      setFormError(null);
     } catch (error: any) {
-      console.error("API Error Response:", error?.response?.data);
       let errorMsg = "Error al guardar el usuario";
       if (error?.response?.data) {
         const d = error.response.data;
@@ -129,18 +132,21 @@ export const SettingsPage: React.FC = () => {
           errorMsg = Object.values(d.errors).flat().join(' ');
         }
       }
-      addToast(errorMsg, "error");
+      // ponytail: keep the modal open so the admin can fix the field; error shown inside the form
+      setFormError(errorMsg);
     }
   };
 
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
+    setFormError(null);
     setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "dev", "validator", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
     setIsModalOpen(true);
   };
 
   const handleAddNewClick = () => {
     setEditingUser(null);
+    setFormError(null);
     setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Consultor" });
     setIsModalOpen(true);
   };
@@ -310,15 +316,18 @@ export const SettingsPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
+              className="space-y-6"
             >
+              <TwoFactorSection />
+              <ChangePasswordSection />
               <section className="bg-red-50 border border-red-200 rounded-lg p-6">
                 <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
                 <p className="text-sm text-red-600 mb-4">
                   Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
-                </p>
+               </p>
                 <DeleteAccountSection />
-              </section>
-            </m.div>
+             </section>
+           </m.div>
           )}
 
 
@@ -330,10 +339,11 @@ export const SettingsPage: React.FC = () => {
         isOpen={isModalOpen}
         editingUser={editingUser}
         formData={formData}
+        error={formError}
         isProcessing={isProcessing}
-        onChange={setFormData}
+        onChange={(data) => { setFormError(null); setFormData(data); }}
         onSubmit={handleSaveUser}
-        onClose={() => { setIsModalOpen(false); setEditingUser(null); }}
+        onClose={() => { setIsModalOpen(false); setEditingUser(null); setFormError(null); }}
       />
 
       {/* Delete Confirmation Modal */}

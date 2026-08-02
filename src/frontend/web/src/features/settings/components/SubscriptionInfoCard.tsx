@@ -76,18 +76,27 @@ export const SubscriptionInfoCard: React.FC = () => {
   const formattedDate = currentPeriodEnd ? DATE_FORMATTER.format(currentPeriodEnd) : null;
 
   const billingCycle = data?.billingCycle ?? 'monthly';
-  const isAnnual = billingCycle === 'yearly' || billingCycle === 'annual' || billingCycle === 'year';
 
   let formattedPrice: string | null = null;
-  if (hasPlan && data) {
-    if (data.planPrice === 0) {
+  let originalMonthlyPrice: string | null = null;
+  let isDiscountApplied = false;
+
+    if (hasPlan && data) {
+      const basePrice = data.planPrice ?? 0;
+      const monthlyPrice = data.pricing?.monthlyPrice ?? basePrice;
+
+    if (monthlyPrice === 0 && !data.pricing?.yearlyPrice) {
       formattedPrice = 'Gratis';
-    } else if (data.planPrice && data.planPrice > 0) {
+    } else {
+      const isAnnual = ['yearly', 'annual', 'year', 'anual'].includes(String(billingCycle).toLowerCase()) || (daysRemaining ?? 0) > 35;
+      
       if (isAnnual) {
-        const annualPrice = data.pricing?.yearlyPrice ?? data.planPrice;
-        formattedPrice = `${PRICE_FORMATTER.format(annualPrice)} USD / año`;
+        const discountedMonthlyPrice = monthlyPrice * 0.8;
+        formattedPrice = `${PRICE_FORMATTER.format(discountedMonthlyPrice)} USD / mes`;
+        originalMonthlyPrice = `${PRICE_FORMATTER.format(monthlyPrice)} USD / mes`;
+        isDiscountApplied = true;
       } else {
-        formattedPrice = `${PRICE_FORMATTER.format(data.planPrice)} USD / mes`;
+        formattedPrice = `${PRICE_FORMATTER.format(monthlyPrice)} USD / mes`;
       }
     }
   }
@@ -188,7 +197,21 @@ export const SubscriptionInfoCard: React.FC = () => {
                     }
                   </div>
                   {formattedPrice && (
-                    <div className="text-sm text-text-secondary font-medium">{formattedPrice}</div>
+                    <div className="flex flex-col gap-0.5 mt-1">
+                      {originalMonthlyPrice && (
+                        <div className="text-xs text-text-secondary font-medium line-through opacity-70">
+                          {originalMonthlyPrice}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm text-text-secondary font-medium">{formattedPrice}</div>
+                        {isDiscountApplied && (
+                          <div className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wide">
+                            20% Dto. Anual
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </>
               )}
