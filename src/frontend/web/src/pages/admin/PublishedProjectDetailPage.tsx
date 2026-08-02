@@ -21,6 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useProject } from "../../features/projects/api/useProjects";
+import { useCategories } from "../../features/projects/api/useCategories";
 import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
 import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
 import { IntegrityStatus } from "../../features/projects/types";
@@ -264,6 +265,10 @@ export const PublishedProjectDetailPage: React.FC = () => {
   const saved = localSaved;
   const interested = localInterested;
 
+  const { data: categorias = [] } = useCategories();
+  // ponytail: categoriaNombre arrives empty on the wire (repo GetByIdAsync has no Include(CategoriaProyecto)); resolve the name from the cached catalog by id instead
+  const categoriaNombre = categorias.find(c => c.id === project?.categoriaId)?.nombre ?? project?.categoriaNombre ?? "N/D";
+
   // Gather all available images
   const allImgs = [
     project?.imagenUrl,
@@ -459,7 +464,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-slate-700">Estado: <span className="font-bold">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span></p>
-                <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{project.categoriaNombre || "N/D"}</span></p>
+                <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{categoriaNombre}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Integridad: <span className="font-bold">{getIntegrityLabel()}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Ubicación: <span className="font-bold">{project.ubicacionTexto || "N/D"}</span></p>
               </div>
@@ -530,7 +535,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
                 </div>
                 <div className="min-w-0 border-b border-slate-200 pb-1.5">
                   <span className="block font-bold text-slate-700">Categoría:</span>
-                  <span className="block break-words text-slate-600">{project.categoriaNombre || "N/D"}</span>
+                  <span className="block break-words text-slate-600">{categoriaNombre}</span>
                 </div>
                 <div className="min-w-0 border-b border-slate-200 pb-1.5">
                   <span className="block font-bold text-slate-700">Superficie M²:</span>

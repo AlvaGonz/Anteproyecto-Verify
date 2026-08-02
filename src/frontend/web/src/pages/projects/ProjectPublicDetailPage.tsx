@@ -29,11 +29,13 @@ import {
   Info,
   User,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { m } from "framer-motion";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { usePlanLimits } from "../../features/settings/api/useSettings";
 import { DocumentosModal } from "../../features/documents/components/DocumentosModal";
+import { BackToTopButton } from "../../shared/components/ui/BackToTopButton";
 
 
 
@@ -64,7 +66,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const { registerInterest, isRegisteringInterest, unregisterInterest, isUnregisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
   const { data: interestsList } = useInterests(isAuthenticated);
   const { data: savedList } = useSavedProjects(isAuthenticated);
-  const [, setLocalSaved] = React.useState(false);
+  const [localSaved, setLocalSaved] = React.useState(false);
   const { addToast } = useToast();
 
   React.useEffect(() => {
@@ -230,7 +232,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
     <div className="min-h-screen bg-background font-body text-on-surface antialiased overflow-x-hidden selection:bg-primary-container">
 
       {/* Dynamic Nav */}
-      <nav className="fixed top-0 z-50 w-full flex justify-between items-center px-10 h-24 bg-secondary shadow-2xl">
+      <nav className="fixed top-0 z-50 w-full flex justify-between items-center px-4 md:px-10 h-24 bg-secondary shadow-2xl">
         <div className="flex items-center gap-6">
           <Link to="/projects" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all">
             <ArrowLeft className="w-6 h-6" />
@@ -346,7 +348,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
             )}
 
             {/* Asset Details Grid */}
-            <section className="bg-surface-container-lowest p-2 md:p-5 rounded-[3.5rem] border border-surface-container-high/50 relative overflow-hidden shadow-sm">
+            <section className="bg-surface-container-lowest p-4 md:p-5 rounded-[1.5rem] md:rounded-[3.5rem] border border-surface-container-high/50 relative overflow-hidden shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-[1.25rem] bg-secondary flex items-center justify-center text-white shadow-lg">
                   <Info className="w-4 h-4" />
@@ -360,7 +362,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     <Landmark className="w-3.5 h-3.5" />
                     <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Entidad Desarrolladora</span>
                   </div>
-                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic">
+                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic break-words">
                     {project.datosDesarrollador || "CORPORACIÓN NO ESPECIFICADA"}
                   </p>
                 </div>
@@ -378,7 +380,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
                     <Layers className="w-3.5 h-3.5" />
                     <span className="text-[9px] font-black uppercase tracking-widest text-[#223382]">Clasificación de Activo</span>
                   </div>
-                    {project.categoriaNombre?.toUpperCase()}
+                  <p className="text-lg md:text-xl font-black text-secondary leading-none tracking-tight font-display italic break-words">
+                    {project.categoriaNombre?.toUpperCase() || "SIN CLASIFICACIÓN"}
+                  </p>
                 </div>
                 <div className="space-y-1 group">
                   <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
@@ -472,7 +476,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                               </div>
                               <div className="min-w-0">
                                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Correo Electrónico</span>
-                                <a href={`mailto:${project.registradoPor.email}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
+                                <a href={`mailto:${project.registradoPor.email}`} className="text-sm font-medium text-white/90 hover:text-white break-words block">
                                   {project.registradoPor.email}
                                 </a>
                               </div>
@@ -557,6 +561,46 @@ export const ProjectPublicDetailPage: React.FC = () => {
               </m.div>
             )}
 
+            {/* Save button */}
+            <button
+                type="button"
+                disabled={isSaving || isUnsaving}
+                onClick={() => {
+                  if (canManage) {
+                    addToast("Esta acción no es posible porque usted es el vendedor o representante de este proyecto.", "error");
+                    return;
+                  }
+                  if (localSaved) {
+                    setLocalSaved(false);
+                    unsaveProject(project.id, {
+                      onError: () => setLocalSaved(true)
+                    });
+                  } else {
+                    setLocalSaved(true);
+                    saveProject(project.id, {
+                      onError: () => setLocalSaved(false)
+                    });
+                  }
+                }}
+                className={`text-xs font-bold px-4 py-2 rounded shadow-sm transition-all duration-300 disabled:opacity-70 flex items-center gap-2 cursor-pointer ${
+                  localSaved ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-[0_0_10px_rgba(5,150,105,0.4)]" : "bg-primary text-white hover:bg-primary/90"
+                }`}
+              >
+                {isSaving || isUnsaving ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Procesando...</span>
+                  </>
+                ) : localSaved ? (
+                  <>
+                    <CheckCircle2 size={14} />
+                    <span>Guardado</span>
+                  </>
+                ) : (
+                  <span>Guardar</span>
+                )}
+              </button>
+
             {/* Integrity Status Card */}
             <m.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -625,6 +669,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
       used={quotaError?.used}
       max={quotaError?.max}
     />
+
+    <BackToTopButton />
     </div>
   );
 };
