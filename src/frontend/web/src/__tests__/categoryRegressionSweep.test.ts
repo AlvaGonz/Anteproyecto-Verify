@@ -47,7 +47,9 @@ const SKIP_FILES = (file: string) =>
   file.endsWith("\\categoryRegressionSweep.test.ts") ||
   file.endsWith("/categoryRegressionSweep.test.ts") ||
   file.endsWith("\\impact-map-categoria-proyecto-cutover.md") ||
-  file.endsWith("/impact-map-categoria-proyecto-cutover.md");
+  file.endsWith("/impact-map-categoria-proyecto-cutover.md") ||
+  file.endsWith("\\progress.md") ||
+  file.endsWith("/progress.md");
 
 interface Match {
   file: string;

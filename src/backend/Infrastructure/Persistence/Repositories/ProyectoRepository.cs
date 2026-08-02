@@ -24,6 +24,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -35,6 +36,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .AsQueryable();
 
         if (usuarioId.HasValue)
@@ -83,6 +85,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .AsQueryable();
 
         if (usuarioId.HasValue)
@@ -106,6 +109,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .Where(p => p.Estado.CodigoUnico != draftCode);
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -128,6 +132,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .Where(p => p.Estado.CodigoUnico != draftCode)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -206,6 +211,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .Where(p => 
                 p.CedulaRncPropietario == query ||
                 p.Ipi == query ||
@@ -315,6 +321,8 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(p => p.UsuarioCreador)
             .Include(g => g.Project)
                 .ThenInclude(p => p.Estado)
+            .Include(g => g.Project)
+                .ThenInclude(p => p.CategoriaProyecto)
             .Where(g => g.SaverId == usuarioId)
             .ToListAsync(cancellationToken);
     }
