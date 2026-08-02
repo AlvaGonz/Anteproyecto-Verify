@@ -339,7 +339,7 @@ def main():
     chunk_map = {}
     t_start = time.time()
     
-    with ThreadPoolExecutor(max_workers=6) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         for record in records_generator:
             current_chunk.append(record)
             if len(current_chunk) >= chunk_size:
@@ -355,7 +355,7 @@ def main():
             chunk_map[chunk_count] = {"size": len(chunk_copy), "status": "pending"}
             futures.append(executor.submit(insert_chunk, chunk_count, chunk_copy))
             
-        print(f"\nAll {chunk_count} chunks submitted (max_workers=6). Waiting for completion...\n")
+        print(f"\nAll {chunk_count} chunks submitted (max_workers=1). Waiting for completion...\n")
         
         total_rows = 0
         failed_chunks = 0
