@@ -47,7 +47,7 @@ public class ResendEmailServiceTests
     public async Task SendEmailAsync_SendsMessageWithCorrectValues()
     {
         // Arrange
-        string to = "test@example.com";
+        string to = "test@verifinca.test";
         string subject = "Test Subject";
         string body = "Test Body";
 
@@ -73,7 +73,7 @@ public class ResendEmailServiceTests
     public async Task SendAccountVerificationAsync_UsesCorrectTemplate()
     {
         // Arrange
-        string to = "user@example.com";
+        string to = "user@verifinca.test";
         string userName = "John Doe";
         string token = "token123";
 
@@ -99,7 +99,7 @@ public class ResendEmailServiceTests
     public async Task SendDocumentUploadConfirmationAsync_UsesCorrectTemplate()
     {
         // Arrange
-        string to = "user@example.com";
+        string to = "user@verifinca.test";
         string userName = "John Doe";
         string projectName = "My Estate";
         string docType = "Title";
@@ -126,7 +126,7 @@ public class ResendEmailServiceTests
     public async Task SendDocumentStatusUpdateAsync_Approved_UsesCorrectTemplate()
     {
         // Arrange
-        string to = "user@example.com";
+        string to = "user@verifinca.test";
         string userName = "John Doe";
         string projectName = "My Estate";
         string docType = "Title";
@@ -153,7 +153,7 @@ public class ResendEmailServiceTests
     public async Task SendDocumentStatusUpdateAsync_Rejected_UsesCorrectTemplate()
     {
         // Arrange
-        string to = "user@example.com";
+        string to = "user@verifinca.test";
         string userName = "John Doe";
         string projectName = "My Estate";
         string docType = "Title";
@@ -181,7 +181,7 @@ public class ResendEmailServiceTests
     public async Task SendProjectCreatedAsync_UsesCorrectTemplate()
     {
         // Arrange
-        string to = "user@example.com";
+        string to = "user@verifinca.test";
         string userName = "John Doe";
         string projectName = "My Estate";
         string id = "proj-123";

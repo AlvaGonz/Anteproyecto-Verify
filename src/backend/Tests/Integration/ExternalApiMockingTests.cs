@@ -90,7 +90,7 @@ public class ExternalApiMockingTests : IntegrationTestBase, IAsyncLifetime
         }
 
         // Act
-        var response = await Client.GetAsync($"/api/proyectos/{projectId}/documentos/diagnosis");
+        var response = await Client.GetAsync($"/api/projects/{projectId}/documents/diagnosis");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

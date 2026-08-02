@@ -1,3 +1,21 @@
+# Progress: Categoria cutover completion — public DTO rename + sweep guard GREEN (2026-08-02)
+
+- **Rename (ponytail)**: public search response DTO `Categoria` (int?) → `CategoriaId` (int) — NO `CategoriaNombre` (zero frontend consumers on public wire; repo `GetPublishedAsync`/`SearchPublishedAsync` don't `Include(CategoriaProyecto)`).
+  - Backend: `SearchPublicProjectsQuery.cs:26` + handler `CategoriaId = p.CategoriaId` (line 69). `dotnet build` 0 warnings/0 errors.
+  - Frontend prod: `usePublishedProjects.ts` DTO + filter; `ProjectsPublicListPage.tsx:50` (`getDefaultProjectImage(project.categoriaId)`, cast removed); `AdminPublishedProjectsView.tsx:54-55,329`; **latent bug fixed** `AdminSavedProjectsView.tsx:84` (read `.categoria` on `ProyectoDto[]` which already has `categoriaId`).
+  - Featured/search-detail DTOs (`useFeaturedProjects.ts`, `useSearchPublicProjects.ts`) intentionally keep `categoria` — separate DTOs, out of sweep scope.
+- **e2e**: all 24 `categoria:` hits converted to `categoriaId` with real IDs (1→16 VIVIENDAS, 2→8 COMERCIAL Y OFICINAS, 3→12 HOSPEDAJE) across 15 spec files (batch A: category-requirements/certificacion-ipi-ocr/create-project/estado-juridico-dropdown-regression/ocr-cedula-extraction/plano-mensura-*; batch B: orphan-municipio, project-crud ×2, project-photos ×2, project-search ×2, public-directory-filter ×4 + "Residencial"→"VIVIENDAS" label click, route-performance, upload-edge-cases, validation).
+- **Sweep guard**: `categoryRegressionSweep.test.ts` 3/3 GREEN (repo-wide `ProjectCategory`/`categoria:` scan).
+- **Test fixes (pre-existing breakage, NOT cutover-caused)**:
+  - `ProjectForm.test.tsx` + `ProjectManagePage.test.tsx`: added `useCategories` + `useProvinces` mocks (real hooks return no data in jsdom → form crash/empty selects); rewrote stale "disables save button" test to actual contract ("blocks submit when required fields are empty" — `isSaveDisabled = isSubmitting || isUploadingPhotos` only); replaced 3 dead status-button tests (UI removed — `ProjectStatusBar` is display-only, `handleStatusChange` has no consumer) with 1 real test rendering `ProjectManageLayout` (status stepper labels Creado/Editado/En Revisión/Publicado/Con Observaciones); trimmed unused `handleStatusChange` from the hook mock.
+  - Backend: created missing `Api/wwwroot/` (Swagger/ApiStatus tests); `ResendEmailServiceTests` addresses `@example.com` → `@verifinca.test` (service short-circuits `@example.com` as test simulation, mock never called); `ExternalApiMockingTests` route `/api/proyectos/.../documentos` → `/api/projects/.../documents` (stale Spanish path). Api.Tests now 34/34.
+- **Verification**: category suites 35/35 vitest GREEN; full frontend 202/220 with the EXACT known pre-existing failure set (VerifySearchForm 5, RequirementUploadRow 1, Sidebar 1, AvatarConsumers 2, LandingPage 2, DashboardPage 1, apiClient 1, client.test 5) + 3 pre-existing suite crashes (ImagenAdicionalPersistence broken `../ProjectActionBarContext` import, LegalPage i18n mock, projectsApi.unit.test.ts:5 syntax error). Zero regressions introduced.
+- **Open decisions (product/security — NOT changed, out of scope)**:
+  1. `ProjectsController` POST/PUT have `[AllowAnonymous]` + `// [Authorize] // TODO` (since `fecbd742`) → AnonymousAccessTests/AuthWallTests get 415 instead of 401. Enable-auth needs security-rules consultation.
+  2. `ProjectDocumentsController` `[Authorize(Roles = "DEVELOPER,VALIDATOR")]` on `diagnosis` is unsatisfiable — JWT claims are only "admin"/"user" (`LoginUserCommandHandler.cs:74`), UserRole enum has no Developer/Validator → ExternalApiMockingTests 403. Needs role-model decision.
+  - Both pre-existing per 2026-07-31 entry (10 integration failures documented); unchanged by this session.
+- Status: cutover COMPLETE. Uncommitted: all files above (feat branch).
+
 # Progress: PagosLegacy → Pagos cleanup (2026-08-01)
 
 - **Finding**: runtime model ALREADY mapped `Pago` → `Pagos` (`PagoConfiguration.cs:11`, restored in `fe49108c`); live DB has no `PagosLegacy` table (only `Pagos`, `LogPagos`, `Recibo`, `ApiGobernanza`, `PagoIPI`). The only stale artifact was the EF model snapshot (`AppDbContextModelSnapshot.cs` still said `ToTable("PagosLegacy")`).
@@ -356,7 +374,7 @@ Status: **Complete** — Ready for commit.
 
 
 ### BUG-RHF-AUTOFILL-LOOP
-- **S�ntoma**: Infinite render loop in React (Maximum update depth exceeded) accompanied by 'Extension context invalidated' from browser extensions when autofilling forms.
+- **S�ntoma**: Infinite render loop in React (Maximum update depth exceeded) accompanied by 'Extension context invalidated' from browser extensions when autofilling forms.
 - **Root Cause**: Mixing react-hook-form's 'register' with local controlled state (value={...}) for formatted inputs (like telefono/cedula) causes an infinite loop when DOM is updated by extensions.
 - **Fix**: Removed local state bindings for these inputs. Used react-hook-form's native onChange to format e.target.value directly, and stripped formatting in onSubmit.
 - **Commit**: (Pending commit)
