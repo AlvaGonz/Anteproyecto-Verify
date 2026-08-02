@@ -35,8 +35,7 @@ public class QuotaTests : IntegrationTestBase
         // First project — should succeed
         var first = await Client.PostAsJsonAsync(
             "/api/projects", ValidProjectPayload("Proyecto 1", userId));
-        var firstBody = await first.Content.ReadAsStringAsync();
-        first.StatusCode.Should().Be(HttpStatusCode.Created, because: $"body: {firstBody}");
+        first.StatusCode.Should().Be(HttpStatusCode.Created);
 
         // Second project — should be blocked by quota
         var second = await Client.PostAsJsonAsync(

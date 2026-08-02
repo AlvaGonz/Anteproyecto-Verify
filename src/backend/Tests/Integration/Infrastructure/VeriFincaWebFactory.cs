@@ -58,6 +58,11 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
                 ["JwtSettings:Audience"] = "verifinca-test-client",
                 ["JwtSettings:ExpirationMinutes"] = "60",
                 ["Stripe:SecretKey"] = "sk_test_dummy_for_integration_tests",
+                ["AzureBlob:ConnectionString"] =
+                    "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;" +
+                    "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;" +
+                    "BlobEndpoint=http://localhost:10000/devstoreaccount1;",
+                ["AzureBlob:ContainerName"] = "verifinca-documents",
                 ["IsTestingEnvironment"] = "true"
             });
         });
