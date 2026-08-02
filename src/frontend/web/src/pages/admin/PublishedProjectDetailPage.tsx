@@ -519,34 +519,34 @@ export const PublishedProjectDetailPage: React.FC = () => {
           <div>
             <h3 className="text-primary font-bold text-sm mb-3">Datos Generales</h3>
             <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100 text-sm">
-              <div className="grid grid-cols-2 gap-y-2 gap-x-4">
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Desarrollador:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.datosDesarrollador || "N/D"}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Desarrollador:</span>
+                  <span className="block break-words text-slate-600">{project.datosDesarrollador || "N/D"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">RNC/Cédula:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.rncDesarrollador || project.cedulaRncPropietario || "N/D"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">RNC/Cédula:</span>
+                  <span className="block break-words text-slate-600">{project.rncDesarrollador || project.cedulaRncPropietario || "N/D"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Categoría:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.categoriaNombre || "N/D"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Categoría:</span>
+                  <span className="block break-words text-slate-600">{project.categoriaNombre || "N/D"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Superficie M²:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.superficieM2 != null ? `${project.superficieM2.toLocaleString("es-DO")} m²` : "N/D"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Superficie M²:</span>
+                  <span className="block break-words text-slate-600">{project.superficieM2 != null ? `${project.superficieM2.toLocaleString("es-DO")} m²` : "N/D"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Estado:</span>
-                  <span className="text-slate-600 w-1/2">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Estado:</span>
+                  <span className="block text-slate-600">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Integridad:</span>
-                  <span className="text-slate-600 w-1/2">{getIntegrityLabel()}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Integridad:</span>
+                  <span className="block text-slate-600">{getIntegrityLabel()}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Ubicación:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.ubicacionTexto || "N/D"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Ubicación:</span>
+                  <span className="block break-words text-slate-600">{project.ubicacionTexto || "N/D"}</span>
                 </div>
               </div>
             </div>
