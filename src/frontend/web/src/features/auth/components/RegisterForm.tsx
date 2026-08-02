@@ -6,7 +6,6 @@ import { useSearchParams } from "react-router-dom";
 import { registerSchema, type RegisterFormValues } from "../schemas";
 import { useRegister } from "../api/useAuth";
 import { VerificationEmailActions } from "./VerificationEmailActions";
-import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { RegisterFormLayout } from "./RegisterFormLayout";
 
 const blockNonDigits = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -35,8 +34,6 @@ export const RegisterForm = () => {
   });
 
 const onSubmit = (data: RegisterFormValues) => {
-     // Use raw digits from phone hook for submission
-     const telefonoDigits = phone.digits;
      // ponytail: extract plan/billing from redirect URL so backend stores as pendingPlanCode
      let pendingPlanCode: string | undefined;
      let pendingBillingCycle: string | undefined;
@@ -50,8 +47,8 @@ const onSubmit = (data: RegisterFormValues) => {
        }
      }
      const { acceptedTerms: _, ...submitData } = {
-       ...data,
-       telefono: telefonoDigits,
+       telefono: data.telefono ? data.telefono.replace(/\D/g, '') : undefined,
+       cedula: data.cedula ? data.cedula.replace(/\D/g, '') : undefined,
        returnUrl: redirectUrl || undefined,
        pendingPlanCode,
        pendingBillingCycle
@@ -73,18 +70,20 @@ const password = (watch("password") as string) || "";
     { label: "Al menos 1 Carácter Especial (!@#$%^&*-)", passed: /[!@#$%^&*\-]/.test(password) },
    ];
 
-// Phone input hook
-   const phoneValueRaw = (watch("telefono") as string) ? (watch("telefono") as string).replace(/\D/g, '') : "";
-   const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
-     const digits = formattedValue.replace(/\D/g, '');
-     setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
-   });
+  const telefonoOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+    let formatted = digits;
+    if (digits.length > 6) formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+    else if (digits.length > 3) formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    else if (digits.length > 0) formatted = `(${digits}`;
+    e.target.value = formatted;
+  };
 
   const cedulaOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/\D/g, "");
     if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
     else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
-    setValue("cedula", val, { shouldValidate: true, shouldDirty: true });
+    e.target.value = val;
   };
 
   const openModal = (type: "terms" | "privacy") => {
@@ -119,7 +118,7 @@ const password = (watch("password") as string) || "";
       formErrors={formErrors}
       password={password}
       checks={checks}
-      phone={{ value: phone.value, handleChange: phone.handleChange }}
+      telefonoOnChange={telefonoOnChange}
       blockNonDigits={blockNonDigits}
       cedulaOnChange={cedulaOnChange}
       openModal={openModal}

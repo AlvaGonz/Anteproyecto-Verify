@@ -5,7 +5,6 @@ import { UpdateProfileSchema, UpdateProfileDto } from "../../auth/schemas";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useUpdateMyProfile } from "../api/useSettings";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
-import { usePhoneInput } from "@/shared/hooks/usePhoneInput";
 import { useProvinces } from "../../provinces/api/useProvinces";
 import { User, Mail, Phone, Shield, CreditCard, Award, Building2, Briefcase, MapPin, Globe, AtSign, BadgeCheck, ArrowRight, X } from "lucide-react";
 import { UserAvatarUpload } from "../../../shared/components/ui/UserAvatarUpload";
@@ -33,7 +32,6 @@ export const MyProfileForm: React.FC = () => {
   const updateProfile = useUpdateMyProfile();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingData, setPendingData] = useState<UpdateProfileDto | null>(null);
-  const [cedulaDisplay, setCedulaDisplay] = useState(() => user?.cedula ? formatCedula(user.cedula) : "");
 
   const {
     register,
@@ -57,12 +55,7 @@ export const MyProfileForm: React.FC = () => {
     },
   });
 
-  // Phone input hook
-  const phoneValueRaw = watch("telefono") ? watch("telefono")!.replace(/\D/g, '') : "";
-  const phone = usePhoneInput(phoneValueRaw, (formattedValue) => {
-    const digits = formattedValue.replace(/\D/g, '');
-    setValue("telefono", digits, { shouldValidate: true, shouldDirty: true });
-  });
+
 
   // RNC auto-search logic
   const { searchRnc, isSearching: isSearchingRnc, error: rncSearchError, setError: setRncSearchError } = useDgiiLookup();
@@ -107,14 +100,17 @@ export const MyProfileForm: React.FC = () => {
       reset({
         nombre: user.nombre ?? "",
         apellido: user.apellido ?? "",
-        telefono: user.telefono ?? "",
-        cedula: user.cedula ?? "",
+        telefono: user.telefono ? (() => {
+          const d = user.telefono;
+          if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+          return d;
+        })() : "",
+        cedula: user.cedula ? formatCedula(user.cedula) : "",
         direccion: user.direccion ?? "",
         provincia: user.provincia ?? "" as any,
         nickname: user.nickname ?? "",
         changePassword: false,
       });
-      setCedulaDisplay(user.cedula ? formatCedula(user.cedula) : "");
     }
   }, [user, reset]);
 
@@ -133,8 +129,8 @@ export const MyProfileForm: React.FC = () => {
       await updateProfile.mutateAsync({
         nombre: data.nombre,
         apellido: data.apellido,
-        telefono: data.telefono || undefined,
-        cedula: data.cedula ?? "",
+        telefono: data.telefono ? data.telefono.replace(/\D/g, '') : undefined,
+        cedula: data.cedula ? data.cedula.replace(/\D/g, '') : "",
         rnc: data.rnc ?? "",
         razonSocial: isRncEmpty ? "" : (previewDgii?.nombreRazonSocial || user?.razonSocial || ""),
         nombreComercial: isRncEmpty ? "" : (previewDgii?.nombreComercial || user?.nombreComercial || ""),
@@ -311,12 +307,19 @@ export const MyProfileForm: React.FC = () => {
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                 <input
                   id="mp-telefono"
-                  {...register("telefono")}
+                  {...register("telefono", {
+                    onChange: (e) => {
+                      const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      let formatted = digits;
+                      if (digits.length > 6) formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+                      else if (digits.length > 3) formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+                      else if (digits.length > 0) formatted = `(${digits}`;
+                      e.target.value = formatted;
+                    }
+                  })}
                   type="text"
                   maxLength={14}
                   inputMode="numeric"
-                  value={phone.value}
-                  onChange={phone.handleChange}
                   onKeyDown={(e) => {
                     const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
                     if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
@@ -439,14 +442,13 @@ export const MyProfileForm: React.FC = () => {
                 <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                 <input
                   id="mp-cedula"
-                  {...register("cedula", { setValueAs: (v: string) => v.replace(/\D/g, '').slice(0, 11) })}
+                  {...register("cedula", {
+                    onChange: (e) => {
+                      e.target.value = formatCedula(e.target.value);
+                    }
+                  })}
                   type="text"
                   maxLength={15}
-                  value={cedulaDisplay}
-                  onChange={(e) => {
-                    const formatted = formatCedula(e.target.value);
-                    setCedulaDisplay(formatted);
-                  }}
                   className="vf-input w-full pl-9"
                   placeholder="Ej: 402-1234567-8"
                 />
