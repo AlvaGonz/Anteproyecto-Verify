@@ -41,14 +41,14 @@ public class DuplicateDetectionTests
         var targetProjectId = Guid.NewGuid();
         var existingProjectId = Guid.NewGuid();
 
-        var targetProject = new Proyecto("Target", "Location", Guid.NewGuid(), ProjectCategory.Residencial, "Developer", "CAT-123");
+        var targetProject = new Proyecto("Target", "Location", Guid.NewGuid(), 1, "Developer", "CAT-123");
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(targetProject, targetProjectId);
-        targetProject.UpdateDetails("Target", "Location", "GPS-123", null, ProjectCategory.Residencial, "Developer", "CAT-123");
+        targetProject.UpdateDetails("Target", "Location", "GPS-123", null, 1, "Developer", "CAT-123");
         targetProject.UpdateRncYMatricula("RNC-123", "MAT-123");
 
-        var existingProject = new Proyecto("Existing", "Location", Guid.NewGuid(), ProjectCategory.Residencial, "Developer", "CAT-123");
+        var existingProject = new Proyecto("Existing", "Location", Guid.NewGuid(), 1, "Developer", "CAT-123");
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(existingProject, existingProjectId);
-        existingProject.UpdateDetails("Existing", "Location", "GPS-123", null, ProjectCategory.Residencial, "Developer", "CAT-123");
+        existingProject.UpdateDetails("Existing", "Location", "GPS-123", null, 1, "Developer", "CAT-123");
         existingProject.UpdateRncYMatricula("RNC-123", "MAT-123");
 
         _proyectoRepoMock.GetByIdAsync(targetProjectId, Arg.Any<CancellationToken>()).Returns(targetProject);
@@ -79,13 +79,13 @@ public class DuplicateDetectionTests
 
         var targetProject = new Proyecto("Target", "Location", Guid.NewGuid());
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(targetProject, targetProjectId);
-        targetProject.UpdateDetails("Target", "Location", "GPS-123", null, ProjectCategory.Residencial, "Developer", "CAT-123");
+        targetProject.UpdateDetails("Target", "Location", "GPS-123", null, 1, "Developer", "CAT-123");
         targetProject.UpdateRncYMatricula("RNC-123", "MAT-123");
 
         // Partial match: only 2 attributes match (Catastral and Matricula), GPS is different
         var existingProject = new Proyecto("Existing", "Location", Guid.NewGuid());
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(existingProject, existingProjectId);
-        existingProject.UpdateDetails("Existing", "Location", "GPS-999", null, ProjectCategory.Residencial, "Developer", "CAT-123");
+        existingProject.UpdateDetails("Existing", "Location", "GPS-999", null, 1, "Developer", "CAT-123");
         existingProject.UpdateRncYMatricula("RNC-123", "MAT-123");
 
         _proyectoRepoMock.GetByIdAsync(targetProjectId, Arg.Any<CancellationToken>()).Returns(targetProject);
@@ -115,7 +115,7 @@ public class DuplicateDetectionTests
         
         var targetProject = new Proyecto("Target", "Location", Guid.NewGuid());
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(targetProject, targetProjectId);
-        targetProject.UpdateDetails("Target", "Location", "GPS-123", null, ProjectCategory.Residencial, "Developer", "CAT-123");
+        targetProject.UpdateDetails("Target", "Location", "GPS-123", null, 1, "Developer", "CAT-123");
         targetProject.UpdateRncYMatricula("RNC-123", "MAT-123");
 
         _proyectoRepoMock.GetByIdAsync(targetProjectId, Arg.Any<CancellationToken>()).Returns(targetProject);

@@ -222,6 +222,14 @@ public class ProyectoRepository : IProyectoRepository
             .CountAsync(p => p.UsuarioCreadorId == usuarioId, cancellationToken);
     }
 
+    public async Task<IEnumerable<CategoriaProyecto>> GetCategoriasAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.CategoriasProyecto
+            .Where(c => c.Activo)
+            .OrderBy(c => c.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task AddAsync(Proyecto proyecto, CancellationToken cancellationToken = default)
     {
         await _context.Proyectos.AddAsync(proyecto, cancellationToken);
@@ -344,10 +352,10 @@ public class ProyectoRepository : IProyectoRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, ProjectCategory category, CancellationToken cancellationToken = default)
+    public async Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, int categoryId, CancellationToken cancellationToken = default)
     {
         // Define required document types for the project category (same logic as ProjectDocumentStatus component)
-        var requiredTypes = GetRequiredDocumentTypesForCategory(category);
+        var requiredTypes = GetRequiredDocumentTypesForCategory(categoryId);
 
         if (requiredTypes.Count == 0) return 100;
 
@@ -364,31 +372,31 @@ public class ProyectoRepository : IProyectoRepository
         return Math.Min(rate, 100);
     }
 
-    private static List<DocumentType> GetRequiredDocumentTypesForCategory(ProjectCategory category)
+    private static List<DocumentType> GetRequiredDocumentTypesForCategory(int categoryId)
     {
         // Same logic as DOCUMENT_INFO in ProjectDocumentStatus.tsx
-        var allTypes = new Dictionary<DocumentType, List<ProjectCategory>>
+        var allTypes = new Dictionary<DocumentType, List<int>>
         {
-            { DocumentType.TITLE, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.LEGAL_STATUS, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.SURVEY, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.ID, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.NOTARIAL_POWER, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.OTHER, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificadoTitulo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificacionEstadoJuridico, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.PlanoMensuraCatastral, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificadoUsoSuelo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificacionIPI, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.RegistroMercantil, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.PoderNotarial, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.RNC, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.TITLE, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.LEGAL_STATUS, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.SURVEY, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.ID, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.NOTARIAL_POWER, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.OTHER, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificadoTitulo, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificacionEstadoJuridico, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.PlanoMensuraCatastral, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificadoUsoSuelo, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificacionIPI, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.RegistroMercantil, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.PoderNotarial, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.RNC, new List<int> { 1, 2, 3, 4, 99 } },
         };
 
         var result = new List<DocumentType>();
         foreach (var kvp in allTypes)
         {
-            if (kvp.Value.Contains(category))
+            if (kvp.Value.Contains(categoryId))
             {
                 result.Add(kvp.Key);
             }

@@ -67,7 +67,7 @@ public class ProjectServiceTests
             "New Project",
             "Location",
             userId,
-            ProjectCategory.Comercial,
+            2,
             "DevData",
             "RNC-123",
             "CAT-123",
@@ -86,7 +86,7 @@ public class ProjectServiceTests
         
         await _proyectoRepoMock.Received(1).AddAsync(Arg.Is<Proyecto>(p => 
             p.Nombre == "New Project" && 
-            p.Categoria == ProjectCategory.Comercial &&
+            p.CategoriaId == 2 &&
             p.UbicacionGps == "GPS-123" &&
             p.RncDesarrollador == "RNC-123"
         ), Arg.Any<CancellationToken>());
@@ -100,7 +100,7 @@ public class ProjectServiceTests
         var userId = Guid.NewGuid();
         _usuarioRepoMock.GetByIdWithPlanAsync(userId, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
 
-        var dto = new CreateProyectoDto("Test", "Location", userId, ProjectCategory.Residencial, null, null, null, null, null);
+        var dto = new CreateProyectoDto("Test", "Location", userId, 1, null, null, null, null, null);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateProjectAsync(dto, CancellationToken.None));
@@ -128,7 +128,7 @@ public class ProjectServiceTests
         // Basic plan limit is 3, let's say they have 3
         _proyectoRepoMock.CountByUsuarioAsync(userId, Arg.Any<CancellationToken>()).Returns(3);
 
-        var dto = new CreateProyectoDto("Test", "Location", userId, ProjectCategory.Residencial, null, null, null, null, null);
+        var dto = new CreateProyectoDto("Test", "Location", userId, 1, null, null, null, null, null);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<QuotaExceededException>(() => _service.CreateProjectAsync(dto, CancellationToken.None));

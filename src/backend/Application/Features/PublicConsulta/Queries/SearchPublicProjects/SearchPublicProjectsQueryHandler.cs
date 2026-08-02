@@ -50,7 +50,7 @@ public class SearchPublicProjectsQueryHandler
         foreach (var p in proyectoList)
         {
             var sello = sellosPorProyecto.GetValueOrDefault(p.Id);
-            var completionRate = await _proyectoRepository.GetDocumentCompletionRateAsync(p.Id, p.Categoria, cancellationToken);
+            var completionRate = await _proyectoRepository.GetDocumentCompletionRateAsync(p.Id, p.CategoriaId, cancellationToken);
 
             results.Add(new PublicProjectSearchResultDto
             {
@@ -66,7 +66,7 @@ public class SearchPublicProjectsQueryHandler
                 Constructora = p.DatosDesarrollador ?? p.Propietario,
                 Registrante = p.UsuarioCreador?.NombreCompleto,
                 ImagenUrl = p.ImagenUrl,
-                Categoria = (int)p.Categoria,
+                Categoria = p.CategoriaId,
                 ValorEstimado = p.ValorEstimado,
                 DesignacionCatastral = p.DesignacionCatastral,
                 Matricula = p.Matricula,

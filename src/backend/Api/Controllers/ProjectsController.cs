@@ -22,7 +22,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Application.Abstractions.Storage;
 using Infrastructure.Persistence;
-
+using MediatR;
+using Application.Features.Projects.Queries.GetCategorias;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -34,19 +35,22 @@ public class ProjectsController : ControllerBase
     private readonly IBlobStorageService _blobStorageService;
     private readonly IDocumentService _documentService;
     private readonly AppDbContext _dbContext;
+    private readonly IMediator _mediator;
 
     public ProjectsController(
         IProjectService projectService,
         IUsuarioRepository usuarioRepository,
         IBlobStorageService blobStorageService,
         IDocumentService documentService,
-        AppDbContext dbContext)
+        AppDbContext dbContext,
+        IMediator mediator)
     {
         _projectService = projectService;
         _usuarioRepository = usuarioRepository;
         _blobStorageService = blobStorageService;
         _documentService = documentService;
         _dbContext = dbContext;
+        _mediator = mediator;
     }
 
     [HttpGet]
@@ -76,6 +80,14 @@ public class ProjectsController : ControllerBase
 
         var visibleResult = await _projectService.GetVisibleProjectsWithCountAsync(page, pageSize, cancellationToken);
         return Ok(visibleResult);
+    }
+
+    [HttpGet("categories")]
+    [AllowAnonymous]
+    public async Task<ActionResult<List<CategoriaProyectoDto>>> GetCategories(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetCategoriasQuery(), cancellationToken);
+        return Ok(result);
     }
 
     [HttpGet("{id:guid}")]

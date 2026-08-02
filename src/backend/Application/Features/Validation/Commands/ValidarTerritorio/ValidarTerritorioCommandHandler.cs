@@ -106,11 +106,11 @@ public class ValidarTerritorioCommandHandler
             // RS2: Verificar congruencia entre zona de uso de suelo y tipo de proyecto
             if (!string.IsNullOrEmpty(geoResult.ZonaUsoSuelo))
             {
-                bool zonaCompatible = EsZonaCompatible(project.Categoria, geoResult.ZonaUsoSuelo);
+                bool zonaCompatible = EsZonaCompatible(project.CategoriaId, geoResult.ZonaUsoSuelo);
                 if (!zonaCompatible)
                 {
                     esValido = false;
-                    mensaje = $"Incongruencia de uso de suelo: Proyecto {project.Categoria} en zona {geoResult.ZonaUsoSuelo}.";
+                    mensaje = $"Incongruencia de uso de suelo: Proyecto con categoria {project.CategoriaId} en zona {geoResult.ZonaUsoSuelo}.";
                     
                     var hallazgoUsoSuelo = new Hallazgo(
                         project.Id,
@@ -146,16 +146,16 @@ public class ValidarTerritorioCommandHandler
         };
     }
 
-    private bool EsZonaCompatible(ProjectCategory categoria, string zonaUsoSuelo)
+    private bool EsZonaCompatible(int categoriaId, string zonaUsoSuelo)
     {
         // Lógica simplificada para el mock
-        if (categoria == ProjectCategory.Residencial && zonaUsoSuelo.Contains("Residencial", StringComparison.OrdinalIgnoreCase)) return true;
-        if (categoria == ProjectCategory.Comercial && zonaUsoSuelo.Contains("Comercial", StringComparison.OrdinalIgnoreCase)) return true;
-        if (categoria == ProjectCategory.Industrial && zonaUsoSuelo.Contains("Industrial", StringComparison.OrdinalIgnoreCase)) return true;
-        if (categoria == ProjectCategory.Turistico && zonaUsoSuelo.Contains("Turistico", StringComparison.OrdinalIgnoreCase)) return true;
+        if (categoriaId == 1 && zonaUsoSuelo.Contains("Residencial", StringComparison.OrdinalIgnoreCase)) return true; // Residencial
+        if (categoriaId == 2 && zonaUsoSuelo.Contains("Comercial", StringComparison.OrdinalIgnoreCase)) return true; // Comercial
+        if (categoriaId == 5 && zonaUsoSuelo.Contains("Industrial", StringComparison.OrdinalIgnoreCase)) return true; // Industrial
+        if (categoriaId == 3 && zonaUsoSuelo.Contains("Turistico", StringComparison.OrdinalIgnoreCase)) return true; // Turistico
         
         // Si es mixto, suele ser compatible con residencial o comercial
-        if (categoria == ProjectCategory.Mixto && (zonaUsoSuelo.Contains("Residencial", StringComparison.OrdinalIgnoreCase) || zonaUsoSuelo.Contains("Comercial", StringComparison.OrdinalIgnoreCase))) return true;
+        if (categoriaId == 4 && (zonaUsoSuelo.Contains("Residencial", StringComparison.OrdinalIgnoreCase) || zonaUsoSuelo.Contains("Comercial", StringComparison.OrdinalIgnoreCase))) return true;
 
         return false;
     }

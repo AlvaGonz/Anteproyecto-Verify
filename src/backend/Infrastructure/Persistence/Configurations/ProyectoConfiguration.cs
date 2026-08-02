@@ -41,6 +41,11 @@ public class ProyectoConfiguration : IEntityTypeConfiguration<Proyecto>
             .HasForeignKey(p => p.UsuarioCreadorId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(p => p.CategoriaProyecto)
+            .WithMany()
+            .HasForeignKey(p => p.CategoriaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(p => p.UsuarioCreadorId)
             .HasColumnName("IdUsuario");
     }

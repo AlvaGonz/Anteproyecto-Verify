@@ -57,11 +57,20 @@ public class AppDbContext : DbContext
     // 2FA
     public DbSet<Verificacion2FA> Verificaciones2FA => Set<Verificacion2FA>();
 
+    // Project Categories
+    public DbSet<CategoriaProyecto> CategoriasProyecto => Set<CategoriaProyecto>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Usuario>().ToTable("Usuario");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // Project Categories
+        modelBuilder.Entity<CategoriaProyecto>(entity =>
+        {
+            entity.HasIndex(e => e.Nombre).IsUnique();
+        });
 
         // ProjectInterest Config
         modelBuilder.Entity<ProyectoInteresado>()

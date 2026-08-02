@@ -20,6 +20,7 @@ public interface IProyectoRepository
     Task<ProyectoEstado?> GetEstadoByStatusAsync(ProjectStatus status, CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default);
     Task<int> CountByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<CategoriaProyecto>> GetCategoriasAsync(CancellationToken cancellationToken = default);
     Task AddAsync(Proyecto proyecto, CancellationToken cancellationToken = default);
     void Update(Proyecto proyecto);
     void Delete(Proyecto proyecto);
@@ -34,6 +35,6 @@ public interface IProyectoRepository
     Task<IEnumerable<ProyectoInteresado>> GetInteresesByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<IEnumerable<ProyectoInteresado>> GetInteresadosInUserProjectsAsync(Guid usuarioCreadorId, CancellationToken cancellationToken = default);
     Task AddLogProyectoAsync(LogProyecto log, CancellationToken cancellationToken = default);
-    Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, ProjectCategory category, CancellationToken cancellationToken = default);
+    Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, int categoryId, CancellationToken cancellationToken = default);
 }
 

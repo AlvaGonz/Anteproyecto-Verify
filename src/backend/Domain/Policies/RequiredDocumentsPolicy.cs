@@ -6,7 +6,7 @@ using Domain.Enums;
 
 public static class RequiredDocumentsPolicy
 {
-    public static IEnumerable<DocumentType> GetRequiredDocumentsForCategory(ProjectCategory category)
+    public static IEnumerable<DocumentType> GetRequiredDocumentsForCategory(int categoryId)
     {
         var baseDocuments = new List<DocumentType>
         {
@@ -25,7 +25,7 @@ public static class RequiredDocumentsPolicy
             DocumentType.RNC
         };
 
-        if (category == ProjectCategory.Comercial || category == ProjectCategory.Turistico || category == ProjectCategory.Mixto)
+        if (categoryId == 8 || categoryId == 12 || categoryId == 7) // 8=COMERCIAL Y OFICINAS, 12=HOSPEDAJE, 7=COMBINADOS
         {
             baseDocuments.Add(DocumentType.OTHER);
         }
