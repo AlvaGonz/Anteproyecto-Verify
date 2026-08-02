@@ -47,3 +47,7 @@ waza.exe
 # Scratch and logs
 scratch_*
 api_logs.txt
+
+# Custom Skills
+.agents/skills/ELConsejo/
+.agents/skills/claude-mem/
