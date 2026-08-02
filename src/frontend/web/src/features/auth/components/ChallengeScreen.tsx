@@ -27,7 +27,7 @@ export const ChallengeScreen: React.FC = () => {
   if (!pendingChallenge) return null;
 
   const handleCodeChange = (value: string) => {
-    setCode(mode === "recovery" ? value.toUpperCase().replace(/[^A-Z0-9]/g, '') : sanitizeDigits(value, CODE_LENGTH));
+    setCode(mode === "recovery" ? value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) : sanitizeDigits(value, CODE_LENGTH));
     setError(null);
   };
 
@@ -85,7 +85,7 @@ export const ChallengeScreen: React.FC = () => {
   };
 
   const title = mode === "recovery" ? "Código de recuperación" : "Verificación en dos pasos";
-  const placeholder = mode === "recovery" ? "ABCDEFGHIJ" : "000000";
+  const placeholder = mode === "recovery" ? "ABCDEFGHJK" : "000000";
 
   return (
     <m.div
@@ -134,7 +134,7 @@ export const ChallengeScreen: React.FC = () => {
               value={code}
               onChange={(e) => handleCodeChange(e.target.value)}
               className="vf-input w-full pl-12 pr-4 h-[52px] text-center tracking-[0.4em] font-mono"
-              maxLength={mode === "recovery" ? 16 : CODE_LENGTH}
+              maxLength={mode === "recovery" ? 10 : CODE_LENGTH}
               disabled={isSubmitting}
             />
           </div>
@@ -142,7 +142,7 @@ export const ChallengeScreen: React.FC = () => {
 
         <button
           type="submit"
-          disabled={isSubmitting || (mode !== "recovery" && code.length !== CODE_LENGTH) || (mode === "recovery" && code.trim().length < 8)}
+          disabled={isSubmitting || (mode !== "recovery" && code.length !== CODE_LENGTH) || (mode === "recovery" && code.length !== 10)}
           className="vf-btn-primary w-full h-[52px] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (

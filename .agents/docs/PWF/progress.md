@@ -353,3 +353,10 @@ Status: **Complete** — Ready for commit.
 - **Test infra fix**: `VeriFincaWebFactory` now supplies a dummy `Stripe:SecretKey` — without it the whole integration suite could not bootstrap on dev machines (Program.cs hard-requires it and user-secrets do not load in the Testing env).
 - **Known pre-existing (NOT caused by this change, were unrunnable before the Stripe fix)**: 10 integration tests fail — AuthWallTests, AnonymousAccessTests, QuotaTests, SealIssuanceTests, PublicSealVerificationTests, ExternalApiMockingTests (400-vs-401/200 drift and external-mock gaps). Follow-up needed.
 - **Frontend unchanged**: useDeleteUser already does optimistic removal + invalidate; resurrection was purely the backend 500.
+
+
+### BUG-RHF-AUTOFILL-LOOP
+- **S�ntoma**: Infinite render loop in React (Maximum update depth exceeded) accompanied by 'Extension context invalidated' from browser extensions when autofilling forms.
+- **Root Cause**: Mixing react-hook-form's 'register' with local controlled state (value={...}) for formatted inputs (like telefono/cedula) causes an infinite loop when DOM is updated by extensions.
+- **Fix**: Removed local state bindings for these inputs. Used react-hook-form's native onChange to format e.target.value directly, and stripped formatting in onSubmit.
+- **Commit**: (Pending commit)

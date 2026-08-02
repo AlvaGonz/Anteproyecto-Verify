@@ -38,11 +38,10 @@ public sealed class ConsumeRecoveryCodeCommandHandler
 
     public async Task<ConsumeRecoveryCodeResult> Handle(ConsumeRecoveryCodeCommand request, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"[2FA Recovery] token={request.Code?.Substring(0, Math.Min(4, request.Code?.Length ?? 0))}...");
         if (string.IsNullOrWhiteSpace(request.Code))
             return new ConsumeRecoveryCodeResult(false, "Código de recuperación requerido.", null, null);
 
-        var challenge = await _challengeStore.ConsumeAsync(request.ChallengeToken, cancellationToken);
+        var challenge = await _challengeStore.PeekAsync(request.ChallengeToken, cancellationToken);
         if (challenge is null)
             return new ConsumeRecoveryCodeResult(false, "Desafío inválido o expirado.", null, null);
 
@@ -62,6 +61,7 @@ public sealed class ConsumeRecoveryCodeCommandHandler
             return new ConsumeRecoveryCodeResult(false, "Código de recuperación inválido.", null, null);
         }
 
+        await _challengeStore.ConsumeAsync(request.ChallengeToken, cancellationToken);
         user.ReplaceRecoveryCodes(newJson);
         user.Register2FASuccess();
         await _unitOfWork.SaveChangesAsync(cancellationToken);
