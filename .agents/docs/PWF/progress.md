@@ -1,3 +1,34 @@
+# Progress: Category cutover — Step 7 final verification, all suites GREEN vs pre-existing baseline (2026-08-02, session 3)
+
+- **Step 4 (Backend)**: DONE. UnitTests 358/8, Api.Tests 34/34, Integration 15/19 — all remaining failures = documented pre-existing set (see below). `ProjectService.ValidateCategoriaAsync` rejects unknown/inactive IDs → controller 400 with field; `CreateProyectoDto.CategoriaId` required (no default); `Proyecto` ctor default removed.
+- **Step 5 (Frontend)**: DONE. `useProjectForm.ts:86` defaults from `categorias[0]` (no hardcoded 16); `requirementCatalog.ts` keyed {16,8,12,7} (5/99 dropped, default `[]`); `requirementCatalog.test.ts` + `useProjectFormCategoryDefault.test.tsx` migrated → 14/14 GREEN. `ProjectManagePage.unit.test.tsx` uses `categoriaId` (16).
+- **Step 6 (E2E)**: DONE. 24 `categoria:` → `categoriaId` with real IDs across 15 spec files (1→16, 2→8, 3→12; "Residencial"→"VIVIENDAS" label click).
+- **Step 7 (Verify)**: 
+  - Sweep `categoryRegressionSweep.test.ts` **3/3 GREEN** — added `progress.md` to SKIP_FILES allowlist (history doc legitimately names the removed enum; same rationale as impact-map allowlist).
+  - Full frontend: **202/220** — exact pre-existing failure set (VerifySearchForm 5, RequirementUploadRow 1, Sidebar 1, AvatarConsumers 2, LandingPage 2, DashboardPage 1, apiClient 1, client.test 5) + 3 pre-existing suite crashes (ImagenAdicionalPersistence import, LegalPage i18n, projectsApi.unit syntax). Zero regressions.
+  - Backend: build 0 errors; Api.Tests 34/34; UnitTests 358/8 (same 8 pre-existing); Integration 15/19 (4 pre-existing: AnonymousAccess ×2, AuthWall anonymous-POST, ExternalApiMocking DEVELOPER/VALIDATOR-role-gap — all documented, none cutover-caused).
+  - New (parallel agent) `ProjectCategoryNameTests` (integration) GREEN — asserts wire `categoriaNombre == "VIVIENDAS"`; backed by `ProyectoRepository` `Include(p => p.CategoriaProyecto)` (GetById/GetAll/GetVisible queries — uncommitted).
+  - `VerificationMatrix.md` §1 already canonical (16 rows, CategoriaId 1-16).
+  - `post_task_loop.py` → BLOCK (expected): runs Api.Tests via `docker run dotnet sdk:8.0` which fails on Windows MSBuild path (CoreGenerateAssemblyInfo); pre-existing failures also trip it. Local `dotnet test` is the authoritative gate.
+- **UI (ponytail, user-requested)**: `PublishedProjectDetailPage.tsx` Categoría/Clasificación now resolve name via `useCategories()` catalog by `categoriaId` (fallback `categoriaNombre` → "N/D"); `ProjectPublicDetailPage.tsx` renders `categoriaNombre` fallback "SIN CLASIFICACIÓN".
+- Status: cutover COMPLETE. Uncommitted: `ProyectoRepository.cs` (Include), `categoryRegressionSweep.test.ts` (allowlist), `PublishedProjectDetailPage.tsx`, `ProjectPublicDetailPage.tsx`, `ProjectCategoryNameTests.cs` (new).
+
+# Progress: BackToTopButton for public pages (2026-08-02)
+
+- **New component** `src/frontend/web/src/shared/components/ui/BackToTopButton.tsx`: fixed bottom-right circular `bg-primary` button with lucide `ArrowUp`, `aria-label="Volver arriba"`, appears after `scrollY > 400` (passive listener), click → `window.scrollTo({ top: 0, behavior: "smooth" })`.
+- **Micro-animations (framer-motion)**: `AnimatePresence` entrance/exit (fade + rise 16px + scale 0.8→1, 200ms easeOut), `whileHover` (lift + scale 1.08 + shadow grow + icon nudge), `whileTap` (scale 0.92), `useReducedMotion` disables transforms, focus-visible ring.
+- **Mounted in 6 pages** (no shared layout exists — one line per page): LandingPage `/`, LegalPage `/legal`, PricingPageLayout `/plans`, ProjectsPublicListPage `/projects`, ProjectPublicDetailPage `/p/:slug`, PublicVerifyResultPage `/verify/:code`.
+- **Test**: `BackToTopButton.test.tsx` 3/3 (hidden at top → appears after threshold → smooth scroll to top on click). tsc clean; page suites unchanged (only pre-existing LandingPage 2 failures).
+
+# Progress: Public detail page blank "Clasificación de Activo" — missing Include (2026-08-02, session 3)
+
+- **Report**: `/#/p/:id` public detail rendered the "Clasificación de Activo" label but no category value.
+- **Root cause (live-API confirmed)**: `GET /api/projects/{id}` returned `"categoriaId": 9, "categoriaNombre": ""`. `MapToDto` (ProjectService.cs:391) reads `proyecto.CategoriaProyecto?.Nombre ?? ""` — the navigation is null because **no `ProyectoRepository` query ever `.Include(p => p.CategoriaProyecto)`** (all blocks include `UsuarioCreador`+`Estado` only). Unit tests passed because they set the nav in mocks (mock-vs-real gap).
+- **Fix**: added `.Include(p => p.CategoriaProyecto)` to the 7 ProyectoDto-feeding queries (GetByIdAsync, GetAllWithCountAsync, GetAllAsync, GetVisibleWithCountAsync, GetVisibleAsync, SearchAsync, GetGuardadosByUsuarioAsync ThenInclude). Public/featured queries (GetPublishedAsync, SearchPublishedAsync, GetFeaturedAsync) left lean by design.
+- **Test (RED→GREEN)**: new `Tests/Integration/Projects/ProjectCategoryNameTests.cs` — POST /api/projects (categoriaId 16, Profesional plan) → GET detail → asserts `categoriaNombre == "VIVIENDAS"`. RED: `""`; GREEN after Include.
+- **Frontend defense-in-depth**: `ProjectPublicDetailPage.tsx:381` now wraps the value in the sibling `<p>` style with fallback `|| "SIN CLASIFICACIÓN"`.
+- **Verified**: live API returns `categoriaNombre: "DEPOSITOS"` for COR-61782 (category 9) after `docker compose up -d --build api`. Integration suite 15/19 (same 4 pre-existing auth/role failures), frontend 203/220 (same pre-existing set), tsc clean.
+
 # Progress: Integration suite root cause fixed — Testcontainers DB now runs migrations (2026-08-02, session 2)
 
 - **Root cause of 12 integration failures (NOT the seeder/container-down hypothesis from session 1)**: `VeriFincaWebFactory.InitializeDatabaseAsync()` used `EnsureCreatedAsync()` — schema-only, NO migrations. `Provincia`/`Municipio` are raw-SQL tables created ONLY by migration `20260801232402_AddProvinciasYMunicipiosTables` (no EF entities) → seeder died at line 29 (`SeedProvinciasAsync` → `Invalid object name 'Provincia'`) → outer catch swallowed → NOTHING seeded (no plans/estados/users). `CategoriaProyecto` rows + `ProyectosEstados` rows are seeded INSIDE migrations (raw SQL) → tables existed but EMPTY → FK violations on `CategoriaId=16`, "Sequence contains no elements" (estados), `Plan` null (RegisterUserTests).
