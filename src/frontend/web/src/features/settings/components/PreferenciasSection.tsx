@@ -8,10 +8,13 @@ type NombreModo = "realName" | "nickname";
 type IdentificacionModo = "cedula" | "rnc";
 
 const radioCls =
-  "absolute inset-0 z-10 opacity-0 cursor-pointer";
+  "peer absolute inset-0 z-10 opacity-0 cursor-pointer";
 
 const radioVisualCls =
-  "inline-flex items-center gap-3 w-full rounded-xl border border-border bg-white/50 px-4 py-3 cursor-pointer transition-colors peer-checked:border-[#223382] peer-checked:bg-[#223382]/5 peer-checked:shadow-[0_0_0_1px_#223382]";
+  "inline-flex items-center gap-3 w-full rounded-xl border border-border bg-white/50 px-4 py-3 cursor-pointer transition-colors duration-200 peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50 peer-checked:border-primary peer-checked:bg-primary-subtle peer-checked:shadow-[0_0_0_1px_var(--color-primary)]";
+
+const radioDotCls =
+  "relative w-4 h-4 rounded-full border-2 border-border bg-white shrink-0 transition-colors duration-200 peer-checked:border-primary peer-checked:after:opacity-100 after:absolute after:inset-[3px] after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity after:duration-200";
 
 const radioTitleCls =
   "block text-sm font-bold text-text-primary";
@@ -78,6 +81,7 @@ export const PreferenciasSection: React.FC = () => {
                   className={radioCls}
                 />
                 <span className={radioVisualCls}>
+                  <span className={radioDotCls} aria-hidden="true" />
                   <span className={radioTitleCls}>Nombre real</span>
                 </span>
               </label>
@@ -97,6 +101,7 @@ export const PreferenciasSection: React.FC = () => {
                   className={radioCls}
                 />
                 <span className={radioVisualCls}>
+                  <span className={radioDotCls} aria-hidden="true" />
                   <span className={radioTitleCls}>Nickname (apodo)</span>
                 </span>
               </label>
@@ -135,6 +140,7 @@ export const PreferenciasSection: React.FC = () => {
                   className={radioCls}
                 />
                 <span className={radioVisualCls}>
+                  <span className={radioDotCls} aria-hidden="true" />
                   <span className={radioTitleCls}>Cédula</span>
                 </span>
               </label>
@@ -154,6 +160,7 @@ export const PreferenciasSection: React.FC = () => {
                   className={radioCls}
                 />
                 <span className={radioVisualCls}>
+                  <span className={radioDotCls} aria-hidden="true" />
                   <span className={radioTitleCls}>RNC (razón social)</span>
                 </span>
               </label>
