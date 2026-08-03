@@ -20,9 +20,12 @@ public class UpdatePublicPreferencesCommandHandler
 
     public async Task<UpdatePublicPreferencesResultDto> Handle(UpdatePublicPreferencesCommand request, CancellationToken cancellationToken)
     {
-        if (request.NombreModo is null || request.IdentificacionModo is null)
+        // Regla de negocio: el usuario puede elegir una o ambas opciones por grupo,
+        // pero NUNCA ninguna (modo 0 = sin selección)
+        if (request.NombreModo is null || request.NombreModo == 0 ||
+            request.IdentificacionModo is null || request.IdentificacionModo == 0)
         {
-            return new UpdatePublicPreferencesResultDto(false, "Debe especificar nombre y modo de identificación.");
+            return new UpdatePublicPreferencesResultDto(false, "Debe elegir al menos una opción de nombre y una de identificación.");
         }
 
         var user = await _usuarioRepository.GetByIdAsync(request.UserId, cancellationToken);

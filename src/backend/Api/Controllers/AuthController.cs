@@ -412,18 +412,8 @@ public class AuthController : ControllerBase
             Direccion = user.Direccion,
             Provincia = user.Provincia,
             Nickname = user.Nickname,
-            NombrePublicoModo = user.NombrePublicoModo switch
-            {
-                Domain.Enums.NombrePublicoModo.Nickname => "nickname",
-                Domain.Enums.NombrePublicoModo.RealName => "realName",
-                _ => null
-            },
-            IdentificacionPublicaModo = user.IdentificacionPublicaModo switch
-            {
-                Domain.Enums.IdentificacionPublicaModo.Cedula => "cedula",
-                Domain.Enums.IdentificacionPublicaModo.Rnc => "rnc",
-                _ => null
-            },
+            NombrePublicoModo = NombrePublicoModoToWire(user.NombrePublicoModo),
+            IdentificacionPublicaModo = IdentificacionPublicaModoToWire(user.IdentificacionPublicaModo),
             RazonSocial = user.RazonSocial ?? dgii?.NombreRazonSocial,
             NombreComercial = user.NombreComercial ?? dgii?.NombreComercial,
             ActividadEconomica = user.ActividadEconomica ?? dgii?.ActividadEconomica,
@@ -559,21 +549,12 @@ public class AuthController : ControllerBase
         if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
             return Unauthorized(new { Message = "Token inválido o incompleto." });
 
-        var nombreModo = request.NombreModo switch
-        {
-            "realName" => Domain.Enums.NombrePublicoModo.RealName,
-            "nickname" => Domain.Enums.NombrePublicoModo.Nickname,
-            _ => (Domain.Enums.NombrePublicoModo?)null
-        };
-        var identificacionModo = request.IdentificacionModo switch
-        {
-            "cedula" => Domain.Enums.IdentificacionPublicaModo.Cedula,
-            "rnc" => Domain.Enums.IdentificacionPublicaModo.Rnc,
-            _ => (Domain.Enums.IdentificacionPublicaModo?)null
-        };
-
+        var nombreModo = MapNombreModos(request.NombreModo);
+        var identificacionModo = MapIdentificaciones(request.IdentificacionModo);
         if (nombreModo is null || identificacionModo is null)
-            return BadRequest(new { Message = "Valores de preferencia inválidos." });
+        {
+            return BadRequest(new { Message = "Valores de preferencia inválidos: debe elegir al menos una opción válida por grupo." });
+        }
 
         var command = new Application.Features.Auth.Commands.UpdatePublicPreferences.UpdatePublicPreferencesCommand(userId, nombreModo, identificacionModo);
         var result = await _updatePublicPreferencesHandler.Handle(command, cancellationToken);
@@ -581,6 +562,64 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = result.ErrorMessage });
 
         return Ok(new { Message = "Preferencias actualizadas exitosamente." });
+    }
+
+    private static Domain.Enums.NombrePublicoModo? MapNombreModos(string[]? values)
+    {
+        if (values is null || values.Length == 0) return null;
+        Domain.Enums.NombrePublicoModo result = 0;
+        foreach (var value in values)
+        {
+            var modo = ToNombrePublicoModo(value);
+            if (modo is null) return null; // valor desconocido → inválido
+            result |= modo.Value;
+        }
+        return result;
+    }
+
+    private static Domain.Enums.IdentificacionPublicaModo? MapIdentificaciones(string[]? values)
+    {
+        if (values is null || values.Length == 0) return null;
+        Domain.Enums.IdentificacionPublicaModo result = 0;
+        foreach (var value in values)
+        {
+            var modo = ToIdentificacionPublicaModo(value);
+            if (modo is null) return null;
+            result |= modo.Value;
+        }
+        return result;
+    }
+
+    private static Domain.Enums.NombrePublicoModo? ToNombrePublicoModo(string? value) => value switch
+    {
+        "realName" => Domain.Enums.NombrePublicoModo.RealName,
+        "nickname" => Domain.Enums.NombrePublicoModo.Nickname,
+        _ => null
+    };
+
+    private static Domain.Enums.IdentificacionPublicaModo? ToIdentificacionPublicaModo(string? value) => value switch
+    {
+        "cedula" => Domain.Enums.IdentificacionPublicaModo.Cedula,
+        "rnc" => Domain.Enums.IdentificacionPublicaModo.Rnc,
+        _ => null
+    };
+
+    private static string[]? NombrePublicoModoToWire(Domain.Enums.NombrePublicoModo? modo)
+    {
+        if (modo is null) return null;
+        var result = new List<string>();
+        if (modo.Value.HasFlag(Domain.Enums.NombrePublicoModo.RealName)) result.Add("realName");
+        if (modo.Value.HasFlag(Domain.Enums.NombrePublicoModo.Nickname)) result.Add("nickname");
+        return result;
+    }
+
+    private static string[]? IdentificacionPublicaModoToWire(Domain.Enums.IdentificacionPublicaModo? modo)
+    {
+        if (modo is null) return null;
+        var result = new List<string>();
+        if (modo.Value.HasFlag(Domain.Enums.IdentificacionPublicaModo.Cedula)) result.Add("cedula");
+        if (modo.Value.HasFlag(Domain.Enums.IdentificacionPublicaModo.Rnc)) result.Add("rnc");
+        return result;
     }
 
     [Microsoft.AspNetCore.Authorization.Authorize]
@@ -631,8 +670,8 @@ public class UpdateProfileRequestDto
 
 public class UpdatePublicPreferencesRequestDto
 {
-    public string? NombreModo { get; set; }
-    public string? IdentificacionModo { get; set; }
+    public string[]? NombreModo { get; set; }
+    public string[]? IdentificacionModo { get; set; }
 }
 
 public class RegisterRequestDto

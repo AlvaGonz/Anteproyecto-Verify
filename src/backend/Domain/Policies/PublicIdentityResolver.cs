@@ -1,5 +1,6 @@
 namespace Domain.Policies;
 
+using System.Collections.Generic;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -34,7 +35,16 @@ public static class PublicIdentityResolver
 
     private static string ResolveNombreMostrado(Usuario usuario)
     {
-        if (usuario.NombrePublicoModo == NombrePublicoModo.Nickname && !string.IsNullOrWhiteSpace(usuario.Nickname))
+        var modo = usuario.NombrePublicoModo ?? NombrePublicoModo.RealName; // legado: nombre real
+        var mostrarReal = modo.HasFlag(NombrePublicoModo.RealName);
+        var mostrarNickname = modo.HasFlag(NombrePublicoModo.Nickname) && !string.IsNullOrWhiteSpace(usuario.Nickname);
+
+        if (mostrarReal && mostrarNickname)
+        {
+            return $"{usuario.NombreCompleto} ({usuario.Nickname})";
+        }
+
+        if (mostrarNickname)
         {
             return usuario.Nickname!;
         }
@@ -44,38 +54,56 @@ public static class PublicIdentityResolver
 
     private static (string? Mostrada, IdentificacionPublicaModo? Tipo) ResolveIdentificacion(Usuario usuario, Proyecto proyecto)
     {
-        if (usuario.IdentificacionPublicaModo == IdentificacionPublicaModo.Rnc)
+        var modo = usuario.IdentificacionPublicaModo;
+        if (modo is null)
         {
-            if (!string.IsNullOrWhiteSpace(usuario.Rnc))
-            {
-                return (usuario.Rnc, IdentificacionPublicaModo.Rnc);
-            }
-
-            // Fallback: sin RNC registrado se muestra la cédula
-            return (usuario.Cedula, IdentificacionPublicaModo.Cedula);
+            // Sin preferencia explícita: comportamiento heredado (datos registrales del proyecto)
+            return (proyecto.CedulaRncPropietario ?? proyecto.RncDesarrollador, null);
         }
 
-        if (usuario.IdentificacionPublicaModo == IdentificacionPublicaModo.Cedula)
-        {
-            if (!string.IsNullOrWhiteSpace(usuario.Cedula))
-            {
-                return (usuario.Cedula, IdentificacionPublicaModo.Cedula);
-            }
+        var tieneCedula = !string.IsNullOrWhiteSpace(usuario.Cedula);
+        var tieneRnc = !string.IsNullOrWhiteSpace(usuario.Rnc);
 
-            return (usuario.Rnc, string.IsNullOrWhiteSpace(usuario.Rnc) ? null : IdentificacionPublicaModo.Rnc);
+        var mostrarCedula = modo.Value.HasFlag(IdentificacionPublicaModo.Cedula) && tieneCedula;
+        var mostrarRnc = modo.Value.HasFlag(IdentificacionPublicaModo.Rnc) && tieneRnc;
+
+        // Fallbacks: el documento preferido pero ausente cae al otro
+        if (modo.Value.HasFlag(IdentificacionPublicaModo.Rnc) && !mostrarRnc && !mostrarCedula)
+        {
+            mostrarCedula = tieneCedula;
+        }
+        if (modo.Value.HasFlag(IdentificacionPublicaModo.Cedula) && !mostrarCedula && !mostrarRnc)
+        {
+            mostrarRnc = tieneRnc;
         }
 
-        // Sin preferencia explícita: comportamiento heredado (datos registrales del proyecto)
-        return (proyecto.CedulaRncPropietario ?? proyecto.RncDesarrollador, null);
+        var partes = new List<string>();
+        if (mostrarCedula) partes.Add(usuario.Cedula);
+        if (mostrarRnc) partes.Add(usuario.Rnc!);
+
+        IdentificacionPublicaModo? tipo = mostrarRnc
+            ? IdentificacionPublicaModo.Rnc
+            : mostrarCedula
+                ? IdentificacionPublicaModo.Cedula
+                : null;
+        return (partes.Count > 0 ? string.Join(" · ", partes) : null, tipo);
     }
 
     private static string? ResolveRazonSocialMostrada(Usuario usuario, Proyecto proyecto)
     {
-        return usuario.IdentificacionPublicaModo switch
+        var modo = usuario.IdentificacionPublicaModo;
+        if (modo is null)
         {
-            IdentificacionPublicaModo.Rnc => string.IsNullOrWhiteSpace(usuario.RazonSocial) ? null : usuario.RazonSocial,
-            IdentificacionPublicaModo.Cedula => null,
-            _ => string.IsNullOrWhiteSpace(usuario.RazonSocial) ? proyecto.DatosDesarrollador : usuario.RazonSocial
-        };
+            // Sin preferencia: comportamiento heredado
+            return string.IsNullOrWhiteSpace(usuario.RazonSocial) ? proyecto.DatosDesarrollador : usuario.RazonSocial;
+        }
+
+        var mostrarRnc = modo.Value.HasFlag(IdentificacionPublicaModo.Rnc) && !string.IsNullOrWhiteSpace(usuario.Rnc);
+        if (!mostrarRnc)
+        {
+            return null;
+        }
+
+        return string.IsNullOrWhiteSpace(usuario.RazonSocial) ? null : usuario.RazonSocial;
     }
 }
