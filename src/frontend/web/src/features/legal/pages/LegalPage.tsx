@@ -73,11 +73,11 @@ const drawerVariants: Variants = {
   open: {
     x: "0%",
     transition: {
-      type: "spring",
-      stiffness: 340,
-      damping: 32,
+      type: "tween",
+      duration: 0.3,
+      ease: [0.32, 0.72, 0, 1],
       staggerChildren: 0.045,
-      delayChildren: 0.07,
+      delayChildren: 0.06,
     },
   },
   closed: {
@@ -262,7 +262,7 @@ export const LegalPage: React.FC = () => {
   const navLinkClass = (id: string) => {
     const active = activeSection === id;
     return [
-      "flex-1 min-w-0 flex items-center gap-3 rounded-lg px-3 py-2.5 sm:px-3.5 font-body text-[clamp(0.875rem,5cqw,1.0625rem)] leading-snug text-left",
+      "flex-1 min-w-0 flex items-center gap-3 rounded-lg px-3 py-2 sm:px-3.5 sm:py-2.5 font-body text-[clamp(0.875rem,5cqw,1.0625rem)] leading-snug text-left",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500",
       "transition-colors duration-150",
       active ? "text-orange-600 bg-orange-50 font-semibold" : "text-slate-600 hover:text-slate-900 hover:bg-surface-container-low",
@@ -310,28 +310,25 @@ export const LegalPage: React.FC = () => {
           {isDrawerOpen && (
             <motion.div
               className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
               onClick={() => setIsDrawerOpen(false)}
             />
           )}
         </AnimatePresence>
 
-        {/* Drawer panel (slides from left) */}
+        {/* Drawer panel (slides from left) — width adapts to the longest label */}
         <motion.div
           ref={drawerRef}
           variants={drawerVariants}
           initial="closed"
           animate={isDrawerOpen ? "open" : "closed"}
-          className="fixed left-0 top-0 h-full w-[clamp(300px,26vw,380px)] max-w-[85vw] bg-surface z-50 shadow-2xl flex flex-col will-change-transform [container-type:inline-size]"
+          className="fixed left-0 top-0 h-full w-fit min-w-[clamp(300px,26vw,380px)] max-w-[85vw] bg-surface z-50 shadow-2xl flex flex-col will-change-transform [container-type:inline-size]"
         >
-          {/* Drawer header */}
-          <motion.div
-            variants={panelItemVariants}
-            className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-outline-variant/40"
-          >
+          {/* Drawer header — static so the close button (X) is visible immediately */}
+          <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-outline-variant/40">
             <h2 className="font-headline text-[clamp(1.0625rem,6cqw,1.5rem)] font-bold text-slate-900">Índice Legal</h2>
             <button
               type="button"
@@ -341,7 +338,7 @@ export const LegalPage: React.FC = () => {
             >
               <span className="material-symbols-outlined text-[clamp(1.25rem,7.3cqw,1.5rem)]">close</span>
             </button>
-          </motion.div>
+          </div>
 
           {/* Nav items + checkboxes */}
           <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-0.5">
@@ -372,7 +369,7 @@ export const LegalPage: React.FC = () => {
                     <span className="material-symbols-outlined text-[clamp(1.25rem,7cqw,1.5rem)]" style={{ fontVariationSettings: activeSection === item.id ? "'FILL' 1" : "'FILL' 0" }}>
                       {item.icon}
                     </span>
-                    <span className="truncate">{label}</span>
+                    <span className="break-words">{label}</span>
                   </button>
                 </motion.div>
               );
@@ -388,7 +385,7 @@ export const LegalPage: React.FC = () => {
               type="button"
               onClick={downloadSelected}
               disabled={selCount === 0}
-              className={`w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-label font-semibold text-[clamp(0.875rem,5cqw,1.0625rem)] transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${selCount > 0
+              className={`w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 sm:py-3 font-label font-semibold text-[clamp(0.875rem,5cqw,1.0625rem)] transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${selCount > 0
                   ? "bg-primary text-on-primary hover:bg-primary-hover shadow-sm"
                   : "bg-surface-container-low text-slate-400 cursor-not-allowed"
                 }`}
@@ -412,7 +409,7 @@ export const LegalPage: React.FC = () => {
             <button
               type="button"
               onClick={downloadFullDocument}
-              className="w-full flex items-center justify-center gap-2 rounded-xl border border-outline-variant/60 px-4 py-3 font-label font-semibold text-[clamp(0.875rem,5cqw,1.0625rem)] text-slate-600 hover:bg-surface-container-low transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              className="w-full flex items-center justify-center gap-2 rounded-xl border border-outline-variant/60 px-4 py-2.5 sm:py-3 font-label font-semibold text-[clamp(0.875rem,5cqw,1.0625rem)] text-slate-600 hover:bg-surface-container-low transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
             >
               <motion.div
                 key={isSaving ? "saved" : "idle"}
