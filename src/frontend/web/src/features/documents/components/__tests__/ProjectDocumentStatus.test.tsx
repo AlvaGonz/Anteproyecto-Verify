@@ -123,4 +123,83 @@ describe("ProjectDocumentStatus", () => {
     expect(screen.getByText("Cédula / Identidad del Titular")).toBeInTheDocument();
     expect(screen.getByText("Certificado EIA")).toBeInTheDocument();
   });
+
+  it("shows 80% confidence when all 5 essentials are uploaded but no anexos", () => {
+    const essentials = [
+      DocumentType.CertificadoTitulo,
+      DocumentType.CertificacionEstadoJuridico,
+      DocumentType.PlanoMensuraCatastral,
+      DocumentType.CopiaCedulaIdentidad,
+      DocumentType.CertificacionIPI,
+    ];
+    vi.mocked(useDocuments).mockReturnValue({
+      data: essentials.map((tipoDocumento, i) => ({
+        id: `doc-${i}`,
+        tipoDocumento,
+        estadoDocumento: DocumentStatus.Verificado,
+        nombreArchivoOriginal: `doc-${i}.pdf`,
+      })),
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    expect(screen.getByText("80")).toBeInTheDocument();
+  });
+
+  it("shows 100% confidence when all 5 essentials and all 5 anexos are uploaded", () => {
+    const essentials = [
+      DocumentType.CertificadoTitulo,
+      DocumentType.CertificacionEstadoJuridico,
+      DocumentType.PlanoMensuraCatastral,
+      DocumentType.CopiaCedulaIdentidad,
+      DocumentType.CertificacionIPI,
+    ];
+    const anexos = [
+      DocumentType.CertificadoUsoSuelo,
+      DocumentType.RegistroMercantil,
+      DocumentType.PoderNotarial,
+      DocumentType.RNC,
+      DocumentType.CertificadoEIA,
+    ];
+    vi.mocked(useDocuments).mockReturnValue({
+      data: [...essentials, ...anexos].map((tipoDocumento, i) => ({
+        id: `doc-${i}`,
+        tipoDocumento,
+        estadoDocumento: DocumentStatus.Verificado,
+        nombreArchivoOriginal: `doc-${i}.pdf`,
+      })),
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    expect(screen.getByText("100")).toBeInTheDocument();
+  });
+
+  it("shows 20% confidence when no essentials are uploaded but all 5 anexos are", () => {
+    const anexos = [
+      DocumentType.CertificadoUsoSuelo,
+      DocumentType.RegistroMercantil,
+      DocumentType.PoderNotarial,
+      DocumentType.RNC,
+      DocumentType.CertificadoEIA,
+    ];
+    vi.mocked(useDocuments).mockReturnValue({
+      data: anexos.map((tipoDocumento, i) => ({
+        id: `doc-${i}`,
+        tipoDocumento,
+        estadoDocumento: DocumentStatus.Verificado,
+        nombreArchivoOriginal: `doc-${i}.pdf`,
+      })),
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    expect(screen.getByText("20")).toBeInTheDocument();
+  });
 });

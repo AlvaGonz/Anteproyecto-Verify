@@ -60,12 +60,21 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     </div>
   );
 
-  const uploadedDocs = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ESSENTIAL_TYPES.includes(d.tipoDocumento));
+  const uploadedEssentials = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ESSENTIAL_TYPES.includes(d.tipoDocumento));
+  const uploadedAnexos = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ANEXO_TYPES.includes(d.tipoDocumento));
 
-  const missingCount = ESSENTIAL_TYPES.length - uploadedDocs.length;
-  const progressPercent = ESSENTIAL_TYPES.length > 0
-    ? Math.round((uploadedDocs.length / ESSENTIAL_TYPES.length) * 100)
-    : 100;
+  const missingCount = ESSENTIAL_TYPES.length - uploadedEssentials.length;
+
+  // Nivel de Confianza: 5 esenciales valen 80% (16% c/u), 5 anexos valen 20% (4% c/u).
+  const ESSENTIAL_WEIGHT = 80;
+  const ANEXO_WEIGHT = 20;
+  const essentialPercent = ESSENTIAL_TYPES.length > 0
+    ? Math.round((uploadedEssentials.length / ESSENTIAL_TYPES.length) * ESSENTIAL_WEIGHT)
+    : ESSENTIAL_WEIGHT;
+  const anexoPercent = ANEXO_TYPES.length > 0
+    ? Math.round((uploadedAnexos.length / ANEXO_TYPES.length) * ANEXO_WEIGHT)
+    : ANEXO_WEIGHT;
+  const progressPercent = essentialPercent + anexoPercent;
 
   const renderDocItem = (typeId: DocumentType, index: number) => {
     const info = DOCUMENT_INFO[typeId];
