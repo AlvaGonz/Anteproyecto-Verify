@@ -26,7 +26,7 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 ? _context.Set<Proyecto>().Where(p => p.UsuarioCreadorId == userId.Value)
                 : _context.Set<Proyecto>();
             var activeUsersQuery = _context.Set<Usuario>()
-                .Where(u => u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator && (u.Plan == null || u.Plan.NombrePlan != "Consultor"));
+                .Where(u => u.Activo && u.AccountStatus == Domain.Enums.UserAccountStatus.Active && u.Rol != Domain.Enums.UserRole.Administrator);
 
             // Execute queries that can be done sequentially to avoid DbContext concurrency issues
             var totalUsuarios = await activeUsersQuery.CountAsync(cancellationToken);
