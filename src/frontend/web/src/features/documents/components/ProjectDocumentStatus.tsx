@@ -49,6 +49,18 @@ const ANEXO_TYPES: DocumentType[] = [
   DocumentType.CertificadoEIA,
 ];
 
+// Tipos legacy del enum backend que se mapean a su categoría canónica,
+// para que documentos subidos con el tipo antiguo aparezcan en la vista pública.
+const LEGACY_TYPE_ALIASES: Partial<Record<DocumentType, DocumentType>> = {
+  [DocumentType.TITLE]: DocumentType.CertificadoTitulo,
+  [DocumentType.LEGAL_STATUS]: DocumentType.CertificacionEstadoJuridico,
+  [DocumentType.SURVEY]: DocumentType.PlanoMensuraCatastral,
+  [DocumentType.ID]: DocumentType.CopiaCedulaIdentidad,
+  [DocumentType.NOTARIAL_POWER]: DocumentType.PoderNotarial,
+};
+
+const canonicalType = (tipo: DocumentType): DocumentType => LEGACY_TYPE_ALIASES[tipo] ?? tipo;
+
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId }) => {
   const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
   const { mutate: downloadDoc, isPending: isDownloading } = useDownloadDocument(projectId || "");
@@ -60,8 +72,8 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     </div>
   );
 
-  const uploadedEssentials = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ESSENTIAL_TYPES.includes(d.tipoDocumento));
-  const uploadedAnexos = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ANEXO_TYPES.includes(d.tipoDocumento));
+  const uploadedEssentials = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ESSENTIAL_TYPES.includes(canonicalType(d.tipoDocumento)));
+  const uploadedAnexos = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ANEXO_TYPES.includes(canonicalType(d.tipoDocumento)));
 
   const missingCount = ESSENTIAL_TYPES.length - uploadedEssentials.length;
 
@@ -80,7 +92,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     const info = DOCUMENT_INFO[typeId];
     if (!info) return null;
 
-    const doc = documents.find((d: any) => d.tipoDocumento === typeId);
+    const doc = documents.find((d: any) => d.tipoDocumento === typeId || canonicalType(d.tipoDocumento) === typeId);
     const isVerificado = doc?.estadoDocumento === DocumentStatus.Verificado || doc?.estadoDocumento === DocumentStatus.Valid;
     const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isVerificado;
     const isObservado = doc?.estadoDocumento === DocumentStatus.Observado;

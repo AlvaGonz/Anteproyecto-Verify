@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ProjectDocumentStatus } from "../ProjectDocumentStatus";
 import { DocumentStatus, DocumentType } from "../../types";
@@ -201,5 +201,48 @@ describe("ProjectDocumentStatus", () => {
     renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
 
     expect(screen.getByText("20")).toBeInTheDocument();
+  });
+
+  it("shows the uploaded cedula doc when its type is legacy ID (4) instead of CopiaCedulaIdentidad (26)", () => {
+    vi.mocked(useDocuments).mockReturnValue({
+      data: [
+        {
+          id: "doc-cedula",
+          tipoDocumento: DocumentType.ID,
+          estadoDocumento: DocumentStatus.Verificado,
+          nombreArchivoOriginal: "cedula nueva Nadelka.pdf",
+        },
+      ],
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    // The cedula card must show the uploaded file instead of NO SUMINISTRADO
+    expect(screen.getByText("cedula nueva Nadelka.pdf")).toBeInTheDocument();
+    const cedulaCard = screen.getByText("Cédula / Identidad del Titular").closest(".group") as HTMLElement;
+    expect(within(cedulaCard).queryByText("NO SUMINISTRADO")).not.toBeInTheDocument();
+  });
+
+  it("counts a legacy ID (4) cedula doc as an uploaded essential", () => {
+    vi.mocked(useDocuments).mockReturnValue({
+      data: [
+        {
+          id: "doc-cedula",
+          tipoDocumento: DocumentType.ID,
+          estadoDocumento: DocumentStatus.Verificado,
+          nombreArchivoOriginal: "cedula.pdf",
+        },
+      ],
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    // 1 of 5 essentials present → 4 missing; confidence 16% (16 * 1/5 = 3.2 → rounds to 3? no: 80/5 = 16 per doc)
+    expect(screen.getByText("4 documentos esenciales")).toBeInTheDocument();
+    expect(screen.getByText("16")).toBeInTheDocument();
   });
 });
