@@ -30,12 +30,16 @@ import {
   User,
   ArrowRight,
   Loader2,
+  FileText,
+  Building2,
+  MapIcon,
 } from "lucide-react";
 import { m } from "framer-motion";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { usePlanLimits } from "../../features/settings/api/useSettings";
 import { DocumentosModal } from "../../features/documents/components/DocumentosModal";
 import { BackToTopButton } from "../../shared/components/ui/BackToTopButton";
+import { MiniMap } from "../../shared/components/ui/MiniMap";
 
 
 
@@ -90,6 +94,17 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
   const quotaHandledRef = React.useRef(false);
+
+  // Parse GPS coordinates
+  let gpsLat: number | null = null;
+  let gpsLng: number | null = null;
+  if (project?.ubicacionGps) {
+    const parts = project.ubicacionGps.split(",").map((s) => parseFloat(s.trim()));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+      gpsLat = parts[0];
+      gpsLng = parts[1];
+    }
+  }
 
   React.useEffect(() => {
     async function consumeBg() {
@@ -495,6 +510,63 @@ export const ProjectPublicDetailPage: React.FC = () => {
                               </div>
                             </div>
                           )}
+                          {(project.cedulaRncPropietario || project.rncDesarrollador) && (
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                                <Fingerprint className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">RNC/Cédula</span>
+                                <span className="text-sm font-medium text-white/90 break-words block">
+                                  {project.cedulaRncPropietario || project.rncDesarrollador}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {project.ubicacionTexto && (
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                                <MapPin className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Ubicación</span>
+                                <span className="text-sm font-medium text-white/90 break-words block">
+                                  {project.ubicacionTexto}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {project.registradoPor.direccion && (
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                                <Building2 className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Dirección</span>
+                                <span className="text-sm font-medium text-white/90 break-words block">
+                                  {project.registradoPor.direccion}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {project.registradoPor.telefono && (
+                            <a
+                              href={`https://wa.me/${project.registradoPor.telefono.replace(/\D/g, '')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                            >
+                              <div className="w-9 h-9 rounded-2xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                                <Phone className="w-4 h-4 text-emerald-400" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/80 block mb-0.5">WhatsApp</span>
+                                <span className="text-sm font-medium text-emerald-300 break-words block">
+                                  {project.registradoPor.telefono}
+                                </span>
+                              </div>
+                            </a>
+                          )}
                         </div>
 
                         {/* Me Interesa / Guardado Button */}
@@ -555,6 +627,28 @@ export const ProjectPublicDetailPage: React.FC = () => {
                             <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
                           )}
                         </button>
+
+                        {/* Ver Documentos */}
+                        <button
+                          type="button"
+                          onClick={() => setShowDocumentos(true)}
+                          className="w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer bg-white/10 text-white border border-white/10 hover:bg-white/15 hover:border-white/20 disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                          <FileText className="w-4 h-4 relative z-10 shrink-0" />
+                          <span className="relative z-10 text-center leading-tight">Ver Documentos</span>
+                        </button>
+
+                        {/* Map */}
+                        <div className="w-full h-48 border border-white/10 rounded-3xl overflow-hidden bg-white/5">
+                          {gpsLat !== null && gpsLng !== null ? (
+                            <MiniMap lat={gpsLat} lng={gpsLng} />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-white/30">
+                              <MapIcon size={24} className="mb-2" />
+                              <span className="text-[10px] font-bold uppercase">Sin coordenadas</span>
+                            </div>
+                          )}
+                        </div>
                     </div>
 
                 </div>
