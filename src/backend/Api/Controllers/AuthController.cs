@@ -610,7 +610,7 @@ public class AuthController : ControllerBase
         var result = new List<string>();
         if (modo.Value.HasFlag(Domain.Enums.NombrePublicoModo.RealName)) result.Add("realName");
         if (modo.Value.HasFlag(Domain.Enums.NombrePublicoModo.Nickname)) result.Add("nickname");
-        return result;
+        return result.ToArray();
     }
 
     private static string[]? IdentificacionPublicaModoToWire(Domain.Enums.IdentificacionPublicaModo? modo)
@@ -619,7 +619,7 @@ public class AuthController : ControllerBase
         var result = new List<string>();
         if (modo.Value.HasFlag(Domain.Enums.IdentificacionPublicaModo.Cedula)) result.Add("cedula");
         if (modo.Value.HasFlag(Domain.Enums.IdentificacionPublicaModo.Rnc)) result.Add("rnc");
-        return result;
+        return result.ToArray();
     }
 
     [Microsoft.AspNetCore.Authorization.Authorize]

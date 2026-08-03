@@ -129,4 +129,62 @@ public class PublicIdentityResolverTests
         Assert.Equal(IdentificacionPublicaModo.Rnc, result.IdentificacionTipo);
         Assert.Null(result.RazonSocialMostrada);
     }
+
+    // ── Combinaciones (ambas opciones seleccionadas) ─────────────────────────
+
+    [Fact]
+    public void Resolve_AmbosNombres_MuestraNombreYNickname()
+    {
+        var user = MakeUser(nickname: "nickPro");
+        user.UpdatePreferenciasPublicas(
+            NombrePublicoModo.RealName | NombrePublicoModo.Nickname,
+            IdentificacionPublicaModo.Cedula);
+
+        var result = PublicIdentityResolver.Resolve(user, MakeProject());
+
+        Assert.Equal("Test User (nickPro)", result.NombreMostrado);
+    }
+
+    [Fact]
+    public void Resolve_AmbosNombresSinNickname_FallaAlNombreReal()
+    {
+        var user = MakeUser(nickname: null);
+        user.UpdatePreferenciasPublicas(
+            NombrePublicoModo.RealName | NombrePublicoModo.Nickname,
+            IdentificacionPublicaModo.Cedula);
+
+        var result = PublicIdentityResolver.Resolve(user, MakeProject());
+
+        Assert.Equal("Test User", result.NombreMostrado);
+    }
+
+    [Fact]
+    public void Resolve_AmbasIdentificaciones_MuestraCedulaYRncConRazonSocial()
+    {
+        var user = MakeUser();
+        user.UpdatePreferenciasPublicas(
+            NombrePublicoModo.RealName,
+            IdentificacionPublicaModo.Cedula | IdentificacionPublicaModo.Rnc);
+
+        var result = PublicIdentityResolver.Resolve(user, MakeProject());
+
+        Assert.Equal("001-0000001-1 · 101000000", result.IdentificacionMostrada);
+        Assert.Equal(IdentificacionPublicaModo.Rnc, result.IdentificacionTipo);
+        Assert.Equal("Desarrollos del Este SRL", result.RazonSocialMostrada);
+    }
+
+    [Fact]
+    public void Resolve_AmbasIdentificacionesSinRnc_FallaSoloAlaCedula()
+    {
+        var user = MakeUser(rnc: null, razonSocial: null);
+        user.UpdatePreferenciasPublicas(
+            NombrePublicoModo.RealName,
+            IdentificacionPublicaModo.Cedula | IdentificacionPublicaModo.Rnc);
+
+        var result = PublicIdentityResolver.Resolve(user, MakeProject());
+
+        Assert.Equal("001-0000001-1", result.IdentificacionMostrada);
+        Assert.Equal(IdentificacionPublicaModo.Cedula, result.IdentificacionTipo);
+        Assert.Null(result.RazonSocialMostrada);
+    }
 }
