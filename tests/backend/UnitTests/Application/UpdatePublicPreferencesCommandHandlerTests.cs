@@ -20,9 +20,9 @@ public class UpdatePublicPreferencesCommandHandlerTests
 
     [Theory]
     [InlineData(null, null)]
-    [InlineData(0, 0)]
-    [InlineData(NombrePublicoModo.RealName, 0)]
-    [InlineData(0, IdentificacionPublicaModo.Cedula)]
+    [InlineData((NombrePublicoModo)0, (IdentificacionPublicaModo)0)]
+    [InlineData(NombrePublicoModo.RealName, (IdentificacionPublicaModo)0)]
+    [InlineData((NombrePublicoModo)0, IdentificacionPublicaModo.Cedula)]
     public async Task Handle_SinOpcionElegida_Rechaza(NombrePublicoModo? nombreModo, IdentificacionPublicaModo? identificacionModo)
     {
         var result = await CreateSut().Handle(
