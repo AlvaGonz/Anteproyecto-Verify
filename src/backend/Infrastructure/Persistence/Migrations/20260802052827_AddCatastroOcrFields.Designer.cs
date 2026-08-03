@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260802052827_AddCatastroOcrFields")]
+    partial class AddCatastroOcrFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,30 @@ namespace Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Entities.Acceso", b =>
+                {
+                    b.Property<Guid>("IdAcceso")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("IdAcceso");
+
+                    b.Property<Guid?>("IdPerfil")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("IdPerfil");
+
+                    b.Property<Guid?>("IdUsuario")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("IdUsuario");
+
+                    b.HasKey("IdAcceso");
+
+                    b.HasIndex("IdPerfil");
+
+                    b.HasIndex("IdUsuario");
+
+                    b.ToTable("Acceso", (string)null);
+                });
 
             modelBuilder.Entity("Domain.Entities.AlertaValidacion", b =>
                 {
@@ -201,40 +228,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasKey("IdCatastroTitulo");
 
                     b.ToTable("CatastroTitulo", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.CategoriaProyecto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nombre")
-                        .IsUnique();
-
-                    b.ToTable("CategoriaProyecto");
                 });
 
             modelBuilder.Entity("Domain.Entities.Certificacion", b =>
@@ -1087,7 +1080,7 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("IdProyecto");
 
-                    b.Property<int>("CategoriaId")
+                    b.Property<int>("Categoria")
                         .HasColumnType("int");
 
                     b.Property<string>("CedulaRncPropietario")
@@ -1191,8 +1184,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoriaId");
 
                     b.HasIndex("CodigoInterno")
                         .IsUnique();
@@ -1818,6 +1809,44 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Usuario", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.UsuarioLegacy", b =>
+                {
+                    b.Property<Guid>("IdUsuario")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Cedula")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContrasenaHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NombreCompleto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Telefono")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdUsuario");
+
+                    b.ToTable("UsuariosLegacy");
+                });
+
             modelBuilder.Entity("Domain.Entities.Validacion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1986,6 +2015,23 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Verificacion2FA", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Acceso", b =>
+                {
+                    b.HasOne("Domain.Entities.Perfil", "Perfil")
+                        .WithMany()
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.UsuarioLegacy", "UsuarioLegacy")
+                        .WithMany()
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Perfil");
+
+                    b.Navigation("UsuarioLegacy");
+                });
+
             modelBuilder.Entity("Domain.Entities.AlertaValidacion", b =>
                 {
                     b.HasOne("Domain.Entities.Documento", "Documento")
@@ -2137,8 +2183,8 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Pago", b =>
                 {
-                    b.HasOne("Domain.Entities.Usuario", "Usuario")
-                        .WithMany()
+                    b.HasOne("Domain.Entities.UsuarioLegacy", "UsuarioLegacy")
+                        .WithMany("Pagos")
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -2149,7 +2195,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Navigation("PlanSuscripcion");
 
-                    b.Navigation("Usuario");
+                    b.Navigation("UsuarioLegacy");
                 });
 
             modelBuilder.Entity("Domain.Entities.PerfilPermiso", b =>
@@ -2173,12 +2219,6 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Proyecto", b =>
                 {
-                    b.HasOne("Domain.Entities.CategoriaProyecto", "CategoriaProyecto")
-                        .WithMany()
-                        .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.ProyectoEstado", "Estado")
                         .WithMany("Proyectos")
                         .HasForeignKey("EstadoId")
@@ -2190,8 +2230,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasForeignKey("UsuarioCreadorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("CategoriaProyecto");
 
                     b.Navigation("Estado");
 
@@ -2466,6 +2504,11 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("MiembrosEquipo");
 
                     b.Navigation("Proyectos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UsuarioLegacy", b =>
+                {
+                    b.Navigation("Pagos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Validacion", b =>

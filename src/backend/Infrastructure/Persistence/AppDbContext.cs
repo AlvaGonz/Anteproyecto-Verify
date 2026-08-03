@@ -50,9 +50,13 @@ public class AppDbContext : DbContext
 
     // External Data
     public DbSet<LicenciaConstruccion> LicenciasConstruccion => Set<LicenciaConstruccion>();
-
-    // 2FA
     public DbSet<Verificacion2FA> Verificaciones2FA => Set<Verificacion2FA>();
+    
+    // Entidades Gubernamentales Simuladas (Mock DB)
+    public DbSet<CatastroTitulo> CatastroTitulos => Set<CatastroTitulo>();
+    public DbSet<PermisoSuelo> PermisosSuelo => Set<PermisoSuelo>();
+    public DbSet<JCE_Ciudadano> JCE_Ciudadanos => Set<JCE_Ciudadano>();
+    public DbSet<PagoIPI> PagosIPI => Set<PagoIPI>();
 
     // Project Categories
     public DbSet<CategoriaProyecto> CategoriasProyecto => Set<CategoriaProyecto>();

@@ -236,8 +236,10 @@ def is_transient_error(e):
 
 def insert_chunk(chunk_id, chunk_records):
     import uuid
-    max_retries = 3
-    print(f"[Chunk {chunk_id}] Started — {len(chunk_records)} records...")
+def insert_chunk(chunk_id, chunk_records, attempt=1):
+    import uuid
+    max_retries = 10
+    print(f"[Chunk {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
@@ -296,7 +298,17 @@ def insert_chunk(chunk_id, chunk_records):
         print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {len(chunk_records)} records inserted!")
         return len(chunk_records)
     except Exception as e:
-        print(f"[Chunk {chunk_id}] PERMANENT ERROR: {e}")
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
+        if attempt < max_retries and is_transient_error(e):
+            wait = (2 ** attempt) + (attempt * 0.5)
+            print(f"[Chunk {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
+            time.sleep(wait)
+            return insert_chunk(chunk_id, chunk_records, attempt + 1)
+        print(f"[Chunk {chunk_id}] PERMANENT ERROR after {attempt} attempt(s): {e}")
         traceback.print_exc()
         raise e
     finally:

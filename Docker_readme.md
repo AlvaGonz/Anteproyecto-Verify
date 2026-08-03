@@ -6,15 +6,15 @@ Este proyecto contiene una configuración robusta de orquestación con Docker Co
 
 ## 🗂️ Arquitectura de Archivos y Contenedores
 
-| Archivo / Directorio | Propósito |
-| :--- | :--- |
-| `docker-compose.yml` | Archivo principal de orquestación para todos los contenedores. |
-| `Build-Database-Sql.sql` | Script SQL original con la estructura de tablas (escrito en dialecto MySQL). |
-| `docker/SQL_Server/` | Directorio contenedor de los archivos de personalización del servidor SQL Server. |
-| ├── `Dockerfile` | Imagen personalizada basada en SQL Server 2022 que integra Python 3 y configuraciones custom. |
-| ├── `translate.py` | Utilidad en Python que traduce en tiempo real la sintaxis MySQL original a T-SQL (SQL Server). |
-| └── `entrypoint.sh` | Script de inicialización de Unix que orquesta la traducción, espera a la salud del servidor y ejecuta la siembra. |
-| `Docker_readmwe.md` | Este manual técnico explicativo de orquestación Docker. |
+| Archivo / Directorio     | Propósito                                                                                                         |
+| :----------------------- | :---------------------------------------------------------------------------------------------------------------- |
+| `docker-compose.yml`     | Archivo principal de orquestación para todos los contenedores.                                                    |
+| `Build-Database-Sql.sql` | Script SQL original con la estructura de tablas (escrito en dialecto MySQL).                                      |
+| `docker/SQL_Server/`     | Directorio contenedor de los archivos de personalización del servidor SQL Server.                                 |
+| ├── `Dockerfile`         | Imagen personalizada basada en SQL Server 2022 que integra Python 3 y configuraciones custom.                     |
+| ├── `translate.py`       | Utilidad en Python que traduce en tiempo real la sintaxis MySQL original a T-SQL (SQL Server).                    |
+| └── `entrypoint.sh`      | Script de inicialización de Unix que orquesta la traducción, espera a la salud del servidor y ejecuta la siembra. |
+| `Docker_readmwe.md`      | Este manual técnico explicativo de orquestación Docker.                                                           |
 
 ---
 
@@ -64,8 +64,10 @@ docker compose down
 ### D) Reiniciar y Destruir Datos por Completo (Hard Reset)
 Si modificaste sustancialmente tus esquemas de bases de datos de forma destructiva y necesitas **borrar todos los datos y tablas guardadas en la base de datos para crearlas de nuevo limpiamente desde `Build-Database-Sql.sql`**:
 ```bash
+
 docker compose down -v
 docker compose up --build -d
+
 ```
 *(El argumento `-v` elimina los volúmenes persistentes creados por Docker, obligando al contenedor de SQL Server a ejecutar nuevamente la inicialización desde cero en su próximo arranque).*
 
@@ -77,13 +79,13 @@ Para garantizar que el sistema inicie al 100% de manera consistente en cualquier
 
 A continuación se detalla el paso a paso del flujo del sistema al ejecutar `docker compose up -d`:
 
-| Paso | Descripción | Acción Requerida | Tiempo Estimado | Estado del Sistema / Validación |
-| :--- | :--- | :--- | :--- | :--- |
-| **1. Variables de Entorno** | Cargar configuraciones del backend, base de datos y llaves de desarrollo. | Asegúrate de tener el archivo `.env` en la raíz del proyecto (puedes copiar de `.env.example`). | 1 minuto | El sistema leerá las variables de base de datos y configuración JWT. |
-| **2. docker compose up -d** | Orquestación en segundo plano de los contenedores (`api`, `web`, `sqlserver`, `azurite`). | Ejecutar `docker compose up -d` en tu terminal. | 15 segundos | Todos los contenedores quedan en estado `Up` o `Starting`. |
-| **3. Healthcheck de BD** | SQL Server se inicia, compila la base de datos, traduce el script MySQL a T-SQL y crea el esquema. | Ninguna (Automático). El contenedor de la API esperará hasta que SQL Server esté saludable (`service_healthy`). | 30 - 45 segundos | Puedes verificar con `docker compose ps` que `sqlserver-1` tenga status `healthy`. |
-| **4. Compilación y Seeding** | El backend se compila en el contenedor con `dotnet watch` y siembra la base de datos. | Ninguna (Automático). La API verifica la conexión con SQL Server (reintenta hasta 30 veces), crea las tablas y **siembra automáticamente los usuarios y planes por defecto**. | 1 - 2 minutos | Verás `dotnet watch 🚀 Started` en los logs de `api` y el puerto `5000` estará activo. |
-| **5. Acceso al Frontend** | El frontend web compilado en Vite expone el portal en el puerto `3000`. | Abrir `http://localhost:3000` en tu navegador. | Inmediato | La pantalla de Login estará disponible y podrás entrar inmediatamente. |
+| Paso                         | Descripción                                                                                        | Acción Requerida                                                                                                                                                              | Tiempo Estimado  | Estado del Sistema / Validación                                                       |
+| :--------------------------- | :------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------- | :------------------------------------------------------------------------------------ |
+| **1. Variables de Entorno**  | Cargar configuraciones del backend, base de datos y llaves de desarrollo.                          | Asegúrate de tener el archivo `.env` en la raíz del proyecto (puedes copiar de `.env.example`).                                                                               | 1 minuto         | El sistema leerá las variables de base de datos y configuración JWT.                  |
+| **2. docker compose up -d**  | Orquestación en segundo plano de los contenedores (`api`, `web`, `sqlserver`, `azurite`).          | Ejecutar `docker compose up -d` en tu terminal.                                                                                                                               | 15 segundos      | Todos los contenedores quedan en estado `Up` o `Starting`.                            |
+| **3. Healthcheck de BD**     | SQL Server se inicia, compila la base de datos, traduce el script MySQL a T-SQL y crea el esquema. | Ninguna (Automático). El contenedor de la API esperará hasta que SQL Server esté saludable (`service_healthy`).                                                               | 30 - 45 segundos | Puedes verificar con `docker compose ps` que `sqlserver-1` tenga status `healthy`.    |
+| **4. Compilación y Seeding** | El backend se compila en el contenedor con `dotnet watch` y siembra la base de datos.              | Ninguna (Automático). La API verifica la conexión con SQL Server (reintenta hasta 30 veces), crea las tablas y **siembra automáticamente los usuarios y planes por defecto**. | 1 - 2 minutos    | Verás `dotnet watch 🚀 Started` en los logs de `api` y el puerto `5000` estará activo. |
+| **5. Acceso al Frontend**    | El frontend web compilado en Vite expone el portal en el puerto `3000`.                            | Abrir `http://localhost:3000` en tu navegador.                                                                                                                                | Inmediato        | La pantalla de Login estará disponible y podrás entrar inmediatamente.                |
 
 ### 🔐 Credenciales Sembradas por Defecto (Listas para Usar)
 Una vez finalizado el Paso 4, puedes iniciar sesión inmediatamente con:

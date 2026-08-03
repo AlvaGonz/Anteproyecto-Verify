@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260801215607_Add2FAColumns")]
-    partial class Add2FAColumns
+    [Migration("20260802050250_AddGobernanzaDeDatosMockTables")]
+    partial class AddGobernanzaDeDatosMockTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -172,6 +172,47 @@ namespace Infrastructure.Persistence.Migrations
                         });
 
                     b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
+                });
+
+            modelBuilder.Entity("Domain.Entities.CatastroTitulo", b =>
+                {
+                    b.Property<Guid>("IdCatastroTitulo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodigoDesignacionCatastral")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Latitud")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Longitud")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Matricula")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Municipio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroTitulo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Oficina")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Provincia")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Rnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Superficie")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("IdCatastroTitulo");
+
+                    b.ToTable("CatastroTitulo", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Certificacion", b =>
@@ -570,6 +611,30 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Invitaciones", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.JCE_Ciudadano", b =>
+                {
+                    b.Property<string>("Cedula")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Apellidos")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaExpiracion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaNacimiento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombres")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Cedula");
+
+                    b.ToTable("JCE_Ciudadano", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.LicenciaConstruccion", b =>
                 {
                     b.Property<Guid>("MivedId")
@@ -765,6 +830,35 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Pagos", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.PagoIPI", b =>
+                {
+                    b.Property<string>("Rnc")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Cuota_ipi")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Estatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoCertificacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoInmueble")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParcelaNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Rnc");
+
+                    b.ToTable("PagoIPI", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Perfil", b =>
                 {
                     b.Property<Guid>("IdPerfil")
@@ -814,6 +908,62 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasKey("IdPermiso");
 
                     b.ToTable("Permisos", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.PermisoSuelo", b =>
+                {
+                    b.Property<Guid>("IdPSuelo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Departamento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Documento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaEmision")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Latitud")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Longitud")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Lugar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Municipio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroExpediente")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroPermiso")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Operacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Provincia")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Rnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Seccion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Superficie")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TienePermiso")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdPSuelo");
+
+                    b.ToTable("PermisoSuelo", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.PlanSuscripcion", b =>

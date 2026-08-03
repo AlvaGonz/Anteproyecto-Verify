@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +27,7 @@ export const ResetPasswordPage: React.FC = () => {
   useEffect(() => {
     if (!token) {
       const timer = setTimeout(() => {
-        setError(new Error("Token de restablecimiento inválido o ausente."));
+        setError(new Error("Token de restablecimiento invÃ¡lido o ausente."));
       }, 0);
       return () => clearTimeout(timer);
     }
@@ -42,7 +42,7 @@ export const ResetPasswordPage: React.FC = () => {
       await authApi.resetPassword({ token, newPassword: data.newPassword });
       setIsSuccess(true);
     } catch (err: any) {
-      setError(new Error(err?.response?.data?.message || err?.message || "Ocurrió un error al intentar restablecer la contraseña."));
+      setError(new Error(err?.response?.data?.message || err?.message || "OcurriÃ³ un error al intentar restablecer la contraseÃ±a."));
     } finally {
       setIsPending(false);
     }
@@ -66,10 +66,10 @@ export const ResetPasswordPage: React.FC = () => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-5xl bg-white border border-border rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative z-10"
+        className="w-full max-w-5xl bg-white border border-border rounded-3xl md:rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative z-10"
       >
         {/* Left Side: Info */}
-        <div className="w-full md:w-[400px] bg-[#223382] p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
+        <div className="w-full md:w-[400px] bg-[#223382] p-8 md:p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-64 h-64 border-2 border-white rounded-full" />
             <div className="absolute bottom-[-5%] left-[-5%] w-48 h-48 border border-white rounded-full opacity-50" />
@@ -85,15 +85,15 @@ export const ResetPasswordPage: React.FC = () => {
                 />
               </Link>
               <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-4">
-                Recuperación Segura
+                RecuperaciÃ³n Segura
               </div>
               <h2 className="text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter text-white">
                 Nueva <br />
-                <span className="text-primary-light">Contraseña.</span>
+                <span className="text-primary-light">ContraseÃ±a.</span>
               </h2>
 
               <p className="text-base text-white/70 leading-relaxed font-medium max-w-[280px]">
-                Ingresa tu nueva contraseña para recuperar el acceso a la plataforma.
+                Ingresa tu nueva contraseÃ±a para recuperar el acceso a la plataforma.
               </p>
             </div>
 
@@ -103,8 +103,8 @@ export const ResetPasswordPage: React.FC = () => {
                   <ShieldCheck className="w-6 h-6 text-primary-light" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1 text-white">Contraseña Segura</h4>
-                  <p className="text-xs text-white/80 leading-normal">Mínimo 8 caracteres, mayúscula, minúscula, número y símbolo especial.</p>
+                  <h4 className="font-display font-bold text-[15px] leading-tight mb-1 text-white">ContraseÃ±a Segura</h4>
+                  <p className="text-xs text-white/80 leading-normal">MÃ­nimo 8 caracteres, mayÃºscula, minÃºscula, nÃºmero y sÃ­mbolo especial.</p>
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@ export const ResetPasswordPage: React.FC = () => {
         </div>
 
         {/* Right Side: Form */}
-        <div className="flex-1 p-12 flex items-center justify-center">
+        <div className="flex-1 p-6 sm:p-8 md:p-12 flex items-center justify-center">
           <div className="w-full max-w-[400px]">
             {isSuccess ? (
               <m.div 
@@ -123,15 +123,15 @@ export const ResetPasswordPage: React.FC = () => {
                 <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-8 h-8 text-emerald-600" />
                 </div>
-                <h3 className="text-2xl font-display font-extrabold text-[#223382] mb-3">Contraseña Actualizada</h3>
+                <h3 className="text-2xl font-display font-extrabold text-[#223382] mb-3">ContraseÃ±a Actualizada</h3>
                 <p className="text-text-secondary mb-8 leading-relaxed">
-                  Tu contraseña ha sido restablecida exitosamente. Ya puedes acceder a tu cuenta.
+                  Tu contraseÃ±a ha sido restablecida exitosamente. Ya puedes acceder a tu cuenta.
                 </p>
                 <button
                   onClick={() => navigate("/login")}
                   className="vf-btn-primary w-full h-[56px] flex items-center justify-center text-base font-bold transition-all shadow-floating"
                 >
-                  Ir a Iniciar Sesión <ArrowRight className="w-5 h-5 ml-2" />
+                  Ir a Iniciar SesiÃ³n <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
               </m.div>
             ) : (
@@ -140,8 +140,8 @@ export const ResetPasswordPage: React.FC = () => {
                 animate={{ opacity: 1 }}
               >
                 <div className="mb-10 text-center md:text-left">
-                  <h3 className="text-2xl font-display font-extrabold text-[#223382] tracking-tight">Establecer Contraseña</h3>
-                  <p className="text-text-secondary mt-1">Ingresa tu nueva contraseña debajo</p>
+                  <h3 className="text-2xl font-display font-extrabold text-[#223382] tracking-tight">Establecer ContraseÃ±a</h3>
+                  <p className="text-text-secondary mt-1">Ingresa tu nueva contraseÃ±a debajo</p>
                 </div>
 
                 {error && (
@@ -152,12 +152,12 @@ export const ResetPasswordPage: React.FC = () => {
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div className="relative">
-                    <label htmlFor="newPassword" className="sr-only">Nueva Contraseña</label>
+                    <label htmlFor="newPassword" className="sr-only">Nueva ContraseÃ±a</label>
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
                     <input
                       id="newPassword"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Nueva Contraseña *"
+                      placeholder="Nueva ContraseÃ±a *"
                       className="vf-input w-full pl-12 pr-12 h-[52px]"
                       disabled={!token}
                       {...register("newPassword")}
@@ -177,12 +177,12 @@ export const ResetPasswordPage: React.FC = () => {
                   </div>
 
                   <div className="relative">
-                    <label htmlFor="confirmPassword" className="sr-only">Confirmar Contraseña</label>
+                    <label htmlFor="confirmPassword" className="sr-only">Confirmar ContraseÃ±a</label>
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
                     <input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirmar Contraseña *"
+                      placeholder="Confirmar ContraseÃ±a *"
                       className="vf-input w-full pl-12 pr-12 h-[52px]"
                       disabled={!token}
                       {...register("confirmPassword")}
@@ -213,7 +213,7 @@ export const ResetPasswordPage: React.FC = () => {
                       </span>
                     ) : (
                       <span className="flex items-center justify-center gap-2">
-                        Restablecer Contraseña <ArrowRight className="w-5 h-5" />
+                        Restablecer ContraseÃ±a <ArrowRight className="w-5 h-5" />
                       </span>
                     )}
                   </button>

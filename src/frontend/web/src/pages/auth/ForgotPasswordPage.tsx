@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +25,7 @@ export const ForgotPasswordPage: React.FC = () => {
       await authApi.forgotPassword(data.email);
       setIsSuccess(true);
     } catch (err: any) {
-      setError(new Error(err?.response?.data?.message || err?.message || "Ocurrió un error al intentar enviar el correo."));
+      setError(new Error(err?.response?.data?.message || err?.message || "OcurriÃ³ un error al intentar enviar el correo."));
     } finally {
       setIsPending(false);
     }
@@ -48,9 +48,9 @@ export const ForgotPasswordPage: React.FC = () => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-5xl bg-white border border-border rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative z-10"
+        className="w-full max-w-5xl bg-white border border-border rounded-3xl md:rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative z-10"
       >
-        <div className="w-full md:w-[400px] bg-[#223382] p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
+        <div className="w-full md:w-[400px] bg-[#223382] p-8 md:p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-64 h-64 border-2 border-white rounded-full" />
             <div className="absolute bottom-[-5%] left-[-5%] w-48 h-48 border border-white rounded-full opacity-50" />
@@ -66,11 +66,11 @@ export const ForgotPasswordPage: React.FC = () => {
                 />
               </Link>
               <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-4">
-                Recuperación Segura
+                RecuperaciÃ³n Segura
               </div>
               <h2 className="text-4xl font-display font-black leading-[1.1] mb-6 tracking-tighter text-white">
                 Restablecer <br />
-                <span className="text-primary-light">Contraseña.</span>
+                <span className="text-primary-light">ContraseÃ±a.</span>
               </h2>
 
               <p className="text-base text-white/70 leading-relaxed font-medium max-w-[280px]">
@@ -85,14 +85,14 @@ export const ForgotPasswordPage: React.FC = () => {
                 </div>
                 <div className="flex flex-col justify-center">
                   <h4 className="font-display font-bold text-[15px] leading-tight mb-1 text-white">Proceso Verificado</h4>
-                  <p className="text-xs text-white/80 leading-normal">Los enlaces de recuperación tienen una validez temporal por seguridad.</p>
+                  <p className="text-xs text-white/80 leading-normal">Los enlaces de recuperaciÃ³n tienen una validez temporal por seguridad.</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 p-12 flex items-center justify-center">
+        <div className="flex-1 p-6 sm:p-8 md:p-12 flex items-center justify-center">
           <div className="w-full max-w-[400px]">
             {isSuccess ? (
               <m.div 
@@ -105,13 +105,13 @@ export const ForgotPasswordPage: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-display font-extrabold text-[#223382] mb-3">Revisa tu correo</h3>
                 <p className="text-text-secondary mb-8 leading-relaxed">
-                  Si la dirección ingresada está registrada, recibirás un correo con un enlace seguro para restablecer tu contraseña.
+                  Si la direcciÃ³n ingresada estÃ¡ registrada, recibirÃ¡s un correo con un enlace seguro para restablecer tu contraseÃ±a.
                 </p>
                 <Link
                   to="/login"
                   className="vf-btn-secondary w-full h-[56px] flex items-center justify-center text-base font-bold transition-all"
                 >
-                  Volver al inicio de sesión
+                  Volver al inicio de sesiÃ³n
                 </Link>
               </m.div>
             ) : (
@@ -132,12 +132,12 @@ export const ForgotPasswordPage: React.FC = () => {
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div className="relative">
-                    <label htmlFor="email" className="sr-only">Correo electrónico</label>
+                    <label htmlFor="email" className="sr-only">Correo electrÃ³nico</label>
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-border" />
                     <input
                       id="email"
                       type="email"
-                      placeholder="Correo electrónico *"
+                      placeholder="Correo electrÃ³nico *"
                       className="vf-input w-full pl-12 pr-4 h-[52px]"
                       {...register("email")}
                     />
@@ -168,9 +168,9 @@ export const ForgotPasswordPage: React.FC = () => {
 
                 <div className="mt-8 pt-6 border-t border-border/50 text-center">
                   <p className="text-sm text-text-secondary font-medium">
-                    ¿Recordaste tu contraseña?{" "}
+                    Â¿Recordaste tu contraseÃ±a?{" "}
                     <Link to="/login" className="text-primary font-bold hover:underline">
-                      Inicia sesión
+                      Inicia sesiÃ³n
                     </Link>
                   </p>
                 </div>

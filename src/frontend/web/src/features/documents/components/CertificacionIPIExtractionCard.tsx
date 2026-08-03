@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { CertificacionIPIExtraction, ExtractionStatus, FieldStatus, ExtractedField } from "../types";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
+import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
+import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { ShieldCheck } from "lucide-react";
 
 interface CertificacionIPIExtractionCardProps {
   extraction: CertificacionIPIExtraction;
@@ -15,6 +18,20 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+
+  const handleVerifyGobernanza = () => {
+    verifyDocument({
+      documentType: 'pagoipi',
+      payload: {
+        rnc: '', // Depending on where it's stored, maybe empty for IPI
+        noCertificacion: extraction.numeroCertificacion?.normalizedValue || extraction.numeroCertificacion?.rawValue,
+        noInmueble: extraction.numeroInmueble?.normalizedValue || extraction.numeroInmueble?.rawValue,
+        parcelaNo: extraction.parcelaNumero?.normalizedValue || extraction.parcelaNumero?.rawValue
+      }
+    });
+  };
 
   const handleEditClick = (fieldName: string, currentValue: string) => {
     setEditingField(fieldName);
@@ -109,6 +126,25 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
       {renderField("No. de Certificación", "numeroCertificacion", extraction.numeroCertificacion, true, "field-numeroCertificacion")}
       {renderField("No. Inmueble", "numeroInmueble", extraction.numeroInmueble, true, "field-numeroInmueble")}
       {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero")}
+      
+      <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
+        <div className="flex justify-end">
+          <button
+            onClick={handleVerifyGobernanza}
+            disabled={isVerifying}
+            className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold tracking-wide shadow-md hover:bg-primary/90 hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShieldCheck className="w-5 h-5" />
+            {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
+          </button>
+        </div>
+        
+        <VerificationFeedbackCard 
+          response={verificationResponse || null} 
+          isLoading={isVerifying} 
+          error={verificationError}
+        />
+      </div>
     </DocumentExtractionPanel>
   );
 };

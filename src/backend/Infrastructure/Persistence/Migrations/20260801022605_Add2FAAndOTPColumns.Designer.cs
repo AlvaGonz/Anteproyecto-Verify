@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260801022605_Add2FAAndOTPColumns")]
+    partial class Add2FAAndOTPColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,30 @@ namespace Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Entities.Acceso", b =>
+                {
+                    b.Property<Guid>("IdAcceso")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("IdAcceso");
+
+                    b.Property<Guid?>("IdPerfil")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("IdPerfil");
+
+                    b.Property<Guid?>("IdUsuario")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("IdUsuario");
+
+                    b.HasKey("IdAcceso");
+
+                    b.HasIndex("IdPerfil");
+
+                    b.HasIndex("IdUsuario");
+
+                    b.ToTable("Acceso", (string)null);
+                });
 
             modelBuilder.Entity("Domain.Entities.AlertaValidacion", b =>
                 {
@@ -145,96 +172,6 @@ namespace Infrastructure.Persistence.Migrations
                         });
 
                     b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
-                });
-
-            modelBuilder.Entity("Domain.Entities.CatastroTitulo", b =>
-                {
-                    b.Property<Guid>("IdCatastroTitulo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodigoDesignacionCatastral")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DesigCatastralPosicional")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DesignCatastralOrigen")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FechaEmision")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaInscripcion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Latitud")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Longitud")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Matricula")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Municipio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroTitulo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Oficina")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Provincia")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Rnc")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Superficie")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("VieneDe")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdCatastroTitulo");
-
-                    b.ToTable("CatastroTitulo", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.CategoriaProyecto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nombre")
-                        .IsUnique();
-
-                    b.ToTable("CategoriaProyecto");
                 });
 
             modelBuilder.Entity("Domain.Entities.Certificacion", b =>
@@ -633,30 +570,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Invitaciones", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.JCE_Ciudadano", b =>
-                {
-                    b.Property<string>("Cedula")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Apellidos")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FechaExpiracion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaNacimiento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nombres")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Cedula");
-
-                    b.ToTable("JCE_Ciudadano", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Entities.LicenciaConstruccion", b =>
                 {
                     b.Property<Guid>("MivedId")
@@ -852,35 +765,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Pagos", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.PagoIPI", b =>
-                {
-                    b.Property<string>("Rnc")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal>("Cuota_ipi")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Estatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("NoCertificacion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NoInmueble")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ParcelaNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Rnc");
-
-                    b.ToTable("PagoIPI", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Entities.Perfil", b =>
                 {
                     b.Property<Guid>("IdPerfil")
@@ -930,62 +814,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasKey("IdPermiso");
 
                     b.ToTable("Permisos", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.PermisoSuelo", b =>
-                {
-                    b.Property<Guid>("IdPSuelo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Departamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Documento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FechaEmision")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Latitud")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Longitud")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Lugar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Municipio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroExpediente")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroPermiso")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Operacion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Provincia")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Rnc")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Seccion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Superficie")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("TienePermiso")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdPSuelo");
-
-                    b.ToTable("PermisoSuelo", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.PlanSuscripcion", b =>
@@ -1087,7 +915,7 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("IdProyecto");
 
-                    b.Property<int>("CategoriaId")
+                    b.Property<int>("Categoria")
                         .HasColumnType("int");
 
                     b.Property<string>("CedulaRncPropietario")
@@ -1191,8 +1019,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoriaId");
 
                     b.HasIndex("CodigoInterno")
                         .IsUnique();
@@ -1818,6 +1644,52 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Usuario", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.UsuarioLegacy", b =>
+                {
+                    b.Property<Guid>("IdUsuario")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("IdUsuario");
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Cedula")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("ContrasenaHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("IdUsuario");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("IX_UsuarioLegacy_Email");
+
+                    b.ToTable("UsuarioLegacy", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Validacion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1986,6 +1858,23 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Verificacion2FA", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Acceso", b =>
+                {
+                    b.HasOne("Domain.Entities.Perfil", "Perfil")
+                        .WithMany()
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.UsuarioLegacy", "UsuarioLegacy")
+                        .WithMany()
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Perfil");
+
+                    b.Navigation("UsuarioLegacy");
+                });
+
             modelBuilder.Entity("Domain.Entities.AlertaValidacion", b =>
                 {
                     b.HasOne("Domain.Entities.Documento", "Documento")
@@ -2137,7 +2026,7 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Pago", b =>
                 {
-                    b.HasOne("Domain.Entities.Usuario", "Usuario")
+                    b.HasOne("Domain.Entities.UsuarioLegacy", "UsuarioLegacy")
                         .WithMany()
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -2149,7 +2038,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Navigation("PlanSuscripcion");
 
-                    b.Navigation("Usuario");
+                    b.Navigation("UsuarioLegacy");
                 });
 
             modelBuilder.Entity("Domain.Entities.PerfilPermiso", b =>
@@ -2173,12 +2062,6 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Proyecto", b =>
                 {
-                    b.HasOne("Domain.Entities.CategoriaProyecto", "CategoriaProyecto")
-                        .WithMany()
-                        .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.ProyectoEstado", "Estado")
                         .WithMany("Proyectos")
                         .HasForeignKey("EstadoId")
@@ -2190,8 +2073,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasForeignKey("UsuarioCreadorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("CategoriaProyecto");
 
                     b.Navigation("Estado");
 

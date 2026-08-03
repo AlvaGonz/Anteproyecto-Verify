@@ -16,12 +16,15 @@ const NAV_ITEMS = [
   { name: "Reportes", href: "/reports", icon: BarChart },
   { name: "Configuración", href: "/settings", icon: Settings },
 ];
+interface PortalSidebarNavProps {
+  onClose?: () => void;
+}
 
-export const PortalSidebarNav: React.FC = () => {
+export const PortalSidebarNav: React.FC<PortalSidebarNavProps> = ({ onClose }) => {
   const location = useLocation();
 
   return (
-    <nav className="fixed left-0 top-0 h-full w-64 bg-[#223382] py-8 z-50 flex flex-col shadow-premium">
+    <nav className="h-full w-64 bg-[#223382] py-8 flex flex-col shadow-premium">
       {/* Branding */}
       <div className="px-8 mb-12">
         <Link to="/" className="flex items-center gap-2">

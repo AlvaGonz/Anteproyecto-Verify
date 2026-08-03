@@ -10,6 +10,9 @@ import { Loader2 } from "lucide-react";
 import { formatMatricula, formatSuperficieM2 } from "../utils/numericFormatter";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
+import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
+import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { ShieldCheck } from "lucide-react";
 
 type NumericKind = "matricula" | "superficieM2";
 
@@ -164,6 +167,22 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
   const [editValue, setEditValue] = React.useState("");
   const [isSaving, setIsSaving] = React.useState(false);
 
+  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+
+  const handleVerifyGobernanza = () => {
+    verifyDocument({
+      documentType: 'catastro',
+      payload: {
+        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue,
+        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue,
+        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue,
+        fechaInscripcion: extraction.fechaYHoraInscripcion?.normalizedValue || extraction.fechaYHoraInscripcion?.rawValue,
+        fechaEmision: '', // Titulo extraction model doesn't output this yet directly here?
+        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue,
+      }
+    });
+  };
+
   const handleEditClick = (fieldName: string, currentValue: string) => {
     setEditingField(fieldName);
     setEditValue(currentValue);
@@ -301,6 +320,25 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
       {renderField("Municipio", "municipio", extraction.municipio)}
       {renderField("Provincia", "provincia", extraction.provincia)}
       {renderField("Superficie M2", "superficieM2", extraction.superficieM2)}
+
+      <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
+        <div className="flex justify-end">
+          <button
+            onClick={handleVerifyGobernanza}
+            disabled={isVerifying}
+            className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold tracking-wide shadow-md hover:bg-primary/90 hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShieldCheck className="w-5 h-5" />
+            {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
+          </button>
+        </div>
+        
+        <VerificationFeedbackCard 
+          response={verificationResponse || null} 
+          isLoading={isVerifying} 
+          error={verificationError}
+        />
+      </div>
     </DocumentExtractionPanel>
   );
 };

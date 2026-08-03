@@ -239,9 +239,9 @@ def is_transient_error(e):
             return True
     return False
 
-def insert_chunk(chunk_id, chunk_records):
-    max_retries = 3
-    print(f"[Chunk {chunk_id}] Started — {len(chunk_records)} records...")
+def insert_chunk(chunk_id, chunk_records, attempt=1):
+    max_retries = 10
+    print(f"[Chunk {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
     conn = None
     try:
         conn = get_db_connection()
@@ -263,6 +263,7 @@ def insert_chunk(chunk_id, chunk_records):
         
         for i in range(0, len(chunk_records), batch_size):
             batch = chunk_records[i : i + batch_size]
+            batch_success = False
             placeholders_str = ", ".join([row_placeholder] * len(batch))
             sql = f"INSERT INTO DGII ({cols_str}) VALUES {placeholders_str}"
             
@@ -274,11 +275,13 @@ def insert_chunk(chunk_id, chunk_records):
                 try:
                     cursor.execute(sql, tuple(params))
                     conn.commit()
+                    batch_success = True
                     break
                 except Exception as e:
                     err_str = str(e)
                     if batch_attempt > 1 and ("2627" in err_str or "PRIMARY KEY" in err_str.upper()):
                         print(f"    [Chunk {chunk_id}] Ignoring PK violation on retry {batch_attempt}, assuming previous attempt committed successfully.")
+                        batch_success = True
                         break
                         
                     if conn:
@@ -286,25 +289,34 @@ def insert_chunk(chunk_id, chunk_records):
                         except: pass
                         
                     if batch_attempt < max_retries and is_transient_error(e):
-                        wait = 2 ** batch_attempt
+                        wait = (2 ** batch_attempt) + (batch_attempt * 0.5)
                         time.sleep(wait)
                         try: conn.close()
                         except: pass
                         conn = get_db_connection()
                         cursor = conn.cursor()
                     else:
-                        raise e
-                        
-            count += len(batch)
+                        print(f"    [Chunk {chunk_id}] Batch failed permanently: {e}")
+            
+            if batch_success:
+                count += len(batch)
             if count % 10000 == 0 or count == len(chunk_records):
                 elapsed = time.time() - t0
                 speed = count / elapsed if elapsed > 0 else 0
                 print(f"[Chunk {chunk_id}] Inserted {count}/{len(chunk_records)} records. Speed: {speed:.1f} rec/sec")
                 
-        print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {len(chunk_records)} records inserted successfully!")
-        return len(chunk_records)
+        print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {count} records inserted successfully!")
+        return count
     except Exception as e:
-        print(f"[Chunk {chunk_id}] PERMANENT ERROR: {e}")
+        if conn:
+            try: conn.rollback()
+            except: pass
+        if attempt < max_retries and is_transient_error(e):
+            wait = (2 ** attempt) + (attempt * 0.5)
+            print(f"[Chunk {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
+            time.sleep(wait)
+            return insert_chunk(chunk_id, chunk_records, attempt + 1)
+        print(f"[Chunk {chunk_id}] PERMANENT ERROR after {attempt} attempt(s): {e}")
         traceback.print_exc()
         raise e
     finally:
