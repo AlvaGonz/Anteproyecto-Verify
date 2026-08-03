@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useRoutePrefetch } from "../../hooks/useRoutePrefetch";
 
@@ -40,8 +41,8 @@ export const LandingNav: React.FC = () => {
     : "text-sm font-semibold text-on-surface-variant hover:text-on-surface px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
 
   const hamburgerClassName = isDarkBackground
-    ? "lg:hidden p-2 -mr-2 text-white hover:text-white rounded-lg hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-    : "lg:hidden p-2 -mr-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+    ? "lg:hidden p-2 text-white hover:text-white rounded-lg hover:bg-white/10 transition-all duration-[230ms] active:scale-[0.96] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    : "lg:hidden p-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-low transition-all duration-[230ms] active:scale-[0.96] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
 
   const logoSrc = isDarkBackground
     ? "/brand/logotipo/LOGOTIPO WHITE.optimized.svg"
@@ -112,12 +113,19 @@ export const LandingNav: React.FC = () => {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Abrir menú"
         >
-          <span className="material-symbols-outlined text-2xl">{mobileMenuOpen ? "close" : "menu"}</span>
+          <span className={`material-symbols-outlined text-2xl transition-transform duration-[230ms] ${mobileMenuOpen ? "rotate-90" : ""}`}>{mobileMenuOpen ? "close" : "menu"}</span>
         </button>
 
         {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <div className="absolute top-[calc(100%+8px)] left-0 right-0 p-4 bg-surface/95 backdrop-blur-xl border border-outline-variant/30 shadow-lg rounded-2xl flex flex-col gap-2 lg:hidden animate-in fade-in slide-in-from-top-4 duration-200">
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -8 }}
+              transition={{ duration: 0.23, ease: "easeOut" }}
+              className="absolute top-[calc(100%+8px)] left-0 right-0 p-4 bg-surface/95 backdrop-blur-xl border border-outline-variant/30 shadow-lg rounded-2xl flex flex-col gap-2 lg:hidden"
+            >
             {NAV_LINKS.map((item) => {
               const className = "text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low px-4 py-3 rounded-xl transition-colors";
               if (item.href.startsWith("/")) {
@@ -145,8 +153,9 @@ export const LandingNav: React.FC = () => {
                 </Link>
               </div>
             )}
-          </div>
-        )}
+          </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </div>
   );

@@ -37,6 +37,21 @@ vi.mock("leaflet/dist/images/marker-icon-2x.png", () => ({ default: "" }));
 vi.mock("leaflet/dist/images/marker-icon.png", () => ({ default: "" }));
 vi.mock("leaflet/dist/images/marker-shadow.png", () => ({ default: "" }));
 
+vi.mock("../api/useCategories", () => ({
+  useCategories: () => ({
+    data: [
+      { id: 1, nombre: "ALBERGUES", descripcion: null },
+      { id: 16, nombre: "VIVIENDAS", descripcion: null },
+    ],
+  }),
+}));
+
+vi.mock("../../provinces/api/useProvinces", () => ({
+  useProvinces: () => ({
+    data: [{ id: "SC", nombre: "Santiago", lat: 19.45, lng: -70.7, dcPrefix: "SC" }],
+  }),
+}));
+
 const queryClient = new QueryClient();
 
 const renderWithAuth = (ui: React.ReactElement) =>
@@ -56,10 +71,11 @@ describe("ProjectForm", () => {
     expect(screen.getByRole("button", { name: /Guardar/i })).toBeDefined();
   });
 
-  it("disables save button when required fields are empty", () => {
-    renderWithAuth(<ProjectForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
-    const submitButton = screen.getByRole("button", { name: /Guardar/i }) as HTMLButtonElement;
-    expect(submitButton.disabled).toBe(true);
+  it("blocks submit when required fields are empty", () => {
+    const handleSubmit = vi.fn();
+    renderWithAuth(<ProjectForm onSubmit={handleSubmit} onCancel={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /Guardar/i }));
+    expect(handleSubmit).not.toHaveBeenCalled();
   });
 
   it("calls onSubmit with correct data when form is filled", async () => {
@@ -72,6 +88,7 @@ describe("ProjectForm", () => {
 
     fireEvent.change(nameInput, { target: { value: "Residencial Las Palmas" } });
     fireEvent.change(provinciaSelect, { target: { value: "Santiago" } });
+    fireEvent.change(screen.getByLabelText(/Constructora/i), { target: { value: "Constructora XYZ" } });
     fireEvent.click(submitButton);
 
     expect(handleSubmit).toHaveBeenCalledWith(

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
@@ -7,21 +7,18 @@ import { CreateUserDto, UserSettings } from "../../features/settings/types/setti
 import { UsersTable } from "../../features/settings/components/UsersTable";
 import { UserFormModal } from "../../features/settings/components/UserFormModal";
 import { DeleteModal } from "../../features/settings/components/DeleteModal";
-import { MyProfileForm } from "../../features/settings/components/MyProfileForm";
-import { SubscriptionSettings } from "../../features/settings/components/SubscriptionSettings";
-import { InviteesSettings } from "../../features/settings/components/InviteesSettings";
-import { DeleteAccountSection } from "../../features/settings/components/DeleteAccountSection";
-import {
-  Settings,
-  Users,
-  Loader2,
-  User,
-  CreditCard,
-  UserPlus,
-  Shield
-} from "lucide-react";
+import { Settings, Users, Loader2, User, CreditCard, UserPlus, Shield } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
+
+const MyProfileForm = lazy(() => import("../../features/settings/components/MyProfileForm").then(m => ({ default: m.MyProfileForm })));
+const SubscriptionSettings = lazy(() => import("../../features/settings/components/SubscriptionSettings").then(m => ({ default: m.SubscriptionSettings })));
+const InviteesSettings = lazy(() => import("../../features/settings/components/InviteesSettings").then(m => ({ default: m.InviteesSettings })));
+const DeleteAccountSection = lazy(() => import("../../features/settings/components/DeleteAccountSection").then(m => ({ default: m.DeleteAccountSection })));
+const TwoFactorSection = lazy(() => import("../../features/settings/components/TwoFactorSection").then(m => ({ default: m.TwoFactorSection })));
+const ChangePasswordSection = lazy(() => import("../../features/settings/components/ChangePasswordSection").then(m => ({ default: m.ChangePasswordSection })));
+
+const TabFallback = () => <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
 type TabId = "profile" | "subscription" | "users" | "invitees" | "security";
 
@@ -45,19 +42,15 @@ export const SettingsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const isManagementTier = user?.plan === "Corporativo" || user?.plan === "Empresa";
 
-  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin);
-
-  useEffect(() => {
-    if (activeTab === "users") {
-      refetchUsers();
-    }
-  }, [activeTab, refetchUsers]);
-
+  // ponytail: request the full user list (no page cap); UsersTable groups and
+  // paginates client-side, so partial fetches would show wrong totals/counts
+  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 1000, isAdmin && activeTab === "users");
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans(isAdmin);
 
   const createUserMutation = useCreateUser();
@@ -90,7 +83,8 @@ export const SettingsPage: React.FC = () => {
       addToast("La cédula es obligatoria", "error");
       return;
     }
-    if (formData.cedula) {
+    // Cédula is immutable in edit mode, so its check digit is only validated on create
+    if (!editingUser && formData.cedula) {
       const cedDigits = formData.cedula.replace(/\D/g, "");
       if (cedDigits.length > 0 && !validateCedulaCheckDigit(cedDigits)) {
         addToast("Cédula inválida o dígito verificador incorrecto", "error");
@@ -107,9 +101,6 @@ export const SettingsPage: React.FC = () => {
     }
 
     try {
-      setIsModalOpen(false);
-      setEditingUser(null);
-
       if (editingUser) {
         await updateUserMutation.mutateAsync({ userId: editingUser.id, data: formData });
         addToast("Usuario actualizado exitosamente", "success");
@@ -117,8 +108,10 @@ export const SettingsPage: React.FC = () => {
         await createUserMutation.mutateAsync(formData);
         addToast("Usuario creado exitosamente", "success");
       }
+      setIsModalOpen(false);
+      setEditingUser(null);
+      setFormError(null);
     } catch (error: any) {
-      console.error("API Error Response:", error?.response?.data);
       let errorMsg = "Error al guardar el usuario";
       if (error?.response?.data) {
         const d = error.response.data;
@@ -129,18 +122,21 @@ export const SettingsPage: React.FC = () => {
           errorMsg = Object.values(d.errors).flat().join(' ');
         }
       }
-      addToast(errorMsg, "error");
+      // ponytail: keep the modal open so the admin can fix the field; error shown inside the form
+      setFormError(errorMsg);
     }
   };
 
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
-    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "dev", "validator", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
+    setFormError(null);
+    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
     setIsModalOpen(true);
   };
 
   const handleAddNewClick = () => {
     setEditingUser(null);
+    setFormError(null);
     setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Consultor" });
     setIsModalOpen(true);
   };
@@ -247,39 +243,22 @@ export const SettingsPage: React.FC = () => {
 
       {/* Tab Contents */}
       <div className="mt-6">
+        <Suspense fallback={<TabFallback />}>
         <AnimatePresence mode="wait">
           {activeTab === "profile" && (
-            <m.div
-              key="profile"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <MyProfileForm />
             </m.div>
           )}
 
           {activeTab === "subscription" && (
-            <m.div
-              key="subscription"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="subscription" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <SubscriptionSettings />
             </m.div>
           )}
 
           {activeTab === "users" && (
-            <m.div
-              key="users"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="users" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <UsersTable
                 users={users}
                 plans={plans}
@@ -292,37 +271,27 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {activeTab === "invitees" && isManagementTier && (
-            <m.div
-              key="invitees"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="invitees" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               <InviteesSettings />
             </m.div>
           )}
 
           {activeTab === "security" && (
-            <m.div
-              key="security"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
+            <m.div key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
+              <TwoFactorSection />
+              <ChangePasswordSection />
               <section className="bg-red-50 border border-red-200 rounded-lg p-6">
                 <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
                 <p className="text-sm text-red-600 mb-4">
                   Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
-                </p>
+               </p>
                 <DeleteAccountSection />
-              </section>
-            </m.div>
+             </section>
+           </m.div>
           )}
 
-
         </AnimatePresence>
+        </Suspense>
       </div>
 
       {/* User Form Modal */}
@@ -330,10 +299,11 @@ export const SettingsPage: React.FC = () => {
         isOpen={isModalOpen}
         editingUser={editingUser}
         formData={formData}
+        error={formError}
         isProcessing={isProcessing}
-        onChange={setFormData}
+        onChange={(data) => { setFormError(null); setFormData(data); }}
         onSubmit={handleSaveUser}
-        onClose={() => { setIsModalOpen(false); setEditingUser(null); }}
+        onClose={() => { setIsModalOpen(false); setEditingUser(null); setFormError(null); }}
       />
 
       {/* Delete Confirmation Modal */}

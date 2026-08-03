@@ -47,9 +47,9 @@ public class ProjectService : IProjectService
         return proyectos.Select(MapToDto);
     }
 
-    public async Task<PaginatedResult<ProyectoDto>> GetAllProjectsWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<PaginatedResult<ProyectoDto>> GetAllProjectsWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, string? searchTerm = null, string? estados = null, CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await _proyectoRepository.GetAllWithCountAsync(usuarioId, page, pageSize, cancellationToken);
+        var (items, totalCount) = await _proyectoRepository.GetAllWithCountAsync(usuarioId, page, pageSize, searchTerm, estados, cancellationToken);
         return new PaginatedResult<ProyectoDto>(
             items.Select(MapToDto).ToList(),
             totalCount,
@@ -93,6 +93,8 @@ public class ProjectService : IProjectService
                 "Límite de proyectos alcanzado para su plan actual. Considere mejorar su plan.");
         }
 
+        var categoria = await ValidateCategoriaAsync(dto.CategoriaId, cancellationToken);
+
         var estadoCreado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Creado, cancellationToken);
         if (estadoCreado == null)
         {
@@ -100,11 +102,12 @@ public class ProjectService : IProjectService
                 "Estado 'CREADO' no encontrado en ProyectosEstados. Ejecute el seeder o la migración de estados.");
         }
 
-        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        proyecto.AsignarCategoria(categoria);
         proyecto.UpdateEstado(estadoCreado);
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {
-            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
         }
         if (!string.IsNullOrEmpty(dto.RncDesarrollador) || !string.IsNullOrEmpty(dto.Matricula))
         {
@@ -125,7 +128,10 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException($"Project with id {id} not found.");
         }
 
-        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.Categoria, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        var categoria = await ValidateCategoriaAsync(dto.CategoriaId, cancellationToken);
+
+        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        proyecto.AsignarCategoria(categoria);
         proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
 
         // Auto-promote CREADO → EDITADO when the expediente is modified
@@ -335,6 +341,20 @@ public class ProjectService : IProjectService
         return guardados.Select(g => MapToDto(g.Project));
     }
 
+    private async Task<CategoriaProyecto> ValidateCategoriaAsync(int categoriaId, CancellationToken cancellationToken)
+    {
+        var categorias = await _proyectoRepository.GetCategoriasAsync(cancellationToken);
+        var categoria = categorias.FirstOrDefault(c => c.Id == categoriaId);
+        if (categoria == null || !categoria.Activo)
+        {
+            throw new ArgumentException(
+                "La categoría seleccionada no existe o está inactiva.",
+                nameof(Proyecto.CategoriaId));
+        }
+
+        return categoria;
+    }
+
     private static ProyectoDto MapToDto(Proyecto proyecto)
     {
         ProjectRegistrantDto? registradoPor = null;
@@ -367,7 +387,8 @@ public class ProjectService : IProjectService
             proyecto.ImagenAdicional4,
             proyecto.ImagenAdicional5,
             proyecto.ValorEstimado,
-            proyecto.Categoria,
+            proyecto.CategoriaId,
+            proyecto.CategoriaProyecto?.Nombre ?? "",
             proyecto.DatosDesarrollador,
             proyecto.RncDesarrollador,
             proyecto.DesignacionCatastral,

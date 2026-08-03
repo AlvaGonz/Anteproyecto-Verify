@@ -19,7 +19,7 @@ test.describe('Plano de Mensura - full-text fallback for label-less PDFs', () =>
     const userId = (await loginRes.json()).user.id;
 
     const projRes = await request.post(`${API_BASE}/api/Projects`, {
-      data: { nombre: 'Plano ESTE label-less', ubicacionTexto: 'Probe', usuarioCreadorId: userId, categoria: 3 },
+      data: { nombre: 'Plano ESTE label-less', ubicacionTexto: 'Probe', usuarioCreadorId: userId, categoriaId: 12 },
     });
     const projectId = (await projRes.json()).id;
 

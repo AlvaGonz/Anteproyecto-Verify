@@ -5,14 +5,24 @@ Documentar los requisitos de verificación y la matriz de cumplimiento aplicable
 
 ---
 
-## 1. Categorías de Proyectos (ProjectCategory)
-El sistema clasifica los proyectos en las siguientes categorías (basado en `ProjectCategory`):
-- **Residencial**
-- **Comercial**
-- **Turístico**
-- **Mixto**
-- **Industrial**
-- **Otro**
+## 1. Categorías de Proyectos (tabla `CategoriaProyecto`)
+El sistema clasifica los proyectos según la tabla `CategoriaProyecto` (16 categorías, `CategoriaId` 1-16):
+- **1 ALBERGUES**
+- **2 ALMACENES**
+- **3 APARTAMENTOS**
+- **4 CENTROS DE RECREACIÓN Y DEPORTES**
+- **5 CENTROS DE SALUD**
+- **6 COLEGIOS Y CENTROS EDUCATIVOS**
+- **7 COMBINADOS**
+- **8 COMERCIAL Y OFICINAS**
+- **9 DEPÓSITOS**
+- **10 ESTACIÓN DE COMBUSTIBLE**
+- **11 ESTRUCTURAS ESPECIALES**
+- **12 HOSPEDAJE**
+- **13 OBRAS DE ORDEN SOCIAL**
+- **14 PARQUEOS**
+- **15 SERVICIOS DE TRANSPORTE**
+- **16 VIVIENDAS**
 
 ## 2. Documentación Requerida por Categoría (OE-1)
 

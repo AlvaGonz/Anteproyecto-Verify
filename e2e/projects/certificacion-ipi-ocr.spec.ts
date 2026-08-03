@@ -66,7 +66,7 @@ test.describe('Real OCR Extraction Flow - Certificación IPI', () => {
           nombre: `OCR Test Certificacion IPI ${fileInfo.name}`,
           ubicacionTexto: "Santo Domingo",
           usuarioCreadorId: userId,
-          categoria: 1 // Residencial
+          categoriaId: 16 // VIVIENDAS
         }
       });
       if (!projRes.ok()) throw new Error(`Failed to create project: ${projRes.status()} ${await projRes.text()}`);

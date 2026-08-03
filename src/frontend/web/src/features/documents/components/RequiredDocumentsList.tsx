@@ -19,7 +19,7 @@ const REQUIRED_DOCUMENTS = [
   { id: "mensura", label: "Plano de Mensura", category: DocumentType.PlanoMensuraCatastral, categoryLabel: "MENSURA", description: "Plano catastral aprobado por autoridad competente" },
   { id: "cedula", label: "Cédula / Identidad del Titular", category: DocumentType.ID, categoryLabel: "OTROS", description: "Documento de identidad vigente del titular" },
   { id: "certificacion_ipi", label: "Certificación IPI", category: DocumentType.CertificacionIPI, categoryLabel: "CATASTRO", description: "Certificación de Impuesto sobre la Propiedad Inmobiliaria" },
-  { id: "poder", label: "Poder Notarial (si aplica)", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
+  { id: "poder", label: "Poder Notarial", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
 ];
 
 export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ projectId }) => {

@@ -10,7 +10,7 @@ public class PagoConfiguration : IEntityTypeConfiguration<Pago>
     {
         builder.ToTable("Pagos");
         builder.HasKey(p => p.IdPago);
-        
+
         builder.Property(p => p.IdPago).HasColumnName("IdPago").ValueGeneratedOnAdd();
         builder.Property(p => p.IdUsuario).HasColumnName("IdUsuario");
         builder.Property(p => p.IdApiGobernanza).HasColumnName("IdApiGobernanza");
@@ -19,7 +19,7 @@ public class PagoConfiguration : IEntityTypeConfiguration<Pago>
         builder.Property(p => p.FechaPago).HasDefaultValueSql("GETDATE()");
 
         builder.HasOne(p => p.UsuarioLegacy)
-            .WithMany()
+            .WithMany(ul => ul.Pagos)
             .HasForeignKey(p => p.IdUsuario)
             .OnDelete(DeleteBehavior.Cascade);
 

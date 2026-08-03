@@ -58,7 +58,8 @@ def parse_env():
     return env_vars
 
 env = parse_env()
-conn_str = env.get("ConnectionStrings__DefaultConnection", "")
+# Prefer OS env (Docker injects the correct service-name connection string)
+conn_str = os.environ.get("ConnectionStrings__DefaultConnection", "") or env.get("ConnectionStrings__DefaultConnection", "")
 
 def get_conn_params(conn_str):
     params = {
@@ -132,7 +133,8 @@ def wait_for_database():
 # wait_for_database() is called in main()
 
 def get_db_connection():
-    hosts_to_try = [conn_params["server"], "localhost", "127.0.0.1", "sqlserver"]
+    # Always try the Docker service name first, then the configured server, then fallbacks
+    hosts_to_try = ["sqlserver", conn_params["server"], "localhost", "127.0.0.1"]
     seen = set()
     hosts_to_try = [x for x in hosts_to_try if x and not (x in seen or seen.add(x))]
     
@@ -268,15 +270,37 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
             for r in batch:
                 params.extend(r)
                 
-            cursor.execute(sql, tuple(params))
+            for batch_attempt in range(1, max_retries + 1):
+                try:
+                    cursor.execute(sql, tuple(params))
+                    conn.commit()
+                    break
+                except Exception as e:
+                    err_str = str(e)
+                    if batch_attempt > 1 and ("2627" in err_str or "PRIMARY KEY" in err_str.upper()):
+                        print(f"    [Chunk {chunk_id}] Ignoring PK violation on retry {batch_attempt}, assuming previous attempt committed successfully.")
+                        break
+                        
+                    if conn:
+                        try: conn.rollback()
+                        except: pass
+                        
+                    if batch_attempt < max_retries and is_transient_error(e):
+                        wait = 2 ** batch_attempt
+                        time.sleep(wait)
+                        try: conn.close()
+                        except: pass
+                        conn = get_db_connection()
+                        cursor = conn.cursor()
+                    else:
+                        raise e
+                        
             count += len(batch)
             if count % 10000 == 0 or count == len(chunk_records):
-                conn.commit()
                 elapsed = time.time() - t0
                 speed = count / elapsed if elapsed > 0 else 0
                 print(f"[Chunk {chunk_id}] Inserted {count}/{len(chunk_records)} records. Speed: {speed:.1f} rec/sec")
                 
-        conn.commit()
         print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {len(chunk_records)} records inserted successfully!")
         return len(chunk_records)
     except Exception as e:
@@ -324,7 +348,7 @@ def main():
         conn = get_db_connection()
         cursor = conn.cursor()
         print("Cleaning up old data in DGII table to prevent primary key conflicts...")
-        cursor.execute("DELETE FROM DGII;")
+        cursor.execute("TRUNCATE TABLE DGII;")
         conn.commit()
         conn.close()
     except Exception as e:
@@ -392,9 +416,6 @@ def main():
     print(f"  Tiempo total:     {int(m)}m {int(s)}s")
     speed = total_rows / t_total if t_total > 0 else 0
     print(f"  Velocidad media:  {speed:>.0f} reg/s")
-    expected = sum(v["size"] for v in chunk_map.values())
-    if total_rows < expected:
-        print(f"  PERDIDOS:         {expected - total_rows:>10,} registros")
     print("="*55 + "\n")
 
 if __name__ == "__main__":

@@ -32,11 +32,11 @@ public class SearchPublicProjectsQueryHandler
 
         if (string.IsNullOrWhiteSpace(request.Query))
         {
-            proyectos = await _proyectoRepository.GetVisibleAsync(1, 50, cancellationToken);
+            proyectos = await _proyectoRepository.GetPublishedAsync(1, 50, cancellationToken);
         }
         else
         {
-            proyectos = await _proyectoRepository.SearchAsync(request.Query, cancellationToken);
+            proyectos = await _proyectoRepository.SearchPublishedAsync(request.Query, cancellationToken);
         }
 
         var proyectoList = proyectos.ToList();
@@ -50,7 +50,7 @@ public class SearchPublicProjectsQueryHandler
         foreach (var p in proyectoList)
         {
             var sello = sellosPorProyecto.GetValueOrDefault(p.Id);
-            var completionRate = await _proyectoRepository.GetDocumentCompletionRateAsync(p.Id, p.Categoria, cancellationToken);
+            var completionRate = await _proyectoRepository.GetDocumentCompletionRateAsync(p.Id, p.CategoriaId, cancellationToken);
 
             results.Add(new PublicProjectSearchResultDto
             {
@@ -66,7 +66,7 @@ public class SearchPublicProjectsQueryHandler
                 Constructora = p.DatosDesarrollador ?? p.Propietario,
                 Registrante = p.UsuarioCreador?.NombreCompleto,
                 ImagenUrl = p.ImagenUrl,
-                Categoria = (int)p.Categoria,
+                CategoriaId = p.CategoriaId,
                 ValorEstimado = p.ValorEstimado,
                 DesignacionCatastral = p.DesignacionCatastral,
                 Matricula = p.Matricula,

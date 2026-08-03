@@ -61,7 +61,7 @@ public class GetFeaturedProjectsQueryHandler
                 Constructora = p.DatosDesarrollador ?? p.Propietario,
                 Registrante = p.UsuarioCreador?.NombreCompleto,
                 ImagenUrl = p.ImagenUrl,
-                Categoria = (int)p.Categoria,
+                CategoriaId = p.CategoriaId,
                 ValorEstimado = p.ValorEstimado,
                 DesignacionCatastral = p.DesignacionCatastral,
                 Matricula = p.Matricula,
@@ -107,7 +107,7 @@ public class GetFeaturedProjectsQueryHandler
         };
 
         var requiredTypes = docCategories
-            .Where(kvp => kvp.Value.Contains((int)proyecto.Categoria))
+            .Where(kvp => kvp.Value.Contains(proyecto.CategoriaId))
             .Select(kvp => (DocumentType)kvp.Key)
             .ToList();
 

@@ -22,7 +22,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Application.Abstractions.Storage;
 using Infrastructure.Persistence;
-
+using MediatR;
+using Application.Features.Projects.Queries.GetCategorias;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -34,19 +35,22 @@ public class ProjectsController : ControllerBase
     private readonly IBlobStorageService _blobStorageService;
     private readonly IDocumentService _documentService;
     private readonly AppDbContext _dbContext;
+    private readonly IMediator _mediator;
 
     public ProjectsController(
         IProjectService projectService,
         IUsuarioRepository usuarioRepository,
         IBlobStorageService blobStorageService,
         IDocumentService documentService,
-        AppDbContext dbContext)
+        AppDbContext dbContext,
+        IMediator mediator)
     {
         _projectService = projectService;
         _usuarioRepository = usuarioRepository;
         _blobStorageService = blobStorageService;
         _documentService = documentService;
         _dbContext = dbContext;
+        _mediator = mediator;
     }
 
     [HttpGet]
@@ -54,6 +58,8 @@ public class ProjectsController : ControllerBase
     public async Task<ActionResult<PaginatedResult<ProyectoDto>>> GetProjects(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
+        [FromQuery] string? q = null,
+        [FromQuery] string? estados = null,
         CancellationToken cancellationToken = default)
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -65,7 +71,7 @@ public class ProjectsController : ControllerBase
                 if (loggedInUser != null)
                 {
                     Guid? filterUserId = loggedInUser.Rol != UserRole.Administrator ? userId : null;
-                    var result = await _projectService.GetAllProjectsWithCountAsync(filterUserId, page, pageSize, cancellationToken);
+                    var result = await _projectService.GetAllProjectsWithCountAsync(filterUserId, page, pageSize, q, estados, cancellationToken);
                     
                     return Ok(result);
                 }
@@ -74,6 +80,14 @@ public class ProjectsController : ControllerBase
 
         var visibleResult = await _projectService.GetVisibleProjectsWithCountAsync(page, pageSize, cancellationToken);
         return Ok(visibleResult);
+    }
+
+    [HttpGet("categories")]
+    [AllowAnonymous]
+    public async Task<ActionResult<List<CategoriaProyectoDto>>> GetCategories(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetCategoriasQuery(), cancellationToken);
+        return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
@@ -212,8 +226,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> CreateProject([FromBody] CreateProyectoDto dto, CancellationToken cancellationToken)
     {
         try
@@ -236,8 +248,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> UpdateProject(Guid id, [FromBody] UpdateProyectoDto dto, CancellationToken cancellationToken)
     {
         try
@@ -256,8 +266,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/status")]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] string statusCode, CancellationToken cancellationToken)
     {
         if (!ProjectStatusCodes.TryParseCodigoUnico(statusCode, out var status))
@@ -289,8 +297,6 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [AllowAnonymous]
-    // [Authorize] // TODO: Enable when auth is fully implemented
     public async Task<IActionResult> DeleteProject(Guid id, CancellationToken cancellationToken)
     {
         try

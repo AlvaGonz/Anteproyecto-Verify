@@ -14,7 +14,7 @@ public class QuotaTests : IntegrationTestBase
     {
         nombre,
         ubicacionTexto = "Santo Domingo, DN",
-        categoria = 1,
+        categoriaId = 16,
         datosDesarrollador = "Dev SA",
         designacionCatastral = "CAT-001",
         usuarioCreadorId = userId

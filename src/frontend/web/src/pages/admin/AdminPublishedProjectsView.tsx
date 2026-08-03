@@ -16,14 +16,14 @@ import { ProjectStatusBadge } from "../../features/public/components/ProjectStat
 import {
   usePublishedProjects,
   PublishedProjectFilters,
-  PROJECT_CATEGORIES,
   PRICE_MAX,
   PRICE_STEPS,
   getDefaultProjectImage,
 } from "../../features/projects/api/usePublishedProjects";
+import { ProjectTypeFilter } from "../../features/projects/components/ProjectTypeFilter";
 import { useProvinces } from "../../features/provinces/api/useProvinces";
 
-export const AdminPublishedProjectsView: React.FC = () => {
+export const AdminPublishedProjectsView: React.FC = React.memo(() => {
   const { data: provincias } = useProvinces();
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [filters, setFilters] = useState<PublishedProjectFilters>({
@@ -51,8 +51,8 @@ export const AdminPublishedProjectsView: React.FC = () => {
         if (!matches) return false;
       }
 
-      if (filters.projectTypes.length > 0 && p.categoria !== undefined && p.categoria !== null) {
-        if (!filters.projectTypes.includes(p.categoria)) return false;
+      if (filters.projectTypes.length > 0 && p.categoriaId !== undefined && p.categoriaId !== null) {
+        if (!filters.projectTypes.includes(p.categoriaId)) return false;
       }
 
       if (p.valorEstimado !== undefined && p.valorEstimado !== null) {
@@ -195,29 +195,7 @@ export const AdminPublishedProjectsView: React.FC = () => {
               className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
             />
 
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
-              <span className="text-primary">●</span> Tipo (acumulativo)
-            </label>
-            <div className="flex flex-col gap-1.5">
-              {PROJECT_CATEGORIES.map((cat) => (
-                <label
-                  key={cat.value}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-all ${
-                    filters.projectTypes.includes(cat.value)
-                      ? "bg-primary text-white border-primary"
-                      : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={filters.projectTypes.includes(cat.value)}
-                    onChange={() => toggleProjectType(cat.value)}
-                    className="w-3 h-3 accent-primary"
-                  />
-                  {cat.label}
-                </label>
-              ))}
-            </div>
+            <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
           </div>
 
           {/* Red Box: Price Filter */}
@@ -326,8 +304,10 @@ export const AdminPublishedProjectsView: React.FC = () => {
                 >
                   <div className="relative aspect-video overflow-hidden">
                     <img
-                      src={project.imagenUrl || getDefaultProjectImage(project.categoria)}
+                      src={project.imagenUrl || getDefaultProjectImage(project.categoriaId)}
                       alt={project.nombreProyecto}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute top-4 left-4">
@@ -511,4 +491,4 @@ export const AdminPublishedProjectsView: React.FC = () => {
       </div>
     </div>
   );
-};
+});

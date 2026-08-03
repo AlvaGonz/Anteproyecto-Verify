@@ -19,6 +19,7 @@ interface AdminProjectsPageLayoutProps {
   setOpenMenuId: (v: string | null) => void;
   isLoading: boolean;
   filtered: any[];
+  totalCount: number;
   metrics: Array<{ label: string; value: number; icon: React.ComponentType<any>; color: string; bg: string; barColor: string; pct: number }>;
   updateStatus: (params: { id: string; status: ProjectStatus }) => void;
   deleteProject: (id: string) => void;
@@ -27,7 +28,7 @@ interface AdminProjectsPageLayoutProps {
   onPageChange: (page: number) => void;
 }
 
-export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = ({
+export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = React.memo(({
   t,
   isAdmin,
   searchTerm,
@@ -42,6 +43,7 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
   setOpenMenuId,
   isLoading,
   filtered,
+  totalCount,
   metrics,
   updateStatus,
   deleteProject,
@@ -69,6 +71,7 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
         isAdmin={isAdmin}
         isLoading={isLoading}
         filtered={filtered}
+        totalCount={totalCount}
         openMenuId={openMenuId}
         setOpenMenuId={setOpenMenuId}
         updateStatus={updateStatus}
@@ -79,4 +82,4 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = (
       />
     </div>
   );
-};
+});

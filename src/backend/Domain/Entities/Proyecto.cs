@@ -15,7 +15,8 @@ public class Proyecto : EntityBase
     public string? DatosDesarrollador { get; private set; }
     public string? RncDesarrollador { get; private set; }
     public string? Matricula { get; private set; }
-    public ProjectCategory Categoria { get; private set; }
+    public int CategoriaId { get; private set; }
+    public CategoriaProyecto CategoriaProyecto { get; private set; } = null!;
     public string? DesignacionCatastral { get; private set; }
     public string? Ipi { get; private set; }
     public string? ImagenUrl { get; private set; }
@@ -50,7 +51,7 @@ public class Proyecto : EntityBase
 
     private Proyecto() { } // For EF Core
 
-    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, ProjectCategory categoria = ProjectCategory.Residencial, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
+    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, int categoriaId, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -59,7 +60,7 @@ public class Proyecto : EntityBase
         Nombre = nombre;
         UbicacionTexto = ubicacionTexto;
         UsuarioCreadorId = usuarioCreadorId;
-        Categoria = categoria;
+        CategoriaId = categoriaId;
         DatosDesarrollador = datosDesarrollador;
         DesignacionCatastral = designacionCatastral;
         Propietario = propietario;
@@ -77,7 +78,7 @@ public class Proyecto : EntityBase
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
-    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, ProjectCategory categoria, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
+    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, int categoriaId, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -86,7 +87,7 @@ public class Proyecto : EntityBase
         UbicacionTexto = ubicacionTexto;
         UbicacionGps = ubicacionGps;
         ValorEstimado = valorEstimado;
-        Categoria = categoria;
+        CategoriaId = categoriaId;
         DatosDesarrollador = datosDesarrollador;
         DesignacionCatastral = designacionCatastral;
         Propietario = propietario;
@@ -133,6 +134,14 @@ public class Proyecto : EntityBase
     {
         RncDesarrollador = rnc;
         Matricula = matricula;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AsignarCategoria(CategoriaProyecto categoria)
+    {
+        if (categoria == null) throw new ArgumentNullException(nameof(categoria));
+        CategoriaId = categoria.Id;
+        CategoriaProyecto = categoria;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

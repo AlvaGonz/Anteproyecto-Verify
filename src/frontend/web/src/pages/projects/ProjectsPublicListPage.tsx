@@ -20,13 +20,14 @@ import {
   useSuspensePublishedProjects,
   filterPublishedProjects,
   PublishedProjectFilters,
-  PROJECT_CATEGORIES,
   PRICE_MAX,
   PRICE_STEPS,
   getDefaultProjectImage,
   PublicProjectSearchResultDto,
 } from "../../features/projects/api/usePublishedProjects";
+import { ProjectTypeFilter } from "../../features/projects/components/ProjectTypeFilter";
 import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
+import { BackToTopButton } from "../../shared/components/ui/BackToTopButton";
 
 import { useProvinces } from "../../features/provinces/api/useProvinces";
 
@@ -47,8 +48,10 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
   >
     <div className="relative aspect-[16/10] overflow-hidden">
       <img
-        src={project.imagenUrl || getDefaultProjectImage(project.categoria as unknown as number)}
+        src={project.imagenUrl || getDefaultProjectImage(project.categoriaId)}
         alt={project.nombreProyecto}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
       <div className="absolute top-6 left-6">
@@ -223,29 +226,7 @@ const ProjectsPublicListContent: React.FC = () => {
                 className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
               />
 
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
-                <span className="text-primary">●</span> Tipo (acumulativo)
-              </label>
-              <div className="flex flex-col gap-1.5">
-                {PROJECT_CATEGORIES.map((cat) => (
-                  <label
-                    key={cat.value}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-all ${
-                      filters.projectTypes.includes(cat.value)
-                        ? "bg-primary text-white border-primary"
-                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={filters.projectTypes.includes(cat.value)}
-                      onChange={() => toggleProjectType(cat.value)}
-                      className="w-3 h-3 accent-primary"
-                    />
-                    {cat.label}
-                  </label>
-                ))}
-              </div>
+              <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
             </div>
 
             {/* Red Box: Price Filter */}
@@ -552,6 +533,7 @@ export const ProjectsPublicListPage: React.FC = () => {
         </main>
 
         <LandingFooter />
+        <BackToTopButton />
       </div>
     </Suspense>
   );

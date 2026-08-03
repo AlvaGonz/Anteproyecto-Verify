@@ -5,9 +5,9 @@ import { Suspense } from "react";
 import { ProjectsPublicListPage } from "./ProjectsPublicListPage";
 
 const MOCK_PROJECTS = [
-  { id: "1", nombreProyecto: "Residencial Terra Noble", categoria: 1, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 5000000, completionRate: 100 },
-  { id: "2", nombreProyecto: "Torre San Gerónimo", categoria: 2, estadoValidacion: "Verificado", ubicacionTexto: "Santiago", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 8000000, completionRate: 100 },
-  { id: "3", nombreProyecto: "Plaza Central Mall", categoria: 2, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 3000000, completionRate: 80 }
+  { id: "1", nombreProyecto: "Residencial Terra Noble", categoriaId: 16, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 5000000, completionRate: 100 },
+  { id: "2", nombreProyecto: "Torre San Gerónimo", categoriaId: 8, estadoValidacion: "Verificado", ubicacionTexto: "Santiago", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 8000000, completionRate: 100 },
+  { id: "3", nombreProyecto: "Plaza Central Mall", categoriaId: 8, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 3000000, completionRate: 80 }
 ];
 
 vi.mock("../../features/projects/api/usePublishedProjects", () => ({
@@ -18,8 +18,8 @@ vi.mock("../../features/projects/api/usePublishedProjects", () => ({
         const q = filters.searchQuery.toLowerCase();
         if (!p.nombreProyecto.toLowerCase().includes(q)) return false;
       }
-      if (filters.projectTypes.length > 0 && p.categoria) {
-        if (!filters.projectTypes.includes(p.categoria)) return false;
+      if (filters.projectTypes.length > 0 && p.categoriaId) {
+        if (!filters.projectTypes.includes(p.categoriaId)) return false;
       }
       if (p.valorEstimado !== undefined && p.valorEstimado !== null) {
         if (p.valorEstimado < filters.priceRange[0] || p.valorEstimado > filters.priceRange[1]) return false;
@@ -30,12 +30,22 @@ vi.mock("../../features/projects/api/usePublishedProjects", () => ({
       return true;
     }),
   PROJECT_CATEGORIES: [
-    { value: 1, label: "Residencial" },
-    { value: 2, label: "Comercial" },
-    { value: 3, label: "Turístico" },
-    { value: 4, label: "Mixto" },
-    { value: 5, label: "Industrial" },
-    { value: 99, label: "Otro" },
+    { value: 1, label: "ALBERGUES" },
+    { value: 2, label: "ALMACENES" },
+    { value: 3, label: "APARTAMENTOS" },
+    { value: 4, label: "CENTROS DE RECREACIÓN Y DEPORTES" },
+    { value: 5, label: "CENTROS DE SALUD" },
+    { value: 6, label: "COLEGIOS Y CENTROS EDUCATIVOS" },
+    { value: 7, label: "COMBINADOS" },
+    { value: 8, label: "COMERCIAL Y OFICINAS" },
+    { value: 9, label: "DEPÓSITOS" },
+    { value: 10, label: "ESTACIÓN DE COMBUSTIBLE" },
+    { value: 11, label: "ESTRUCTURAS ESPECIALES" },
+    { value: 12, label: "HOSPEDAJE" },
+    { value: 13, label: "OBRAS DE ORDEN SOCIAL" },
+    { value: 14, label: "PARQUEOS" },
+    { value: 15, label: "SERVICIOS DE TRANSPORTE" },
+    { value: 16, label: "VIVIENDAS" },
   ],
   PROVINCIAS: ["Distrito Nacional", "Santo Domingo", "Santiago"],
   PRICE_MAX: 15_000_000,
@@ -124,12 +134,10 @@ describe("ProjectsPublicListPage", () => {
 
   it("renders cumulative type checkboxes", async () => {
     renderPage();
-    expect(await screen.findByText("Residencial")).toBeInTheDocument();
-    expect(screen.getByText("Comercial")).toBeInTheDocument();
-    expect(screen.getByText("Turístico")).toBeInTheDocument();
-    expect(screen.getByText("Mixto")).toBeInTheDocument();
-    expect(screen.getByText("Industrial")).toBeInTheDocument();
-    expect(screen.getByText("Otro")).toBeInTheDocument();
+    expect(await screen.findByText("ALBERGUES")).toBeInTheDocument();
+    expect(screen.getByText("ALMACENES")).toBeInTheDocument();
+    expect(screen.getByText("APARTAMENTOS")).toBeInTheDocument();
+    expect(screen.getByText("VIVIENDAS")).toBeInTheDocument();
   });
 
   it("renders price range filter section", async () => {

@@ -89,7 +89,7 @@ export const BASE_REQUIREMENTS: RequirementDefinition[] = [
 ];
 
 export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
-  1: [ // Residencial
+  16: [ // VIVIENDAS
     {
       code: "REGIMEN_CONDOMINIO",
       label: "Régimen de Condominio",
@@ -100,7 +100,7 @@ export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
       required: true,
     }
   ],
-  2: [ // Comercial
+  8: [ // COMERCIAL Y OFICINAS
     {
       code: "REGISTRO_SANITARIO",
       label: "Registro Sanitario",
@@ -120,7 +120,7 @@ export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
       required: true,
     }
   ],
-  3: [ // Turistico
+  12: [ // HOSPEDAJE
     {
       code: "RESOLUCION_CONFOTUR",
       label: "Resolución CONFOTUR",
@@ -131,7 +131,7 @@ export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
       required: true,
     },
   ],
-  4: [ // Mixto
+  7: [ // COMBINADOS
     {
       code: "RESOLUCION_ZONIFICACION",
       label: "Resolución Especial de Zonificación",
@@ -142,8 +142,6 @@ export const CATEGORY_REQUIREMENTS: Record<string, RequirementDefinition[]> = {
       required: true,
     }
   ],
-  5: [], // Industrial
-  99: [] // Otro
 };
 
 export const getRequirementsForCategory = (categoryId: number): RequirementDefinition[] => {

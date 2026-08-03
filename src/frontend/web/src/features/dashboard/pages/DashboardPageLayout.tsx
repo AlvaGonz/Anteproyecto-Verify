@@ -30,7 +30,7 @@ interface DashboardPageLayoutProps {
   statsData: DashboardStatsDto | undefined;
 }
 
-export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
+export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = React.memo(({
   showBanner,
   activatedPlan,
   handleDismissBanner,
@@ -133,7 +133,7 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                   <DashboardProjectList loading={loading} recentProjects={recentProjects} />
-                  <DashboardCharts totalProjects={totalProjects} verified={verified} />
+                  <DashboardCharts totalProjects={totalProjects} verified={verified} proyectosPorMes={statsData?.proyectosPorMes ?? []} />
                 </div>
               </m.div>
             )}
@@ -158,4 +158,4 @@ export const DashboardPageLayout: React.FC<DashboardPageLayoutProps> = ({
       </div>
     </div>
   );
-};
+});

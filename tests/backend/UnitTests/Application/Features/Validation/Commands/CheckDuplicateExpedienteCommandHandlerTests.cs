@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Validation.Commands;
+﻿namespace UnitTests.Application.Features.Validation.Commands;
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ public class CheckDuplicateExpedienteCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", userId);
+        var project = new Proyecto("Test", "Loc", userId, 16);
         project.UpdateRncYMatricula("123", "MAT-123");
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))

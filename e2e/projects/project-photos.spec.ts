@@ -5,7 +5,7 @@ const MOCK_PROJECT_WITH_PHOTO = {
   codigoInterno: "VF-PHOTO-2026",
   nombre: "Proyecto Con Foto",
   ubicacionTexto: "Santo Domingo, RD",
-  categoria: 1, // Residencial
+  categoriaId: 16, // VIVIENDAS
   estadoProyecto: 0, // Draft
   estadoIntegridad: 0, // Pending
   usuarioCreadorId: "user-001",
@@ -18,7 +18,7 @@ const MOCK_PROJECT_WITHOUT_PHOTO = {
   codigoInterno: "VF-NOPHOTO-2026",
   nombre: "Proyecto Sin Foto",
   ubicacionTexto: "Santiago, RD",
-  categoria: 1,
+  categoriaId: 16,
   estadoProyecto: 0,
   estadoIntegridad: 0,
   usuarioCreadorId: "user-001",

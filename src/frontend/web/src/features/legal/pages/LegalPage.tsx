@@ -2,8 +2,10 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
+import { ensureLegalResources } from "../../../legalResources";
 import { LandingNav } from "../../../shared/components/layout/LandingNav";
 import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
+import { BackToTopButton } from "../../../shared/components/ui/BackToTopButton";
 import { TerminosSection, PrivacidadSection, DpaSection, SlaSection } from "./LegalSections1";
 import {
   MarcoLegalSection,
@@ -14,6 +16,8 @@ import {
   PaymentDataSection,
   AcceptableUseSection,
 } from "./LegalSections2";
+
+ensureLegalResources();
 
 const ICONS = {
   gavel: "gavel",
@@ -354,6 +358,7 @@ export const LegalPage: React.FC = () => {
       </section>
 
       <LandingFooter />
+      <BackToTopButton />
     </div>
   );
 };

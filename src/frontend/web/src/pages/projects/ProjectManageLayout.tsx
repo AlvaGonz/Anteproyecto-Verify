@@ -4,7 +4,7 @@ import { PenTool, ShieldCheck, ClipboardList } from "lucide-react";
 import { ProjectActionBarProvider, ProjectActionBar } from "../../features/projects/components/ProjectActionBarContext";
 import { ProjectStatusBar } from "../../features/projects/components/ProjectStatusBar";
 
-export const ProjectManageLayout: React.FC = () => {
+export const ProjectManageLayout: React.FC = React.memo(() => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const isEditing = !!id && id !== "new";
@@ -124,4 +124,4 @@ export const ProjectManageLayout: React.FC = () => {
       </div>
     </div>
   );
-};
+});

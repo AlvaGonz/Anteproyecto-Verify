@@ -28,7 +28,7 @@ describe('SubscriptionSettings', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     (useSyncSubscription as any).mockReturnValue({ mutate: mockSync, isPending: false });
     (useCancelSubscription as any).mockReturnValue({ mutate: mockCancel, isPending: false });
     (useReactivateSubscription as any).mockReturnValue({ mutate: mockReactivate, isPending: false });
@@ -63,10 +63,10 @@ describe('SubscriptionSettings', () => {
 
     renderComponent();
     expect(screen.getByText('Suscripción Activa')).toBeInTheDocument();
-    
+
     const cancelButton = screen.getByRole('button', { name: /Cancelar Suscripción/i });
     expect(cancelButton).toBeInTheDocument();
-    
+
     // Test cancel flow — button opens a modal, need to confirm in modal
     fireEvent.click(cancelButton);
     const confirmButton = screen.getByRole('button', { name: /Sí, cancelar suscripción/i });
@@ -89,10 +89,10 @@ describe('SubscriptionSettings', () => {
 
     renderComponent();
     expect(screen.getByText('Cancelación Programada')).toBeInTheDocument();
-    
+
     const reactivateButton = screen.getByRole('button', { name: /Reactivar Suscripción/i });
     expect(reactivateButton).toBeInTheDocument();
-    
+
     fireEvent.click(reactivateButton);
     expect(mockReactivate).toHaveBeenCalled();
   });
@@ -111,25 +111,25 @@ describe('SubscriptionSettings', () => {
 
     renderComponent();
     expect(screen.getByText('Suscripción Cancelada')).toBeInTheDocument();
-    
+
     expect(screen.queryByRole('button', { name: /Cancelar Suscripción/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Reactivar Suscripción/i })).not.toBeInTheDocument();
   });
 
   it('renders annual subscription with pricing info and discount badge', () => {
-    const yearlyPrice = 3500 * 12 * 0.8; // 33600
+    const yearlyPrice = 60 * 12 * 0.8; // 33600
     (useMySubscription as any).mockReturnValue({
       isLoading: false,
       isError: false,
       data: {
         subscriptionStatus: 'active',
         plan: 'profesional',
-        planPrice: 3500,
+        planPrice: 60,
         billingCycle: 'yearly',
         isManagedByStripe: true,
         currentPeriodEnd: new Date(Date.now() + 86400000 * 30).toISOString(),
         pricing: {
-          monthlyPrice: 3500,
+          monthlyPrice: 60,
           yearlyPrice: yearlyPrice,
           yearlyDiscountPercent: 20,
           yearlyBadge: 'Ahorra 20%'
@@ -160,16 +160,16 @@ describe('SubscriptionSettings', () => {
     });
 
     renderComponent();
-    
+
     // Check guest badge is displayed
     expect(screen.getByText('Invitado')).toBeInTheDocument();
-    
+
     // Check inviter's plan is displayed
     expect(screen.getByText('Corporativo')).toBeInTheDocument();
-    
+
     // Check inviter name is shown in the footer text
     expect(screen.getByText(/Tu suscripción es gestionada por el propietario de tu cuenta \(Juan Pérez\)/)).toBeInTheDocument();
-    
+
     // Check next billing date is displayed
     expect(screen.getByText(/Próximo cobro/)).toBeInTheDocument();
   });

@@ -37,6 +37,20 @@ namespace Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("user-stats")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUserDashboardStats(CancellationToken cancellationToken)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var result = await _handler.HandleForUser(userId, cancellationToken);
+            return Ok(result);
+        }
+
         private bool IsAdmin()
         {
             if (User?.Identity?.IsAuthenticated != true)
@@ -52,6 +66,12 @@ namespace Api.Controllers
             return roles.Any(r => 
                 string.Equals(r, "admin", System.StringComparison.OrdinalIgnoreCase) || 
                 string.Equals(r, "Administrator", System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        private Guid GetUserId()
+        {
+            var sub = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier || c.Type == "sub")?.Value;
+            return Guid.TryParse(sub, out var id) ? id : Guid.Empty;
         }
     }
 }

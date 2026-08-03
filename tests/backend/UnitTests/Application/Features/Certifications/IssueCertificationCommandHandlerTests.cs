@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Certifications;
+﻿namespace UnitTests.Application.Features.Certifications;
 
 using System;
 using System.Collections.Generic;
@@ -50,7 +50,7 @@ public class IssueCertificationCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test", "Loc", userId);
+        var proyecto = new Proyecto("Test", "Loc", userId, 16);
 
         // Simulate setting IntegrityStatus (since it's private set, we might need reflection or just assume it's Pending/Valid for the test)
         
@@ -78,7 +78,7 @@ public class IssueCertificationCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var proyecto = new Proyecto("Test", "Loc", userId);
+        var proyecto = new Proyecto("Test", "Loc", userId, 16);
         
         _mockProyectoRepo.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(proyecto);
         _mockReporteRepo.Setup(r => r.GetByProyectoIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(new List<Reporte>());

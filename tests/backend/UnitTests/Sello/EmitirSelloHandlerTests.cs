@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Sello.Commands;
+﻿namespace UnitTests.Application.Features.Sello.Commands;
 
 using System;
 using System.Threading;
@@ -41,7 +41,7 @@ public class EmitirSelloCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", Guid.NewGuid());
+        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), 16);
 
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);
@@ -57,7 +57,7 @@ public class EmitirSelloCommandHandlerTests
 
         // Assert
         Assert.False(result.IsSuccess);
-        Assert.Equal("El proyecto no es apto para el sello de integridad debido a hallazgos críticos o altos.", result.Mensaje);
+        Assert.Equal("El proyecto no es apto para el sello de integridad debido a hallazgos crÃ­ticos o altos.", result.Mensaje);
         _selloRepositoryMock.Verify(x => x.AddAsync(It.IsAny<SelloIntegridad>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -67,7 +67,7 @@ public class EmitirSelloCommandHandlerTests
         // Arrange
         var projectId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", Guid.NewGuid());
+        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), 16);
 
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);

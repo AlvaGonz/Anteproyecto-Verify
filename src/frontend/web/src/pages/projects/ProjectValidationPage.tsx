@@ -10,7 +10,7 @@ import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { FindingDto, AuditLogDto } from "../../features/validations/types";
 import { ProjectValidationPageLayout } from "./ProjectValidationPageLayout";
 
-export const ProjectValidationPage: React.FC = () => {
+export const ProjectValidationPage: React.FC = React.memo(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -50,7 +50,7 @@ export const ProjectValidationPage: React.FC = () => {
     return <AdminErrorFallback error={resultError} />;
   }
 
-  const result = rawResult ? {
+  const result = React.useMemo(() => rawResult ? {
     ...rawResult,
     internalValidation: rawResult.internalValidation ? {
       ...rawResult.internalValidation,
@@ -58,7 +58,7 @@ export const ProjectValidationPage: React.FC = () => {
       proyectoId: String(projectId),
     } : undefined,
     externalSources: rawResult.externalSources || []
-  } as unknown as ValidationExecutionResult : null;
+  } as unknown as ValidationExecutionResult : null, [rawResult, projectId]);
 
   const isLoading = isResultLoading || isFindingsLoading || isAuditLoading;
   const isEvaluating = runFullValidationMutation.isPending;
@@ -102,4 +102,4 @@ export const ProjectValidationPage: React.FC = () => {
       handleScanComplete={handleScanComplete}
     />
   );
-};
+});

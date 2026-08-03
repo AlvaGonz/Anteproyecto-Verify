@@ -4,6 +4,7 @@ import { useParams, Link, useLocation } from "react-router-dom";
 import { usePublicVerification } from "../../features/public-verification/api/usePublicVerification";
 import { VerificationResultCard } from "../../features/public-verification/components/VerificationResultCard";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
+import { BackToTopButton } from "../../shared/components/ui/BackToTopButton";
 import {
   ShieldCheck,
   Search,
@@ -181,6 +182,8 @@ export const PublicVerifyResultPage: React.FC = () => {
       <div className="print:hidden">
         <LandingFooter />
       </div>
+
+      <BackToTopButton />
     </div>
   );
 };

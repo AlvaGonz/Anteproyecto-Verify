@@ -5,5 +5,5 @@ using Domain.Entities;
 
 public interface IJwtTokenGenerator
 {
-    string GenerateToken(Usuario user);
+    string GenerateToken(Usuario user, bool mfaAuthenticated = false);
 }

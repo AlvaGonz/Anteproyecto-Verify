@@ -43,4 +43,7 @@ export const useResendVerificationEmail = () =>
   useMutation({
     mutationFn: (data: { email: string; returnUrl?: string }) =>
       apiClient.post("/auth/resend-verification", data).then(res => res.data),
+    onError: (error) => {
+      console.error("[RESEND_FAILURE]", { context: "resend-verification", error });
+    },
   });

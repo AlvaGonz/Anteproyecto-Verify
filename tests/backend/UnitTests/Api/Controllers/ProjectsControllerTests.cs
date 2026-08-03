@@ -19,6 +19,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
 using Moq;
 using Xunit;
 
@@ -30,6 +31,7 @@ namespace UnitTests.Api.Controllers
         private readonly Mock<IUsuarioRepository> _mockUsuarioRepository;
         private readonly Mock<IBlobStorageService> _mockBlobStorageService;
         private readonly Mock<global::Application.Contracts.Documents.IDocumentService> _mockDocumentService;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly AppDbContext _dbContext;
         private readonly ProjectsController _controller;
 
@@ -39,6 +41,7 @@ namespace UnitTests.Api.Controllers
             _mockUsuarioRepository = new Mock<IUsuarioRepository>();
             _mockBlobStorageService = new Mock<IBlobStorageService>();
             _mockDocumentService = new Mock<global::Application.Contracts.Documents.IDocumentService>();
+            _mockMediator = new Mock<IMediator>();
 
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
@@ -50,7 +53,8 @@ namespace UnitTests.Api.Controllers
                 _mockUsuarioRepository.Object,
                 _mockBlobStorageService.Object,
                 _mockDocumentService.Object,
-                _dbContext)
+                _dbContext,
+                _mockMediator.Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -79,19 +83,20 @@ namespace UnitTests.Api.Controllers
                 null, // ImagenAdicional4
                 null, // ImagenAdicional5
                 null, // ValorEstimado
-                ProjectCategory.Residencial,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                16, // CategoriaId
+                "VIVIENDAS", // CategoriaNombre
+                null, // DatosDesarrollador
+                null, // RncDesarrollador
+                null, // DesignacionCatastral
+                null, // Matricula
+                null, // Propietario
+                null, // CedulaRncPropietario
+                null, // Ipi
                 EstadoJuridico.Pendiente,
-                null,
-                null,
-                "Borrador",
-                "Creado",
+                null, // EstatusIpi
+                null, // SuperficieM2
+                "Borrador", // EstatusDescripcion
+                "Creado", // EstadoProyecto
                 IntegrityStatus.Valid,
                 usuarioCreadorId,
                 DateTime.UtcNow,
@@ -130,7 +135,7 @@ namespace UnitTests.Api.Controllers
             };
 
             _mockProjectService
-                .Setup(s => s.GetAllProjectsWithCountAsync(developerId, 1, 50, It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetAllProjectsWithCountAsync(developerId, 1, 50, null, null, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PaginatedResult<ProyectoDto>(allProjects, allProjects.Count, 1, 50));
 
             _mockUsuarioRepository
@@ -138,7 +143,7 @@ namespace UnitTests.Api.Controllers
                 .ReturnsAsync(CreateUsuario(developerId, UserRole.User));
 
             // Act
-            var result = await _controller.GetProjects(1, 50, CancellationToken.None);
+            var result = await _controller.GetProjects(1, 50, null, null, CancellationToken.None);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);

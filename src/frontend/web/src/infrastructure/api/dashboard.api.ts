@@ -14,7 +14,15 @@ export interface DashboardStatsDto {
   totalConsultasRealizadas: number;
   totalProyectosRegistrados: number;
   totalOfertas: number;
+  proyectosPorMes: ProyectosPorMesDto[];
 }
+
+export interface ProyectosPorMesDto {
+  year: number;
+  month: number;
+  count: number;
+}
+
 export interface SuscripcionRecienteDto {
   fechaAlta: string;
   plan: string;
@@ -33,6 +41,10 @@ export interface ProyectoRecienteDto {
 export const adminDashboardApi = {
   getStats: async (): Promise<DashboardStatsDto> => {
     const response = await apiClient.get<DashboardStatsDto>("/admin/dashboard/stats");
+    return response.data;
+  },
+  getUserStats: async (): Promise<DashboardStatsDto> => {
+    const response = await apiClient.get<DashboardStatsDto>("/admin/dashboard/user-stats");
     return response.data;
   },
 };

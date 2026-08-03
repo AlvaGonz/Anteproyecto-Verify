@@ -15,7 +15,10 @@ public record LoginUserResultDto(
 
 public record LoginUserResponseDto(
     LoginUserUserDto User,
-    string Token
+    string Token,
+    bool Requires2fa = false,
+    string? ChallengeToken = null,
+    string? EmailMasked = null
 );
 
 public record LoginUserUserDto(
@@ -31,5 +34,7 @@ public record LoginUserUserDto(
     bool IsGuest = false,
     Guid? TitularId = null,
     string? InviterPlan = null,
+    int? MaxProyectos = null,
+    int? MaxUsuariosSecundarios = null,
     object? InviteesList = null
 );

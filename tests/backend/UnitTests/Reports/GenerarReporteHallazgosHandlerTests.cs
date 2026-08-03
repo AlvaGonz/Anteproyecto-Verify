@@ -1,4 +1,4 @@
-namespace UnitTests.Application.Features.Reports.Queries;
+﻿namespace UnitTests.Application.Features.Reports.Queries;
 
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ public class GenerarReporteHallazgosQueryHandlerTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Proyecto("Test Project", "Loc", Guid.NewGuid());
+        var project = new Proyecto("Test Project", "Loc", Guid.NewGuid(), 16);
         
         var hallazgos = new List<Hallazgo>
         {
@@ -64,7 +64,7 @@ public class GenerarReporteHallazgosQueryHandlerTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Proyecto("Test Project", "Loc", Guid.NewGuid());
+        var project = new Proyecto("Test Project", "Loc", Guid.NewGuid(), 16);
         
         var hallazgos = new List<Hallazgo>
         {

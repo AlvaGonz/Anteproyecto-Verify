@@ -134,7 +134,7 @@ public class ConsentGuardTests
         var projectId = Guid.NewGuid();
         var request = new ConsultarCreditoCommand { ProyectoId = projectId, UsuarioId = userId };
 
-        var project = new Proyecto("Test Project", "Location", userId);
+        var project = new Proyecto("Test Project", "Location", userId, 16);
         var developer = new Usuario("Test", "User", "test@test.com", "809", Domain.Enums.UserRole.User, "123456789", "hash");
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(developer, userId);
 
@@ -164,7 +164,7 @@ public class ConsentGuardTests
         var projectId = Guid.NewGuid();
         var request = new ConsultarCreditoCommand { ProyectoId = projectId, UsuarioId = userId };
 
-        var project = new Proyecto("Test Project", "Location", userId);
+        var project = new Proyecto("Test Project", "Location", userId, 16);
         var developer = new Usuario("Test", "User", "test@test.com", "809", Domain.Enums.UserRole.User, "123456789", "hash");
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(developer, userId);
 
@@ -191,7 +191,7 @@ public class ConsentGuardTests
         var projectId = Guid.NewGuid();
         var request = new ConsultarCreditoCommand { ProyectoId = projectId, UsuarioId = userId };
 
-        var project = new Proyecto("Test Project", "Location", userId);
+        var project = new Proyecto("Test Project", "Location", userId, 16);
         var developer = new Usuario("Test", "User", "test@test.com", "809", Domain.Enums.UserRole.User, "123456789", "hash");
         typeof(Domain.Common.EntityBase).GetProperty("Id")?.SetValue(developer, userId);
 

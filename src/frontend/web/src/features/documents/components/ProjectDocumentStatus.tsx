@@ -12,26 +12,26 @@ import {
   Gavel,
   Download
 } from "lucide-react";
-import { ProjectCategory } from "../../projects/types";
+
 import { m, AnimatePresence } from "framer-motion";
 
 interface ProjectDocumentStatusProps {
   projectId: string;
-  projectCategory?: ProjectCategory;
+  categoriaId?: number;
 }
 
-const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string; categories: ProjectCategory[] }> = {
-  [DocumentType.CertificadoTitulo]: { name: "Certificado de Título de Propiedad", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico", entity: "Registro de Títulos", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.PlanoMensuraCatastral]: { name: "Plano de Mensura Catastral", entity: "Tribunal de Tierras", norm: "Ley 108-05", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.CertificadoUsoSuelo]: { name: "Certificado de Uso de Suelo", entity: "Ayuntamiento", norm: "Ordenanzas", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.PoderNotarial]: { name: "Poder Notarial", entity: "Notaría Pública", norm: "Ley 301 Notarial", categories: [1, 2, 3, 4, 99] },
-  [DocumentType.RNC]: { name: "RNC activo", entity: "DGII", norm: "-", categories: [1, 2, 3, 4, 99] },
+const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string }> = {
+  [DocumentType.CertificadoTitulo]: { name: "Certificado de Título de Propiedad", entity: "Registro de Títulos", norm: "Ley 108-05" },
+  [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico", entity: "Registro de Títulos", norm: "Ley 108-05" },
+  [DocumentType.PlanoMensuraCatastral]: { name: "Plano de Mensura Catastral", entity: "Tribunal de Tierras", norm: "Ley 108-05" },
+  [DocumentType.CertificadoUsoSuelo]: { name: "Certificado de Uso de Suelo", entity: "Ayuntamiento", norm: "Ordenanzas" },
+  [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88" },
+  [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02" },
+  [DocumentType.PoderNotarial]: { name: "Poder Notarial", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
+  [DocumentType.RNC]: { name: "RNC activo", entity: "DGII", norm: "-" },
 };
 
-export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, projectCategory = ProjectCategory.Residencial }) => {
+export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId }) => {
   const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
   const { mutate: downloadDoc, isPending: isDownloading } = useDownloadDocument(projectId || "");
 
@@ -42,11 +42,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     </div>
   );
 
-  const requiredTypes = Object.entries(DOCUMENT_INFO)
-    .reduce<DocumentType[]>((acc, [key, info]) => {
-      if (info.categories.includes(projectCategory)) acc.push(Number(key) as DocumentType);
-      return acc;
-    }, []);
+  const requiredTypes = Object.keys(DOCUMENT_INFO).map(Number) as DocumentType[];
 
   const uploadedDocs = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
 

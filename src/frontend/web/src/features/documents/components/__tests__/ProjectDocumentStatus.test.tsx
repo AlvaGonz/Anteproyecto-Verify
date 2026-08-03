@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ProjectDocumentStatus } from "../ProjectDocumentStatus";
 import { DocumentStatus, DocumentType } from "../../types";
-import { ProjectCategory } from "../../../projects/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -36,7 +35,7 @@ describe("ProjectDocumentStatus", () => {
       error: null,
     } as any);
 
-    renderWithClient(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
     expect(screen.getByText(/Auditoría Digital en curso.../i)).toBeInTheDocument();
   });
 
@@ -54,12 +53,12 @@ describe("ProjectDocumentStatus", () => {
       error: null,
     } as any);
 
-    renderWithClient(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
     
     // Check if the filename is displayed
     expect(screen.getByText("titulo_original.pdf")).toBeInTheDocument();
     // Check if the status VERIFICADO (OCR) is displayed
-    expect(screen.getByText("VERIFICADO (OCR)")).toBeInTheDocument();
+    expect(screen.getByText("VERIFICADO")).toBeInTheDocument();
   });
 
   it("displays observed document without verified status", () => {
@@ -76,7 +75,7 @@ describe("ProjectDocumentStatus", () => {
       error: null,
     } as any);
 
-    renderWithClient(<ProjectDocumentStatus projectId="proj-123" projectCategory={ProjectCategory.Residencial} />);
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
     
     // Check if the filename is displayed
     expect(screen.getByText("titulo_invalido.pdf")).toBeInTheDocument();

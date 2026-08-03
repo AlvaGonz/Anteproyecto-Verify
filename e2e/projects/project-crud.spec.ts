@@ -10,7 +10,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
     codigoInterno: "VF-001-2026",
     nombre: "Residencial Las Palmas",
     ubicacionTexto: "La Romana, RD",
-    categoria: 1, // Residencial
+    categoriaId: 16, // VIVIENDAS
     estadoProyecto: "CREADO", // Draft
     estadoIntegridad: 0, // Pending
     usuarioCreadorId: "user-001",
@@ -305,7 +305,7 @@ test.describe("CRUD Proyectos — E2E con Mock", () => {
           codigoInterno: "VF-001-2026",
           nombre: "Residencial Las Palmas",
           ubicacionTexto: "La Romana, RD",
-          categoria: 1,
+          categoriaId: 16,
           estadoProyecto: "PUBLICADO",
           estadoIntegridad: 0,
           usuarioCreadorId: "user-001",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Download,
   Search,
@@ -28,6 +28,12 @@ const getStatusBadge = (tipoEvento: string) => {
 export const AuditLogPage: React.FC = () => {
   const [filters, setFilters] = useState<AuditFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const { data: rawLogs = [], isLoading: loading } = useGlobalAuditTrail(filters);
   const exportMutation = useExportGlobalAudit();
@@ -48,7 +54,7 @@ export const AuditLogPage: React.FC = () => {
     }
   };
 
-  const logs = React.useMemo(() => {
+  const logs = useMemo(() => {
     let filtered = rawLogs.map((l: any) => ({
       ...l,
       id: String(l.idLog || l.id),
@@ -60,15 +66,15 @@ export const AuditLogPage: React.FC = () => {
       detalle: l.descripcion || "Sin detalles",
     })) as unknown as AuditDto[];
 
-    if (searchQuery) {
+    if (debouncedSearch) {
       filtered = filtered.filter(l =>
-        (l.detalle || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (l.usuarioId || "").toLowerCase().includes(searchQuery.toLowerCase())
+        (l.detalle || "").toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        (l.usuarioId || "").toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
 
     return filtered;
-  }, [rawLogs, searchQuery]);
+  }, [rawLogs, debouncedSearch]);
 
   // ponytail: moved outside component
 

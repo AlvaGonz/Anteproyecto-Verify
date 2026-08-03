@@ -23,7 +23,7 @@ public class PublicProjectSearchResultDto
     public string? Constructora { get; set; }
     public string? Registrante { get; set; }
     public string? ImagenUrl { get; set; }
-    public int? Categoria { get; set; }
+    public int CategoriaId { get; set; }
     public decimal? ValorEstimado { get; set; }
     public string? DesignacionCatastral { get; set; }
     public string? Matricula { get; set; }

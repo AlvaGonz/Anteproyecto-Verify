@@ -182,12 +182,12 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
 
   return (
     <div className={cn(
-      "max-w-xl mx-auto rounded-3xl p-1 md:p-8 shadow-premium border transition-all duration-500",
+      "max-w-xl mx-auto rounded-3xl p-4 md:p-8 shadow-premium border transition-all duration-500",
       isDark ? "bg-slate-900/50 border-white/10 backdrop-blur-xl" : "bg-white border-slate-100",
       className
     )}>
       {/* Header Section with Icon and Title */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-8">
         <div className="flex items-center gap-4">
           <div className={cn(
             "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform duration-500",
@@ -307,7 +307,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
       </form>
 
       <div className={cn(
-        "mt-8 pt-6 border-t flex justify-between items-center text-[10px] font-black uppercase tracking-widest",
+        "mt-8 pt-6 border-t flex flex-wrap justify-between gap-2 items-center text-[10px] font-black uppercase tracking-widest",
         isDark ? "border-white/5 text-white/20" : "border-slate-50 text-slate-300"
       )}>
         <div className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Encriptado</div>

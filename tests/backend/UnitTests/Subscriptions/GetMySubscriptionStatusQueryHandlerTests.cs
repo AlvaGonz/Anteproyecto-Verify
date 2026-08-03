@@ -27,7 +27,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     private static PlanSuscripcion CreateProfesionalPlan(AppDbContext db)
     {
         var plan = PlanSuscripcion.Create(
-            Guid.NewGuid(), "Profesional", 3500m,
+            Guid.NewGuid(), "Profesional", 60m,
             25, 5, true, true, 0, 200, false, false, false, false, true, false, "Email", false);
         db.PlanesSuscripcion.Add(plan);
         db.SaveChanges();
@@ -47,7 +47,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     private static PlanSuscripcion CreateCorporativoPlan(AppDbContext db)
     {
         var plan = PlanSuscripcion.Create(
-            Guid.NewGuid(), "Corporativo", 30000m,
+            Guid.NewGuid(), "Corporativo", 500m,
             -1, 50, true, true, -1, 10240, true, true, true, true, true, true, "Account Manager", true);
         db.PlanesSuscripcion.Add(plan);
         db.SaveChanges();
@@ -106,7 +106,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal("Profesional", result.Plan);
-        Assert.Equal(3500m, result.PlanPrice);
+        Assert.Equal(60m, result.PlanPrice);
         Assert.Equal("active", result.SubscriptionStatus);
         Assert.NotNull(result.PlanLimits);
         
@@ -308,7 +308,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
         }
         for (int i = 0; i < 3; i++)
         {
-            db.Proyectos.Add(new global::Domain.Entities.Proyecto("Test", "Test", user.Id));
+            db.Proyectos.Add(new global::Domain.Entities.Proyecto("Test", "Test", user.Id, 16));
         }
         db.SaveChanges();
         
@@ -330,7 +330,7 @@ public class GetMySubscriptionStatusQueryHandlerTests
     {
         // Arrange
         using var db = CreateDbContext();
-        var plan = CreateProfesionalPlan(db); // Precio = 3500m
+        var plan = CreateProfesionalPlan(db); // Precio = 60m
         var user = CreateUser(db, plan, activeSubscription: true);
         
         var repository = CreateRepository(db);
@@ -344,8 +344,8 @@ public class GetMySubscriptionStatusQueryHandlerTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.Pricing);
-        Assert.Equal(3500m, result.Pricing!.MonthlyPrice);
-        Assert.Equal(33600m, result.Pricing.YearlyPrice); // 3500 * 12 * 0.8
+        Assert.Equal(60m, result.Pricing!.MonthlyPrice);
+        Assert.Equal(576m, result.Pricing.YearlyPrice); // 60 * 12 * 0.8
         Assert.Equal(20, result.Pricing.YearlyDiscountPercent);
         Assert.Equal("Ahorra 20%", result.Pricing.YearlyBadge);
     }

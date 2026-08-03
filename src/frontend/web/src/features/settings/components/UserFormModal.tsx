@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { m } from "framer-motion";
 import { X, Eye, EyeOff } from "lucide-react";
 import { UserSettings, CreateUserDto } from "../types/settings.types";
@@ -8,6 +8,7 @@ interface UserFormModalProps {
   isOpen: boolean;
   editingUser: UserSettings | null;
   formData: CreateUserDto;
+  error?: string | null;
   isProcessing: boolean;
   onChange: (data: CreateUserDto) => void;
   onSubmit: (e: React.FormEvent) => Promise<void>;
@@ -18,6 +19,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   isOpen,
   editingUser,
   formData,
+  error,
   isProcessing,
   onChange,
   onSubmit,
@@ -34,17 +36,33 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    >
       <m.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="user-form-modal-title"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
       >
         <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-surface-raised/30">
-          <h2 className="text-lg font-bold text-[#223382]">
+          <h2 id="user-form-modal-title" className="text-lg font-bold text-[#223382]">
             {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
           </h2>
           <button type="button" onClick={onClose} className="p-2 hover:bg-surface rounded-full transition-colors">
@@ -53,6 +71,11 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
         </div>
 
         <form onSubmit={onSubmit} className="p-6 space-y-4">
+          {error && (
+            <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-3 py-2">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="uf-nombre" className="block text-xs font-bold text-text-secondary uppercase mb-1">Nombre</label>

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProjectCategory } from "./types";
+
 
 export const createProjectSchema = z.object({
   nombre: z
@@ -10,9 +10,7 @@ export const createProjectSchema = z.object({
     .string()
     .min(5, "Ingrese una ubicación válida")
     .max(500, "Ubicación demasiado larga"),
-  categoria: z.nativeEnum(ProjectCategory, {
-    error: () => "Seleccione una categoría válida",
-  }),
+  categoriaId: z.number().min(1, "Seleccione una categoría válida"),
   datosDesarrollador: z.string().max(1000).optional(),
   rncDesarrollador: z.string().optional(),
   designacionCatastral: z

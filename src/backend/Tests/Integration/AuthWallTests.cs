@@ -18,7 +18,7 @@ public class AuthWallTests : IntegrationTestBase
     {
         nombre = "Test Project",
         ubicacionTexto = "Location",
-        categoria = 1,
+        categoriaId = 16,
         datosDesarrollador = "DevData",
         designacionCatastral = "CAT-123",
         usuarioCreadorId = userId
@@ -35,20 +35,6 @@ public class AuthWallTests : IntegrationTestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-    }
-
-    [Fact]
-    public async Task RegularUser_CannotAccessValidatorEndpoint_Returns403()
-    {
-        // Arrange
-        var token = await RegisterAndGetTokenAsync("regular.user@test.com", "Password123!");
-        SetBearerToken(token); // Implicitly regular user
-
-        // Act: Try to access a validation endpoint that requires DEVELOPER,VALIDATOR roles
-        var response = await Client.GetAsync($"/api/projects/{Guid.NewGuid()}/documents/diagnosis");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]

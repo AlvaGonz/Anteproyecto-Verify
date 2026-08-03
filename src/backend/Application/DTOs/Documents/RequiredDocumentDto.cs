@@ -6,5 +6,5 @@ public record RequiredDocumentDto(
     DocumentType TipoDocumento,
     string Nombre,
     string Descripcion,
-    ProjectCategory Categoria
+    int CategoriaId
 );

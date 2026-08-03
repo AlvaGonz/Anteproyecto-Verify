@@ -20,6 +20,9 @@ namespace Application.DTOs.Admin
         public int TotalConsultasRealizadas { get; init; }
         public int TotalProyectosRegistrados { get; init; }
         public int TotalOfertas { get; init; }
+
+        // Trend
+        public List<ProyectosPorMesDto> ProyectosPorMes { get; init; } = new();
     }
 
     public record SuscripcionRecienteDto
@@ -37,5 +40,12 @@ namespace Application.DTOs.Admin
         public string Desarrollador { get; init; } = string.Empty;
         public string Estado { get; init; } = string.Empty;
         public string? ImagenUrl { get; init; }
+    }
+
+    public record ProyectosPorMesDto
+    {
+        public int Year { get; init; }
+        public int Month { get; init; }
+        public int Count { get; init; }
     }
 }

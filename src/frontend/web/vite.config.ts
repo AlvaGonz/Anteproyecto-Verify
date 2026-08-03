@@ -21,15 +21,30 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks(id) {
-                    if (id.includes('node_modules/react-dom')) return 'vendor-react';
-                    if (id.includes('node_modules/react')) return 'vendor-react';
-                    if (id.includes('node_modules/framer-motion')) return 'vendor-animation';
-                    if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
-                    if (id.includes('node_modules/@tanstack/react-query')) return 'vendor-query';
+                    if (!id.includes('node_modules')) return undefined;
+                    // React runtime deps must live with react-dom (fixes the
+                    // vendor-other -> vendor-react circular chunk warning)
+                    if (id.includes('node_modules/react-dom')
+                        || id.includes('node_modules/scheduler')
+                        || id.includes('node_modules/use-sync-external-store')
+                        || id.includes('node_modules/react-is')) return 'vendor-react';
+                    if (id.includes('node_modules/framer-motion')
+                        || id.includes('node_modules/motion-dom')
+                        || id.includes('node_modules/motion-utils')) return 'vendor-animation';
+                    if (id.includes('node_modules/@stripe')) return 'vendor-stripe';
+                    if (id.includes('node_modules/zod')
+                        || id.includes('node_modules/react-hook-form')
+                        || id.includes('node_modules/@hookform')) return 'vendor-forms';
+                    if (id.includes('node_modules/@react-oauth')) return 'vendor-oauth';
+                    if (id.includes('node_modules/@tanstack')) return 'vendor-query';
                     if (id.includes('node_modules/leaflet')) return 'vendor-map';
-                    if (id.includes('node_modules/i18next')) return 'vendor-i18n';
+                    if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
+                    if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) return 'vendor-i18n';
                     if (id.includes('node_modules/axios')) return 'vendor-http';
-                    if (id.includes('node_modules')) return 'vendor-other';
+                    if (id.includes('node_modules/clsx') || id.includes('node_modules/tailwind-merge')) return 'vendor-utils';
+                    if (id.includes('node_modules/prop-types')) return 'vendor-react';
+                    if (id.includes('node_modules/react')) return 'vendor-react';
+                    return 'vendor-other';
                 },
             },
         },

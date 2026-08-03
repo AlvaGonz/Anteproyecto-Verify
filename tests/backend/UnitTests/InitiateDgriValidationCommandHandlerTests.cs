@@ -1,4 +1,4 @@
-namespace UnitTests;
+﻿namespace UnitTests;
 
 using System;
 using System.Threading;
@@ -46,7 +46,7 @@ public class InitiateDgriValidationCommandHandlerTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", Guid.NewGuid());
+        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), 16);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         
@@ -77,7 +77,7 @@ public class InitiateDgriValidationCommandHandlerTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Proyecto("Test", "Loc", Guid.NewGuid());
+        var project = new Proyecto("Test", "Loc", Guid.NewGuid(), 16);
         
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
         

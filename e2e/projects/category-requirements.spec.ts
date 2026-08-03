@@ -52,12 +52,6 @@ test.describe("Category Specific Requirements E2E", () => {
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents`, async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) });
     });
-    await page.route(`**/api/projects/${MOCK_PROJECT_ID}/documents/diagnosis`, async (route) => {
-      await route.fulfill({
-        status: 200, contentType: "application/json",
-        body: JSON.stringify({ requirements: [], documents: [] })
-      });
-    });
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}/validation-result`, async (route) => {
       await route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
     });
@@ -69,7 +63,7 @@ test.describe("Category Specific Requirements E2E", () => {
     });
   });
 
-  test("Comercial project (Category 2) renders generic requirement rows", async ({ page }) => {
+  test("Comercial project (CategoriaId 8) renders generic requirement rows", async ({ page }) => {
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}`, async (route) => {
       await route.fulfill({
         status: 200,
@@ -78,7 +72,7 @@ test.describe("Category Specific Requirements E2E", () => {
           id: MOCK_PROJECT_ID,
           nombre: "Plaza Central",
           estadoProyecto: 1, 
-          categoria: 2 // Comercial
+          categoriaId: 8 // Comercial
         })
       });
     });
@@ -91,7 +85,7 @@ test.describe("Category Specific Requirements E2E", () => {
     await expect(page.getByTestId("requirement-row-mensura")).toBeVisible({ timeout: 5000 });
   });
 
-  test("Turistico project (Category 3) renders generic requirement rows", async ({ page }) => {
+  test("Hospedaje project (CategoriaId 12) renders generic requirement rows", async ({ page }) => {
     await page.route(`**/api/projects/${MOCK_PROJECT_ID}`, async (route) => {
       await route.fulfill({
         status: 200,
@@ -100,7 +94,7 @@ test.describe("Category Specific Requirements E2E", () => {
           id: MOCK_PROJECT_ID,
           nombre: "Hotel Punta Cana",
           estadoProyecto: 1, 
-          categoria: 3 // Turistico
+          categoriaId: 12 // Hospedaje
         })
       });
     });

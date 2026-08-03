@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import { useProjects } from "../../../features/projects/api/useProjects";
 import { useAuth } from "../../context/AuthContext";
+import { LimitReachedModal } from "../../../features/projects/components/LimitReachedModal";
 import { clsx } from "clsx";
 
 interface SidebarProps {
@@ -33,11 +35,14 @@ const NAVIGATION = [
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: projects, error: projectsError } = useProjects(1, 500);
-  const projectCount = projectsError ? 0 : (projects?.length || 0);
+  const { totalCount: projectCount, error: projectsError } = useProjects(1, 1);
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const shouldReduceMotion = usePrefersReducedMotion();
+
+  const maxProjects = user?.role === "admin" ? 999999 : (user?.maxProyectos ?? 1);
+  const isAtLimit = maxProjects !== 999999 && projectCount >= maxProjects;
 
   useEffect(() => {
     if (projectsError) {
@@ -50,17 +55,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     navigate("/login");
   };
 
-  const fullName = user ? `${user.nombre || ""} ${user.apellido || ""}`.trim() : "";
-  const firstName = fullName ? fullName.split(" ")[0] : "Usuario";
-  const initials = fullName
-    ? fullName
-      .split(" ")
-      .filter(Boolean)
-      .map((n: string) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase()
-    : "US";
+  const fullName = user
+    ? `${user.nombre || ""} ${user.apellido || ""}`.trim() || (user.name || "").trim()
+    : "";
+  const nameParts = fullName.split(" ").filter(Boolean);
+  const firstName = nameParts[0] || "Usuario";
+  const initials = nameParts
+    .map((n: string) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "US";
   const roleLabel = {
     admin: "Administrador",
     dev: "Desarrollador",
@@ -147,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
           }}
         >
-          {NAVIGATION.map((item) => {
+          {NAVIGATION.filter(item => item.name !== "Reglas de Validacion" || user?.role === "admin").map((item) => {
             const isActive = location.pathname.startsWith(item.href);
             return (
               <motion.div
@@ -225,6 +229,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <div className={clsx("transition-all duration-500 shrink-0", isCollapsed ? "px-2 mt-2 sm:mt-4" : "mt-4 sm:mt-8 px-2")}>
           <Link
             to="/admin/projects/new"
+            onClick={(e) => {
+              if (isAtLimit && user?.role !== "admin") {
+                e.preventDefault();
+                setShowLimitModal(true);
+              } else if (onClose) {
+                onClose();
+              }
+            }}
             className={clsx(
               "flex items-center bg-primary hover:bg-primary-hover text-white rounded-2xl font-display font-black text-xs uppercase tracking-widest transition-all shadow-premium hover:shadow-premium-lg group",
               isCollapsed ? "justify-center py-2.5 sm:py-3.5" : "justify-center gap-3 w-full py-3 sm:py-4"
@@ -324,11 +336,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
               {user?.avatarUrl ? (
                 <img
                   data-testid="sidebar-avatar-img"
-                  src={
-                    /^(data|blob|http)/.test(user.avatarUrl)
-                      ? user.avatarUrl
-                      : `http://localhost:5000${user.avatarUrl}`
-                  }
+                  loading="lazy"
+                  decoding="async"
+                  src={user.avatarUrl}
                   alt="Avatar"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"
@@ -387,6 +397,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </span>
         </button>
       </div>
+
+      <LimitReachedModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        onViewPlans={() => {
+          setShowLimitModal(false);
+          navigate("/admin/settings");
+        }}
+        limitType="projects"
+        used={projectCount}
+        max={maxProjects}
+      />
     </motion.div>
   );
 };

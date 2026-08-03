@@ -12,10 +12,81 @@ import {
   Search,
   BookOpen,
   LayoutDashboard,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CreateRuleCommand, ReglaValidacionDto } from "../../features/rules/api/useRules";
+
+interface RuleSelectProps {
+  id: string;
+  label: string;
+  value: number;
+  options: { value: number; label: string }[];
+  onChange: (value: number) => void;
+}
+
+// Custom dropdown (pattern: legal/verify-search dropdown) replacing native <select>
+const RuleSelect: React.FC<RuleSelectProps> = ({ id, label, value, options, onChange }) => {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <div className="space-y-2">
+      <label htmlFor={id} className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-2">{label}</label>
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
+          id={id}
+          onClick={() => setOpen(!open)}
+          className="vf-input h-14 flex items-center justify-between gap-2 cursor-pointer"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+        >
+          <span className={selected ? "text-secondary" : "text-text-secondary/50"}>{selected?.label ?? "Seleccionar"}</span>
+          <ChevronDown className={`w-4 h-4 text-on-surface-variant transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        </button>
+        <AnimatePresence>
+          {open && (
+            <m.div
+              initial={{ opacity: 0, y: -6, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="absolute z-50 w-full mt-2 rounded-xl border border-outline-variant/30 bg-surface shadow-xl overflow-hidden"
+              role="listbox"
+            >
+              {options.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => { onChange(opt.value); setOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 text-left text-sm font-bold transition-colors ${
+                    opt.value === value ? "text-primary bg-primary/5" : "text-on-surface-variant hover:bg-surface-container-low hover:text-secondary"
+                  }`}
+                >
+                  {opt.label}
+                  {opt.value === value && <Check className="w-4 h-4 text-primary" />}
+                </button>
+              ))}
+            </m.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
 
 interface RulesManagePageLayoutProps {
   showForm: boolean;
@@ -30,7 +101,7 @@ interface RulesManagePageLayoutProps {
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = ({
+export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = React.memo(({
   showForm,
   setShowForm,
   handleSubmit,
@@ -44,7 +115,7 @@ export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = ({
 }) => (
   <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
     {/* Page Header */}
-    <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 flex-wrap">
       <div>
         <div className="flex items-center gap-3 mb-4">
           <Link to="/admin/projects" className="text-on-surface-variant hover:text-primary transition-colors">
@@ -64,7 +135,7 @@ export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = ({
 
       <button type="button"
         onClick={() => setShowForm(!showForm)}
-        className={`vf-btn-primary h-14 !rounded-2xl shadow-lg transition-all ${showForm ? '!bg-secondary' : ''}`}
+        className={`vf-btn-primary h-14 !rounded-2xl shadow-lg transition-all shrink-0 whitespace-nowrap ${showForm ? '!bg-secondary' : ''}`}
       >
         {showForm ? <X className="w-5 h-5 mr-2" /> : <Plus className="w-5 h-5 mr-2" />}
         {showForm ? "Cancelar Operación" : "Definir Nueva Regla"}
@@ -164,32 +235,41 @@ export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = ({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="space-y-2">
-                  <label htmlFor="rule-tipo" className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-2">Tipo de Proyecto</label>
-                  <select id="rule-tipo" value={formData.tipoProyecto} onChange={(e) => setFormData({ ...formData, tipoProyecto: Number(e.target.value) })} className="vf-input h-14">
-                    <option value={1}>Residencial</option>
-                    <option value={2}>Comercial</option>
-                    <option value={3}>Turístico</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="rule-entidad" className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-2">Entidad Aplicable</label>
-                  <select id="rule-entidad" value={formData.tipoDocumentoAplicable} onChange={(e) => setFormData({ ...formData, tipoDocumentoAplicable: Number(e.target.value) })} className="vf-input h-14">
-                    <option value={1}>Certificado de Titulo</option>
-                    <option value={3}>Planos Arquitectónicos</option>
-                    <option value={5}>Permiso de Construcción</option>
-                    <option value={12}>DGII / RNC</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="rule-nivel" className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-2">Nivel de Gravedad</label>
-                  <select id="rule-nivel" value={formData.nivelAlerta} onChange={(e) => setFormData({ ...formData, nivelAlerta: Number(e.target.value) })} className="vf-input h-14">
-                    <option value={1}>Informativo</option>
-                    <option value={2}>Advertencia</option>
-                    <option value={3}>Alta Severidad</option>
-                    <option value={4}>Bloqueante (Crítica)</option>
-                  </select>
-                </div>
+                <RuleSelect
+                  id="rule-tipo"
+                  label="Tipo de Proyecto"
+                  value={formData.tipoProyecto}
+                  options={[
+                    { value: 1, label: "Residencial" },
+                    { value: 2, label: "Comercial" },
+                    { value: 3, label: "Turístico" },
+                  ]}
+                  onChange={(v) => setFormData({ ...formData, tipoProyecto: v })}
+                />
+                <RuleSelect
+                  id="rule-entidad"
+                  label="Entidad Aplicable"
+                  value={formData.tipoDocumentoAplicable}
+                  options={[
+                    { value: 1, label: "Certificado de Titulo" },
+                    { value: 3, label: "Planos Arquitectónicos" },
+                    { value: 5, label: "Permiso de Construcción" },
+                    { value: 12, label: "DGII / RNC" },
+                  ]}
+                  onChange={(v) => setFormData({ ...formData, tipoDocumentoAplicable: v })}
+                />
+                <RuleSelect
+                  id="rule-nivel"
+                  label="Nivel de Gravedad"
+                  value={formData.nivelAlerta}
+                  options={[
+                    { value: 1, label: "Informativo" },
+                    { value: 2, label: "Advertencia" },
+                    { value: 3, label: "Alta Severidad" },
+                    { value: 4, label: "Bloqueante (Crítica)" },
+                  ]}
+                  onChange={(v) => setFormData({ ...formData, nivelAlerta: v })}
+                />
               </div>
 
               <div className="flex justify-end gap-4 pt-4">
@@ -298,4 +378,4 @@ export const RulesManagePageLayout: React.FC<RulesManagePageLayoutProps> = ({
       </div>
     </div>
   </div>
-);
+));

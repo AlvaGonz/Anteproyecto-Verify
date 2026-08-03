@@ -26,6 +26,8 @@ public static class AppDbContextSeeder
         {
             logger.LogInformation("Seeding prototype demo data...");
 
+            await SeedProvinciasAsync(context, logger);
+            await SeedMunicipiosAsync(context, logger);
             await SeedPlanesSuscripcionAsync(context, logger);
             await SeedProyectoEstadosAsync(context, logger);
 
@@ -156,16 +158,16 @@ public static class AppDbContextSeeder
 
             var proyectos = new[]
             {
-                new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Publicado },
-                new { Nombre = "Residencial Los Cacicazgos", Ubicacion = "Los Cacicazgos, Distrito Nacional", Categoria = ProjectCategory.Residencial, Dev = "Desarrollos Inmobiliarios XYZ", Cat = "DC-67890", Status = ProjectStatus.Creado },
-                new { Nombre = "Proyecto Costero La Romana", Ubicacion = "La Romana, RD", Categoria = ProjectCategory.Turistico, Dev = "Grupo Turístico del Este", Cat = "DC-11223", Status = ProjectStatus.Revision },
-                new { Nombre = "Condominio Oasis", Ubicacion = "Bávaro, Punta Cana", Categoria = ProjectCategory.Residencial, Dev = "Desarrollos Inmobiliarios", Cat = "DC-22334", Status = ProjectStatus.Publicado },
-                new { Nombre = "Plaza del Sol", Ubicacion = "Santiago", Categoria = ProjectCategory.Comercial, Dev = "Grupo Constructor Sur", Cat = "DC-33445", Status = ProjectStatus.Publicado },
-                new { Nombre = "Torre Lumiere", Ubicacion = "Santo Domingo Centro", Categoria = ProjectCategory.Residencial, Dev = "Inversiones Caribe", Cat = "DC-44556", Status = ProjectStatus.Publicado },
-                new { Nombre = "Residencial Altos del Mar", Ubicacion = "Puerto Plata", Categoria = ProjectCategory.Residencial, Dev = "Constructora del Norte", Cat = "DC-55667", Status = ProjectStatus.Publicado },
-                new { Nombre = "Villa Costa Marina", Ubicacion = "Samaná", Categoria = ProjectCategory.Turistico, Dev = "Desarrollos Marinos", Cat = "DC-66778", Status = ProjectStatus.Publicado },
-                new { Nombre = "Plaza Comercial Norte", Ubicacion = "Santo Domingo Norte", Categoria = ProjectCategory.Comercial, Dev = "Inmobiliaria del Este", Cat = "DC-77889", Status = ProjectStatus.Publicado },
-                new { Nombre = "Condominio Vista Bella", Ubicacion = "La Vega", Categoria = ProjectCategory.Residencial, Dev = "Constructora VIP", Cat = "DC-88990", Status = ProjectStatus.Publicado },
+                new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = 3, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Publicado }, // APARTAMENTOS
+                new { Nombre = "Residencial Los Cacicazgos", Ubicacion = "Los Cacicazgos, Distrito Nacional", Categoria = 16, Dev = "Desarrollos Inmobiliarios XYZ", Cat = "DC-67890", Status = ProjectStatus.Creado }, // VIVIENDAS
+                new { Nombre = "Proyecto Costero La Romana", Ubicacion = "La Romana, RD", Categoria = 12, Dev = "Grupo Turístico del Este", Cat = "DC-11223", Status = ProjectStatus.Revision }, // HOSPEDAJE
+                new { Nombre = "Condominio Oasis", Ubicacion = "Bávaro, Punta Cana", Categoria = 3, Dev = "Desarrollos Inmobiliarios", Cat = "DC-22334", Status = ProjectStatus.Publicado }, // APARTAMENTOS
+                new { Nombre = "Plaza del Sol", Ubicacion = "Santiago", Categoria = 8, Dev = "Grupo Constructor Sur", Cat = "DC-33445", Status = ProjectStatus.Publicado }, // COMERCIAL Y OFICINAS
+                new { Nombre = "Torre Lumiere", Ubicacion = "Santo Domingo Centro", Categoria = 8, Dev = "Inversiones Caribe", Cat = "DC-44556", Status = ProjectStatus.Publicado }, // COMERCIAL Y OFICINAS
+                new { Nombre = "Residencial Altos del Mar", Ubicacion = "Puerto Plata", Categoria = 16, Dev = "Constructora del Norte", Cat = "DC-55667", Status = ProjectStatus.Publicado }, // VIVIENDAS
+                new { Nombre = "Villa Costa Marina", Ubicacion = "Samaná", Categoria = 12, Dev = "Desarrollos Marinos", Cat = "DC-66778", Status = ProjectStatus.Publicado }, // HOSPEDAJE
+                new { Nombre = "Plaza Comercial Norte", Ubicacion = "Santo Domingo Norte", Categoria = 8, Dev = "Inmobiliaria del Este", Cat = "DC-77889", Status = ProjectStatus.Publicado }, // COMERCIAL Y OFICINAS
+                new { Nombre = "Condominio Vista Bella", Ubicacion = "La Vega", Categoria = 3, Dev = "Constructora VIP", Cat = "DC-88990", Status = ProjectStatus.Publicado }, // APARTAMENTOS
             };
 
             var proyectoEntities = new List<Proyecto>();
@@ -226,7 +228,7 @@ public static class AppDbContextSeeder
                 var p2 = proyectoEntities[1];
                 var p3 = proyectoEntities[2];
 
-                p1.UpdateDetails(p1.Nombre, p1.UbicacionTexto, null, null, p1.Categoria, p1.DatosDesarrollador, p1.DesignacionCatastral, "Propietario Test", "402-1234567-8", "1-01-99999-9");
+                p1.UpdateDetails(p1.Nombre, p1.UbicacionTexto, null, null, p1.CategoriaId, p1.DatosDesarrollador, p1.DesignacionCatastral, "Propietario Test", "402-1234567-8", "1-01-99999-9");
                 p1.UpdateRncYMatricula("1-30-12345-1", "001-02-003");
                 await context.SaveChangesAsync();
 
@@ -352,6 +354,246 @@ public static class AppDbContextSeeder
         }
     }
 
+    private static async Task SeedProvinciasAsync(AppDbContext context, ILogger logger)
+    {
+        var connection = context.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = "SELECT COUNT(1) FROM Provincia";
+        var count = (int)cmd.ExecuteScalar()!;
+        if (count > 0) { logger.LogInformation("Provincias already seeded. Skipping."); return; }
+
+        logger.LogInformation("Seeding Provincias...");
+
+        var sql = @"
+INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES
+('Distrito Nacional', 18.47186, -69.93988),
+('Azua', 18.45320, -70.73490),
+('Bahoruco', 18.50000, -71.30000),
+('Barahona', 18.20850, -71.10080),
+
+('Dajabón', 19.54000, -71.70000),
+('Duarte', 19.30000, -70.25000),
+('El Seibo', 18.76000, -69.04000),
+('Elías Piña', 18.88000, -71.68000),
+('Espaillat', 19.50000, -70.50000),
+('Hato Mayor', 18.76000, -69.25000),
+('Hermanas Mirabal', 19.38000, -70.35000),
+('Independencia', 18.40000, -71.60000),
+('La Altagracia', 18.61890, -68.70830),
+('La Romana', 18.42730, -68.97280),
+('La Vega', 19.22000, -70.53000),
+('María Trinidad Sánchez', 19.38000, -69.95000),
+('Monseñor Nouel', 18.91000, -70.43000),
+('Monte Cristi', 19.72000, -71.58000),
+('Monte Plata', 18.80700, -69.78900),
+('Pedernales', 18.03000, -71.74000),
+('Peravia', 18.28000, -70.33000),
+('Puerto Plata', 19.79340, -70.68840),
+('Samaná', 19.20000, -69.33000),
+('San Cristóbal', 18.41667, -70.10000),
+('San José de Ocoa', 18.55000, -70.50000),
+('San Juan', 18.80580, -71.22990),
+('San Pedro de Macorís', 18.45390, -69.30820),
+('Sánchez Ramírez', 19.00160, -70.14920),
+('Santiago', 19.45170, -70.69703),
+('Santiago Rodríguez', 19.48000, -71.34000),
+('Santo Domingo', 18.54118, -69.83988),
+('Valverde', 19.58000, -71.07000)";
+
+        await context.Database.ExecuteSqlRawAsync(sql);
+        logger.LogInformation("Provincias seeded (32 provinces).");
+    }
+
+    private static async Task SeedMunicipiosAsync(AppDbContext context, ILogger logger)
+    {
+        var connection = context.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = "SELECT COUNT(*) FROM Municipio";
+        var count = (int)cmd.ExecuteScalar()!;
+        if (count > 0) { logger.LogInformation("Municipios already seeded. Skipping."); return; }
+
+        logger.LogInformation("Seeding Municipios...");
+
+        // Province names here match exactly what was inserted in SeedProvinciasAsync (accented)
+        var sql = @"
+-- Provincias lookup table via MERGE-like INSERT with JOIN
+DECLARE @m TABLE (NombreMunicipio VARCHAR(100), NombreProvincia VARCHAR(100), Latitud DECIMAL(9,6), Longitud DECIMAL(9,6));
+
+INSERT INTO @m (NombreMunicipio, NombreProvincia, Latitud, Longitud) VALUES
+('Distrito Nacional', 'Distrito Nacional', 18.485, -69.93),
+('Santo Domingo Este', 'Santo Domingo', 18.526, -69.802),
+('Santo Domingo Oeste', 'Santo Domingo', 18.463, -69.992),
+('Santo Domingo Norte', 'Santo Domingo', 18.612, -69.912),
+('Boca Chica', 'Santo Domingo', 18.457, -69.615),
+('San Antonio de Guerra', 'Santo Domingo', 18.581, -69.654),
+('Santiago de los Caballeros', 'Santiago', 19.517, -70.697),
+('Tamboril', 'Santiago', 19.488, -70.608),
+('Villa Gonzalez', 'Santiago', 19.45, -70.7),
+('Licey al Medio', 'Santiago', 19.428, -70.619),
+('Bisono', 'Santiago', 19.45, -70.7),
+('Janico', 'Santiago', 19.249, -70.764),
+('Lopez', 'Santiago', 19.428, -70.619),
+('Punal', 'Santiago', 19.398, -70.637),
+('Sabana Iglesia', 'Santiago', 19.342, -70.745),
+('Higuey', 'La Altagracia', 18.708, -68.687),
+('La Otra Banda', 'La Altagracia', 18.65, -70.75),
+('San Rafael del Yuma', 'La Altagracia', 18.373, -68.727),
+('San Pedro de Macorís', 'San Pedro de Macorís', 18.482, -69.26),
+('Consuelo', 'San Pedro de Macorís', 18.594, -69.253),
+('Ramon Santana', 'San Pedro de Macorís', 18.45, -69.3),
+('Quisqueya', 'San Pedro de Macorís', 18.546, -69.423),
+('Guayacanes', 'San Pedro de Macorís', 18.447, -69.433),
+('La Romana', 'La Romana', 18.155, -68.677),
+('Guaymate', 'La Romana', 18.567, -68.951),
+('Villa Hermosa', 'La Romana', 18.451, -69.051),
+('San Felipe de Puerto Plata', 'Puerto Plata', 19.71, -70.692),
+('Sosua', 'Puerto Plata', 19.666, -70.491),
+('Cabarete', 'Puerto Plata', 19.7833, -70.6833),
+('Imbert', 'Puerto Plata', 19.765, -70.872),
+('Altamira', 'Puerto Plata', 19.651, -70.793),
+('Guananico', 'Puerto Plata', 19.697, -70.923),
+('Los Hidalgos', 'Puerto Plata', 19.746, -71.015),
+('Villa Isabela', 'Puerto Plata', 19.809, -71.136),
+('Villa Montellano', 'Puerto Plata', 19.705, -70.577),
+('San Francisco de Macoris', 'Duarte', 19.339, -70.206),
+('Arenoso', 'Duarte', 19.189, -69.77),
+('Castillo', 'Duarte', 19.24, -70.028),
+('Eugenio Maria de Hostos', 'Duarte', 19.141, -70.021),
+('Las Guaranas', 'Duarte', 19.2, -70.232),
+('Pimentel', 'Duarte', 19.216, -70.147),
+('Villa Riva', 'Duarte', 19.152, -69.903),
+('El Seibo', 'El Seibo', 18.741, -69.031),
+('Miches', 'El Seibo', 18.962, -68.981),
+('Comendador', 'Elías Piña', 18.919, -71.696),
+('Banica', 'Elías Piña', 19.018, -71.645),
+('El Llano', 'Elías Piña', 18.816, -71.672),
+('Hondo Valle', 'Elías Piña', 18.711, -71.698),
+('Juan Santiago', 'Elías Piña', 18.729, -71.602),
+('Pedro Santana', 'Elías Piña', 19.173, -71.479),
+('Moca', 'Espaillat', 19.478, -70.505),
+('Gaspar Hernandez', 'Espaillat', 19.614, -70.241),
+('Cayetano Germosen', 'Espaillat', 19.344, -70.472),
+('Jamao al Norte', 'Espaillat', 19.597, -70.467),
+('Hato Mayor del Rey', 'Hato Mayor', 18.709, -69.326),
+('Sabana de la Mar', 'Hato Mayor', 19.008, -69.412),
+('El Valle', 'Hato Mayor', 18.944, -69.385),
+('Salcedo', 'Hermanas Mirabal', 19.447, -70.389),
+('Tenares', 'Hermanas Mirabal', 19.448, -70.307),
+('Villa Tapia', 'Hermanas Mirabal', 19.291, -70.39),
+('Jimani', 'Independencia', 18.501, -71.844),
+('Cristobal', 'Independencia', 18.342, -71.299),
+('Dulverge', 'Independencia', 18.32, -71.621),
+('La Descubierta', 'Independencia', 18.598, -71.756),
+('Postrer Rio', 'Independencia', 18.599, -71.119),
+('Azua de Compostela', 'Azua', 18.459, -70.754),
+('Estebania', 'Azua', 18.594, -70.769),
+('Guayabal', 'Azua', 18.722, -70.768),
+('Las Charcas', 'Azua', 18.72, -70.786),
+('Las Yayas de Viajama', 'Azua', 18.594, -71.034),
+('Padre Las Casas', 'Azua', 18.833, -70.895),
+('Peralta', 'Azua', 18.591, -70.933),
+('Pueblo Viejo', 'Azua', 18.401, -70.769),
+('Sabana Yegua', 'Azua', 18.419, -70.88),
+('Tabara Arriba', 'Azua', 18.484, -70.907),
+('Neiba', 'Bahoruco', 18.419, -71.262),
+('Gulvan', 'Bahoruco', 18.4833, -71.4167),
+('Los Rios', 'Bahoruco', 18.565, -71.582),
+('Tamayo', 'Bahoruco', 18.477, -71.161),
+('Villa Jaragua', 'Bahoruco', 18.544, -71.493),
+('Barahona', 'Barahona', 18.187, -71.139),
+('Cabral', 'Barahona', 18.195, -71.248),
+('El Penon', 'Barahona', 18.294, -71.214),
+('Enriquillo', 'Barahona', 17.979, -71.339),
+('Fundacion', 'Barahona', 18.262, -71.163),
+('Jaquimeyes', 'Barahona', 18.304, -71.123),
+('La Cienaga', 'Barahona', 18.095, -71.142),
+('Paraiso', 'Barahona', 18.017, -71.21),
+('Polo', 'Barahona', 18.121, -71.323),
+('Vicente Noble', 'Barahona', 18.41, -71.088),
+('Las Salinas', 'Barahona', 18.237, -71.337),
+('Dajabon', 'Dajabon', 19.571, -71.622),
+('El Pino', 'Dajabon', 19.406, -71.489),
+('Loma de Cabrera', 'Dajabon', 19.433, -71.618),
+('Partido', 'Dajabon', 19.506, -71.513),
+('Restauracion', 'Dajabon', 19.304, -71.633),
+('San Fernando de Monte Cristi', 'Monte Cristi', 19.76, -71.652),
+('Castanuelas', 'Monte Cristi', 19.737, -71.509),
+('Guayubin', 'Monte Cristi', 19.688, -71.309),
+('Las Matas de Santa Cruz', 'Monte Cristi', 19.626, -71.501),
+('Pepillo Salcedo', 'Monte Cristi', 19.661, -71.655),
+('Villa Vusquez', 'Monte Cristi', 19.809, -71.443),
+('Monte Plata', 'Monte Plata', 18.76, -69.839),
+('Bayaguana', 'Monte Plata', 18.815, -69.592),
+('Peralvillo', 'Monte Plata', 18.857, -70.066),
+('Sabana Grande de Boya', 'Monte Plata', 18.976, -69.775),
+('Yamasa', 'Monte Plata', 18.768, -70.085),
+('Pedernales', 'Pedernales', 18.064, -71.743),
+('Oviedo', 'Pedernales', 17.827, -71.46),
+('Jose Francisco Pena Gomez', 'Pedernales', 17.9, -71.277),
+('Juancho', 'Pedernales', 17.857, -71.543),
+('Banil', 'Peravia', 18.351, -70.37),
+('Nizao', 'Peravia', 18.269, -70.21),
+('San Cristóbal', 'San Cristóbal', 18.415, -70.11),
+('Bajos de Haina', 'San Cristóbal', 18.432, -70.031),
+('Cambita Garabitos', 'San Cristóbal', 18.471, -70.223),
+('Los Cacaos', 'San Cristóbal', 18.61, -70.326),
+('Sabana Grande de Palenque', 'San Cristóbal', 18.258, -70.162),
+('San Gregorio de Nigua', 'San Cristóbal', 18.353, -70.086),
+('Villa Altagracia', 'San Cristóbal', 18.656, -70.179),
+('Yaguate', 'San Cristóbal', 18.34, -70.188),
+('San José de Ocoa', 'San José de Ocoa', 18.557, -70.439),
+('Sabana Larga', 'San José de Ocoa', 19.47, -71.047),
+('Rancho Arriba', 'San José de Ocoa', 18.774, -70.457),
+('San Juan de la Maguana', 'San Juan', 18.897, -71.326),
+('Bohechio', 'San Juan', 18.909, -71.021),
+('El Cercado', 'San Juan', 18.71, -71.512),
+('Juan de Herrera', 'San Juan', 18.876, -71.201),
+('Las Matas de Farfan', 'San Juan', 18.954, -71.493),
+('Vallejuelo', 'San Juan', 18.667, -71.11),
+('Cotuil', 'Sánchez Ramírez', 18.998, -70.131),
+('Fantino', 'Sánchez Ramírez', 19.103, -70.303),
+('Cevicos', 'Sánchez Ramírez', 19.007, -69.976),
+('La Mata', 'Sánchez Ramírez', 19.433, -70.464),
+('San Ignacio de Roland', 'Santiago Rodríguez', 19.369, -71.327),
+('Moncion', 'Santiago Rodríguez', 19.391, -71.081),
+('Villa Los Comicos', 'Santiago Rodríguez', 19.336, -71.439),
+('Mao', 'Valverde', 19.534, -71.042),
+('Esperanza', 'Valverde', 19.63, -70.96),
+('Laguna Salada', 'Valverde', 19.669, -71.101),
+('Nagua', 'María Trinidad Sánchez', 19.35, -70.003),
+('Cabrera', 'María Trinidad Sánchez', 19.58, -69.98),
+('El Factor', 'María Trinidad Sánchez', 19.294, -69.931),
+('Rio San Juan', 'María Trinidad Sánchez', 19.567, -70.089),
+('Bonao', 'Monseñor Nouel', 18.943, -70.441),
+('Mainon', 'Monseñor Nouel', 18.888, -70.27),
+('Piedra Blanca', 'Monseñor Nouel', 18.812, -70.331),
+('La Vega', 'La Vega', 19.208, -70.458),
+('Constanza', 'La Vega', 18.865, -70.691),
+('Jarabacoa', 'La Vega', 19.106, -70.702),
+('Jima Abajo', 'La Vega', 19.118, -70.38),
+('Santa Barbara de Samana', 'Samaná', 19.272, -69.32),
+('Sanchez', 'Samaná', 19.143, -69.678),
+('Las Terrenas', 'Samaná', 19.284, -69.566);
+
+INSERT INTO Municipio (IdProvincia, NombreMunicipio, Latitud, Longitud)
+SELECT p.IdProvincia, m.NombreMunicipio, m.Latitud, m.Longitud
+FROM @m m
+INNER JOIN Provincia p ON p.NombreProvincia = m.NombreProvincia
+WHERE NOT EXISTS (
+    SELECT 1 FROM Municipio mu
+    INNER JOIN Provincia pu ON pu.IdProvincia = mu.IdProvincia
+    WHERE mu.NombreMunicipio = m.NombreMunicipio AND pu.NombreProvincia = m.NombreProvincia
+);";
+
+        await context.Database.ExecuteSqlRawAsync(sql);
+        using var countCmd = connection.CreateCommand();
+        countCmd.CommandText = "SELECT COUNT(*) FROM Municipio";
+        var finalCount = (int)countCmd.ExecuteScalar()!;
+        logger.LogInformation("Municipios: seeded {Count} municipalities.", finalCount);
+    }
+
     private static async Task SeedPlanesSuscripcionAsync(AppDbContext context, ILogger logger)
     {
         logger.LogInformation("Sincronizando planes de suscripción (Upsert dinámico)...");
@@ -379,7 +621,7 @@ public static class AppDbContextSeeder
 
             // Profesional
             PlanSuscripcion.Create(
-                id: Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"), nombrePlan: "Profesional", precio: 3500.00m,
+                id: Guid.Parse("66AFDABF-632E-434C-86F4-6F9060D2656F"), nombrePlan: "Profesional", precio: 60.00m,
                 maxConsultas: 25, maxProyectos: 5, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 0, maxAlmacenamientoMb: 200,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: false, validacionLoteDisponible: false,
@@ -388,7 +630,7 @@ public static class AppDbContextSeeder
 
             // Empresa
             PlanSuscripcion.Create(
-                id: Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"), nombrePlan: "Empresa", precio: 10000.00m,
+                id: Guid.Parse("41037268-58B6-40A3-A8AE-C18EFE00C7D3"), nombrePlan: "Empresa", precio: 170.00m,
                 maxConsultas: 100, maxProyectos: 10, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 5, maxAlmacenamientoMb: 1024,
                 alertasTiempoRealDisponible: false, modeloLmDisponible: true, validacionLoteDisponible: false,
@@ -397,7 +639,7 @@ public static class AppDbContextSeeder
 
             // Corporativo
             PlanSuscripcion.Create(
-                id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Corporativo", precio: 30000.00m,
+                id: Guid.Parse("F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4"), nombrePlan: "Corporativo", precio: 500.00m,
                 maxConsultas: -1, maxProyectos: 50, presentacionPublica: true,
                 qrIncluido: true, maxUsuariosSecundarios: 30, maxAlmacenamientoMb: 10240,
                 alertasTiempoRealDisponible: true, modeloLmDisponible: true, validacionLoteDisponible: true,
@@ -715,7 +957,7 @@ public static class AppDbContextSeeder
         string nombre,
         string ubicacionTexto,
         Guid usuarioCreadorId,
-        ProjectCategory categoria,
+        int categoria,
         string? datosDesarrollador,
         string? designacionCatastral,
         ProjectStatus status)

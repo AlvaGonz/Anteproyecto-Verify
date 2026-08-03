@@ -34,7 +34,9 @@ export const useProjectStatusBar = (projectId: string) => {
     onSuccess: () => {
       // Invalidate project and eligibility queries
       qc.invalidateQueries({ queryKey: ["projects"] });
-      qc.invalidateQueries({ queryKey });
+      qc.invalidateQueries({ queryKey: ["projects", projectId] }); // ponytail: detail may depend on status
+      qc.invalidateQueries({ queryKey }); // statusEligibility
+      qc.invalidateQueries({ queryKey: ["audit", projectId] }); // ponytail: audit may record transition
       addToast("Estado actualizado exitosamente", "success");
     },
     onError: () => {

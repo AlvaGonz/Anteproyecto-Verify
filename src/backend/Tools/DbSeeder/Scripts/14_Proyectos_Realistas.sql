@@ -5,7 +5,6 @@
 -- Creates realistic projects for 4 test accounts
 -- At least 1/3 per user are Published (EstadoId = PUBLICADO)
 -- EstadoId is looked up dynamically from ProyectosEstados by CodigoUnico
--- Consultor also gets FremiunProyectos_Log entries
 -- ============================================================
 SET NOCOUNT ON;
 SET QUOTED_IDENTIFIER ON;
@@ -37,7 +36,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -52,20 +51,18 @@ BEGIN
         22000000,
         'BIENVENIDO SOLIS MORETA',
         '01200264719',
-        1,
+        2,
         '060379417391:0011',
         '1802232199',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         1,
         0,
         0,
-        '2026-07-16T23:31:53'
+        '2026-07-29T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('3946C9A7-D681-0B83-76EA-CFB5920258BF', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), '2026-07-16T23:31:53', 'Creacion de proyecto: Villa Los Cacicazgos', '2026-07-16T23:31:53', '2026-07-16T23:31:53');
-    INSERT INTO FremiunProyectos_Log (IdProyectoLog, IdProyecto, IdUsuario, FechaAcceso)
-    VALUES ('4E3FFA3B-2B8B-0F2A-690F-FE25348BC12A', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), '2026-07-16T23:31:53');
+    VALUES ('3946C9A7-D681-0B83-76EA-CFB5920258BF', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), '2026-07-29T04:03:16', 'Creacion de proyecto: Villa Los Cacicazgos', '2026-07-29T04:03:16', '2026-07-29T04:03:16');
 END
 
 -- ============================================================
@@ -77,7 +74,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -99,11 +96,11 @@ BEGIN
         1,
         0,
         0,
-        '2026-03-21T23:31:53'
+        '2026-04-03T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A56257B0-9710-F68A-F3A0-543157BE3FD8', '820FA5F2-2BCC-A04D-5B13-FC63ABBC0048', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-03-21T23:31:53', 'Creacion de proyecto: Residencial Sosua Resort', '2026-03-21T23:31:53', '2026-03-21T23:31:53');
+    VALUES ('A56257B0-9710-F68A-F3A0-543157BE3FD8', '820FA5F2-2BCC-A04D-5B13-FC63ABBC0048', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-04-03T04:03:16', 'Creacion de proyecto: Residencial Sosua Resort', '2026-04-03T04:03:16', '2026-04-03T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-19606')
@@ -112,7 +109,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -127,18 +124,18 @@ BEGIN
         8700000,
         'ANDRES AVELINO SARANTE CASTILLO',
         '03101914889',
-        4,
+        14,
         '030035734518:0045',
         '1352226002',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         2,
         0,
         0,
-        '2026-06-12T23:31:53'
+        '2026-06-25T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('4F608335-FD32-53B2-2476-A3C2322E5269', 'CF06F7ED-8C57-E720-8F59-BA555239D6D5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-06-12T23:31:53', 'Creacion de proyecto: Don Bosco Oeste', '2026-06-12T23:31:53', '2026-06-12T23:31:53');
+    VALUES ('4F608335-FD32-53B2-2476-A3C2322E5269', 'CF06F7ED-8C57-E720-8F59-BA555239D6D5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-06-25T04:03:16', 'Creacion de proyecto: Don Bosco Oeste', '2026-06-25T04:03:16', '2026-06-25T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-44863')
@@ -147,7 +144,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -162,18 +159,18 @@ BEGIN
         7000000,
         'SOLUCIONES MEDICAS PARA LA SALUD S M S S SRL',
         '131151507',
-        3,
+        10,
         '240103411399:0007',
         '1448954352',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         1,
         0,
-        '2026-07-18T23:31:53'
+        '2026-07-31T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('BE28DAE2-626E-68E7-FB2D-E5B5C90BFAC2', '3B24D85B-7D5E-445A-702D-3B66D73C4C1B', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-07-18T23:31:53', 'Creacion de proyecto: Portales Bayahibe', '2026-07-18T23:31:53', '2026-07-18T23:31:53');
+    VALUES ('BE28DAE2-626E-68E7-FB2D-E5B5C90BFAC2', '3B24D85B-7D5E-445A-702D-3B66D73C4C1B', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-07-31T04:03:16', 'Creacion de proyecto: Portales Bayahibe', '2026-07-31T04:03:16', '2026-07-31T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-41495')
@@ -182,7 +179,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -197,18 +194,18 @@ BEGIN
         9800000,
         'MARKUS BARTH',
         '00118055250',
-        1,
+        3,
         '320066496804:0005',
         '1052786567',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         2,
         0,
-        '2026-05-03T23:31:53'
+        '2026-05-16T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('ED9EDE68-E6A2-4F73-B50A-7691A04B8762', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-05-03T23:31:53', 'Creacion de proyecto: Edificio Cumayasa Empresarial', '2026-05-03T23:31:53', '2026-05-03T23:31:53');
+    VALUES ('ED9EDE68-E6A2-4F73-B50A-7691A04B8762', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-05-16T04:03:16', 'Creacion de proyecto: Edificio Cumayasa Empresarial', '2026-05-16T04:03:16', '2026-05-16T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-10736')
@@ -217,7 +214,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -229,21 +226,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'),
         'El Cercado, San Juan',
         '18.796781,-71.232032',
-        6100000,
+        4200000,
         'CRISTIAN RAFAEL GONZALEZ CABRERA',
         '07200110539',
-        99,
+        5,
         '140247791514:0074',
         '1629351677',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
+        2,
         0,
-        0,
-        '2026-03-24T23:31:53'
+        '2026-07-05T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('ADEA68B3-0DE7-75D8-2E3F-2A9D86DFFCC4', '45D831DA-7D05-D478-43C5-2A434E80CA34', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-03-24T23:31:53', 'Creacion de proyecto: Paseo Arroyo Hondo Suites', '2026-03-24T23:31:53', '2026-03-24T23:31:53');
+    VALUES ('86DFFCC3-C50A-F8DC-8BBC-731821A718A9', '45D831DA-7D05-D478-43C5-2A434E80CA34', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-07-05T04:03:16', 'Creacion de proyecto: Paseo Arroyo Hondo Suites', '2026-07-05T04:03:16', '2026-07-05T04:03:16');
 END
 
 -- ============================================================
@@ -255,7 +252,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -270,18 +267,18 @@ BEGIN
         5200000,
         'HERACLES 2003 SRL',
         '101897449',
-        3,
+        9,
         '130470982929:0007',
         '1616701270',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         1,
         0,
         0,
-        '2026-03-21T23:31:53'
+        '2026-04-03T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('50B67442-D26D-09C1-1CF6-C99FAC348FF1', '0AA5C477-C613-EB19-8ED2-6F4705A2F44B', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-03-21T23:31:53', 'Creacion de proyecto: Mirador Los Prados Oeste', '2026-03-21T23:31:53', '2026-03-21T23:31:53');
+    VALUES ('50B67442-D26D-09C1-1CF6-C99FAC348FF1', '0AA5C477-C613-EB19-8ED2-6F4705A2F44B', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-04-03T04:03:16', 'Creacion de proyecto: Mirador Los Prados Oeste', '2026-04-03T04:03:16', '2026-04-03T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-71297')
@@ -290,7 +287,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -305,18 +302,18 @@ BEGIN
         11000000,
         'GRUPO LEHILSA DISTRIBUIDORES SRL',
         '132053109',
-        2,
+        8,
         '020395338679:0051',
         '1355024502',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         1,
         0,
         0,
-        '2026-06-24T23:31:53'
+        '2026-07-07T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('CD4286FD-C91D-1DA4-9907-B0D009CFB87C', '7762A0B9-0A6C-B16D-68DA-32714C92AC60', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-06-24T23:31:53', 'Creacion de proyecto: Edificio Rio San Juan Suites', '2026-06-24T23:31:53', '2026-06-24T23:31:53');
+    VALUES ('CD4286FD-C91D-1DA4-9907-B0D009CFB87C', '7762A0B9-0A6C-B16D-68DA-32714C92AC60', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-07T04:03:16', 'Creacion de proyecto: Edificio Rio San Juan Suites', '2026-07-07T04:03:16', '2026-07-07T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-5341')
@@ -325,7 +322,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -340,18 +337,18 @@ BEGIN
         14000000,
         'RALENA FONDEUR COMERCIAL SRL',
         '133514321',
-        3,
+        11,
         '140100516900:0054',
         '1662675522',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         3,
         0,
-        '2026-07-03T23:31:53'
+        '2026-07-16T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('82174921-C2E4-358B-6CD3-E44FDEF4789D', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-03T23:31:53', 'Creacion de proyecto: Viviendas Casa de Campo Park', '2026-07-03T23:31:53', '2026-07-03T23:31:53');
+    VALUES ('82174921-C2E4-358B-6CD3-E44FDEF4789D', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-16T04:03:16', 'Creacion de proyecto: Viviendas Casa de Campo Park', '2026-07-16T04:03:16', '2026-07-16T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-80667')
@@ -360,7 +357,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -375,18 +372,18 @@ BEGIN
         4500000,
         'ANTONIO ROSARIO VALERIO',
         '00102475183',
-        4,
+        16,
         '120360479870:0038',
         '1824694470',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         1,
         3,
         0,
-        '2026-02-20T23:31:53'
+        '2026-03-05T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('D7CBBA99-8393-BA49-B897-A461AF71F900', 'E2C3FE42-54FB-F74F-4DC3-2B3D049AFD50', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-20T23:31:53', 'Creacion de proyecto: Jardines Reparto del Este', '2026-02-20T23:31:53', '2026-02-20T23:31:53');
+    VALUES ('D7CBBA99-8393-BA49-B897-A461AF71F900', 'E2C3FE42-54FB-F74F-4DC3-2B3D049AFD50', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-03-05T04:03:16', 'Creacion de proyecto: Jardines Reparto del Este', '2026-03-05T04:03:16', '2026-03-05T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-39483')
@@ -395,7 +392,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -410,18 +407,18 @@ BEGIN
         2800000,
         'IGLESIA CASA DE RESTAURACION Y AVIVAMIENTO',
         '430098809',
-        2,
+        6,
         '160155694752:0095',
         '1194727373',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         2,
         0,
         0,
-        '2026-07-07T23:31:53'
+        '2026-07-20T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('B22111D3-C4F3-6B53-B615-DB86A3CC7AEE', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-07T23:31:53', 'Creacion de proyecto: Portales Naco Beach', '2026-07-07T23:31:53', '2026-07-07T23:31:53');
+    VALUES ('B22111D3-C4F3-6B53-B615-DB86A3CC7AEE', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-20T04:03:16', 'Creacion de proyecto: Portales Naco Beach', '2026-07-20T04:03:16', '2026-07-20T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-23399')
@@ -430,7 +427,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -442,21 +439,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'),
         'San Fernando de Monte Cristi, Monte Cristi',
         '19.865418,-71.655535',
-        2800000,
+        16500000,
         'H & H ASOCIADOS E I R L',
         '130594971',
-        99,
+        13,
         '270032279294:0006',
         '1329747335',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'),
+        0,
         2,
         0,
-        0,
-        '2026-02-10T23:31:53'
+        '2026-02-23T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('55748755-E3FD-32D4-96E2-8EE2F4C50087', 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-10T23:31:53', 'Creacion de proyecto: Complejo Quisqueya del Sur', '2026-02-10T23:31:53', '2026-02-10T23:31:53');
+    VALUES ('55748755-E3FD-32D4-96E2-8EE2F4C50087', 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-23T04:03:16', 'Creacion de proyecto: Complejo Quisqueya del Sur', '2026-02-23T04:03:16', '2026-02-23T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-67610')
@@ -465,7 +462,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -487,11 +484,11 @@ BEGIN
         0,
         1,
         0,
-        '2026-07-03T23:31:53'
+        '2026-07-16T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('060A07A9-FE07-6CB0-816B-7F49F4A73009', '23FAC32A-7DCA-F4FF-ABB8-D9DB4C16B966', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-03T23:31:53', 'Creacion de proyecto: Plaza Altos de Chavon', '2026-07-03T23:31:53', '2026-07-03T23:31:53');
+    VALUES ('060A07A9-FE07-6CB0-816B-7F49F4A73009', '23FAC32A-7DCA-F4FF-ABB8-D9DB4C16B966', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-16T04:03:16', 'Creacion de proyecto: Plaza Altos de Chavon', '2026-07-16T04:03:16', '2026-07-16T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-6182')
@@ -500,7 +497,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -515,18 +512,18 @@ BEGIN
         7000000,
         'DISTRITO 06-07 GASPAR HERNANDEZ',
         '430152161',
-        2,
+        7,
         '090169910143:0009',
         '1170695513',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         2,
         1,
         0,
-        '2026-06-10T23:31:53'
+        '2026-06-23T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('5573BAE9-F050-1F1B-49D5-199CFAE4A279', '159C5866-E5F7-6E21-483B-37689050BEA1', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-06-10T23:31:53', 'Creacion de proyecto: Edificio Playa Dorada Turistico', '2026-06-10T23:31:53', '2026-06-10T23:31:53');
+    VALUES ('5573BAE9-F050-1F1B-49D5-199CFAE4A279', '159C5866-E5F7-6E21-483B-37689050BEA1', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-06-23T04:03:16', 'Creacion de proyecto: Edificio Playa Dorada Turistico', '2026-06-23T04:03:16', '2026-06-23T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-94259')
@@ -535,7 +532,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -550,18 +547,18 @@ BEGIN
         8700000,
         'FLEURY ALFONZO RUIZ AGRAMONTE',
         '00500451398',
-        3,
+        10,
         '320134837766:0054',
         '1961716920',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         1,
         0,
-        '2026-02-09T23:31:53'
+        '2026-02-22T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('91B72BA8-0A77-1875-2A9E-E23DFC752631', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-09T23:31:53', 'Creacion de proyecto: Torre Los Restauradores Metropolitano', '2026-02-09T23:31:53', '2026-02-09T23:31:53');
+    VALUES ('91B72BA8-0A77-1875-2A9E-E23DFC752631', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-22T04:03:16', 'Creacion de proyecto: Torre Los Restauradores Metropolitano', '2026-02-22T04:03:16', '2026-02-22T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-2894')
@@ -570,7 +567,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -585,18 +582,18 @@ BEGIN
         3800000,
         'SUPLIDORA J D S A',
         '101551895',
-        3,
+        9,
         '080090716362:0045',
         '1763501099',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         1,
         0,
-        '2026-07-07T23:31:53'
+        '2026-07-20T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('82007172-ED8A-14A5-6B67-B0686EC84D2F', '6DE91B1C-BDC3-2A70-3676-1292D1C1CF57', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-07T23:31:53', 'Creacion de proyecto: Residencial Jarabacoa Norte', '2026-07-07T23:31:53', '2026-07-07T23:31:53');
+    VALUES ('82007172-ED8A-14A5-6B67-B0686EC84D2F', '6DE91B1C-BDC3-2A70-3676-1292D1C1CF57', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-20T04:03:16', 'Creacion de proyecto: Residencial Jarabacoa Norte', '2026-07-20T04:03:16', '2026-07-20T04:03:16');
 END
 
 -- ============================================================
@@ -608,7 +605,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -623,18 +620,18 @@ BEGIN
         50000000,
         'SOCIAL BLUE INVESTMENT EIRL',
         '133051796',
-        1,
+        4,
         '150218439029:0099',
         '1795357394',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         0,
         0,
-        '2026-07-05T23:31:53'
+        '2026-07-18T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('49225228-AEB6-0C1F-856F-2D05F36A2E0C', '3EE73396-E7AB-6326-CE77-07B37E6C2209', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-05T23:31:53', 'Creacion de proyecto: Complejo Bavaro Beach', '2026-07-05T23:31:53', '2026-07-05T23:31:53');
+    VALUES ('49225228-AEB6-0C1F-856F-2D05F36A2E0C', '3EE73396-E7AB-6326-CE77-07B37E6C2209', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-18T04:03:16', 'Creacion de proyecto: Complejo Bavaro Beach', '2026-07-18T04:03:16', '2026-07-18T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-89350')
@@ -643,7 +640,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -655,21 +652,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Santo Domingo de Guzman, Distrito Nacional',
         '18.494984,-69.922413',
-        1800000,
+        16500000,
         'RONNY BAUTISTA SANDOVAL POLANCO',
         '00106950348',
-        99,
+        3,
         '010255477026:0009',
         '1241851074',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
-        0,
+        1,
         1,
         0,
-        '2026-01-30T23:31:53'
+        '2026-02-12T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('B498D443-8C58-A873-A167-DD681DC43353', 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-01-30T23:31:53', 'Creacion de proyecto: Gazcue Metropolitano', '2026-01-30T23:31:53', '2026-01-30T23:31:53');
+    VALUES ('B498D443-8C58-A873-A167-DD681DC43353', 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-12T04:03:16', 'Creacion de proyecto: Gazcue Metropolitano', '2026-02-12T04:03:16', '2026-02-12T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-60810')
@@ -678,7 +675,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -693,18 +690,18 @@ BEGIN
         2500000,
         'INVERSIONES ARAUNA SRL',
         '124002818',
-        2,
+        8,
         '070477455723:0025',
         '1807559331',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         0,
         0,
-        '2026-05-02T23:31:53'
+        '2026-05-15T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('FF3A179D-46A9-FF64-EB81-0624A157EAED', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-02T23:31:53', 'Creacion de proyecto: Terrazas Sosua', '2026-05-02T23:31:53', '2026-05-02T23:31:53');
+    VALUES ('FF3A179D-46A9-FF64-EB81-0624A157EAED', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-15T04:03:16', 'Creacion de proyecto: Terrazas Sosua', '2026-05-15T04:03:16', '2026-05-15T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-35835')
@@ -713,7 +710,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -728,18 +725,18 @@ BEGIN
         4500000,
         'MARINO EMILIO CACERES TRONCOSO',
         '00100676881',
-        1,
+        4,
         '150124173734:0089',
         '1288704335',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         0,
         0,
-        '2026-03-20T23:31:53'
+        '2026-04-02T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('66B91EBA-5021-8B83-0A34-5C31D19A883E', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-20T23:31:53', 'Creacion de proyecto: Viviendas Los Corales', '2026-03-20T23:31:53', '2026-03-20T23:31:53');
+    VALUES ('66B91EBA-5021-8B83-0A34-5C31D19A883E', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-02T04:03:16', 'Creacion de proyecto: Viviendas Los Corales', '2026-04-02T04:03:16', '2026-04-02T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-89892')
@@ -748,7 +745,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -763,18 +760,18 @@ BEGIN
         5200000,
         'TDM ENGINEERING S A',
         '130479895',
-        1,
+        4,
         '260103806941:0027',
         '1426800674',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         0,
         0,
-        '2026-07-05T23:31:53'
+        '2026-07-18T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('DA48AF17-A992-9FED-B18F-C8138A7E65A8', 'B3EA78F7-C737-902D-6E4C-636DEE29E81A', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-05T23:31:53', 'Creacion de proyecto: Centro Arroyo Hondo', '2026-07-05T23:31:53', '2026-07-05T23:31:53');
+    VALUES ('DA48AF17-A992-9FED-B18F-C8138A7E65A8', 'B3EA78F7-C737-902D-6E4C-636DEE29E81A', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-18T04:03:16', 'Creacion de proyecto: Centro Arroyo Hondo', '2026-07-18T04:03:16', '2026-07-18T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-60151')
@@ -783,7 +780,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -798,18 +795,18 @@ BEGIN
         22000000,
         'FUNDACION CIED',
         '430437052',
-        1,
+        2,
         '250210307709:0026',
         '1726601449',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         1,
         0,
         0,
-        '2026-02-08T23:31:53'
+        '2026-02-21T04:03:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('53A7CFA0-66FB-1D88-DE6C-3A9C31361660', '6D80D558-0E60-DF92-F823-1D9965E382CB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-08T23:31:53', 'Creacion de proyecto: Palacio Altos de Chavon Exclusivo', '2026-02-08T23:31:53', '2026-02-08T23:31:53');
+    VALUES ('53A7CFA0-66FB-1D88-DE6C-3A9C31361660', '6D80D558-0E60-DF92-F823-1D9965E382CB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-21T04:03:16', 'Creacion de proyecto: Palacio Altos de Chavon Exclusivo', '2026-02-21T04:03:16', '2026-02-21T04:03:16');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-27581')
@@ -818,7 +815,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -833,18 +830,18 @@ BEGIN
         2800000,
         'IDEAL DAY SRL',
         '131136621',
-        3,
+        10,
         '020147195778:0083',
         '1723638965',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         2,
         0,
-        '2026-06-30T23:31:53'
+        '2026-07-13T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A78FD78D-535C-6B83-A65D-44237157D32D', '51E0663E-6B7B-0930-EDBF-01163974C9D3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-30T23:31:53', 'Creacion de proyecto: Viviendas La Julia Metropolitano', '2026-06-30T23:31:53', '2026-06-30T23:31:53');
+    VALUES ('A78FD78D-535C-6B83-A65D-44237157D32D', '51E0663E-6B7B-0930-EDBF-01163974C9D3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-13T04:03:17', 'Creacion de proyecto: Viviendas La Julia Metropolitano', '2026-07-13T04:03:17', '2026-07-13T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-46345')
@@ -853,7 +850,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -865,21 +862,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'El Cercado, San Juan',
         '18.81814,-71.213103',
-        14000000,
+        8700000,
         'ALFREDO HORACIO YEGER TORIBIO',
         '40220070078',
-        99,
+        16,
         '140363604244:0061',
         '1020041396',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'),
+        0,
         2,
         0,
-        0,
-        '2026-05-09T23:31:53'
+        '2026-04-05T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('9BE77A59-092F-5123-F415-BD357B8C46FA', '06607483-93B5-F920-1BBF-5B9C60A2E073', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-09T23:31:53', 'Creacion de proyecto: Marina Sosua Exclusivo', '2026-05-09T23:31:53', '2026-05-09T23:31:53');
+    VALUES ('B35E6907-1880-5651-0999-AD79222C34B1', '06607483-93B5-F920-1BBF-5B9C60A2E073', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-05T04:03:17', 'Creacion de proyecto: Marina Sosua Exclusivo', '2026-04-05T04:03:17', '2026-04-05T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-80509')
@@ -888,7 +885,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -900,21 +897,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Bánica, Elias Pina',
         '18.89674,-71.696042',
-        7500000,
+        5200000,
         'UPUAN SRL',
         '132988191',
-        99,
+        11,
         '220097510938:0069',
         '1675533291',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
-        1,
         0,
         0,
-        '2026-04-20T23:31:53'
+        0,
+        '2026-05-02T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('65F72336-474D-7585-5BD5-20B9BB1242B9', 'AA140462-D7C7-94CF-88D5-3D3DC8041584', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-20T23:31:53', 'Creacion de proyecto: Edificio Cabarete Suites', '2026-04-20T23:31:53', '2026-04-20T23:31:53');
+    VALUES ('D2D048BD-6C92-E8CE-65C4-74ADB7A4A5B8', 'AA140462-D7C7-94CF-88D5-3D3DC8041584', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-02T04:03:17', 'Creacion de proyecto: Edificio Cabarete Suites', '2026-05-02T04:03:17', '2026-05-02T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-83901')
@@ -923,7 +920,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -938,18 +935,18 @@ BEGIN
         4500000,
         'ULLOA AUTO IMPORT C POR A',
         '130187053',
-        4,
+        16,
         '110454809981:0069',
         '1017973176',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         2,
         3,
         0,
-        '2026-02-13T23:31:53'
+        '2026-02-26T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('2CA9BBEB-EAE3-BCBE-D047-A3E34FA9B0B4', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-13T23:31:53', 'Creacion de proyecto: Edificio La Julia Hills', '2026-02-13T23:31:53', '2026-02-13T23:31:53');
+    VALUES ('2CA9BBEB-EAE3-BCBE-D047-A3E34FA9B0B4', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-26T04:03:17', 'Creacion de proyecto: Edificio La Julia Hills', '2026-02-26T04:03:17', '2026-02-26T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-66087')
@@ -958,7 +955,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -973,18 +970,18 @@ BEGIN
         2800000,
         'MARIO ALEXIS CRUCETA MENA',
         '40223865011',
-        3,
+        9,
         '320407536607:0008',
         '1747974716',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         0,
         2,
         0,
-        '2026-06-27T23:31:53'
+        '2026-07-10T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('666C326C-5FCF-379B-87BE-B4F7B9333186', '5CCB078F-F02A-002A-9B64-107CB05C0847', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-27T23:31:53', 'Creacion de proyecto: Palacio Reparto del Este Corporativo', '2026-06-27T23:31:53', '2026-06-27T23:31:53');
+    VALUES ('666C326C-5FCF-379B-87BE-B4F7B9333186', '5CCB078F-F02A-002A-9B64-107CB05C0847', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-10T04:03:17', 'Creacion de proyecto: Palacio Reparto del Este Corporativo', '2026-07-10T04:03:17', '2026-07-10T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-37006')
@@ -993,7 +990,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1008,18 +1005,18 @@ BEGIN
         22000000,
         'GRUPO BORNHEIM SRL',
         '131109802',
-        3,
+        9,
         '270239168655:0046',
         '1108437353',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         0,
         0,
-        '2026-05-22T23:31:53'
+        '2026-06-04T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('65E0D2B1-0291-111B-5921-B9201DCA40C2', 'D4A4668C-276C-CE23-BACE-7C1EFCCCE0CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-22T23:31:53', 'Creacion de proyecto: Residencial Zona Universitaria', '2026-05-22T23:31:53', '2026-05-22T23:31:53');
+    VALUES ('65E0D2B1-0291-111B-5921-B9201DCA40C2', 'D4A4668C-276C-CE23-BACE-7C1EFCCCE0CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-04T04:03:17', 'Creacion de proyecto: Residencial Zona Universitaria', '2026-06-04T04:03:17', '2026-06-04T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-35384')
@@ -1028,7 +1025,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1043,18 +1040,18 @@ BEGIN
         22000000,
         'MILENNE AUTO IMPORT SRL',
         '131637622',
-        2,
+        7,
         '290376706049:0076',
         '1490708650',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         2,
         2,
         0,
-        '2026-02-13T23:31:53'
+        '2026-02-26T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('71953545-1CEF-2C3A-E547-31B6B9D6BF42', '7D342462-B5E5-68F8-6905-89EF3F3A46C0', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-13T23:31:53', 'Creacion de proyecto: Sosua Resort', '2026-02-13T23:31:53', '2026-02-13T23:31:53');
+    VALUES ('71953545-1CEF-2C3A-E547-31B6B9D6BF42', '7D342462-B5E5-68F8-6905-89EF3F3A46C0', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-26T04:03:17', 'Creacion de proyecto: Sosua Resort', '2026-02-26T04:03:17', '2026-02-26T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-47426')
@@ -1063,7 +1060,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1078,18 +1075,18 @@ BEGIN
         12000000,
         'FIDEICOMISO INMOBILIARIO DE VIVIENDAS DE BAJO COSTO RESIDENCIAL P',
         '131453775',
-        2,
+        7,
         '050221307664:0018',
         '1718541326',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         1,
         0,
         0,
-        '2026-06-01T23:31:53'
+        '2026-06-14T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('FD1E3AA6-B8B2-ACEF-3635-2802FF8F2034', '00251EE9-977E-FCE2-DFC3-7BC63A9F6D58', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-01T23:31:53', 'Creacion de proyecto: Mirador Reparto del Este Central', '2026-06-01T23:31:53', '2026-06-01T23:31:53');
+    VALUES ('FD1E3AA6-B8B2-ACEF-3635-2802FF8F2034', '00251EE9-977E-FCE2-DFC3-7BC63A9F6D58', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-14T04:03:17', 'Creacion de proyecto: Mirador Reparto del Este Central', '2026-06-14T04:03:17', '2026-06-14T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-87942')
@@ -1098,7 +1095,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1113,18 +1110,18 @@ BEGIN
         12000000,
         'INVERSIONES KITE SURF SRL',
         '105087847',
-        2,
+        8,
         '260248648345:0041',
         '1221106208',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'),
         0,
         1,
         0,
-        '2026-03-28T23:31:53'
+        '2026-04-10T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('377236D2-3812-ABC2-344E-235A8D1F5CF7', '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-28T23:31:53', 'Creacion de proyecto: Edificio San Miguel Beach', '2026-03-28T23:31:53', '2026-03-28T23:31:53');
+    VALUES ('377236D2-3812-ABC2-344E-235A8D1F5CF7', '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-10T04:03:17', 'Creacion de proyecto: Edificio San Miguel Beach', '2026-04-10T04:03:17', '2026-04-10T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-3838')
@@ -1133,7 +1130,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1148,18 +1145,18 @@ BEGIN
         9800000,
         'LILIANA MARIA ROJAS',
         '00100693258',
-        2,
+        8,
         '310334622352:0044',
         '1395161271',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         1,
         0,
-        '2026-03-10T23:31:53'
+        '2026-03-23T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('106A5551-78EB-5A6F-2356-6478A4F92B6C', '2B2368E4-DE49-3212-D157-ADCC574B5127', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-10T23:31:53', 'Creacion de proyecto: La Julia del Sur', '2026-03-10T23:31:53', '2026-03-10T23:31:53');
+    VALUES ('106A5551-78EB-5A6F-2356-6478A4F92B6C', '2B2368E4-DE49-3212-D157-ADCC574B5127', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-23T04:03:17', 'Creacion de proyecto: La Julia del Sur', '2026-03-23T04:03:17', '2026-03-23T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-65884')
@@ -1168,7 +1165,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1183,18 +1180,18 @@ BEGIN
         1800000,
         'JUAN PABLO CURY VASQUEZ',
         '01800054437',
-        1,
+        4,
         '270251296188:0024',
         '1366138963',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         2,
         0,
-        '2026-06-04T23:31:53'
+        '2026-06-17T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('1DE959A9-4A46-1282-5A44-39C1B2C9AAAE', '266858A4-92B8-4843-4D4C-D89916497AF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-04T23:31:53', 'Creacion de proyecto: Las Terrenas Corporativo', '2026-06-04T23:31:53', '2026-06-04T23:31:53');
+    VALUES ('1DE959A9-4A46-1282-5A44-39C1B2C9AAAE', '266858A4-92B8-4843-4D4C-D89916497AF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-17T04:03:17', 'Creacion de proyecto: Las Terrenas Corporativo', '2026-06-17T04:03:17', '2026-06-17T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-70830')
@@ -1203,7 +1200,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1218,18 +1215,18 @@ BEGIN
         6100000,
         'BELLA VERONA COAST EIRL',
         '130536147',
-        3,
+        12,
         '320355173583:0011',
         '1761074170',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'),
         0,
         1,
         0,
-        '2026-06-10T23:31:53'
+        '2026-06-23T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('1F6B263D-D827-1EBA-DCA5-0740B1BC199C', 'E026118E-6F23-9395-686B-7CC56918AC80', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-10T23:31:53', 'Creacion de proyecto: Palacio El Cacique Suites', '2026-06-10T23:31:53', '2026-06-10T23:31:53');
+    VALUES ('1F6B263D-D827-1EBA-DCA5-0740B1BC199C', 'E026118E-6F23-9395-686B-7CC56918AC80', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-23T04:03:17', 'Creacion de proyecto: Palacio El Cacique Suites', '2026-06-23T04:03:17', '2026-06-23T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-14178')
@@ -1238,7 +1235,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1253,18 +1250,18 @@ BEGIN
         3800000,
         'NOHELY MOJICA BAUTISTA',
         '22500376730',
-        2,
+        8,
         '310119624783:0067',
         '1441283961',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         2,
         0,
         0,
-        '2026-03-12T23:31:54'
+        '2026-03-25T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('C2CF69D1-318B-9C48-0B5C-6E11E0352488', 'F227D859-BE99-F2B7-DAF2-80A3C6777DF8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-12T23:31:54', 'Creacion de proyecto: Paseo Quisqueya', '2026-03-12T23:31:54', '2026-03-12T23:31:54');
+    VALUES ('C2CF69D1-318B-9C48-0B5C-6E11E0352488', 'F227D859-BE99-F2B7-DAF2-80A3C6777DF8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-25T04:03:17', 'Creacion de proyecto: Paseo Quisqueya', '2026-03-25T04:03:17', '2026-03-25T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-22195')
@@ -1273,7 +1270,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1288,18 +1285,18 @@ BEGIN
         4200000,
         'RUBBER JIMENEZ MATEO',
         '22900091053',
-        1,
+        4,
         '230252463271:0068',
         '1883860501',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         2,
         1,
         0,
-        '2026-02-08T23:31:54'
+        '2026-02-21T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('10CFD600-B0BA-B0F8-0C38-3FE3C5A498DF', '946FE30F-9277-FA24-6C67-23E8E5A032C6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-08T23:31:54', 'Creacion de proyecto: Portales Las Terrenas', '2026-02-08T23:31:54', '2026-02-08T23:31:54');
+    VALUES ('10CFD600-B0BA-B0F8-0C38-3FE3C5A498DF', '946FE30F-9277-FA24-6C67-23E8E5A032C6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-21T04:03:17', 'Creacion de proyecto: Portales Las Terrenas', '2026-02-21T04:03:17', '2026-02-21T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-28160')
@@ -1308,7 +1305,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1323,18 +1320,18 @@ BEGIN
         3800000,
         'FRANCISCO ALBERTO PEÑA GUERRERO',
         '00110995669',
-        4,
+        15,
         '200267604206:0055',
         '1301110254',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         1,
         2,
         0,
-        '2026-04-24T23:31:54'
+        '2026-05-07T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('3F76032B-8E79-B92C-3FD3-5195ABBF5441', '5876179F-9542-7C2D-3544-A10FE7DE27FD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-24T23:31:54', 'Creacion de proyecto: Complejo Zona Universitaria Exclusivo', '2026-04-24T23:31:54', '2026-04-24T23:31:54');
+    VALUES ('3F76032B-8E79-B92C-3FD3-5195ABBF5441', '5876179F-9542-7C2D-3544-A10FE7DE27FD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-07T04:03:17', 'Creacion de proyecto: Complejo Zona Universitaria Exclusivo', '2026-05-07T04:03:17', '2026-05-07T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-72666')
@@ -1343,7 +1340,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1358,18 +1355,18 @@ BEGIN
         9800000,
         'JOSE RICARDO VICIOSO REYNOSO',
         '00116539545',
-        4,
+        15,
         '130090102766:0081',
         '1674455980',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         0,
         0,
         0,
-        '2026-05-18T23:31:54'
+        '2026-05-31T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('2526B3BC-358A-831D-0D4E-6D644142DA84', '352BCDAE-66BB-6486-3BF6-9A614AC8724E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-18T23:31:54', 'Creacion de proyecto: Plaza Altos de Chavon Park', '2026-05-18T23:31:54', '2026-05-18T23:31:54');
+    VALUES ('2526B3BC-358A-831D-0D4E-6D644142DA84', '352BCDAE-66BB-6486-3BF6-9A614AC8724E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-31T04:03:17', 'Creacion de proyecto: Plaza Altos de Chavon Park', '2026-05-31T04:03:17', '2026-05-31T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-2980')
@@ -1378,7 +1375,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1390,21 +1387,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Las Yayas de Viajama, Azua',
         '18.448137,-70.720815',
-        3800000,
+        6100000,
         'FLAVIO GERALDO RODRIGUEZ MENDEZ',
         '00100860915',
-        99,
+        9,
         '180192688968:0057',
         '1366274434',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
-        1,
         2,
         0,
-        '2026-02-21T23:31:54'
+        0,
+        '2026-06-13T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('7D568C4C-F7A7-571C-F795-7CADDF04D0A8', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-21T23:31:54', 'Creacion de proyecto: Portales Cumayasa Oeste', '2026-02-21T23:31:54', '2026-02-21T23:31:54');
+    VALUES ('142D7A40-57E3-B51E-839B-5E01CE3297E5', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-13T04:03:17', 'Creacion de proyecto: Portales Cumayasa Oeste', '2026-06-13T04:03:17', '2026-06-13T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-17224')
@@ -1413,7 +1410,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1428,18 +1425,18 @@ BEGIN
         15500000,
         'FUNDACION DOMINGO DE LEON INC',
         '430147877',
-        3,
+        11,
         '210387183415:0096',
         '1522570464',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         0,
         0,
-        '2026-04-16T23:31:54'
+        '2026-04-29T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('0CE02E19-A679-A2FF-0B38-07E118DE3CA6', '6A50C349-DBDB-F690-8239-1E093532BF06', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-16T23:31:54', 'Creacion de proyecto: Palacio Samana Oeste', '2026-04-16T23:31:54', '2026-04-16T23:31:54');
+    VALUES ('0CE02E19-A679-A2FF-0B38-07E118DE3CA6', '6A50C349-DBDB-F690-8239-1E093532BF06', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-29T04:03:17', 'Creacion de proyecto: Palacio Samana Oeste', '2026-04-29T04:03:17', '2026-04-29T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-85602')
@@ -1448,7 +1445,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1463,18 +1460,18 @@ BEGIN
         1800000,
         'ALMACENES MGP SRL',
         '131194761',
-        4,
+        16,
         '100274526902:0008',
         '1813347004',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         1,
         2,
         0,
-        '2026-02-20T23:31:54'
+        '2026-03-05T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('DB1B7CFC-26DA-41EA-5B3D-912439CB8551', 'DB2B1655-7E28-0A25-2B63-6F7004A67331', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-20T23:31:54', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-02-20T23:31:54', '2026-02-20T23:31:54');
+    VALUES ('DB1B7CFC-26DA-41EA-5B3D-912439CB8551', 'DB2B1655-7E28-0A25-2B63-6F7004A67331', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-05T04:03:17', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-03-05T04:03:17', '2026-03-05T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-99451')
@@ -1483,7 +1480,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1495,21 +1492,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Pimentel, Duarte',
         '19.302157,-70.246462',
-        3800000,
+        9800000,
         'LOLINDA S BUFFET SRL',
         '133175789',
-        99,
+        11,
         '080038173519:0010',
         '1518200229',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
-        1,
         2,
         0,
-        '2026-01-26T23:31:54'
+        0,
+        '2026-06-15T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('2089A97A-D1C5-2D2E-711A-7903947B0BD0', '90C89EC2-FF55-240A-4E31-760184B7B5C2', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-01-26T23:31:54', 'Creacion de proyecto: Viviendas Quisqueya', '2026-01-26T23:31:54', '2026-01-26T23:31:54');
+    VALUES ('FA794F1C-C295-49C2-0420-39A29AC6F268', '90C89EC2-FF55-240A-4E31-760184B7B5C2', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-15T04:03:17', 'Creacion de proyecto: Viviendas Quisqueya', '2026-06-15T04:03:17', '2026-06-15T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-98592')
@@ -1518,7 +1515,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1533,18 +1530,18 @@ BEGIN
         4500000,
         'INTER DE COMERC TEXTIL S A',
         '101166292',
-        2,
+        5,
         '270151881439:0051',
         '1605848108',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         2,
         1,
         0,
-        '2026-05-17T23:31:54'
+        '2026-05-30T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('BB7A0264-D86E-C51B-5E8B-2988F4E7D410', '5390AA79-70EF-3B62-0397-8C0C85B1C3E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-17T23:31:54', 'Creacion de proyecto: Terrazas Piantini', '2026-05-17T23:31:54', '2026-05-17T23:31:54');
+    VALUES ('BB7A0264-D86E-C51B-5E8B-2988F4E7D410', '5390AA79-70EF-3B62-0397-8C0C85B1C3E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-30T04:03:17', 'Creacion de proyecto: Terrazas Piantini', '2026-05-30T04:03:17', '2026-05-30T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-52937')
@@ -1553,7 +1550,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1568,18 +1565,18 @@ BEGIN
         11000000,
         'LEADER HOME REPUBLICA DOMINICANA H4GT',
         '430301582',
-        4,
+        16,
         '030210557457:0079',
         '1480014947',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'),
         1,
         1,
         0,
-        '2026-06-08T23:31:54'
+        '2026-06-21T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('01451296-F451-641D-76AC-9E8D153E5FBB', '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-08T23:31:54', 'Creacion de proyecto: Zona Universitaria Club', '2026-06-08T23:31:54', '2026-06-08T23:31:54');
+    VALUES ('01451296-F451-641D-76AC-9E8D153E5FBB', '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-21T04:03:17', 'Creacion de proyecto: Zona Universitaria Club', '2026-06-21T04:03:17', '2026-06-21T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-56183')
@@ -1588,7 +1585,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1603,18 +1600,18 @@ BEGIN
         15500000,
         'JUNTA DE CENTRO EDUCATIVO 08528 ENRIQUILLO',
         '430265101',
-        2,
+        5,
         '110081413040:0009',
         '1089163307',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         1,
         0,
-        '2026-06-18T23:31:54'
+        '2026-07-01T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('C9F4651A-6E2B-B28C-5459-D79BF800649B', '697D8E5E-AA3F-9553-DB99-7E99873F40D7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-18T23:31:54', 'Creacion de proyecto: Torre Los Molinos Palms', '2026-06-18T23:31:54', '2026-06-18T23:31:54');
+    VALUES ('C9F4651A-6E2B-B28C-5459-D79BF800649B', '697D8E5E-AA3F-9553-DB99-7E99873F40D7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-01T04:03:17', 'Creacion de proyecto: Torre Los Molinos Palms', '2026-07-01T04:03:17', '2026-07-01T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-76780')
@@ -1623,7 +1620,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1645,11 +1642,11 @@ BEGIN
         2,
         0,
         0,
-        '2026-02-01T23:31:54'
+        '2026-02-14T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('6189F983-7D87-2CBA-111F-A891D33E5D70', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-01T23:31:54', 'Creacion de proyecto: Playa Dorada Palms', '2026-02-01T23:31:54', '2026-02-01T23:31:54');
+    VALUES ('6189F983-7D87-2CBA-111F-A891D33E5D70', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-14T04:03:17', 'Creacion de proyecto: Playa Dorada Palms', '2026-02-14T04:03:17', '2026-02-14T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-33098')
@@ -1658,7 +1655,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1673,18 +1670,18 @@ BEGIN
         1800000,
         'CYNTHIA ESPINAL ANTONIO',
         '14300013506',
-        3,
+        11,
         '160368355197:0011',
         '1845845718',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         2,
         0,
         0,
-        '2026-05-07T23:31:54'
+        '2026-05-20T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A6E0C5B1-77A9-C775-02D7-58A1931FFD76', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-07T23:31:54', 'Creacion de proyecto: Bosque Playa Dorada Club', '2026-05-07T23:31:54', '2026-05-07T23:31:54');
+    VALUES ('A6E0C5B1-77A9-C775-02D7-58A1931FFD76', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-20T04:03:17', 'Creacion de proyecto: Bosque Playa Dorada Club', '2026-05-20T04:03:17', '2026-05-20T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-92611')
@@ -1693,7 +1690,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1705,21 +1702,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Jimani, Independencia',
         '18.492234,-71.834705',
-        50000000,
+        3800000,
         'ASOCIACION PRO BIENESTAR DEL CIEGO DE LA REP DOMINICANA INC',
         '401505673',
-        99,
+        8,
         '250380904600:0004',
         '1681221888',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
-        0,
         2,
+        1,
         0,
-        '2026-06-15T23:31:54'
+        '2026-04-23T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('D4D9C525-2EB1-616A-726C-1F5464D4AF15', '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-15T23:31:54', 'Creacion de proyecto: San Miguel Resort', '2026-06-15T23:31:54', '2026-06-15T23:31:54');
+    VALUES ('67BAF4D0-9AF2-11B3-913D-FF386F0EE37A', '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-23T04:03:17', 'Creacion de proyecto: San Miguel Resort', '2026-04-23T04:03:17', '2026-04-23T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-90091')
@@ -1728,7 +1725,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1743,18 +1740,18 @@ BEGIN
         22000000,
         'AGENCIA DE MARKETING DIGITAL MELO GARCÍA SRL',
         '132819675',
-        4,
+        16,
         '320325353850:0086',
         '1968603925',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         0,
         0,
         0,
-        '2026-04-11T23:31:54'
+        '2026-04-24T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('E3B478DB-A464-B9C0-3966-81FB18C78168', '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-11T23:31:54', 'Creacion de proyecto: Complejo Gazcue del Este', '2026-04-11T23:31:54', '2026-04-11T23:31:54');
+    VALUES ('E3B478DB-A464-B9C0-3966-81FB18C78168', '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-24T04:03:17', 'Creacion de proyecto: Complejo Gazcue del Este', '2026-04-24T04:03:17', '2026-04-24T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-62643')
@@ -1763,7 +1760,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1775,21 +1772,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Rio San Juan, Maria Trinidad Sanchez',
         '19.382219,-69.853718',
-        50000000,
+        8700000,
         'HIPOLITO MINAYA HICIANO',
         '03100421944',
-        99,
+        12,
         '260310570078:0048',
         '1494763133',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'),
+        0,
         1,
         0,
-        0,
-        '2026-04-12T23:31:54'
+        '2026-03-15T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('112046F2-EFFA-4843-55E5-7C768BA3F2D8', '108807D5-A6BB-3889-2BAB-AC74B7D74706', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-12T23:31:54', 'Creacion de proyecto: Edificio El Cacique Vacacional', '2026-04-12T23:31:54', '2026-04-12T23:31:54');
+    VALUES ('F201A2AA-2317-31C9-9500-EBC3CC5D9E96', '108807D5-A6BB-3889-2BAB-AC74B7D74706', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-15T04:03:17', 'Creacion de proyecto: Edificio El Cacique Vacacional', '2026-03-15T04:03:17', '2026-03-15T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-22285')
@@ -1798,7 +1795,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1813,18 +1810,18 @@ BEGIN
         4500000,
         'ASTRID DOMINICANA LA ROMANA SRL',
         '132941055',
-        4,
+        16,
         '030370581777:0013',
         '1902783989',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         1,
         2,
         0,
-        '2026-03-02T23:31:54'
+        '2026-03-15T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('FB7AF6E8-0EDD-12C5-7ACA-BC56F3A28833', '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-02T23:31:54', 'Creacion de proyecto: Marina Don Bosco Norte', '2026-03-02T23:31:54', '2026-03-02T23:31:54');
+    VALUES ('FB7AF6E8-0EDD-12C5-7ACA-BC56F3A28833', '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-15T04:03:17', 'Creacion de proyecto: Marina Don Bosco Norte', '2026-03-15T04:03:17', '2026-03-15T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-1140')
@@ -1833,7 +1830,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1848,18 +1845,18 @@ BEGIN
         4500000,
         'JUAN JOSE TEJADA QUEZADA',
         '05300330510',
-        1,
+        3,
         '190055307506:0015',
         '1319824143',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         1,
         0,
-        '2026-02-03T23:31:54'
+        '2026-02-16T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('EEFA001C-EA03-C38D-7017-3B2E665155B7', '77FE1E64-3205-59FC-909A-B41D31181FDE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-03T23:31:54', 'Creacion de proyecto: La Esperanza Beach', '2026-02-03T23:31:54', '2026-02-03T23:31:54');
+    VALUES ('EEFA001C-EA03-C38D-7017-3B2E665155B7', '77FE1E64-3205-59FC-909A-B41D31181FDE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-16T04:03:17', 'Creacion de proyecto: La Esperanza Beach', '2026-02-16T04:03:17', '2026-02-16T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-61782')
@@ -1868,7 +1865,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1883,18 +1880,18 @@ BEGIN
         1800000,
         'JOHANNA ELIZABETH RAMOS POLANCO',
         '01200846093',
-        3,
+        9,
         '090186851314:0067',
         '1087823396',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
         0,
         0,
         0,
-        '2026-03-28T23:31:54'
+        '2026-04-10T04:03:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('6B8EF70F-D065-8AC6-9BA4-434E4AD5C341', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-28T23:31:54', 'Creacion de proyecto: Centro La Julia', '2026-03-28T23:31:54', '2026-03-28T23:31:54');
+    VALUES ('6B8EF70F-D065-8AC6-9BA4-434E4AD5C341', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-10T04:03:17', 'Creacion de proyecto: Centro La Julia', '2026-04-10T04:03:17', '2026-04-10T04:03:17');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-87582')
@@ -1903,7 +1900,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1915,21 +1912,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Gaspar Hernandez, Espaillat',
         '19.506138,-70.494153',
-        16500000,
+        6100000,
         'INVERSIONES LA FONTANICA SRL',
         '101690471',
-        99,
+        11,
         '110380468369:0010',
         '1216621859',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
-        1,
         0,
+        3,
         0,
-        '2026-05-07T23:31:54'
+        '2026-05-14T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('55D3BBF1-4FF8-6511-F030-D501D4C05935', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-07T23:31:54', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-05-07T23:31:54', '2026-05-07T23:31:54');
+    VALUES ('4CBB492E-D3D6-515F-17FE-5FEDF2D19589', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-14T04:03:18', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-05-14T04:03:18', '2026-05-14T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-94408')
@@ -1938,7 +1935,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1960,11 +1957,11 @@ BEGIN
         0,
         0,
         0,
-        '2026-04-13T23:31:54'
+        '2026-04-26T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('B8FAAE82-A484-B4F4-807B-C4413FF6FCEB', '25AB4E07-AF72-7335-6D10-C1FE310587F8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-13T23:31:54', 'Creacion de proyecto: Paseo Las Terrenas Urbano', '2026-04-13T23:31:54', '2026-04-13T23:31:54');
+    VALUES ('B8FAAE82-A484-B4F4-807B-C4413FF6FCEB', '25AB4E07-AF72-7335-6D10-C1FE310587F8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-26T04:03:18', 'Creacion de proyecto: Paseo Las Terrenas Urbano', '2026-04-26T04:03:18', '2026-04-26T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-12053')
@@ -1973,7 +1970,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -1988,18 +1985,18 @@ BEGIN
         14000000,
         'EQUIPOS Y SUMINISTROS MEDICOS ESUMED SRL',
         '101785845',
-        4,
+        14,
         '080489409802:0030',
         '1222396203',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         0,
         0,
-        '2026-06-16T23:31:54'
+        '2026-06-29T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('E338F7CE-635D-24F6-7A31-62DEB3D7D0AB', '653A5D86-9635-43BF-3BA3-3E33236EE590', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-16T23:31:54', 'Creacion de proyecto: Complejo Costa Azul Gardens', '2026-06-16T23:31:54', '2026-06-16T23:31:54');
+    VALUES ('E338F7CE-635D-24F6-7A31-62DEB3D7D0AB', '653A5D86-9635-43BF-3BA3-3E33236EE590', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-29T04:03:18', 'Creacion de proyecto: Complejo Costa Azul Gardens', '2026-06-29T04:03:18', '2026-06-29T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-60197')
@@ -2008,7 +2005,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2020,21 +2017,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Villa Vasquez, Monte Cristi',
         '19.837664,-71.648549',
-        7000000,
+        16500000,
         'INVERSIONES Y DESARROLLOS INMOBILIARIOS DONA ROSA SRL',
         '101082607',
-        99,
+        7,
         '270008726187:0049',
         '1441918564',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
+        3,
         0,
-        0,
-        '2026-02-03T23:31:54'
+        '2026-02-16T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('63C4CBEB-2C04-BEB6-69FD-F8CC6FA621C0', '14998618-4A71-013F-DB86-9FB7C4E833EF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-03T23:31:54', 'Creacion de proyecto: Paseo La Esperanza', '2026-02-03T23:31:54', '2026-02-03T23:31:54');
+    VALUES ('63C4CBEB-2C04-BEB6-69FD-F8CC6FA621C0', '14998618-4A71-013F-DB86-9FB7C4E833EF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-16T04:03:18', 'Creacion de proyecto: Paseo La Esperanza', '2026-02-16T04:03:18', '2026-02-16T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-44036')
@@ -2043,7 +2040,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2058,18 +2055,18 @@ BEGIN
         5200000,
         'BRO PONT S A',
         '101702494',
-        1,
+        2,
         '200334705518:0042',
         '1744754245',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         1,
         1,
         0,
-        '2026-05-25T23:31:54'
+        '2026-06-07T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('3C70D69D-92E3-D32C-2BC4-14F8E2D18C85', 'F97E587E-CEF5-6155-418B-2ECB559A3D50', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-25T23:31:54', 'Creacion de proyecto: Bosque Constanza Ejecutivo', '2026-05-25T23:31:54', '2026-05-25T23:31:54');
+    VALUES ('3C70D69D-92E3-D32C-2BC4-14F8E2D18C85', 'F97E587E-CEF5-6155-418B-2ECB559A3D50', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-07T04:03:18', 'Creacion de proyecto: Bosque Constanza Ejecutivo', '2026-06-07T04:03:18', '2026-06-07T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-56331')
@@ -2078,7 +2075,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2093,18 +2090,18 @@ BEGIN
         15500000,
         'DOMINICAN OCEAN DREAMS BY DY EIRL',
         '132178922',
-        3,
+        9,
         '210312672180:0076',
         '1450163036',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'),
         2,
         0,
         0,
-        '2026-03-20T23:31:54'
+        '2026-04-02T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('260E3F71-DD72-ACFF-CC46-7B165B1880A1', '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-20T23:31:54', 'Creacion de proyecto: Quisqueya Towers', '2026-03-20T23:31:54', '2026-03-20T23:31:54');
+    VALUES ('260E3F71-DD72-ACFF-CC46-7B165B1880A1', '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-02T04:03:18', 'Creacion de proyecto: Quisqueya Towers', '2026-04-02T04:03:18', '2026-04-02T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-88003')
@@ -2113,7 +2110,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2128,18 +2125,18 @@ BEGIN
         12000000,
         'MARIA LUZ MARTINEZ CID',
         '03700369105',
-        3,
+        10,
         '140301197306:0024',
         '1746921976',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         1,
         0,
-        '2026-06-18T23:31:54'
+        '2026-07-01T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('7BF1D7FC-3272-BDAB-774E-00A2E181DF01', 'A85C061E-DDCC-F169-7742-D8B08AD7DAED', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-18T23:31:54', 'Creacion de proyecto: Complejo Santa Fe Park', '2026-06-18T23:31:54', '2026-06-18T23:31:54');
+    VALUES ('7BF1D7FC-3272-BDAB-774E-00A2E181DF01', 'A85C061E-DDCC-F169-7742-D8B08AD7DAED', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-01T04:03:18', 'Creacion de proyecto: Complejo Santa Fe Park', '2026-07-01T04:03:18', '2026-07-01T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-15227')
@@ -2148,7 +2145,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2163,18 +2160,18 @@ BEGIN
         9800000,
         'TRANSEXPRESS C & L SRL',
         '130177732',
-        1,
+        4,
         '050288801657:0057',
         '1830946778',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         1,
         2,
         0,
-        '2026-04-16T23:31:54'
+        '2026-04-29T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A9B5104F-004C-D661-58FF-C3ECBC50BCC9', 'D7333BEC-F373-F1EA-AA07-32C4FDF03BF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-16T23:31:54', 'Creacion de proyecto: Plaza Rio San Juan Vacacional', '2026-04-16T23:31:54', '2026-04-16T23:31:54');
+    VALUES ('A9B5104F-004C-D661-58FF-C3ECBC50BCC9', 'D7333BEC-F373-F1EA-AA07-32C4FDF03BF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-29T04:03:18', 'Creacion de proyecto: Plaza Rio San Juan Vacacional', '2026-04-29T04:03:18', '2026-04-29T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-48129')
@@ -2183,7 +2180,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2198,18 +2195,18 @@ BEGIN
         4500000,
         'FERRETERIA GUZMAN MARTINEZ SRL',
         '131932134',
-        4,
+        16,
         '200419707558:0069',
         '1130434610',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         0,
         3,
         0,
-        '2026-04-12T23:31:54'
+        '2026-04-25T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('472EC74B-AEE2-A3CD-C631-F94A22D41A84', '33E0D9C5-B866-7E9C-6F49-12FF3A0ACB67', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-12T23:31:54', 'Creacion de proyecto: Palacio Bavaro', '2026-04-12T23:31:54', '2026-04-12T23:31:54');
+    VALUES ('472EC74B-AEE2-A3CD-C631-F94A22D41A84', '33E0D9C5-B866-7E9C-6F49-12FF3A0ACB67', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-25T04:03:18', 'Creacion de proyecto: Palacio Bavaro', '2026-04-25T04:03:18', '2026-04-25T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-7877')
@@ -2218,7 +2215,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2230,21 +2227,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Piedra Blanca, Monsenor Nouel',
         '18.92059,-70.426269',
-        4500000,
+        2800000,
         'BORDSHIPP DOMINICANA SRL',
         '131314589',
-        99,
+        12,
         '120260167201:0091',
         '1939957589',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
-        1,
         0,
+        3,
         0,
-        '2026-05-14T23:31:54'
+        '2026-06-08T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('096F3D49-2755-9F6B-38F3-DD3A36298342', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-14T23:31:54', 'Creacion de proyecto: Torre Playa Dorada Beach', '2026-05-14T23:31:54', '2026-05-14T23:31:54');
+    VALUES ('1400D29D-096F-3D49-2755-9F6B38F3DD3B', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-08T04:03:18', 'Creacion de proyecto: Torre Playa Dorada Beach', '2026-06-08T04:03:18', '2026-06-08T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-19696')
@@ -2253,7 +2250,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2265,21 +2262,21 @@ BEGIN
         (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'),
         'Fantino, Sanchez Ramirez',
         '19.060143,-70.160545',
-        8700000,
+        3800000,
         'ELSA VALENTINA                 TAVARES TORRES',
         '03103105783',
-        99,
+        11,
         '290393932955:0041',
         '1682952307',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'),
-        1,
+        2,
         2,
         0,
-        '2026-05-22T23:31:54'
+        '2026-07-05T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('E4BFE000-3877-2715-3BDF-50BD2CB50A3A', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-22T23:31:54', 'Creacion de proyecto: Paseo El Cacique', '2026-05-22T23:31:54', '2026-05-22T23:31:54');
+    VALUES ('8F98F707-49A3-4AAE-D912-B3B0C230894D', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-05T04:03:18', 'Creacion de proyecto: Paseo El Cacique', '2026-07-05T04:03:18', '2026-07-05T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-56302')
@@ -2288,7 +2285,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2303,18 +2300,18 @@ BEGIN
         7000000,
         'JFF BUSINESS GROUP SRL',
         '133667312',
-        1,
+        4,
         '110370301462:0049',
         '1333861877',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'),
         0,
         0,
         0,
-        '2026-04-03T23:31:54'
+        '2026-04-16T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('D52785FA-09F8-6BC6-BA5E-B56AF6D5FEEE', '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-03T23:31:54', 'Creacion de proyecto: Viviendas Los Cacicazgos Oeste', '2026-04-03T23:31:54', '2026-04-03T23:31:54');
+    VALUES ('D52785FA-09F8-6BC6-BA5E-B56AF6D5FEEE', '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-16T04:03:18', 'Creacion de proyecto: Viviendas Los Cacicazgos Oeste', '2026-04-16T04:03:18', '2026-04-16T04:03:18');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-49862')
@@ -2323,7 +2320,7 @@ BEGIN
         IdProyecto, NombreProyecto, CodigoInterno,
         IdUsuario,
         UbicacionTexto, UbicacionGps, ValorEstimado,
-        DatosDesarrollador, RncDesarrollador, Categoria,
+        DatosDesarrollador, RncDesarrollador, CategoriaId,
         DesignacionCatastral, Matricula,
         EstadoId,
         EstadoIntegridad, EstadoJuridico, SelladoBloqueado,
@@ -2338,16 +2335,16 @@ BEGIN
         50000000,
         'ASOCIACION DE GUIAS LOMAS DE BLANCO AGUILOMAB',
         '430375594',
-        3,
+        9,
         '190055920184:0010',
         '1166888677',
         (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'),
         2,
         0,
         0,
-        '2026-03-11T23:31:54'
+        '2026-03-24T04:03:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('9699E379-0385-C2EA-6FE3-9D7864B7B2CA', 'E0592D67-8E08-89F3-2F94-FD94A262D346', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-11T23:31:54', 'Creacion de proyecto: Jardines El Cacique Hills', '2026-03-11T23:31:54', '2026-03-11T23:31:54');
+    VALUES ('9699E379-0385-C2EA-6FE3-9D7864B7B2CA', 'E0592D67-8E08-89F3-2F94-FD94A262D346', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-24T04:03:18', 'Creacion de proyecto: Jardines El Cacique Hills', '2026-03-24T04:03:18', '2026-03-24T04:03:18');
 END

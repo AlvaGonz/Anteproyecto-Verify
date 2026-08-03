@@ -3,6 +3,7 @@ namespace Infrastructure.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using Resend;
 using Configuration;
 using Application.Abstractions;
@@ -143,21 +144,6 @@ public static class DependencyInjection
         services.Configure<ExternalServices.Credit.TransUnionOptions>(configuration.GetSection(ExternalServices.Credit.TransUnionOptions.SectionName));
         services.AddScoped<Application.Abstractions.ExternalServices.Credit.ITransUnionService, ExternalServices.Credit.TransUnionServiceMock>();
 
-        // Nvidia AI Document Diagnosis
-        services.Configure<ExternalServices.NvidiaAi.NvidiaAiOptions>(configuration.GetSection(ExternalServices.NvidiaAi.NvidiaAiOptions.SectionName));
-        services.AddHttpClient("nvidia-nim", (serviceProvider, client) =>
-        {
-            var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ExternalServices.NvidiaAi.NvidiaAiOptions>>().Value;
-            client.BaseAddress = new Uri(options.BaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
-            if (!string.IsNullOrEmpty(options.ApiKey))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
-            }
-        });
-        services.AddScoped<Application.Abstractions.DocumentIntelligence.IAiDiagnosisService, ExternalServices.NvidiaAi.NvidiaAiDiagnosisService>();
-        services.AddScoped<Application.Features.Documents.GetDocumentDiagnosis.GetDocumentDiagnosisQueryHandler>();
-
         // Validation Rules
         services.AddScoped<Application.Abstractions.Persistence.IReglaValidacionRepository, Persistence.Repositories.ReglaValidacionRepository>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.CreateRule.CreateRuleCommandHandler>();
@@ -166,6 +152,22 @@ public static class DependencyInjection
         services.AddSingleton<Application.Abstractions.Security.IJwtTokenGenerator, Security.JwtTokenGenerator>();
         services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Security.BCryptPasswordHasher>();
         services.AddScoped<Application.Abstractions.Security.IGoogleAuthService, Security.GoogleAuthService>();
+
+        // 2FA
+        services.AddSingleton<Application.Abstractions.Security.ITotpService, Security.TotpService>();
+        services.AddScoped<Application.Abstractions.Security.IRecoveryCodeService, Security.RecoveryCodeService>();
+        services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "dpkeys-" + Guid.NewGuid().ToString("N"))));
+        services.AddSingleton<Microsoft.AspNetCore.DataProtection.IDataProtector>(sp =>
+            sp.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>()
+              .CreateProtector("TwoFactorSecret"));
+        services.AddScoped<Application.Abstractions.Security.ITwoFactorSecretProtector>(sp =>
+            new Security.TwoFactorSecretProtector(sp.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtector>()));
+        services.AddMemoryCache();
+        services.AddSingleton<Application.Abstractions.Security.ITwoFactorChallengeStore, Security.InMemoryTwoFactorChallengeStore>();
+        services.AddSingleton<global::Infrastructure.Services.ITwoFactorEmailEventLogger, global::Infrastructure.Services.TwoFactorEmailEventLogger>();
+        services.AddScoped<global::Infrastructure.Services.EmailOtpService>();
+
         services.AddScoped<IStripeService, Services.StripeService>();
         services.AddScoped<Application.Contracts.Subscriptions.ISubscriptionService, Services.SubscriptionService>();
 

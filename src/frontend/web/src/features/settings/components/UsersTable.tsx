@@ -3,7 +3,7 @@ import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { useUpdateUserPlan } from "../api/useSettings";
 import { UserSettings, SubscriptionPlan } from "../types/settings.types";
 import { 
-  Mail, Phone, Layers, Pencil, Trash2, Plus, Shield, Search, ArrowUp, ArrowDown
+  Mail, Phone, Layers, Pencil, Trash2, Plus, Search, ArrowUp, ArrowDown
 } from "lucide-react";
 
 interface UsersTableProps {
@@ -42,12 +42,13 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
   }, [plans]);
 
   // Group users by plan categories
+  // ponytail: roles are admin/user only (per DB); "owner" was a legacy role that never existed in the API
   const groupedUsers = {
-    "Corporativo": users.filter(u => u.planName === "Corporativo" && u.role !== "admin" && u.role !== "owner"),
-    "Empresa": users.filter(u => u.planName === "Empresa" && u.role !== "admin" && u.role !== "owner"),
-    "Profesional": users.filter(u => u.planName === "Profesional" && u.role !== "admin" && u.role !== "owner"),
-    "Consultor": users.filter(u => (u.planName === "Consultor" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin" && u.role !== "owner"),
-    "Invitado": users.filter(u => u.planName === "Invitado" && u.role !== "admin" && u.role !== "owner")
+    "Corporativo": users.filter(u => u.planName === "Corporativo" && u.role !== "admin"),
+    "Empresa": users.filter(u => u.planName === "Empresa" && u.role !== "admin"),
+    "Profesional": users.filter(u => u.planName === "Profesional" && u.role !== "admin"),
+    "Consultor": users.filter(u => (u.planName === "Consultor" || u.planName === "Sin Plan" || !u.planName) && u.role !== "admin"),
+    "Invitado": users.filter(u => u.planName === "Invitado" && u.role !== "admin")
   };
 
   const [activeTab, setActiveTab] = useState<string>("Corporativo");
@@ -144,11 +145,6 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
               - {u.nombreComercial || u.razonSocial} {u.rnc && `(RNC: ${u.rnc})`}
             </span>
           )}
-          {u.role === "owner" && (
-            <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
-              <Shield className="w-3 h-3" /> OWNER
-            </span>
-          )}
           {u.role === "admin" && (
             <span className="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">ADMIN</span>
           )}
@@ -190,7 +186,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             } else if (plan.includes("corporativo")) {
               maxProjects = 50;
               maxQueries = "∞";
-            } else if (u.role === "admin" || u.role === "owner") {
+            } else if (u.role === "admin") {
               maxProjects = "∞";
               maxQueries = "∞";
             }
@@ -220,7 +216,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
             id={`plan-${u.id}`}
             value={u.planId || ""}
             onChange={(e) => handlePlanChange(u.id, e.target.value)}
-            disabled={isUpdating || u.role === "owner"}
+            disabled={isUpdating || u.role === "admin"}
             className="vf-input h-10 px-3 text-sm w-full"
           >
             <option value="" disabled>Seleccionar Plan...</option>
@@ -242,7 +238,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, plans, onEdit, on
           </button>
           <button type="button" 
             onClick={() => onDelete(u.id)} 
-            disabled={u.role === "owner"}
+            disabled={u.role === "admin"}
             className="w-10 h-10 flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors" 
             title="Eliminar Usuario"
           >

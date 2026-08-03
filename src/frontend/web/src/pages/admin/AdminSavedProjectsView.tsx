@@ -6,7 +6,7 @@ import { useSavedProjects, useProjectsInteractions } from "../../features/projec
 import { ProjectStatusBadge } from "../../features/public/components/ProjectStatusBadge";
 import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
 
-export const AdminSavedProjectsView: React.FC = () => {
+export const AdminSavedProjectsView: React.FC = React.memo(() => {
   const { data: savedProjects = [], isLoading } = useSavedProjects();
   const { unsaveProject, isUnsaving } = useProjectsInteractions();
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,8 +81,10 @@ export const AdminSavedProjectsView: React.FC = () => {
                   <X size={16} />
                 </button>
                 <img
-                  src={project.imagenUrl || getDefaultProjectImage(project.categoria)}
+                  src={project.imagenUrl || getDefaultProjectImage(project.categoriaId)}
                   alt={project.nombre}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute top-4 left-4">
@@ -215,4 +217,4 @@ export const AdminSavedProjectsView: React.FC = () => {
       </AnimatePresence>
     </div>
   );
-};
+});

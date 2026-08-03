@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
@@ -52,6 +52,7 @@ interface AdminProjectListProps {
   isAdmin: boolean;
   isLoading: boolean;
   filtered: any[];
+  totalCount: number;
   openMenuId: string | null;
   setOpenMenuId: (v: string | null) => void;
   updateStatus: (params: { id: string; status: ProjectStatus }) => void;
@@ -61,28 +62,21 @@ interface AdminProjectListProps {
   onPageChange: (page: number) => void;
 }
 
-export const AdminProjectList: React.FC<AdminProjectListProps> = ({
+export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
   t,
   isAdmin,
   isLoading,
   filtered,
+  totalCount,
   openMenuId,
   setOpenMenuId,
   updateStatus,
   deleteProject,
+  page,
+  pageSize,
+  onPageChange,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCurrentPage(1);
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [filtered]);
-
-  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
-  const paginatedProjects = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   if (isLoading) {
     return (
@@ -131,37 +125,8 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 min-h-[1000px]">
-        {Array.from({ length: itemsPerPage }).map((_, idx) => {
-          const project = paginatedProjects[idx];
-          
-          if (!project) {
-            return (
-              <div
-                key={`empty-${idx}`}
-                className="p-5 rounded-3xl border border-transparent flex flex-col md:flex-row md:items-center justify-between gap-6 opacity-0 pointer-events-none"
-              >
-                <div className="flex items-start gap-5 min-w-0 w-full">
-                  <div className="w-14 h-14 rounded-2xl flex-shrink-0" />
-                  <div className="min-w-0 space-y-3 w-full max-w-md">
-                    <div className="h-5 rounded-md w-3/4" />
-                    <div className="flex gap-4">
-                      <div className="h-4 rounded-md w-24" />
-                      <div className="h-4 rounded-md w-24" />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-4 md:pt-0 w-full md:w-auto">
-                  <div className="h-6 rounded-full w-24" />
-                  <div className="flex gap-2">
-                    <div className="w-10 h-10 rounded-xl" />
-                    <div className="w-10 h-10 rounded-xl" />
-                  </div>
-                </div>
-              </div>
-            );
-          }
-
+      <div className="grid grid-cols-1 gap-4">
+        {filtered.map((project, idx) => {
           const badge = getStatusBadge(project.estadoProyecto, t);
           return (
             <div
@@ -241,33 +206,33 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
       {totalPages > 1 && (
         <div className="px-6 py-4 bg-white border border-gray-100 rounded-3xl shadow-sm flex items-center justify-between">
           <span className="text-sm font-medium text-gray-500">
-            Mostrando {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filtered.length)} de {filtered.length}
+            Mostrando {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, totalCount)} de {totalCount}
           </span>
           <div className="flex gap-1.5">
             <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
+              onClick={() => onPageChange(1)}
+              disabled={page === 1}
               className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
             >
               <ChevronsLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
+              onClick={() => onPageChange(Math.max(page - 1, 1))}
+              disabled={page === 1}
               className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
+              onClick={() => onPageChange(Math.min(page + 1, totalPages))}
+              disabled={page === totalPages}
               className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
+              onClick={() => onPageChange(totalPages)}
+              disabled={page === totalPages}
               className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
             >
               <ChevronsRight className="w-5 h-5" />
@@ -277,5 +242,5 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
       )}
     </div>
   );
-};
+});
 

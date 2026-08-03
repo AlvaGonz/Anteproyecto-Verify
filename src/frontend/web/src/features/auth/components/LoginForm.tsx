@@ -43,9 +43,13 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsPending(true);
-    const user = await login(data.email, data.password);
-    if (!user) {
+    const result = await login(data.email, data.password);
+    if (!result.succeeded) {
       setIsPending(false);
+      if (result.requires2fa) {
+        // ChallengeScreen is mounted in the parent page; nothing else to do here.
+        return;
+      }
       return; // authError is set by AuthContext, shows on next render
     }
     // Soft update for browser state (React Router navigation)

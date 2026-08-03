@@ -2,12 +2,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
 import type { ProyectoDto, CreateProyectoDto, LegalStatus } from "../types";
-import { ProjectCategory } from "../types";
 
 export const projectKeys = {
   all: ["projects"] as const,
-  list: (page?: number, pageSize?: number) => ["projects", "list", page, pageSize] as const,
+  list: (page?: number, pageSize?: number, q?: string, estados?: string) =>
+    ["projects", "list", page, pageSize, q ?? "", estados ?? ""] as const,
   detail: (id: string) => ["projects", id] as const,
+  // ponytail: keep raw string keys for statusEligibility/validation/findings/audit
+  // to match existing usage in other files until those files are updated
 };
 
 const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
@@ -17,7 +19,8 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   ubicacionTexto: apiProj.ubicacionTexto || "",
   ubicacionGps: apiProj.ubicacionGps,
   valorEstimado: apiProj.valorEstimado,
-  categoria: apiProj.categoria,
+  categoriaId: apiProj.categoriaId,
+  categoriaNombre: apiProj.categoriaNombre,
   datosDesarrollador: apiProj.datosDesarrollador,
   rncDesarrollador: apiProj.rncDesarrollador,
   designacionCatastral: apiProj.designacionCatastral,
@@ -36,6 +39,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   imagenAdicional5: apiProj.imagenAdicional5,
   planNombre: apiProj.planNombre || null,
   registradoPor: apiProj.registradoPor || null,
+  superficieM2: apiProj.superficieM2,
 });
 
 interface PaginatedProjectsResponse {
@@ -45,12 +49,14 @@ interface PaginatedProjectsResponse {
   pageSize: number;
 }
 
-export const useProjects = (page = 1, pageSize = 50) => {
+export const useProjects = (page = 1, pageSize = 50, q?: string, estados?: string) => {
   const query = useQuery({
-    queryKey: projectKeys.list(page, pageSize),
+    queryKey: projectKeys.list(page, pageSize, q, estados),
     queryFn: () =>
       apiClient
-        .get<PaginatedProjectsResponse>("/projects", { params: { page, pageSize } })
+        .get<PaginatedProjectsResponse>("/projects", {
+          params: { page, pageSize, q: q || undefined, estados: estados || undefined },
+        })
         .then((res) => {
           const data = res.data as any;
           // Handle different response structures
@@ -111,12 +117,11 @@ export const useCreateProject = () => {
       apiClient
         .post<ApiProyectoDto>("/projects", {
           ...data,
-          categoria: data.categoria ?? ProjectCategory.Residencial,
         })
         .then((res) => mapApiProject(res.data)),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: projectKeys.all });
-      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: projectKeys.all });
+      await qc.invalidateQueries({ queryKey: ["dashboardStats"] });
     },
   });
 };

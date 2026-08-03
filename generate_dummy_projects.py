@@ -144,7 +144,7 @@ PLAN_CONFIG = [
     ("corporativo@verifinca.do", "Corporativo", 50, False),
 ]
 
-PROJECT_CATEGORIES = [1, 2, 3, 4, 99]
+PROJECT_CATEGORIES = list(range(1, 17))
 
 # ── Load data ────────────────────────────────────────────────────────────
 print("Loading real data...")
@@ -159,7 +159,6 @@ lines.append("-- Uses real RNCs from DGII_RNC.TXT + Catastro coordinate map")
 lines.append("-- Creates realistic projects for 4 test accounts")
 lines.append("-- At least 1/3 per user are Published (EstadoId = PUBLICADO)")
 lines.append("-- EstadoId is looked up dynamically from ProyectosEstados by CodigoUnico")
-lines.append("-- Consultor also gets FremiunProyectos_Log entries")
 lines.append("-- ============================================================")
 lines.append("SET NOCOUNT ON;")
 lines.append("SET QUOTED_IDENTIFIER ON;")
@@ -254,7 +253,7 @@ for email, label, max_count, is_freemium in PLAN_CONFIG:
         lines.append(f"        IdProyecto, NombreProyecto, CodigoInterno,")
         lines.append(f"        IdUsuario,")
         lines.append(f"        UbicacionTexto, UbicacionGps, ValorEstimado,")
-        lines.append(f"        DatosDesarrollador, RncDesarrollador, Categoria,")
+        lines.append(f"        DatosDesarrollador, RncDesarrollador, CategoriaId,")
         lines.append(f"        DesignacionCatastral, Matricula,")
         lines.append(f"        EstadoId,")
         lines.append(f"        EstadoIntegridad, EstadoJuridico, SelladoBloqueado,")
@@ -285,12 +284,6 @@ for email, label, max_count, is_freemium in PLAN_CONFIG:
         lines.append("")
         lines.append(f"    INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)")
         lines.append(f"    VALUES ('{log_id}', '{rid}', (SELECT IdUsuario FROM Usuario WHERE Email = '{email}'), '{now.strftime('%Y-%m-%dT%H:%M:%S')}', '{detail}', '{now.strftime('%Y-%m-%dT%H:%M:%S')}', '{now.strftime('%Y-%m-%dT%H:%M:%S')}');")
-
-        # ── FremiunProyectos_Log (only for consultor) ──
-        if is_freemium:
-            fremium_id = str(uuid.UUID(int=r.randint(0, 2**128 - 1)+2)).upper()
-            lines.append(f"    INSERT INTO FremiunProyectos_Log (IdProyectoLog, IdProyecto, IdUsuario, FechaAcceso)")
-            lines.append(f"    VALUES ('{fremium_id}', '{rid}', (SELECT IdUsuario FROM Usuario WHERE Email = '{email}'), '{now.strftime('%Y-%m-%dT%H:%M:%S')}');")
 
         lines.append("END")
         lines.append("")

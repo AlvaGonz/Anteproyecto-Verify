@@ -308,13 +308,13 @@ try
         if (project == null)
             throw new KeyNotFoundException($"Proyecto con ID {projectId} no encontrado.");
 
-        var requiredTypes = Domain.Policies.RequiredDocumentsPolicy.GetRequiredDocumentsForCategory(project.Categoria);
+        var requiredTypes = Domain.Policies.RequiredDocumentsPolicy.GetRequiredDocumentsForCategory(project.CategoriaId);
         
         return requiredTypes.Select(type => new RequiredDocumentDto(
             type,
             type.ToString(), // Or a better mapping to friendly names
-            $"Documento requerido para categoría {project.Categoria}",
-            project.Categoria
+            $"Documento requerido para categoría {project.CategoriaId}",
+            project.CategoriaId
         ));
     }
 
@@ -324,7 +324,7 @@ try
         if (project == null)
             throw new KeyNotFoundException($"Proyecto con ID {projectId} no encontrado.");
 
-        var requiredTypes = Domain.Policies.RequiredDocumentsPolicy.GetRequiredDocumentsForCategory(project.Categoria).ToList();
+        var requiredTypes = Domain.Policies.RequiredDocumentsPolicy.GetRequiredDocumentsForCategory(project.CategoriaId).ToList();
         var uploadedDocs = await _documentoRepository.GetByProyectoIdAsync(projectId, cancellationToken);
 
         var diagnostics = new List<DocumentDiagnosticDto>();

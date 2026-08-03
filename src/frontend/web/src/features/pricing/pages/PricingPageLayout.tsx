@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { LandingNav } from "../../../shared/components/layout/LandingNav";
 import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
+import { BackToTopButton } from "../../../shared/components/ui/BackToTopButton";
 import { BillingToggle } from "../components/BillingToggle";
 import { PricingCards } from "../components/PricingCards";
 import { FeatureComparisonTable } from "../components/FeatureComparisonTable";
@@ -146,6 +147,7 @@ export const PricingPageLayout: React.FC<PricingPageLayoutProps> = ({
 
       {/* Footer Component from LandingFooter */}
       <LandingFooter />
+      <BackToTopButton />
     </div>
   );
 };

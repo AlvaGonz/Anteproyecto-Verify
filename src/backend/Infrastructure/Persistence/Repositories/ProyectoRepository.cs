@@ -24,10 +24,11 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetAllWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetAllWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, string? searchTerm = null, string? estados = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Proyectos
             .AsNoTracking()
@@ -35,11 +36,35 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .AsQueryable();
 
         if (usuarioId.HasValue)
         {
             query = query.Where(p => p.UsuarioCreadorId == usuarioId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim().ToLower();
+            query = query.Where(p =>
+                (p.Nombre != null && p.Nombre.ToLower().Contains(term)) ||
+                (p.DesignacionCatastral != null && p.DesignacionCatastral.ToLower().Contains(term)) ||
+                (p.Matricula != null && p.Matricula.ToLower().Contains(term)) ||
+                (p.UbicacionTexto != null && p.UbicacionTexto.ToLower().Contains(term)) ||
+                (p.UbicacionGps != null && p.UbicacionGps.ToLower().Contains(term)) ||
+                (p.DatosDesarrollador != null && p.DatosDesarrollador.ToLower().Contains(term)) ||
+                (p.RncDesarrollador != null && p.RncDesarrollador.ToLower().Contains(term)) ||
+                (p.CedulaRncPropietario != null && p.CedulaRncPropietario.ToLower().Contains(term)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(estados))
+        {
+            var codigos = estados.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (codigos.Length > 0)
+            {
+                query = query.Where(p => p.Estado != null && codigos.Contains(p.Estado.CodigoUnico));
+            }
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -60,6 +85,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .AsQueryable();
 
         if (usuarioId.HasValue)
@@ -83,6 +109,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .Where(p => p.Estado.CodigoUnico != draftCode);
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -105,9 +132,46 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .Where(p => p.Estado.CodigoUnico != draftCode)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Proyecto>> GetPublishedAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    {
+        var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+
+        return await _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
+            .Include(p => p.Estado)
+            .Where(p => p.Estado.CodigoUnico == publicadoCode)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Proyecto>> SearchPublishedAsync(string query, CancellationToken cancellationToken = default)
+    {
+        var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+        
+        return await _context.Proyectos
+            .AsNoTracking()
+            .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
+            .Include(p => p.Estado)
+            .Where(p => 
+                (p.CedulaRncPropietario == query ||
+                p.Ipi == query ||
+                p.RncDesarrollador == query ||
+                p.Matricula == query ||
+                _context.SellosIntegridad.Any(s => s.ProyectoId == p.Id && s.CodigoSello == query))
+                && p.Estado.CodigoUnico == publicadoCode
+            )
             .ToListAsync(cancellationToken);
     }
 
@@ -147,6 +211,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
+            .Include(p => p.CategoriaProyecto)
             .Where(p => 
                 p.CedulaRncPropietario == query ||
                 p.Ipi == query ||
@@ -161,6 +226,14 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Proyectos
             .CountAsync(p => p.UsuarioCreadorId == usuarioId, cancellationToken);
+    }
+
+    public async Task<IEnumerable<CategoriaProyecto>> GetCategoriasAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.CategoriasProyecto
+            .Where(c => c.Activo)
+            .OrderBy(c => c.Id)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(Proyecto proyecto, CancellationToken cancellationToken = default)
@@ -248,6 +321,8 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(p => p.UsuarioCreador)
             .Include(g => g.Project)
                 .ThenInclude(p => p.Estado)
+            .Include(g => g.Project)
+                .ThenInclude(p => p.CategoriaProyecto)
             .Where(g => g.SaverId == usuarioId)
             .ToListAsync(cancellationToken);
     }
@@ -285,10 +360,10 @@ public class ProyectoRepository : IProyectoRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, ProjectCategory category, CancellationToken cancellationToken = default)
+    public async Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, int categoryId, CancellationToken cancellationToken = default)
     {
         // Define required document types for the project category (same logic as ProjectDocumentStatus component)
-        var requiredTypes = GetRequiredDocumentTypesForCategory(category);
+        var requiredTypes = GetRequiredDocumentTypesForCategory(categoryId);
 
         if (requiredTypes.Count == 0) return 100;
 
@@ -305,31 +380,31 @@ public class ProyectoRepository : IProyectoRepository
         return Math.Min(rate, 100);
     }
 
-    private static List<DocumentType> GetRequiredDocumentTypesForCategory(ProjectCategory category)
+    private static List<DocumentType> GetRequiredDocumentTypesForCategory(int categoryId)
     {
         // Same logic as DOCUMENT_INFO in ProjectDocumentStatus.tsx
-        var allTypes = new Dictionary<DocumentType, List<ProjectCategory>>
+        var allTypes = new Dictionary<DocumentType, List<int>>
         {
-            { DocumentType.TITLE, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.LEGAL_STATUS, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.SURVEY, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.ID, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.NOTARIAL_POWER, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.OTHER, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificadoTitulo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificacionEstadoJuridico, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.PlanoMensuraCatastral, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificadoUsoSuelo, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.CertificacionIPI, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.RegistroMercantil, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.PoderNotarial, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
-            { DocumentType.RNC, new List<ProjectCategory> { ProjectCategory.Residencial, ProjectCategory.Comercial, ProjectCategory.Turistico, ProjectCategory.Mixto, ProjectCategory.Otro } },
+            { DocumentType.TITLE, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.LEGAL_STATUS, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.SURVEY, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.ID, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.NOTARIAL_POWER, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.OTHER, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificadoTitulo, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificacionEstadoJuridico, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.PlanoMensuraCatastral, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificadoUsoSuelo, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificacionIPI, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.RegistroMercantil, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.PoderNotarial, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.RNC, new List<int> { 1, 2, 3, 4, 99 } },
         };
 
         var result = new List<DocumentType>();
         foreach (var kvp in allTypes)
         {
-            if (kvp.Value.Contains(category))
+            if (kvp.Value.Contains(categoryId))
             {
                 result.Add(kvp.Key);
             }

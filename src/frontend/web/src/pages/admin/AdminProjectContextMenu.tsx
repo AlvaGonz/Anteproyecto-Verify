@@ -20,7 +20,7 @@ interface AdminProjectContextMenuProps {
   deleteProject: (id: string) => void;
 }
 
-export const AdminProjectContextMenu: React.FC<AdminProjectContextMenuProps> = ({
+export const AdminProjectContextMenu: React.FC<AdminProjectContextMenuProps> = React.memo(({
   project,
   isOpen,
   onToggle,
@@ -194,4 +194,4 @@ export const AdminProjectContextMenu: React.FC<AdminProjectContextMenuProps> = (
       )}
     </>
   );
-};
+});

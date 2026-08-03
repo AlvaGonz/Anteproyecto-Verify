@@ -21,6 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useProject } from "../../features/projects/api/useProjects";
+import { useCategories } from "../../features/projects/api/useCategories";
 import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
 import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
 import { IntegrityStatus } from "../../features/projects/types";
@@ -264,6 +265,10 @@ export const PublishedProjectDetailPage: React.FC = () => {
   const saved = localSaved;
   const interested = localInterested;
 
+  const { data: categorias = [] } = useCategories();
+  // ponytail: categoriaNombre arrives empty on the wire (repo GetByIdAsync has no Include(CategoriaProyecto)); resolve the name from the cached catalog by id instead
+  const categoriaNombre = categorias.find(c => c.id === project?.categoriaId)?.nombre ?? project?.categoriaNombre ?? "N/D";
+
   // Gather all available images
   const allImgs = [
     project?.imagenUrl,
@@ -277,7 +282,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
 
   const uniqueImgs = allImgs.length > 0
     ? Array.from(new Set(allImgs))
-    : [getDefaultProjectImage(project?.categoria as unknown as number)];
+    : [getDefaultProjectImage(project?.categoriaId as number)];
 
   // Parse GPS coordinates
   let gpsLat: number | null = null;
@@ -412,6 +417,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
                 <img
                   src={uniqueImgs[0]}
                   alt={`${project.nombre} - Foto principal`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
@@ -432,6 +439,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
                       <img
                         src={url}
                         alt=""
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     </button>
@@ -455,7 +464,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-slate-700">Estado: <span className="font-bold">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span></p>
-                <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{project.categoria === 1 ? "Construcción" : project.categoria === 2 ? "Comercio" : project.categoria === 3 ? "Turismo" : "N/D"}</span></p>
+                <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{categoriaNombre}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Integridad: <span className="font-bold">{getIntegrityLabel()}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Ubicación: <span className="font-bold">{project.ubicacionTexto || "N/D"}</span></p>
               </div>
@@ -515,30 +524,34 @@ export const PublishedProjectDetailPage: React.FC = () => {
           <div>
             <h3 className="text-primary font-bold text-sm mb-3">Datos Generales</h3>
             <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100 text-sm">
-              <div className="grid grid-cols-2 gap-y-2 gap-x-4">
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Desarrollador:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.datosDesarrollador || "N/D"}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Desarrollador:</span>
+                  <span className="block break-words text-slate-600">{project.datosDesarrollador || "N/D"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">RNC/Cédula:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.rncDesarrollador || project.cedulaRncPropietario || "N/D"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">RNC/Cédula:</span>
+                  <span className="block break-words text-slate-600">{project.rncDesarrollador || project.cedulaRncPropietario || "N/D"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Categoría:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.categoria === 1 ? "Construcción" : project.categoria === 2 ? "Comercio" : "Turismo"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Categoría:</span>
+                  <span className="block break-words text-slate-600">{categoriaNombre}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Estado:</span>
-                  <span className="text-slate-600 w-1/2">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Superficie M²:</span>
+                  <span className="block break-words text-slate-600">{project.superficieM2 != null ? `${project.superficieM2.toLocaleString("es-DO")} m²` : "N/D"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Integridad:</span>
-                  <span className="text-slate-600 w-1/2">{getIntegrityLabel()}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Estado:</span>
+                  <span className="block text-slate-600">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span>
                 </div>
-                <div className="flex border-b border-slate-200 pb-1">
-                  <span className="font-bold text-slate-700 w-1/2">Ubicación:</span>
-                  <span className="text-slate-600 w-1/2 truncate">{project.ubicacionTexto || "N/D"}</span>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Integridad:</span>
+                  <span className="block text-slate-600">{getIntegrityLabel()}</span>
+                </div>
+                <div className="min-w-0 border-b border-slate-200 pb-1.5">
+                  <span className="block font-bold text-slate-700">Ubicación:</span>
+                  <span className="block break-words text-slate-600">{project.ubicacionTexto || "N/D"}</span>
                 </div>
               </div>
             </div>
@@ -582,9 +595,9 @@ export const PublishedProjectDetailPage: React.FC = () => {
                   Responsable Registral
                 </p>
               </div>
-              <div className="w-16 h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-16 h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden rounded-md">
                 {project.registradoPor?.avatarUrl ? (
-                  <img src={project.registradoPor.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  <img src={project.registradoPor.avatarUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 ) : (
                   <Building2 size={24} className="text-slate-300" />
                 )}
@@ -747,6 +760,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
             <img
               src={uniqueImgs[selectedImageIndex]}
               alt={`${project.nombre} - Foto ampliada`}
+              loading="lazy"
+              decoding="async"
               className="max-w-full max-h-full object-contain"
             />
 
@@ -774,7 +789,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
                     i === selectedImageIndex ? "border-2 border-primary scale-110 shadow-[0_0_15px_rgba(249,133,19,0.5)] z-10" : "opacity-40 hover:opacity-100 border border-slate-700"
                   }`}
                 >
-                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <img src={url} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

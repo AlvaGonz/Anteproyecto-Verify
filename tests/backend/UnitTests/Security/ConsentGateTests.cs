@@ -1,4 +1,4 @@
-namespace UnitTests.Security;
+﻿namespace UnitTests.Security;
 
 using System;
 using System.Threading;
@@ -55,7 +55,7 @@ public class ConsentGateTests
         
         var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.User, "8095551212", "40200000000");
         var promotorId = promotor.Id;
-        var project = new Proyecto("Test", "Loc", promotorId);
+        var project = new Proyecto("Test", "Loc", promotorId, 16);
         
         _proyectoRepositoryMock.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(project);
@@ -86,7 +86,7 @@ public class ConsentGateTests
         
         var promotor = new Usuario("Promotor", "LastName", "promotor@test.com", "123", UserRole.User, "8095551212", "40200000000");
         var promotorId = promotor.Id;
-        var project = new Proyecto("Test", "Loc", promotorId);
+        var project = new Proyecto("Test", "Loc", promotorId, 16);
         var oldVersion = "v0.9";
         var consentimiento = new ConsentimientoFinanciero(promotorId, "1.1.1.1", oldVersion);
         

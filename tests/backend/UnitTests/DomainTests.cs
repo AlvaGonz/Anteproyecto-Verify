@@ -1,4 +1,4 @@
-namespace UnitTests;
+﻿namespace UnitTests;
 
 using System;
 using Domain.Entities;
@@ -39,7 +39,7 @@ public class DomainTests
         var usuarioId = Guid.NewGuid();
 
         // Act
-        var proyecto = new Proyecto(nombre, ubicacion, usuarioId);
+        var proyecto = new Proyecto(nombre, ubicacion, usuarioId, 16);
 
         // Assert
         Assert.Equal(nombre, proyecto.Nombre);
