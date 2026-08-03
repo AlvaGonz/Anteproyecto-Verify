@@ -26,8 +26,8 @@ public class CatastroVerificationRequest
     public string? Oficina { get; set; }
     
     // Nuevas variables
-    public DateTime? FechaInscripcion { get; set; }
-    public DateTime? FechaEmision { get; set; }
+    public string? FechaInscripcion { get; set; }
+    public string? FechaEmision { get; set; }
     public string? VieneDe { get; set; }
     public string? DesignCatastralOrigen { get; set; }
     public string? DesigCatastralPosicional { get; set; }
@@ -38,19 +38,26 @@ public class JceVerificationRequest
     public string? Cedula { get; set; }
     public string? Nombres { get; set; }
     public string? Apellidos { get; set; }
+    public string? FechaNacimiento { get; set; }
+    public string? FechaExpiracion { get; set; }
 }
 
 public class DgiiVerificationRequest
 {
     public string? Rnc { get; set; }
-    public string? RazonSocial { get; set; }
+    public string? NombreRazonSocial { get; set; }
+    public string? ActividadEconomica { get; set; }
 }
 
 public class PermisoSueloVerificationRequest
 {
     public string? NumeroPermiso { get; set; }
+    public string? NumeroExpediente { get; set; }
     public string? Rnc { get; set; }
     public string? Departamento { get; set; }
+    public string? Operacion { get; set; }
+    public string? Seccion { get; set; }
+    public string? Lugar { get; set; }
 }
 
 public class IpiVerificationRequest
@@ -58,4 +65,5 @@ public class IpiVerificationRequest
     public string? Rnc { get; set; }
     public string? NoCertificacion { get; set; }
     public string? NoInmueble { get; set; }
+    public string? ParcelaNo { get; set; }
 }
