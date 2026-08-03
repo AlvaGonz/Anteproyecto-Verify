@@ -65,9 +65,9 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
     );
   }
 
-  // Sort logs by date (newest first)
-  const sortedLogs = [...logs].sort((a, b) => 
-    new Date(b.fechaUtc).getTime() - new Date(a.fechaUtc).getTime()
+  // Sort logs by date (newest first); null dates sink to the bottom
+  const sortedLogs = [...logs].sort((a, b) =>
+    (toUtcDate(b.fechaUtc)?.getTime() ?? 0) - (toUtcDate(a.fechaUtc)?.getTime() ?? 0)
   );
 
   return (
@@ -79,7 +79,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
         {sortedLogs.map((log) => {
           const config = ACTION_CONFIG[log.accion] || ACTION_CONFIG[AuditActionType.StatusChange];
           const Icon = config.icon;
-           const date = toUtcDate(log.fechaUtc)!;
+          const date = toUtcDate(log.fechaUtc);
 
           return (
             <div key={log.id} className="flex gap-6 group animate-fade-in-up">
@@ -98,7 +98,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
                   </span>
                   <div className="flex items-center gap-2 text-on-surface-variant/50 text-[10px] font-bold">
                     <History className="w-3 h-3" />
-                    {date.toLocaleDateString()} — {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {date ? `${date.toLocaleDateString()} — ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : "Fecha no disponible"}
                   </div>
                 </div>
 
