@@ -470,14 +470,6 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {project.registradoPor.verificado && (
-                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">
-                          <ShieldCheck className="w-3 h-3" />
-                          <span className="text-[9px] font-black uppercase tracking-widest">Verificado</span>
-                        </div>
-                      )}
-                    </div>
                   </div>
 
                   {/* Registrant details */}
