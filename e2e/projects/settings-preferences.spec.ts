@@ -162,7 +162,7 @@ async function stubApis(page: Page) {
 async function openPreferencesTab(page: Page) {
   await page.goto('/#/admin/settings');
   await page.waitForLoadState('networkidle');
-  await page.getByRole('button', { name: 'Preferencias' }).click();
+  await page.getByRole('button', { name: 'Preferencias', exact: true }).click();
 }
 
 async function savePreferences(page: Page, nameMode: NameMode, idMode: IdMode) {
@@ -197,9 +197,9 @@ test.describe('Settings > Preferencias tab', () => {
     await expect(page.getByRole('button', { name: 'Suscripción' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Usuarios y Accesos' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Seguridad' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Preferencias' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Preferencias', exact: true })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Preferencias' }).click();
+    await page.getByRole('button', { name: 'Preferencias', exact: true }).click();
     await expect(page.getByLabel('Nombre real')).toBeVisible();
     await expect(page.getByLabel('Nickname (apodo)')).toBeVisible();
     await expect(page.getByLabel('Cédula')).toBeVisible();
@@ -308,10 +308,10 @@ test.describe('Settings > Preferencias tab', () => {
     await page.getByRole('button', { name: 'Mi Perfil' }).click();
     await expect(page.getByTestId('settings-grid')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Preferencias' }).click();
+    await page.getByRole('button', { name: 'Preferencias', exact: true }).click();
     await expect(page.getByLabel('Nombre real')).toBeVisible();
 
     await page.getByRole('button', { name: 'Suscripción' }).click();
-    await expect(page.getByRole('button', { name: 'Preferencias' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Preferencias', exact: true })).toBeVisible();
   });
 });

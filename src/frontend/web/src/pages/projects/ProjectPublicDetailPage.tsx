@@ -460,14 +460,20 @@ export const ProjectPublicDetailPage: React.FC = () => {
                       )}
                       <div className="font-display min-w-0">
                         <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50 block mb-0.5">Responsable Registral</span>
-                        <span className="text-xl md:text-2xl font-black leading-tight tracking-tighter italic block break-words">
-                          {project.registradoPor.nombreCompleto}
+                        <span className="text-xl md:text-2xl font-black leading-tight tracking-tighter italic block break-words" data-testid="public-registrant-name">
+                          {project.registradoPor.presentacionPublica?.nombreMostrado ?? project.registradoPor.nombreCompleto}
                         </span>
-                        {project.registradoPor.razonSocial && (
-                          <span className="text-xs font-medium text-primary mt-1 block break-words">
-                            {project.registradoPor.razonSocial}
-                          </span>
-                        )}
+                        {project.registradoPor.presentacionPublica
+                          ? project.registradoPor.presentacionPublica.razonSocialMostrada && (
+                              <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
+                                {project.registradoPor.presentacionPublica.razonSocialMostrada}
+                              </span>
+                            )
+                          : project.registradoPor.razonSocial && (
+                              <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
+                                {project.registradoPor.razonSocial}
+                              </span>
+                            )}
                       </div>
                     </div>
                   </div>
@@ -501,15 +507,19 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           </div>
                         </div>
                       )}
-                      {(project.cedulaRncPropietario || project.rncDesarrollador) && (
+                      {(project.registradoPor.presentacionPublica
+                        ? project.registradoPor.presentacionPublica.identificacionMostrada
+                        : (project.cedulaRncPropietario || project.rncDesarrollador)) && (
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
                             <Fingerprint className="w-4 h-4 text-primary" />
                           </div>
                           <div className="min-w-0">
                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">RNC/Cédula</span>
-                            <span className="text-sm font-medium text-white/90 break-words block">
-                              {project.cedulaRncPropietario || project.rncDesarrollador}
+                            <span className="text-sm font-medium text-white/90 break-words block" data-testid="public-registrant-identification">
+                              {project.registradoPor.presentacionPublica
+                                ? project.registradoPor.presentacionPublica.identificacionMostrada
+                                : (project.cedulaRncPropietario || project.rncDesarrollador)}
                             </span>
                           </div>
                         </div>

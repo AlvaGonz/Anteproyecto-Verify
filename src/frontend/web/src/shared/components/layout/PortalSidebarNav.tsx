@@ -20,7 +20,7 @@ interface PortalSidebarNavProps {
   onClose?: () => void;
 }
 
-export const PortalSidebarNav: React.FC<PortalSidebarNavProps> = ({ onClose }) => {
+export const PortalSidebarNav: React.FC<PortalSidebarNavProps> = () => {
   const location = useLocation();
 
   return (

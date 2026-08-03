@@ -7,7 +7,7 @@ import { CreateUserDto, UserSettings } from "../../features/settings/types/setti
 import { UsersTable } from "../../features/settings/components/UsersTable";
 import { UserFormModal } from "../../features/settings/components/UserFormModal";
 import { DeleteModal } from "../../features/settings/components/DeleteModal";
-import { Settings, Users, Loader2, User, CreditCard, UserPlus, Shield } from "lucide-react";
+import { Settings, Users, Loader2, User, CreditCard, UserPlus, Shield, Palette } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
@@ -17,10 +17,11 @@ const InviteesSettings = lazy(() => import("../../features/settings/components/I
 const DeleteAccountSection = lazy(() => import("../../features/settings/components/DeleteAccountSection").then(m => ({ default: m.DeleteAccountSection })));
 const TwoFactorSection = lazy(() => import("../../features/settings/components/TwoFactorSection").then(m => ({ default: m.TwoFactorSection })));
 const ChangePasswordSection = lazy(() => import("../../features/settings/components/ChangePasswordSection").then(m => ({ default: m.ChangePasswordSection })));
+const PreferenciasSection = lazy(() => import("../../features/settings/components/PreferenciasSection").then(m => ({ default: m.PreferenciasSection })));
 
 const TabFallback = () => <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
-type TabId = "profile" | "subscription" | "users" | "invitees" | "security";
+type TabId = "profile" | "subscription" | "users" | "invitees" | "security" | "preferences";
 
 
 
@@ -239,6 +240,19 @@ export const SettingsPage: React.FC = () => {
           <Shield className="w-4 h-4" />
           Seguridad
         </button>
+
+        {/* Preferencias tab - how the user is presented on public projects */}
+        <button
+          type="button"
+          onClick={() => setActiveTab("preferences")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "preferences"
+            ? "border-[#223382] text-[#223382]"
+            : "border-transparent text-text-secondary hover:text-text-primary"
+            }`}
+        >
+          <Palette className="w-4 h-4" />
+          Preferencias
+        </button>
       </div>
 
       {/* Tab Contents */}
@@ -288,6 +302,12 @@ export const SettingsPage: React.FC = () => {
                 <DeleteAccountSection />
              </section>
            </m.div>
+          )}
+
+          {activeTab === "preferences" && (
+            <m.div key="preferences" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+              <PreferenciasSection />
+            </m.div>
           )}
 
         </AnimatePresence>

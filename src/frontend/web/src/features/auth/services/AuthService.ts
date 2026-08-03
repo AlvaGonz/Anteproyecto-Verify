@@ -16,6 +16,8 @@ export interface User {
   direccion?: string;
   provincia?: string;
   nickname?: string;
+  nombrePublicoModo?: 'realName' | 'nickname' | null;
+  identificacionPublicaModo?: 'cedula' | 'rnc' | null;
   plan?: string;
   avatarUrl?: string;
   stripeCustomerId?: string | null;

@@ -453,8 +453,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
             {/* Seller Header */}
             <div className="flex items-center gap-3 mb-4 min-w-0">
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-primary text-sm leading-tight break-words">
-                  {project.registradoPor?.nombreCompleto || "Usuario Desconocido"}
+                <h3 className="font-bold text-primary text-sm leading-tight break-words" data-testid="registrant-name">
+                  {project.registradoPor?.presentacionPublica?.nombreMostrado ?? (project.registradoPor?.nombreCompleto || "Usuario Desconocido")}
                 </h3>
                 <p className="text-xs text-slate-500 font-semibold">
                   Responsable Registral
@@ -474,13 +474,31 @@ export const PublishedProjectDetailPage: React.FC = () => {
               <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
                 <span className="font-bold shrink-0">RNC/Cédula:</span> 
-                <span className="break-all min-w-0">{project.cedulaRncPropietario || project.rncDesarrollador || "N/D"}</span>
+                <span className="break-all min-w-0" data-testid="registrant-identification">
+                  {project.registradoPor?.presentacionPublica
+                    ? (project.registradoPor.presentacionPublica.identificacionMostrada || "N/D")
+                    : (project.cedulaRncPropietario || project.rncDesarrollador || "N/D")}
+                </span>
               </li>
-              <li className="flex gap-2 items-start min-w-0">
-                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold shrink-0">R. Social:</span> 
-                <span className="break-words min-w-0">{project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}</span>
-              </li>
+              {project.registradoPor?.presentacionPublica ? (
+                project.registradoPor.presentacionPublica.razonSocialMostrada && (
+                  <li className="flex gap-2 items-start min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                    <span className="font-bold shrink-0">R. Social:</span> 
+                    <span className="break-words min-w-0" data-testid="registrant-razon-social">
+                      {project.registradoPor.presentacionPublica.razonSocialMostrada}
+                    </span>
+                  </li>
+                )
+              ) : (
+                <li className="flex gap-2 items-start min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                  <span className="font-bold shrink-0">R. Social:</span> 
+                  <span className="break-words min-w-0" data-testid="registrant-razon-social">
+                    {project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}
+                  </span>
+                </li>
+              )}
               <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
                 <span className="font-bold shrink-0">Tel:</span> 
