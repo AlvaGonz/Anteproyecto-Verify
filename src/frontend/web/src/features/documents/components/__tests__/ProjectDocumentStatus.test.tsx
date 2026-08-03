@@ -82,4 +82,45 @@ describe("ProjectDocumentStatus", () => {
     // Check if the status OBSERVADO is displayed
     expect(screen.getByText("OBSERVADO")).toBeInTheDocument();
   });
+
+  it("counts essential documents using only the 5 Documentos Principales (not anexos)", () => {
+    vi.mocked(useDocuments).mockReturnValue({
+      data: [
+        {
+          id: "doc-1",
+          tipoDocumento: DocumentType.CertificadoTitulo,
+          estadoDocumento: DocumentStatus.Verificado,
+          nombreArchivoOriginal: "titulo_original.pdf",
+        },
+        {
+          id: "doc-2",
+          tipoDocumento: DocumentType.PoderNotarial,
+          estadoDocumento: DocumentStatus.Verificado,
+          nombreArchivoOriginal: "poder.pdf",
+        },
+      ],
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    // 1 of 5 esenciales present (PoderNotarial is an anexo and must NOT count)
+    expect(screen.getByText("4 documentos esenciales")).toBeInTheDocument();
+  });
+
+  it("renders Documentos Principales and Anexos as separate sections", () => {
+    vi.mocked(useDocuments).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    expect(screen.getByText("Documentos Principales")).toBeInTheDocument();
+    expect(screen.getByText("Anexos")).toBeInTheDocument();
+    expect(screen.getByText("Cédula / Identidad del Titular")).toBeInTheDocument();
+    expect(screen.getByText("Certificado EIA")).toBeInTheDocument();
+  });
 });

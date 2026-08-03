@@ -33,6 +33,22 @@ const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string
   [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
 };
 
+const ESSENTIAL_TYPES: DocumentType[] = [
+  DocumentType.CertificadoTitulo,
+  DocumentType.CertificacionEstadoJuridico,
+  DocumentType.PlanoMensuraCatastral,
+  DocumentType.CopiaCedulaIdentidad,
+  DocumentType.CertificacionIPI,
+];
+
+const ANEXO_TYPES: DocumentType[] = [
+  DocumentType.CertificadoUsoSuelo,
+  DocumentType.RegistroMercantil,
+  DocumentType.PoderNotarial,
+  DocumentType.RNC,
+  DocumentType.CertificadoEIA,
+];
+
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId }) => {
   const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
   const { mutate: downloadDoc, isPending: isDownloading } = useDownloadDocument(projectId || "");
@@ -44,14 +60,11 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     </div>
   );
 
-  const requiredTypes = Object.keys(DOCUMENT_INFO).map(Number) as DocumentType[];
+  const uploadedDocs = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ESSENTIAL_TYPES.includes(d.tipoDocumento));
 
-  const uploadedDocs = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
-
-
-  const missingCount = requiredTypes.length - uploadedDocs.length;
-  const progressPercent = requiredTypes.length > 0
-    ? Math.round((uploadedDocs.length / requiredTypes.length) * 100)
+  const missingCount = ESSENTIAL_TYPES.length - uploadedDocs.length;
+  const progressPercent = ESSENTIAL_TYPES.length > 0
+    ? Math.round((uploadedDocs.length / ESSENTIAL_TYPES.length) * 100)
     : 100;
 
   const renderDocItem = (typeId: DocumentType, index: number) => {
@@ -218,8 +231,26 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 gap-4">
-        {requiredTypes.map((typeId, idx) => renderDocItem(typeId, idx))}
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-5 bg-primary rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-secondary">Documentos Principales</h3>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {ESSENTIAL_TYPES.map((typeId, idx) => renderDocItem(typeId, idx))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-5 bg-on-surface-variant/30 rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant/60">Anexos</h3>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {ANEXO_TYPES.map((typeId, idx) => renderDocItem(typeId, idx + ESSENTIAL_TYPES.length))}
+          </div>
+        </div>
       </div>
 
       <div className="pt-10 border-t border-surface-container-high/50 flex flex-col items-center gap-4">
