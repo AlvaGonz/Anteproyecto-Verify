@@ -1,3 +1,14 @@
+# Progress: Tab "Preferencias" — multi-select: ambas opciones por grupo, nunca ninguna (2026-08-03, oe-preferences round 2)
+
+- **Cambio de semántica (pedido por el usuario)**: de radio (exclusivo) a **checkboxes multi-select** — el usuario puede elegir UNA o AMBAS opciones de cada grupo (nombre real Y nickname; cédula Y RNC), pero **nunca puede quedar sin ninguna** (mínimo 1 por grupo).
+- **UI**: `PreferenciasSection.tsx` con checkboxes (indicador cuadrado naranja + check CSS, estado seleccionado `border-primary/bg-primary-subtle/ring`); desmarcar la última opción del grupo se bloquea con toast info "Debes mantener al menos una opción...". Hint de grupo: "Al menos una opción debe permanecer seleccionada".
+- **Resolución combinada (server-side, PublicIdentityResolver)**: `[Flags]` enums `NombrePublicoModo`/`IdentificacionPublicaModo`; ambas → "Nombre (nickname)" y "cédula · rnc"; fallbacks: nickname faltante → solo real; RNC faltante → solo cédula; razón social solo si el RNC realmente se muestra; sin preferencia → comportamiento heredado.
+- **API**: `PATCH /api/auth/preferences` acepta arrays `["realName","nickname"]`/`["cedula","rnc"]` (400 si vacío o valor desconocido — `MapNombreModos`/`MapIdentificaciones`); `GET /api/auth/me` devuelve arrays (`NombrePublicoModoToWire`). Handler rechaza modos null/0 (min 1 por grupo). Persistencia: mismas columnas `nvarchar(20)` (valores flags "RealName, Nickname" = 18 chars ≤ 20) — sin migración nueva.
+- **Tests**: E2E `settings-preferences.spec.ts` 9/9 (agregados: "BOTH options render combined" + "never none: last checked cannot be unchecked"); resolver 13 casos (combinaciones + fallbacks); handler 5 casos (rechazo min-1). UnitTests totales 383/8 (mismos 8 pre-existentes).
+- **Entorno/locators**: los tabs ahora son ARIA `tablist`/`tab` (commit del usuario `6a81b4bb`) → el spec usa `getByRole('tab', ...)`; `networkidle` no es fiable contra el Vite docker (chunks lazy lentos) → esperas por aserción (`heading Configuración` + 20s). `uncheck()` de Playwright lanza si el estado no cambia → el test "never none" usa `click()` + `toBeChecked`.
+- **Colaboración en paralelo**: el usuario commitó `ac7f4af7`/`49c6f5fa` (backend multi-select) y `6a81b4bb` (tablist) mientras trabajaba — integrados sin conflicto; mi fix posterior: `08b12bff` (InlineData casts).
+- Status: COMPLETE. Commits: b546a670 (spec), 96da489d (frontend), ac7f4af7/49c6f5fa/08b12bff (backend).
+
 # Progress: Tab "Preferencias" — presentación pública del responsable registral (2026-08-03, oe-preferences)
 
 - **Feature**: nuevo tab `Preferencias` en `/admin/settings` (a la derecha inmediata de "Mi Perfil"). El usuario elige cómo se presenta como responsable en proyectos públicos: nombre (real | nickname) e identificación (cédula | RNC + razón social). Aplica a `/admin/projects/:id/publicado`, `/#/p/:slug` y la lista admin.
