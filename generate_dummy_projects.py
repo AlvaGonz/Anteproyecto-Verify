@@ -285,6 +285,28 @@ for email, label, max_count, is_freemium in PLAN_CONFIG:
         lines.append(f"    INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)")
         lines.append(f"    VALUES ('{log_id}', '{rid}', (SELECT IdUsuario FROM Usuario WHERE Email = '{email}'), '{now.strftime('%Y-%m-%dT%H:%M:%S')}', '{detail}', '{now.strftime('%Y-%m-%dT%H:%M:%S')}', '{now.strftime('%Y-%m-%dT%H:%M:%S')}');")
 
+        # ── Status History (Auditorias con CambioEstado) ──────────────────
+        status_chain = {
+            1: ['CREADO'],
+            2: ['CREADO', 'EDITADO'],
+            3: ['CREADO', 'EDITADO', 'REVISION'],
+            4: ['CREADO', 'EDITADO', 'REVISION', 'PUBLICADO'],
+        }
+        chain = status_chain.get(status, ['CREADO'])
+        for step_idx, target_estado in enumerate(chain):
+            if step_idx == 0:
+                anterior_estado = None
+                anterior_lookup = 'NULL'
+            else:
+                anterior_estado = chain[step_idx - 1]
+                anterior_lookup = f"(SELECT Id FROM ProyectosEstados WHERE CodigoUnico = '{anterior_estado}')"
+            nuevo_lookup = f"(SELECT Id FROM ProyectosEstados WHERE CodigoUnico = '{target_estado}')"
+            step_date = now + timedelta(hours=step_idx * random.Random(SEED + project_counter * 17 + step_idx).randint(1, 48))
+            hist_id = str(uuid.UUID(int=r.randint(0, 2**128 - 1)+2+step_idx)).upper()
+            lines.append("")
+            lines.append(f"    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)")
+            lines.append(f"    VALUES ('{hist_id}', (SELECT IdUsuario FROM Usuario WHERE Email = '{email}'), '{rid}', 'CambioEstado', 'CambioEstado', 21, '{anterior_estado or 'null'} -> {target_estado}', '{rid}', '{step_date.strftime('%Y-%m-%dT%H:%M:%S')}', '{step_date.strftime('%Y-%m-%dT%H:%M:%S')}', {anterior_lookup}, {nuevo_lookup}, 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');")
+
         lines.append("END")
         lines.append("")
 
