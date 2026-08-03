@@ -57,16 +57,32 @@ try
             if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.SqlServer")
             {
                 logger.LogInformation("Applying database migrations...");
-                try
+                // ALTER DATABASE / ALTER COLUMN steps can block behind the mock-data generator for minutes
+                db.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+                const int maxMigrationAttempts = 3;
+                for (int attempt = 1; attempt <= maxMigrationAttempts; attempt++)
                 {
-                    await db.Database.MigrateAsync();
-                    logger.LogInformation("Database migrations applied successfully.");
+                    try
+                    {
+                        await db.Database.MigrateAsync();
+                        break;
+                    }
+                    catch (Microsoft.Data.SqlClient.SqlException ex)
+                        when (attempt < maxMigrationAttempts && (ex.Number == -2 || ex.Number == 4060))
+                    {
+                        // Database creation can race with SQL Server startup (e.g. ALTER DATABASE ... SET READ_COMMITTED_SNAPSHOT ON timing out)
+                        logger.LogWarning(ex,
+                            "Migration attempt {Attempt}/{Max} failed transiently. Retrying in 5 seconds...",
+                            attempt, maxMigrationAttempts);
+                        await Task.Delay(TimeSpan.FromSeconds(5));
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Fatal: database migration failed on startup.");
+                        throw;  // App no debe arrancar con DB corrupta
+                    }
                 }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Fatal: database migration failed on startup.");
-                    throw;  // App no debe arrancar con DB corrupta
-                }
+                logger.LogInformation("Database migrations applied successfully.");
             }
             else
             {

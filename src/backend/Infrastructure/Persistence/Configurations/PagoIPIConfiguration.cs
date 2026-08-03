@@ -10,5 +10,7 @@ public class PagoIPIConfiguration : IEntityTypeConfiguration<PagoIPI>
     {
         builder.ToTable("PagoIPI");
         builder.HasKey(p => p.Rnc);
+
+        builder.Property(p => p.Cuota_ipi).HasPrecision(18, 2);
     }
 }

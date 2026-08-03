@@ -1,3 +1,16 @@
+# Progress: API startup — EF decimal precision warnings + RCSI timeout crash (2026-08-03)
+
+- **Report**: API container startup emitted 7× `EF Model.Validation[30000]` warnings ("No store type was specified for the decimal property") for `CatastroTitulo.Latitud/Longitud/Superficie`, `PermisoSuelo.Latitud/Longitud/Superficie`, `PagoIPI.Cuota_ipi`; DB columns were default `decimal(18,2)` → coordinates silently truncated to 2 decimals (18.47186 → 18.47, ~1km error). First boot also crashed: EF8 database-creator `ALTER DATABASE ... SET READ_COMMITTED_SNAPSHOT ON` (after `CREATE DATABASE`) hit the 60s command timeout (Error -2) → "Fatal: database migration failed on startup"; only the container restart recovered it.
+- **Fixes (TDD red→green)**:
+  - RED: `tests/backend/UnitTests/Infrastructure/Persistence/GobernanzaDataDecimalPrecisionTests.cs` (7 tests, model-metadata seam, same pattern as `PagoModelMappingTests`) — all 7 failed with `Precision: null`.
+  - GREEN: `HasPrecision` added to `CatastroTituloConfiguration` (Latitud/Longitud 18,6; Superficie 18,2), `PermisoSueloConfiguration` (same), `PagoIPIConfiguration` (Cuota_ipi 18,2). 7/7 pass.
+  - Migration `20260803142031_FixGobernanzaDataDecimalPrecision` — ALTERs Latitud/Longitud to `decimal(18,6)` on CatastroTitulo + PermisoSuelo (Superficie/Cuota_ipi already match at 18,2 → no-op). Verified live via mssql MCP: all 7 columns now (18,6)/(18,2).
+  - `Program.cs`: `SetCommandTimeout(5 min)` + bounded retry loop (3 attempts, retries only SqlException `-2`/`4060`) around `MigrateAsync` — rides through both the RCSI 60s window and the mock-data generator's long `ALTER COLUMN` lock hold.
+- **Environment gotcha (documented)**: `python_env` container's `generador_entidades_gubernamentales.py` runs giant parallel multi-VALUES INSERTs into the mock tables for ~7+ min, holding `LCK_M_SCH_M`-blocking locks; the ALTER COLUMN waits behind it. One-time cost — after this migration there are no pending migrations, so future startups only check `__EFMigrationsHistory`.
+- **Verified live**: rebuilt API image → migration applied, `Now listening on: http://0.0.0.0:8080`, **0** `Model.Validation[30000]` warnings in the full startup log.
+- **Suites**: UnitTests 365/8 — same 8 pre-existing failures (quota/auth/role set, documented below), zero regressions (baseline on clean tree: 358/15 including the 7 new RED tests). `post_task_loop.py` → BLOCK (pre-existing: last commit is a merge without conventional-commit prefix).
+- Status: COMPLETE. Uncommitted: 3 EF configs, `Program.cs`, new test file, migration `20260803142031_FixGobernanzaDataDecimalPrecision` (+ Designer + snapshot).
+
 # Progress: Category cutover — Step 7 final verification, all suites GREEN vs pre-existing baseline (2026-08-02, session 3)
 
 - **Step 4 (Backend)**: DONE. UnitTests 358/8, Api.Tests 34/34, Integration 15/19 — all remaining failures = documented pre-existing set (see below). `ProjectService.ValidateCategoriaAsync` rejects unknown/inactive IDs → controller 400 with field; `CreateProyectoDto.CategoriaId` required (no default); `Proyecto` ctor default removed.

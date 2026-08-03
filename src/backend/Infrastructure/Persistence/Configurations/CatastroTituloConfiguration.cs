@@ -10,5 +10,9 @@ public class CatastroTituloConfiguration : IEntityTypeConfiguration<CatastroTitu
     {
         builder.ToTable("CatastroTitulo");
         builder.HasKey(c => c.IdCatastroTitulo);
+
+        builder.Property(c => c.Latitud).HasPrecision(18, 6);
+        builder.Property(c => c.Longitud).HasPrecision(18, 6);
+        builder.Property(c => c.Superficie).HasPrecision(18, 2);
     }
 }
