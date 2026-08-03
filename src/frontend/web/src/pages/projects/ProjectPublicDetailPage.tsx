@@ -30,7 +30,6 @@ import {
   User,
   ArrowRight,
   Loader2,
-  FileText,
   Building2,
   MapIcon,
 } from "lucide-react";
@@ -626,16 +625,6 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           ) : (
                             <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
                           )}
-                        </button>
-
-                        {/* Ver Documentos */}
-                        <button
-                          type="button"
-                          onClick={() => setShowDocumentos(true)}
-                          className="w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer bg-white/10 text-white border border-white/10 hover:bg-white/15 hover:border-white/20 disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                          <FileText className="w-4 h-4 relative z-10 shrink-0" />
-                          <span className="relative z-10 text-center leading-tight">Ver Documentos</span>
                         </button>
 
                         {/* Map */}
