@@ -1,8 +1,10 @@
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { VerifySearchForm } from "./VerifySearchForm";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -14,13 +16,34 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+// Mock projectsApi.consumeQuota used inside handleSubmit via dynamic import
+vi.mock("../../projects/api/projectsApi", () => ({
+  projectsApi: {
+    consumeQuota: vi.fn().mockResolvedValue({ _tag: "Success" }),
+  },
+}));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+    mutations: { retry: false },
+  },
+});
+
+const renderForm = () =>
+  render(
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        <MemoryRouter>
+          <VerifySearchForm variant="light" />
+        </MemoryRouter>
+      </ToastProvider>
+    </QueryClientProvider>
+  );
+
 describe("VerifySearchForm Validation", () => {
   it("should show an error message when RNC format is invalid", async () => {
-    render(
-      <MemoryRouter>
-        <VerifySearchForm variant="light" />
-      </MemoryRouter>
-    );
+    renderForm();
 
     // Change search type to RNC
     const typeButton = screen.getByText(/Tipo:/i);
@@ -42,11 +65,7 @@ describe("VerifySearchForm Validation", () => {
   });
 
   it("should show an error message when Cédula format is invalid", async () => {
-    render(
-      <MemoryRouter>
-        <VerifySearchForm variant="light" />
-      </MemoryRouter>
-    );
+    renderForm();
 
     // Change search type to Cédula
     const typeButton = screen.getByText(/Tipo:/i);
@@ -68,11 +87,7 @@ describe("VerifySearchForm Validation", () => {
   });
 
   it("should show an error message when Sello VeriFinca format is invalid", async () => {
-    render(
-      <MemoryRouter>
-        <VerifySearchForm variant="light" />
-      </MemoryRouter>
-    );
+    renderForm();
 
     // Default is Sello, but let's be explicit
     const input = screen.getByPlaceholderText(/Ej: VF-2026-X83L/i);
@@ -86,11 +101,7 @@ describe("VerifySearchForm Validation", () => {
   });
 
   it("should show an error message when Suelo format is invalid", async () => {
-    render(
-      <MemoryRouter>
-        <VerifySearchForm variant="light" />
-      </MemoryRouter>
-    );
+    renderForm();
 
     const typeButton = screen.getByText(/Tipo:/i);
     fireEvent.click(typeButton);
@@ -108,11 +119,7 @@ describe("VerifySearchForm Validation", () => {
   });
 
   it("should navigate correctly when inputs are valid", async () => {
-    render(
-      <MemoryRouter>
-        <VerifySearchForm variant="light" />
-      </MemoryRouter>
-    );
+    renderForm();
 
     const input = screen.getByPlaceholderText(/Ej: VF-2026-X83L/i);
     fireEvent.change(input, { target: { value: "VF-2026-X83L" } });
@@ -120,6 +127,8 @@ describe("VerifySearchForm Validation", () => {
     const submitButton = screen.getByRole("button", { name: /CONSULTAR Sello VeriFinca/i });
     fireEvent.click(submitButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/projects/verify/VF-2026-X83L");
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith("/projects/verify/VF-2026-X83L");
+    });
   });
 });

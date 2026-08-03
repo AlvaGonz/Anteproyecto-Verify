@@ -187,8 +187,8 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
       className
     )}>
       {/* Header Section with Icon and Title */}
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-8">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <div className="flex items-center gap-4 flex-1 justify-center min-w-0">
           <div className={cn(
             "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform duration-500",
             isDark ? "bg-white/5" : "bg-slate-50"
