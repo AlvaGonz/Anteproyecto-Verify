@@ -71,9 +71,10 @@ async function expectSixMocDocuments(page: Page, projectId: string) {
   await page.goto(`/#/admin/projects/${projectId}/validations`);
   for (const code of REQUIREMENT_CODES) {
     const row = page.getByTestId(`requirement-row-${code}`);
-    await expect(row).toBeVisible();
+    // La página de validación gatea sobre 3 APIs (resultado, hallazgos, auditoría) — margen amplio
+    await expect(row).toBeVisible({ timeout: 20_000 });
     // Estado subido = sin botón "Subir" (solo se renderiza si el documento falta)
-    await expect(row.getByRole("button", { name: "Subir", exact: true })).toHaveCount(0);
+    await expect(row.getByRole("button", { name: "Subir", exact: true })).toHaveCount(0, { timeout: 20_000 });
   }
 }
 

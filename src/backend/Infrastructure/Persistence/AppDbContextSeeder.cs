@@ -16,6 +16,17 @@ using Microsoft.Extensions.Logging;
 
 public static class AppDbContextSeeder
 {
+    // Carpeta en test_docs → DocumentType canónico (mapea 1:1 a las 6 carpetas MOC)
+    private static readonly (string Folder, DocumentType Tipo)[] TestDocumentFolders = new[]
+    {
+        ("Título de Propiedad", DocumentType.CertificadoTitulo),
+        ("Estado Juridico", DocumentType.CertificacionEstadoJuridico),
+        ("Planos de Mensura", DocumentType.PlanoMensuraCatastral),
+        ("Cedula", DocumentType.ID),
+        ("Certificación IPI", DocumentType.CertificacionIPI),
+        ("Poder Notarial", DocumentType.PoderNotarial),
+    };
+
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
@@ -844,17 +855,6 @@ WHERE NOT EXISTS (
         List<Proyecto> seedProjects,
         ILogger logger)
     {
-        // Carpeta en test_docs → DocumentType canónico (mapea 1:1 a las 6 carpetas)
-        var folders = new (string Folder, DocumentType Tipo)[]
-        {
-            ("Título de Propiedad", DocumentType.CertificadoTitulo),
-            ("Estado Juridico", DocumentType.CertificacionEstadoJuridico),
-            ("Planos de Mensura", DocumentType.PlanoMensuraCatastral),
-            ("Cedula", DocumentType.ID),
-            ("Certificación IPI", DocumentType.CertificacionIPI),
-            ("Poder Notarial", DocumentType.PoderNotarial),
-        };
-
         var config = serviceProvider.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
         var configuredPath = config?["Seed:TestDocumentsPath"];
         var basePath = !string.IsNullOrWhiteSpace(configuredPath)
@@ -895,7 +895,7 @@ WHERE NOT EXISTS (
         int inserted = 0, skipped = 0;
         foreach (var proyecto in targetProjects)
         {
-            foreach (var (folder, tipo) in folders)
+            foreach (var (folder, tipo) in TestDocumentFolders)
             {
                 if (await context.Documentos.AnyAsync(d => d.ProyectoId == proyecto.Id && d.TipoDocumento == tipo))
                 {
