@@ -20,6 +20,18 @@
 - **Mounted in 6 pages** (no shared layout exists — one line per page): LandingPage `/`, LegalPage `/legal`, PricingPageLayout `/plans`, ProjectsPublicListPage `/projects`, ProjectPublicDetailPage `/p/:slug`, PublicVerifyResultPage `/verify/:code`.
 - **Test**: `BackToTopButton.test.tsx` 3/3 (hidden at top → appears after threshold → smooth scroll to top on click). tsc clean; page suites unchanged (only pre-existing LandingPage 2 failures).
 
+# Progress: User counts diverged across admin sections (settings 50-cap, dashboard Consultor exclusion) (2026-08-02)
+
+- **Report**: `/admin/settings` "Usuarios y Accesos" showed only 50 users; dashboard card "Total Usuarios" showed 114; settings/DB totals differed (142).
+- **Root causes (DB + code confirmed)**:
+  1. `SettingsPage.tsx` called `useUsers(1, 50)` — hardcoded pageSize 50; the backend's pageSize clamp was already removed ("allow loading all users") but the frontend never asked for more. UsersTable groups/paginates client-side → counts were computed over only 50.
+  2. `DashboardRepository.GetAdminDashboardStatsInternalAsync` `activeUsersQuery` excluded the **Consultor** plan (`Plan.NombrePlan != "Consultor"`) — 27 active users hidden → 114 vs 141. Ground truth: DB=142 (incl. 1 admin), active non-admin=141.
+- **Fixes (TDD)**:
+  - Backend: removed the Consultor exclusion → same population everywhere (active, non-admin, ANY plan). New integration test `Tests/Integration/Dashboard/DashboardStatsTests.cs` (RED: dashboard 4 ≠ settings 7; GREEN after fix) asserting `totalUsuarios == settings totalCount` including a Consultor user.
+  - Frontend: `SettingsPage` → `useUsers(1, 1000)` with ponytail comment (client-side pagination/tab counts need the full set). New SettingsPage test (RED: pageSize 50 → GREEN: >50).
+- **Test-infra gotcha discovered**: `JwtBearerEvents.OnMessageReceived` (ServiceCollectionExtensions.cs:60) prefers the `jwt` cookie over the Authorization header — integration tests on the shared client must log in the ADMIN LAST, or the last user's cookie overrides the admin token (403). Documented in the DashboardStatsTests comment.
+- **Verified live**: rebuilt API container → dashboard TotalUsuarios 181 == settings totalCount 181 == items returned 181. Integration suite 18/18, frontend 207/224 (same 17 pre-existing failures, zero regressions), tsc clean.
+
 # Progress: Public detail page blank "Clasificación de Activo" — missing Include (2026-08-02, session 3)
 
 - **Report**: `/#/p/:id` public detail rendered the "Clasificación de Activo" label but no category value.
