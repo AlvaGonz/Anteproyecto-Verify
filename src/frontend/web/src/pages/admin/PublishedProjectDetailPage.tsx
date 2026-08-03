@@ -248,7 +248,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
       {/* HEADER AREA */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-slate-100 pb-4 mb-6">
         <div>
-          <h1 className="text-3xl font-black text-secondary tracking-tight">
+          <h1 className="text-3xl font-black text-secondary tracking-tight break-words">
             {project.nombre}
           </h1>
           <p className="text-xs text-slate-400 font-semibold mt-1">
@@ -268,7 +268,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* LEFT COLUMN: IMAGES (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col gap-2">
+        <div className="lg:col-span-4 flex flex-col gap-2 min-w-0">
           {uniqueImgs.length > 0 ? (
             <div className="flex flex-col gap-4 items-center w-full">
               {/* Main Image (100% width) */}
@@ -322,7 +322,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
         </div>
 
         {/* CENTER COLUMN: DETAILS (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        <div className="lg:col-span-5 flex flex-col gap-6 min-w-0">
           
           {/* Top Info block (Transmision, Traccion style) */}
           <div className="pb-6 border-b border-slate-100">
@@ -443,17 +443,17 @@ export const PublishedProjectDetailPage: React.FC = () => {
         </div>
 
         {/* RIGHT COLUMN: PUBLISHER & MAP (3 cols) */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 min-w-0">
           
-          <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg overflow-hidden max-w-full">
             <h2 className="text-xl font-bold text-secondary mb-4 border-b border-slate-200 pb-2">
               Publicado por
             </h2>
 
             {/* Seller Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1">
-                <h3 className="font-bold text-primary text-sm leading-tight">
+            <div className="flex items-center gap-3 mb-4 min-w-0">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-primary text-sm leading-tight break-words">
                   {project.registradoPor?.nombreCompleto || "Usuario Desconocido"}
                 </h3>
                 <p className="text-xs text-slate-500 font-semibold">
@@ -470,57 +470,57 @@ export const PublishedProjectDetailPage: React.FC = () => {
             </div>
 
             {/* Seller Details List */}
-            <ul className="space-y-2 mb-6 text-[11px] text-slate-700">
-              <li className="flex gap-2 items-start">
+            <ul className="space-y-2 mb-6 text-[11px] text-slate-700 min-w-0">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">RNC/Cédula:</span> 
-                <span className="break-all">{project.cedulaRncPropietario || project.rncDesarrollador || "N/D"}</span>
+                <span className="font-bold shrink-0">RNC/Cédula:</span> 
+                <span className="break-all min-w-0">{project.cedulaRncPropietario || project.rncDesarrollador || "N/D"}</span>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">R. Social:</span> 
-                <span>{project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}</span>
+                <span className="font-bold shrink-0">R. Social:</span> 
+                <span className="break-words min-w-0">{project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}</span>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Tel:</span> 
-                <a href={project.registradoPor?.telefono ? `tel:${project.registradoPor.telefono.replace(/\s+/g, '')}` : undefined} className="text-primary hover:underline">
+                <span className="font-bold shrink-0">Tel:</span> 
+                <a href={project.registradoPor?.telefono ? `tel:${project.registradoPor.telefono.replace(/\s+/g, '')}` : undefined} className="text-primary hover:underline break-all min-w-0">
                   {project.registradoPor?.telefono || "N/D"}
                 </a>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Email:</span> 
-                <a href={project.registradoPor?.email ? `mailto:${project.registradoPor.email}` : undefined} className="text-primary hover:underline break-all">
+                <span className="font-bold shrink-0">Email:</span> 
+                <a href={project.registradoPor?.email ? `mailto:${project.registradoPor.email}` : undefined} className="text-primary hover:underline break-all min-w-0">
                   {project.registradoPor?.email || "N/D"}
                 </a>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Ubicación:</span> 
-                <span>{project.ubicacionTexto || "N/D"}</span>
+                <span className="font-bold shrink-0">Ubicación:</span> 
+                <span className="break-words min-w-0">{project.ubicacionTexto || "N/D"}</span>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Dirección:</span> 
-                <span>{project.registradoPor?.direccion || "N/D"}</span>
+                <span className="font-bold shrink-0">Dirección:</span> 
+                <span className="break-words min-w-0">{project.registradoPor?.direccion || "N/D"}</span>
               </li>
             </ul>
 
             {/* WhatsApp badges */}
             {project.registradoPor?.telefono && (
-              <div className="space-y-2 mb-6">
-                <a href={`https://wa.me/${project.registradoPor.telefono.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-emerald-600 hover:underline">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+              <div className="space-y-2 mb-6 min-w-0">
+                <a href={`https://wa.me/${project.registradoPor.telefono.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-emerald-600 hover:underline break-all">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0">
                     <Phone size={10} />
                   </div>
-                  WhatsApp: {project.registradoPor.telefono}
+                  <span className="min-w-0">WhatsApp: {project.registradoPor.telefono}</span>
                 </a>
               </div>
             )}
 
             {/* Action Buttons */}
-            <div className="space-y-2 mb-6">
+            <div className="space-y-2 mb-6 min-w-0">
               <button 
                 type="button" 
                 onClick={() => {
@@ -558,12 +558,12 @@ export const PublishedProjectDetailPage: React.FC = () => {
               >
                 {isRegisteringInterest || isUnregisteringInterest ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={16} className="animate-spin shrink-0" />
                     <span>Procesando...</span>
                   </>
                 ) : interested ? (
                   <>
-                    <CheckCircle2 size={16} />
+                    <CheckCircle2 size={16} className="shrink-0" />
                     <span>Interés Registrado</span>
                   </>
                 ) : (
