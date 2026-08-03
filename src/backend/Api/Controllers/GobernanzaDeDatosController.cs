@@ -42,7 +42,7 @@ public class GobernanzaDeDatosController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("verificar/permiso-suelo")]
+    [HttpPost("verificar/permisosuelo")]
     [ProducesResponseType(typeof(VerificationResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> VerificarPermisoSuelo([FromBody] PermisoSueloVerificationRequest request)
     {
@@ -50,7 +50,7 @@ public class GobernanzaDeDatosController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("verificar/ipi")]
+    [HttpPost("verificar/pagoipi")]
     [ProducesResponseType(typeof(VerificationResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> VerificarIpi([FromBody] IpiVerificationRequest request)
     {

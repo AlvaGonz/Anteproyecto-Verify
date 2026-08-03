@@ -549,9 +549,12 @@ def generate_catastro_ps_ipi_records(rncs_list):
                     cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
                     estatus_ipi = random.choice(["Pagado", "No Pagado"])
                     num_cert = "CERT" + str(random.randint(10000, 999999)) + "JUICIODEVALOR"
+                    day_offset_ipi = random.randint(0, 183)
+                    fecha_creacion_ipi = start_date + datetime.timedelta(days=day_offset_ipi)
                     ipi_record = {
                         "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi,
-                        "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc
+                        "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc,
+                        "fecha_creacion": fecha_creacion_ipi.strftime("%Y-%m-%d")
                     }
                     
                 yield cat_record, ps_record, ipi_record
@@ -582,9 +585,9 @@ def insert_ipi_chunk(chunk_id, chunk_records, attempt=1):
         batch_size = 300
         for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
-            sql_ipi = f"INSERT INTO PagoIPI (Rnc, Cuota_ipi, Estatus, NoCertificacion, NoInmueble, ParcelaNo) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
+            sql_ipi = f"INSERT INTO PagoIPI (Rnc, Cuota_ipi, Estatus, NoCertificacion, NoInmueble, ParcelaNo, FechaCreacion) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
             params_ipi = []
-            for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"], r.get("no_cert"), r.get("no_inmueble"), r.get("parcela_no")])
+            for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"], r.get("no_cert"), r.get("no_inmueble"), r.get("parcela_no"), r.get("fecha_creacion")])
             cursor.execute(sql_ipi, tuple(params_ipi))
             if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
