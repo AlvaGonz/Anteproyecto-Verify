@@ -24,13 +24,13 @@ const validateProjectData = (data: CreateProyectoDto | UpdateProyectoDto) => {
 
 
 
-export const ProjectManagePage: React.FC = () => {
+export const ProjectManagePage: React.FC = React.memo(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const isEditing = !!id;
 
-  const { data: rawProject, isLoading: loading } = useProject(id || "");
+  const { data: rawProject, isLoading: loading } = useProject(isEditing ? id! : "");
   const project = rawProject;
 
   const createMutation = useCreateProject();
@@ -166,4 +166,4 @@ export const ProjectManagePage: React.FC = () => {
       />
     </div>
   );
-};
+});

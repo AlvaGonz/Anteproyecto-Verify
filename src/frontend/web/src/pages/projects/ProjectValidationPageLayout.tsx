@@ -1,16 +1,19 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck, ArrowLeft, RefreshCw, FileText, CheckCircle,
-  ExternalLink, AlertTriangle, Database, Cpu, Fingerprint
+  ExternalLink, AlertTriangle, Database, Cpu, Fingerprint, Loader2
 } from "lucide-react";
 import { ValidationHUD } from "../../features/validations/components/ValidationHUD";
-import { ValidationSummary as InternalValidationSummary } from "../../features/validations/components/ValidationSummary";
-import { ValidationRulesTable } from "../../features/validations/components/ValidationRulesTable";
-import { FindingsPanel } from "../../features/validations/components/findings/FindingsPanel";
-import { AuditLogList } from "../../features/validations/components/audit/AuditLogList";
 import type { ValidationExecutionResult, FindingDto, AuditLogDto } from "../../features/validations/types";
-import { RequiredDocumentsList } from "../../features/documents/components/RequiredDocumentsList";
+
+const ValidationSummary = lazy(() => import("../../features/validations/components/ValidationSummary").then(m => ({ default: m.ValidationSummary })));
+const ValidationRulesTable = lazy(() => import("../../features/validations/components/ValidationRulesTable").then(m => ({ default: m.ValidationRulesTable })));
+const FindingsPanel = lazy(() => import("../../features/validations/components/findings/FindingsPanel").then(m => ({ default: m.FindingsPanel })));
+const AuditLogList = lazy(() => import("../../features/validations/components/audit/AuditLogList").then(m => ({ default: m.AuditLogList })));
+const RequiredDocumentsList = lazy(() => import("../../features/documents/components/RequiredDocumentsList").then(m => ({ default: m.RequiredDocumentsList })));
+
+const TabFallback = () => <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
 interface ProjectValidationPageLayoutProps {
   id: string | undefined;
@@ -25,7 +28,7 @@ interface ProjectValidationPageLayoutProps {
   handleScanComplete: () => Promise<void>;
 }
 
-export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutProps> = ({
+export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutProps> = React.memo(({
   id,
   error,
   activeTab,
@@ -132,6 +135,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
           {/* Main Area */}
           <div className={`${result ? 'lg:col-span-3' : ''} space-y-12`}>
             {activeTab === 'analysis' && (
+              <Suspense fallback={<TabFallback />}>
               <>
                 <RequiredDocumentsList projectId={id || ""} />
                 {result && (
@@ -139,7 +143,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
                     {/* Integrated Summary & Metrics */}
                     {result.internalValidation && (
                       <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <InternalValidationSummary summary={result.internalValidation} />
+                        <ValidationSummary summary={result.internalValidation} />
                         <div className="mt-8 vf-card p-0 overflow-hidden ring-1 ring-border/30 hover:ring-primary/30 transition-shadow">
                           <ValidationRulesTable results={result.internalValidation.results} />
                         </div>
@@ -181,6 +185,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
                   </>
                 )}
               </>
+              </Suspense>
             )}
 
             {activeTab === 'findings' && (
@@ -243,4 +248,4 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
       )}
     </div>
   );
-};
+});
