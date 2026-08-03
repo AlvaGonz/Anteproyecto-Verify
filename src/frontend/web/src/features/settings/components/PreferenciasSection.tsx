@@ -7,16 +7,19 @@ import { Loader2, Eye, UserRound, Fingerprint, BadgeCheck } from "lucide-react";
 type NombreModo = "realName" | "nickname";
 type IdentificacionModo = "cedula" | "rnc";
 
-const radioCls =
+const DEFAULT_NOMBRE: NombreModo[] = ["realName"];
+const DEFAULT_IDENTIFICACION: IdentificacionModo[] = ["cedula"];
+
+const checkCls =
   "peer absolute inset-0 z-10 opacity-0 cursor-pointer";
 
-const radioVisualCls =
+const checkVisualCls =
   "inline-flex items-center gap-3 w-full rounded-xl border border-border bg-white/50 px-4 py-3 cursor-pointer transition-colors duration-200 peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50 peer-checked:border-primary peer-checked:bg-primary-subtle peer-checked:shadow-[0_0_0_1px_var(--color-primary)]";
 
-const radioDotCls =
-  "relative w-4 h-4 rounded-full border-2 border-border bg-white shrink-0 transition-colors duration-200 peer-checked:border-primary peer-checked:after:opacity-100 after:absolute after:inset-[3px] after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity after:duration-200";
+const checkBoxCls =
+  "relative w-5 h-5 rounded-md border-2 border-border bg-white shrink-0 transition-colors duration-200 peer-checked:border-primary peer-checked:bg-primary after:absolute after:left-[4px] after:top-[1px] after:w-[6px] after:h-[10px] after:border-r-2 after:border-b-2 after:border-white after:rotate-45 after:opacity-0 after:transition-opacity after:duration-200 peer-checked:after:opacity-100";
 
-const radioTitleCls =
+const checkTitleCls =
   "block text-sm font-bold text-text-primary";
 
 export const PreferenciasSection: React.FC = () => {
@@ -24,18 +27,53 @@ export const PreferenciasSection: React.FC = () => {
   const { addToast } = useToast();
   const updatePreferences = useUpdatePublicPreferences();
 
-  const [nombreModo, setNombreModo] = useState<NombreModo>(
-    user?.nombrePublicoModo === "nickname" ? "nickname" : "realName"
+  const [nombreModo, setNombreModo] = useState<NombreModo[]>(() =>
+    Array.isArray(user?.nombrePublicoModo) && user!.nombrePublicoModo!.length > 0
+      ? user!.nombrePublicoModo as NombreModo[]
+      : DEFAULT_NOMBRE
   );
-  const [identificacionModo, setIdentificacionModo] = useState<IdentificacionModo>(
-    user?.identificacionPublicaModo === "rnc" ? "rnc" : "cedula"
+  const [identificacionModo, setIdentificacionModo] = useState<IdentificacionModo[]>(() =>
+    Array.isArray(user?.identificacionPublicaModo) && user!.identificacionPublicaModo!.length > 0
+      ? user!.identificacionPublicaModo as IdentificacionModo[]
+      : DEFAULT_IDENTIFICACION
   );
 
   useEffect(() => {
     if (!user) return;
-    if (user.nombrePublicoModo) setNombreModo(user.nombrePublicoModo);
-    if (user.identificacionPublicaModo) setIdentificacionModo(user.identificacionPublicaModo);
+    if (Array.isArray(user.nombrePublicoModo) && user.nombrePublicoModo.length > 0) {
+      setNombreModo(user.nombrePublicoModo as NombreModo[]);
+    }
+    if (Array.isArray(user.identificacionPublicaModo) && user.identificacionPublicaModo.length > 0) {
+      setIdentificacionModo(user.identificacionPublicaModo as IdentificacionModo[]);
+    }
   }, [user]);
+
+  // Multi-select with a hard rule: at least ONE option per group must stay selected.
+  const toggleNombre = (modo: NombreModo) => {
+    setNombreModo(prev => {
+      const next = prev.includes(modo)
+        ? prev.filter(m => m !== modo)
+        : [...prev, modo];
+      if (next.length === 0) {
+        addToast("Debes mantener al menos una opción de nombre activa.", "info");
+        return prev;
+      }
+      return next;
+    });
+  };
+
+  const toggleIdentificacion = (modo: IdentificacionModo) => {
+    setIdentificacionModo(prev => {
+      const next = prev.includes(modo)
+        ? prev.filter(m => m !== modo)
+        : [...prev, modo];
+      if (next.length === 0) {
+        addToast("Debes mantener al menos una opción de identificación activa.", "info");
+        return prev;
+      }
+      return next;
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +102,8 @@ export const PreferenciasSection: React.FC = () => {
             <div>
               <h2 className="text-base font-bold text-text-primary">Nombre público</h2>
               <p className="text-xs text-text-secondary">
-                Cómo aparecerás como responsable en tus proyectos públicos.
+                Cómo aparecerás como responsable en tus proyectos públicos. Puedes elegir una o
+                ambas opciones.
               </p>
             </div>
           </div>
@@ -73,16 +112,16 @@ export const PreferenciasSection: React.FC = () => {
             <div>
               <label className="relative block cursor-pointer">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="nombreModo"
                   value="realName"
-                  checked={nombreModo === "realName"}
-                  onChange={() => setNombreModo("realName")}
-                  className={radioCls}
+                  checked={nombreModo.includes("realName")}
+                  onChange={() => toggleNombre("realName")}
+                  className={checkCls}
                 />
-                <span className={radioVisualCls}>
-                  <span className={radioDotCls} aria-hidden="true" />
-                  <span className={radioTitleCls}>Nombre real</span>
+                <span className={checkVisualCls}>
+                  <span className={checkBoxCls} aria-hidden="true" />
+                  <span className={checkTitleCls}>Nombre real</span>
                 </span>
               </label>
               <p className="mt-1.5 pl-1 text-xs text-text-secondary">
@@ -93,16 +132,16 @@ export const PreferenciasSection: React.FC = () => {
             <div>
               <label className="relative block cursor-pointer">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="nombreModo"
                   value="nickname"
-                  checked={nombreModo === "nickname"}
-                  onChange={() => setNombreModo("nickname")}
-                  className={radioCls}
+                  checked={nombreModo.includes("nickname")}
+                  onChange={() => toggleNombre("nickname")}
+                  className={checkCls}
                 />
-                <span className={radioVisualCls}>
-                  <span className={radioDotCls} aria-hidden="true" />
-                  <span className={radioTitleCls}>Nickname (apodo)</span>
+                <span className={checkVisualCls}>
+                  <span className={checkBoxCls} aria-hidden="true" />
+                  <span className={checkTitleCls}>Nickname (apodo)</span>
                 </span>
               </label>
               <p className="mt-1.5 pl-1 text-xs text-text-secondary">
@@ -112,6 +151,10 @@ export const PreferenciasSection: React.FC = () => {
               </p>
             </div>
           </div>
+
+          <p className="text-[11px] text-text-secondary border-t border-border/60 pt-3">
+            Al menos una opción debe permanecer seleccionada.
+          </p>
         </section>
 
         {/* Identificación pública */}
@@ -123,7 +166,8 @@ export const PreferenciasSection: React.FC = () => {
             <div>
               <h2 className="text-base font-bold text-text-primary">Identificación pública</h2>
               <p className="text-xs text-text-secondary">
-                Qué documento de identidad se muestra junto a tu nombre.
+                Qué documentos de identidad se muestran junto a tu nombre. Puedes elegir una o
+                ambas opciones.
               </p>
             </div>
           </div>
@@ -132,16 +176,16 @@ export const PreferenciasSection: React.FC = () => {
             <div>
               <label className="relative block cursor-pointer">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="identificacionModo"
                   value="cedula"
-                  checked={identificacionModo === "cedula"}
-                  onChange={() => setIdentificacionModo("cedula")}
-                  className={radioCls}
+                  checked={identificacionModo.includes("cedula")}
+                  onChange={() => toggleIdentificacion("cedula")}
+                  className={checkCls}
                 />
-                <span className={radioVisualCls}>
-                  <span className={radioDotCls} aria-hidden="true" />
-                  <span className={radioTitleCls}>Cédula</span>
+                <span className={checkVisualCls}>
+                  <span className={checkBoxCls} aria-hidden="true" />
+                  <span className={checkTitleCls}>Cédula</span>
                 </span>
               </label>
               <p className="mt-1.5 pl-1 text-xs text-text-secondary">
@@ -152,16 +196,16 @@ export const PreferenciasSection: React.FC = () => {
             <div>
               <label className="relative block cursor-pointer">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="identificacionModo"
                   value="rnc"
-                  checked={identificacionModo === "rnc"}
-                  onChange={() => setIdentificacionModo("rnc")}
-                  className={radioCls}
+                  checked={identificacionModo.includes("rnc")}
+                  onChange={() => toggleIdentificacion("rnc")}
+                  className={checkCls}
                 />
-                <span className={radioVisualCls}>
-                  <span className={radioDotCls} aria-hidden="true" />
-                  <span className={radioTitleCls}>RNC (razón social)</span>
+                <span className={checkVisualCls}>
+                  <span className={checkBoxCls} aria-hidden="true" />
+                  <span className={checkTitleCls}>RNC (razón social)</span>
                 </span>
               </label>
               <p className="mt-1.5 pl-1 text-xs text-text-secondary">
@@ -171,6 +215,10 @@ export const PreferenciasSection: React.FC = () => {
               </p>
             </div>
           </div>
+
+          <p className="text-[11px] text-text-secondary border-t border-border/60 pt-3">
+            Al menos una opción debe permanecer seleccionada.
+          </p>
         </section>
       </div>
 
