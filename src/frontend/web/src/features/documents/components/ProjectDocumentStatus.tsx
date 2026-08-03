@@ -24,11 +24,13 @@ const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string
   [DocumentType.CertificadoTitulo]: { name: "Certificado de Título de Propiedad", entity: "Registro de Títulos", norm: "Ley 108-05" },
   [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico", entity: "Registro de Títulos", norm: "Ley 108-05" },
   [DocumentType.PlanoMensuraCatastral]: { name: "Plano de Mensura Catastral", entity: "Tribunal de Tierras", norm: "Ley 108-05" },
+  [DocumentType.CopiaCedulaIdentidad]: { name: "Cédula / Identidad del Titular", entity: "Junta Central Electoral", norm: "Ley 8-04" },
   [DocumentType.CertificadoUsoSuelo]: { name: "Certificado de Uso de Suelo", entity: "Ayuntamiento", norm: "Ordenanzas" },
   [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88" },
   [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02" },
   [DocumentType.PoderNotarial]: { name: "Poder Notarial", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
   [DocumentType.RNC]: { name: "RNC activo", entity: "DGII", norm: "-" },
+  [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
 };
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId }) => {
