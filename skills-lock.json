@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-07T00:40:46.072Z",
-  "total": 100,
+  "generated_at": "2026-08-03T23:28:59.497Z",
+  "total": 49,
   "skills": [
     {
       "name": "accessibility",
@@ -8,23 +8,8 @@
       "version": "1.0"
     },
     {
-      "name": "agent-memory-systems",
-      "short_description": "You are a cognitive architect who understands that memory makes agents intelligent. You've built memory systems for agents handling millions of interactions. You know that the hard part isn't storing ",
-      "version": "1.0"
-    },
-    {
       "name": "animejs-animation",
       "short_description": "Create and manage anime.js animations including timelines, scroll-triggered effects, staggered elements, and SVG path morphing with performance optimization.",
-      "version": "1.0"
-    },
-    {
-      "name": "antigravity-skill-orchestrator",
-      "short_description": "A meta-skill that dynamically discovers available skills from local and global directories, evaluates task complexity, selects the optimal skill combination via structured Tool Calling, and tracks dec",
-      "version": "1.0"
-    },
-    {
-      "name": "antigravity-workflows",
-      "short_description": "Orchestrate multiple Antigravity skills through guided workflows for SaaS MVP delivery, security audits, AI agent builds, and browser QA.",
       "version": "1.0"
     },
     {
@@ -38,33 +23,28 @@
       "version": "1.0"
     },
     {
-      "name": "architecture-decision-records",
-      "short_description": "Comprehensive patterns for creating, maintaining, and managing Architecture Decision Records (ADRs) that capture the context and rationale behind significant technical decisions.",
-      "version": "1.0"
-    },
-    {
-      "name": "architecture-patterns",
-      "short_description": "Master proven backend architecture patterns including Clean Architecture, Hexagonal Architecture, and Domain-Driven Design to build maintainable, testable, and scalable systems.",
-      "version": "1.0"
-    },
-    {
       "name": "backend-dev-guidelines",
       "short_description": "You are a senior backend engineer operating production-grade services under strict architectural and reliability constraints. Use when routes, controllers, services, repositories, express middleware, ",
       "version": "1.0"
     },
     {
-      "name": "bash-defensive-patterns",
-      "short_description": "Master defensive Bash programming techniques for production-grade scripts. Use when writing robust shell scripts, CI/CD pipelines, or system utilities requiring fault tolerance and safety.",
+      "name": "backend-patterns",
+      "short_description": "Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.",
       "version": "1.0"
     },
     {
-      "name": "code-refactoring-refactor-clean",
-      "short_description": "You are a code refactoring expert specializing in clean code principles, SOLID design patterns, and modern software engineering best practices. Analyze and refactor the provided code to improve its qu",
+      "name": "banner-design",
+      "short_description": "Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Faceboo",
       "version": "1.0"
     },
     {
-      "name": "code-refactoring-tech-debt",
-      "short_description": "You are a technical debt expert specializing in identifying, quantifying, and prioritizing technical debt in software projects. Analyze the codebase to uncover debt, assess its impact, and create acti",
+      "name": "benchmark-methodology",
+      "short_description": "Use after competitive-platform-analysis has produced a tiered competitor set. Scores each competitor across nine weighted dimensions (positioning, voice, visual craft, offer packaging, evidence, corpo",
+      "version": "1.0"
+    },
+    {
+      "name": "brand",
+      "short_description": "Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.",
       "version": "1.0"
     },
     {
@@ -73,48 +53,18 @@
       "version": "1.0"
     },
     {
+      "name": "competitive-platform-analysis",
+      "short_description": "Use when scoping a competitive landscape — identifying, categorising, and score-filtering a competitor set before any benchmarking begins. Decides who counts as a competitor, which tier they belong to",
+      "version": "1.0"
+    },
+    {
+      "name": "competitive-report-structure",
+      "short_description": "Use after benchmark-methodology has produced scored competitor profile cards. Assembles findings into a decision-grade report: landscape map, competitor profiles, benchmarking matrix, white-space anal",
+      "version": "1.0"
+    },
+    {
       "name": "vercel-composition-patterns",
       "short_description": "React composition patterns that scale. Use when refactoring components with boolean prop proliferation, building flexible component libraries, or designing reusable APIs. Triggers on tasks involving c",
-      "version": "1.0"
-    },
-    {
-      "name": "context7",
-      "short_description": "Retrieve up-to-date documentation for software libraries, frameworks, and components via the Context7 API. This skill should be used when looking up documentation for any programming library or framew",
-      "version": "1.0"
-    },
-    {
-      "name": "csharp-async",
-      "short_description": "Get best practices for C# async programming",
-      "version": "1.0"
-    },
-    {
-      "name": "csharp-docs",
-      "short_description": "Ensure that C# types are documented with XML comments and follow best practices for documentation.",
-      "version": "1.0"
-    },
-    {
-      "name": "csharp-mstest",
-      "short_description": "Get best practices for MSTest 3.x/4.x unit testing, including modern assertion APIs and data-driven tests",
-      "version": "1.0"
-    },
-    {
-      "name": "csharp-nunit",
-      "short_description": "Get best practices for NUnit unit testing, including data-driven tests",
-      "version": "1.0"
-    },
-    {
-      "name": "csharp-tunit",
-      "short_description": "Get best practices for TUnit unit testing, including data-driven tests",
-      "version": "1.0"
-    },
-    {
-      "name": "csharp-xunit",
-      "short_description": "Get best practices for XUnit unit testing, including data-driven tests",
-      "version": "1.0"
-    },
-    {
-      "name": "docker-expert",
-      "short_description": "You are an advanced Docker containerization expert with comprehensive, practical knowledge of container optimization, security hardening, multi-stage builds, orchestration patterns, and production dep",
       "version": "1.0"
     },
     {
@@ -128,13 +78,8 @@
       "version": "1.0"
     },
     {
-      "name": "dotnet-upgrade",
-      "short_description": "Ready-to-use prompts for comprehensive .NET framework upgrade analysis and execution",
-      "version": "1.0"
-    },
-    {
-      "name": "frontend-design",
-      "short_description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples inclu",
+      "name": "e2e-testing",
+      "short_description": "Playwright E2E testing patterns, Page Object Model, configuration, CI/CD integration, artifact management, and flaky test strategies.",
       "version": "1.0"
     },
     {
@@ -143,33 +88,8 @@
       "version": "1.0"
     },
     {
-      "name": "git-advanced-workflows",
-      "short_description": "Master advanced Git techniques to maintain clean history, collaborate effectively, and recover from any situation with confidence.",
-      "version": "1.0"
-    },
-    {
-      "name": "git-hooks-automation",
-      "short_description": "Master Git hooks setup with Husky, lint-staged, pre-commit framework, and commitlint. Automate code quality gates, formatting, linting, and commit message enforcement before code reaches CI.",
-      "version": "1.0"
-    },
-    {
-      "name": "git-pr-workflows-git-workflow",
-      "short_description": "Orchestrate a comprehensive git workflow from code review through PR creation, leveraging specialized agents for quality assurance, testing, and deployment readiness. This workflow implements modern g",
-      "version": "1.0"
-    },
-    {
-      "name": "git-pr-workflows-onboard",
-      "short_description": "You are an **expert onboarding specialist and knowledge transfer architect** with deep experience in remote-first organizations, technical team integration, and accelerated learning methodologies. You",
-      "version": "1.0"
-    },
-    {
-      "name": "git-pr-workflows-pr-enhance",
-      "short_description": "You are a PR optimization expert specializing in creating high-quality pull requests that facilitate efficient code reviews. Generate comprehensive PR descriptions, automate review processes, and ensu",
-      "version": "1.0"
-    },
-    {
-      "name": "git-pushing",
-      "short_description": "Stage all changes, create a conventional commit, and push to the remote branch. Use when explicitly asks to push changes (\"push this\", \"commit and push\"), mentions saving work to remote (\"save to gith",
+      "name": "frontend-patterns",
+      "short_description": "Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.",
       "version": "1.0"
     },
     {
@@ -178,73 +98,8 @@
       "version": "1.0"
     },
     {
-      "name": "github-actions-templates",
-      "short_description": "Production-ready GitHub Actions workflow patterns for testing, building, and deploying applications.",
-      "version": "1.0"
-    },
-    {
-      "name": "github-automation",
-      "short_description": "Automate GitHub repositories, issues, pull requests, branches, CI/CD, and permissions via Rube MCP (Composio). Manage code workflows, review PRs, search code, and handle deployments programmatically.",
-      "version": "1.0"
-    },
-    {
-      "name": "github-issue-creator",
-      "short_description": "Turn error logs, screenshots, voice notes, and rough bug reports into crisp, developer-ready GitHub issues with repro steps, impact, and evidence.",
-      "version": "1.0"
-    },
-    {
-      "name": "github-workflow-automation",
-      "short_description": "Patterns for automating GitHub workflows with AI assistance, inspired by [Gemini CLI](https://github.com/google-gemini/gemini-cli) and modern DevOps practices.",
-      "version": "1.0"
-    },
-    {
-      "name": "i18n-localization",
-      "short_description": "Add internationalization and localization support including string translation, locale-based routing, RTL language support, and pluralization handling.",
-      "version": "1.0"
-    },
-    {
-      "name": "mcp-builder",
-      "short_description": "Create MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. The quality of an MCP server is measured by how well it enables LLMs to acc",
-      "version": "1.0"
-    },
-    {
-      "name": "mcp-builder-ms",
-      "short_description": "Use this skill when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
-      "version": "1.0"
-    },
-    {
-      "name": "nano-banana-pro-openrouter",
-      "short_description": "Generate or edit images via OpenRouter with the Gemini 3 Pro Image model. Use for prompt-only image generation, image edits, and multi-image compositing; supports 1K/2K/4K output.",
-      "version": "1.0"
-    },
-    {
-      "name": "nodejs-backend-patterns",
-      "short_description": "Build production-ready Node.js backend services with Express/Fastify, implementing middleware patterns, error handling, authentication, database integration, and API design best practices. Use when cr",
-      "version": "1.0"
-    },
-    {
-      "name": "nodejs-best-practices",
-      "short_description": "Node.js development principles and decision-making. Framework selection, async patterns, security, and architecture. Teaches thinking, not copying.",
-      "version": "1.0"
-    },
-    {
-      "name": "opencode-skill-orchestrator",
-      "short_description": "A meta-skill that dynamically discovers available skills from local and global directories, evaluates task complexity, selects the optimal skill combination via structured Tool Calling, and tracks dec",
-      "version": "1.0"
-    },
-    {
-      "name": "opencode-workflow-engine",
-      "short_description": "Orchestrate OpenCode sessions through guided multi-phase workflows: feature delivery, security audits, AI agent evolution, CI healing, and post-task hooks.",
-      "version": "3.0"
-    },
-    {
       "name": "owasp-security",
       "short_description": "Use when reviewing code for security vulnerabilities, implementing authentication/authorization, handling user input, or discussing web application security. Covers OWASP Top 10:2025, ASVS 5.0, and Ag",
-      "version": "1.0"
-    },
-    {
-      "name": "planning-with-files",
-      "short_description": "Implements Manus-style file-based planning to organize and track progress on complex tasks. Creates task_plan.md, findings.md, and progress.md. Use when asked to plan out, break down, or organize a mu",
       "version": "1.0"
     },
     {
@@ -258,53 +113,8 @@
       "version": "1.0"
     },
     {
-      "name": "playwright-explore-website",
-      "short_description": "Website exploration for testing using Playwright MCP",
-      "version": "1.0"
-    },
-    {
-      "name": "playwright-generate-test",
-      "short_description": "Generate a Playwright test based on a scenario using Playwright MCP",
-      "version": "1.0"
-    },
-    {
-      "name": "playwright-skill",
-      "short_description": "IMPORTANT - Path Resolution: This skill can be installed in different locations (plugin system, manual installation, global, or project-specific). Before executing any commands, determine the skill di",
-      "version": "1.0"
-    },
-    {
-      "name": "ponytail",
-      "short_description": "Forces the laziest solution that actually works, simplest, shortest, most minimal. Channels a senior dev who has seen everything: question whether the task needs to exist at all (YAGNI), reach for the",
-      "version": "1.0"
-    },
-    {
-      "name": "ponytail-audit",
-      "short_description": "Whole-repo audit for over-engineering. Like ponytail-review, but scans the entire codebase instead of a diff: a ranked list of what to delete, simplify, or replace with stdlib/native equivalents. Use ",
-      "version": "1.0"
-    },
-    {
-      "name": "ponytail-debt",
-      "short_description": "Harvest every `ponytail:` comment in the codebase into a debt ledger, so the deliberate shortcuts and deferrals ponytail leaves behind get tracked instead of rotting into \"later means never\". Use when",
-      "version": "1.0"
-    },
-    {
-      "name": "ponytail-gain",
-      "short_description": "Show ponytail's measured impact as a compact scoreboard: less code, less cost, more speed, from the benchmark medians. One-shot display, not a persistent mode, and not a per-repo number. Trigger: /pon",
-      "version": "1.0"
-    },
-    {
-      "name": "ponytail-help",
-      "short_description": "Quick-reference card for all ponytail modes, skills, and commands. One-shot display, not a persistent mode. Trigger: /ponytail-help, \"ponytail help\", \"what ponytail commands\", \"how do I use ponytail\".",
-      "version": "1.0"
-    },
-    {
-      "name": "ponytail-review",
-      "short_description": "Code review focused exclusively on over-engineering. Finds what to delete: reinvented standard library, unneeded dependencies, speculative abstractions, dead flexibility. One line per finding: locatio",
-      "version": "1.0"
-    },
-    {
-      "name": "project-skill-audit",
-      "short_description": "Audit a project and recommend the highest-value skills to add or update.",
+      "name": "quality-qa",
+      "short_description": "Enforce rigorous quality assurance via matrix testing and smoke checklists.",
       "version": "1.0"
     },
     {
@@ -323,16 +133,6 @@
       "version": "1.0"
     },
     {
-      "name": "refactor-plan",
-      "short_description": "Plan a multi-file refactor with proper sequencing and rollback steps",
-      "version": "1.0"
-    },
-    {
-      "name": "reference-builder",
-      "short_description": "Creates exhaustive technical references and API documentation. Generates comprehensive parameter listings, configuration guides, and searchable reference materials.",
-      "version": "1.0"
-    },
-    {
       "name": "secrets-management",
       "short_description": "Secure secrets management practices for CI/CD pipelines using Vault, AWS Secrets Manager, and other tools.",
       "version": "1.0"
@@ -348,13 +148,18 @@
       "version": "1.0"
     },
     {
-      "name": "security-requirement-extraction",
-      "short_description": "Derive security requirements from threat models and business context. Use when translating threats into actionable requirements, creating security user stories, or building security test cases.",
+      "name": "security-guardrails",
+      "short_description": "Apply systemic security validations and adversarial review models.",
       "version": "1.0"
     },
     {
-      "name": "seo",
-      "short_description": "Optimize for search engine visibility and ranking. Use when asked to \"improve SEO\", \"optimize for search\", \"fix meta tags\", \"add structured data\", \"sitemap optimization\", or \"search engine optimizatio",
+      "name": "security-review",
+      "short_description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and ",
+      "version": "1.0"
+    },
+    {
+      "name": "slides",
+      "short_description": "Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.",
       "version": "1.0"
     },
     {
@@ -388,23 +193,8 @@
       "version": "1.0"
     },
     {
-      "name": "tailwind-css-patterns",
-      "short_description": "Provides comprehensive Tailwind CSS utility-first styling patterns including responsive design, layout utilities, flexbox, grid, spacing, typography, colors, and modern CSS best practices. Use when st",
-      "version": "1.0"
-    },
-    {
-      "name": "task-management",
-      "short_description": "Task management CLI for tracking and managing feature subtasks with status, dependencies, and validation",
-      "version": "1.0.0"
-    },
-    {
       "name": "test-driven-development",
       "short_description": "Use when implementing any feature or bugfix, before writing implementation code",
-      "version": "1.0"
-    },
-    {
-      "name": "typescript-advanced-types",
-      "short_description": "Comprehensive guidance for mastering TypeScript's advanced type system including generics, conditional types, mapped types, template literal types, and utility types for building robust, type-safe app",
       "version": "1.0"
     },
     {
@@ -418,43 +208,18 @@
       "version": "1.0"
     },
     {
-      "name": "typespec-api-operations",
-      "short_description": "Add GET, POST, PATCH, and DELETE operations to a TypeSpec API plugin with proper routing, parameters, and adaptive cards",
-      "version": "1.0"
-    },
-    {
-      "name": "typespec-create-agent",
-      "short_description": "Generate a complete TypeSpec declarative agent with instructions, capabilities, and conversation starters for Microsoft 365 Copilot",
-      "version": "1.0"
-    },
-    {
-      "name": "typespec-create-api-plugin",
-      "short_description": "Generate a TypeSpec API plugin with REST operations, authentication, and Adaptive Cards for Microsoft 365 Copilot",
+      "name": "ui-styling",
+      "short_description": "Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user inter",
       "version": "1.0"
     },
     {
       "name": "ui-ux-pro-max",
-      "short_description": "UI/UX design intelligence with searchable database",
+      "short_description": "Comprehensive design guide for web, mobile, and desktop applications. Contains 67 styles, 161 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 22 technology stacks.",
       "version": "1.0"
     },
     {
       "name": "ui-visual-validator",
       "short_description": "Rigorous visual validation expert specializing in UI testing, design system compliance, and accessibility verification.",
-      "version": "1.0"
-    },
-    {
-      "name": "upgrade-stripe",
-      "short_description": "Guide for upgrading Stripe API versions and SDKs",
-      "version": "1.0"
-    },
-    {
-      "name": "vite",
-      "short_description": "Vite build tool configuration, plugin API, SSR, and Vite 8 Rolldown migration. Use when working with Vite projects, vite.config.ts, Vite plugins, or building libraries/SSR apps with Vite.",
-      "version": "1.0"
-    },
-    {
-      "name": "vitest",
-      "short_description": "Vitest fast unit testing framework powered by Vite with Jest-compatible API. Use when writing tests, mocking, configuring coverage, or working with test filtering and fixtures.",
       "version": "1.0"
     },
     {
@@ -468,16 +233,6 @@
       "version": "1.0"
     },
     {
-      "name": "web-artifacts-builder",
-      "short_description": "To build powerful frontend claude.ai artifacts, follow these steps:",
-      "version": "1.0"
-    },
-    {
-      "name": "web-coder",
-      "short_description": "Web platform knowledge reference covering web standards, HTTP protocols, browser APIs, and cross-browser compatibility. Use when the user needs authoritative information about W3C/WHATWG specs, HTTP s",
-      "version": "1.0"
-    },
-    {
       "name": "web-design-guidelines",
       "short_description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
       "version": "1.0"
@@ -485,16 +240,6 @@
     {
       "name": "web-design-reviewer",
       "short_description": "This skill enables visual inspection of websites running locally or remotely to identify and fix design issues. Triggers on requests like \"review website design\", \"check the UI\", \"fix the layout\", \"fi",
-      "version": "1.0"
-    },
-    {
-      "name": "workflow-automation",
-      "short_description": "You are a workflow automation architect who has seen both the promise and the pain of these platforms. You've migrated teams from brittle cron jobs to durable execution and watched their on-call burde",
-      "version": "1.0"
-    },
-    {
-      "name": "workflow-orchestration-patterns",
-      "short_description": "Master workflow orchestration architecture with Temporal, covering fundamental design decisions, resilience patterns, and best practices for building reliable distributed systems.",
       "version": "1.0"
     },
     {

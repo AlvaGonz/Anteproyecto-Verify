@@ -46,5 +46,5 @@ Details:
 ## Related
 
 - Routes to `@reviewer-agent` for detailed analysis
-- Loads `context/standards/architecture-standards.md`
+- Loads `context/standards/code-quality-standards.md` (Clean Architecture, CQRS)
 - References `.agents/docs/ARCHITECTURE.md` (§8 Clean Architecture Dependency Rules)
