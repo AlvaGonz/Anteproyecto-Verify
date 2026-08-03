@@ -17,7 +17,7 @@ public class AuditoriaService : IAuditLogger
         _unitOfWork = unitOfWork;
     }
 
-    public async Task AppendAsync(AuditEntryDto entry, CancellationToken cancellationToken = default)
+    public async Task Append(AuditEntryDto entry, CancellationToken cancellationToken = default)
     {
         var auditoria = new Auditoria(
             entry.UsuarioId,
@@ -26,10 +26,17 @@ public class AuditoriaService : IAuditLogger
             entry.Resultado,
             entry.ReferenciaExpedienteId,
             entry.IpOrigen,
-            entry.UserAgent
+            entry.UserAgent,
+            entry.EstadoAnteriorId,
+            entry.EstadoNuevoId
         );
 
         await _auditoriaRepository.AddAsync(auditoria, cancellationToken);
+    }
+
+    public async Task AppendAsync(AuditEntryDto entry, CancellationToken cancellationToken = default)
+    {
+        await Append(entry, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

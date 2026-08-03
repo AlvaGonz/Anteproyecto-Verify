@@ -15,6 +15,7 @@ using Domain.Policies;
 
 using Application.Abstractions.Notifications;
 using Application.Common.Exceptions;
+using Application.Abstractions;
 
 public class ProjectService : IProjectService
 {
@@ -22,17 +23,20 @@ public class ProjectService : IProjectService
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IEmailNotificationService _emailNotificationService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IAuditLogger _auditLogger;
 
     public ProjectService(
         IProyectoRepository proyectoRepository, 
         IUsuarioRepository usuarioRepository,
         IEmailNotificationService emailNotificationService,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IAuditLogger auditLogger)
     {
         _proyectoRepository = proyectoRepository;
         _usuarioRepository = usuarioRepository;
         _emailNotificationService = emailNotificationService;
         _unitOfWork = unitOfWork;
+        _auditLogger = auditLogger;
     }
 
     public async Task<IEnumerable<ProyectoDto>> GetVisibleProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
@@ -178,6 +182,7 @@ public class ProjectService : IProjectService
         }
 
         var oldStatus = proyecto.Estado?.CodigoUnico;
+        var oldEstadoId = proyecto.EstadoId;
         var estado = await _proyectoRepository.GetEstadoByStatusAsync(status, cancellationToken);
         if (estado == null)
             throw new InvalidOperationException($"Estado {status} no encontrado.");
@@ -185,6 +190,18 @@ public class ProjectService : IProjectService
         proyecto.UpdateEstado(estado);
         
         _proyectoRepository.Update(proyecto);
+
+        await _auditLogger.Append(new AuditEntryDto
+        {
+            UsuarioId = proyecto.UsuarioCreadorId,
+            TipoOperacion = TipoOperacion.CambioEstado,
+            Accion = "CambioEstado",
+            Resultado = $"{oldStatus} → {status.ToCodigoUnico()}",
+            ReferenciaExpedienteId = id,
+            EstadoAnteriorId = oldEstadoId,
+            EstadoNuevoId = estado.Id
+        }, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (oldStatus != status.ToCodigoUnico() && (status == ProjectStatus.Publicado || status == ProjectStatus.ConObservacion))

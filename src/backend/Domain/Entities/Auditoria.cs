@@ -27,6 +27,12 @@ public class Auditoria : EntityBase
     public Guid? ReferenciaExpedienteId { get; private set; }
     public DateTime FechaHoraUtc => FechaEventoUtc; // Alias for RF-17
 
+    // Status history fields
+    public Guid? EstadoAnteriorId { get; private set; }
+    public ProyectoEstado? EstadoAnterior { get; private set; }
+    public Guid? EstadoNuevoId { get; private set; }
+    public ProyectoEstado? EstadoNuevo { get; private set; }
+
     private Auditoria() { } // For EF Core
 
     // Old constructor for backward compatibility
@@ -108,5 +114,34 @@ public class Auditoria : EntityBase
         FechaEventoUtc = DateTime.UtcNow;
         TipoEvento = tipoOperacion.ToString();
         Detalle = resultado;
+    }
+
+    // Constructor with status history fields
+    public Auditoria(
+        Guid? usuarioId,
+        TipoOperacion tipoOperacion,
+        string accion,
+        string resultado,
+        Guid? referenciaExpedienteId,
+        string? ipOrigen,
+        string? userAgent,
+        Guid? estadoAnteriorId,
+        Guid? estadoNuevoId)
+    {
+        if (string.IsNullOrWhiteSpace(accion)) throw new ArgumentException("Acción requerida", nameof(accion));
+
+        UsuarioId = usuarioId;
+        TipoOperacion = tipoOperacion;
+        Accion = accion;
+        Resultado = resultado;
+        ReferenciaExpedienteId = referenciaExpedienteId;
+        ProyectoId = referenciaExpedienteId;
+        IpOrigen = ipOrigen;
+        UserAgent = userAgent;
+        FechaEventoUtc = DateTime.UtcNow;
+        TipoEvento = tipoOperacion.ToString();
+        Detalle = resultado;
+        EstadoAnteriorId = estadoAnteriorId;
+        EstadoNuevoId = estadoNuevoId;
     }
 }

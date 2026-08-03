@@ -14,9 +14,12 @@ public class AuditEntryDto
     public Guid? ReferenciaExpedienteId { get; set; }
     public string? IpOrigen { get; set; }
     public string? UserAgent { get; set; }
+    public Guid? EstadoAnteriorId { get; set; }
+    public Guid? EstadoNuevoId { get; set; }
 }
 
 public interface IAuditLogger
 {
+    Task Append(AuditEntryDto entry, CancellationToken cancellationToken = default);
     Task AppendAsync(AuditEntryDto entry, CancellationToken cancellationToken = default);
 }

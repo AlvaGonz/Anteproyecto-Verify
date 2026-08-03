@@ -4,15 +4,15 @@ const FIXTURE_PROJECT_ID = "ecc3f121-f494-d477-6ce5-00069f8a27ab";
 
 const STATUS_HISTORY_FIXTURE = [
   {
-    id: "hist-001",
+    id: "hist-003",
     proyectoId: FIXTURE_PROJECT_ID,
-    estadoAnterior: null,
-    estadoAnteriorNombre: null,
-    estadoNuevo: "CREADO",
-    estadoNuevoNombre: "Creado",
+    estadoAnterior: "EDITADO",
+    estadoAnteriorNombre: "Editado",
+    estadoNuevo: "REVISION",
+    estadoNuevoNombre: "En Revisión",
     usuarioId: "user-001",
     usuarioNombre: "Admin Test",
-    fechaCambioUtc: "2026-07-01T10:00:00Z",
+    fechaCambioUtc: "2026-07-03T09:15:00Z",
   },
   {
     id: "hist-002",
@@ -26,15 +26,15 @@ const STATUS_HISTORY_FIXTURE = [
     fechaCambioUtc: "2026-07-02T14:30:00Z",
   },
   {
-    id: "hist-003",
+    id: "hist-001",
     proyectoId: FIXTURE_PROJECT_ID,
-    estadoAnterior: "EDITADO",
-    estadoAnteriorNombre: "Editado",
-    estadoNuevo: "REVISION",
-    estadoNuevoNombre: "En Revisión",
+    estadoAnterior: null,
+    estadoAnteriorNombre: null,
+    estadoNuevo: "CREADO",
+    estadoNuevoNombre: "Creado",
     usuarioId: "user-001",
     usuarioNombre: "Admin Test",
-    fechaCambioUtc: "2026-07-03T09:15:00Z",
+    fechaCambioUtc: "2026-07-01T10:00:00Z",
   },
 ];
 
@@ -74,6 +74,35 @@ test.describe("Historial de Estatus — Project Reports Page", () => {
           plan: "Profesional",
           subscriptionStatus: "active",
           isGuest: false,
+        }),
+      });
+    });
+
+    await page.route("**/api/notifications*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([]),
+      });
+    });
+
+    await page.route("**/api/auth/refresh", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accessToken: "mock-token" }),
+      });
+    });
+
+    await page.route("**/api/admin/dashboard/**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          totalProjects: 0,
+          publishedProjects: 0,
+          pendingValidations: 0,
+          activeUsers: 0,
         }),
       });
     });

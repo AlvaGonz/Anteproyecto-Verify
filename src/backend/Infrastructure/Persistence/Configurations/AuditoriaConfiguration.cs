@@ -26,5 +26,15 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
             .WithMany(p => p.Auditorias)
             .HasForeignKey(a => a.ProyectoId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(a => a.EstadoAnterior)
+            .WithMany()
+            .HasForeignKey(a => a.EstadoAnteriorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(a => a.EstadoNuevo)
+            .WithMany()
+            .HasForeignKey(a => a.EstadoNuevoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
