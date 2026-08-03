@@ -1,5 +1,7 @@
 namespace Infrastructure.Email;
 
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Notifications;
@@ -15,7 +17,7 @@ public class ResendEmailService : IEmailService
     private readonly string _fromName;
     private readonly bool _isTestEnvironment;
 
-public ResendEmailService(
+    public ResendEmailService(
         IResend resend,
         IConfiguration configuration,
         ILogger<ResendEmailService> logger)
@@ -26,64 +28,107 @@ public ResendEmailService(
         var section = configuration.GetSection("Resend");
         _fromEmail = section.GetValue<string>("FromEmail") ?? "onboarding@resend.dev";
         _fromName = section.GetValue<string>("FromName") ?? "VeriFinca";
-        
-        // In test/development environments with mock tokens, simulate success
-        // instead of calling the real Resend API (which would fail with invalid tokens).
+
         var apiToken = section.GetValue<string>("ApiToken") ?? "re_mock_token";
         _isTestEnvironment = apiToken.StartsWith("re_mock", StringComparison.OrdinalIgnoreCase)
             || apiToken.StartsWith("test", StringComparison.OrdinalIgnoreCase)
             || string.IsNullOrWhiteSpace(apiToken);
-        
-        _logger.LogInformation("ResendEmailService initialized: isTestEnvironment={IsTestEnvironment}, apiTokenPrefix={ApiTokenPrefix}", 
+
+        _logger.LogInformation("ResendEmailService initialized: isTestEnvironment={IsTestEnvironment}, apiTokenPrefix={ApiTokenPrefix}",
             _isTestEnvironment, apiToken?.Substring(0, Math.Min(8, apiToken?.Length ?? 0)) ?? "null");
     }
 
     public async Task SendEmailAsync(string to, string subject, string body, string? fromAddress = null, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Sending email via Resend to {To} with subject '{Subject}'", to, subject);
+        await SendCoreAsync(to, subject, body, fromAddress, cancellationToken);
+    }
 
-        var message = new EmailMessage
+    public async Task<EmailSendResult> TrySendEmailAsync(string to, string subject, string body, string? fromAddress = null, CancellationToken cancellationToken = default)
+    {
+        var correlationId = Guid.NewGuid().ToString("N");
+        var recipientHash = HashEmail(to);
+
+        _logger.LogInformation(
+            "Sending email via Resend: CorrelationId={CorrelationId}, RecipientHash={RecipientHash}, Subject='{Subject}'",
+            correlationId, recipientHash, subject);
+
+        if (_isTestEnvironment || to.EndsWith("@example.com", StringComparison.OrdinalIgnoreCase))
         {
-            From = fromAddress ?? $"{_fromName} <{_fromEmail}>",
-            Subject = subject,
-            HtmlBody = body
-        };
-        message.To.Add(to);
+            _logger.LogInformation("Test environment — simulating email send: CorrelationId={CorrelationId}", correlationId);
+            return EmailSendResult.Success(correlationId);
+        }
+
+        var message = BuildMessage(to, subject, body, fromAddress);
 
         try
         {
-            if (_isTestEnvironment || to.EndsWith("@example.com", StringComparison.OrdinalIgnoreCase))
-            {
-                _logger.LogInformation("Test environment detected — simulating email send to {To}", to);
-                return;
-            }
-            
             await _resend.EmailSendAsync(message, cancellationToken);
-            _logger.LogInformation("Email sent successfully via Resend to {To}", to);
+            _logger.LogInformation("Email sent via Resend: CorrelationId={CorrelationId}, RecipientHash={RecipientHash}",
+                correlationId, recipientHash);
+            return EmailSendResult.Success(correlationId);
         }
         catch (Exception ex)
         {
-            // For non-OTP transactional sends, callers are fire-and-forget and
-            // do not act on a swallowed failure. This is preserved for backward
-            // compatibility with the registration, password-reset, etc. flows.
-            // [RESEND_FAILURE] marker keeps the otherwise-silent swallow greppable in logs.
-            _logger.LogError(ex, "[RESEND_FAILURE] Failed to send email via Resend to {To}. (If running E2E tests without a valid API key, this is expected).", to);
+            var (statusCode, errorBody) = ExtractResendErrorDetails(ex);
+
+            _logger.LogError(ex,
+                "[RESEND_FAILURE] CorrelationId={CorrelationId}, RecipientHash={RecipientHash}, StatusCode={StatusCode}, ErrorBody={ErrorBody}",
+                correlationId, recipientHash, statusCode, errorBody);
+
+            return EmailSendResult.Failure(correlationId, statusCode, errorBody, ex.Message);
+        }
+    }
+
+    private async Task SendCoreAsync(string to, string subject, string body, string? fromAddress, CancellationToken cancellationToken)
+    {
+        var correlationId = Guid.NewGuid().ToString("N");
+        var recipientHash = HashEmail(to);
+
+        _logger.LogInformation(
+            "Sending email via Resend: CorrelationId={CorrelationId}, RecipientHash={RecipientHash}, Subject='{Subject}'",
+            correlationId, recipientHash, subject);
+
+        if (_isTestEnvironment || to.EndsWith("@example.com", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogInformation("Test environment — simulating email send: CorrelationId={CorrelationId}", correlationId);
+            return;
+        }
+
+        var message = BuildMessage(to, subject, body, fromAddress);
+
+        try
+        {
+            await _resend.EmailSendAsync(message, cancellationToken);
+            _logger.LogInformation("Email sent via Resend: CorrelationId={CorrelationId}, RecipientHash={RecipientHash}",
+                correlationId, recipientHash);
+        }
+        catch (Exception ex)
+        {
+            var (statusCode, errorBody) = ExtractResendErrorDetails(ex);
+
+            _logger.LogError(ex,
+                "[RESEND_FAILURE] CorrelationId={CorrelationId}, RecipientHash={RecipientHash}, StatusCode={StatusCode}, ErrorBody={ErrorBody}",
+                correlationId, recipientHash, statusCode, errorBody);
         }
     }
 
     /// <summary>
-    /// 2FA email-OTP challenge. Unlike SendEmailAsync, this MUST surface
+    /// 2FA email-OTP challenge. Unlike the legacy SendEmailAsync, this MUST surface
     /// provider failures as exceptions — the OTP service depends on this
     /// signal to write the audit log, the dispatch-failed lifecycle event,
     /// and to refuse returning success to the user.
-    ///
-    /// In test environments with mock tokens, we simulate success to allow
-    /// integration tests to pass without a real Resend API key.
     ///</summary>
     public async Task SendEmailOtpAsync(string toEmail, string userName, string code, CancellationToken ct = default)
     {
+        var correlationId = Guid.NewGuid().ToString("N");
+        var recipientHash = HashEmail(toEmail);
+
         var html = EmailTemplates.GetEmailOtpEmail(userName, code);
         var subject = "Tu código de verificación - VeriFinca";
+
+        _logger.LogInformation(
+            "Sending OTP email via Resend: CorrelationId={CorrelationId}, RecipientHash={RecipientHash}",
+            correlationId, recipientHash);
 
         var message = new EmailMessage
         {
@@ -95,44 +140,53 @@ public ResendEmailService(
 
         if (_isTestEnvironment || toEmail.EndsWith("@example.com", StringComparison.OrdinalIgnoreCase))
         {
-            _logger.LogInformation("Test environment detected — simulating OTP email send to {To}", toEmail);
+            _logger.LogInformation("Test environment — simulating OTP email send: CorrelationId={CorrelationId}", correlationId);
             return;
         }
 
-        // NOTE: no try/catch — provider failure MUST bubble so the caller can
-        // observe it and record `2fa_email_provider_dispatch_failed`.
-        await _resend.EmailSendAsync(message, ct);
+        try
+        {
+            await _resend.EmailSendAsync(message, ct);
+        }
+        catch (Exception ex)
+        {
+            var (statusCode, errorBody) = ExtractResendErrorDetails(ex);
+            _logger.LogError(ex,
+                "[RESEND_FAILURE] OTP send failed: CorrelationId={CorrelationId}, RecipientHash={RecipientHash}, StatusCode={StatusCode}, ErrorBody={ErrorBody}",
+                correlationId, recipientHash, statusCode, errorBody);
+            throw;
+        }
     }
 
     public async Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, string? returnUrl = null, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetAccountVerificationEmail(userName, verificationToken, returnUrl);
-        await SendEmailAsync(toEmail, "Verificación de Cuenta - VeriFinca", html, "VeriFinca <hola@handymansolutionrd.lat>", ct);
+        await SendCoreAsync(toEmail, "Verificación de Cuenta - VeriFinca", html, "VeriFinca <hola@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetDocumentUploadConfirmationEmail(userName, projectName, documentType);
-        await SendEmailAsync(toEmail, "Confirmación de Recepción de Documento - VeriFinca", html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
+        await SendCoreAsync(toEmail, "Confirmación de Recepción de Documento - VeriFinca", html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetDocumentStatusUpdateEmail(userName, projectName, documentType, status, rejectionReason);
         string subject = $"Estatus de Documento Actualizado - VeriFinca ({status.ToUpper()})";
-        await SendEmailAsync(toEmail, subject, html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
+        await SendCoreAsync(toEmail, subject, html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendProjectCreatedAsync(string toEmail, string ownerName, string projectName, string projectId, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetProjectCreatedEmail(ownerName, projectName, projectId);
-        await SendEmailAsync(toEmail, "¡Tu Proyecto ha sido Creado! - VeriFinca", html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
+        await SendCoreAsync(toEmail, "¡Tu Proyecto ha sido Creado! - VeriFinca", html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendSubscriptionActivatedAsync(string toEmail, string userName, string planName, string interval, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetSubscriptionActivatedEmail(userName, planName, interval);
-        await SendEmailAsync(toEmail, "Suscripción Activada - VeriFinca", html, "Suscripciones <suscripciones@handymansolutionrd.lat>", ct);
+        await SendCoreAsync(toEmail, "Suscripción Activada - VeriFinca", html, "Suscripciones <suscripciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendProjectStatusUpdateAsync(string toEmail, string userName, string projectName, string newStatus, CancellationToken ct = default)
@@ -140,13 +194,46 @@ public ResendEmailService(
         bool isApproved = newStatus.Contains("Aprobado", StringComparison.OrdinalIgnoreCase);
         var html = EmailTemplates.GetProjectStatusChangeEmail(projectName, "", newStatus, isApproved);
         string subject = $"Actualización de Estado: Proyecto {projectName}";
-        await SendEmailAsync(toEmail, subject, html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
+        await SendCoreAsync(toEmail, subject, html, "VeriFinca <notificaciones@handymansolutionrd.lat>", ct);
     }
 
     public async Task SendPasswordResetAsync(string toEmail, string userName, string resetToken, string? returnUrl = null, CancellationToken ct = default)
     {
         var html = EmailTemplates.GetPasswordResetEmail(userName, resetToken, returnUrl);
-        await SendEmailAsync(toEmail, "Recuperación de Contraseña - VeriFinca", html, "VeriFinca <hola@handymansolutionrd.lat>", ct);
+        await SendCoreAsync(toEmail, "Recuperación de Contraseña - VeriFinca", html, "VeriFinca <hola@handymansolutionrd.lat>", ct);
+    }
+
+    private EmailMessage BuildMessage(string to, string subject, string body, string? fromAddress)
+    {
+        var message = new EmailMessage
+        {
+            From = fromAddress ?? $"{_fromName} <{_fromEmail}>",
+            Subject = subject,
+            HtmlBody = body
+        };
+        message.To.Add(to);
+        return message;
+    }
+
+    private static string HashEmail(string email)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(email.ToLowerInvariant()));
+        return Convert.ToHexString(bytes)[..16];
+    }
+
+    private static (int? StatusCode, string? ErrorBody) ExtractResendErrorDetails(Exception ex)
+    {
+        if (ex is ResendException resendEx)
+        {
+            return ((int?)resendEx.StatusCode, resendEx.ErrorType.ToString());
+        }
+
+        if (ex is HttpRequestException httpEx)
+        {
+            return (httpEx.StatusCode.HasValue ? (int)httpEx.StatusCode : null, httpEx.Message);
+        }
+
+        return (null, ex.Message);
     }
 }
 

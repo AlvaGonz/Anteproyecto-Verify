@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Abstractions.Notifications;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -257,13 +258,17 @@ public class ResendEmailServiceTests
             var errorEntry = logger.Errors[0];
 
             // FAILING assertions — these will fail until structured logging is implemented
-            Assert.Contains("CorrelationId", errorEntry.State?.ToString() ?? "",
+            Assert.True(
+                (errorEntry.State?.ToString() ?? "").Contains("CorrelationId"),
                 "Error log MUST include CorrelationId for tracing");
-            Assert.Contains("StatusCode", errorEntry.State?.ToString() ?? "",
+            Assert.True(
+                (errorEntry.State?.ToString() ?? "").Contains("StatusCode"),
                 "Error log MUST include HTTP status code from Resend");
-            Assert.Contains("RecipientHash", errorEntry.State?.ToString() ?? "",
+            Assert.True(
+                (errorEntry.State?.ToString() ?? "").Contains("RecipientHash"),
                 "Error log MUST include recipient hash (Ley 172-13)");
-            Assert.Contains("[RESEND_FAILURE]", errorEntry.Message ?? "",
+            Assert.True(
+                (errorEntry.Message ?? "").Contains("[RESEND_FAILURE]"),
                 "Error log MUST include [RESEND_FAILURE] marker");
         }
         finally
@@ -273,7 +278,7 @@ public class ResendEmailServiceTests
     }
 
     [Fact]
-    public async Task SendEmailAsync_WhenResendThrows_SurfacesFailureInsteadOfSwallowing()
+    public async Task TrySendEmailAsync_WhenResendThrows_ReturnsFailureResult()
     {
         // Arrange
         var (sut, logger) = CreateSutWithLogger();
@@ -284,30 +289,23 @@ public class ResendEmailServiceTests
         var originalResend = resendField.GetValue(sut);
         resendField.SetValue(sut, ThrowingResend(resendEx));
 
-        bool exceptionSurfaced = false;
+        EmailSendResult? result = null;
         try
         {
-            // Act: this should NOT silently swallow — it should either throw or return a typed failure
-            await sut.SendEmailAsync("user@realdomain.com", "Test", "<p>Body</p>");
-        }
-        catch
-        {
-            exceptionSurfaced = true;
+            // Act: TrySendEmailAsync MUST return a typed failure, not swallow
+            result = await sut.TrySendEmailAsync("user@realdomain.com", "Test", "<p>Body</p>");
         }
         finally
         {
             resendField.SetValue(sut, originalResend);
         }
 
-        // Assert: exception surfaced OR typed error result was returned
-        // FAILING: current code swallows all exceptions silently
-        Assert.True(
-            exceptionSurfaced || logger.Errors.Any(e =>
-                (e.Message ?? "").Contains("[RESEND_FAILURE]") &&
-                (e.State?.ToString() ?? "").Contains("Success") &&
-                (e.State?.ToString() ?? "").Contains("False")),
-            "Resend failure MUST surface as either an exception OR a typed failure result. Current code swallows silently."
-        );
+        // Assert: typed result indicates failure
+        Assert.NotNull(result);
+        Assert.False(result.IsSuccess,
+            "TrySendEmailAsync MUST return IsSuccess=false when Resend fails");
+        Assert.NotEmpty(result.CorrelationId);
+        Assert.NotNull(result.ErrorMessage);
     }
 
     [Fact]
@@ -339,7 +337,8 @@ public class ResendEmailServiceTests
 
             // FAILING: correlationId not yet implemented on success path either
             var successEntry = infoLogs[0];
-            Assert.Contains("CorrelationId", successEntry.State?.ToString() ?? "",
+            Assert.True(
+                (successEntry.State?.ToString() ?? "").Contains("CorrelationId"),
                 "Success log MUST include CorrelationId for traceability");
         }
         finally

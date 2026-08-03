@@ -130,6 +130,7 @@ public static class DependencyInjection
         services.AddResend(options =>
         {
             options.ApiToken = resendToken;
+            options.ThrowExceptions = true;
         });
         services.AddScoped<Application.Abstractions.Notifications.IEmailService, Email.ResendEmailService>();
         services.AddScoped<Application.Abstractions.Notifications.IEmailNotificationService, Services.EmailNotificationService>();

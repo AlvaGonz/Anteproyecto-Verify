@@ -90,6 +90,9 @@ internal sealed class NullEmailService : Application.Abstractions.Notifications.
     public Task SendEmailAsync(string to, string subject, string body, string? fromAddress = null, System.Threading.CancellationToken ct = default)
         => Task.CompletedTask;
 
+    public Task<Application.Abstractions.Notifications.EmailSendResult> TrySendEmailAsync(string to, string subject, string body, string? fromAddress = null, System.Threading.CancellationToken ct = default)
+        => Task.FromResult(Application.Abstractions.Notifications.EmailSendResult.Success("null-email-service-test"));
+
     public Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, string? returnUrl = null, System.Threading.CancellationToken ct = default)
         => Task.CompletedTask;
 
