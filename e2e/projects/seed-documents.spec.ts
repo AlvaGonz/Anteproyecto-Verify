@@ -34,28 +34,23 @@ const TORRE_PLAYA_DORADA = "Torre Playa Dorada Beach";
 // Los 6 tipos MOC en el orden del checklist (RequiredDocumentsList)
 const REQUIREMENT_CODES = ["titulo", "estado_juridico", "mensura", "cedula", "certificacion_ipi", "poder"];
 
-let authStatePromise: Promise<string> | null = null;
-
-function getAuthState(): Promise<string> {
-  if (!authStatePromise) {
-    authStatePromise = (async () => {
-      const ctx = await apiRequest.newContext({ baseURL: API_BASE });
-      const res = await ctx.post("/api/auth/login", {
-        data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD },
-      });
-      if (!res.ok()) throw new Error(`Login falló (${res.status()}) — ¿backend arriba?`);
-      const state = await ctx.storageState();
-      await ctx.dispose();
-      return JSON.stringify(state);
-    })();
-  }
-  return authStatePromise;
+// Login fresco por test: el backend rota el refreshToken en cada /auth/refresh,
+// así que un storageState compartido queda invalidado para el siguiente test.
+async function newAuthedContext(browser: import("@playwright/test").Browser) {
+  const ctx = await apiRequest.newContext({ baseURL: API_BASE });
+  const res = await ctx.post("/api/auth/login", {
+    data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD },
+  });
+  if (!res.ok()) throw new Error(`Login falló (${res.status()}) — ¿backend arriba?`);
+  const state = await ctx.storageState();
+  await ctx.dispose();
+  return browser.newContext({ storageState: state });
 }
 
-async function resolveProjectId(projectName: string): Promise<string> {
+async function resolveProjectId(projectName: string, authState: string): Promise<string> {
   const ctx = await apiRequest.newContext({
     baseURL: API_BASE,
-    storageState: JSON.parse(await getAuthState()),
+    storageState: JSON.parse(authState),
   });
   try {
     for (let page = 1; page <= 20; page++) {
@@ -88,9 +83,10 @@ test.describe("Documentos MOC seedeados", () => {
   for (const name of SEED_PROJECT_NAMES) {
     test(`'${name}' tiene los 6 tipos de documento`, async ({ browser }) => {
       test.setTimeout(90_000);
-      const projectId = await resolveProjectId(name);
-      const context = await browser.newContext({ storageState: JSON.parse(await getAuthState()) });
+      const context = await newAuthedContext(browser);
       const page = await context.newPage();
+      const authState = JSON.stringify(await context.storageState());
+      const projectId = await resolveProjectId(name, authState);
       await expectSixMocDocuments(page, projectId);
       await context.close();
     });
@@ -98,9 +94,10 @@ test.describe("Documentos MOC seedeados", () => {
 
   test(`'${TORRE_PLAYA_DORADA}' tiene los 6 documentos MOC`, async ({ browser }) => {
     test.setTimeout(90_000);
-    const projectId = await resolveProjectId(TORRE_PLAYA_DORADA);
-    const context = await browser.newContext({ storageState: JSON.parse(await getAuthState()) });
+    const context = await newAuthedContext(browser);
     const page = await context.newPage();
+    const authState = JSON.stringify(await context.storageState());
+    const projectId = await resolveProjectId(TORRE_PLAYA_DORADA, authState);
     await expectSixMocDocuments(page, projectId);
     await context.close();
   });

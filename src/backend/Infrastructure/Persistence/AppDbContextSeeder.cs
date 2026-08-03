@@ -7,6 +7,7 @@ using System.IO;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Abstractions.Storage;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -184,6 +185,8 @@ public static class AppDbContextSeeder
                     status: p.Status);
                 proyectoEntities.Add(proyecto);
             }
+
+            await SeedTestDocumentsAsync(context, scope.ServiceProvider, adminUser.Id, corporativoUser, proyectoEntities, logger);
 
             await SeedDashboardDummyDataAsync(context, logger, adminUser, corporativoUser, freemiumUser, proyectoEntities);
 
@@ -824,6 +827,134 @@ WHERE NOT EXISTS (
             
             await context.SaveChangesAsync();
         }
+    }
+
+    /// <summary>
+    /// Seed de documentos MOC (carpetas test_docs/) para los proyectos del seed
+    /// + "Torre Playa Dorada Beach". Idempotente por (ProyectoId, TipoDocumento).
+    /// Dev-only: SeedAsync solo corre con ASPNETCORE_ENVIRONMENT=Development o UseMockData=true.
+    /// Los archivos se copian al blob storage real (IBlobStorageService) con fallback
+    /// a URL mock si el storage no está disponible.
+    /// </summary>
+    private static async Task SeedTestDocumentsAsync(
+        AppDbContext context,
+        IServiceProvider serviceProvider,
+        Guid usuarioCargaId,
+        Usuario corporativoUser,
+        List<Proyecto> seedProjects,
+        ILogger logger)
+    {
+        // Carpeta en test_docs → DocumentType canónico (mapea 1:1 a las 6 carpetas)
+        var folders = new (string Folder, DocumentType Tipo)[]
+        {
+            ("Título de Propiedad", DocumentType.CertificadoTitulo),
+            ("Estado Juridico", DocumentType.CertificacionEstadoJuridico),
+            ("Planos de Mensura", DocumentType.PlanoMensuraCatastral),
+            ("Cedula", DocumentType.ID),
+            ("Certificación IPI", DocumentType.CertificacionIPI),
+            ("Poder Notarial", DocumentType.PoderNotarial),
+        };
+
+        var config = serviceProvider.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
+        var configuredPath = config?["Seed:TestDocumentsPath"];
+        var basePath = !string.IsNullOrWhiteSpace(configuredPath)
+            ? configuredPath!
+            : new[]
+            {
+                Path.Combine(Directory.GetCurrentDirectory(), "test_docs"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "test_docs"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "test_docs"),
+            }.FirstOrDefault(Directory.Exists) ?? Path.Combine(Directory.GetCurrentDirectory(), "test_docs");
+
+        if (!Directory.Exists(basePath))
+        {
+            logger.LogWarning("SeedTestDocuments: carpeta test_docs no encontrada en '{Path}'. Documentos MOC omitidos.", basePath);
+            return;
+        }
+
+        var torre = await context.Proyectos.FirstOrDefaultAsync(p => p.Nombre == "Torre Playa Dorada Beach");
+        if (torre == null)
+        {
+            torre = await GetOrCreateProyectoAsync(
+                context,
+                nombre: "Torre Playa Dorada Beach",
+                ubicacionTexto: "Piedra Blanca, Monsenor Nouel",
+                usuarioCreadorId: corporativoUser.Id,
+                categoria: 12,
+                datosDesarrollador: "BORDSHIPP DOMINICANA SRL",
+                designacionCatastral: "120260167201:0091",
+                status: ProjectStatus.Publicado);
+        }
+
+        var targetProjects = seedProjects.Concat(new[] { torre }).ToList();
+
+        IBlobStorageService? blob = null;
+        try { blob = serviceProvider.GetService<IBlobStorageService>(); }
+        catch { blob = null; } // storage no configurado → fallback URL mock
+
+        int inserted = 0, skipped = 0;
+        foreach (var proyecto in targetProjects)
+        {
+            foreach (var (folder, tipo) in folders)
+            {
+                if (await context.Documentos.AnyAsync(d => d.ProyectoId == proyecto.Id && d.TipoDocumento == tipo))
+                {
+                    skipped++;
+                    continue;
+                }
+
+                var folderPath = Path.Combine(basePath, folder);
+                if (!Directory.Exists(folderPath))
+                {
+                    logger.LogWarning("SeedTestDocuments: carpeta '{Folder}' no existe en test_docs", folder);
+                    continue;
+                }
+
+                var file = Directory.GetFiles(folderPath).OrderBy(f => f).FirstOrDefault();
+                if (file == null)
+                {
+                    logger.LogWarning("SeedTestDocuments: carpeta '{Folder}' vacía", folder);
+                    continue;
+                }
+
+                var safeName = Path.GetFileName(file); // sanitiza: solo nombre de archivo, nunca rutas
+                var ext = Path.GetExtension(safeName).ToLowerInvariant();
+                var contentType = ext switch
+                {
+                    ".pdf" => "application/pdf",
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    ".webp" => "image/webp",
+                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    _ => "application/octet-stream",
+                };
+
+                var bytes = await File.ReadAllBytesAsync(file);
+                var blobName = $"seed/{proyecto.Id}/{safeName}";
+                var url = $"https://mockstorage.blob.core.windows.net/docs/{blobName}";
+                if (blob != null)
+                {
+                    try
+                    {
+                        using var stream = new MemoryStream(bytes);
+                        var result = await blob.UploadAsync(stream, blobName, contentType);
+                        url = result.Url;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning(ex, "SeedTestDocuments: fallback a URL mock para '{File}' (blob no disponible)", safeName);
+                    }
+                }
+
+                context.Documentos.Add(new Documento(
+                    proyecto.Id, tipo, safeName, safeName, url,
+                    contentType, ext.TrimStart('.'), bytes.Length, usuarioCargaId));
+                inserted++;
+            }
+        }
+
+        await context.SaveChangesAsync();
+        logger.LogInformation("SeedTestDocuments: {Inserted} documentos MOC insertados, {Skipped} ya existentes (idempotente).", inserted, skipped);
     }
 
     /// <summary>
