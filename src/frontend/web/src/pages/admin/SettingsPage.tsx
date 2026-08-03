@@ -48,7 +48,9 @@ export const SettingsPage: React.FC = () => {
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const isManagementTier = user?.plan === "Corporativo" || user?.plan === "Empresa";
 
-  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 50, isAdmin && activeTab === "users");
+  // ponytail: request the full user list (no page cap); UsersTable groups and
+  // paginates client-side, so partial fetches would show wrong totals/counts
+  const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 1000, isAdmin && activeTab === "users");
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans(isAdmin);
 
   const createUserMutation = useCreateUser();
