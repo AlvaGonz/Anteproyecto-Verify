@@ -119,7 +119,9 @@ test.describe("Public Directory Filter — E2E", () => {
       });
     });
     await page.goto("/#/projects");
-    await page.getByText("Comercial").first().click();
+    // Open the collapsible "Tipo (acumulativo)" filter panel
+    await page.getByText("Tipo (acumulativo)").click();
+    await page.getByText("COMERCIAL Y OFICINAS").first().click();
     await expect(page.getByText("Torre San Gerónimo")).toBeVisible();
     await expect(page.getByText("Plaza Central Mall")).toBeVisible();
     await expect(page.getByText("Residencial Terra Noble")).not.toBeVisible();

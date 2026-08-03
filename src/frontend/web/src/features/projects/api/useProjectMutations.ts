@@ -46,6 +46,7 @@ export const useUpdateProject = (projectId: string) => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
       qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] }); // ponytail: status may auto-transition after save
+      qc.invalidateQueries({ queryKey: ["statusHistory", projectId] }); // ponytail: CREADO→EDITADO auto-promote writes a new entry
     },
   });
 };

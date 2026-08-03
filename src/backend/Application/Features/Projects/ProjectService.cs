@@ -142,6 +142,7 @@ public class ProjectService : IProjectService
         var currentCodigo = proyecto.Estado?.CodigoUnico;
         if (string.IsNullOrEmpty(currentCodigo) || currentCodigo == ProjectStatusCodes.Creado)
         {
+            var oldEstadoId = proyecto.EstadoId;
             var estadoEditado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Editado, cancellationToken);
             if (estadoEditado == null)
             {
@@ -149,6 +150,17 @@ public class ProjectService : IProjectService
                     "Estado 'EDITADO' no encontrado en ProyectosEstados. Ejecute el seeder o la migración de estados.");
             }
             proyecto.UpdateEstado(estadoEditado);
+
+            await _auditLogger.Append(new AuditEntryDto
+            {
+                UsuarioId = proyecto.UsuarioCreadorId,
+                TipoOperacion = TipoOperacion.CambioEstado,
+                Accion = "CambioEstado",
+                Resultado = $"{currentCodigo} → {ProjectStatus.Editado.ToCodigoUnico()}",
+                ReferenciaExpedienteId = id,
+                EstadoAnteriorId = oldEstadoId,
+                EstadoNuevoId = estadoEditado.Id
+            }, cancellationToken);
         }
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -79,37 +79,14 @@ test.describe("Checkout Flow — E2E con Mock", () => {
   });
 
   test("CHECKOUT RETURN — resolves correctly and redirects to dashboard with proper access", async ({ page }) => {
-    // Debug: log all API requests to diagnose flakiness
-    const apiCalls: { url: string; status?: number; error?: string }[] = [];
-    page.on('request', req => {
-      const url = req.url();
-      if (url.includes('/api/')) apiCalls.push({ url, status: undefined });
-    });
-    page.on('response', resp => {
-      const url = resp.url();
-      if (url.includes('/api/')) {
-        const entry = apiCalls.find(r => r.url === url && r.status === undefined);
-        if (entry) entry.status = resp.status();
-      }
-    });
-    page.on('requestfailed', req => {
-      const url = req.url();
-      if (url.includes('/api/')) {
-        const entry = apiCalls.find(r => r.url === url && r.status === undefined);
-        if (entry) { entry.status = -1; entry.error = req.failure()?.errorText; }
-      }
-    });
-
     // Navigate to the checkout return page with session_id
     await page.goto("/#/checkout/return?session_id=cs_test_123");
-
 
     // We expect it to be loading (pending_confirmation) because auth/me returns inactive
     // Use toPass polling to handle Vite dev module loading + React lazy chunk latency
     await expect(async () => {
       await expect(page.getByText('Verificando estado del pago')).toBeVisible({ timeout: 2000 });
     }).toPass({ timeout: 20000, intervals: [1000, 2000, 2000] }).catch(async () => {
-      console.log('API CALLS (failing run):', JSON.stringify(apiCalls));
       throw new Error('Loading text never appeared');
     });
 
@@ -141,6 +118,7 @@ test.describe("Checkout Flow — E2E con Mock", () => {
   });
 
   test("SETTINGS — shows correct paid plan", async ({ page }) => {
+    test.setTimeout(60_000);
     // Navigate straight to settings but mock the active subscription
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({
@@ -175,9 +153,14 @@ test.describe("Checkout Flow — E2E con Mock", () => {
       });
     });
 
+    // Admin shell calls /api/admin/dashboard/stats, /api/admin/users, /api/admin/plans on settings page mount
+    await page.route("**/api/admin/dashboard/**", route => route.fulfill({ json: { totalProyectos: 0, proyectosAprobados: 0, proyectosPendientes: 0 } }));
+    await page.route("**/api/admin/users**", route => route.fulfill({ json: { items: [], totalCount: 0, page: 1, pageSize: 50 } }));
+    await page.route("**/api/admin/plans**", route => route.fulfill({ json: [] }));
+
     await page.goto("/#/admin/settings");
-    await expect(page.getByRole('button', { name: /Suscripción/i })).toBeVisible();
-    await page.getByRole('button', { name: /Suscripción/i }).click();
+    await expect(page.getByRole('tab', { name: /Suscripción/i })).toBeVisible();
+    await page.getByRole('tab', { name: /Suscripción/i }).click();
 
     await expect(page.getByText(/Profesional/i)).toBeVisible();
     await expect(page.getByText(/Activa/i)).toBeVisible();

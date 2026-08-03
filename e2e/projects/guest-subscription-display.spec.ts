@@ -43,8 +43,8 @@ async function stubSettingsApis(page: import('@playwright/test').Page, overrides
 
 // ponytail: navigate to settings and click subscription tab
 async function goToSubscriptionTab(page: import('@playwright/test').Page) {
-  await page.goto('http://localhost:3000/#/admin/settings', { waitUntil: 'networkidle' });
-  await page.getByRole('button', { name: /suscripci/i }).click();
+  await page.goto('http://localhost:3000/#/admin/settings');
+  await page.getByRole('tab', { name: /suscripci/i }).click();
 }
 
 // ── Scenario A: Guest user sees inviter's plan badge + plan card ─────────────

@@ -14,6 +14,30 @@ import { test, expect } from '@playwright/test';
  */
 test.describe('Resend failure verifier', () => {
 
+  async function mockAuthAndNotifications(page: import('@playwright/test').Page) {
+    await page.route('**/api/auth/me', route => route.fulfill({ json: { id: 'mock', email: 'mock@test.com', role: 'user', aceptoDescargo: true } }));
+    await page.route('**/api/auth/refresh', route => route.fulfill({ json: { accessToken: 'mock' } }));
+    await page.route('**/api/notifications*', route => route.fulfill({ json: [] }));
+  }
+
+  async function goToRegister(page: import('@playwright/test').Page) {
+    await page.goto('/#/register');
+    await expect(page.getByRole('button', { name: /crear mi cuenta/i })).toBeVisible({ timeout: 15_000 });
+  }
+
+  async function fillRegisterForm(page: import('@playwright/test').Page, prefix: string = 'Test') {
+    const ts = Date.now().toString().slice(-6);
+    const email = `resend-${prefix}-${ts}@example.com`;
+    await page.fill('#nombre', prefix);
+    await page.fill('#apellido', 'User');
+    await page.fill('#email', email);
+    await page.fill('#telefono', '8095550111');
+    await page.fill('#cedula', '00100000003');
+    await page.fill('#password', 'SecurePass123!');
+    await page.locator('input[name="acceptedTerms"]').check();
+    return email;
+  }
+
   test('SCENARIO 1: emits [RESEND_FAILURE] console error when resend-verification API fails', async ({ page }) => {
     const failures: string[] = [];
     const allConsoleErrors: string[] = [];
@@ -101,95 +125,39 @@ test.describe('Resend failure verifier', () => {
   });
 
   test('SCENARIO 3: does NOT emit [RESEND_FAILURE] when resend-verification succeeds', async ({ page }) => {
+    test.setTimeout(30_000);
     const failures: string[] = [];
-    page.on('console', (msg) => {
-      if (msg.type() === 'error' && msg.text().includes('[RESEND_FAILURE]')) {
-        failures.push(msg.text());
-      }
-    });
+    page.on('console', (msg) => { if (msg.type() === 'error' && msg.text().includes('[RESEND_FAILURE]')) failures.push(msg.text()); });
 
-    const email = `resend-ok-${Date.now()}@example.com`;
+    await mockAuthAndNotifications(page);
+    await page.route('**/api/auth/register', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ isSuccess: true }) }));
+    await page.route('**/api/auth/resend-verification', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ isSuccess: true }) }));
 
-    await page.route('**/api/auth/register', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ isSuccess: true }),
-      })
-    );
-    await page.route('**/api/auth/resend-verification', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ isSuccess: true }),
-      })
-    );
-
-    await page.goto('/#/register', { waitUntil: 'domcontentloaded' });
-
-    await page.fill('#nombre', 'Success');
-    await page.fill('#apellido', 'Case');
-    await page.fill('#email', email);
-    await page.fill('#telefono', '8095550199');
-    await page.fill('#cedula', '00100000011');
-    await page.fill('#password', 'SecurePass123!');
-    await page.locator('input[name="acceptedTerms"]').check();
+    await goToRegister(page);
+    await fillRegisterForm(page, 'Success');
 
     await page.getByRole('button', { name: /crear mi cuenta/i }).click();
-
-    await expect(page.getByTestId('resend-verification-button')).toBeVisible();
+    await expect(page.getByTestId('resend-verification-button')).toBeVisible({ timeout: 10_000 });
     await page.getByTestId('resend-verification-button').click();
-
-    // Give it time for any potential async error to surface
     await page.waitForTimeout(2000);
     expect(failures.length).toBe(0);
   });
 
   test('SCENARIO 4: surfaced error includes context (recipient masked, correlation)', async ({ page }) => {
+    test.setTimeout(30_000);
     const failures: string[] = [];
-    page.on('console', (msg) => {
-      if (msg.type() === 'error' && msg.text().includes('[RESEND_FAILURE]')) {
-        failures.push(msg.text());
-      }
-    });
+    page.on('console', (msg) => { if (msg.type() === 'error' && msg.text().includes('[RESEND_FAILURE]')) failures.push(msg.text()); });
 
-    const email = `resend-ctx-${Date.now()}@example.com`;
+    await mockAuthAndNotifications(page);
+    await page.route('**/api/auth/register', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ isSuccess: true }) }));
+    await page.route('**/api/auth/resend-verification', route => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ isSuccess: false, message: 'Email provider returned 500', statusCode: 500, correlationId: 'test-correlation-id-123' }) }));
 
-    await page.route('**/api/auth/register', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ isSuccess: true }),
-      })
-    );
-    await page.route('**/api/auth/resend-verification', (route) =>
-      route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          isSuccess: false,
-          message: 'Email provider returned 500',
-          statusCode: 500,
-          correlationId: 'test-correlation-id-123',
-        }),
-      })
-    );
-
-    await page.goto('/#/register', { waitUntil: 'domcontentloaded' });
-
-    await page.fill('#nombre', 'Context');
-    await page.fill('#apellido', 'Check');
-    await page.fill('#email', email);
-    await page.fill('#telefono', '8095550199');
-    await page.fill('#cedula', '00100000012');
-    await page.fill('#password', 'SecurePass123!');
-    await page.locator('input[name="acceptedTerms"]').check();
+    await goToRegister(page);
+    await fillRegisterForm(page, 'Context');
 
     await page.getByRole('button', { name: /crear mi cuenta/i }).click();
-
-    await expect(page.getByTestId('resend-verification-button')).toBeVisible();
+    await expect(page.getByTestId('resend-verification-button')).toBeVisible({ timeout: 10_000 });
     await page.getByTestId('resend-verification-button').click();
-
     await expect.poll(() => failures.length, { timeout: 10_000 }).toBeGreaterThan(0);
     expect(failures[0]).toContain('[RESEND_FAILURE]');
   });

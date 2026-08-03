@@ -161,7 +161,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
 
   test('User with Professional plan (exportacionPdf=true) can see PDF export option', async ({ page }) => {
     await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     // Check that PDF export is shown as available
     await expect(page.locator('[data-testid="export-pdf-btn"]')).toBeVisible();
@@ -172,7 +172,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
     await setupSubscription(page, 'consultor');
     
     await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     // PDF export should not be visible or should be disabled
     await expect(page.locator('[data-testid="export-pdf-btn"]')).not.toBeVisible();
@@ -180,7 +180,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
 
   test('User with Professional plan (presentacionPublica=true) can publish project', async ({ page }) => {
     await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     // Check that public presentation is enabled
     await expect(page.locator('[data-testid="project-publication-control"]')).toBeEnabled();
@@ -190,7 +190,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
     await setupSubscription(page, 'consultor');
     
     await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     await expect(page.locator('[data-testid="project-publication-control"]')).toBeDisabled();
     await expect(page.locator('[data-testid="project-publication-control"]')).toHaveAttribute('title', /no permite presentar/);
@@ -198,7 +198,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
 
   test('Usage UI displays consultasUsadas and MaxConsultas from API response', async ({ page }) => {
     await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     // Check consultas limit display
     await expect(page.locator('[data-testid="consultas-limit"]')).toBeVisible();
@@ -211,7 +211,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
     await stubSettingsApis(page);
 
     await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     // Guest badge should be visible
     await expect(page.locator('.guest-plan-badge')).toBeVisible();
@@ -226,7 +226,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
     // Start with Consultor plan
     await setupSubscription(page, 'consultor');
     await page.goto('/#/admin/settings');
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     // Verify Consultor limits
     await expect(page.locator('[data-testid="consultas-limit"]')).toContainText('0 / 1');
@@ -237,7 +237,7 @@ test.describe('Subscription Plan Enforcement E2E', () => {
     
     // Reload page to fetch new plan limits
     await page.reload();
-    await page.getByRole('button', { name: /suscripci/i }).click();
+    await page.getByRole('tab', { name: /suscripci/i }).click();
 
     // Verify Professional limits
     await expect(page.locator('[data-testid="consultas-limit"]')).toContainText('5 / 25');
