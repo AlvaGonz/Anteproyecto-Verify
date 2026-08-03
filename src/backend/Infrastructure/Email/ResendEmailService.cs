@@ -66,7 +66,8 @@ public ResendEmailService(
             // For non-OTP transactional sends, callers are fire-and-forget and
             // do not act on a swallowed failure. This is preserved for backward
             // compatibility with the registration, password-reset, etc. flows.
-            _logger.LogWarning(ex, "Failed to send email via Resend to {To}. (If running E2E tests without a valid API key, this is expected).", to);
+            // [RESEND_FAILURE] marker keeps the otherwise-silent swallow greppable in logs.
+            _logger.LogError(ex, "[RESEND_FAILURE] Failed to send email via Resend to {To}. (If running E2E tests without a valid API key, this is expected).", to);
         }
     }
 
