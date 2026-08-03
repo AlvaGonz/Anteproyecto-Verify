@@ -560,10 +560,10 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Me Interesa / Guardado Button */}
+                        {/* Me Interesa Button — solo registra interés, no guarda (el botón Guardar es aparte) */}
                         <button
                           type="button"
-                          disabled={isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving}
+                          disabled={isRegisteringInterest || isUnregisteringInterest}
                           onClick={() => {
                             if (!isAuthenticated) {
                               addToast("Debe iniciar sesión para registrar su interés en el proyecto.", "info");
@@ -574,23 +574,14 @@ export const ProjectPublicDetailPage: React.FC = () => {
                               return;
                             }
                             if (isInterested) {
-                              // Toggle off: unregister interest + unsave
                               setIsInterested(false);
-                              setLocalSaved(false);
                               unregisterInterest(project.id, {
-                                onError: () => { setIsInterested(true); setLocalSaved(true); }
-                              });
-                              unsaveProject(project.id, {
-                                onError: () => setLocalSaved(true)
+                                onError: () => setIsInterested(true)
                               });
                             } else {
                               setIsInterested(true);
-                              setLocalSaved(true);
                               registerInterest(project.id, {
-                                onError: () => { setIsInterested(false); setLocalSaved(false); }
-                              });
-                              saveProject(project.id, {
-                                onError: () => setLocalSaved(false)
+                                onError: () => setIsInterested(false)
                               });
                             }
                           }}
@@ -604,13 +595,13 @@ export const ProjectPublicDetailPage: React.FC = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                           )}
                           <span className="relative z-10 text-center leading-tight">
-                            {(isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving)
+                            {(isRegisteringInterest || isUnregisteringInterest)
                               ? "Procesando..."
                               : isInterested
-                              ? "Guardado en tus registros"
+                              ? "Interés Registrado"
                               : "Me interesa el proyecto"}
                           </span>
-                          {(isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving) ? (
+                          {(isRegisteringInterest || isUnregisteringInterest) ? (
                             <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0 relative z-10" />
                           ) : isInterested ? (
                             <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />
