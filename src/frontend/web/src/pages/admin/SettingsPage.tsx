@@ -175,7 +175,7 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Navigation tabs */}
-      <div className="flex overflow-x-auto border-b border-border hide-scrollbar">
+      <div className="flex flex-wrap gap-x-1 gap-y-0 border-b border-border">
         <button type="button"
           onClick={() => setActiveTab("profile")}
           className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "profile"
@@ -185,6 +185,19 @@ export const SettingsPage: React.FC = () => {
         >
           <User className="w-4 h-4" />
           Mi Perfil
+        </button>
+
+        {/* Preferencias tab - how the user is presented on public projects */}
+        <button
+          type="button"
+          onClick={() => setActiveTab("preferences")}
+          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "preferences"
+            ? "border-[#223382] text-[#223382]"
+            : "border-transparent text-text-secondary hover:text-text-primary"
+            }`}
+        >
+          <Palette className="w-4 h-4" />
+          Preferencias
         </button>
 
         <button type="button"
@@ -240,77 +253,64 @@ export const SettingsPage: React.FC = () => {
           <Shield className="w-4 h-4" />
           Seguridad
         </button>
-
-        {/* Preferencias tab - how the user is presented on public projects */}
-        <button
-          type="button"
-          onClick={() => setActiveTab("preferences")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "preferences"
-            ? "border-[#223382] text-[#223382]"
-            : "border-transparent text-text-secondary hover:text-text-primary"
-            }`}
-        >
-          <Palette className="w-4 h-4" />
-          Preferencias
-        </button>
       </div>
 
       {/* Tab Contents */}
       <div className="mt-6">
         <Suspense fallback={<TabFallback />}>
-        <AnimatePresence mode="wait">
-          {activeTab === "profile" && (
-            <m.div key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <MyProfileForm />
-            </m.div>
-          )}
+          <AnimatePresence mode="wait">
+            {activeTab === "profile" && (
+              <m.div key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <MyProfileForm />
+              </m.div>
+            )}
 
-          {activeTab === "subscription" && (
-            <m.div key="subscription" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <SubscriptionSettings />
-            </m.div>
-          )}
+            {activeTab === "preferences" && (
+              <m.div key="preferences" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <PreferenciasSection />
+              </m.div>
+            )}
 
-          {activeTab === "users" && (
-            <m.div key="users" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <UsersTable
-                users={users}
-                plans={plans}
-                onEdit={handleEditClick}
-                onDelete={(id) => setDeleteId(id)}
-                onAddNew={handleAddNewClick}
-                onRefresh={refetchUsers}
-              />
-            </m.div>
-          )}
+            {activeTab === "subscription" && (
+              <m.div key="subscription" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <SubscriptionSettings />
+              </m.div>
+            )}
 
-          {activeTab === "invitees" && isManagementTier && (
-            <m.div key="invitees" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <InviteesSettings />
-            </m.div>
-          )}
+            {activeTab === "users" && (
+              <m.div key="users" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <UsersTable
+                  users={users}
+                  plans={plans}
+                  onEdit={handleEditClick}
+                  onDelete={(id) => setDeleteId(id)}
+                  onAddNew={handleAddNewClick}
+                  onRefresh={refetchUsers}
+                />
+              </m.div>
+            )}
 
-          {activeTab === "security" && (
-            <m.div key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
-              <TwoFactorSection />
-              <ChangePasswordSection />
-              <section className="bg-red-50 border border-red-200 rounded-lg p-6">
-                <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
-                <p className="text-sm text-red-600 mb-4">
-                  Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
-               </p>
-                <DeleteAccountSection />
-             </section>
-           </m.div>
-          )}
+            {activeTab === "invitees" && isManagementTier && (
+              <m.div key="invitees" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <InviteesSettings />
+              </m.div>
+            )}
 
-          {activeTab === "preferences" && (
-            <m.div key="preferences" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <PreferenciasSection />
-            </m.div>
-          )}
+            {activeTab === "security" && (
+              <m.div key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
+                <TwoFactorSection />
+                <ChangePasswordSection />
+                <section className="bg-red-50 border border-red-200 rounded-lg p-6">
+                  <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
+                  <p className="text-sm text-red-600 mb-4">
+                    Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
+                  </p>
+                  <DeleteAccountSection />
+                </section>
+              </m.div>
+            )}
 
-        </AnimatePresence>
+          </AnimatePresence>
         </Suspense>
       </div>
 
