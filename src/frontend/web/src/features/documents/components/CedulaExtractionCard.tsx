@@ -3,6 +3,9 @@ import { CedulaRdExtractionV1, ExtractionStatus, ExtractedField } from "../types
 import { Fingerprint } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
+import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
+import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { ShieldCheck } from "lucide-react";
 
 interface CedulaExtractionCardProps {
   extraction: CedulaRdExtractionV1;
@@ -16,6 +19,21 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({ extr
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
   const [isSaving, setIsSaving] = React.useState(false);
+
+  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+
+  const handleVerifyGobernanza = () => {
+    verifyDocument({
+      documentType: 'jce',
+      payload: {
+        cedula: extraction.cedulaNumber?.normalizedValue || extraction.cedulaNumber?.rawValue,
+        nombres: extraction.firstNames?.normalizedValue || extraction.firstNames?.rawValue,
+        apellidos: extraction.lastNames?.normalizedValue || extraction.lastNames?.rawValue,
+        fechaNacimiento: extraction.birthDate?.normalizedValue || extraction.birthDate?.rawValue,
+        fechaExpiracion: extraction.expiryDate?.normalizedValue || extraction.expiryDate?.rawValue
+      }
+    });
+  };
 
   const handleEditClick = (fieldName: string, currentValue: string) => {
     setEditingField(fieldName);
@@ -79,6 +97,25 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({ extr
       {renderField("Apellidos", "lastNames", extraction.lastNames)}
       {renderField("Fecha Nacimiento", "birthDate", extraction.birthDate)}
       {renderField("Fecha Expiración", "expiryDate", extraction.expiryDate)}
+
+      <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10">
+        <div className="flex justify-end">
+          <button
+            onClick={handleVerifyGobernanza}
+            disabled={isVerifying}
+            className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold tracking-wide shadow-md hover:bg-primary/90 hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShieldCheck className="w-5 h-5" />
+            {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
+          </button>
+        </div>
+        
+        <VerificationFeedbackCard 
+          response={verificationResponse || null} 
+          isLoading={isVerifying} 
+          error={verificationError}
+        />
+      </div>
     </DocumentExtractionPanel>
   );
 };

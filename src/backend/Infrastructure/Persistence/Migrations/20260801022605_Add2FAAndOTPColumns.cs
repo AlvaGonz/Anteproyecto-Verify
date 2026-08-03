@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Add2FAColumns : Migration
+    public partial class Add2FAAndOTPColumns : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -54,8 +54,19 @@ namespace Infrastructure.Persistence.Migrations
                 table: "Usuario",
                 type: "nvarchar(max)",
                 nullable: true);
+
+//             migrationBuilder.AlterColumn<string>(
+//                 name: "Rnc",
+//                 table: "DGII",
+//                 type: "varchar(20)",
+//                 maxLength: 20,
+//                 nullable: false,
+//                 oldClrType: typeof(string),
+//                 oldType: "nvarchar(20)",
+//                 oldMaxLength: 20);
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -85,6 +96,16 @@ namespace Infrastructure.Persistence.Migrations
             migrationBuilder.DropColumn(
                 name: "TwoFactorSecretEncrypted",
                 table: "Usuario");
+            migrationBuilder.AlterColumn<string>(
+                name: "Rnc",
+                table: "DGII",
+                type: "nvarchar(20)",
+                maxLength: 20,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "varchar(20)",
+                oldMaxLength: 20);
+
             migrationBuilder.DropColumn(
                 name: "EmailOtpLastSentUtc",
                 table: "Usuario");

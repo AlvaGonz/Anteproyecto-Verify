@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260802052827_AddCatastroOcrFields")]
+    partial class AddCatastroOcrFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,40 +228,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasKey("IdCatastroTitulo");
 
                     b.ToTable("CatastroTitulo", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.CategoriaProyecto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nombre")
-                        .IsUnique();
-
-                    b.ToTable("CategoriaProyecto");
                 });
 
             modelBuilder.Entity("Domain.Entities.Certificacion", b =>
@@ -1111,7 +1080,7 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("IdProyecto");
 
-                    b.Property<int>("CategoriaId")
+                    b.Property<int>("Categoria")
                         .HasColumnType("int");
 
                     b.Property<string>("CedulaRncPropietario")
@@ -1215,8 +1184,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoriaId");
 
                     b.HasIndex("CodigoInterno")
                         .IsUnique();
@@ -2252,12 +2219,6 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Proyecto", b =>
                 {
-                    b.HasOne("Domain.Entities.CategoriaProyecto", "CategoriaProyecto")
-                        .WithMany()
-                        .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.ProyectoEstado", "Estado")
                         .WithMany("Proyectos")
                         .HasForeignKey("EstadoId")
@@ -2269,8 +2230,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasForeignKey("UsuarioCreadorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("CategoriaProyecto");
 
                     b.Navigation("Estado");
 

@@ -157,7 +157,7 @@ public static class DependencyInjection
         services.AddSingleton<Application.Abstractions.Security.ITotpService, Security.TotpService>();
         services.AddScoped<Application.Abstractions.Security.IRecoveryCodeService, Security.RecoveryCodeService>();
         services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "dpkeys-" + Guid.NewGuid().ToString("N"))));
+            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "dpkeys-verifinca")));
         services.AddSingleton<Microsoft.AspNetCore.DataProtection.IDataProtector>(sp =>
             sp.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>()
               .CreateProtector("TwoFactorSecret"));
@@ -170,6 +170,9 @@ public static class DependencyInjection
 
         services.AddScoped<IStripeService, Services.StripeService>();
         services.AddScoped<Application.Contracts.Subscriptions.ISubscriptionService, Services.SubscriptionService>();
+        
+        // Gobernanza de Datos
+        services.AddScoped<Application.Contracts.Gobernanza.IGobernanzaDeDatosService, Services.GobernanzaDeDatosService>();
 
         // Account Deletion
         services.AddScoped<Application.Features.Account.Commands.RequestAccountDeletion.RequestAccountDeletionCommandHandler>();

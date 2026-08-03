@@ -26,7 +26,7 @@ export const DocumentExtractionPanel: React.FC<DocumentExtractionPanelProps> = (
   icon = <FileText className="w-4 h-4 text-primary" />,
   warnings = [],
   children,
-  gridClassName = "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"
+  gridClassName = "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 items-start"
 }) => {
   
   const [isExpanded, setIsExpanded] = useState(true);

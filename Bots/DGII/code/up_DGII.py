@@ -263,6 +263,7 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
         
         for i in range(0, len(chunk_records), batch_size):
             batch = chunk_records[i : i + batch_size]
+            batch_success = False
             placeholders_str = ", ".join([row_placeholder] * len(batch))
             sql = f"INSERT INTO DGII ({cols_str}) VALUES {placeholders_str}"
             
@@ -274,11 +275,13 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
                 try:
                     cursor.execute(sql, tuple(params))
                     conn.commit()
+                    batch_success = True
                     break
                 except Exception as e:
                     err_str = str(e)
                     if batch_attempt > 1 and ("2627" in err_str or "PRIMARY KEY" in err_str.upper()):
                         print(f"    [Chunk {chunk_id}] Ignoring PK violation on retry {batch_attempt}, assuming previous attempt committed successfully.")
+                        batch_success = True
                         break
                         
                     if conn:
@@ -286,23 +289,24 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
                         except: pass
                         
                     if batch_attempt < max_retries and is_transient_error(e):
-                        wait = 2 ** batch_attempt
+                        wait = (2 ** batch_attempt) + (batch_attempt * 0.5)
                         time.sleep(wait)
                         try: conn.close()
                         except: pass
                         conn = get_db_connection()
                         cursor = conn.cursor()
                     else:
-                        raise e
-                        
-            count += len(batch)
+                        print(f"    [Chunk {chunk_id}] Batch failed permanently: {e}")
+            
+            if batch_success:
+                count += len(batch)
             if count % 10000 == 0 or count == len(chunk_records):
                 elapsed = time.time() - t0
                 speed = count / elapsed if elapsed > 0 else 0
                 print(f"[Chunk {chunk_id}] Inserted {count}/{len(chunk_records)} records. Speed: {speed:.1f} rec/sec")
                 
-        print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {len(chunk_records)} records inserted successfully!")
-        return len(chunk_records)
+        print(f"[Chunk {chunk_id}] Completed in {time.time() - t0:.2f}s — {count} records inserted successfully!")
+        return count
     except Exception as e:
         if conn:
             try: conn.rollback()

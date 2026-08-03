@@ -1,0 +1,180 @@
+1181: CreatedAtUtc       DATETIME2        NOT NULL DEFAULT GETUTCDATE(),
+1182: 
+1183: UpdatedAtUtc       DATETIME2        NULL
+1184: 
+1185: );
+1186: 
+1187: 
+1188: 
+1189: 
+1190: -- ============================================================
+1191: 
+1192: -- ALTER TABLE ADD COLUMN â each column guarded individually
+1193: 
+1194: -- ============================================================
+1195: 
+1196: 
+1197: 
+1198: -- TipoInmoviliario.IdProyecto
+1199: 
+1200: IF NOT EXISTS (
+1201: 
+1202: SELECT 1 FROM sys.columns
+1203: 
+1204: WHERE object_id = OBJECT_ID(N'[TipoInmoviliario]') AND name = 'IdProyecto'
+1205: 
+1206: 
+1207: BEGIN
+1208: 
+1209: ALTER TABLE TipoInmoviliario ADD IdProyecto UNIQUEIDENTIFIER;
+1210: 
+1211: ALTER TABLE TipoInmoviliario ADD FOREIGN KEY (IdProyecto)
+1212: 
+1213: REFERENCES ProyectosInmobiliarios(IdProyecto);
+1214: 
+1215: END
+1216: 
+1217: 
+1218: 
+1219: 
+1220: -- ProyectosInmobiliarios.IdMivhed
+1221: 
+1222: IF NOT EXISTS (
+1223: 
+1224: SELECT 1 FROM sys.columns
+1225: 
+1226: WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdMivhed'
+1227: 
+1228: 
+1229: BEGIN
+1230: 
+1231: ALTER TABLE ProyectosInmobiliarios ADD IdMivhed UNIQUEIDENTIFIER;
+1232: 
+1233: ALTER TABLE ProyectosInmobiliarios ADD FOREIGN KEY (IdMivhed)
+1234: 
+1235: REFERENCES CertiMivhed(IdMivhed);
+1236: 
+1237: END
+1238: 
+1239: 
+1240: 
+1241: 
+1242: -- ProyectosInmobiliarios.IdCatastroTitulo
+1243: 
+1244: IF NOT EXISTS (
+1245: 
+1246: SELECT 1 FROM sys.columns
+1247: 
+1248: WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdCatastroTitulo'
+1249: 
+1250: 
+1251: BEGIN
+1252: 
+1253: ALTER TABLE ProyectosInmobiliarios ADD IdCatastroTitulo UNIQUEIDENTIFIER;
+1254: 
+1255: ALTER TABLE ProyectosInmobiliarios ADD FOREIGN KEY (IdCatastroTitulo)
+1256: 
+1257: REFERENCES CatastroTitulo(IdCatastroTitulo);
+1258: 
+1259: END
+1260: 
+1261: 
+1262: 
+1263: 
+1264: -- ProyectosInmobiliarios.IdTarifaAyuntamiento
+1265: 
+1266: IF NOT EXISTS (
+1267: 
+1268: SELECT 1 FROM sys.columns
+1269: 
+1270: WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdTarifaAyuntamiento'
+1271: 
+1272: 
+1273: BEGIN
+1274: 
+1275: ALTER TABLE ProyectosInmobiliarios ADD IdTarifaAyuntamiento UNIQUEIDENTIFIER;
+1276: 
+1277: ALTER TABLE ProyectosInmobiliarios ADD FOREIGN KEY (IdTarifaAyuntamiento)
+1278: 
+1279: REFERENCES TarifaSueloAyuntamiento(IdTarifaAyuntamiento);
+1280: 
+1281: END
+1282: 
+1283: 
+1284: 
+1285: 
+1286: -- ProyectosInmobiliarios.IdPSuelo
+1287: 
+1288: IF NOT EXISTS (
+1289: 
+1290: SELECT 1 FROM sys.columns
+1291: 
+1292: WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdPSuelo'
+1293: 
+1294: 
+1295: BEGIN
+1296: 
+1297: ALTER TABLE ProyectosInmobiliarios ADD IdPSuelo UNIQUEIDENTIFIER;
+1298: 
+1299: ALTER TABLE ProyectosInmobiliarios ADD FOREIGN KEY (IdPSuelo)
+1300: 
+1301: REFERENCES PermisoSuelo(IdPSuelo);
+1302: 
+1303: END
+1304: 
+1305: 
+1306: 
+1307: 
+1308: -- ProyectosInmobiliarios.IdESuelo
+1309: 
+1310: IF NOT EXISTS (
+1311: 
+1312: SELECT 1 FROM sys.columns
+1313: 
+1314: WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdESuelo'
+1315: 
+1316: 
+1317: BEGIN
+1318: 
+1319: ALTER TABLE ProyectosInmobiliarios ADD IdESuelo UNIQUEIDENTIFIER;
+1320: 
+1321: ALTER TABLE ProyectosInmobiliarios ADD FOREIGN KEY (IdESuelo)
+1322: 
+1323: REFERENCES EstudioSuelo(IdESuelo);
+1324: 
+1325: END
+1326: 
+1327: 
+1328: 
+1329: 
+1330: -- Usuario -> PlanSuscripcion FK (only if not already present)
+1331: 
+1332: IF NOT EXISTS (
+1333: 
+1334: SELECT 1 FROM sys.foreign_keys
+1335: 
+1336: WHERE parent_object_id = OBJECT_ID(N'[Usuario]')
+1337: 
+1338: AND referenced_object_id = OBJECT_ID(N'[PlanSuscripcion]')
+1339: 
+1340: 
+1341: ALTER TABLE Usuario ADD FOREIGN KEY (PlanSuscripcionId)
+1342: 
+1343: REFERENCES PlanSuscripcion(Idsuscripcion);
+1344: 
+1345: 
+1346: 
+1347: 
+1348: -- ============================================================
+1349: 
+1350: -- EF Core tables + migration history
+1351: 
+1352: -- (All guarded â EF Core may have already created these)
+1353: 
+1354: -- ============================================================
+1355: 
+1356: 
+1357: 
+1358: IF OBJECT_ID(N'[Auditorias]', 'U') IS NULL
+1359: 
+1360: CREATE TABLE [Auditorias] (

@@ -9,6 +9,9 @@ import { ResolutionAction } from "../schemas/estadoJuridico.schema";
 import { Loader2 } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
+import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
+import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { ShieldCheck } from "lucide-react";
 
 interface EstadoJuridicoExtractionCardProps {
   extraction: EstadoJuridicoRdExtractionV1;
@@ -144,6 +147,22 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+
+  const handleVerifyGobernanza = () => {
+    verifyDocument({
+      documentType: 'catastro', // mapping Estado Jurídico to Catastro for governance
+      payload: {
+        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue,
+        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue,
+        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue,
+        fechaInscripcion: '', // Emision is what's on Estado Juridico
+        fechaEmision: extraction.fechaHoraInscripcion?.normalizedValue || extraction.fechaHoraInscripcion?.rawValue,
+        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue,
+      }
+    });
+  };
 
   const handleEditClick = (fieldName: string, currentValue: string) => {
     setEditingField(fieldName);
@@ -282,6 +301,25 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       {renderField("Provincia", "provincia", extraction.provincia, false, "field-provincia")}
       {renderField("Municipio", "municipio", extraction.municipio, false, "field-municipio")}
       {renderField("Superficie M²", "superficieMetrosCuadrados", extraction.superficieMetrosCuadrados, true, "field-superficie")}
+
+      <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
+        <div className="flex justify-end">
+          <button
+            onClick={handleVerifyGobernanza}
+            disabled={isVerifying}
+            className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold tracking-wide shadow-md hover:bg-primary/90 hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShieldCheck className="w-5 h-5" />
+            {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
+          </button>
+        </div>
+        
+        <VerificationFeedbackCard 
+          response={verificationResponse || null} 
+          isLoading={isVerifying} 
+          error={verificationError}
+        />
+      </div>
     </DocumentExtractionPanel>
   );
 };
