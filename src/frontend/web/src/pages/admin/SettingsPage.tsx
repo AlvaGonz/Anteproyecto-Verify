@@ -174,54 +174,56 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation tabs */}
-      <div className="flex flex-wrap gap-x-1 gap-y-0 border-b border-border">
-        <button type="button"
+      {/* Navigation tabs — single line, equal distribution, no scrollbar */}
+      <div role="tablist" className="flex w-full border-b border-border">
+        <button type="button" role="tab" aria-selected={activeTab === "profile"}
           onClick={() => setActiveTab("profile")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "profile"
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "profile"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
-          <User className="w-4 h-4" />
-          Mi Perfil
+          <User className="w-4 h-4 shrink-0" />
+          <span className="truncate">Mi Perfil</span>
         </button>
 
         {/* Preferencias tab - how the user is presented on public projects */}
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === "preferences"}
           onClick={() => setActiveTab("preferences")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "preferences"
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "preferences"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
-          <Palette className="w-4 h-4" />
-          Preferencias
+          <Palette className="w-4 h-4 shrink-0" />
+          <span className="truncate">Preferencias</span>
         </button>
 
-        <button type="button"
+        <button type="button" role="tab" aria-selected={activeTab === "subscription"}
           onClick={() => setActiveTab("subscription")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "subscription"
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "subscription"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
-          <CreditCard className="w-4 h-4" />
-          Suscripción
+          <CreditCard className="w-4 h-4 shrink-0" />
+          <span className="truncate">Suscripción</span>
         </button>
 
         {(user?.role === "admin" || user?.role === "owner") && (
           <>
-            <button type="button"
+            <button type="button" role="tab" aria-selected={activeTab === "users"}
               onClick={() => setActiveTab("users")}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "users"
+              className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "users"
                 ? "border-[#223382] text-[#223382]"
                 : "border-transparent text-text-secondary hover:text-text-primary"
                 }`}
             >
-              <Users className="w-4 h-4" />
-              Usuarios y Accesos
+              <Users className="w-4 h-4 shrink-0" />
+              <span className="truncate">Usuarios y Accesos</span>
             </button>
 
           </>
@@ -230,28 +232,32 @@ export const SettingsPage: React.FC = () => {
         {isManagementTier && (
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "invitees"}
             onClick={() => setActiveTab("invitees")}
-            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "invitees"
+            className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "invitees"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-text-secondary hover:text-text-primary"
               }`}
           >
-            <UserPlus className="w-4 h-4" />
-            Usuarios Invitados
+            <UserPlus className="w-4 h-4 shrink-0" />
+            <span className="truncate">Usuarios Invitados</span>
           </button>
         )}
 
         {/* Security tab - available for all authenticated users */}
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === "security"}
           onClick={() => setActiveTab("security")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "security"
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "security"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
-          <Shield className="w-4 h-4" />
-          Seguridad
+          <Shield className="w-4 h-4 shrink-0" />
+          <span className="truncate">Seguridad</span>
         </button>
       </div>
 
