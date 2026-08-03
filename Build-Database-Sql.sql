@@ -720,34 +720,12 @@ CREATE TABLE [Perfiles] (
 );
 GO
 
-CREATE TABLE [UsuarioLegacy] (
-    [IdUsuario] uniqueidentifier NOT NULL,
-    [Nombre] nvarchar(100) NOT NULL,
-    [Apellido] nvarchar(100) NOT NULL,
-    [Cedula] nvarchar(15) NOT NULL,
-    [ContrasenaHash] nvarchar(255) NOT NULL,
-    [Email] nvarchar(100) NOT NULL,
-    [Telefono] nvarchar(15) NOT NULL,
-    CONSTRAINT [PK_UsuarioLegacy] PRIMARY KEY ([IdUsuario])
-);
-GO
-
 CREATE TABLE [PerfilPermiso] (
     [IdPerfil] uniqueidentifier NOT NULL,
     [IdPermiso] uniqueidentifier NOT NULL,
     CONSTRAINT [PK_PerfilPermiso] PRIMARY KEY ([IdPerfil], [IdPermiso]),
     CONSTRAINT [FK_PerfilPermiso_Perfiles_IdPerfil] FOREIGN KEY ([IdPerfil]) REFERENCES [Perfiles] ([IdPerfil]) ON DELETE CASCADE,
     CONSTRAINT [FK_PerfilPermiso_Permisos_IdPermiso] FOREIGN KEY ([IdPermiso]) REFERENCES [Permisos] ([IdPermiso]) ON DELETE CASCADE
-);
-GO
-
-CREATE TABLE [Acceso] (
-    [IdAcceso] uniqueidentifier NOT NULL,
-    [IdPerfil] uniqueidentifier NULL,
-    [IdUsuario] uniqueidentifier NULL,
-    CONSTRAINT [PK_Acceso] PRIMARY KEY ([IdAcceso]),
-    CONSTRAINT [FK_Acceso_Perfiles_IdPerfil] FOREIGN KEY ([IdPerfil]) REFERENCES [Perfiles] ([IdPerfil]) ON DELETE NO ACTION,
-    CONSTRAINT [FK_Acceso_UsuarioLegacy_IdUsuario] FOREIGN KEY ([IdUsuario]) REFERENCES [UsuarioLegacy] ([IdUsuario]) ON DELETE CASCADE
 );
 GO
 
@@ -760,14 +738,8 @@ CREATE TABLE [Pagos] (
     [Monto] decimal(10,2) NOT NULL,
     CONSTRAINT [PK_Pagos] PRIMARY KEY ([IdPago]),
     CONSTRAINT [FK_Pagos_PlanSuscripcion_Idsuscripcion] FOREIGN KEY ([Idsuscripcion]) REFERENCES [PlanSuscripcion] ([Idsuscripcion]) ON DELETE NO ACTION,
-    CONSTRAINT [FK_Pagos_UsuarioLegacy_IdUsuario] FOREIGN KEY ([IdUsuario]) REFERENCES [UsuarioLegacy] ([IdUsuario]) ON DELETE CASCADE
+    CONSTRAINT [FK_Pagos_Usuario_IdUsuario] FOREIGN KEY ([IdUsuario]) REFERENCES [Usuario] ([IdUsuario]) ON DELETE CASCADE
 );
-GO
-
-CREATE INDEX [IX_Acceso_IdPerfil] ON [Acceso] ([IdPerfil]);
-GO
-
-CREATE INDEX [IX_Acceso_IdUsuario] ON [Acceso] ([IdUsuario]);
 GO
 
 CREATE INDEX [IX_Pagos_Idsuscripcion] ON [Pagos] ([Idsuscripcion]);
@@ -777,13 +749,6 @@ CREATE INDEX [IX_Pagos_IdUsuario] ON [Pagos] ([IdUsuario]);
 GO
 
 CREATE INDEX [IX_PerfilPermiso_IdPermiso] ON [PerfilPermiso] ([IdPermiso]);
-GO
-
-CREATE UNIQUE INDEX [IX_UsuarioLegacy_Email] ON [UsuarioLegacy] ([Email]);
-GO
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20260630195722_AddLegacyProfilesAndPermissions', N'8.0.2');
 GO
 
 COMMIT;

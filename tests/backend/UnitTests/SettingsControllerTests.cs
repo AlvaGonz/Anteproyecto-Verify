@@ -125,12 +125,6 @@ public class SettingsControllerTests
                 PlanSuscripcion.Create(freePlanId, "Consultor", 0.00m, 5, 1, false, false, 0, 0, false, false, false, false, false, false, "Comunidad", false),
                 PlanSuscripcion.Create(proPlanId, "Profesional", 60.00m, -1, 5, true, true, 0, 200, false, false, false, false, true, false, "Email", false)
             );
-            
-            // Add legacy view records manually for InMemory testing
-            context.UsuariosLegacy.AddRange(
-                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
-                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
-            );
 
             await context.SaveChangesAsync();
         }
@@ -153,12 +147,6 @@ public class SettingsControllerTests
             var response = Assert.IsType<global::Api.Controllers.PaginatedResponse<global::Api.Controllers.AdminUserSettingsDto>>(okResult.Value);
             Assert.Equal(1, response.TotalCount);
             Assert.Single(response.Items);
-
-            // Verify syncing occurred
-            var legacyUsers = await context.UsuariosLegacy.ToListAsync();
-            Assert.Equal(2, legacyUsers.Count);
-            Assert.Contains(legacyUsers, lu => lu.Email == "admin@verifinca.do");
-            Assert.Contains(legacyUsers, lu => lu.Email == "dev@verifinca.do");
         }
     }
 
@@ -182,17 +170,6 @@ public class SettingsControllerTests
 
             context.Usuarios.AddRange(admin, dev);
 
-            context.Perfiles.AddRange(
-                new Perfil { IdPerfil = adminProfileId, NombrePerfil = "ADMIN" },
-                new Perfil { IdPerfil = devProfileId, NombrePerfil = "DEVELOPER" },
-                new Perfil { IdPerfil = validatorProfileId, NombrePerfil = "VALIDATOR" }
-            );
-
-            context.UsuariosLegacy.AddRange(
-                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
-                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
-            );
-
             await context.SaveChangesAsync();
         }
 
@@ -214,22 +191,15 @@ public class SettingsControllerTests
             // Assert
             Assert.IsType<OkObjectResult>(result);
 
-            // Verify DB update
+            // Verify DB update — role lives on the modern Usuario, no legacy sync
             var updatedUser = await context.Usuarios.FindAsync(devUserGuid);
             Assert.NotNull(updatedUser);
             Assert.Equal(UserRole.User, updatedUser.Rol);
-
-            var legacyUser = await context.UsuariosLegacy.FirstOrDefaultAsync(lu => lu.Email == "dev@verifinca.do");
-            Assert.NotNull(legacyUser);
-
-            var acceso = await context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == legacyUser.IdUsuario);
-            Assert.NotNull(acceso);
-            Assert.Equal(devProfileId, acceso.IdPerfil);
         }
     }
 
     [Fact]
-    public async Task UpdateUserPlan_Should_Insert_Legacy_Pago_Record()
+    public async Task UpdateUserPlan_Should_Insert_Pago_Record_LinkedTo_Usuario()
     {
         // Arrange
         var dbName = "Settings_UpdateUserPlan";
@@ -245,11 +215,6 @@ public class SettingsControllerTests
 
             context.Usuarios.AddRange(admin, dev);
             context.PlanesSuscripcion.Add(PlanSuscripcion.Create(empresaPlanId, "Empresa", 170.00m, -1, -1, true, true, 5, 1024, false, true, false, false, true, true, "Prioritario", true));
-
-            context.UsuariosLegacy.AddRange(
-                new UsuarioLegacy { IdUsuario = admin.Id, Email = admin.Email, Nombre = "A", Apellido = "A", Telefono = "1", Cedula = "1", ContrasenaHash = "1" },
-                new UsuarioLegacy { IdUsuario = dev.Id, Email = dev.Email, Nombre = "D", Apellido = "D", Telefono = "2", Cedula = "2", ContrasenaHash = "2" }
-            );
 
             await context.SaveChangesAsync();
         }
@@ -272,11 +237,8 @@ public class SettingsControllerTests
             // Assert
             Assert.IsType<OkObjectResult>(result);
 
-            // Verify payment record in DB
-            var legacyUser = await context.UsuariosLegacy.FirstOrDefaultAsync(lu => lu.Email == "dev@verifinca.do");
-            Assert.NotNull(legacyUser);
-
-            var pago = await context.Pagos.FirstOrDefaultAsync(p => p.IdUsuario == legacyUser.IdUsuario);
+            // Payment record is linked to the modern Usuario — no legacy table involved
+            var pago = await context.Pagos.FirstOrDefaultAsync(p => p.IdUsuario == devUserGuid);
             Assert.NotNull(pago);
             Assert.Equal(empresaPlanId, pago.Idsuscripcion);
             Assert.Equal(170.00m, pago.Monto);

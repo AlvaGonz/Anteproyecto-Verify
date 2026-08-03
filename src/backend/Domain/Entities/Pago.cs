@@ -11,6 +11,6 @@ public class Pago
     public Guid? IdUsuario { get; set; }
     public Guid? Idsuscripcion { get; set; }
     public decimal Monto { get; set; }
-    public UsuarioLegacy? UsuarioLegacy { get; set; }
+    public Usuario? Usuario { get; set; }
     public PlanSuscripcion? PlanSuscripcion { get; set; }
 }
