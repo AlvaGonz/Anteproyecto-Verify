@@ -245,4 +245,32 @@ describe("ProjectDocumentStatus", () => {
     expect(screen.getByText("4 documentos esenciales")).toBeInTheDocument();
     expect(screen.getByText("16")).toBeInTheDocument();
   });
+
+  it("does not over-count duplicate docs of the same type (2 titulos = 1 essential)", () => {
+    const essentials = [
+      { tipoDocumento: DocumentType.CertificadoTitulo },
+      { tipoDocumento: DocumentType.CertificadoTitulo }, // duplicate of same type
+      { tipoDocumento: DocumentType.CertificacionEstadoJuridico },
+      { tipoDocumento: DocumentType.PlanoMensuraCatastral },
+      { tipoDocumento: DocumentType.CopiaCedulaIdentidad },
+      { tipoDocumento: DocumentType.CertificacionIPI },
+    ];
+    const anexos = [{ tipoDocumento: DocumentType.PoderNotarial }];
+    vi.mocked(useDocuments).mockReturnValue({
+      data: [...essentials, ...anexos].map((d, i) => ({
+        id: `doc-${i}`,
+        ...d,
+        estadoDocumento: DocumentStatus.Verificado,
+        nombreArchivoOriginal: `doc-${i}.pdf`,
+      })),
+      isLoading: false,
+      error: null,
+    } as any);
+
+    renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
+
+    // 5 unique essentials (80%) + 1 anexo (4%) = 84% — NOT 100%
+    expect(screen.getByText("84")).toBeInTheDocument();
+    expect(screen.queryByText("100")).not.toBeInTheDocument();
+  });
 });
