@@ -20,6 +20,7 @@ public class AuthController : ControllerBase
     private readonly Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler _verifyHandler;
     private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
     private readonly Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler _updateProfileHandler;
+    private readonly Application.Features.Auth.Commands.UpdatePublicPreferences.UpdatePublicPreferencesCommandHandler _updatePublicPreferencesHandler;
     private readonly Application.Abstractions.Persistence.IUsuarioRepository _usuarioRepository;
     private readonly IConfiguration _configuration;
     private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
@@ -36,6 +37,7 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler,
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
         Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
+        Application.Features.Auth.Commands.UpdatePublicPreferences.UpdatePublicPreferencesCommandHandler updatePublicPreferencesHandler,
         Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler uploadAvatarHandler,
         Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler resendVerificationHandler,
         Application.Features.Auth.Commands.ForgotPassword.ForgotPasswordCommandHandler forgotPasswordHandler,
@@ -50,6 +52,7 @@ public class AuthController : ControllerBase
         _verifyHandler = verifyHandler;
         _loginHandler = loginHandler;
         _updateProfileHandler = updateProfileHandler;
+        _updatePublicPreferencesHandler = updatePublicPreferencesHandler;
         _uploadAvatarHandler = uploadAvatarHandler;
         _resendVerificationHandler = resendVerificationHandler;
         _forgotPasswordHandler = forgotPasswordHandler;
@@ -409,6 +412,18 @@ public class AuthController : ControllerBase
             Direccion = user.Direccion,
             Provincia = user.Provincia,
             Nickname = user.Nickname,
+            NombrePublicoModo = user.NombrePublicoModo switch
+            {
+                Domain.Enums.NombrePublicoModo.Nickname => "nickname",
+                Domain.Enums.NombrePublicoModo.RealName => "realName",
+                _ => null
+            },
+            IdentificacionPublicaModo = user.IdentificacionPublicaModo switch
+            {
+                Domain.Enums.IdentificacionPublicaModo.Cedula => "cedula",
+                Domain.Enums.IdentificacionPublicaModo.Rnc => "rnc",
+                _ => null
+            },
             RazonSocial = user.RazonSocial ?? dgii?.NombreRazonSocial,
             NombreComercial = user.NombreComercial ?? dgii?.NombreComercial,
             ActividadEconomica = user.ActividadEconomica ?? dgii?.ActividadEconomica,
@@ -537,6 +552,38 @@ public class AuthController : ControllerBase
     }
 
     [Microsoft.AspNetCore.Authorization.Authorize]
+    [HttpPatch("preferences")]
+    public async Task<IActionResult> UpdatePublicPreferences([FromBody] UpdatePublicPreferencesRequestDto request, CancellationToken cancellationToken)
+    {
+        var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
+            return Unauthorized(new { Message = "Token inválido o incompleto." });
+
+        var nombreModo = request.NombreModo switch
+        {
+            "realName" => Domain.Enums.NombrePublicoModo.RealName,
+            "nickname" => Domain.Enums.NombrePublicoModo.Nickname,
+            _ => (Domain.Enums.NombrePublicoModo?)null
+        };
+        var identificacionModo = request.IdentificacionModo switch
+        {
+            "cedula" => Domain.Enums.IdentificacionPublicaModo.Cedula,
+            "rnc" => Domain.Enums.IdentificacionPublicaModo.Rnc,
+            _ => (Domain.Enums.IdentificacionPublicaModo?)null
+        };
+
+        if (nombreModo is null || identificacionModo is null)
+            return BadRequest(new { Message = "Valores de preferencia inválidos." });
+
+        var command = new Application.Features.Auth.Commands.UpdatePublicPreferences.UpdatePublicPreferencesCommand(userId, nombreModo, identificacionModo);
+        var result = await _updatePublicPreferencesHandler.Handle(command, cancellationToken);
+        if (!result.IsSuccess)
+            return BadRequest(new { Message = result.ErrorMessage });
+
+        return Ok(new { Message = "Preferencias actualizadas exitosamente." });
+    }
+
+    [Microsoft.AspNetCore.Authorization.Authorize]
     [HttpPost("me/avatar")]
     public async Task<IActionResult> UploadAvatar(IFormFile file, CancellationToken cancellationToken)
     {
@@ -580,6 +627,12 @@ public class UpdateProfileRequestDto
     public string? Provincia { get; set; }
     public string? Nickname { get; set; }
     public string? NewPassword { get; set; }
+}
+
+public class UpdatePublicPreferencesRequestDto
+{
+    public string? NombreModo { get; set; }
+    public string? IdentificacionModo { get; set; }
 }
 
 public class RegisterRequestDto

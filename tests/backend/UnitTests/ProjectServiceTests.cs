@@ -33,7 +33,8 @@ public class ProjectServiceTests
             _proyectoRepositoryMock.Object,
             _usuarioRepositoryMock.Object,
             _emailNotificationServiceMock.Object,
-            _unitOfWorkMock.Object);
+            _unitOfWorkMock.Object,
+            new Mock<global::Application.Abstractions.IAuditLogger>().Object);
     }
 
     [Fact]

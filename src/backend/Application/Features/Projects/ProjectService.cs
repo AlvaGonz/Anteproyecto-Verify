@@ -372,6 +372,26 @@ public class ProjectService : IProjectService
         return categoria;
     }
 
+    /// <summary>
+    /// Assembler: transforma el resultado del resolver de dominio en el contrato
+    /// público de salida (la UI no conoce las reglas internas de presentación).
+    /// </summary>
+    private static ProjectRegistrantPublicPresentationDto ToPresentationDto(PublicPresentation presentation)
+    {
+        var tipo = presentation.IdentificacionTipo switch
+        {
+            IdentificacionPublicaModo.Cedula => "cedula",
+            IdentificacionPublicaModo.Rnc => "rnc",
+            _ => null
+        };
+
+        return new ProjectRegistrantPublicPresentationDto(
+            presentation.NombreMostrado,
+            presentation.IdentificacionMostrada,
+            tipo,
+            presentation.RazonSocialMostrada);
+    }
+
     private static ProyectoDto MapToDto(Proyecto proyecto)
     {
         ProjectRegistrantDto? registradoPor = null;
@@ -387,7 +407,8 @@ public class ProjectService : IProjectService
                 proyecto.UsuarioCreador.AvatarUrl,
                 proyecto.UsuarioCreador.CreatedAtUtc,
                 proyecto.UsuarioCreador.EmailVerificado,
-                proyecto.UsuarioCreador.TitularId
+                proyecto.UsuarioCreador.TitularId,
+                ToPresentationDto(PublicIdentityResolver.Resolve(proyecto.UsuarioCreador, proyecto))
             );
         }
 

@@ -48,7 +48,20 @@ public record ProjectRegistrantDto(
     string? AvatarUrl,
     DateTime FechaRegistro,
     bool Verificado,
-    Guid? TitularId = null
+    Guid? TitularId = null,
+    ProjectRegistrantPublicPresentationDto? PresentacionPublica = null
+);
+
+/// <summary>
+/// Contrato explícito de exposición pública del responsable registral.
+/// Contiene únicamente los valores ya resueltos por PublicIdentityResolver;
+/// la UI no conoce las reglas internas de presentación ni los datos internos.
+/// </summary>
+public record ProjectRegistrantPublicPresentationDto(
+    string NombreMostrado,
+    string? IdentificacionMostrada,
+    string? IdentificacionTipo,
+    string? RazonSocialMostrada
 );
 
 public record CreateProyectoDto(

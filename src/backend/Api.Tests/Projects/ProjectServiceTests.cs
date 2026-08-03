@@ -34,7 +34,8 @@ public class ProjectServiceTests
             _proyectoRepoMock,
             _usuarioRepoMock,
             _emailServiceMock,
-            _uowMock
+            _uowMock,
+            Substitute.For<global::Application.Abstractions.IAuditLogger>()
         );
     }
 
