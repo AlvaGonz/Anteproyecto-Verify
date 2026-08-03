@@ -40,7 +40,6 @@ export const VerificationFeedbackCard: React.FC<VerificationFeedbackCardProps> =
 
   const { isValid, matchPercentage, message, matchedData } = response;
   
-  const isPerfectMatch = matchPercentage === 100;
   const isPartialMatch = matchPercentage > 0 && matchPercentage < 100;
   const isNoMatch = matchPercentage === 0 || !isValid;
 

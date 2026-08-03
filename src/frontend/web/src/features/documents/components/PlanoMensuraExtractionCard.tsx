@@ -9,6 +9,9 @@ import { ResolutionAction } from "../schemas/planoMensura.schema";
 import { Loader2 } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
+import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
+import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { ShieldCheck } from "lucide-react";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const norm = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -214,6 +217,23 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+
+  const handleVerifyGobernanza = () => {
+    verifyDocument({
+      documentType: 'permisosuelo', // Or 'planomensura' if there's a specific one, using 'permisosuelo' mapping for now based on mapper.ts
+      payload: {
+        numeroPermiso: '', // Depending on where it's stored
+        numeroExpediente: '', 
+        rnc: '', 
+        departamento: extraction.departamento?.normalizedValue || extraction.departamento?.rawValue,
+        operacion: extraction.operacion?.normalizedValue || extraction.operacion?.rawValue,
+        seccion: extraction.seccion?.normalizedValue || extraction.seccion?.rawValue,
+        lugar: extraction.lugar?.normalizedValue || extraction.lugar?.rawValue
+      }
+    });
+  };
+
   const handleEditClick = (fieldName: string, currentValue: string) => {
     setEditingField(fieldName);
     setEditValue(currentValue);
@@ -347,6 +367,25 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       {renderField("Sección", "seccion", extraction.seccion, false, "field-seccion")}
       {renderField("Lugar", "lugar", extraction.lugar, false, "field-lugar")}
       {renderField("Superficie A. Regist.", "superficieARegistrarParcelaM2", extraction.superficieARegistrarParcelaM2, true, "field-superficie")}
+
+      <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
+        <div className="flex justify-end">
+          <button
+            onClick={handleVerifyGobernanza}
+            disabled={isVerifying}
+            className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold tracking-wide shadow-md hover:bg-primary/90 hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShieldCheck className="w-5 h-5" />
+            {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
+          </button>
+        </div>
+        
+        <VerificationFeedbackCard 
+          response={verificationResponse || null} 
+          isLoading={isVerifying} 
+          error={verificationError}
+        />
+      </div>
     </DocumentExtractionPanel>
   );
 };

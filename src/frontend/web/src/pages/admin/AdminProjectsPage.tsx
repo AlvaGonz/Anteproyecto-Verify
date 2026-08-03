@@ -133,7 +133,7 @@ export const AdminProjectsPage: React.FC = () => {
                 setShowLimitModal(true);
               }
             }}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
           >
             <Plus className="w-5 h-5" />
             Nuevo Expediente
@@ -143,7 +143,7 @@ export const AdminProjectsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsExportModalOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
           >
             <Download className="w-5 h-5" />
             Exportar

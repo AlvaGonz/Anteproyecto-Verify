@@ -32,8 +32,8 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
   isFilterDropdownOpen,
   setIsFilterDropdownOpen,
 }) => (
-  <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-4">
-    <div className="relative flex-1 group">
+  <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-4 w-full">
+    <div className="relative flex-1 group w-full">
       <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
       <input
         type="text"
@@ -45,7 +45,7 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
       />
     </div>
 
-    <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-2xl">
+    <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-gray-50 rounded-2xl w-full md:w-auto">
       {[
         { id: "all", label: "Todos" },
         { id: "published", label: "Publicados" },
@@ -77,7 +77,7 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
       ))}
     </div>
 
-    <div className="relative">
+    <div className="relative w-full md:w-auto flex justify-center md:block">
       <button type="button"
         onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
         className={`p-3 rounded-2xl transition-all ${

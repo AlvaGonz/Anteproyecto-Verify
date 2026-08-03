@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
@@ -79,14 +79,14 @@ export const HeroSection: React.FC = () => {
               <ChevronRight className="w-5 h-5" />
             </Link>
           </div>
-          <div className="mt-4 flex flex-wrap gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest px-4">
+          <div className="mt-4 flex flex-col sm:flex-row flex-wrap gap-y-3 gap-x-4 text-xs font-bold text-gray-400 uppercase tracking-widest px-4">
             <Link to="/projects" className="flex items-center gap-1.5 hover:text-primary transition-colors">
               <Zap className="w-3.5 h-3.5 text-primary" /> {t('hero.valExpress')}
             </Link>
-            <Link to="/projects" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+            <Link to="/projects" className="flex items-center gap-1.5 sm:border-l sm:border-gray-200 sm:pl-4 hover:text-primary transition-colors">
               <Lock className="w-3.5 h-3.5 text-primary" /> {t('hero.connNotarial')}
             </Link>
-            <Link to="/projects" className="flex items-center gap-1.5 border-l border-gray-200 pl-4 hover:text-primary transition-colors">
+            <Link to="/projects" className="flex items-center gap-1.5 sm:border-l sm:border-gray-200 sm:pl-4 hover:text-primary transition-colors">
               <Building2 className="w-3.5 h-3.5 text-primary" /> {t('hero.dataProcuraduria')}
             </Link>
           </div>

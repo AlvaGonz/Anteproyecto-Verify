@@ -204,8 +204,8 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = ({
       </div>
 
       {totalPages > 1 && (
-        <div className="px-6 py-4 bg-white border border-gray-100 rounded-3xl shadow-sm flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-500">
+        <div className="px-6 py-4 bg-white border border-gray-100 rounded-3xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <span className="text-sm font-medium text-gray-500 text-center md:text-left">
             Mostrando {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, totalCount)} de {totalCount}
           </span>
           <div className="flex gap-1.5">

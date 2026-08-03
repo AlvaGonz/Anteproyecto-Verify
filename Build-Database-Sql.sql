@@ -1,4 +1,4 @@
-SET QUOTED_IDENTIFIER ON;
+﻿SET QUOTED_IDENTIFIER ON;
 
 
 
@@ -386,13 +386,13 @@ BEGIN
 
         ('Barahona',          18.20850, -71.10080),
 
-        ('Dajab�n',           19.54000, -71.70000),
+        ('Dajabón',           19.54000, -71.70000),
 
         ('Duarte',            19.30000, -70.25000),
 
         ('El Seibo',          18.76000, -69.04000),
 
-        ('El�as Pi�a',        18.88000, -71.68000),
+        ('Elías Piña',        18.88000, -71.68000),
 
         ('Espaillat',         19.50000, -70.50000),
 
@@ -408,9 +408,9 @@ BEGIN
 
         ('La Vega',           19.22000, -70.53000),
 
-        ('Mar�a Trinidad S�nchez', 19.38000, -69.95000),
+        ('María Trinidad Sánchez', 19.38000, -69.95000),
 
-        ('Monse�or Nouel',    18.91000, -70.43000),
+        ('Monseñor Nouel',    18.91000, -70.43000),
 
         ('Monte Cristi',      19.72000, -71.58000),
 
@@ -422,21 +422,21 @@ BEGIN
 
         ('Puerto Plata',      19.79340, -70.68840),
 
-        ('Saman�',            19.20000, -69.33000),
+        ('Samaná',            19.20000, -69.33000),
 
-        ('San Crist�bal',     18.41667, -70.10000),
+        ('San Cristóbal',     18.41667, -70.10000),
 
-        ('San Jos� de Ocoa',  18.55000, -70.50000),
+        ('San José de Ocoa',  18.55000, -70.50000),
 
         ('San Juan',          18.80580, -71.22990),
 
-        ('San Pedro de Macor�s', 18.45390, -69.30820),
+        ('San Pedro de Macorís', 18.45390, -69.30820),
 
-        ('S�nchez Ram�rez',   19.00160, -70.14920),
+        ('Sánchez Ramírez',   19.00160, -70.14920),
 
         ('Santiago',          19.45170, -70.69703),
 
-        ('Santiago Rodr�guez',19.48000, -71.34000),
+        ('Santiago Rodríguez',19.48000, -71.34000),
 
         ('Santo Domingo',     18.54118, -69.83988),
 
@@ -1116,15 +1116,6 @@ CREATE TABLE LogPagos (
 
 
 
-
-
-
-
-);
-
-
-
-
 IF OBJECT_ID(N'[LogConsultas]', 'U') IS NULL
 
 BEGIN
@@ -1189,7 +1180,7 @@ CREATE TABLE Notificaciones (
 
 -- ============================================================
 
--- ALTER TABLE ADD COLUMN — each column guarded individually
+-- ALTER TABLE ADD COLUMN â€” each column guarded individually
 
 -- ============================================================
 
@@ -1202,8 +1193,7 @@ IF NOT EXISTS (
     SELECT 1 FROM sys.columns
 
     WHERE object_id = OBJECT_ID(N'[TipoInmoviliario]') AND name = 'IdProyecto'
-
-
+)
 BEGIN
 
     ALTER TABLE TipoInmoviliario ADD IdProyecto UNIQUEIDENTIFIER;
@@ -1224,8 +1214,7 @@ IF NOT EXISTS (
     SELECT 1 FROM sys.columns
 
     WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdMivhed'
-
-
+)
 BEGIN
 
     ALTER TABLE ProyectosInmobiliarios ADD IdMivhed UNIQUEIDENTIFIER;
@@ -1246,8 +1235,7 @@ IF NOT EXISTS (
     SELECT 1 FROM sys.columns
 
     WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdCatastroTitulo'
-
-
+)
 BEGIN
 
     ALTER TABLE ProyectosInmobiliarios ADD IdCatastroTitulo UNIQUEIDENTIFIER;
@@ -1268,8 +1256,7 @@ IF NOT EXISTS (
     SELECT 1 FROM sys.columns
 
     WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdTarifaAyuntamiento'
-
-
+)
 BEGIN
 
     ALTER TABLE ProyectosInmobiliarios ADD IdTarifaAyuntamiento UNIQUEIDENTIFIER;
@@ -1290,8 +1277,7 @@ IF NOT EXISTS (
     SELECT 1 FROM sys.columns
 
     WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdPSuelo'
-
-
+)
 BEGIN
 
     ALTER TABLE ProyectosInmobiliarios ADD IdPSuelo UNIQUEIDENTIFIER;
@@ -1312,8 +1298,7 @@ IF NOT EXISTS (
     SELECT 1 FROM sys.columns
 
     WHERE object_id = OBJECT_ID(N'[ProyectosInmobiliarios]') AND name = 'IdESuelo'
-
-
+)
 BEGIN
 
     ALTER TABLE ProyectosInmobiliarios ADD IdESuelo UNIQUEIDENTIFIER;
@@ -1336,11 +1321,12 @@ IF NOT EXISTS (
     WHERE parent_object_id = OBJECT_ID(N'[Usuario]')
 
       AND referenced_object_id = OBJECT_ID(N'[PlanSuscripcion]')
-
-
+)
+BEGIN
     ALTER TABLE Usuario ADD FOREIGN KEY (PlanSuscripcionId)
 
         REFERENCES PlanSuscripcion(Idsuscripcion);
+END
 
 
 
@@ -1349,7 +1335,7 @@ IF NOT EXISTS (
 
 -- EF Core tables + migration history
 
--- (All guarded — EF Core may have already created these)
+-- (All guarded â€” EF Core may have already created these)
 
 -- ============================================================
 
@@ -1939,7 +1925,7 @@ CREATE TABLE [Hallazgos] (
 
 -- ============================================================
 
--- Indexes — each wrapped in IF NOT EXISTS
+-- Indexes â€” each wrapped in IF NOT EXISTS
 
 -- ============================================================
 
@@ -2677,5 +2663,8 @@ ALTER TABLE [ProyectosInmobiliarios] ADD [Propietario] nvarchar(200) NULL;
 ALTER TABLE [ProyectosInmobiliarios] ADD [SuperficieM2] decimal(18,2) NULL;
 
 
-ALTER TABLE [Notificaciones] ADD [CodigoReferencia] nvarchar(max) NOT NULL DEFAULT N'';
+ALTER TABLE [Notificaciones] ADD [CodigoReferencia] nvarchar(max) NOT NULL DEFAULT ''
+
+
+GO
 

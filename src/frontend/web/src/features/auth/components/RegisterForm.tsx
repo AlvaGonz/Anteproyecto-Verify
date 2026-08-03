@@ -46,9 +46,11 @@ const onSubmit = (data: RegisterFormValues) => {
          console.warn('Invalid redirect URL, plan/billing context lost:', redirectUrl, err);
        }
      }
-     const { acceptedTerms: _, ...submitData } = {
-       telefono: data.telefono ? data.telefono.replace(/\D/g, '') : undefined,
-       cedula: data.cedula ? data.cedula.replace(/\D/g, '') : undefined,
+     const { acceptedTerms, ...restData } = data as any;
+     const submitData = {
+       ...restData,
+       telefono: data.telefono ? data.telefono.replace(/\D/g, '') : data.telefono,
+       cedula: data.cedula ? data.cedula.replace(/\D/g, '') : data.cedula,
        returnUrl: redirectUrl || undefined,
        pendingPlanCode,
        pendingBillingCycle

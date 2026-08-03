@@ -172,7 +172,7 @@ public static class DependencyInjection
         services.AddSingleton<Application.Abstractions.Security.ITotpService, Security.TotpService>();
         services.AddScoped<Application.Abstractions.Security.IRecoveryCodeService, Security.RecoveryCodeService>();
         services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "dpkeys-" + Guid.NewGuid().ToString("N"))));
+            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "dpkeys-verifinca")));
         services.AddSingleton<Microsoft.AspNetCore.DataProtection.IDataProtector>(sp =>
             sp.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>()
               .CreateProtector("TwoFactorSecret"));

@@ -64,8 +64,10 @@ docker compose down
 ### D) Reiniciar y Destruir Datos por Completo (Hard Reset)
 Si modificaste sustancialmente tus esquemas de bases de datos de forma destructiva y necesitas **borrar todos los datos y tablas guardadas en la base de datos para crearlas de nuevo limpiamente desde `Build-Database-Sql.sql`**:
 ```bash
+
 docker compose down -v
 docker compose up --build -d
+
 ```
 *(El argumento `-v` elimina los volúmenes persistentes creados por Docker, obligando al contenedor de SQL Server a ejecutar nuevamente la inicialización desde cero en su próximo arranque).*
 

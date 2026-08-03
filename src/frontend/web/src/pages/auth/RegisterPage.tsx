@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { ShieldCheck, Zap } from "lucide-react";
@@ -11,9 +11,9 @@ export const RegisterPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-5xl bg-white border border-border rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative">
+        className="w-full max-w-5xl bg-white border border-border rounded-3xl md:rounded-[32px] shadow-premium flex flex-col md:flex-row overflow-hidden relative">
         {/* Left Side: Info */}
-        <div className="w-full md:w-[400px] bg-[#223382] p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
+        <div className="w-full md:w-[400px] bg-[#223382] p-8 md:p-12 text-white relative flex flex-col justify-between overflow-hidden shrink-0">
           {/* Subtle geometric pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-64 h-64 border-2 border-white rounded-full" />
@@ -81,7 +81,7 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         {/* Right Side: Form */}
-        <div className="flex-1 p-12 flex items-center justify-center">
+        <div className="flex-1 p-6 sm:p-8 md:p-12 flex items-center justify-center">
           <RegisterForm />
         </div>
       </m.div>
