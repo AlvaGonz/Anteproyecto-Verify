@@ -12,6 +12,7 @@ const ValidationRulesTable = lazy(() => import("../../features/validations/compo
 const FindingsPanel = lazy(() => import("../../features/validations/components/findings/FindingsPanel").then(m => ({ default: m.FindingsPanel })));
 const AuditLogList = lazy(() => import("../../features/validations/components/audit/AuditLogList").then(m => ({ default: m.AuditLogList })));
 const RequiredDocumentsList = lazy(() => import("../../features/documents/components/RequiredDocumentsList").then(m => ({ default: m.RequiredDocumentsList })));
+const OcrDisclaimerBanner = lazy(() => import("../../features/validations/components/OcrDisclaimerBanner").then(m => ({ default: m.OcrDisclaimerBanner })));
 
 const TabFallback = () => <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
@@ -138,6 +139,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
             {activeTab === 'analysis' && (
               <Suspense fallback={<TabFallback />}>
               <>
+                {id && <OcrDisclaimerBanner projectId={id} />}
                 <RequiredDocumentsList projectId={id || ""} />
                 {result && (
                   <>

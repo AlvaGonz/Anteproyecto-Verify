@@ -554,4 +554,34 @@ public class ProjectsController : ControllerBase
         var guardados = await _projectService.GetProyectosGuardadosAsync(userId, cancellationToken);
         return Ok(guardados);
     }
+
+    [HttpGet("{projectId:guid}/validations/disclaimer")]
+    public async Task<IActionResult> GetValidationDisclaimerStatus(Guid projectId, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var accepted = await _dbContext.Set<ProyectoValidacionDescargo>()
+            .AnyAsync(d => d.UsuarioId == userId && d.ProyectoId == projectId, cancellationToken);
+
+        return Ok(new { accepted });
+    }
+
+    [HttpPost("{projectId:guid}/validations/disclaimer")]
+    public async Task<IActionResult> AcceptValidationDisclaimer(Guid projectId, CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var exists = await _dbContext.Set<ProyectoValidacionDescargo>()
+            .AnyAsync(d => d.UsuarioId == userId && d.ProyectoId == projectId, cancellationToken);
+
+        if (!exists)
+        {
+            _dbContext.Set<ProyectoValidacionDescargo>().Add(new ProyectoValidacionDescargo(userId, projectId));
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return Ok(new { success = true });
+    }
 }
