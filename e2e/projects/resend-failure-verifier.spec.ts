@@ -22,7 +22,8 @@ test.describe('Resend failure verifier', () => {
 
   async function goToRegister(page: import('@playwright/test').Page) {
     await page.goto('/#/register');
-    await expect(page.getByRole('button', { name: /crear mi cuenta/i })).toBeVisible({ timeout: 15_000 });
+    // React + Vite Docker: lazy chunks can take 10-15s to hydrate
+    await expect(page.getByRole('button', { name: /crear mi cuenta/i })).toBeVisible({ timeout: 20_000 });
   }
 
   async function fillRegisterForm(page: import('@playwright/test').Page, prefix: string = 'Test') {

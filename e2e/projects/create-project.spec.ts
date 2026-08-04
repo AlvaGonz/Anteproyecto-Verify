@@ -71,14 +71,12 @@ test.describe('Create Project Flow', () => {
     });
   });
 
-  test('formats RNC/Cedula and auto-refreshes project list after creation', async ({ page }) => {
-    test.setTimeout(60_000);
+  test('creates a project and it appears in the list after submission', async ({ page }) => {
+    test.setTimeout(90_000);
     await page.goto('/#/admin/projects/new');
     
-    // Wait for the form to render — ponytail: the form was refactored, no more h3 heading
-    await expect(page.locator('#nombre')).toBeVisible();
-
-    // Fill the form to create a project
+    // Wait for React hydration — lazy-loaded chunks in Vite Docker take time
+    await expect(page.locator('#nombre')).toBeEnabled({ timeout: 25_000 });
     await page.locator('#nombre').fill('Test Project AutoRefresh');
     
     if (await page.locator('#ubicacionTexto').isVisible()) {
@@ -88,10 +86,7 @@ test.describe('Create Project Flow', () => {
       await page.locator('#categoriaId').selectOption({ index: 1 });
     }
     
-    // Submit the form
     await page.getByRole('button', { name: /Guardar|Crear/i }).click();
-
-    // The new project should be visible in the list automatically
-    await expect(page.getByText('Test Project AutoRefresh')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Test Project AutoRefresh')).toBeVisible({ timeout: 15_000 });
   });
 });
