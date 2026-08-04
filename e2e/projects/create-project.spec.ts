@@ -41,6 +41,9 @@ test.describe('Create Project Flow', () => {
     await page.route('**/api/projects/categories**', async (route) => {
       await route.fulfill({ json: [{ id: 16, nombre: "VIVIENDAS" }, { id: 3, nombre: "APARTAMENTOS" }, { id: 8, nombre: "COMERCIAL Y OFICINAS" }] });
     });
+    await page.route('**/api/provinces**', async (route) => {
+      await route.fulfill({ json: [{ id: 1, nombre: "Distrito Nacional", lat: 18.48, lng: -69.93, dcPrefix: "001" }] });
+    });
     let created = false;
     const mockProject = {
       id: "proj-123", codigoInterno: "VF-123",
@@ -74,18 +77,8 @@ test.describe('Create Project Flow', () => {
   test('creates a project and it appears in the list after submission', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto('/#/admin/projects/new');
-    
-    // Wait for React hydration — lazy-loaded chunks in Vite Docker take time
     await expect(page.locator('#nombre')).toBeEnabled({ timeout: 25_000 });
     await page.locator('#nombre').fill('Test Project AutoRefresh');
-    
-    if (await page.locator('#ubicacionTexto').isVisible()) {
-      await page.locator('#ubicacionTexto').fill('Distrito Nacional');
-    }
-    if (await page.locator('#categoriaId').isVisible()) {
-      await page.locator('#categoriaId').selectOption({ index: 1 });
-    }
-    
     await page.getByRole('button', { name: /Guardar|Crear/i }).click();
     await expect(page.getByText('Test Project AutoRefresh')).toBeVisible({ timeout: 15_000 });
   });

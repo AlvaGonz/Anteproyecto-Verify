@@ -15,8 +15,9 @@ import { test, expect } from '@playwright/test';
 test.describe('Resend failure verifier', () => {
 
   async function mockAuthAndNotifications(page: import('@playwright/test').Page) {
-    await page.route('**/api/auth/me', route => route.fulfill({ json: { id: 'mock', email: 'mock@test.com', role: 'user', aceptoDescargo: true } }));
-    await page.route('**/api/auth/refresh', route => route.fulfill({ json: { accessToken: 'mock' } }));
+    // ponytail: register page is GuestGuard'd — auth/me must return 401 so we stay on register
+    await page.route('**/api/auth/me', route => route.fulfill({ status: 401, json: {} }));
+    await page.route('**/api/auth/refresh', route => route.fulfill({ status: 401, json: {} }));
     await page.route('**/api/notifications*', route => route.fulfill({ json: [] }));
   }
 
@@ -33,7 +34,7 @@ test.describe('Resend failure verifier', () => {
     await page.fill('#apellido', 'User');
     await page.fill('#email', email);
     await page.fill('#telefono', '8095550111');
-    await page.fill('#cedula', '00100000003');
+    await page.fill('#cedula', '00100000009');
     await page.fill('#password', 'SecurePass123!');
     await page.locator('input[name="acceptedTerms"]').check();
     return email;
@@ -114,7 +115,7 @@ test.describe('Resend failure verifier', () => {
     await page.fill('#apellido', 'Register');
     await page.fill('#email', email);
     await page.fill('#telefono', '8095550199');
-    await page.fill('#cedula', '00100000010');
+    await page.fill('#cedula', '00100000009');
     await page.fill('#password', 'SecurePass123!');
     await page.locator('input[name="acceptedTerms"]').check();
 

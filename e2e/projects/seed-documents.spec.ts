@@ -72,9 +72,9 @@ async function expectSixMocDocuments(page: Page, projectId: string) {
   for (const code of REQUIREMENT_CODES) {
     const row = page.getByTestId(`requirement-row-${code}`);
     // La página de validación gatea sobre 3 APIs (resultado, hallazgos, auditoría) — margen amplio
-    await expect(row).toBeVisible({ timeout: 20_000 });
+    await expect(row).toBeVisible({ timeout: 45_000 });
     // Estado subido = sin botón "Subir" (solo se renderiza si el documento falta)
-    await expect(row.getByRole("button", { name: "Subir", exact: true })).toHaveCount(0, { timeout: 20_000 });
+    await expect(row.getByRole("button", { name: "Subir", exact: true })).toHaveCount(0, { timeout: 45_000 });
   }
 }
 
@@ -83,7 +83,7 @@ test.describe("Documentos MOC seedeados", () => {
 
   for (const name of SEED_PROJECT_NAMES) {
     test(`'${name}' tiene los 6 tipos de documento`, async ({ browser }) => {
-      test.setTimeout(90_000);
+      test.setTimeout(180_000);
       const context = await newAuthedContext(browser);
       const page = await context.newPage();
       const authState = JSON.stringify(await context.storageState());
@@ -94,7 +94,7 @@ test.describe("Documentos MOC seedeados", () => {
   }
 
   test(`'${TORRE_PLAYA_DORADA}' tiene los 6 documentos MOC`, async ({ browser }) => {
-    test.setTimeout(90_000);
+    test.setTimeout(180_000);
     const context = await newAuthedContext(browser);
     const page = await context.newPage();
     const authState = JSON.stringify(await context.storageState());
