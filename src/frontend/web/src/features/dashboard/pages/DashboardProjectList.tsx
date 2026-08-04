@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderKanban, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlertCircle, X } from "lucide-react";
+import { FolderKanban, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlertCircle } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
 import { ProjectCoverImage } from "../../projects/components/ProjectCoverImage";
@@ -12,7 +12,6 @@ export interface DashboardProjectListProps {
 
 export const DashboardProjectList: React.FC<DashboardProjectListProps> = React.memo(({ loading, recentProjects }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [dismissedVigencia, setDismissedVigencia] = useState(() => localStorage.getItem("dismiss_vigencia") === "true");
   const itemsPerPage = 5;
   const totalPages = Math.ceil(recentProjects.length / itemsPerPage);
   const paginatedProjects = recentProjects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -43,22 +42,12 @@ export const DashboardProjectList: React.FC<DashboardProjectListProps> = React.m
         </h3>
         <p className="text-xs text-text-secondary font-medium mt-0.5">Últimas actualizaciones en el sistema</p>
       </div>
-      {!dismissedVigencia && (
-        <div className="max-w-3xl flex-1 bg-amber-50/70 border border-amber-200/60 rounded-xl px-4 py-2 text-[11px] text-amber-900 leading-snug flex items-center gap-3 shadow-sm font-medium relative pr-8">
+        <div className="max-w-3xl flex-1 bg-amber-50/70 border border-amber-200/60 rounded-xl px-4 py-2 text-[11px] text-amber-900 leading-snug flex items-center gap-3 shadow-sm font-medium relative">
           <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
           <div>
             <span className="font-bold">Aviso de Vigencia:</span> Los documentos y validaciones de estos proyectos tienen una vigencia máxima de 3 meses para fines del sistema. Posteriormente, VeriFinca actualiza periódicamente las bases de datos registrales y fiscales para garantizar la integridad y validez del expediente frente a terceros.<br /><span className="text-[10px] text-amber-700/70">Última actualización: 15/07/2026</span>
           </div>
-          <button 
-            type="button" 
-            onClick={() => { localStorage.setItem("dismiss_vigencia", "true"); setDismissedVigencia(true); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-amber-700/50 hover:text-amber-700 p-1 rounded-md hover:bg-amber-100/50 transition-colors"
-            title="Ocultar aviso"
-          >
-            <X className="w-4 h-4" />
-          </button>
         </div>
-      )}
     </div>
 
     <div className="flex-1 min-h-[445px] overflow-hidden relative">
