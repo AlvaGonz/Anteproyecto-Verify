@@ -43,11 +43,11 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
 
-      {/* Header Premium */}
+      {/* Header Premium — oculto hasta nuevo aviso */}
+      {false && (
       <div className="mb-6 sm:mb-10 p-5 sm:p-8 lg:p-10 rounded-[24px] sm:rounded-[32px] bg-secondary relative overflow-hidden shadow-2xl group">
         <div className="absolute inset-0 bg-noise opacity-20 mix-blend-overlay pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-black/60 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-primary/20 blur-[80px] sm:blur-[100px] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
         
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
           <div className="flex items-center gap-4 sm:gap-8 min-w-0 flex-1">
@@ -89,6 +89,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
           </div>
         </div>
       </div>
+      )}
 
       {error && (
         <div className="mb-8 p-4 bg-error/10 text-error rounded-2xl border border-error/20 flex items-center gap-4 animate-in slide-in-from-top duration-300">

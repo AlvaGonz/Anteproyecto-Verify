@@ -132,6 +132,19 @@ public class ProjectService : IProjectService
         await _proyectoRepository.AddAsync(proyecto, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        // ponytail: log creation as initial status entry for history timeline
+        await _auditLogger.Append(new AuditEntryDto
+        {
+            UsuarioId = dto.UsuarioCreadorId,
+            TipoOperacion = TipoOperacion.CambioEstado,
+            Accion = "Creación",
+            Resultado = estadoCreado.CodigoUnico,
+            ReferenciaExpedienteId = proyecto.Id,
+            EstadoAnteriorId = null,
+            EstadoNuevoId = estadoCreado.Id
+        }, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return MapToDto(proyecto);
     }
 
