@@ -46,6 +46,12 @@ public class SelloIntegridadRepository : ISelloIntegridadRepository
             .FirstOrDefaultAsync(s => s.CodigoSello == codigoSello, cancellationToken);
     }
 
+    public async Task<SelloIntegridad?> GetByQrTokenAsync(string qrToken, CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<SelloIntegridad>()
+            .FirstOrDefaultAsync(s => s.QrToken == qrToken, cancellationToken);
+    }
+
     public void Update(SelloIntegridad sello)
     {
         _context.Set<SelloIntegridad>().Update(sello);

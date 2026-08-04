@@ -15,6 +15,7 @@ public class EmitirSelloResultDto
     public bool IsSuccess { get; set; }
     public string? Mensaje { get; set; }
     public string? CodigoSello { get; set; }
+    public string? QrToken { get; set; }
     public string? UrlQr { get; set; }
 }
 
@@ -61,7 +62,17 @@ public class EmitirSelloCommandHandler
             }
         }
 
-        // RS2: Validar que no existan hallazgos críticos o altos
+        // RS2: Validar que el proyecto esté publicado
+        if (project.Estado?.CodigoUnico != "PUBLICADO")
+        {
+            return new EmitirSelloResultDto
+            {
+                IsSuccess = false,
+                Mensaje = "El sello de integridad solo puede emitirse para proyectos publicados."
+            };
+        }
+
+        // RS3: Validar que no existan hallazgos críticos o altos
         var reporte = await _reporteBuilder.BuildReporteAsync(request.ProyectoId, cancellationToken);
         if (!reporte.EsAptoParaSello)
         {
@@ -72,8 +83,14 @@ public class EmitirSelloCommandHandler
             };
         }
 
-        // RS3: Generar código, firma y QR
+        // RS4: Generar código, firma, token seguro y QR
         string codigoSello = $"VERIFINCA-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+        
+        // Generate secure QR token (HMACSHA256 signed)
+        string signingSecret = "VERIFINCA_SEAL_SIGNING_KEY_2026";
+        string tokenPayload = $"{project.Id}|{codigoSello}|{DateTime.UtcNow:yyyyMMddHHmmss}";
+        string qrToken = GenerateSecureToken(tokenPayload, signingSecret);
+        
         string datosAFirmar = $"{project.Id}|{codigoSello}|{project.IdentificacionCatastral}";
         
         // Inline firma digital (SHA256 with mock key)
@@ -82,7 +99,7 @@ public class EmitirSelloCommandHandler
         var hash = sha256.ComputeHash(bytes);
         string firmaDigital = Convert.ToBase64String(hash);
         
-        string urlVerificacion = $"https://verifinca.do/verificar/{codigoSello}";
+        string urlVerificacion = $"http://localhost:3000/#/q/{qrToken}";
         
         // Inline QR generation
         var encodedContent = Uri.EscapeDataString(urlVerificacion);
@@ -94,7 +111,8 @@ public class EmitirSelloCommandHandler
             nombre: "Sello Bronce",
             nivel: NivelSelloIntegridad.Bronce,
             urlQr: urlQr,
-            firmaDigital
+            firmaDigital,
+            qrToken
         );
 
         await _selloRepository.AddAsync(nuevoSello, cancellationToken);
@@ -117,7 +135,17 @@ public class EmitirSelloCommandHandler
             IsSuccess = true,
             Mensaje = "Sello de integridad emitido exitosamente.",
             CodigoSello = codigoSello,
+            QrToken = qrToken,
             UrlQr = urlQr
         };
+    }
+
+    private static string GenerateSecureToken(string payload, string secret)
+    {
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
+        var payloadBytes = Encoding.UTF8.GetBytes(payload);
+        var hashBytes = hmac.ComputeHash(payloadBytes);
+        var token = Convert.ToBase64String(hashBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
+        return $"{Convert.ToBase64String(Encoding.UTF8.GetBytes(payload))}.{token}";
     }
 }

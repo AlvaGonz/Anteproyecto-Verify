@@ -14,29 +14,43 @@ public class GetPublicProjectStatusQueryHandler
     private readonly IProyectoRepository _proyectoRepository;
     private readonly IValidacionRepository _validacionRepository;
     private readonly IAuditLogger _auditLogger;
+    private readonly IUnitOfWork _unitOfWork;
 
     public GetPublicProjectStatusQueryHandler(
         ISelloIntegridadRepository selloRepository,
         IProyectoRepository proyectoRepository,
         IValidacionRepository validacionRepository,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IUnitOfWork unitOfWork)
     {
         _selloRepository = selloRepository;
         _proyectoRepository = proyectoRepository;
         _validacionRepository = validacionRepository;
         _auditLogger = auditLogger;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<PublicProjectStatusDto?> Handle(GetPublicProjectStatusQuery request, CancellationToken cancellationToken)
     {
-        var codigo = request.CodigoPublico ?? request.QrToken;
-        if (string.IsNullOrWhiteSpace(codigo))
+        Domain.Entities.SelloIntegridad? sello = null;
+
+        if (!string.IsNullOrWhiteSpace(request.QrToken))
+        {
+            sello = await _selloRepository.GetByQrTokenAsync(request.QrToken, cancellationToken);
+        }
+        else if (!string.IsNullOrWhiteSpace(request.CodigoPublico))
+        {
+            sello = await _selloRepository.GetByCodigoAsync(request.CodigoPublico, cancellationToken);
+        }
+
+        if (sello == null)
         {
             return null;
         }
 
-        var sello = await _selloRepository.GetByCodigoAsync(codigo, cancellationToken);
-        if (sello == null)
+        sello.VerificarVigencia();
+
+        if (sello.Estado == Domain.Enums.EstadoSello.Revocado || sello.Estado == Domain.Enums.EstadoSello.Expirado)
         {
             return null;
         }
@@ -46,6 +60,11 @@ public class GetPublicProjectStatusQueryHandler
         {
             return null;
         }
+
+        // Increment access count for active seals
+        sello.IncrementarAccesos();
+        _selloRepository.Update(sello);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         var validaciones = await _validacionRepository.GetByProyectoIdAsync(proyecto.Id, cancellationToken);
 
