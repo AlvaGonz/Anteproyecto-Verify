@@ -1,13 +1,22 @@
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Infrastructure.Persistence.Migrations
 {
+    /// <inheritdoc />
     public partial class AddSelloQrTokenYContador : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<int>(
+                name: "ContadorAccesos",
+                table: "SellosIntegridad",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
             migrationBuilder.AddColumn<string>(
                 name: "QrToken",
                 table: "SellosIntegridad",
@@ -16,22 +25,27 @@ namespace Infrastructure.Persistence.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.AddColumn<int>(
-                name: "ContadorAccesos",
+            migrationBuilder.CreateIndex(
+                name: "IX_SellosIntegridad_QrToken",
                 table: "SellosIntegridad",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+                column: "QrToken",
+                unique: true,
+                filter: "[QrToken] IS NOT NULL AND [QrToken] <> ''");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "QrToken",
+            migrationBuilder.DropIndex(
+                name: "IX_SellosIntegridad_QrToken",
                 table: "SellosIntegridad");
 
             migrationBuilder.DropColumn(
                 name: "ContadorAccesos",
+                table: "SellosIntegridad");
+
+            migrationBuilder.DropColumn(
+                name: "QrToken",
                 table: "SellosIntegridad");
         }
     }

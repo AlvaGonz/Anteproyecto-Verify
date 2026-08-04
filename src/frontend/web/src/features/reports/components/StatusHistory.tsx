@@ -1,7 +1,7 @@
 import React from "react";
 import { useStatusHistory, StatusHistoryEntry } from "../api/useStatusHistory";
 import { toUtcDate } from "@/shared/utils/dates";
-import { GitCommitHorizontal } from "lucide-react";
+import { GitCommitHorizontal, History, User } from "lucide-react";
 
 interface StatusHistoryProps {
   projectId: string;
@@ -70,28 +70,36 @@ export const StatusHistory: React.FC<StatusHistoryProps> = ({ projectId, hideAtt
 
               <time
                 dateTime={entry.fechaCambioUtc}
-                className="block text-xs font-medium text-text-secondary mb-1"
+                className="flex items-center gap-1.5 text-xs font-medium text-text-secondary mb-2"
               >
+                <History className="w-3 h-3 text-on-surface-variant/50" aria-hidden="true" />
                 {toUtcDate(entry.fechaCambioUtc)?.toLocaleString() ?? ""}
               </time>
 
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border ${badgeStyle}`}>
-                  {entry.estadoNuevoNombre}
-                </span>
-                {entry.estadoAnteriorNombre && (
-                  <>
-                    <span className="text-text-secondary text-xs" aria-hidden="true">←</span>
-                    <span className="text-xs text-text-secondary">{entry.estadoAnteriorNombre}</span>
-                  </>
-                )}
-              </div>
+              <div className="vf-card !bg-surface-raised/50 border-none hover:!bg-white hover:shadow-premium transition-all p-3.5 sm:p-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border ${badgeStyle}`}>
+                    {entry.estadoNuevoNombre}
+                  </span>
+                  {entry.estadoAnteriorNombre && (
+                    <>
+                      <span className="text-text-secondary text-xs" aria-hidden="true">←</span>
+                      <span className="text-xs text-text-secondary">{entry.estadoAnteriorNombre}</span>
+                    </>
+                  )}
+                </div>
 
-              {!hideAttribution && entry.usuarioNombre && (
-                <p className="text-xs text-text-secondary mt-1">
-                  por {entry.usuarioNombre}
-                </p>
-              )}
+                <div className="mt-2.5 flex items-center gap-4 flex-wrap">
+                  {!hideAttribution && entry.usuarioNombre && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/5">
+                      <User className="w-3 h-3 text-on-surface-variant" aria-hidden="true" />
+                      <span className="text-[10px] font-black text-secondary uppercase">
+                        por {entry.usuarioNombre}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </li>
           );
         })}

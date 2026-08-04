@@ -5,12 +5,11 @@ import {
   ExternalLink, AlertTriangle, Database, Cpu, Fingerprint, Loader2
 } from "lucide-react";
 import { ValidationHUD } from "../../features/validations/components/ValidationHUD";
-import type { ValidationExecutionResult, FindingDto, AuditLogDto } from "../../features/validations/types";
+import type { ValidationExecutionResult, FindingDto } from "../../features/validations/types";
 
 const ValidationSummary = lazy(() => import("../../features/validations/components/ValidationSummary").then(m => ({ default: m.ValidationSummary })));
 const ValidationRulesTable = lazy(() => import("../../features/validations/components/ValidationRulesTable").then(m => ({ default: m.ValidationRulesTable })));
 const FindingsPanel = lazy(() => import("../../features/validations/components/findings/FindingsPanel").then(m => ({ default: m.FindingsPanel })));
-const AuditLogList = lazy(() => import("../../features/validations/components/audit/AuditLogList").then(m => ({ default: m.AuditLogList })));
 const RequiredDocumentsList = lazy(() => import("../../features/documents/components/RequiredDocumentsList").then(m => ({ default: m.RequiredDocumentsList })));
 const OcrDisclaimerModal = lazy(() => import("../../features/validations/components/OcrDisclaimerModal").then(m => ({ default: m.OcrDisclaimerModal })));
 const CertificationSection = lazy(() => import("../../features/certifications/components/CertificationSection").then(m => ({ default: m.CertificationSection })));
@@ -20,12 +19,11 @@ const TabFallback = () => <div className="flex items-center justify-center py-12
 interface ProjectValidationPageLayoutProps {
   id: string | undefined;
   error: string | null;
-  activeTab: "analysis" | "findings" | "audit";
-  setActiveTab: (tab: "analysis" | "findings" | "audit") => void;
+  activeTab: "analysis" | "findings";
+  setActiveTab: (tab: "analysis" | "findings") => void;
   isEvaluating: boolean;
   handleRunValidation: () => void;
   findings: FindingDto[];
-  auditLogs: AuditLogDto[];
   result: ValidationExecutionResult | null;
   handleScanComplete: () => Promise<void>;
   projectStatus?: string;
@@ -39,7 +37,6 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
   isEvaluating,
   handleRunValidation,
   findings,
-  auditLogs,
   result,
   handleScanComplete,
   projectStatus,
@@ -112,24 +109,18 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
 
       {/* Tabs Navigation Premium */}
       {!isEvaluating && (
-        <div className="flex flex-nowrap items-center gap-2 mb-10 p-1.5 bg-white rounded-[20px] w-full md:w-fit border border-border/30 shadow-raised shadow-transparent hover:shadow-floating transition-all duration-500 overflow-x-auto no-scrollbar">
+        <div className="flex flex-col sm:flex-row sm:flex-nowrap items-stretch sm:items-center gap-1.5 sm:gap-2 mb-10 p-1.5 bg-white rounded-[20px] w-full border border-border/30 shadow-raised shadow-transparent hover:shadow-floating transition-all duration-500">
           <button type="button"
             onClick={() => setActiveTab('analysis')}
-            className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'analysis' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
+            className={`flex-1 px-4 sm:px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-3 ${activeTab === 'analysis' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
-            <Cpu className="w-3.5 h-3.5" /> 01. Análisis Integral
+            <Cpu className="w-3.5 h-3.5 shrink-0" /> 01. Análisis Integral
           </button>
           <button type="button"
             onClick={() => setActiveTab('findings')}
-            className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'findings' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
+            className={`flex-1 px-4 sm:px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-3 ${activeTab === 'findings' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
           >
-            <Fingerprint className="w-3.5 h-3.5" /> 02. Hallazgos ({findings.length})
-          </button>
-          <button type="button"
-            onClick={() => setActiveTab('audit')}
-            className={`px-8 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.15em] transition-all flex items-center gap-3 ${activeTab === 'audit' ? 'bg-secondary text-white shadow-premium' : 'text-text-secondary hover:bg-surface-raised'}`}
-          >
-            <Database className="w-3.5 h-3.5" /> 03. Registro Bitácora
+            <Fingerprint className="w-3.5 h-3.5 shrink-0" /> 02. Hallazgos ({findings.length})
           </button>
         </div>
       )}
@@ -201,18 +192,6 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
                   <h2 className="h2 uppercase tracking-tighter italic">Hallazgos y Diferenciales de Riesgo</h2>
                 </div>
                 <FindingsPanel findings={findings} projectId={id} />
-              </section>
-            )}
-
-            {activeTab === 'audit' && (
-              <section className="animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-1.5 h-6 bg-secondary rounded-full" />
-                  <h2 className="h2 uppercase tracking-tighter italic">Bitácora de Eventos e Inmutabilidad</h2>
-                </div>
-                <div className="vf-card bg-white p-8 sm:p-10 border-none shadow-premium ring-1 ring-border/30">
-                  <AuditLogList logs={auditLogs} />
-                </div>
               </section>
             )}
           </div>

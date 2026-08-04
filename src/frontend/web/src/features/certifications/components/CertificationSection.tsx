@@ -127,8 +127,8 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
 
   return (
     <div className="bg-white border border-[#C8BFB5] rounded-xl overflow-hidden mt-6 print-section" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)" }}>
-      <div className="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-[#DAD1C8]">
-        <div>
+      <div className="px-4 py-5 sm:px-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 border-b border-[#DAD1C8]">
+        <div className="min-w-0">
           <h3 className="text-lg font-semibold text-[#111144]" style={{ fontFamily: "Manrope" }}>
             Certificación Verificable
           </h3>
@@ -136,7 +136,7 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
             Sello de Integridad &mdash; Constancia pública del estado de validación del proyecto.
           </p>
         </div>
-        <div className="flex space-x-2 no-print">
+        <div className="flex flex-wrap items-center gap-2 no-print">
           {hasSeal && (
             <>
               <button type="button"
