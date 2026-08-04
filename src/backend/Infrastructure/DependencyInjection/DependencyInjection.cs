@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Persistence.IResultadoCrediticioRepository, Persistence.Repositories.ResultadoCrediticioRepository>();
         services.AddScoped<Application.Abstractions.Persistence.ISelloIntegridadRepository, Persistence.Repositories.SelloIntegridadRepository>();
         services.AddScoped<Application.Contracts.Projects.ICatastroLookupRepository, Persistence.Repositories.CatastroLookupRepository>();
+        services.AddScoped<Application.Abstractions.Persistence.IGlobalSearchRepository, Persistence.Repositories.GlobalSearchRepository>();
 
         services.AddScoped<Application.Abstractions.Persistence.IUnitOfWork, Persistence.Repositories.UnitOfWork>();
 
@@ -104,6 +105,7 @@ public static class DependencyInjection
 
         // Public Verification
         services.AddScoped<Application.Features.PublicVerification.Queries.GetPublicProjectVerification.GetPublicProjectVerificationQueryHandler>();
+        services.AddScoped<Application.Features.PublicVerification.Queries.SearchGlobal.SearchGlobalQueryHandler>();
 
         // Public Consultation
         services.AddScoped<Application.Features.PublicConsulta.Queries.GetPublicProjectStatus.GetPublicProjectStatusQueryHandler>();

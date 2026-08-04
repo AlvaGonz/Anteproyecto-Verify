@@ -168,7 +168,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
       if (searchType.id === "cert") {
         navigate(`/projects/verify/${encodeURIComponent(code.trim())}`);
       } else {
-        navigate(`/projects?q=${encodeURIComponent(code.trim())}`);
+        navigate(`/verification-result?type=${encodeURIComponent(searchType.id)}&q=${encodeURIComponent(code.trim())}`);
       }
     }
   };

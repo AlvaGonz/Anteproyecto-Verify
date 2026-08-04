@@ -16,6 +16,7 @@ const ProjectAuditPage = lazy(() => import("../pages/admin/ProjectAuditPage").th
 const ProjectReportsPage = lazy(() => import("../pages/admin/ProjectReportsPage").then(m => ({ default: m.ProjectReportsPage })));
 const RulesManagePage = lazy(() => import("../pages/admin/RulesManagePage").then(m => ({ default: m.RulesManagePage })));
 const SettingsPage = lazy(() => import("../pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const VerificationResultPage = lazy(() => import("../pages/public/VerificationResultPage").then(m => ({ default: m.VerificationResultPage })));
 const PublicVerifyResultPage = lazy(() => import("../pages/public/PublicVerifyResultPage").then(m => ({ default: m.PublicVerifyResultPage })));
 const LoginPage = lazy(() => import("../pages/auth/LoginPage").then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import("../pages/auth/RegisterPage").then(m => ({ default: m.RegisterPage })));
@@ -139,6 +140,22 @@ export const router = createHashRouter([
         element: (
           <GuestGuard>
             <ResetPasswordPage />
+          </GuestGuard>
+        ),
+      },
+      {
+        path: "verification-result",
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <VerificationResultPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "verify-result/:id",
+        element: (
+          <GuestGuard>
+            <EmailVerifiedPage />
           </GuestGuard>
         ),
       },

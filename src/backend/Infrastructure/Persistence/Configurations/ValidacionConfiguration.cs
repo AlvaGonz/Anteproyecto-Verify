@@ -12,13 +12,6 @@ public class ValidacionConfiguration : IEntityTypeConfiguration<Validacion>
         builder.Property(v => v.FuenteValidacion).IsRequired().HasMaxLength(200);
         builder.Property(v => v.Detalle).HasMaxLength(2000);
 
-        builder.OwnsMany(v => v.DatosValidados, a => 
-        {
-            a.WithOwner().HasForeignKey("ValidacionId");
-            a.Property<int>("Id");
-            a.HasKey("Id");
-        });
-
         builder.HasOne(v => v.Sello)
             .WithMany()
             .HasForeignKey(v => v.SelloId)

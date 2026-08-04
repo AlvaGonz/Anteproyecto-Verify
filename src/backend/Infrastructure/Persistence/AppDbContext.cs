@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<ProyectoEstado> ProyectoEstados => Set<ProyectoEstado>();
     public DbSet<Documento> Documentos => Set<Documento>();
     public DbSet<Validacion> Validaciones => Set<Validacion>();
+    public DbSet<DatoValidado> DatosValidados => Set<DatoValidado>();
     public DbSet<ResultadoRegla> ResultadosRegla => Set<ResultadoRegla>();
     public DbSet<Hallazgo> Hallazgos => Set<Hallazgo>();
     public DbSet<Auditoria> Auditorias => Set<Auditoria>();
