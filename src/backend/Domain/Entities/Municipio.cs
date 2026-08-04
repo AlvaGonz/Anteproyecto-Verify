@@ -12,6 +12,4 @@ public class Municipio
     public decimal? Longitud { get; private set; }
 
     public Provincia Provincia { get; private set; } = null!;
-
-    public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
 }

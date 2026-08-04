@@ -10,17 +10,20 @@ namespace Infrastructure.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Drop the Municipio FK that was added in the previous run
-            migrationBuilder.DropForeignKey(
-                name: "FK_ProyectosInmobiliarios_Municipio_MunicipioId",
-                table: "ProyectosInmobiliarios");
+            // (guarded: MunicipioId was hand-applied on some DBs and never
+            // created by a migration, so a fresh DB has no such constraint)
+            migrationBuilder.Sql(
+                "IF OBJECT_ID('FK_ProyectosInmobiliarios_Municipio_MunicipioId', 'F') IS NOT NULL " +
+                "ALTER TABLE ProyectosInmobiliarios DROP CONSTRAINT FK_ProyectosInmobiliarios_Municipio_MunicipioId;");
 
-            migrationBuilder.DropIndex(
-                name: "IX_ProyectosInmobiliarios_MunicipioId",
-                table: "ProyectosInmobiliarios");
+            migrationBuilder.Sql(
+                "IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ProyectosInmobiliarios_MunicipioId' " +
+                "AND object_id = OBJECT_ID('ProyectosInmobiliarios')) " +
+                "DROP INDEX IX_ProyectosInmobiliarios_MunicipioId ON ProyectosInmobiliarios;");
 
-            migrationBuilder.DropColumn(
-                name: "MunicipioId",
-                table: "ProyectosInmobiliarios");
+            migrationBuilder.Sql(
+                "IF COL_LENGTH('ProyectosInmobiliarios', 'MunicipioId') IS NOT NULL " +
+                "ALTER TABLE ProyectosInmobiliarios DROP COLUMN MunicipioId;");
 
             // Add Provincia FK
             migrationBuilder.AddColumn<Guid>(
