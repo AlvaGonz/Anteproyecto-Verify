@@ -64,7 +64,7 @@ public class ProjectServiceTests
         _proyectoRepoMock.GetCategoriasAsync(Arg.Any<CancellationToken>())
             .Returns(new[] { new CategoriaProyecto { Id = 2, Nombre = "ALMACENES", Activo = true } });
         _proyectoRepoMock.GetEstadoByStatusAsync(ProjectStatus.Creado, Arg.Any<CancellationToken>())
-            .Returns(new ProyectoEstado("CREADO", "Creado", "Desc", "Cond", "#000000"));
+            .Returns(new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "Desc", "Cond", "#000000"));
 
         var dto = new CreateProyectoDto(
             "New Project",

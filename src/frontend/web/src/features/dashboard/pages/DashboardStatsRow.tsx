@@ -27,7 +27,7 @@ export const DashboardStatsRow: React.FC<DashboardStatsRowProps> = React.memo(({
             <div className={`absolute inset-0 opacity-10 ${item.bgColor}`} />
             <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent" />
             <item.icon
-              className={`h-8 w-8 ${item.name === "Publicados" ? "text-success" : item.name === "Ofertas" ? "text-warning" : item.name === "En Revision" ? "text-primary" : "text-primary"}`}
+              className={`h-8 w-8 ${item.name === "Publicados" ? "text-success" : item.name === "Proyectos de Interés" ? "text-warning" : item.name === "En Revision" ? "text-primary" : "text-primary"}`}
               aria-hidden="true"
             />
           </div>

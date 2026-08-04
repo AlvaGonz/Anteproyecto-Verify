@@ -58,7 +58,7 @@ export const DashboardPage: React.FC = React.memo(() => {
       bgColor: "bg-success",
     },
     {
-      name: "Ofertas",
+      name: "Proyectos de Interés",
       stat: loading ? "..." : offers.toString(),
       icon: AlertCircle,
       bgColor: "bg-warning",

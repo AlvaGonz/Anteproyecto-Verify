@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
 using Application.DTOs.Admin;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -37,9 +38,9 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 .SumAsync(u => u.Plan!.Precio, cancellationToken);
 
             var totalProyectos = await proyectosQuery.CountAsync(cancellationToken);
-            var proyectosPendientes = await proyectosQuery.CountAsync(p => p.Estado != null && (p.Estado.CodigoUnico == "CREADO" || p.Estado.CodigoUnico == "REVISION"), cancellationToken);
-            var proyectosAprobados = await proyectosQuery.CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "PUBLICADO", cancellationToken);
-            var proyectosRechazados = await proyectosQuery.CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == "OBSERVACION", cancellationToken);
+            var proyectosPendientes = await proyectosQuery.CountAsync(p => p.Estado != null && (p.Estado.CodigoUnico == ProjectStatusCodes.Creado || p.Estado.CodigoUnico == ProjectStatusCodes.Revision), cancellationToken);
+            var proyectosAprobados = await proyectosQuery.CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == ProjectStatusCodes.Publicado, cancellationToken);
+            var proyectosRechazados = await proyectosQuery.CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == ProjectStatusCodes.Observacion, cancellationToken);
 
             var suscripcionesRecientes = await activeUsersQuery
                 .Include(u => u.Plan)
@@ -77,7 +78,7 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);
 
             var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
-            var totalOfertas = await _context.Set<ProyectoInteresado>().Where(pi => !userId.HasValue || pi.Project.UsuarioCreadorId == userId.Value).CountAsync(cancellationToken);
+            var totalOfertas = await _context.Set<ProyectoInteresado>().Where(pi => !userId.HasValue || pi.InterestedUserId == userId.Value).CountAsync(cancellationToken);
 
             var proyectosPorMes = await proyectosQuery
                 .GroupBy(p => new { p.CreatedAtUtc.Year, p.CreatedAtUtc.Month })

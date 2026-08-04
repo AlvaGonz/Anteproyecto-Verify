@@ -58,6 +58,42 @@ public class DashboardStatsTests : IntegrationTestBase
         dashboardTotal.Should().BeGreaterThanOrEqualTo(2);
     }
 
+    [Fact]
+    public async Task UserStats_Ofertas_CountsInterestsRegisteredByUser_NotByProjectCreator()
+    {
+        // Register userA (project creator) and userB (interested user)
+        var userAToken = await RegisterAndGetTokenAsync(email: $"userA_{Guid.NewGuid()}@test.com");
+        var userAId = GetUserIdFromToken(userAToken);
+
+        var userBToken = await RegisterAndGetTokenAsync(email: $"userB_{Guid.NewGuid()}@test.com");
+        var userBId = GetUserIdFromToken(userBToken);
+
+        // userA creates a project, userB registers interest in it
+        using (var scope = Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<global::Infrastructure.Persistence.AppDbContext>();
+            var estado = await db.Set<ProyectoEstado>().FirstAsync();
+            var proyecto = new Proyecto("Test Project", "Test Location", userAId, categoriaId: 1);
+            proyecto.UpdateEstado(estado);
+            db.Proyectos.Add(proyecto);
+            await db.SaveChangesAsync();
+
+            var interes = new ProyectoInteresado(proyecto.Id, userAId, userBId);
+            db.ProyectosInteresados.Add(interes);
+            await db.SaveChangesAsync();
+
+            // Verify: count BY userB (interested user) should include this record
+            var countForInterested = await db.ProyectosInteresados
+                .CountAsync(pi => pi.InterestedUserId == userBId);
+            countForInterested.Should().BeGreaterThanOrEqualTo(1);
+
+            // Verify: count BY userA (project creator, not interested) should NOT include this record
+            var countForCreator = await db.ProyectosInteresados
+                .CountAsync(pi => pi.InterestedUserId == userAId && pi.ProjectId == proyecto.Id);
+            countForCreator.Should().Be(0);
+        }
+    }
+
     private Guid GetUserIdFromToken(string jwt)
     {
         var parts = jwt.Split('.');
