@@ -9,6 +9,7 @@ import { AdminErrorFallback } from "../../components/ui/AdminErrorFallback";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { FindingDto, AuditLogDto } from "../../features/validations/types";
 import { ProjectValidationPageLayout } from "./ProjectValidationPageLayout";
+import { useProject } from "../../features/projects/api/useProjects";
 
 export const ProjectValidationPage: React.FC = React.memo(() => {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,7 @@ export const ProjectValidationPage: React.FC = React.memo(() => {
   const { data: rawResult, isLoading: isResultLoading, error: resultError } = useValidationResult(projectId);
   const { data: rawFindings = [], isLoading: isFindingsLoading } = useFindings(projectId);
   const { data: rawAuditLogs = [], isLoading: isAuditLoading } = useAuditLog(projectId);
+  const { data: project } = useProject(projectId);
 
   const runFullValidationMutation = useRunFullValidation(projectId);
 
@@ -100,6 +102,7 @@ export const ProjectValidationPage: React.FC = React.memo(() => {
       auditLogs={auditLogs}
       result={result}
       handleScanComplete={handleScanComplete}
+      projectStatus={(project as any)?.estadoProyecto}
     />
   );
 });

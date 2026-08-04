@@ -1,28 +1,27 @@
 import React from "react";
-import { CertificationStatus } from "../types";
 
 interface CertificationStatusBadgeProps {
-  status: CertificationStatus;
+  status: number;
 }
 
 export const CertificationStatusBadge: React.FC<
   CertificationStatusBadgeProps
 > = ({ status }) => {
-  let colorClass = "bg-gray-100 text-gray-800";
+  let colorClass = "bg-[#DAD1C8] text-[#5C5C5C]";
   let label = "Desconocido";
 
   switch (status) {
-    case CertificationStatus.Emitido:
-    case CertificationStatus.Vigente:
-      colorClass = "bg-green-100 text-green-800";
-      label = CertificationStatus[status];
+    case 1:
+    case 2:
+      colorClass = "bg-[#E8F5E9] text-[#2E7D32]";
+      label = status === 1 ? "Emitido" : "Activo";
       break;
-    case CertificationStatus.Expirado:
-      colorClass = "bg-yellow-100 text-yellow-800";
+    case 3:
+      colorClass = "bg-[#F9A825]/[0.15] text-[#F9A825]";
       label = "Expirado";
       break;
-    case CertificationStatus.Revocado:
-      colorClass = "bg-red-100 text-red-800";
+    case 4:
+      colorClass = "bg-[#FFEBEE] text-[#C62828]";
       label = "Revocado";
       break;
   }

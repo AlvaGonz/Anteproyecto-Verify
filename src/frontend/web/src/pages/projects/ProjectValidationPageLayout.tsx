@@ -12,7 +12,8 @@ const ValidationRulesTable = lazy(() => import("../../features/validations/compo
 const FindingsPanel = lazy(() => import("../../features/validations/components/findings/FindingsPanel").then(m => ({ default: m.FindingsPanel })));
 const AuditLogList = lazy(() => import("../../features/validations/components/audit/AuditLogList").then(m => ({ default: m.AuditLogList })));
 const RequiredDocumentsList = lazy(() => import("../../features/documents/components/RequiredDocumentsList").then(m => ({ default: m.RequiredDocumentsList })));
-const OcrDisclaimerBanner = lazy(() => import("../../features/validations/components/OcrDisclaimerBanner").then(m => ({ default: m.OcrDisclaimerBanner })));
+const OcrDisclaimerModal = lazy(() => import("../../features/validations/components/OcrDisclaimerModal").then(m => ({ default: m.OcrDisclaimerModal })));
+const CertificationSection = lazy(() => import("../../features/certifications/components/CertificationSection").then(m => ({ default: m.CertificationSection })));
 
 const TabFallback = () => <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
@@ -27,6 +28,7 @@ interface ProjectValidationPageLayoutProps {
   auditLogs: AuditLogDto[];
   result: ValidationExecutionResult | null;
   handleScanComplete: () => Promise<void>;
+  projectStatus?: string;
 }
 
 export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutProps> = React.memo(({
@@ -40,6 +42,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
   auditLogs,
   result,
   handleScanComplete,
+  projectStatus,
 }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -139,7 +142,7 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
             {activeTab === 'analysis' && (
               <Suspense fallback={<TabFallback />}>
               <>
-                {id && <OcrDisclaimerBanner projectId={id} />}
+                {id && <OcrDisclaimerModal projectId={id} />}
                 <RequiredDocumentsList projectId={id || ""} />
                 {result && (
                   <>
@@ -249,6 +252,10 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
 
         </div>
       )}
+
+      {id && <Suspense fallback={<TabFallback />}>
+        <CertificationSection projectId={id} projectStatus={projectStatus} />
+      </Suspense>}
     </div>
   );
 });

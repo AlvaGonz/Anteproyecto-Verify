@@ -61,14 +61,14 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = React.memo(({ p
   const displayStatus = isObserved ? ProjectStatus.Observed : actualStatus;
 
   return (
-    <div className="w-full max-w-4xl mx-auto my-6 px-4 overflow-x-auto no-scrollbar pb-2">
-      <div className="relative flex items-center justify-between min-w-max gap-4 sm:gap-8">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
+    <div className="w-full max-w-4xl mx-auto my-6 px-4">
+      <div className="relative flex flex-wrap items-center justify-center gap-2 md:flex-nowrap md:justify-between md:gap-4">
+        <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
 
         {STEPS.map((step) => {
           const isActive = displayStatus === step.status;
 
-          let buttonClass = "relative z-10 flex items-center justify-center h-10 px-6 rounded-full font-semibold text-sm border-2 transition-all duration-300 ";
+          let buttonClass = "relative z-10 flex items-center justify-center h-9 px-3.5 rounded-full font-semibold text-xs border-2 transition-all duration-300 md:h-10 md:px-6 md:text-sm ";
 
           if (isActive) {
             buttonClass += `${step.activeColor} text-white ${step.borderColor} shadow-md`;
