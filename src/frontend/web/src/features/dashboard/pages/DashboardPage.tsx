@@ -27,13 +27,13 @@ export const DashboardPage: React.FC = React.memo(() => {
 
   const { data: statsData, isLoading: loading } = useDashboardStats();
 
-  const { totalProjects, inReview, verified, offers, recentProjects } = useMemo(() => {
-    if (!statsData) return { totalProjects: 0, inReview: 0, verified: 0, offers: 0, recentProjects: [] as ProyectoRecienteDto[] };
+  const { totalProjects, inReview, verified, intereses, recentProjects } = useMemo(() => {
+    if (!statsData) return { totalProjects: 0, inReview: 0, verified: 0, intereses: 0, recentProjects: [] as ProyectoRecienteDto[] };
     return {
       totalProjects: statsData.totalProyectos || 0,
       inReview: statsData.proyectosPendientes || 0,
       verified: statsData.proyectosAprobados || 0,
-      offers: statsData.totalOfertas || 0,
+      intereses: statsData.totalIntereses || 0,
       recentProjects: statsData.proyectosRecientes || [],
     };
   }, [statsData]);
@@ -59,11 +59,11 @@ export const DashboardPage: React.FC = React.memo(() => {
     },
     {
       name: "Proyectos de Interés",
-      stat: loading ? "..." : offers.toString(),
+      stat: loading ? "..." : intereses.toString(),
       icon: AlertCircle,
       bgColor: "bg-warning",
     },
-  ], [loading, totalProjects, inReview, verified, offers]);
+  ], [loading, totalProjects, inReview, verified, intereses]);
 
   const recentSubscriptions = statsData?.suscripcionesRecientes || [];
 

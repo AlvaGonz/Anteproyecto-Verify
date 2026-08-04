@@ -78,7 +78,7 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 .ToDictionaryAsync(x => x.Plan, x => x.Count, cancellationToken);
 
             var totalConsultas = await _context.Set<LogConsulta>().CountAsync(cancellationToken);
-            var totalOfertas = await _context.Set<ProyectoInteresado>().Where(pi => !userId.HasValue || pi.InterestedUserId == userId.Value).CountAsync(cancellationToken);
+            var totalIntereses = await _context.Set<ProyectoInteresado>().Where(pi => !userId.HasValue || pi.InterestedUserId == userId.Value).CountAsync(cancellationToken);
 
             var proyectosPorMes = await proyectosQuery
                 .GroupBy(p => new { p.CreatedAtUtc.Year, p.CreatedAtUtc.Month })
@@ -106,7 +106,7 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 UsuariosPorPlan = usuariosPorPlan,
                 TotalConsultasRealizadas = totalConsultas,
                 TotalProyectosRegistrados = totalProyectos,
-                TotalOfertas = totalOfertas,
+                TotalIntereses = totalIntereses,
                 ProyectosPorMes = proyectosPorMes
             };
         }
