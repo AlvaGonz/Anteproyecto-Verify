@@ -354,7 +354,7 @@ public static class AppDbContextSeeder
             }
 
             logger.LogInformation("Prototype demo data seeding completed successfully.");
-            await SeedDgiiAsync(context, logger);
+            // await SeedDgiiAsync(context, logger); // Handled by python_env container (up_DGII.py) to prevent race conditions & memory issues
 
             var config = scope.ServiceProvider.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
             if (config != null && config["IsTestingEnvironment"] == "true")

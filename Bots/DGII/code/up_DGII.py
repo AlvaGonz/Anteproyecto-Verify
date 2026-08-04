@@ -279,11 +279,17 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
                     break
                 except Exception as e:
                     err_str = str(e)
-                    if batch_attempt > 1 and ("2627" in err_str or "PRIMARY KEY" in err_str.upper()):
-                        print(f"    [Chunk {chunk_id}] Ignoring PK violation on retry {batch_attempt}, assuming previous attempt committed successfully.")
-                        batch_success = True
-                        break
-                        
+                    
+                    if "2627" in err_str or "PRIMARY KEY" in err_str.upper():
+                        if batch_attempt > 1:
+                            print(f"    [Chunk {chunk_id}] Ignoring PK violation on retry {batch_attempt}, assuming previous attempt committed successfully.")
+                            batch_success = True
+                            break
+                        else:
+                            print(f"    [Chunk {chunk_id}] PK violation on first attempt! This indicates duplicate data already exists in the table.")
+                            # We break instead of retry because a first-attempt PK violation is a hard error
+                            break
+                    
                     if conn:
                         try: conn.rollback()
                         except: pass
@@ -335,6 +341,27 @@ def main():
     print(f"Source file: {file_path}")
     print(f"Database Server: {conn_params['server']}, Database: {conn_params['database']}")
     
+    # Wait for EF Core migrations to create the DGII table
+    print("Waiting for EF Core to create the DGII table...")
+    table_exists = False
+    for attempt in range(60):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'DGII'")
+            if cursor.fetchone()[0] > 0:
+                table_exists = True
+                conn.close()
+                break
+            conn.close()
+        except Exception:
+            pass
+        time.sleep(2)
+        
+    if not table_exists:
+        print("Error: DGII table was not created by EF Core after 120 seconds. Aborting.")
+        sys.exit(1)
+
     # Check if already fully loaded
     try:
         conn = get_db_connection()
@@ -352,7 +379,7 @@ def main():
         conn = get_db_connection()
         cursor = conn.cursor()
         print("Cleaning up old data in DGII table to prevent primary key conflicts...")
-        cursor.execute("TRUNCATE TABLE DGII;")
+        cursor.execute("DELETE FROM DGII;")
         conn.commit()
         conn.close()
     except Exception as e:
