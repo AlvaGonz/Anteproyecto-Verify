@@ -23,5 +23,6 @@ public record UpdateProyectoDto(
     string? ImagenAdicional2 = null,
     string? ImagenAdicional3 = null,
     string? ImagenAdicional4 = null,
-    string? ImagenAdicional5 = null
+    string? ImagenAdicional5 = null,
+    Guid? MunicipioId = null
 );

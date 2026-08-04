@@ -25,6 +25,8 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Include(p => p.CategoriaProyecto)
+            .Include(p => p.Municipio!)
+                .ThenInclude(m => m.Provincia)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -37,6 +39,8 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Include(p => p.CategoriaProyecto)
+            .Include(p => p.Municipio!)
+                .ThenInclude(m => m.Provincia)
             .AsQueryable();
 
         if (usuarioId.HasValue)
@@ -410,5 +414,10 @@ public class ProyectoRepository : IProyectoRepository
             }
         }
         return result;
+    }
+
+    public async Task<bool> ExistsMunicipioAsync(Guid municipioId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Municipios.AnyAsync(m => m.IdMunicipio == municipioId, cancellationToken);
     }
 }

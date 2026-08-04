@@ -35,7 +35,10 @@ public record ProyectoDto(
     DateTime CreatedAtUtc,
     DateTime? UpdatedAtUtc,
     ProjectRegistrantDto? RegistradoPor = null,
-    string? PlanNombre = null
+    string? PlanNombre = null,
+    Guid? MunicipioId = null,
+    string? MunicipioNombre = null,
+    string? ProvinciaNombre = null
 );
 
 public record ProjectRegistrantDto(
@@ -84,5 +87,6 @@ public record CreateProyectoDto(
     string? ImagenAdicional2 = null,
     string? ImagenAdicional3 = null,
     string? ImagenAdicional4 = null,
-    string? ImagenAdicional5 = null
+    string? ImagenAdicional5 = null,
+    Guid? MunicipioId = null
 );

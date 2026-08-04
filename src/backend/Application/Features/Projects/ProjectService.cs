@@ -99,6 +99,17 @@ public class ProjectService : IProjectService
 
         var categoria = await ValidateCategoriaAsync(dto.CategoriaId, cancellationToken);
 
+        if (dto.MunicipioId.HasValue)
+        {
+            var municipioExists = await _proyectoRepository.ExistsMunicipioAsync(dto.MunicipioId.Value, cancellationToken);
+            if (!municipioExists)
+            {
+                throw new ArgumentException(
+                    $"El municipio con Id {dto.MunicipioId} no existe.",
+                    nameof(dto.MunicipioId));
+            }
+        }
+
         var estadoCreado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Creado, cancellationToken);
         if (estadoCreado == null)
         {
@@ -106,12 +117,12 @@ public class ProjectService : IProjectService
                 "Estado 'CREADO' no encontrado en ProyectosEstados. Ejecute el seeder o la migración de estados.");
         }
 
-        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        var proyecto = new Proyecto(dto.Nombre, dto.UbicacionTexto, dto.UsuarioCreadorId, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5, dto.MunicipioId);
         proyecto.AsignarCategoria(categoria);
         proyecto.UpdateEstado(estadoCreado);
         if (!string.IsNullOrEmpty(dto.UbicacionGps))
         {
-            proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, null, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5, dto.MunicipioId);
         }
         if (!string.IsNullOrEmpty(dto.RncDesarrollador) || !string.IsNullOrEmpty(dto.Matricula))
         {
@@ -134,7 +145,7 @@ public class ProjectService : IProjectService
 
         var categoria = await ValidateCategoriaAsync(dto.CategoriaId, cancellationToken);
 
-        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5);
+        proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5, dto.MunicipioId);
         proyecto.AsignarCategoria(categoria);
         proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
 
@@ -456,7 +467,10 @@ public class ProjectService : IProjectService
             proyecto.CreatedAtUtc,
             proyecto.UpdatedAtUtc,
             registradoPor,
-            proyecto.UsuarioCreador?.Plan?.NombrePlan
+            proyecto.UsuarioCreador?.Plan?.NombrePlan,
+            proyecto.MunicipioId,
+            proyecto.Municipio?.NombreMunicipio,
+            proyecto.Municipio?.Provincia?.NombreProvincia
         );
     }
 }

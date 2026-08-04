@@ -214,6 +214,7 @@ public class ProjectServiceTests
             .ReturnsAsync(new List<CategoriaProyecto> { new CategoriaProyecto { Id = 8, Nombre = "COMERCIAL Y OFICINAS", Activo = true } });
         _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8"));
+        _proyectoRepositoryMock.Setup(r => r.ExistsMunicipioAsync(municipioId, It.IsAny<CancellationToken>())).ReturnsAsync(true);
         _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 

@@ -58,6 +58,10 @@ public class AppDbContext : DbContext
     public DbSet<JCE_Ciudadano> JCE_Ciudadanos => Set<JCE_Ciudadano>();
     public DbSet<PagoIPI> PagosIPI => Set<PagoIPI>();
 
+    // Geo
+    public DbSet<Provincia> Provincias => Set<Provincia>();
+    public DbSet<Municipio> Municipios => Set<Municipio>();
+
     // Project Categories
     public DbSet<CategoriaProyecto> CategoriasProyecto => Set<CategoriaProyecto>();
 
