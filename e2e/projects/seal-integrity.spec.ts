@@ -244,9 +244,9 @@ test.describe('Seal Integrity > Admin issuance', () => {
 
     await page.getByText(/Certificación Verificable/i).waitFor({ timeout: 15000 });
 
-    await page.evaluate(() => { window.confirm = () => true; });
-
     await page.getByRole('button', { name: /Emitir Certificaci/i }).click();
+
+    await page.getByRole('button', { name: /Sí, Emitir/i }).click();
 
     await expect(
       page.getByText(/VERIFINCA-/).first()

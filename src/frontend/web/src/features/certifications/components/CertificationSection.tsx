@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useCertification, useIssueSeal } from "../api/useCertifications";
 import { usePlanLimits } from "../../settings/api/useSettings";
 import { CertificationQr } from "./CertificationQr";
 import { CertificationStatusBadge } from "./CertificationStatusBadge";
 import { toUtcDate } from "../../../shared/utils/dates";
 import { ShieldCheck, Download } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface SelloIntegridadResponse {
   id?: string | number;
@@ -60,6 +61,8 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
   const issueSealMutation = useIssueSeal(projectId || "");
   const { planLimits, isLoading: limitsLoading } = usePlanLimits();
   const qrSvgRef = React.useRef<SVGSVGElement>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const hasQrIncluido = planLimits?.qrIncluido ?? false;
   const canIssue = isPublished && hasQrIncluido && !issueSealMutation.isPending;
@@ -74,22 +77,32 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
 
   const hasSeal = selloData && (selloData.vigente !== false && selloData.estado !== "Revocado" && selloData.estado !== "Expirado");
   const sealCode = selloData?.codigoSello || selloData?.codigoQR || "";
-  const qrUrl = selloData?.urlQr || selloData?.urlVerificacion || "";
+  const qrUrl = `${window.location.origin}/#/p/${projectId}`;
   const accessCount = selloData?.contadorAccesos ?? selloData?.accessCount ?? 0;
   const sealStatus = selloData?.estado === "Revocado" ? 4 : selloData?.estado === "Expirado" ? 3 : 2;
 
-  const handleIssue = async () => {
-    if (!isPublished) return;
-    if (
-      !window.confirm(
-        selloData
-          ? "¿Estás seguro de regenerar la certificación? Esto revocará el código actual."
-          : "¿Emitir nueva certificación?",
-      )
-    ) {
-      return;
-    }
+  useEffect(() => {
+    if (!confirmOpen) return;
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setConfirmOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [confirmOpen]);
+
+  const handleIssue = () => {
+    if (!isPublished) return;
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmIssue = async () => {
+    setConfirmOpen(false);
     try {
       await issueSealMutation.mutateAsync();
     } catch (err: unknown) {
@@ -126,7 +139,8 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
   }
 
   return (
-    <div className="bg-white border border-[#C8BFB5] rounded-xl overflow-hidden mt-6 print-section" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)" }}>
+    <>
+      <div className="bg-white border border-[#C8BFB5] rounded-xl overflow-hidden mt-6 print-section" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)" }}>
       <div className="px-4 py-5 sm:px-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 border-b border-[#DAD1C8]">
         <div className="min-w-0">
           <h3 className="text-lg font-semibold text-[#111144]" style={{ fontFamily: "Manrope" }}>
@@ -256,6 +270,79 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
           Este proyecto aún no cuenta con un sello de integridad emitido.
         </div>
       )}
-    </div>
+
+      </div>
+
+      <AnimatePresence>
+        {confirmOpen && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="issue-cert-title"
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-hidden"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setConfirmOpen(false)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md cursor-default"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              transition={reduceMotion ? { duration: 0 } : { type: "spring", damping: 28, stiffness: 320 }}
+              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden border border-[#C8BFB5] flex flex-col"
+            >
+              <div className="p-6 border-b border-[#DAD1C8] flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#F98513]/10 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-6 h-6 text-[#F98513]" />
+                </div>
+                <div>
+                  <h2 id="issue-cert-title" className="text-lg font-semibold text-[#111144]" style={{ fontFamily: "Manrope" }}>
+                    {hasSeal ? "Regenerar Certificación" : "Emitir Certificación"}
+                  </h2>
+                  <p className="text-xs text-[#5C5C5C] mt-0.5">Sello de Integridad del proyecto</p>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <p className="text-sm text-[#111144] font-medium leading-relaxed">
+                  {hasSeal ? "¿Estás seguro de regenerar la certificación?" : "¿Emitir nueva certificación?"}
+                </p>
+                {hasSeal && (
+                  <div className="mt-4 bg-[#F4F1EC] border border-[#C8BFB5] rounded-xl p-4">
+                    <p className="text-xs text-[#5C5C5C] leading-relaxed">
+                      <strong className="text-[#111144]">Esto revocará el código actual.</strong>
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 pt-0 flex flex-col-reverse sm:flex-row justify-end gap-3">
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => setConfirmOpen(false)}
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-[#C8BFB5] rounded-lg text-sm font-semibold text-[#111144] bg-white hover:bg-[#F4F1EC] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F98513]/50 focus-visible:ring-offset-2"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmIssue}
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#F98513] hover:bg-[#E07610] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F98513]/50 focus-visible:ring-offset-2"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  {hasSeal ? "Sí, Regenerar" : "Sí, Emitir"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
