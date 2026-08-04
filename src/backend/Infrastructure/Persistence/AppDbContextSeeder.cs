@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Application.Abstractions.Storage;
 using Domain.Entities;
@@ -331,8 +333,36 @@ public static class AppDbContextSeeder
                     codigoSello: "VF-2026-ABC123XYZ",
                     nombre: "Sello VeriFinca Oro",
                     nivel: NivelSelloIntegridad.Oro,
-                    urlQr: "https://verifinca.do/verify/VF-2026-ABC123XYZ",
-                    firmaDigital: "firma-digital-simulada");
+                    urlQr: $"http://localhost:3000/#/q/{GenerateSealToken(p1.Id, "VF-2026-ABC123XYZ")}",
+                    firmaDigital: "firma-digital-simulada",
+                    qrToken: GenerateSealToken(p1.Id, "VF-2026-ABC123XYZ"));
+
+                // Seal seeding for remaining published projects
+                var publishedProjectSeeds = new (int Index, string Codigo, string Nombre, NivelSelloIntegridad Nivel)[]
+                {
+                    (3, "VF-2026-OASIS001", "Sello Condominio Oasis", NivelSelloIntegridad.Plata),
+                    (4, "VF-2026-PSOL001", "Sello Plaza del Sol", NivelSelloIntegridad.Oro),
+                    (5, "VF-2026-LUMI001", "Sello Torre Lumiere", NivelSelloIntegridad.Oro),
+                    (6, "VF-2026-ALTOS001", "Sello Altos del Mar", NivelSelloIntegridad.Bronce),
+                    (7, "VF-2026-COSTA001", "Sello Villa Costa Marina", NivelSelloIntegridad.Plata),
+                    (8, "VF-2026-PCNOR001", "Sello Plaza Comercial Norte", NivelSelloIntegridad.Bronce),
+                    (9, "VF-2026-VISTA001", "Sello Condominio Vista Bella", NivelSelloIntegridad.Plata),
+                };
+
+                foreach (var s in publishedProjectSeeds)
+                {
+                    var proj = proyectoEntities[s.Index];
+                    var token = GenerateSealToken(proj.Id, s.Codigo);
+                    await GetOrCreateSelloIntegridadAsync(
+                        context,
+                        proyectoId: proj.Id,
+                        codigoSello: s.Codigo,
+                        nombre: s.Nombre,
+                        nivel: s.Nivel,
+                        urlQr: $"http://localhost:3000/#/q/{token}",
+                        firmaDigital: "firma-digital-simulada",
+                        qrToken: token);
+                }
 
                 await GetOrCreateNotificacionAsync(
                     context,
@@ -886,6 +916,19 @@ WHERE NOT EXISTS (
                 status: ProjectStatus.Publicado);
         }
 
+        // Seed QR seal for Torre Playa Dorada Beach
+        var torreCodigo = "VF-2026-TORRE001";
+        var torreToken = GenerateSealToken(torre.Id, torreCodigo);
+        await GetOrCreateSelloIntegridadAsync(
+            context,
+            proyectoId: torre.Id,
+            codigoSello: torreCodigo,
+            nombre: "Sello Torre Playa Dorada",
+            nivel: NivelSelloIntegridad.Oro,
+            urlQr: $"http://localhost:3000/#/q/{torreToken}",
+            firmaDigital: "firma-digital-simulada",
+            qrToken: torreToken);
+
         var targetProjects = seedProjects.Concat(new[] { torre }).ToList();
 
         IBlobStorageService? blob = null;
@@ -1229,7 +1272,8 @@ WHERE NOT EXISTS (
         string nombre,
         NivelSelloIntegridad nivel,
         string urlQr,
-        string firmaDigital)
+        string firmaDigital,
+        string qrToken = "")
     {
         var existing = await context.SellosIntegridad.FirstOrDefaultAsync(s => 
             s.ProyectoId == proyectoId && s.CodigoSello == codigoSello);
@@ -1241,7 +1285,8 @@ WHERE NOT EXISTS (
             nombre,
             nivel,
             urlQr,
-            firmaDigital);
+            firmaDigital,
+            qrToken);
             
         context.SellosIntegridad.Add(entity);
         await context.SaveChangesAsync();
@@ -1485,5 +1530,15 @@ WHERE NOT EXISTS (
             await context.SaveChangesAsync();
             logger.LogInformation($"EF seed complete! Total rows: {count}.");
         }
+    }
+
+    private static string GenerateSealToken(Guid projectId, string codigoSello)
+    {
+        const string signingSecret = "VERIFINCA_SEAL_SIGNING_KEY_2026";
+        var payload = $"{projectId}|{codigoSello}|{DateTime.UtcNow:yyyyMMddHHmmss}";
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(signingSecret));
+        var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
+        var token = Convert.ToBase64String(hashBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
+        return $"{Convert.ToBase64String(Encoding.UTF8.GetBytes(payload))}.{token}";
     }
 }

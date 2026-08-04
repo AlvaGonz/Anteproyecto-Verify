@@ -23,6 +23,17 @@ public class SelloIntegridadConfiguration : IEntityTypeConfiguration<SelloIntegr
             .IsRequired()
             .HasMaxLength(500);
 
+        builder.Property(s => s.QrToken)
+            .HasMaxLength(500);
+
+        builder.HasIndex(s => s.QrToken)
+            .IsUnique()
+            .HasFilter("[QrToken] IS NOT NULL AND [QrToken] <> ''");
+
+        builder.Property(s => s.ContadorAccesos)
+            .IsRequired()
+            .HasDefaultValue(0);
+
         builder.Property(s => s.FirmaDigital)
             .IsRequired()
             .HasMaxLength(1000);
