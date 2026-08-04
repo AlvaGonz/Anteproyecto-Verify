@@ -195,14 +195,14 @@ public class ProjectServiceTests
         Assert.Null(result);
     }
 
-    // ── RED: Municipio/Provincia relation ─────────────────────────────────
+    // ── RED: Provincia relation ──────────────────────────────────────────
 
     [Fact]
-    public async Task CreateProject_WithMunicipioId_ShouldIncludeMunicipioIdInDto()
+    public async Task CreateProject_WithProvinciaId_ShouldIncludeProvinciaIdInDto()
     {
         var userId = Guid.NewGuid();
-        var municipioId = Guid.NewGuid();
-        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123", MunicipioId: municipioId);
+        var provinciaId = Guid.NewGuid();
+        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123", ProvinciaId: provinciaId);
 
         var plan = Tests.Shared.TestPlanFactory.Profesional();
         var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
@@ -214,22 +214,22 @@ public class ProjectServiceTests
             .ReturnsAsync(new List<CategoriaProyecto> { new CategoriaProyecto { Id = 8, Nombre = "COMERCIAL Y OFICINAS", Activo = true } });
         _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8"));
-        _proyectoRepositoryMock.Setup(r => r.ExistsMunicipioAsync(municipioId, It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _proyectoRepositoryMock.Setup(r => r.ExistsProvinciaAsync(provinciaId, It.IsAny<CancellationToken>())).ReturnsAsync(true);
         _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var result = await _projectService.CreateProjectAsync(dto);
 
         Assert.NotNull(result);
-        Assert.Equal(municipioId, result.MunicipioId);
+        Assert.Equal(provinciaId, result.ProvinciaId);
     }
 
     [Fact]
-    public async Task CreateProject_WithInvalidMunicipioId_ShouldThrow()
+    public async Task CreateProject_WithInvalidProvinciaId_ShouldThrow()
     {
         var userId = Guid.NewGuid();
-        var invalidMunicipioId = Guid.NewGuid();
-        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123", MunicipioId: invalidMunicipioId);
+        var invalidProvinciaId = Guid.NewGuid();
+        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123", ProvinciaId: invalidProvinciaId);
 
         var plan = Tests.Shared.TestPlanFactory.Profesional();
         var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");

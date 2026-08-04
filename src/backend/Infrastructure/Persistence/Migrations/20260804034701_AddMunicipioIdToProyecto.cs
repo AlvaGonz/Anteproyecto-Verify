@@ -9,9 +9,54 @@ namespace Infrastructure.Persistence.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Provincia and Municipio tables already exist (seeded via raw SQL)
-            // Only add the FK column to ProyectosInmobiliarios
+            // Drop the Municipio FK that was added in the previous run
+            migrationBuilder.DropForeignKey(
+                name: "FK_ProyectosInmobiliarios_Municipio_MunicipioId",
+                table: "ProyectosInmobiliarios");
 
+            migrationBuilder.DropIndex(
+                name: "IX_ProyectosInmobiliarios_MunicipioId",
+                table: "ProyectosInmobiliarios");
+
+            migrationBuilder.DropColumn(
+                name: "MunicipioId",
+                table: "ProyectosInmobiliarios");
+
+            // Add Provincia FK
+            migrationBuilder.AddColumn<Guid>(
+                name: "ProvinciaId",
+                table: "ProyectosInmobiliarios",
+                type: "uniqueidentifier",
+                nullable: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProyectosInmobiliarios_ProvinciaId",
+                table: "ProyectosInmobiliarios",
+                column: "ProvinciaId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ProyectosInmobiliarios_Provincia_ProvinciaId",
+                table: "ProyectosInmobiliarios",
+                column: "ProvinciaId",
+                principalTable: "Provincia",
+                principalColumn: "IdProvincia");
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropForeignKey(
+                name: "FK_ProyectosInmobiliarios_Provincia_ProvinciaId",
+                table: "ProyectosInmobiliarios");
+
+            migrationBuilder.DropIndex(
+                name: "IX_ProyectosInmobiliarios_ProvinciaId",
+                table: "ProyectosInmobiliarios");
+
+            migrationBuilder.DropColumn(
+                name: "ProvinciaId",
+                table: "ProyectosInmobiliarios");
+
+            // Restore Municipio FK in Down
             migrationBuilder.AddColumn<Guid>(
                 name: "MunicipioId",
                 table: "ProyectosInmobiliarios",
@@ -29,21 +74,6 @@ namespace Infrastructure.Persistence.Migrations
                 column: "MunicipioId",
                 principalTable: "Municipio",
                 principalColumn: "IdMunicipio");
-        }
-
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_ProyectosInmobiliarios_Municipio_MunicipioId",
-                table: "ProyectosInmobiliarios");
-
-            migrationBuilder.DropIndex(
-                name: "IX_ProyectosInmobiliarios_MunicipioId",
-                table: "ProyectosInmobiliarios");
-
-            migrationBuilder.DropColumn(
-                name: "MunicipioId",
-                table: "ProyectosInmobiliarios");
         }
     }
 }
