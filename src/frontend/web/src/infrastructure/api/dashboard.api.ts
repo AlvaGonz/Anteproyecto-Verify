@@ -13,7 +13,7 @@ export interface DashboardStatsDto {
   usuariosPorPlan: Record<string, number>;
   totalConsultasRealizadas: number;
   totalProyectosRegistrados: number;
-  totalOfertas: number;
+  totalIntereses: number;
   proyectosPorMes: ProyectosPorMesDto[];
 }
 

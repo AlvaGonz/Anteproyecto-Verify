@@ -19,7 +19,7 @@ namespace Application.DTOs.Admin
         public Dictionary<string, int> UsuariosPorPlan { get; init; } = new();
         public int TotalConsultasRealizadas { get; init; }
         public int TotalProyectosRegistrados { get; init; }
-        public int TotalOfertas { get; init; }
+        public int TotalIntereses { get; init; }
 
         // Trend
         public List<ProyectosPorMesDto> ProyectosPorMes { get; init; } = new();

@@ -34,7 +34,7 @@ export const PublicProjectReport: React.FC<PublicProjectReportProps> = ({
       <div className="grid md:grid-cols-2 gap-8">
         <div>
           <h3 className="text-sm font-semibold text-secondary uppercase tracking-widest mb-4">Información Clave</h3>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-surface rounded-lg">
               <span className="text-on-surface-variant font-medium">Estado del Proyecto</span>
@@ -50,7 +50,7 @@ export const PublicProjectReport: React.FC<PublicProjectReportProps> = ({
 
         <div>
           <h3 className="text-sm font-semibold text-secondary uppercase tracking-widest mb-4">Detalles</h3>
-          
+
           <div className="bg-surface p-4 rounded-lg h-full flex flex-col justify-between">
             <div className="flex gap-3 mb-2">
               <Info className="w-5 h-5 text-secondary flex-shrink-0" />
@@ -58,7 +58,7 @@ export const PublicProjectReport: React.FC<PublicProjectReportProps> = ({
                 {report.resumenPublico}
               </p>
             </div>
-            
+
             <div className="flex items-center gap-2 mt-4 pt-4 border-t border-outline-variant opacity-70">
               <Calendar className="w-4 h-4 text-secondary" />
               <span className="text-xs font-medium">

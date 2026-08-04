@@ -42,6 +42,9 @@ public class Proyecto : EntityBase
     public Guid UsuarioCreadorId { get; private set; }
     public Usuario UsuarioCreador { get; private set; } = null!;
 
+    public Guid? ProvinciaId { get; private set; }
+    public Provincia? Provincia { get; private set; }
+
     // Navigation properties
     public ICollection<Documento> Documentos { get; private set; } = new List<Documento>();
     public ICollection<Validacion> Validaciones { get; private set; } = new List<Validacion>();
@@ -51,7 +54,7 @@ public class Proyecto : EntityBase
 
     private Proyecto() { } // For EF Core
 
-    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, int categoriaId, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
+    public Proyecto(string nombre, string ubicacionTexto, Guid usuarioCreadorId, int categoriaId, string? datosDesarrollador = null, string? designacionCatastral = null, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null, Guid? provinciaId = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -74,11 +77,12 @@ public class Proyecto : EntityBase
         ImagenAdicional3 = img3;
         ImagenAdicional4 = img4;
         ImagenAdicional5 = img5;
+        ProvinciaId = provinciaId;
         CodigoInterno = GenerateCode();
         EstadoIntegridad = IntegrityStatus.Pending;
     }
 
-    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, int categoriaId, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string? img5 = null)
+    public void UpdateDetails(string nombre, string ubicacionTexto, string? ubicacionGps, decimal? valorEstimado, int categoriaId, string? datosDesarrollador, string? designacionCatastral, string? propietario = null, string? cedulaRncPropietario = null, string? ipi = null, string? estatusIpi = null, decimal? superficieM2 = null, string? imagenUrl = null, string? img1 = null, string? img2 = null, string? img3 = null, string? img4 = null, string?         img5 = null, Guid? provinciaId = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(ubicacionTexto)) throw new ArgumentException("Ubicación requerida", nameof(ubicacionTexto));
@@ -101,6 +105,7 @@ public class Proyecto : EntityBase
         ImagenAdicional3 = img3;
         ImagenAdicional4 = img4;
         ImagenAdicional5 = img5;
+        ProvinciaId = provinciaId;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

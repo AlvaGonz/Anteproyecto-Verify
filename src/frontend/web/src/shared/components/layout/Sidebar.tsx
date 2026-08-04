@@ -91,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       <div
         className={clsx(
           "relative flex flex-col transition-all duration-500 shrink-0",
-          isCollapsed ? "px-3 pt-6 pb-4 items-center" : "px-8 pt-10 pb-6"
+          isCollapsed ? "px-3 pt-4 pb-2 items-center" : "px-8 pt-10 pb-3"
         )}
       >
         <Link
@@ -131,11 +131,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* Navigation Section */}
-      <div className="relative flex-1 min-h-0 flex flex-col py-2 sm:py-4 overflow-hidden">
+      <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden">
         <div
           className={clsx(
-            "px-4 mb-2 sm:mb-4 overflow-hidden transition-all duration-500 shrink-0",
-            isCollapsed ? "opacity-0 h-0" : "opacity-100 h-auto"
+            "px-5 pt-2 pb-1 overflow-hidden transition-all duration-500 shrink-0",
+            isCollapsed ? "opacity-0 h-0 p-0" : "opacity-100 h-auto"
           )}
         >
           <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
@@ -144,7 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </div>
 
         <motion.nav
-          className={clsx("flex flex-col gap-1 sm:gap-1.5 flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]", isCollapsed ? "px-2" : "px-4")}
+          className={clsx("flex flex-col justify-evenly flex-1 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]", isCollapsed ? "px-2" : "px-4")}
           initial={shouldReduceMotion ? false : "hidden"}
           animate="visible"
           variants={{
@@ -170,7 +170,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                     isActive
                       ? "text-white bg-white/10 shadow-inner"
                       : "text-white/50 hover:text-white/80 hover:bg-white/5",
-                    isCollapsed ? "justify-center px-0 py-2.5 sm:py-3.5" : "px-4 py-2.5 sm:py-3.5 text-sm font-bold"
+                    isCollapsed ? "justify-center px-0 py-4 sm:py-4" : "px-4 py-4 sm:py-4 text-sm font-bold"
                   )}
                 >
                   {isActive && (
@@ -223,82 +223,89 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
               </motion.div>
             );
           })}
-        </motion.nav>
 
-        {/* Global Action Button */}
-        <div className={clsx("transition-all duration-500 shrink-0", isCollapsed ? "px-2 mt-2 sm:mt-4" : "mt-4 sm:mt-8 px-2")}>
-          <Link
-            to="/admin/projects/new"
-            onClick={(e) => {
-              if (isAtLimit && user?.role !== "admin") {
-                e.preventDefault();
-                setShowLimitModal(true);
-              } else if (onClose) {
-                onClose();
-              }
+          {/* Global Action Button */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, x: -12 },
+              visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
             }}
-            className={clsx(
-              "flex items-center bg-primary hover:bg-primary-hover text-white rounded-2xl font-display font-black text-xs uppercase tracking-widest transition-all shadow-premium hover:shadow-premium-lg group",
-              isCollapsed ? "justify-center py-2.5 sm:py-3.5" : "justify-center gap-3 w-full py-3 sm:py-4"
-            )}
-            title="Nuevo Expediente"
+            className="shrink-0"
           >
-            <Plus className="w-5 h-5 transition-transform group-hover:rotate-90 shrink-0" />
-            <span
+            <Link
+              to="/admin/projects/new"
+              onClick={(e) => {
+                if (isAtLimit && user?.role !== "admin") {
+                  e.preventDefault();
+                  setShowLimitModal(true);
+                } else if (onClose) {
+                  onClose();
+                }
+              }}
               className={clsx(
-                "overflow-hidden whitespace-nowrap transition-all duration-500",
-                isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                "flex items-center bg-primary hover:bg-primary-hover text-white rounded-2xl font-display font-black text-xs uppercase tracking-widest transition-all shadow-premium hover:shadow-premium-lg group",
+                isCollapsed ? "justify-center py-2.5 sm:py-3" : "justify-center gap-3 w-full py-3 sm:py-3.5"
               )}
+              title="Nuevo Expediente"
             >
-              NUEVO EXPEDIENTE
-            </span>
-          </Link>
-        </div>
+              <Plus className="w-5 h-5 transition-transform group-hover:rotate-90 shrink-0" />
+              <span
+                className={clsx(
+                  "overflow-hidden whitespace-nowrap transition-all duration-500",
+                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                )}
+              >
+                NUEVO EXPEDIENTE
+              </span>
+            </Link>
+          </motion.div>
 
-        {/* Footer Links */}
-        <div
-          className={clsx(
-            "mt-auto space-y-3 transition-all duration-500 shrink-0",
-            isCollapsed ? "px-2 pb-2 sm:pb-4" : "px-4 pb-2 sm:pb-4"
-          )}
-        >
-          <div className={clsx("h-px bg-white/10 transition-all duration-500", isCollapsed ? "mx-0" : "w-full")} />
-          <Link
-            to="/projects"
-            title="Explorar Portal Público"
-            className={clsx(
-              "flex items-center gap-3 text-[10px] font-black text-white/30 hover:text-primary transition-colors uppercase tracking-[0.1em]",
-              isCollapsed ? "justify-center" : ""
-            )}
+          {/* Footer Link */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, x: -12 },
+              visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+            }}
+            className="shrink-0"
           >
-            <Compass className="w-4 h-4 flex-shrink-0" />
-            <span
+            <div className="h-px bg-white/10 mb-2" />
+            <Link
+              to="/projects"
+              title="Explorar Portal Público"
               className={clsx(
-                "overflow-hidden whitespace-nowrap transition-all duration-500",
-                isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                "flex items-center gap-3 text-[10px] font-black text-white/30 hover:text-primary transition-colors uppercase tracking-[0.1em]",
+                isCollapsed ? "justify-center" : ""
               )}
             >
-              Explorar Portal Público
-            </span>
-          </Link>
-        </div>
+              <Compass className="w-4 h-4 flex-shrink-0" />
+              <span
+                className={clsx(
+                  "overflow-hidden whitespace-nowrap transition-all duration-500",
+                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                )}
+              >
+                Explorar Portal Público
+              </span>
+            </Link>
+          </motion.div>
+        </motion.nav>
       </div>
 
       {/* User Section (Persistent Footer) */}
       <div
         className={clsx(
-          "relative shrink-0 transition-all duration-500 bg-white/[0.03] border-t border-white/5 flex flex-col gap-2",
-          isCollapsed ? "p-3" : "p-6"
+          "relative shrink-0 transition-all duration-500 bg-white/[0.03] border-t border-white/5 flex flex-col gap-1",
+          isCollapsed ? "p-2" : "p-4"
         )}
       >
         {/* Collapse Toggle - Desktop only */}
-        <div className="hidden md:block mb-2">
+        <div className="hidden md:block mb-1">
           <button
             type="button"
             onClick={() => setIsCollapsed((prev) => !prev)}
             className={clsx(
               "flex items-center w-full text-[10px] font-black text-white/30 hover:text-white transition-all duration-300 rounded-xl hover:bg-white/5",
-              isCollapsed ? "justify-center py-2" : "px-2 py-2 gap-2"
+              isCollapsed ? "justify-center py-2.5" : "px-2 py-2.5 gap-2"
             )}
             title={isCollapsed ? "Expandir panel" : "Colapsar panel"}
           >
@@ -381,8 +388,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           type="button"
           onClick={handleLogout}
           className={clsx(
-            "flex items-center w-full text-[10px] font-black text-white/30 hover:text-red-400 transition-all duration-300 uppercase tracking-widest rounded-xl hover:bg-white/5 min-h-[44px]",
-            isCollapsed ? "justify-center mt-1" : "px-3 gap-3 mt-2"
+            "flex items-center w-full text-[10px] font-black text-white/30 hover:text-red-400 transition-all duration-300 uppercase tracking-widest rounded-xl hover:bg-white/5 min-h-[52px]",
+            isCollapsed ? "justify-center mt-0.5" : "px-3 gap-3 mt-1"
           )}
           title="Cerrar Sesión"
         >

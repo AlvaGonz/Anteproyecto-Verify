@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260804034701_AddMunicipioIdToProyecto")]
+    partial class AddMunicipioIdToProyecto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1218,6 +1221,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("Matricula")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("MunicipioId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1227,9 +1233,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("Propietario")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<Guid?>("ProvinciaId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RncDesarrollador")
                         .HasColumnType("nvarchar(max)");
@@ -1268,7 +1271,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("EstadoId");
 
-                    b.HasIndex("ProvinciaId");
+                    b.HasIndex("MunicipioId");
 
                     b.HasIndex("UsuarioCreadorId");
 
@@ -1387,34 +1390,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("ProyectoInteres", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.ProyectoValidacionDescargo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ProyectoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProyectoId");
-
-                    b.HasIndex("UsuarioId", "ProyectoId")
-                        .IsUnique();
-
-                    b.ToTable("ProyectoValidacionDescargo", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ReglaValidacion", b =>
@@ -2317,9 +2292,9 @@ namespace Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Provincia", "Provincia")
-                        .WithMany()
-                        .HasForeignKey("ProvinciaId");
+                    b.HasOne("Domain.Entities.Municipio", "Municipio")
+                        .WithMany("Proyectos")
+                        .HasForeignKey("MunicipioId");
 
                     b.HasOne("Domain.Entities.Usuario", "UsuarioCreador")
                         .WithMany("Proyectos")
@@ -2331,7 +2306,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Navigation("Estado");
 
-                    b.Navigation("Provincia");
+                    b.Navigation("Municipio");
 
                     b.Navigation("UsuarioCreador");
                 });
@@ -2388,25 +2363,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("InterestedUser");
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ProyectoValidacionDescargo", b =>
-                {
-                    b.HasOne("Domain.Entities.Proyecto", "Proyecto")
-                        .WithMany()
-                        .HasForeignKey("ProyectoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Proyecto");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Domain.Entities.Reporte", b =>
@@ -2598,6 +2554,11 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Documento", b =>
                 {
                     b.Navigation("Validaciones");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Municipio", b =>
+                {
+                    b.Navigation("Proyectos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Provincia", b =>

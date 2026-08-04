@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { FolderKanban, FileCheck, AlertCircle, TrendingUp } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { FolderKanban, FileCheck, Heart, TrendingUp } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useDashboardStats } from "../api/useDashboardStats";
+import { adminDashboardApi } from "../../../infrastructure/api/dashboard.api";
 
 import { DashboardPageLayout, DashboardTab } from "./DashboardPageLayout";
 import type { ProyectoRecienteDto } from "../../../infrastructure/api/dashboard.api";
@@ -26,17 +28,25 @@ export const DashboardPage: React.FC = React.memo(() => {
   }, [location.state]);
 
   const { data: statsData, isLoading: loading } = useDashboardStats();
+  const { data: userStatsData } = useQuery({
+    queryKey: ["dashboardStats", "user"],
+    queryFn: adminDashboardApi.getUserStats,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+  const navigate = useNavigate();
 
-  const { totalProjects, inReview, verified, offers, recentProjects } = useMemo(() => {
-    if (!statsData) return { totalProjects: 0, inReview: 0, verified: 0, offers: 0, recentProjects: [] as ProyectoRecienteDto[] };
+  const { totalProjects, inReview, verified, intereses, recentProjects } = useMemo(() => {
+    if (!statsData) return { totalProjects: 0, inReview: 0, verified: 0, intereses: 0, recentProjects: [] as ProyectoRecienteDto[] };
     return {
       totalProjects: statsData.totalProyectos || 0,
       inReview: statsData.proyectosPendientes || 0,
       verified: statsData.proyectosAprobados || 0,
-      offers: statsData.totalOfertas || 0,
+      intereses: userStatsData?.totalIntereses || statsData.totalIntereses || 0,
       recentProjects: statsData.proyectosRecientes || [],
     };
-  }, [statsData]);
+  }, [statsData, userStatsData]);
 
   const stats = useMemo(() => [
     {
@@ -58,12 +68,13 @@ export const DashboardPage: React.FC = React.memo(() => {
       bgColor: "bg-success",
     },
     {
-      name: "Ofertas",
-      stat: loading ? "..." : offers.toString(),
-      icon: AlertCircle,
+      name: "Proyectos de Interés",
+      stat: loading ? "..." : intereses.toString(),
+      icon: Heart,
       bgColor: "bg-warning",
+      onClick: () => navigate("/admin/projects?tab=intereses"),
     },
-  ], [loading, totalProjects, inReview, verified, offers]);
+  ], [loading, totalProjects, inReview, verified, intereses, navigate]);
 
   const recentSubscriptions = statsData?.suscripcionesRecientes || [];
 

@@ -5,10 +5,11 @@ import { GitCommitHorizontal } from "lucide-react";
 
 interface StatusHistoryProps {
   projectId: string;
+  hideAttribution?: boolean;
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  Creado: "bg-blue-100 text-blue-700 border-blue-200",
+  Creado: "bg-blue-50 text-blue-700 border-blue-200",
   Editado: "bg-amber-50 text-amber-700 border-amber-200",
   "En Revisión": "bg-orange-50 text-orange-700 border-orange-200",
   Revisión: "bg-orange-50 text-orange-700 border-orange-200",
@@ -27,14 +28,14 @@ const DOT_COLORS: Record<string, string> = {
   Observación: "bg-red-500 ring-red-100",
 };
 
-export const StatusHistory: React.FC<StatusHistoryProps> = ({ projectId }) => {
+export const StatusHistory: React.FC<StatusHistoryProps> = ({ projectId, hideAttribution }) => {
   const { data: entries = [], isLoading } = useStatusHistory(projectId);
 
   if (isLoading)
     return (
-      <div className="flex items-center gap-2 text-sm text-gray-500 py-4">
-        <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-        Cargando historial de estatus...
+      <div className="flex items-center gap-2 text-sm text-text-secondary py-4">
+        <div className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
+        Cargando historial...
       </div>
     );
 
@@ -42,19 +43,19 @@ export const StatusHistory: React.FC<StatusHistoryProps> = ({ projectId }) => {
     return null;
 
   return (
-    <section className="mb-8" aria-labelledby="status-history-heading">
+    <section aria-labelledby="status-history-heading">
       <h2
         id="status-history-heading"
-        className="text-lg font-semibold text-[var(--color-text-strong)] mb-4 flex items-center gap-2"
+        className="text-base font-display font-black text-secondary italic tracking-tighter mb-4 flex items-center gap-2"
       >
-        <GitCommitHorizontal className="w-5 h-5 text-[var(--color-brand-primary)]" aria-hidden="true" />
+        <GitCommitHorizontal className="w-5 h-5 text-primary" aria-hidden="true" />
         Historial de Estatus
       </h2>
 
-      <ol className="relative border-s-2 border-[var(--color-border,#DBEAFE)] ms-3 space-y-6">
+      <ol className="relative border-s-2 border-border ms-3 space-y-5">
         {entries.map((entry: StatusHistoryEntry) => {
-          const dotColor = DOT_COLORS[entry.estadoNuevoNombre] ?? "bg-gray-400 ring-gray-100";
-          const badgeStyle = STATUS_STYLES[entry.estadoNuevoNombre] ?? "bg-gray-50 text-gray-600 border-gray-200";
+          const dotColor = DOT_COLORS[entry.estadoNuevoNombre] ?? "bg-slate-400 ring-slate-100";
+          const badgeStyle = STATUS_STYLES[entry.estadoNuevoNombre] ?? "bg-slate-50 text-slate-600 border-slate-200";
 
           return (
             <li
@@ -69,25 +70,25 @@ export const StatusHistory: React.FC<StatusHistoryProps> = ({ projectId }) => {
 
               <time
                 dateTime={entry.fechaCambioUtc}
-                className="block text-xs font-medium leading-none text-gray-400 mb-1.5"
+                className="block text-xs font-medium text-text-secondary mb-1"
               >
                 {toUtcDate(entry.fechaCambioUtc)?.toLocaleString() ?? ""}
               </time>
 
               <div className="flex items-center gap-2 flex-wrap">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${badgeStyle}`}>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border ${badgeStyle}`}>
                   {entry.estadoNuevoNombre}
                 </span>
                 {entry.estadoAnteriorNombre && (
                   <>
-                    <span className="text-gray-400 text-xs" aria-hidden="true">←</span>
-                    <span className="text-xs text-gray-500">{entry.estadoAnteriorNombre}</span>
+                    <span className="text-text-secondary text-xs" aria-hidden="true">←</span>
+                    <span className="text-xs text-text-secondary">{entry.estadoAnteriorNombre}</span>
                   </>
                 )}
               </div>
 
-              {entry.usuarioNombre && (
-                <p className="text-xs text-gray-400 mt-1">
+              {!hideAttribution && entry.usuarioNombre && (
+                <p className="text-xs text-text-secondary mt-1">
                   por {entry.usuarioNombre}
                 </p>
               )}

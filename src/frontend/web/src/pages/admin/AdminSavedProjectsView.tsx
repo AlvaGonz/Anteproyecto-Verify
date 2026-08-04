@@ -88,7 +88,7 @@ export const AdminSavedProjectsView: React.FC = React.memo(() => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute top-4 left-4">
-                  <ProjectStatusBadge status={project.estadoIntegridad === 1 ? "Verificado" : "Procesando"} />
+                  <ProjectStatusBadge status={project.estadoProyecto === "PUBLICADO" ? "Verificado" : project.estadoProyecto === "OBSERVACION" ? "NoVerificado" : "ConObservaciones"} />
                 </div>
                 <div className="absolute bottom-4 right-4">
                   <span className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 flex items-center gap-1">

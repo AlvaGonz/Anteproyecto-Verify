@@ -189,15 +189,60 @@ public class ProjectServiceTests
     [Fact]
     public async Task GetProjectById_ShouldReturnNull_WhenNotExists()
     {
-        // Arrange
         var id = Guid.NewGuid();
         _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Proyecto?)null);
-
-        // Act
         var result = await _projectService.GetProjectByIdAsync(id);
-
-        // Assert
         Assert.Null(result);
+    }
+
+    // ── RED: Provincia relation ──────────────────────────────────────────
+
+    [Fact]
+    public async Task CreateProject_WithProvinciaId_ShouldIncludeProvinciaIdInDto()
+    {
+        var userId = Guid.NewGuid();
+        var provinciaId = Guid.NewGuid();
+        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123", ProvinciaId: provinciaId);
+
+        var plan = Tests.Shared.TestPlanFactory.Profesional();
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
+        user.GetType().GetProperty("Id")?.SetValue(user, userId);
+        user.GetType().GetProperty("Plan")?.SetValue(user, plan);
+        user.UpdateStripeSubscription("mock_sub", "active", DateTime.UtcNow.AddMonths(1));
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        _proyectoRepositoryMock.Setup(r => r.GetCategoriasAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CategoriaProyecto> { new CategoriaProyecto { Id = 8, Nombre = "COMERCIAL Y OFICINAS", Activo = true } });
+        _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8"));
+        _proyectoRepositoryMock.Setup(r => r.ExistsProvinciaAsync(provinciaId, It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        var result = await _projectService.CreateProjectAsync(dto);
+
+        Assert.NotNull(result);
+        Assert.Equal(provinciaId, result.ProvinciaId);
+    }
+
+    [Fact]
+    public async Task CreateProject_WithInvalidProvinciaId_ShouldThrow()
+    {
+        var userId = Guid.NewGuid();
+        var invalidProvinciaId = Guid.NewGuid();
+        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123", ProvinciaId: invalidProvinciaId);
+
+        var plan = Tests.Shared.TestPlanFactory.Profesional();
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
+        user.GetType().GetProperty("Id")?.SetValue(user, userId);
+        user.GetType().GetProperty("Plan")?.SetValue(user, plan);
+        user.UpdateStripeSubscription("mock_sub", "active", DateTime.UtcNow.AddMonths(1));
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        _proyectoRepositoryMock.Setup(r => r.GetCategoriasAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CategoriaProyecto> { new CategoriaProyecto { Id = 8, Nombre = "COMERCIAL Y OFICINAS", Activo = true } });
+        _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8"));
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _projectService.CreateProjectAsync(dto));
     }
 }
 

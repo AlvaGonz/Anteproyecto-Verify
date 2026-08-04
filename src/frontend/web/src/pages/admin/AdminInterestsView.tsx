@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
-import { Search, Users, Building2, X, BarChart3 } from "lucide-react";
+import { Search, Users, Heart, X, BarChart3 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 
 interface InterestRecord {
@@ -79,8 +79,8 @@ export const AdminInterestsView: React.FC = React.memo(() => {
           </div>
         </div>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-            <Building2 size={22} className="text-blue-600" />
+          <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center shrink-0">
+            <Heart size={22} className="text-warning" />
           </div>
           <div>
             <p className="text-2xl font-black text-slate-900">{misInteresesCount}</p>
@@ -222,7 +222,7 @@ export const AdminInterestsView: React.FC = React.memo(() => {
           ) : (
             <div className="text-center py-16 flex flex-col items-center justify-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
               <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <Building2 size={28} className="text-slate-300" />
+                <Heart size={28} className="text-slate-300" />
               </div>
               <h4 className="text-lg font-bold text-slate-700 mb-1">
                 {searchQuery

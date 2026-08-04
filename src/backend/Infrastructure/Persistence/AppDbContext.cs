@@ -47,6 +47,7 @@ public class AppDbContext : DbContext
     public DbSet<LogProyecto> LogProyectos => Set<LogProyecto>();
     public DbSet<ProyectoInteresado> ProyectosInteresados => Set<ProyectoInteresado>();
     public DbSet<ProyectoGuardado> ProyectosGuardados => Set<ProyectoGuardado>();
+    public DbSet<ProyectoValidacionDescargo> ProyectosValidacionDescargos => Set<ProyectoValidacionDescargo>();
 
     // External Data
     public DbSet<LicenciaConstruccion> LicenciasConstruccion => Set<LicenciaConstruccion>();
@@ -57,6 +58,10 @@ public class AppDbContext : DbContext
     public DbSet<PermisoSuelo> PermisosSuelo => Set<PermisoSuelo>();
     public DbSet<JCE_Ciudadano> JCE_Ciudadanos => Set<JCE_Ciudadano>();
     public DbSet<PagoIPI> PagosIPI => Set<PagoIPI>();
+
+    // Geo
+    public DbSet<Provincia> Provincias => Set<Provincia>();
+    public DbSet<Municipio> Municipios => Set<Municipio>();
 
     // Project Categories
     public DbSet<CategoriaProyecto> CategoriasProyecto => Set<CategoriaProyecto>();
@@ -115,6 +120,22 @@ public class AppDbContext : DbContext
             .HasOne(s => s.Usuario)
             .WithMany()
             .HasForeignKey(s => s.UsuarioId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ValidationDisclaimer Config
+        modelBuilder.Entity<ProyectoValidacionDescargo>()
+            .ToTable("ProyectoValidacionDescargo")
+            .HasIndex(d => new { d.UsuarioId, d.ProyectoId })
+            .IsUnique();
+        modelBuilder.Entity<ProyectoValidacionDescargo>()
+            .HasOne(d => d.Usuario)
+            .WithMany()
+            .HasForeignKey(d => d.UsuarioId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ProyectoValidacionDescargo>()
+            .HasOne(d => d.Proyecto)
+            .WithMany()
+            .HasForeignKey(d => d.ProyectoId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

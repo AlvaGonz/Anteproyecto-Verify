@@ -274,15 +274,6 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
           </div>
         </div>
       </div>
-
-      <div className="pt-10 border-t border-surface-container-high/50 flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant/40 italic">
-          <Lock className="w-3 h-3" /> Reporte de integridad encriptado con protocolo SHA-512
-        </div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-secondary/20 max-w-lg text-center leading-relaxed">
-          Ref: {projectId.split("-")[0].toUpperCase()}
-        </p>
-      </div>
     </section>
   );
 };

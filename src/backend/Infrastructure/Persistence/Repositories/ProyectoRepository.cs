@@ -25,6 +25,7 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Include(p => p.CategoriaProyecto)
+            .Include(p => p.Provincia!)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -37,6 +38,7 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Include(p => p.CategoriaProyecto)
+            .Include(p => p.Provincia!)
             .AsQueryable();
 
         if (usuarioId.HasValue)
@@ -410,5 +412,10 @@ public class ProyectoRepository : IProyectoRepository
             }
         }
         return result;
+    }
+
+    public async Task<bool> ExistsProvinciaAsync(Guid provinciaId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Provincias.AnyAsync(p => p.IdProvincia == provinciaId, cancellationToken);
     }
 }

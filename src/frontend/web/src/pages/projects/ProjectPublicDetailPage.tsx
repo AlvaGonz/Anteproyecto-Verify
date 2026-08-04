@@ -8,7 +8,7 @@ import { useProjectsInteractions, useInterests, useSavedProjects } from "../../f
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { PublicProjectReport } from "../../features/reports/components/PublicProjectReport";
+import { StatusHistory } from "../../features/reports/components/StatusHistory";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
 import { toUtcDate } from "../../shared/utils/dates";
@@ -17,7 +17,6 @@ import {
   MapPin,
   CheckCircle2,
   AlertTriangle,
-  Timer,
   Fingerprint,
   ShieldCheck,
   Calendar,
@@ -42,16 +41,7 @@ import { MiniMap } from "../../shared/components/ui/MiniMap";
 
 
 
-const getIntegrityInfo = (status: IntegrityStatus) => {
-  switch (status) {
-    case IntegrityStatus.Verified:
-      return { label: "VERIFICADO", icon: CheckCircle2, cls: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20", iconFill: true };
-    case IntegrityStatus.Failed:
-      return { label: "RECHAZADO", icon: AlertTriangle, cls: "bg-rose-500/10 text-rose-500 border border-rose-500/20", iconFill: false };
-    default:
-      return { label: "AUDITORÍA", icon: Timer, cls: "bg-amber-500/10 text-amber-500 border border-amber-500/20", iconFill: false };
-  }
-};
+
 
 export const ProjectPublicDetailPage: React.FC = () => {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
@@ -225,8 +215,6 @@ export const ProjectPublicDetailPage: React.FC = () => {
       </div>
     );
 
-  const integrityInfo = getIntegrityInfo(project.estadoIntegridad);
-  const IntIcon = integrityInfo.icon;
 
   // Gather all unique images
   const allImgs = [
@@ -501,7 +489,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           </div>
                           <div className="min-w-0">
                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Teléfono Directo</span>
-                            <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
+                             <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white break-words block">
                               {project.registradoPor.telefono}
                             </a>
                           </div>
@@ -657,47 +645,29 @@ export const ProjectPublicDetailPage: React.FC = () => {
                   });
                 }
               }}
-              className={`text-xs font-bold px-4 py-2 rounded shadow-sm transition-all duration-300 disabled:opacity-70 flex items-center gap-2 cursor-pointer ${localSaved ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-[0_0_10px_rgba(5,150,105,0.4)]" : "bg-primary text-white hover:bg-primary/90"
+              className={`w-full text-sm font-black px-4 py-3 rounded-2xl transition-all duration-300 disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer ${localSaved ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-[0_0_20px_-5px_rgba(5,150,105,0.4)]" : "bg-primary text-white hover:bg-primary-hover shadow-premium"
                 }`}
             >
               {isSaving || isUnsaving ? (
                 <>
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" />
                   <span>Procesando...</span>
                 </>
               ) : localSaved ? (
                 <>
-                  <CheckCircle2 size={14} />
+                  <CheckCircle2 size={16} />
                   <span>Guardado</span>
                 </>
               ) : (
-                <span>Guardar</span>
+                <>
+                  <span>Guardar</span>
+                </>
               )}
             </button>
 
-            {/* Integrity Status Card */}
-            <m.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", damping: 15 }}
-              className={`flex items-center gap-4 px-6 md:px-8 py-5 rounded-[2rem] shadow-2xl ${integrityInfo.cls}`}
-            >
-              <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center scale-110 shrink-0">
-                <IntIcon className="w-6 h-6 stroke-[3]" />
-              </div>
-              <div className="min-w-0">
-                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-60 block mb-0.5">Estado de Integridad</span>
-                <span className="font-display font-black text-xl md:text-2xl tracking-tighter italic truncate block">{integrityInfo.label}</span>
-              </div>
-            </m.div>
-
-            {/* Validation Timeline / Reports */}
-            <div className="space-y-6 md:space-y-8 mt-4 xl:mt-8">
-              <div className="flex items-center gap-4 px-4 md:px-0">
-                <div className="w-2 h-8 bg-on-surface-variant/20 rounded-full"></div>
-                <h2 className="text-2xl md:text-3xl font-display font-black text-secondary italic tracking-tighter uppercase opacity-60">Historial</h2>
-              </div>
-              <PublicProjectReport projectId={project.id} />
+            {/* Status Timeline */}
+            <div className="mt-4 xl:mt-8">
+              <StatusHistory projectId={project.id} hideAttribution />
             </div>
           </div>
         </div>
