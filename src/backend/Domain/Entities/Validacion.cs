@@ -24,8 +24,7 @@ public class Validacion : EntityBase
     public string? CamposValidadosJson { get; private set; }
 
     // Corporativo Fields (RF-11 to RF-15)
-    private readonly List<DatoValidado> _datosValidados = new();
-    public IReadOnlyCollection<DatoValidado> DatosValidados => _datosValidados.AsReadOnly();
+
 
     public SelloIntegridad? Sello { get; private set; }
     public Guid? SelloId { get; private set; }
@@ -65,11 +64,7 @@ public class Validacion : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
-    public void AddDatoValidado(DatoValidado dato)
-    {
-        _datosValidados.Add(dato);
-        UpdatedAtUtc = DateTime.UtcNow;
-    }
+
 
     public void AssignSello(SelloIntegridad sello)
     {
