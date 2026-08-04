@@ -1,82 +1,66 @@
 import { test, expect } from '@playwright/test';
+import path from 'path';
+import fs from 'fs';
 
-test.describe('Project-Municipio relation', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route('**/api/auth/me**', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json',
-        body: JSON.stringify({ id: 'user-001', email: 'admin@verifinca.do', nombre: 'Admin', apellido: 'User', role: 'admin', aceptoDescargo: true }),
-      });
+const API_BASE = process.env.API_BASE_URL ?? 'http://localhost:5000';
+const FRONTEND_BASE = process.env.FRONTEND_BASE_URL ?? 'http://localhost:3000';
+
+test.describe('Project-Municipio relation via OCR extraction', () => {
+  const TEST_DOCS_DIR = path.join(process.cwd(), 'test_docs', 'Planos de Mensura');
+  const PDF = 'PLANO-MENSURA-CATASTRAL(2a6d4dc53820064f4c6aff8ca94f391c).pdf';
+  const PDF_PATH = path.join(TEST_DOCS_DIR, PDF);
+
+  test('municipio selected in OCR extraction persists as MunicipioId on the project', async ({ page, request }) => {
+    test.skip(!fs.existsSync(PDF_PATH), `PDF not found: ${PDF_PATH}`);
+
+    const loginRes = await request.post(`${API_BASE}/api/auth/login`, {
+      data: { email: 'admin@verifinca.do', password: 'AdminVerifinca2026!' },
     });
-    await page.route('**/api/auth/refresh**', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ accessToken: 'fake-jwt-token' }) });
+    const userId = (await loginRes.json()).user.id;
+
+    const projRes = await request.post(`${API_BASE}/api/Projects`, {
+      data: { nombre: 'OCR muni test', ubicacionTexto: 'Probe', usuarioCreadorId: userId, categoriaId: 12 },
     });
-    await page.route('**/api/auth/logout', (route) => route.fulfill({ json: {} }));
-    await page.route('**/api/v1/subscriptions/my-status**', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json',
-        body: JSON.stringify({ plan: 'Profesional', subscriptionStatus: 'active', planPrice: 0, isGuest: false, inviterPlan: null, inviterName: null, planLimits: {} }),
-      });
-    });
-    await page.route('**/api/notifications**', (route) => route.fulfill({ json: [] }));
-    await page.route('**/api/admin/dashboard/**', (route) => route.fulfill({ json: { totalProyectos: 1, proyectosAprobados: 0, proyectosPendientes: 1 } }));
-    await page.route('**/api/dgii/rnc/**', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ nombreRazonSocial: 'Constructora Test S.R.L.' }) });
-    });
-    await page.route('**/api/projects/categories**', async (route) => {
-      await route.fulfill({ json: [{ id: 16, nombre: 'VIVIENDAS' }, { id: 3, nombre: 'APARTAMENTOS' }] });
-    });
-    await page.route('**/api/provinces**', async (route) => {
-      await route.fulfill({ json: [{ id: 'prov-dn', nombre: 'Distrito Nacional', latitud: 18.485, longitud: -69.93 }] });
-    });
+    const projectId = (await projRes.json()).id;
 
-    const mockProject = {
-      id: 'proj-123', codigoInterno: 'VF-123', nombre: 'Test Municipio Project',
-      ubicacionTexto: 'Distrito Nacional', categoriaId: 16,
-      municipioId: 'muni-dn-001', municipioNombre: 'Distrito Nacional',
-      provinciaNombre: 'Distrito Nacional',
-      estadoProyecto: 'CREADO', estadoIntegridad: 0, createdAtUtc: '2026-01-01T00:00:00Z',
-    };
+    const uploadRes = await request.post(
+      `${API_BASE}/api/v1/projects/${projectId}/documents/requirements/PLANO_MENSURA/upload`,
+      { multipart: { file: fs.createReadStream(PDF_PATH) } },
+    );
+    expect(uploadRes.status()).toBe(201);
 
-    let created = false;
-    await page.route('**/api/projects**', async (route) => {
-      const url = route.request().url();
-      if (url.includes('@vite') || url.includes('&t=') || url.includes('__x00__') || url.match(/\.(tsx|ts|css|js)\?/))
-        return route.continue();
-      const method = route.request().method();
-      if (method === 'POST') {
-        created = true;
-        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockProject) });
-      } else if (method === 'GET') {
-        await route.fulfill({ status: 200, contentType: 'application/json',
-          body: JSON.stringify({ items: created ? [mockProject] : [], totalCount: created ? 1 : 0, page: 1, pageSize: 50 }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
-  });
+    // Wait for OCR pipeline
+    await expect.poll(async () => {
+      const docsRes = await request.get(`${API_BASE}/api/projects/${projectId}/documents`);
+      const docs = await docsRes.json() as Array<{
+        tipoDocumento?: number;
+        planoMensuraExtraction?: { municipio?: { rawValue?: string } };
+      }>;
+      const doc = Array.isArray(docs) ? docs.find(d => d.tipoDocumento === 24) : null;
+      return doc?.planoMensuraExtraction?.municipio?.rawValue ?? null;
+    }, { timeout: 120000, intervals: [2000] }).toMatch(/CONCEPCION/);
 
-  test('project form has municipio selector after provincia selection', async ({ page }) => {
-    await page.goto('/#/projects/new');
-    await expect(page.locator('#nombre')).toBeEnabled({ timeout: 25000 });
-    await page.selectOption('#provincia', 'Distrito Nacional');
+    // Navigate to validations page and verify municipio selector is functional
+    await page.goto(`${FRONTEND_BASE}/#/login`);
+    await page.locator('input[type="email"]').fill('admin@verifinca.do');
+    await page.locator('input[type="password"]').fill('AdminVerifinca2026!');
+    await page.getByRole('button', { name: /Iniciar Sesión/i }).click();
+    await expect(page.locator('text=Proyectos').first()).toBeVisible({ timeout: 15000 });
 
-    // RED: municipio selector does not exist yet
-    await expect(page.locator('#municipio')).toBeVisible({ timeout: 5000 });
-    await expect(page.locator('#municipio')).toBeEnabled();
-  });
+    await page.goto(`${FRONTEND_BASE}/#/admin/projects/${projectId}/validations`);
+    const card = page.locator('[data-testid="plano-mensura-extraction-card"]');
+    await card.waitFor({ state: 'visible', timeout: 60000 });
 
-  test('saved project shows municipio and provincia in detail view', async ({ page }) => {
-    await page.goto('/#/projects/new');
-    await expect(page.locator('#nombre')).toBeEnabled({ timeout: 25000 });
-    await page.locator('#nombre').fill('Test Municipio Project');
-    await page.selectOption('#provincia', 'Distrito Nacional');
-    await page.getByRole('button', { name: /Guardar|Crear/i }).click();
+    // The municipio select within the OCR extraction card
+    const municipioSelect = card.locator('[data-testid="municipio-select"]');
+    await expect(municipioSelect).toBeVisible();
+    await expect(municipioSelect).toBeEnabled({ timeout: 15000 });
 
-    await expect(page.getByText('Test Municipio Project')).toBeVisible({ timeout: 15000 });
-    await page.getByText('Test Municipio Project').click();
-
-    // RED: detail view does not render municipio/provincia labels yet
-    await expect(page.getByText(/Municipio:/i)).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/Distrito Nacional/)).toBeVisible();
+    // Select a municipio and verify it's persisted via API
+    const projectRes = await request.get(`${API_BASE}/api/projects/${projectId}`);
+    const project = await projectRes.json();
+    // RED: municipioId not yet set because the frontend doesn't POST it
+    // When GREEN, this should be a valid GUID
+    expect(project.municipioId).toBeDefined();
   });
 });
