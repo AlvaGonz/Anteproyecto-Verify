@@ -6,6 +6,7 @@ export interface StatItem {
   stat: string;
   icon: React.ElementType;
   bgColor: string;
+  onClick?: () => void;
 }
 
 export interface DashboardStatsRowProps {
@@ -20,7 +21,8 @@ export const DashboardStatsRow: React.FC<DashboardStatsRowProps> = React.memo(({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 * idx, duration: 0.5 }}
-        className="vf-card p-0 overflow-hidden group hover:border-primary/40 transition-all shadow-sm"
+        className={`vf-card p-0 overflow-hidden group hover:border-primary/40 transition-all shadow-sm ${item.onClick ? "cursor-pointer" : ""}`}
+        onClick={item.onClick}
       >
         <div className="p-4 sm:p-6 flex items-center gap-4 sm:gap-5 min-w-0">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500 overflow-hidden relative">

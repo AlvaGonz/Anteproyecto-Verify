@@ -9,7 +9,7 @@ export interface DashboardChartsProps {
   proyectosPorMes: ProyectosPorMesDto[];
 }
 
-const MONTHS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
 const Sparkline: React.FC<{ data: { month: string; count: number }[] }> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -90,7 +90,7 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = React.memo(({ tot
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-lg font-display font-black tracking-tight">
-              Salud del <span className="text-[#F98513]">Sistema</span>
+              Salud de los <span className="text-[#F98513]">Proyectos</span>
             </h3>
           </div>
           <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-6">Proyectos aprobados vs total</p>

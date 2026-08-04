@@ -18,54 +18,55 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = R
 
   return (
   <>
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="w-10 h-10 rounded-full bg-[#223382]/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-[#223382]" />
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+      <div className="vf-card p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+            <Users className="w-5 h-5 text-secondary" />
           </div>
-          <p className="text-sm font-bold text-text-secondary uppercase tracking-wider">Total Usuarios</p>
+          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Total Usuarios</p>
         </div>
-        <p className="text-4xl font-display font-black text-text-primary">{loading ? "..." : statsData?.totalUsuarios}</p>
+        <p className="text-3xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalUsuarios}</p>
       </div>
 
-      <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+      <div className="vf-card p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-11 h-11 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
             <Activity className="w-5 h-5 text-success" />
           </div>
-          <p className="text-sm font-bold text-text-secondary uppercase tracking-wider">Suscripciones Activas</p>
+          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Suscripciones Activas</p>
         </div>
-        <p className="text-4xl font-display font-black text-text-primary">{loading ? "..." : statsData?.suscripcionesActivas}</p>
+        <p className="text-3xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.suscripcionesActivas}</p>
       </div>
 
-      <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+      <div className="vf-card p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
             <FileCheck className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Flujo: Consultas/Proyectos</p>
+          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Consultas · Proyectos</p>
         </div>
-        <div className="flex justify-between items-end mt-1">
+        <div className="flex justify-between items-end">
           <div>
-            <p className="text-xs text-text-secondary">Consultas</p>
-            <p className="text-2xl font-display font-black text-text-primary">{loading ? "..." : statsData?.totalConsultasRealizadas || 0}</p>
+            <p className="text-[10px] font-black text-text-secondary/50 uppercase tracking-wider mb-0.5">Consultas</p>
+            <p className="text-2xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalConsultasRealizadas || 0}</p>
           </div>
+          <div className="w-px h-10 bg-border self-center" />
           <div className="text-right">
-            <p className="text-xs text-text-secondary">Proyectos</p>
-            <p className="text-2xl font-display font-black text-text-primary">{loading ? "..." : statsData?.totalProyectosRegistrados || 0}</p>
+            <p className="text-[10px] font-black text-text-secondary/50 uppercase tracking-wider mb-0.5">Proyectos</p>
+            <p className="text-2xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalProyectosRegistrados || 0}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="w-10 h-10 rounded-full bg-[#F98513]/10 flex items-center justify-center">
-            <CreditCard className="w-5 h-5 text-[#F98513]" />
+      <div className="vf-card p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-11 h-11 rounded-xl bg-warning/10 flex items-center justify-center flex-shrink-0">
+            <CreditCard className="w-5 h-5 text-warning" />
           </div>
-          <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Flujo Mensual Estimado</p>
+          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Flujo Mensual Estimado</p>
         </div>
-        <p className="text-3xl font-display font-black text-text-primary">
+        <p className="text-3xl font-display font-black text-text-primary tracking-tighter">
           ${loading ? "..." : statsData?.ingresosMensualesEstimados.toLocaleString()}
         </p>
       </div>
