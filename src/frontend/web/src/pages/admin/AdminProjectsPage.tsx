@@ -13,6 +13,7 @@ import { useAuth } from "../../shared/context/AuthContext";
 import { Download } from "lucide-react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
 import { ExportInterestsModal } from "./ExportInterestsModal";
+import { ExportProjectsModal } from "./ExportProjectsModal";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { useNavigate } from "react-router-dom";
 
@@ -41,6 +42,7 @@ export const AdminProjectsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const pageSize = 20;
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isExportProjectsModalOpen, setIsExportProjectsModalOpen] = useState(false);
   const { data: intereses = [] } = useInterests(activeTab === "intereses");
 
   useEffect(() => {
@@ -127,73 +129,89 @@ export const AdminProjectsPage: React.FC = () => {
           </p>
         </div>
         {activeTab === "proyectos" && (
-          <Link
-            to="/admin/projects/new"
-            onClick={(e) => {
-              if (isAtLimit && user?.role !== "admin") {
-                e.preventDefault();
-                setShowLimitModal(true);
-              }
-            }}
-            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
-          >
-            <Plus className="w-5 h-5" />
-            Nuevo Expediente
-          </Link>
-        )}
-        {activeTab === "intereses" && (
-          <button
-            type="button"
-            onClick={() => setIsExportModalOpen(true)}
-            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
-          >
-            <Download className="w-5 h-5" />
-            Exportar
-          </button>
+          <div className="flex flex-col gap-2 w-full md:w-auto">
+            <Link
+              to="/admin/projects/new"
+              onClick={(e) => {
+                if (isAtLimit && user?.role !== "admin") {
+                  e.preventDefault();
+                  setShowLimitModal(true);
+                }
+              }}
+              className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              <Plus className="w-5 h-5" />
+              Nuevo Expediente
+            </Link>
+          </div>
         )}
       </div>
 
-      <div className="flex overflow-x-auto border-b border-slate-200">
-        <button
-          type="button"
-          onClick={() => setActiveTab("proyectos")}
-          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "proyectos"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-slate-400 hover:text-slate-600"
-            }`}
-        >
-          Proyectos
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("publicados")}
-          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "publicados"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-slate-400 hover:text-slate-600"
-            }`}
-        >
-          Proy. Publicados
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("intereses")}
-          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "intereses"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-slate-400 hover:text-slate-600"
-            }`}
-        >
-          Intereses
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("guardados")}
-          className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "guardados"
-              ? "border-[#223382] text-[#223382]"
-              : "border-transparent text-slate-400 hover:text-slate-600"
-            }`}
-        >
-          Proy. Guardados
-        </button>
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 gap-4 md:gap-0 pb-2 md:pb-0">
+        <div className="flex overflow-x-auto">
+          <button
+            type="button"
+            onClick={() => setActiveTab("proyectos")}
+            className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "proyectos"
+                ? "border-[#223382] text-[#223382]"
+                : "border-transparent text-slate-400 hover:text-slate-600"
+              }`}
+          >
+            Proyectos
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("publicados")}
+            className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "publicados"
+                ? "border-[#223382] text-[#223382]"
+                : "border-transparent text-slate-400 hover:text-slate-600"
+              }`}
+          >
+            Proy. Publicados
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("intereses")}
+            className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "intereses"
+                ? "border-[#223382] text-[#223382]"
+                : "border-transparent text-slate-400 hover:text-slate-600"
+              }`}
+          >
+            Intereses
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("guardados")}
+            className={`whitespace-nowrap flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all ${activeTab === "guardados"
+                ? "border-[#223382] text-[#223382]"
+                : "border-transparent text-slate-400 hover:text-slate-600"
+              }`}
+          >
+            Proy. Guardados
+          </button>
+        </div>
+        <div className="flex px-4 md:px-0 mb-2 md:mb-1">
+          {activeTab === "proyectos" && (
+            <button
+              type="button"
+              onClick={() => setIsExportProjectsModalOpen(true)}
+              className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-5 py-2 bg-primary text-white rounded-xl font-bold shadow-md shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer text-sm"
+            >
+              <Download className="w-4 h-4" />
+              Exportar Lis. Proy.
+            </button>
+          )}
+          {activeTab === "intereses" && (
+            <button
+              type="button"
+              onClick={() => setIsExportModalOpen(true)}
+              className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-5 py-2 bg-primary text-white rounded-xl font-bold shadow-md shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer text-sm"
+            >
+              <Download className="w-4 h-4" />
+              Exportar
+            </button>
+          )}
+        </div>
       </div>
 
       {activeTab === "proyectos" ? (
@@ -231,6 +249,10 @@ export const AdminProjectsPage: React.FC = () => {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         intereses={intereses}
+      />
+      <ExportProjectsModal
+        isOpen={isExportProjectsModalOpen}
+        onClose={() => setIsExportProjectsModalOpen(false)}
       />
       
       <LimitReachedModal

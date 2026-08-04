@@ -8,7 +8,6 @@ const ALL_STATUSES = [
   { value: ProjectStatus.InReview, label: "En Revisión" },
   { value: ProjectStatus.Observed, label: "Con Observaciones" },
   { value: ProjectStatus.Published, label: "Publicado" },
-  { value: ProjectStatus.Rejected, label: "Rechazado" },
 ];
 
 interface AdminProjectToolbarProps {
