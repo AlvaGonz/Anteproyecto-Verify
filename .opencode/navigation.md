@@ -37,6 +37,10 @@ This `.opencode/` system provides AI agent orchestration for the VeriFinca real 
     ├── feature-delivery-workflow.md     ← End-to-end feature delivery
     ├── validation-pipeline-workflow.md  ← Async validation implementation
     └── security-audit-workflow.md       ← Security review process
+
+Also at this level:
+- `ARCHITECTURE.md` — C4 diagram of the `.opencode/` system
+- `navigation.md` — this file, directory index
 ```
 
 ## Quick Start
@@ -89,5 +93,5 @@ For maximum efficiency, load context files in this order based on task type:
 | `.agents/docs/PRD_VeriFinca.md` | Product requirements for context |
 | `.agents/docs/DESIGN.md` | UI design tokens for frontend work |
 | `.agents/workflows/` | Existing workflow definitions |
-| `.agents/skills/` | 80 specialized skills for various tasks |
+| `.agents/skills/` | 49 specialized skills (registry: `skills-lock.json`) |
 | `.agents/rules/` | Repository conventions and protocols |

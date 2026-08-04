@@ -22,30 +22,6 @@ namespace Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.Acceso", b =>
-                {
-                    b.Property<Guid>("IdAcceso")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IdAcceso");
-
-                    b.Property<Guid?>("IdPerfil")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IdPerfil");
-
-                    b.Property<Guid?>("IdUsuario")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IdUsuario");
-
-                    b.HasKey("IdAcceso");
-
-                    b.HasIndex("IdPerfil");
-
-                    b.HasIndex("IdUsuario");
-
-                    b.ToTable("Acceso", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Entities.AlertaValidacion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -124,6 +100,12 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("EntidadId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("EstadoAnteriorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("EstadoNuevoId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("FechaEventoUtc")
                         .HasColumnType("datetime2");
 
@@ -159,6 +141,10 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EstadoAnteriorId");
+
+                    b.HasIndex("EstadoNuevoId");
+
                     b.HasIndex("ProyectoId");
 
                     b.HasIndex("UsuarioId");
@@ -193,10 +179,12 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("Latitud")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
 
                     b.Property<decimal?>("Longitud")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
 
                     b.Property<string>("Matricula")
                         .HasColumnType("nvarchar(max)");
@@ -217,6 +205,7 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Superficie")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("VieneDe")
@@ -882,6 +871,7 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Cuota_ipi")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Estatus")
@@ -972,10 +962,12 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("Latitud")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
 
                     b.Property<decimal?>("Longitud")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
 
                     b.Property<string>("Lugar")
                         .HasColumnType("nvarchar(max)");
@@ -1002,6 +994,7 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Superficie")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TienePermiso")
@@ -1705,6 +1698,10 @@ namespace Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("IdentificacionPublicaModo")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime?>("Last2FAVerifiedUtc")
                         .HasColumnType("datetime2");
 
@@ -1734,6 +1731,10 @@ namespace Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("nvarchar(max)")
                         .HasComputedColumnSql("[Nombre] + ' ' + [Apellido]", true);
+
+                    b.Property<string>("NombrePublicoModo")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PasswordResetToken")
                         .HasColumnType("nvarchar(max)");
@@ -1840,44 +1841,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("TitularId");
 
                     b.ToTable("Usuario", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.UsuarioLegacy", b =>
-                {
-                    b.Property<Guid>("IdUsuario")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Apellido")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cedula")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContrasenaHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NombreCompleto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefono")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdUsuario");
-
-                    b.ToTable("UsuariosLegacy");
                 });
 
             modelBuilder.Entity("Domain.Entities.Validacion", b =>
@@ -2048,23 +2011,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Verificacion2FA", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Acceso", b =>
-                {
-                    b.HasOne("Domain.Entities.Perfil", "Perfil")
-                        .WithMany()
-                        .HasForeignKey("IdPerfil")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Entities.UsuarioLegacy", "UsuarioLegacy")
-                        .WithMany()
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Perfil");
-
-                    b.Navigation("UsuarioLegacy");
-                });
-
             modelBuilder.Entity("Domain.Entities.AlertaValidacion", b =>
                 {
                     b.HasOne("Domain.Entities.Documento", "Documento")
@@ -2084,6 +2030,16 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Auditoria", b =>
                 {
+                    b.HasOne("Domain.Entities.ProyectoEstado", "EstadoAnterior")
+                        .WithMany()
+                        .HasForeignKey("EstadoAnteriorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.ProyectoEstado", "EstadoNuevo")
+                        .WithMany()
+                        .HasForeignKey("EstadoNuevoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Domain.Entities.Proyecto", "Proyecto")
                         .WithMany("Auditorias")
                         .HasForeignKey("ProyectoId")
@@ -2093,6 +2049,10 @@ namespace Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("EstadoAnterior");
+
+                    b.Navigation("EstadoNuevo");
 
                     b.Navigation("Proyecto");
 
@@ -2216,8 +2176,8 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Pago", b =>
                 {
-                    b.HasOne("Domain.Entities.UsuarioLegacy", "UsuarioLegacy")
-                        .WithMany("Pagos")
+                    b.HasOne("Domain.Entities.Usuario", "Usuario")
+                        .WithMany()
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -2228,7 +2188,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Navigation("PlanSuscripcion");
 
-                    b.Navigation("UsuarioLegacy");
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Domain.Entities.PerfilPermiso", b =>
@@ -2545,11 +2505,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("MiembrosEquipo");
 
                     b.Navigation("Proyectos");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UsuarioLegacy", b =>
-                {
-                    b.Navigation("Pagos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Validacion", b =>

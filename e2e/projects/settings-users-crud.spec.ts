@@ -123,8 +123,7 @@ function cardFor(page: Page, name: string) {
 
 async function openUsersTab(page: Page) {
   await page.goto('/#/admin/settings');
-  await page.waitForLoadState('networkidle');
-  await page.getByRole('button', { name: 'Usuarios y Accesos' }).click();
+  await page.getByRole('tab', { name: 'Usuarios y Accesos' }).click();
   await expect(page.getByRole('button', { name: 'Corporativo 2' })).toBeVisible();
 }
 

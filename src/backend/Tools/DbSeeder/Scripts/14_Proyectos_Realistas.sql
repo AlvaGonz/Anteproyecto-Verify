@@ -58,11 +58,23 @@ BEGIN
         1,
         0,
         0,
-        '2026-07-29T04:03:16'
+        '2026-07-30T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('3946C9A7-D681-0B83-76EA-CFB5920258BF', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), '2026-07-29T04:03:16', 'Creacion de proyecto: Villa Los Cacicazgos', '2026-07-29T04:03:16', '2026-07-29T04:03:16');
+    VALUES ('3946C9A7-D681-0B83-76EA-CFB5920258BF', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), '2026-07-30T19:09:15', 'Creacion de proyecto: Villa Los Cacicazgos', '2026-07-30T19:09:15', '2026-07-30T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('4E3FFA3B-2B8B-0F2A-690F-FE25348BC12A', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', '2026-07-30T19:09:15', '2026-07-30T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8DD48AD3-4F1F-6DC9-3897-D5422A023F88', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', '2026-07-30T22:09:15', '2026-07-30T22:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A2E65664-4D3E-C589-3598-8E5A70B283AC', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', '2026-08-02T01:09:15', '2026-08-02T01:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('BDBBC8B5-9A49-2685-95FA-D506783CFDAF', (SELECT IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do'), 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', 'F3CD8CE1-B816-AAF8-5177-E90767DE8F74', '2026-08-02T01:09:15', '2026-08-02T01:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 -- ============================================================
@@ -96,11 +108,14 @@ BEGIN
         1,
         0,
         0,
-        '2026-04-03T04:03:16'
+        '2026-04-04T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A56257B0-9710-F68A-F3A0-543157BE3FD8', '820FA5F2-2BCC-A04D-5B13-FC63ABBC0048', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-04-03T04:03:16', 'Creacion de proyecto: Residencial Sosua Resort', '2026-04-03T04:03:16', '2026-04-03T04:03:16');
+    VALUES ('A56257B0-9710-F68A-F3A0-543157BE3FD8', '820FA5F2-2BCC-A04D-5B13-FC63ABBC0048', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-04-04T19:09:15', 'Creacion de proyecto: Residencial Sosua Resort', '2026-04-04T19:09:15', '2026-04-04T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('142AEE70-B7F9-9C31-366D-F5E3B10A93BA', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '820FA5F2-2BCC-A04D-5B13-FC63ABBC0048', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '820FA5F2-2BCC-A04D-5B13-FC63ABBC0048', '2026-04-04T19:09:15', '2026-04-04T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-19606')
@@ -131,11 +146,14 @@ BEGIN
         2,
         0,
         0,
-        '2026-06-25T04:03:16'
+        '2026-06-26T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('4F608335-FD32-53B2-2476-A3C2322E5269', 'CF06F7ED-8C57-E720-8F59-BA555239D6D5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-06-25T04:03:16', 'Creacion de proyecto: Don Bosco Oeste', '2026-06-25T04:03:16', '2026-06-25T04:03:16');
+    VALUES ('4F608335-FD32-53B2-2476-A3C2322E5269', 'CF06F7ED-8C57-E720-8F59-BA555239D6D5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-06-26T19:09:15', 'Creacion de proyecto: Don Bosco Oeste', '2026-06-26T19:09:15', '2026-06-26T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D105C6C8-80DB-2D9A-B9AA-E94CEDA7E65A', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), 'CF06F7ED-8C57-E720-8F59-BA555239D6D5', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'CF06F7ED-8C57-E720-8F59-BA555239D6D5', '2026-06-26T19:09:15', '2026-06-26T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-44863')
@@ -166,11 +184,14 @@ BEGIN
         0,
         1,
         0,
-        '2026-07-31T04:03:16'
+        '2026-08-01T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('BE28DAE2-626E-68E7-FB2D-E5B5C90BFAC2', '3B24D85B-7D5E-445A-702D-3B66D73C4C1B', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-07-31T04:03:16', 'Creacion de proyecto: Portales Bayahibe', '2026-07-31T04:03:16', '2026-07-31T04:03:16');
+    VALUES ('BE28DAE2-626E-68E7-FB2D-E5B5C90BFAC2', '3B24D85B-7D5E-445A-702D-3B66D73C4C1B', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-08-01T19:09:15', 'Creacion de proyecto: Portales Bayahibe', '2026-08-01T19:09:15', '2026-08-01T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('065D0AD5-74EC-A0DA-8ACE-392254FCABF8', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '3B24D85B-7D5E-445A-702D-3B66D73C4C1B', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '3B24D85B-7D5E-445A-702D-3B66D73C4C1B', '2026-08-01T19:09:15', '2026-08-01T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-41495')
@@ -201,11 +222,23 @@ BEGIN
         0,
         2,
         0,
-        '2026-05-16T04:03:16'
+        '2026-05-17T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('ED9EDE68-E6A2-4F73-B50A-7691A04B8762', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-05-16T04:03:16', 'Creacion de proyecto: Edificio Cumayasa Empresarial', '2026-05-16T04:03:16', '2026-05-16T04:03:16');
+    VALUES ('ED9EDE68-E6A2-4F73-B50A-7691A04B8762', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-05-17T19:09:15', 'Creacion de proyecto: Edificio Cumayasa Empresarial', '2026-05-17T19:09:15', '2026-05-17T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('2AB0CC72-F724-2ACA-7222-B702D241492B', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '306E7B43-3653-9DC5-A658-D453F3C0A0E5', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', '2026-05-17T19:09:15', '2026-05-17T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DF92355A-EE87-C2E6-8CE3-8FEE2FB932C7', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '306E7B43-3653-9DC5-A658-D453F3C0A0E5', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', '2026-05-18T09:09:15', '2026-05-18T09:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('70D0CDBC-524A-32C7-D8F1-B39298A733CA', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '306E7B43-3653-9DC5-A658-D453F3C0A0E5', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', '2026-05-20T09:09:15', '2026-05-20T09:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('B7B2484B-C082-6248-E922-43B822D05E9F', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '306E7B43-3653-9DC5-A658-D453F3C0A0E5', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '306E7B43-3653-9DC5-A658-D453F3C0A0E5', '2026-05-18T01:09:15', '2026-05-18T01:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-10736')
@@ -236,11 +269,23 @@ BEGIN
         0,
         2,
         0,
-        '2026-07-05T04:03:16'
+        '2026-07-06T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('86DFFCC3-C50A-F8DC-8BBC-731821A718A9', '45D831DA-7D05-D478-43C5-2A434E80CA34', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-07-05T04:03:16', 'Creacion de proyecto: Paseo Arroyo Hondo Suites', '2026-07-05T04:03:16', '2026-07-05T04:03:16');
+    VALUES ('86DFFCC3-C50A-F8DC-8BBC-731821A718A9', '45D831DA-7D05-D478-43C5-2A434E80CA34', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '2026-07-06T19:09:15', 'Creacion de proyecto: Paseo Arroyo Hondo Suites', '2026-07-06T19:09:15', '2026-07-06T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('06535AE7-13B5-4173-ADEA-68B30DE775DA', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '45D831DA-7D05-D478-43C5-2A434E80CA34', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '45D831DA-7D05-D478-43C5-2A434E80CA34', '2026-07-06T19:09:15', '2026-07-06T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('C5168AB4-ED66-54C0-49E2-51A9813B31AF', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '45D831DA-7D05-D478-43C5-2A434E80CA34', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '45D831DA-7D05-D478-43C5-2A434E80CA34', '2026-07-07T11:09:15', '2026-07-07T11:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('6C91FEA9-A944-78A4-1A52-5ADD1FB0CA06', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '45D831DA-7D05-D478-43C5-2A434E80CA34', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '45D831DA-7D05-D478-43C5-2A434E80CA34', '2026-07-09T23:09:15', '2026-07-09T23:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('F8F3F1A0-CA49-C586-FC16-1C332916DD06', (SELECT IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do'), '45D831DA-7D05-D478-43C5-2A434E80CA34', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '45D831DA-7D05-D478-43C5-2A434E80CA34', '2026-07-11T01:09:15', '2026-07-11T01:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 -- ============================================================
@@ -274,11 +319,14 @@ BEGIN
         1,
         0,
         0,
-        '2026-04-03T04:03:16'
+        '2026-04-04T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('50B67442-D26D-09C1-1CF6-C99FAC348FF1', '0AA5C477-C613-EB19-8ED2-6F4705A2F44B', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-04-03T04:03:16', 'Creacion de proyecto: Mirador Los Prados Oeste', '2026-04-03T04:03:16', '2026-04-03T04:03:16');
+    VALUES ('50B67442-D26D-09C1-1CF6-C99FAC348FF1', '0AA5C477-C613-EB19-8ED2-6F4705A2F44B', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-04-04T19:09:15', 'Creacion de proyecto: Mirador Los Prados Oeste', '2026-04-04T19:09:15', '2026-04-04T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8B784310-9188-120F-3C05-32921B77B59C', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '0AA5C477-C613-EB19-8ED2-6F4705A2F44B', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '0AA5C477-C613-EB19-8ED2-6F4705A2F44B', '2026-04-04T19:09:15', '2026-04-04T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-71297')
@@ -309,11 +357,20 @@ BEGIN
         1,
         0,
         0,
-        '2026-07-07T04:03:16'
+        '2026-07-08T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('CD4286FD-C91D-1DA4-9907-B0D009CFB87C', '7762A0B9-0A6C-B16D-68DA-32714C92AC60', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-07T04:03:16', 'Creacion de proyecto: Edificio Rio San Juan Suites', '2026-07-07T04:03:16', '2026-07-07T04:03:16');
+    VALUES ('CD4286FD-C91D-1DA4-9907-B0D009CFB87C', '7762A0B9-0A6C-B16D-68DA-32714C92AC60', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-08T19:09:15', 'Creacion de proyecto: Edificio Rio San Juan Suites', '2026-07-08T19:09:15', '2026-07-08T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8FC16C11-4094-E2B1-29CB-D326D3FC3CB4', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '7762A0B9-0A6C-B16D-68DA-32714C92AC60', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '7762A0B9-0A6C-B16D-68DA-32714C92AC60', '2026-07-08T19:09:15', '2026-07-08T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('AAE65CE7-B8DA-90FE-0A7C-BA17183B1E50', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '7762A0B9-0A6C-B16D-68DA-32714C92AC60', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '7762A0B9-0A6C-B16D-68DA-32714C92AC60', '2026-07-08T23:09:15', '2026-07-08T23:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('FF0EE651-382E-355A-E9ED-755A21D358E2', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '7762A0B9-0A6C-B16D-68DA-32714C92AC60', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '7762A0B9-0A6C-B16D-68DA-32714C92AC60', '2026-07-11T17:09:15', '2026-07-11T17:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-5341')
@@ -344,11 +401,23 @@ BEGIN
         0,
         3,
         0,
-        '2026-07-16T04:03:16'
+        '2026-07-17T19:09:15'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('82174921-C2E4-358B-6CD3-E44FDEF4789D', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-16T04:03:16', 'Creacion de proyecto: Viviendas Casa de Campo Park', '2026-07-16T04:03:16', '2026-07-16T04:03:16');
+    VALUES ('82174921-C2E4-358B-6CD3-E44FDEF4789D', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-17T19:09:15', 'Creacion de proyecto: Viviendas Casa de Campo Park', '2026-07-17T19:09:15', '2026-07-17T19:09:15');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('B166A7F4-F379-61B3-E373-1FF3AAC4B762', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', '2026-07-17T19:09:15', '2026-07-17T19:09:15', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DC637DA1-7B9B-2705-7EBC-A92BBD5006D8', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', '2026-07-18T08:09:15', '2026-07-18T08:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('9E54049B-B830-7A60-C4CA-8E80AEAEBED3', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', '2026-07-18T15:09:15', '2026-07-18T15:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('2B258C7D-0321-D39C-C53A-22E1F7EED19B', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', '2026-07-22T13:09:15', '2026-07-22T13:09:15', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-80667')
@@ -379,11 +448,14 @@ BEGIN
         1,
         3,
         0,
-        '2026-03-05T04:03:16'
+        '2026-03-06T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('D7CBBA99-8393-BA49-B897-A461AF71F900', 'E2C3FE42-54FB-F74F-4DC3-2B3D049AFD50', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-03-05T04:03:16', 'Creacion de proyecto: Jardines Reparto del Este', '2026-03-05T04:03:16', '2026-03-05T04:03:16');
+    VALUES ('D7CBBA99-8393-BA49-B897-A461AF71F900', 'E2C3FE42-54FB-F74F-4DC3-2B3D049AFD50', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-03-06T19:09:16', 'Creacion de proyecto: Jardines Reparto del Este', '2026-03-06T19:09:16', '2026-03-06T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DDF421EC-F574-9C8A-E146-2B69E0DD60A0', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'E2C3FE42-54FB-F74F-4DC3-2B3D049AFD50', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'E2C3FE42-54FB-F74F-4DC3-2B3D049AFD50', '2026-03-06T19:09:16', '2026-03-06T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-39483')
@@ -414,11 +486,23 @@ BEGIN
         2,
         0,
         0,
-        '2026-07-20T04:03:16'
+        '2026-07-21T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('B22111D3-C4F3-6B53-B615-DB86A3CC7AEE', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-20T04:03:16', 'Creacion de proyecto: Portales Naco Beach', '2026-07-20T04:03:16', '2026-07-20T04:03:16');
+    VALUES ('B22111D3-C4F3-6B53-B615-DB86A3CC7AEE', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-21T19:09:16', 'Creacion de proyecto: Portales Naco Beach', '2026-07-21T19:09:16', '2026-07-21T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('0E54E935-1028-4F5D-293F-999FDA75B824', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', '2026-07-21T19:09:16', '2026-07-21T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('C92CB389-97FD-A1A0-EB04-AAFAC8E4AD80', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', '2026-07-22T05:09:16', '2026-07-22T05:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('858F49BD-A25C-93B4-7703-36A56065D46F', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', '2026-07-24T15:09:16', '2026-07-24T15:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A4773437-9132-AA05-5F56-79D5B9515C0C', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', 'C05D6BCB-19A2-444D-A2C0-AE736AB48B46', '2026-07-22T04:09:16', '2026-07-22T04:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-23399')
@@ -449,11 +533,17 @@ BEGIN
         0,
         2,
         0,
-        '2026-02-23T04:03:16'
+        '2026-02-24T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('55748755-E3FD-32D4-96E2-8EE2F4C50087', 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-23T04:03:16', 'Creacion de proyecto: Complejo Quisqueya del Sur', '2026-02-23T04:03:16', '2026-02-23T04:03:16');
+    VALUES ('55748755-E3FD-32D4-96E2-8EE2F4C50087', 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-24T19:09:16', 'Creacion de proyecto: Complejo Quisqueya del Sur', '2026-02-24T19:09:16', '2026-02-24T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8C53B648-102D-A288-CB86-441BB05D7A86', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', '2026-02-24T19:09:16', '2026-02-24T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DFF8760D-115F-1265-5BEC-1FE526D9BE8A', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'CC90C9F4-33ED-3F4B-4271-D7AA7326ED61', '2026-02-26T17:09:16', '2026-02-26T17:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-67610')
@@ -484,11 +574,14 @@ BEGIN
         0,
         1,
         0,
-        '2026-07-16T04:03:16'
+        '2026-07-17T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('060A07A9-FE07-6CB0-816B-7F49F4A73009', '23FAC32A-7DCA-F4FF-ABB8-D9DB4C16B966', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-16T04:03:16', 'Creacion de proyecto: Plaza Altos de Chavon', '2026-07-16T04:03:16', '2026-07-16T04:03:16');
+    VALUES ('060A07A9-FE07-6CB0-816B-7F49F4A73009', '23FAC32A-7DCA-F4FF-ABB8-D9DB4C16B966', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-17T19:09:16', 'Creacion de proyecto: Plaza Altos de Chavon', '2026-07-17T19:09:16', '2026-07-17T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('83772705-9437-E9EC-38FD-A8B50C16CB7F', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '23FAC32A-7DCA-F4FF-ABB8-D9DB4C16B966', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '23FAC32A-7DCA-F4FF-ABB8-D9DB4C16B966', '2026-07-17T19:09:16', '2026-07-17T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-6182')
@@ -519,11 +612,23 @@ BEGIN
         2,
         1,
         0,
-        '2026-06-23T04:03:16'
+        '2026-06-24T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('5573BAE9-F050-1F1B-49D5-199CFAE4A279', '159C5866-E5F7-6E21-483B-37689050BEA1', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-06-23T04:03:16', 'Creacion de proyecto: Edificio Playa Dorada Turistico', '2026-06-23T04:03:16', '2026-06-23T04:03:16');
+    VALUES ('5573BAE9-F050-1F1B-49D5-199CFAE4A279', '159C5866-E5F7-6E21-483B-37689050BEA1', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-06-24T19:09:16', 'Creacion de proyecto: Edificio Playa Dorada Turistico', '2026-06-24T19:09:16', '2026-06-24T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DAD729F8-9445-C295-77AF-F17331B89A0D', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '159C5866-E5F7-6E21-483B-37689050BEA1', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '159C5866-E5F7-6E21-483B-37689050BEA1', '2026-06-24T19:09:16', '2026-06-24T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('63B7D7B6-FFC4-66B7-E1E8-BF2EE688070C', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '159C5866-E5F7-6E21-483B-37689050BEA1', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '159C5866-E5F7-6E21-483B-37689050BEA1', '2026-06-26T11:09:16', '2026-06-26T11:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('2B6CF4F5-3E11-FFC9-1BAA-3B49927D21EA', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '159C5866-E5F7-6E21-483B-37689050BEA1', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '159C5866-E5F7-6E21-483B-37689050BEA1', '2026-06-26T23:09:16', '2026-06-26T23:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D309061C-72AD-2381-558E-8C772C840352', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '159C5866-E5F7-6E21-483B-37689050BEA1', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '159C5866-E5F7-6E21-483B-37689050BEA1', '2026-06-25T10:09:16', '2026-06-25T10:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-94259')
@@ -554,11 +659,23 @@ BEGIN
         0,
         1,
         0,
-        '2026-02-22T04:03:16'
+        '2026-02-23T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('91B72BA8-0A77-1875-2A9E-E23DFC752631', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-22T04:03:16', 'Creacion de proyecto: Torre Los Restauradores Metropolitano', '2026-02-22T04:03:16', '2026-02-22T04:03:16');
+    VALUES ('91B72BA8-0A77-1875-2A9E-E23DFC752631', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-02-23T19:09:16', 'Creacion de proyecto: Torre Los Restauradores Metropolitano', '2026-02-23T19:09:16', '2026-02-23T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('6B340D85-A584-6E70-2A6E-10CD94628A3F', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'D7E7BA70-3757-876A-CA5D-DB5D40394659', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', '2026-02-23T19:09:16', '2026-02-23T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('2A749496-0A41-C479-A196-6D0EC1EE6686', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'D7E7BA70-3757-876A-CA5D-DB5D40394659', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', '2026-02-23T21:09:16', '2026-02-23T21:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8C9D7A3C-5AF4-BC9C-BD4C-633B4F2253B3', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'D7E7BA70-3757-876A-CA5D-DB5D40394659', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', '2026-02-27T09:09:16', '2026-02-27T09:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('9CEE2DEE-E741-13B6-EE30-E9F47F225EFA', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), 'D7E7BA70-3757-876A-CA5D-DB5D40394659', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', 'D7E7BA70-3757-876A-CA5D-DB5D40394659', '2026-03-01T16:09:16', '2026-03-01T16:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-2894')
@@ -589,11 +706,14 @@ BEGIN
         0,
         1,
         0,
-        '2026-07-20T04:03:16'
+        '2026-07-21T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('82007172-ED8A-14A5-6B67-B0686EC84D2F', '6DE91B1C-BDC3-2A70-3676-1292D1C1CF57', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-20T04:03:16', 'Creacion de proyecto: Residencial Jarabacoa Norte', '2026-07-20T04:03:16', '2026-07-20T04:03:16');
+    VALUES ('82007172-ED8A-14A5-6B67-B0686EC84D2F', '6DE91B1C-BDC3-2A70-3676-1292D1C1CF57', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '2026-07-21T19:09:16', 'Creacion de proyecto: Residencial Jarabacoa Norte', '2026-07-21T19:09:16', '2026-07-21T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('2E65147D-4876-7E00-ED85-E9E1B5D95BB6', (SELECT IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do'), '6DE91B1C-BDC3-2A70-3676-1292D1C1CF57', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '6DE91B1C-BDC3-2A70-3676-1292D1C1CF57', '2026-07-21T19:09:16', '2026-07-21T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 -- ============================================================
@@ -627,11 +747,14 @@ BEGIN
         0,
         0,
         0,
-        '2026-07-18T04:03:16'
+        '2026-07-19T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('49225228-AEB6-0C1F-856F-2D05F36A2E0C', '3EE73396-E7AB-6326-CE77-07B37E6C2209', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-18T04:03:16', 'Creacion de proyecto: Complejo Bavaro Beach', '2026-07-18T04:03:16', '2026-07-18T04:03:16');
+    VALUES ('49225228-AEB6-0C1F-856F-2D05F36A2E0C', '3EE73396-E7AB-6326-CE77-07B37E6C2209', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-19T19:09:16', 'Creacion de proyecto: Complejo Bavaro Beach', '2026-07-19T19:09:16', '2026-07-19T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('120EA772-E60C-EF7D-D96B-530E13D9972E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3EE73396-E7AB-6326-CE77-07B37E6C2209', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '3EE73396-E7AB-6326-CE77-07B37E6C2209', '2026-07-19T19:09:16', '2026-07-19T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-89350')
@@ -662,11 +785,20 @@ BEGIN
         1,
         1,
         0,
-        '2026-02-12T04:03:16'
+        '2026-02-13T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('B498D443-8C58-A873-A167-DD681DC43353', 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-12T04:03:16', 'Creacion de proyecto: Gazcue Metropolitano', '2026-02-12T04:03:16', '2026-02-12T04:03:16');
+    VALUES ('B498D443-8C58-A873-A167-DD681DC43353', 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-13T19:09:16', 'Creacion de proyecto: Gazcue Metropolitano', '2026-02-13T19:09:16', '2026-02-13T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('448BAFA9-7F9E-648C-71AC-5F7649F034A5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', '2026-02-13T19:09:16', '2026-02-13T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('762EC54B-AD18-B5A4-5FB8-4DD7407A23C3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', '2026-02-14T11:09:16', '2026-02-14T11:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('ADC04F7B-3CD9-6CF9-0D53-A31D097D131B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'FDBDCFDC-A7BE-8625-6E77-E5C457D9A5CE', '2026-02-16T19:09:16', '2026-02-16T19:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-60810')
@@ -697,11 +829,23 @@ BEGIN
         0,
         0,
         0,
-        '2026-05-15T04:03:16'
+        '2026-05-16T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('FF3A179D-46A9-FF64-EB81-0624A157EAED', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-15T04:03:16', 'Creacion de proyecto: Terrazas Sosua', '2026-05-15T04:03:16', '2026-05-15T04:03:16');
+    VALUES ('FF3A179D-46A9-FF64-EB81-0624A157EAED', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-16T19:09:16', 'Creacion de proyecto: Terrazas Sosua', '2026-05-16T19:09:16', '2026-05-16T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('B462BD3E-BBA9-EF74-FA3B-4C23BDC64663', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3B4259BD-5508-B580-C0EA-E3E44F949ECC', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', '2026-05-16T19:09:16', '2026-05-16T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('6FEE852D-A816-0A56-1B47-CCBED9B281C9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3B4259BD-5508-B580-C0EA-E3E44F949ECC', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', '2026-05-17T22:09:16', '2026-05-17T22:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A16F2713-363F-623C-C5F4-994AFE62AB37', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3B4259BD-5508-B580-C0EA-E3E44F949ECC', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', '2026-05-18T19:09:16', '2026-05-18T19:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('628A2B36-BDB5-74F1-54AE-7FA9401B8995', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3B4259BD-5508-B580-C0EA-E3E44F949ECC', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '3B4259BD-5508-B580-C0EA-E3E44F949ECC', '2026-05-21T19:09:16', '2026-05-21T19:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-35835')
@@ -732,11 +876,23 @@ BEGIN
         0,
         0,
         0,
-        '2026-04-02T04:03:16'
+        '2026-04-03T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('66B91EBA-5021-8B83-0A34-5C31D19A883E', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-02T04:03:16', 'Creacion de proyecto: Viviendas Los Corales', '2026-04-02T04:03:16', '2026-04-02T04:03:16');
+    VALUES ('66B91EBA-5021-8B83-0A34-5C31D19A883E', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-03T19:09:16', 'Creacion de proyecto: Viviendas Los Corales', '2026-04-03T19:09:16', '2026-04-03T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('42563A21-9229-DCCC-5428-CA4B5715A529', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '59EAAEEF-E71D-131F-4383-DAE2644F0F51', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', '2026-04-03T19:09:16', '2026-04-03T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('44197082-CFB0-8B79-C9F8-1590782D2BAA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '59EAAEEF-E71D-131F-4383-DAE2644F0F51', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', '2026-04-04T00:09:16', '2026-04-04T00:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('29168FF1-BCBC-7671-A253-5B51B7F30479', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '59EAAEEF-E71D-131F-4383-DAE2644F0F51', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', '2026-04-04T01:09:16', '2026-04-04T01:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('AB71D7EE-696C-E3F5-76E8-3109C921BEE2', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '59EAAEEF-E71D-131F-4383-DAE2644F0F51', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '59EAAEEF-E71D-131F-4383-DAE2644F0F51', '2026-04-07T16:09:16', '2026-04-07T16:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-89892')
@@ -767,11 +923,14 @@ BEGIN
         0,
         0,
         0,
-        '2026-07-18T04:03:16'
+        '2026-07-19T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('DA48AF17-A992-9FED-B18F-C8138A7E65A8', 'B3EA78F7-C737-902D-6E4C-636DEE29E81A', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-18T04:03:16', 'Creacion de proyecto: Centro Arroyo Hondo', '2026-07-18T04:03:16', '2026-07-18T04:03:16');
+    VALUES ('DA48AF17-A992-9FED-B18F-C8138A7E65A8', 'B3EA78F7-C737-902D-6E4C-636DEE29E81A', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-19T19:09:16', 'Creacion de proyecto: Centro Arroyo Hondo', '2026-07-19T19:09:16', '2026-07-19T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('04456DFD-8676-7860-5182-ED5A22C428B3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'B3EA78F7-C737-902D-6E4C-636DEE29E81A', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'B3EA78F7-C737-902D-6E4C-636DEE29E81A', '2026-07-19T19:09:16', '2026-07-19T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-60151')
@@ -802,11 +961,14 @@ BEGIN
         1,
         0,
         0,
-        '2026-02-21T04:03:16'
+        '2026-02-22T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('53A7CFA0-66FB-1D88-DE6C-3A9C31361660', '6D80D558-0E60-DF92-F823-1D9965E382CB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-21T04:03:16', 'Creacion de proyecto: Palacio Altos de Chavon Exclusivo', '2026-02-21T04:03:16', '2026-02-21T04:03:16');
+    VALUES ('53A7CFA0-66FB-1D88-DE6C-3A9C31361660', '6D80D558-0E60-DF92-F823-1D9965E382CB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-22T19:09:16', 'Creacion de proyecto: Palacio Altos de Chavon Exclusivo', '2026-02-22T19:09:16', '2026-02-22T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('726A44E2-411C-BCBB-C0B9-D65A3FA26172', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '6D80D558-0E60-DF92-F823-1D9965E382CB', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '6D80D558-0E60-DF92-F823-1D9965E382CB', '2026-02-22T19:09:16', '2026-02-22T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-27581')
@@ -837,11 +999,23 @@ BEGIN
         0,
         2,
         0,
-        '2026-07-13T04:03:17'
+        '2026-07-14T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A78FD78D-535C-6B83-A65D-44237157D32D', '51E0663E-6B7B-0930-EDBF-01163974C9D3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-13T04:03:17', 'Creacion de proyecto: Viviendas La Julia Metropolitano', '2026-07-13T04:03:17', '2026-07-13T04:03:17');
+    VALUES ('A78FD78D-535C-6B83-A65D-44237157D32D', '51E0663E-6B7B-0930-EDBF-01163974C9D3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-14T19:09:16', 'Creacion de proyecto: Viviendas La Julia Metropolitano', '2026-07-14T19:09:16', '2026-07-14T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('EAC24803-482E-944F-A43A-558DBEE95A4E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '51E0663E-6B7B-0930-EDBF-01163974C9D3', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '51E0663E-6B7B-0930-EDBF-01163974C9D3', '2026-07-14T19:09:16', '2026-07-14T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('4BAA2AFD-0A92-287E-8EF1-14EE983E32C9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '51E0663E-6B7B-0930-EDBF-01163974C9D3', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '51E0663E-6B7B-0930-EDBF-01163974C9D3', '2026-07-16T10:09:16', '2026-07-16T10:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('019BC03D-6179-7893-BA00-36CE24BA2647', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '51E0663E-6B7B-0930-EDBF-01163974C9D3', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '51E0663E-6B7B-0930-EDBF-01163974C9D3', '2026-07-16T13:09:16', '2026-07-16T13:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('0768659B-8E08-529E-E7EC-17F3BF2EAAD8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '51E0663E-6B7B-0930-EDBF-01163974C9D3', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '51E0663E-6B7B-0930-EDBF-01163974C9D3', '2026-07-19T19:09:16', '2026-07-19T19:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-46345')
@@ -872,11 +1046,17 @@ BEGIN
         0,
         2,
         0,
-        '2026-04-05T04:03:17'
+        '2026-04-06T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('B35E6907-1880-5651-0999-AD79222C34B1', '06607483-93B5-F920-1BBF-5B9C60A2E073', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-05T04:03:17', 'Creacion de proyecto: Marina Sosua Exclusivo', '2026-04-05T04:03:17', '2026-04-05T04:03:17');
+    VALUES ('B35E6907-1880-5651-0999-AD79222C34B1', '06607483-93B5-F920-1BBF-5B9C60A2E073', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-06T19:09:16', 'Creacion de proyecto: Marina Sosua Exclusivo', '2026-04-06T19:09:16', '2026-04-06T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('51956E29-BE65-777F-1FDD-E2447E25FE0D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '06607483-93B5-F920-1BBF-5B9C60A2E073', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '06607483-93B5-F920-1BBF-5B9C60A2E073', '2026-04-06T19:09:16', '2026-04-06T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('68F20E1B-A2A4-4B50-A98D-24594A7B1D8C', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '06607483-93B5-F920-1BBF-5B9C60A2E073', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '06607483-93B5-F920-1BBF-5B9C60A2E073', '2026-04-07T19:09:16', '2026-04-07T19:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-80509')
@@ -907,11 +1087,14 @@ BEGIN
         0,
         0,
         0,
-        '2026-05-02T04:03:17'
+        '2026-05-03T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('D2D048BD-6C92-E8CE-65C4-74ADB7A4A5B8', 'AA140462-D7C7-94CF-88D5-3D3DC8041584', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-02T04:03:17', 'Creacion de proyecto: Edificio Cabarete Suites', '2026-05-02T04:03:17', '2026-05-02T04:03:17');
+    VALUES ('D2D048BD-6C92-E8CE-65C4-74ADB7A4A5B8', 'AA140462-D7C7-94CF-88D5-3D3DC8041584', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-03T19:09:16', 'Creacion de proyecto: Edificio Cabarete Suites', '2026-05-03T19:09:16', '2026-05-03T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('FEC75568-91A9-B916-C63A-976DD00A7864', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'AA140462-D7C7-94CF-88D5-3D3DC8041584', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'AA140462-D7C7-94CF-88D5-3D3DC8041584', '2026-05-03T19:09:16', '2026-05-03T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-83901')
@@ -942,11 +1125,23 @@ BEGIN
         2,
         3,
         0,
-        '2026-02-26T04:03:17'
+        '2026-02-27T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('2CA9BBEB-EAE3-BCBE-D047-A3E34FA9B0B4', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-26T04:03:17', 'Creacion de proyecto: Edificio La Julia Hills', '2026-02-26T04:03:17', '2026-02-26T04:03:17');
+    VALUES ('2CA9BBEB-EAE3-BCBE-D047-A3E34FA9B0B4', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-27T19:09:16', 'Creacion de proyecto: Edificio La Julia Hills', '2026-02-27T19:09:16', '2026-02-27T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('906D3F4F-E7FD-5442-7A06-0FC0AD475461', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '06ED7140-C412-8340-6F51-6A22A8D2F2E6', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', '2026-02-27T19:09:16', '2026-02-27T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('544D34B6-4956-3A23-73FF-B17392E2B40B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '06ED7140-C412-8340-6F51-6A22A8D2F2E6', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', '2026-02-28T09:09:16', '2026-02-28T09:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('EC6372C4-81AF-FA2D-7CC0-D9DAB7F91F5A', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '06ED7140-C412-8340-6F51-6A22A8D2F2E6', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', '2026-03-01T05:09:16', '2026-03-01T05:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('745AB5FF-3F95-C4C6-39BE-8CA0FC81FFAE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '06ED7140-C412-8340-6F51-6A22A8D2F2E6', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '06ED7140-C412-8340-6F51-6A22A8D2F2E6', '2026-02-28T04:09:16', '2026-02-28T04:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-66087')
@@ -977,11 +1172,20 @@ BEGIN
         0,
         2,
         0,
-        '2026-07-10T04:03:17'
+        '2026-07-11T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('666C326C-5FCF-379B-87BE-B4F7B9333186', '5CCB078F-F02A-002A-9B64-107CB05C0847', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-10T04:03:17', 'Creacion de proyecto: Palacio Reparto del Este Corporativo', '2026-07-10T04:03:17', '2026-07-10T04:03:17');
+    VALUES ('666C326C-5FCF-379B-87BE-B4F7B9333186', '5CCB078F-F02A-002A-9B64-107CB05C0847', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-11T19:09:16', 'Creacion de proyecto: Palacio Reparto del Este Corporativo', '2026-07-11T19:09:16', '2026-07-11T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D70E8273-D63F-6FD8-39FD-BFF6468664B5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5CCB078F-F02A-002A-9B64-107CB05C0847', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '5CCB078F-F02A-002A-9B64-107CB05C0847', '2026-07-11T19:09:16', '2026-07-11T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('CDC4619F-71CB-1CBF-3A33-F36AC570A1BB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5CCB078F-F02A-002A-9B64-107CB05C0847', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '5CCB078F-F02A-002A-9B64-107CB05C0847', '2026-07-12T04:09:16', '2026-07-12T04:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('66C9F003-A662-0C55-1AD1-D2D0996C81E6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5CCB078F-F02A-002A-9B64-107CB05C0847', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '5CCB078F-F02A-002A-9B64-107CB05C0847', '2026-07-12T19:09:16', '2026-07-12T19:09:16', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-37006')
@@ -1012,11 +1216,14 @@ BEGIN
         0,
         0,
         0,
-        '2026-06-04T04:03:17'
+        '2026-06-05T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('65E0D2B1-0291-111B-5921-B9201DCA40C2', 'D4A4668C-276C-CE23-BACE-7C1EFCCCE0CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-04T04:03:17', 'Creacion de proyecto: Residencial Zona Universitaria', '2026-06-04T04:03:17', '2026-06-04T04:03:17');
+    VALUES ('65E0D2B1-0291-111B-5921-B9201DCA40C2', 'D4A4668C-276C-CE23-BACE-7C1EFCCCE0CE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-05T19:09:16', 'Creacion de proyecto: Residencial Zona Universitaria', '2026-06-05T19:09:16', '2026-06-05T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('360A844F-1899-C78C-E933-12BC7DA4D8EB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'D4A4668C-276C-CE23-BACE-7C1EFCCCE0CE', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'D4A4668C-276C-CE23-BACE-7C1EFCCCE0CE', '2026-06-05T19:09:16', '2026-06-05T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-35384')
@@ -1047,11 +1254,14 @@ BEGIN
         2,
         2,
         0,
-        '2026-02-26T04:03:17'
+        '2026-02-27T19:09:16'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('71953545-1CEF-2C3A-E547-31B6B9D6BF42', '7D342462-B5E5-68F8-6905-89EF3F3A46C0', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-26T04:03:17', 'Creacion de proyecto: Sosua Resort', '2026-02-26T04:03:17', '2026-02-26T04:03:17');
+    VALUES ('71953545-1CEF-2C3A-E547-31B6B9D6BF42', '7D342462-B5E5-68F8-6905-89EF3F3A46C0', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-27T19:09:16', 'Creacion de proyecto: Sosua Resort', '2026-02-27T19:09:16', '2026-02-27T19:09:16');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('3E7CF762-0133-4D08-8F9A-57AC2774BEFA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '7D342462-B5E5-68F8-6905-89EF3F3A46C0', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '7D342462-B5E5-68F8-6905-89EF3F3A46C0', '2026-02-27T19:09:16', '2026-02-27T19:09:16', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-47426')
@@ -1082,11 +1292,14 @@ BEGIN
         1,
         0,
         0,
-        '2026-06-14T04:03:17'
+        '2026-06-15T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('FD1E3AA6-B8B2-ACEF-3635-2802FF8F2034', '00251EE9-977E-FCE2-DFC3-7BC63A9F6D58', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-14T04:03:17', 'Creacion de proyecto: Mirador Reparto del Este Central', '2026-06-14T04:03:17', '2026-06-14T04:03:17');
+    VALUES ('FD1E3AA6-B8B2-ACEF-3635-2802FF8F2034', '00251EE9-977E-FCE2-DFC3-7BC63A9F6D58', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-15T19:09:17', 'Creacion de proyecto: Mirador Reparto del Este Central', '2026-06-15T19:09:17', '2026-06-15T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D601DF8F-55B4-34B5-DCD9-C1D032D2ACA1', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '00251EE9-977E-FCE2-DFC3-7BC63A9F6D58', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '00251EE9-977E-FCE2-DFC3-7BC63A9F6D58', '2026-06-15T19:09:17', '2026-06-15T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-87942')
@@ -1117,11 +1330,17 @@ BEGIN
         0,
         1,
         0,
-        '2026-04-10T04:03:17'
+        '2026-04-11T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('377236D2-3812-ABC2-344E-235A8D1F5CF7', '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-10T04:03:17', 'Creacion de proyecto: Edificio San Miguel Beach', '2026-04-10T04:03:17', '2026-04-10T04:03:17');
+    VALUES ('377236D2-3812-ABC2-344E-235A8D1F5CF7', '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-11T19:09:17', 'Creacion de proyecto: Edificio San Miguel Beach', '2026-04-11T19:09:17', '2026-04-11T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('F962A3B9-7A77-FEC6-4548-FE01DEA958E0', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', '2026-04-11T19:09:17', '2026-04-11T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('7FDCACCD-ACEB-7656-7784-7CC639EB3CC4', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '31749EA1-FF65-AACB-39B8-0CDEB4980C1D', '2026-04-13T02:09:17', '2026-04-13T02:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-3838')
@@ -1152,11 +1371,14 @@ BEGIN
         0,
         1,
         0,
-        '2026-03-23T04:03:17'
+        '2026-03-24T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('106A5551-78EB-5A6F-2356-6478A4F92B6C', '2B2368E4-DE49-3212-D157-ADCC574B5127', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-23T04:03:17', 'Creacion de proyecto: La Julia del Sur', '2026-03-23T04:03:17', '2026-03-23T04:03:17');
+    VALUES ('106A5551-78EB-5A6F-2356-6478A4F92B6C', '2B2368E4-DE49-3212-D157-ADCC574B5127', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-24T19:09:17', 'Creacion de proyecto: La Julia del Sur', '2026-03-24T19:09:17', '2026-03-24T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('69562CFD-FA97-5E07-EF14-198472B103F3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2B2368E4-DE49-3212-D157-ADCC574B5127', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '2B2368E4-DE49-3212-D157-ADCC574B5127', '2026-03-24T19:09:17', '2026-03-24T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-65884')
@@ -1187,11 +1409,23 @@ BEGIN
         0,
         2,
         0,
-        '2026-06-17T04:03:17'
+        '2026-06-18T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('1DE959A9-4A46-1282-5A44-39C1B2C9AAAE', '266858A4-92B8-4843-4D4C-D89916497AF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-17T04:03:17', 'Creacion de proyecto: Las Terrenas Corporativo', '2026-06-17T04:03:17', '2026-06-17T04:03:17');
+    VALUES ('1DE959A9-4A46-1282-5A44-39C1B2C9AAAE', '266858A4-92B8-4843-4D4C-D89916497AF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-18T19:09:17', 'Creacion de proyecto: Las Terrenas Corporativo', '2026-06-18T19:09:17', '2026-06-18T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D53CE564-7584-0114-26E4-C64845F097F3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '266858A4-92B8-4843-4D4C-D89916497AF5', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '266858A4-92B8-4843-4D4C-D89916497AF5', '2026-06-18T19:09:17', '2026-06-18T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('198B46BF-F743-E473-9F33-43F1D6F9FFE1', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '266858A4-92B8-4843-4D4C-D89916497AF5', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '266858A4-92B8-4843-4D4C-D89916497AF5', '2026-06-20T17:09:17', '2026-06-20T17:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('06A10229-C563-24D4-D48C-37387988BDC6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '266858A4-92B8-4843-4D4C-D89916497AF5', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '266858A4-92B8-4843-4D4C-D89916497AF5', '2026-06-22T17:09:17', '2026-06-22T17:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A2EA7934-B6B4-DA5C-A991-E9C15036D8C3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '266858A4-92B8-4843-4D4C-D89916497AF5', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '266858A4-92B8-4843-4D4C-D89916497AF5', '2026-06-19T19:09:17', '2026-06-19T19:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-70830')
@@ -1222,11 +1456,17 @@ BEGIN
         0,
         1,
         0,
-        '2026-06-23T04:03:17'
+        '2026-06-24T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('1F6B263D-D827-1EBA-DCA5-0740B1BC199C', 'E026118E-6F23-9395-686B-7CC56918AC80', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-23T04:03:17', 'Creacion de proyecto: Palacio El Cacique Suites', '2026-06-23T04:03:17', '2026-06-23T04:03:17');
+    VALUES ('1F6B263D-D827-1EBA-DCA5-0740B1BC199C', 'E026118E-6F23-9395-686B-7CC56918AC80', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-24T19:09:17', 'Creacion de proyecto: Palacio El Cacique Suites', '2026-06-24T19:09:17', '2026-06-24T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('6A84478C-6853-0090-7F70-76D89659C9A9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'E026118E-6F23-9395-686B-7CC56918AC80', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'E026118E-6F23-9395-686B-7CC56918AC80', '2026-06-24T19:09:17', '2026-06-24T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D28DC9FF-3BFE-F314-45E5-EDED4F6AB65E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'E026118E-6F23-9395-686B-7CC56918AC80', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'E026118E-6F23-9395-686B-7CC56918AC80', '2026-06-25T00:09:17', '2026-06-25T00:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-14178')
@@ -1257,11 +1497,14 @@ BEGIN
         2,
         0,
         0,
-        '2026-03-25T04:03:17'
+        '2026-03-26T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('C2CF69D1-318B-9C48-0B5C-6E11E0352488', 'F227D859-BE99-F2B7-DAF2-80A3C6777DF8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-25T04:03:17', 'Creacion de proyecto: Paseo Quisqueya', '2026-03-25T04:03:17', '2026-03-25T04:03:17');
+    VALUES ('C2CF69D1-318B-9C48-0B5C-6E11E0352488', 'F227D859-BE99-F2B7-DAF2-80A3C6777DF8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-26T19:09:17', 'Creacion de proyecto: Paseo Quisqueya', '2026-03-26T19:09:17', '2026-03-26T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('14DE9765-6E03-BBCD-8C12-E1B32BB0D3BD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'F227D859-BE99-F2B7-DAF2-80A3C6777DF8', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'F227D859-BE99-F2B7-DAF2-80A3C6777DF8', '2026-03-26T19:09:17', '2026-03-26T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-22195')
@@ -1292,11 +1535,23 @@ BEGIN
         2,
         1,
         0,
-        '2026-02-21T04:03:17'
+        '2026-02-22T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('10CFD600-B0BA-B0F8-0C38-3FE3C5A498DF', '946FE30F-9277-FA24-6C67-23E8E5A032C6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-21T04:03:17', 'Creacion de proyecto: Portales Las Terrenas', '2026-02-21T04:03:17', '2026-02-21T04:03:17');
+    VALUES ('10CFD600-B0BA-B0F8-0C38-3FE3C5A498DF', '946FE30F-9277-FA24-6C67-23E8E5A032C6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-22T19:09:17', 'Creacion de proyecto: Portales Las Terrenas', '2026-02-22T19:09:17', '2026-02-22T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8E8686DC-A3FC-616F-E2E9-943E4A44FA80', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '946FE30F-9277-FA24-6C67-23E8E5A032C6', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '946FE30F-9277-FA24-6C67-23E8E5A032C6', '2026-02-22T19:09:17', '2026-02-22T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('934C2D9E-464A-1DB6-823B-5AF6F500BC4A', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '946FE30F-9277-FA24-6C67-23E8E5A032C6', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '946FE30F-9277-FA24-6C67-23E8E5A032C6', '2026-02-24T12:09:17', '2026-02-24T12:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('CDE98055-CE0A-0668-10FC-4C5E04E0A1C9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '946FE30F-9277-FA24-6C67-23E8E5A032C6', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '946FE30F-9277-FA24-6C67-23E8E5A032C6', '2026-02-26T15:09:17', '2026-02-26T15:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D1C29528-CF1E-DA83-3418-F6369FCC6DD8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '946FE30F-9277-FA24-6C67-23E8E5A032C6', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '946FE30F-9277-FA24-6C67-23E8E5A032C6', '2026-02-23T01:09:17', '2026-02-23T01:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-28160')
@@ -1327,11 +1582,20 @@ BEGIN
         1,
         2,
         0,
-        '2026-05-07T04:03:17'
+        '2026-05-08T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('3F76032B-8E79-B92C-3FD3-5195ABBF5441', '5876179F-9542-7C2D-3544-A10FE7DE27FD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-07T04:03:17', 'Creacion de proyecto: Complejo Zona Universitaria Exclusivo', '2026-05-07T04:03:17', '2026-05-07T04:03:17');
+    VALUES ('3F76032B-8E79-B92C-3FD3-5195ABBF5441', '5876179F-9542-7C2D-3544-A10FE7DE27FD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-08T19:09:17', 'Creacion de proyecto: Complejo Zona Universitaria Exclusivo', '2026-05-08T19:09:17', '2026-05-08T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A6AEDC7D-0AC2-1CE5-1A92-1945E251C4B7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5876179F-9542-7C2D-3544-A10FE7DE27FD', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '5876179F-9542-7C2D-3544-A10FE7DE27FD', '2026-05-08T19:09:17', '2026-05-08T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('C872930C-78A4-8222-0765-CE8840A048E4', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5876179F-9542-7C2D-3544-A10FE7DE27FD', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '5876179F-9542-7C2D-3544-A10FE7DE27FD', '2026-05-08T22:09:17', '2026-05-08T22:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('709D208F-98EA-F0D7-246B-2622C2AC9285', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5876179F-9542-7C2D-3544-A10FE7DE27FD', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '5876179F-9542-7C2D-3544-A10FE7DE27FD', '2026-05-12T09:09:17', '2026-05-12T09:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-72666')
@@ -1362,11 +1626,20 @@ BEGIN
         0,
         0,
         0,
-        '2026-05-31T04:03:17'
+        '2026-06-01T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('2526B3BC-358A-831D-0D4E-6D644142DA84', '352BCDAE-66BB-6486-3BF6-9A614AC8724E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-31T04:03:17', 'Creacion de proyecto: Plaza Altos de Chavon Park', '2026-05-31T04:03:17', '2026-05-31T04:03:17');
+    VALUES ('2526B3BC-358A-831D-0D4E-6D644142DA84', '352BCDAE-66BB-6486-3BF6-9A614AC8724E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-01T19:09:17', 'Creacion de proyecto: Plaza Altos de Chavon Park', '2026-06-01T19:09:17', '2026-06-01T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('9D452A21-372C-9799-BF20-6B2E910E632B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '352BCDAE-66BB-6486-3BF6-9A614AC8724E', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '352BCDAE-66BB-6486-3BF6-9A614AC8724E', '2026-06-01T19:09:17', '2026-06-01T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('79913399-25FD-56AF-708F-E155A17FF52D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '352BCDAE-66BB-6486-3BF6-9A614AC8724E', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '352BCDAE-66BB-6486-3BF6-9A614AC8724E', '2026-06-01T21:09:17', '2026-06-01T21:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('9DF44DC5-F630-85EA-70E2-73C6BCED3F75', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '352BCDAE-66BB-6486-3BF6-9A614AC8724E', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '352BCDAE-66BB-6486-3BF6-9A614AC8724E', '2026-06-04T15:09:17', '2026-06-04T15:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-2980')
@@ -1397,11 +1670,23 @@ BEGIN
         2,
         0,
         0,
-        '2026-06-13T04:03:17'
+        '2026-06-14T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('142D7A40-57E3-B51E-839B-5E01CE3297E5', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-13T04:03:17', 'Creacion de proyecto: Portales Cumayasa Oeste', '2026-06-13T04:03:17', '2026-06-13T04:03:17');
+    VALUES ('142D7A40-57E3-B51E-839B-5E01CE3297E5', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-14T19:09:17', 'Creacion de proyecto: Portales Cumayasa Oeste', '2026-06-14T19:09:17', '2026-06-14T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8A85AA3D-3D26-6818-6444-C16D8E27E6AB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', '2026-06-14T19:09:17', '2026-06-14T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('FF383EF6-C5D3-58D2-5F9E-3BA5EE74C66C', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', '2026-06-16T10:09:17', '2026-06-16T10:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('904BDE16-876F-7590-4792-9A967763F6C4', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', '2026-06-16T13:09:17', '2026-06-16T13:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('0E9678C7-23A2-63B3-1A89-95B74A43515C', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '743B10A6-6C28-9E56-FCD7-CD11AA3A39FA', '2026-06-20T10:09:17', '2026-06-20T10:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-17224')
@@ -1432,11 +1717,23 @@ BEGIN
         0,
         0,
         0,
-        '2026-04-29T04:03:17'
+        '2026-04-30T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('0CE02E19-A679-A2FF-0B38-07E118DE3CA6', '6A50C349-DBDB-F690-8239-1E093532BF06', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-29T04:03:17', 'Creacion de proyecto: Palacio Samana Oeste', '2026-04-29T04:03:17', '2026-04-29T04:03:17');
+    VALUES ('0CE02E19-A679-A2FF-0B38-07E118DE3CA6', '6A50C349-DBDB-F690-8239-1E093532BF06', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-30T19:09:17', 'Creacion de proyecto: Palacio Samana Oeste', '2026-04-30T19:09:17', '2026-04-30T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('634090CE-AD5B-70C7-1C2C-6AD3DFE88C88', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '6A50C349-DBDB-F690-8239-1E093532BF06', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '6A50C349-DBDB-F690-8239-1E093532BF06', '2026-04-30T19:09:17', '2026-04-30T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D171C138-138B-A2B3-B24E-FE30ED0F06B9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '6A50C349-DBDB-F690-8239-1E093532BF06', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '6A50C349-DBDB-F690-8239-1E093532BF06', '2026-05-02T11:09:17', '2026-05-02T11:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('42ACE324-4096-D4FC-311E-451496E9C21B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '6A50C349-DBDB-F690-8239-1E093532BF06', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '6A50C349-DBDB-F690-8239-1E093532BF06', '2026-04-30T23:09:17', '2026-04-30T23:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('25AA1E12-786A-23AF-6DC2-04EC6DEC1206', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '6A50C349-DBDB-F690-8239-1E093532BF06', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '6A50C349-DBDB-F690-8239-1E093532BF06', '2026-05-01T19:09:17', '2026-05-01T19:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-85602')
@@ -1467,11 +1764,20 @@ BEGIN
         1,
         2,
         0,
-        '2026-03-05T04:03:17'
+        '2026-03-06T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('DB1B7CFC-26DA-41EA-5B3D-912439CB8551', 'DB2B1655-7E28-0A25-2B63-6F7004A67331', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-05T04:03:17', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-03-05T04:03:17', '2026-03-05T04:03:17');
+    VALUES ('DB1B7CFC-26DA-41EA-5B3D-912439CB8551', 'DB2B1655-7E28-0A25-2B63-6F7004A67331', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-06T19:09:17', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-03-06T19:09:17', '2026-03-06T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DD625138-1AEC-6711-20F6-9A9D462F6670', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'DB2B1655-7E28-0A25-2B63-6F7004A67331', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'DB2B1655-7E28-0A25-2B63-6F7004A67331', '2026-03-06T19:09:17', '2026-03-06T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('992BE102-B202-7534-6C29-86A85FD33785', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'DB2B1655-7E28-0A25-2B63-6F7004A67331', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'DB2B1655-7E28-0A25-2B63-6F7004A67331', '2026-03-08T06:09:17', '2026-03-08T06:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('FC8E80EC-776A-5C67-B0C9-C1178C788A7E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'DB2B1655-7E28-0A25-2B63-6F7004A67331', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'DB2B1655-7E28-0A25-2B63-6F7004A67331', '2026-03-10T17:09:17', '2026-03-10T17:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-99451')
@@ -1502,11 +1808,23 @@ BEGIN
         2,
         0,
         0,
-        '2026-06-15T04:03:17'
+        '2026-06-16T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('FA794F1C-C295-49C2-0420-39A29AC6F268', '90C89EC2-FF55-240A-4E31-760184B7B5C2', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-15T04:03:17', 'Creacion de proyecto: Viviendas Quisqueya', '2026-06-15T04:03:17', '2026-06-15T04:03:17');
+    VALUES ('FA794F1C-C295-49C2-0420-39A29AC6F268', '90C89EC2-FF55-240A-4E31-760184B7B5C2', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-16T19:09:17', 'Creacion de proyecto: Viviendas Quisqueya', '2026-06-16T19:09:17', '2026-06-16T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('77BDAE7E-2BDA-AEFC-4CE9-9ADD6B50A6AD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '90C89EC2-FF55-240A-4E31-760184B7B5C2', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '90C89EC2-FF55-240A-4E31-760184B7B5C2', '2026-06-16T19:09:17', '2026-06-16T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('42FC018C-23DD-7B34-EEF3-2C85DBEE0B70', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '90C89EC2-FF55-240A-4E31-760184B7B5C2', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '90C89EC2-FF55-240A-4E31-760184B7B5C2', '2026-06-18T08:09:17', '2026-06-18T08:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('C74CB038-6013-8C7F-E1CF-F44DC7DB68FE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '90C89EC2-FF55-240A-4E31-760184B7B5C2', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '90C89EC2-FF55-240A-4E31-760184B7B5C2', '2026-06-18T01:09:17', '2026-06-18T01:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('BC7CA91A-8BE8-97EC-A26F-F7F55A499406', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '90C89EC2-FF55-240A-4E31-760184B7B5C2', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '90C89EC2-FF55-240A-4E31-760184B7B5C2', '2026-06-20T04:09:17', '2026-06-20T04:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-98592')
@@ -1537,11 +1855,14 @@ BEGIN
         2,
         1,
         0,
-        '2026-05-30T04:03:17'
+        '2026-05-31T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('BB7A0264-D86E-C51B-5E8B-2988F4E7D410', '5390AA79-70EF-3B62-0397-8C0C85B1C3E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-30T04:03:17', 'Creacion de proyecto: Terrazas Piantini', '2026-05-30T04:03:17', '2026-05-30T04:03:17');
+    VALUES ('BB7A0264-D86E-C51B-5E8B-2988F4E7D410', '5390AA79-70EF-3B62-0397-8C0C85B1C3E5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-31T19:09:17', 'Creacion de proyecto: Terrazas Piantini', '2026-05-31T19:09:17', '2026-05-31T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('ECB50D85-0C63-E8DB-7B4C-30BEB4124DB1', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5390AA79-70EF-3B62-0397-8C0C85B1C3E5', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '5390AA79-70EF-3B62-0397-8C0C85B1C3E5', '2026-05-31T19:09:17', '2026-05-31T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-52937')
@@ -1572,11 +1893,17 @@ BEGIN
         1,
         1,
         0,
-        '2026-06-21T04:03:17'
+        '2026-06-22T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('01451296-F451-641D-76AC-9E8D153E5FBB', '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-21T04:03:17', 'Creacion de proyecto: Zona Universitaria Club', '2026-06-21T04:03:17', '2026-06-21T04:03:17');
+    VALUES ('01451296-F451-641D-76AC-9E8D153E5FBB', '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-22T19:09:17', 'Creacion de proyecto: Zona Universitaria Club', '2026-06-22T19:09:17', '2026-06-22T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8B6E0DD3-8F2A-6BBB-3D9C-1D2EBBA5A5D0', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', '2026-06-22T19:09:17', '2026-06-22T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A05C4A10-51B0-D739-0532-964A086F5883', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '5AA54432-4F72-2171-67FA-79FAA0BCBDBD', '2026-06-23T15:09:17', '2026-06-23T15:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-56183')
@@ -1607,11 +1934,14 @@ BEGIN
         0,
         1,
         0,
-        '2026-07-01T04:03:17'
+        '2026-07-02T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('C9F4651A-6E2B-B28C-5459-D79BF800649B', '697D8E5E-AA3F-9553-DB99-7E99873F40D7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-01T04:03:17', 'Creacion de proyecto: Torre Los Molinos Palms', '2026-07-01T04:03:17', '2026-07-01T04:03:17');
+    VALUES ('C9F4651A-6E2B-B28C-5459-D79BF800649B', '697D8E5E-AA3F-9553-DB99-7E99873F40D7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-02T19:09:17', 'Creacion de proyecto: Torre Los Molinos Palms', '2026-07-02T19:09:17', '2026-07-02T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('991799FE-D774-4644-5936-DCCAAFC99A72', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '697D8E5E-AA3F-9553-DB99-7E99873F40D7', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '697D8E5E-AA3F-9553-DB99-7E99873F40D7', '2026-07-02T19:09:17', '2026-07-02T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-76780')
@@ -1642,11 +1972,23 @@ BEGIN
         2,
         0,
         0,
-        '2026-02-14T04:03:17'
+        '2026-02-15T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('6189F983-7D87-2CBA-111F-A891D33E5D70', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-14T04:03:17', 'Creacion de proyecto: Playa Dorada Palms', '2026-02-14T04:03:17', '2026-02-14T04:03:17');
+    VALUES ('6189F983-7D87-2CBA-111F-A891D33E5D70', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-15T19:09:17', 'Creacion de proyecto: Playa Dorada Palms', '2026-02-15T19:09:17', '2026-02-15T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('EBE49AF4-39E9-F602-E7C4-33B9A5A9F65E', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', '2026-02-15T19:09:17', '2026-02-15T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('26FFD52E-CF5F-59CE-9F46-8B6043130BE2', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', '2026-02-16T19:09:17', '2026-02-16T19:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D4714D9F-CEF2-86A0-E9F9-C32C9DBD95F1', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', '2026-02-16T03:09:17', '2026-02-16T03:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('B7BEA95E-5C83-2C5B-0B63-FDD9F5CFAAE1', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '9BB791B0-9CCC-4971-48D6-9F9F15E7BBEC', '2026-02-21T13:09:17', '2026-02-21T13:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-33098')
@@ -1677,11 +2019,23 @@ BEGIN
         2,
         0,
         0,
-        '2026-05-20T04:03:17'
+        '2026-05-21T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A6E0C5B1-77A9-C775-02D7-58A1931FFD76', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-20T04:03:17', 'Creacion de proyecto: Bosque Playa Dorada Club', '2026-05-20T04:03:17', '2026-05-20T04:03:17');
+    VALUES ('A6E0C5B1-77A9-C775-02D7-58A1931FFD76', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-21T19:09:17', 'Creacion de proyecto: Bosque Playa Dorada Club', '2026-05-21T19:09:17', '2026-05-21T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('1BEA1669-D411-BBEF-B16D-CF15EA898108', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', '2026-05-21T19:09:17', '2026-05-21T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('F5824049-F685-4BC4-7690-296BD0E0B918', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', '2026-05-22T13:09:17', '2026-05-22T13:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('545406D7-B847-55F5-0F7E-7C803D6ABA04', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', '2026-05-24T19:09:17', '2026-05-24T19:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DF052D09-CB2E-3EBF-53C8-8D2C2A2F6CB6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '04F4D058-C0FC-EF7D-DDDE-40F2D58A4234', '2026-05-24T16:09:17', '2026-05-24T16:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-92611')
@@ -1712,11 +2066,20 @@ BEGIN
         2,
         1,
         0,
-        '2026-04-23T04:03:17'
+        '2026-04-24T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('67BAF4D0-9AF2-11B3-913D-FF386F0EE37A', '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-23T04:03:17', 'Creacion de proyecto: San Miguel Resort', '2026-04-23T04:03:17', '2026-04-23T04:03:17');
+    VALUES ('67BAF4D0-9AF2-11B3-913D-FF386F0EE37A', '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-24T19:09:17', 'Creacion de proyecto: San Miguel Resort', '2026-04-24T19:09:17', '2026-04-24T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('455B14D9-9022-14F6-655E-23AD75C036CA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', '2026-04-24T19:09:17', '2026-04-24T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('E8598990-53C5-4F0E-41C6-88CCF897B872', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', '2026-04-25T00:09:17', '2026-04-25T00:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('E4ABFA18-A2FE-068B-3B13-3F2B3CF1DB99', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '3F28B6F4-7068-CE06-3E42-1B4C5FC36774', '2026-04-28T09:09:17', '2026-04-28T09:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-90091')
@@ -1747,11 +2110,20 @@ BEGIN
         0,
         0,
         0,
-        '2026-04-24T04:03:17'
+        '2026-04-25T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('E3B478DB-A464-B9C0-3966-81FB18C78168', '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-24T04:03:17', 'Creacion de proyecto: Complejo Gazcue del Este', '2026-04-24T04:03:17', '2026-04-24T04:03:17');
+    VALUES ('E3B478DB-A464-B9C0-3966-81FB18C78168', '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-25T19:09:17', 'Creacion de proyecto: Complejo Gazcue del Este', '2026-04-25T19:09:17', '2026-04-25T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('CD7E02FC-6837-17D8-F615-D18C7F94FFC5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', '2026-04-25T19:09:17', '2026-04-25T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A45B76CB-49DD-0FBF-A02C-BDA8464F8455', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', '2026-04-27T08:09:17', '2026-04-27T08:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('83994B7B-BE40-A5DF-B318-9C409C16C3F2', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '7C02E1F1-EB72-7FA4-29B5-2EFB25A724B9', '2026-04-26T13:09:17', '2026-04-26T13:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-62643')
@@ -1782,11 +2154,17 @@ BEGIN
         0,
         1,
         0,
-        '2026-03-15T04:03:17'
+        '2026-03-16T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('F201A2AA-2317-31C9-9500-EBC3CC5D9E96', '108807D5-A6BB-3889-2BAB-AC74B7D74706', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-15T04:03:17', 'Creacion de proyecto: Edificio El Cacique Vacacional', '2026-03-15T04:03:17', '2026-03-15T04:03:17');
+    VALUES ('F201A2AA-2317-31C9-9500-EBC3CC5D9E96', '108807D5-A6BB-3889-2BAB-AC74B7D74706', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-16T19:09:17', 'Creacion de proyecto: Edificio El Cacique Vacacional', '2026-03-16T19:09:17', '2026-03-16T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('ED3F0048-345C-B480-262E-B290D66DB913', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '108807D5-A6BB-3889-2BAB-AC74B7D74706', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '108807D5-A6BB-3889-2BAB-AC74B7D74706', '2026-03-16T19:09:17', '2026-03-16T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('9112F718-82B6-1235-C542-EC43E93D5579', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '108807D5-A6BB-3889-2BAB-AC74B7D74706', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '108807D5-A6BB-3889-2BAB-AC74B7D74706', '2026-03-18T17:09:17', '2026-03-18T17:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-22285')
@@ -1817,11 +2195,20 @@ BEGIN
         1,
         2,
         0,
-        '2026-03-15T04:03:17'
+        '2026-03-16T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('FB7AF6E8-0EDD-12C5-7ACA-BC56F3A28833', '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-15T04:03:17', 'Creacion de proyecto: Marina Don Bosco Norte', '2026-03-15T04:03:17', '2026-03-15T04:03:17');
+    VALUES ('FB7AF6E8-0EDD-12C5-7ACA-BC56F3A28833', '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-16T19:09:17', 'Creacion de proyecto: Marina Don Bosco Norte', '2026-03-16T19:09:17', '2026-03-16T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('9434F65E-A0B8-E9BC-7C33-5CC193A6888B', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', '2026-03-16T19:09:17', '2026-03-16T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('11586938-FD51-C5DD-53D8-A4E644A7F349', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', '2026-03-18T04:09:17', '2026-03-18T04:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('4AD1CA56-2B7A-386E-88AF-20C191B88BD5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '49F8A04E-5B93-F10F-8B3D-9EB372A1FF6B', '2026-03-19T05:09:17', '2026-03-19T05:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-1140')
@@ -1852,11 +2239,23 @@ BEGIN
         0,
         1,
         0,
-        '2026-02-16T04:03:17'
+        '2026-02-17T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('EEFA001C-EA03-C38D-7017-3B2E665155B7', '77FE1E64-3205-59FC-909A-B41D31181FDE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-16T04:03:17', 'Creacion de proyecto: La Esperanza Beach', '2026-02-16T04:03:17', '2026-02-16T04:03:17');
+    VALUES ('EEFA001C-EA03-C38D-7017-3B2E665155B7', '77FE1E64-3205-59FC-909A-B41D31181FDE', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-17T19:09:17', 'Creacion de proyecto: La Esperanza Beach', '2026-02-17T19:09:17', '2026-02-17T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('38711C18-8B7C-4C18-A238-CBF375E9F26C', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '77FE1E64-3205-59FC-909A-B41D31181FDE', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '77FE1E64-3205-59FC-909A-B41D31181FDE', '2026-02-17T19:09:17', '2026-02-17T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('E45094CB-B4C3-602A-1F09-957FF4D49DB1', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '77FE1E64-3205-59FC-909A-B41D31181FDE', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '77FE1E64-3205-59FC-909A-B41D31181FDE', '2026-02-19T11:09:17', '2026-02-19T11:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DE52CE77-B2B1-DD44-F316-C9B19F85E259', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '77FE1E64-3205-59FC-909A-B41D31181FDE', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '77FE1E64-3205-59FC-909A-B41D31181FDE', '2026-02-20T07:09:17', '2026-02-20T07:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('F5C00CB3-4767-5560-96E1-82970AF05DBA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '77FE1E64-3205-59FC-909A-B41D31181FDE', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '77FE1E64-3205-59FC-909A-B41D31181FDE', '2026-02-22T01:09:17', '2026-02-22T01:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-61782')
@@ -1887,11 +2286,23 @@ BEGIN
         0,
         0,
         0,
-        '2026-04-10T04:03:17'
+        '2026-04-11T19:09:17'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('6B8EF70F-D065-8AC6-9BA4-434E4AD5C341', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-10T04:03:17', 'Creacion de proyecto: Centro La Julia', '2026-04-10T04:03:17', '2026-04-10T04:03:17');
+    VALUES ('6B8EF70F-D065-8AC6-9BA4-434E4AD5C341', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-11T19:09:17', 'Creacion de proyecto: Centro La Julia', '2026-04-11T19:09:17', '2026-04-11T19:09:17');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('526731EF-A4CC-9795-B6FD-EE85E296C0A5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', '2026-04-11T19:09:17', '2026-04-11T19:09:17', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('DD2AA4E0-90C9-E7E0-53B4-4B63B26A77BA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', '2026-04-13T12:09:17', '2026-04-13T12:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('7884CE60-376A-3B9E-073C-0B795A2AC207', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', '2026-04-13T11:09:17', '2026-04-13T11:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('3FAEE4D9-9DDB-75BF-CE55-38ECF12480E4', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '2B799FEE-852B-FA59-F64B-0CA9EAA96F34', '2026-04-13T10:09:17', '2026-04-13T10:09:17', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-87582')
@@ -1922,11 +2333,23 @@ BEGIN
         0,
         3,
         0,
-        '2026-05-14T04:03:18'
+        '2026-05-15T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('4CBB492E-D3D6-515F-17FE-5FEDF2D19589', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-14T04:03:18', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-05-14T04:03:18', '2026-05-14T04:03:18');
+    VALUES ('4CBB492E-D3D6-515F-17FE-5FEDF2D19589', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-05-15T19:09:18', 'Creacion de proyecto: Plaza Cerros de Gurabo', '2026-05-15T19:09:18', '2026-05-15T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('E47BE38F-153E-FCB6-6314-9E0DEFBC5F4D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', '2026-05-15T19:09:18', '2026-05-15T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('A583A757-D757-6109-F467-D0D86217DCC1', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', '2026-05-15T20:09:18', '2026-05-15T20:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('4D97B14E-167D-D70F-4556-09E7BEC96C45', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', '2026-05-18T03:09:18', '2026-05-18T03:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('B9F18A81-7662-4180-753A-9FB849987FCD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '4E2DA8C2-1FA1-0507-F588-AE0BEE48BFDF', '2026-05-16T04:09:18', '2026-05-16T04:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-94408')
@@ -1957,11 +2380,23 @@ BEGIN
         0,
         0,
         0,
-        '2026-04-26T04:03:18'
+        '2026-04-27T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('B8FAAE82-A484-B4F4-807B-C4413FF6FCEB', '25AB4E07-AF72-7335-6D10-C1FE310587F8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-26T04:03:18', 'Creacion de proyecto: Paseo Las Terrenas Urbano', '2026-04-26T04:03:18', '2026-04-26T04:03:18');
+    VALUES ('B8FAAE82-A484-B4F4-807B-C4413FF6FCEB', '25AB4E07-AF72-7335-6D10-C1FE310587F8', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-27T19:09:18', 'Creacion de proyecto: Paseo Las Terrenas Urbano', '2026-04-27T19:09:18', '2026-04-27T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('618C6CDC-5E13-612B-631F-3E24CF4D64D7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '25AB4E07-AF72-7335-6D10-C1FE310587F8', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '25AB4E07-AF72-7335-6D10-C1FE310587F8', '2026-04-27T19:09:18', '2026-04-27T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('3FF94EC5-D6F5-DCB7-8767-522EE3A0411C', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '25AB4E07-AF72-7335-6D10-C1FE310587F8', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '25AB4E07-AF72-7335-6D10-C1FE310587F8', '2026-04-29T13:09:18', '2026-04-29T13:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('22D3B719-DB81-92A9-CAF1-EB1FD4D03AC6', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '25AB4E07-AF72-7335-6D10-C1FE310587F8', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '25AB4E07-AF72-7335-6D10-C1FE310587F8', '2026-04-29T05:09:18', '2026-04-29T05:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('2F9C605D-294D-8367-C042-B682568AE54D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '25AB4E07-AF72-7335-6D10-C1FE310587F8', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', '25AB4E07-AF72-7335-6D10-C1FE310587F8', '2026-05-02T04:09:18', '2026-05-02T04:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-12053')
@@ -1992,11 +2427,14 @@ BEGIN
         0,
         0,
         0,
-        '2026-06-29T04:03:18'
+        '2026-06-30T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('E338F7CE-635D-24F6-7A31-62DEB3D7D0AB', '653A5D86-9635-43BF-3BA3-3E33236EE590', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-29T04:03:18', 'Creacion de proyecto: Complejo Costa Azul Gardens', '2026-06-29T04:03:18', '2026-06-29T04:03:18');
+    VALUES ('E338F7CE-635D-24F6-7A31-62DEB3D7D0AB', '653A5D86-9635-43BF-3BA3-3E33236EE590', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-30T19:09:18', 'Creacion de proyecto: Complejo Costa Azul Gardens', '2026-06-30T19:09:18', '2026-06-30T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('D353095D-0447-907B-0044-BFC92F0ABA0A', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '653A5D86-9635-43BF-3BA3-3E33236EE590', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '653A5D86-9635-43BF-3BA3-3E33236EE590', '2026-06-30T19:09:18', '2026-06-30T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-60197')
@@ -2027,11 +2465,14 @@ BEGIN
         0,
         3,
         0,
-        '2026-02-16T04:03:18'
+        '2026-02-17T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('63C4CBEB-2C04-BEB6-69FD-F8CC6FA621C0', '14998618-4A71-013F-DB86-9FB7C4E833EF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-16T04:03:18', 'Creacion de proyecto: Paseo La Esperanza', '2026-02-16T04:03:18', '2026-02-16T04:03:18');
+    VALUES ('63C4CBEB-2C04-BEB6-69FD-F8CC6FA621C0', '14998618-4A71-013F-DB86-9FB7C4E833EF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-02-17T19:09:18', 'Creacion de proyecto: Paseo La Esperanza', '2026-02-17T19:09:18', '2026-02-17T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('6AF856CB-2531-4104-69FB-CACD3C56E111', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '14998618-4A71-013F-DB86-9FB7C4E833EF', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '14998618-4A71-013F-DB86-9FB7C4E833EF', '2026-02-17T19:09:18', '2026-02-17T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-44036')
@@ -2062,11 +2503,20 @@ BEGIN
         1,
         1,
         0,
-        '2026-06-07T04:03:18'
+        '2026-06-08T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('3C70D69D-92E3-D32C-2BC4-14F8E2D18C85', 'F97E587E-CEF5-6155-418B-2ECB559A3D50', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-07T04:03:18', 'Creacion de proyecto: Bosque Constanza Ejecutivo', '2026-06-07T04:03:18', '2026-06-07T04:03:18');
+    VALUES ('3C70D69D-92E3-D32C-2BC4-14F8E2D18C85', 'F97E587E-CEF5-6155-418B-2ECB559A3D50', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-08T19:09:18', 'Creacion de proyecto: Bosque Constanza Ejecutivo', '2026-06-08T19:09:18', '2026-06-08T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('ACABD007-8258-A3CA-3606-00EB3DBCE0AD', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'F97E587E-CEF5-6155-418B-2ECB559A3D50', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'F97E587E-CEF5-6155-418B-2ECB559A3D50', '2026-06-08T19:09:18', '2026-06-08T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('894DC385-B70A-BFA3-6718-B27BC73310EF', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'F97E587E-CEF5-6155-418B-2ECB559A3D50', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'F97E587E-CEF5-6155-418B-2ECB559A3D50', '2026-06-09T17:09:18', '2026-06-09T17:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('4DED07B5-9746-5CC0-2913-492FFB670FCC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'F97E587E-CEF5-6155-418B-2ECB559A3D50', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'F97E587E-CEF5-6155-418B-2ECB559A3D50', '2026-06-11T11:09:18', '2026-06-11T11:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-56331')
@@ -2097,11 +2547,20 @@ BEGIN
         2,
         0,
         0,
-        '2026-04-02T04:03:18'
+        '2026-04-03T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('260E3F71-DD72-ACFF-CC46-7B165B1880A1', '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-02T04:03:18', 'Creacion de proyecto: Quisqueya Towers', '2026-04-02T04:03:18', '2026-04-02T04:03:18');
+    VALUES ('260E3F71-DD72-ACFF-CC46-7B165B1880A1', '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-03T19:09:18', 'Creacion de proyecto: Quisqueya Towers', '2026-04-03T19:09:18', '2026-04-03T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('11182E7E-F718-C626-2FDD-632F69D9B5C3', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', '2026-04-03T19:09:18', '2026-04-03T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('E9500F15-E419-9F7C-38CD-486F40A34D79', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', '2026-04-05T10:09:18', '2026-04-05T10:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('634DB633-94FD-CC71-D078-1457A3218DC9', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', '2C4F0BC7-9CFA-C2FF-E2A4-C52FA00A353F', '2026-04-04T03:09:18', '2026-04-04T03:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-88003')
@@ -2132,11 +2591,14 @@ BEGIN
         0,
         1,
         0,
-        '2026-07-01T04:03:18'
+        '2026-07-02T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('7BF1D7FC-3272-BDAB-774E-00A2E181DF01', 'A85C061E-DDCC-F169-7742-D8B08AD7DAED', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-01T04:03:18', 'Creacion de proyecto: Complejo Santa Fe Park', '2026-07-01T04:03:18', '2026-07-01T04:03:18');
+    VALUES ('7BF1D7FC-3272-BDAB-774E-00A2E181DF01', 'A85C061E-DDCC-F169-7742-D8B08AD7DAED', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-02T19:09:18', 'Creacion de proyecto: Complejo Santa Fe Park', '2026-07-02T19:09:18', '2026-07-02T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('3EC611DA-2801-AB2E-53F7-15C05CB747EC', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'A85C061E-DDCC-F169-7742-D8B08AD7DAED', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'A85C061E-DDCC-F169-7742-D8B08AD7DAED', '2026-07-02T19:09:18', '2026-07-02T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-15227')
@@ -2167,11 +2629,14 @@ BEGIN
         1,
         2,
         0,
-        '2026-04-29T04:03:18'
+        '2026-04-30T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('A9B5104F-004C-D661-58FF-C3ECBC50BCC9', 'D7333BEC-F373-F1EA-AA07-32C4FDF03BF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-29T04:03:18', 'Creacion de proyecto: Plaza Rio San Juan Vacacional', '2026-04-29T04:03:18', '2026-04-29T04:03:18');
+    VALUES ('A9B5104F-004C-D661-58FF-C3ECBC50BCC9', 'D7333BEC-F373-F1EA-AA07-32C4FDF03BF5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-30T19:09:18', 'Creacion de proyecto: Plaza Rio San Juan Vacacional', '2026-04-30T19:09:18', '2026-04-30T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('B9093C7E-8BB5-9351-2076-0D44F640EF1D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'D7333BEC-F373-F1EA-AA07-32C4FDF03BF5', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'D7333BEC-F373-F1EA-AA07-32C4FDF03BF5', '2026-04-30T19:09:18', '2026-04-30T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-48129')
@@ -2202,11 +2667,14 @@ BEGIN
         0,
         3,
         0,
-        '2026-04-25T04:03:18'
+        '2026-04-26T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('472EC74B-AEE2-A3CD-C631-F94A22D41A84', '33E0D9C5-B866-7E9C-6F49-12FF3A0ACB67', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-25T04:03:18', 'Creacion de proyecto: Palacio Bavaro', '2026-04-25T04:03:18', '2026-04-25T04:03:18');
+    VALUES ('472EC74B-AEE2-A3CD-C631-F94A22D41A84', '33E0D9C5-B866-7E9C-6F49-12FF3A0ACB67', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-26T19:09:18', 'Creacion de proyecto: Palacio Bavaro', '2026-04-26T19:09:18', '2026-04-26T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('5C72CA22-25C6-105F-9ECC-224480F519FA', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '33E0D9C5-B866-7E9C-6F49-12FF3A0ACB67', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '33E0D9C5-B866-7E9C-6F49-12FF3A0ACB67', '2026-04-26T19:09:18', '2026-04-26T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-7877')
@@ -2237,11 +2705,23 @@ BEGIN
         0,
         3,
         0,
-        '2026-06-08T04:03:18'
+        '2026-06-09T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('1400D29D-096F-3D49-2755-9F6B38F3DD3B', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-08T04:03:18', 'Creacion de proyecto: Torre Playa Dorada Beach', '2026-06-08T04:03:18', '2026-06-08T04:03:18');
+    VALUES ('1400D29D-096F-3D49-2755-9F6B38F3DD3B', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-06-09T19:09:18', 'Creacion de proyecto: Torre Playa Dorada Beach', '2026-06-09T19:09:18', '2026-06-09T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('61CECA50-EAC5-126B-009E-59241DC8BF66', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'ECC3F121-F494-D477-6CE5-00069F8A27AB', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', '2026-06-09T19:09:18', '2026-06-09T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('84926D00-FB93-4BD7-B096-5EF381D2E612', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'ECC3F121-F494-D477-6CE5-00069F8A27AB', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', '2026-06-11T05:09:18', '2026-06-11T05:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('4D6B436B-F346-B00B-323F-EADF05170E7D', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'ECC3F121-F494-D477-6CE5-00069F8A27AB', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', '2026-06-10T19:09:18', '2026-06-10T19:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('4AFF3BE3-0584-86A3-8164-78FD9E1F8D49', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'ECC3F121-F494-D477-6CE5-00069F8A27AB', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', 'ECC3F121-F494-D477-6CE5-00069F8A27AB', '2026-06-13T01:09:18', '2026-06-13T01:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-19696')
@@ -2272,11 +2752,23 @@ BEGIN
         2,
         2,
         0,
-        '2026-07-05T04:03:18'
+        '2026-07-06T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('8F98F707-49A3-4AAE-D912-B3B0C230894D', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-05T04:03:18', 'Creacion de proyecto: Paseo El Cacique', '2026-07-05T04:03:18', '2026-07-05T04:03:18');
+    VALUES ('8F98F707-49A3-4AAE-D912-B3B0C230894D', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-07-06T19:09:18', 'Creacion de proyecto: Paseo El Cacique', '2026-07-06T19:09:18', '2026-07-06T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('85B4F9D9-FFC1-043E-3670-B1F12FFC5FA0', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'CED52785-9B19-E7FF-9728-8C202D9E94E7', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', '2026-07-06T19:09:18', '2026-07-06T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('7E9591F9-87F3-1574-383C-E010A08EAFB5', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'CED52785-9B19-E7FF-9728-8C202D9E94E7', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', '2026-07-08T05:09:18', '2026-07-08T05:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('9FE0D9A1-24A3-3881-E7EC-7C036B3CCA29', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'CED52785-9B19-E7FF-9728-8C202D9E94E7', 'CambioEstado', 'CambioEstado', 21, 'EDITADO -> REVISION', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', '2026-07-08T07:09:18', '2026-07-08T07:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('6A3C49E8-A3F9-C33A-AC71-03008AACD239', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'CED52785-9B19-E7FF-9728-8C202D9E94E7', 'CambioEstado', 'CambioEstado', 21, 'REVISION -> PUBLICADO', 'CED52785-9B19-E7FF-9728-8C202D9E94E7', '2026-07-11T10:09:18', '2026-07-11T10:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-56302')
@@ -2307,11 +2799,17 @@ BEGIN
         0,
         0,
         0,
-        '2026-04-16T04:03:18'
+        '2026-04-17T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('D52785FA-09F8-6BC6-BA5E-B56AF6D5FEEE', '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-16T04:03:18', 'Creacion de proyecto: Viviendas Los Cacicazgos Oeste', '2026-04-16T04:03:18', '2026-04-16T04:03:18');
+    VALUES ('D52785FA-09F8-6BC6-BA5E-B56AF6D5FEEE', '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-04-17T19:09:18', 'Creacion de proyecto: Viviendas Los Cacicazgos Oeste', '2026-04-17T19:09:18', '2026-04-17T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('854BB75F-A492-1E3F-C211-B241FD673518', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', '2026-04-17T19:09:18', '2026-04-17T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('98D65604-77BC-5CCC-C0B9-2619D1359D43', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', 'CambioEstado', 'CambioEstado', 21, 'CREADO -> EDITADO', '04D1E9B0-A5AC-7537-E4F3-62AC2328D458', '2026-04-17T20:09:18', '2026-04-17T20:09:18', (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-49862')
@@ -2342,9 +2840,12 @@ BEGIN
         2,
         0,
         0,
-        '2026-03-24T04:03:18'
+        '2026-03-25T19:09:18'
     );
 
     INSERT INTO LogProyectos (Id, ProyectoId, UsuarioId, FechaCreacion, Detalle, CreatedAtUtc, UpdatedAtUtc)
-    VALUES ('9699E379-0385-C2EA-6FE3-9D7864B7B2CA', 'E0592D67-8E08-89F3-2F94-FD94A262D346', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-24T04:03:18', 'Creacion de proyecto: Jardines El Cacique Hills', '2026-03-24T04:03:18', '2026-03-24T04:03:18');
+    VALUES ('9699E379-0385-C2EA-6FE3-9D7864B7B2CA', 'E0592D67-8E08-89F3-2F94-FD94A262D346', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), '2026-03-25T19:09:18', 'Creacion de proyecto: Jardines El Cacique Hills', '2026-03-25T19:09:18', '2026-03-25T19:09:18');
+
+    INSERT INTO Auditorias (Id, UsuarioId, ProyectoId, TipoEvento, Accion, TipoOperacion, Resultado, ReferenciaExpedienteId, FechaEventoUtc, CreatedAtUtc, EstadoAnteriorId, EstadoNuevoId, Detalle, IpOrigen, UserAgent)
+    VALUES ('8AAED302-B978-DC76-68DE-B451187CA741', (SELECT IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do'), 'E0592D67-8E08-89F3-2F94-FD94A262D346', 'CambioEstado', 'CambioEstado', 21, 'null -> CREADO', 'E0592D67-8E08-89F3-2F94-FD94A262D346', '2026-03-25T19:09:18', '2026-03-25T19:09:18', NULL, (SELECT Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO'), 'Transicion automatica de estado', '127.0.0.1', 'Seeder/1.0');
 END

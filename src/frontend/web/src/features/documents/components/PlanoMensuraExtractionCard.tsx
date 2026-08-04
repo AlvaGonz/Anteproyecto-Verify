@@ -6,6 +6,7 @@ import {
   ExtractedField
 } from "../types";
 import { ResolutionAction } from "../schemas/planoMensura.schema";
+import { fetchMunicipalities } from "../api/geo";
 import { Loader2 } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
@@ -118,13 +119,11 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       extraction.municipio?.rawValue || extraction.municipalityResolution?.resolvedId || extraction.municipio?.normalizedValue;
 
     if (selectedProvinceId) {
-      const fetchMunicipalities = async () => {
+      const loadMunicipalities = async () => {
         setLoadingMunicipalities(true);
         setMunicipalityError(null);
         try {
-          const response = await fetch(`/api/geo/municipios?provinciaId=${selectedProvinceId}`);
-          if (!response.ok) throw new Error('Failed to fetch municipalities');
-          const data: Municipality[] = await response.json();
+          const data: Municipality[] = await fetchMunicipalities(selectedProvinceId);
           setMunicipalities(data);
 
           const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
@@ -149,18 +148,16 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
           setLoadingMunicipalities(false);
         }
       };
-      fetchMunicipalities();
+      loadMunicipalities();
       return;
     }
 
     if (municipioData) {
-      const fetchAllMunicipalities = async () => {
+      const loadAllMunicipalities = async () => {
         setLoadingMunicipalities(true);
         setMunicipalityError(null);
         try {
-          const response = await fetch('/api/geo/municipios');
-          if (!response.ok) throw new Error('Failed to fetch municipalities');
-          const data: Municipality[] = await response.json();
+          const data: Municipality[] = await fetchMunicipalities();
           setMunicipalities(data);
 
           const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
@@ -180,7 +177,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
           setLoadingMunicipalities(false);
         }
       };
-      fetchAllMunicipalities();
+      loadAllMunicipalities();
       return;
     }
 

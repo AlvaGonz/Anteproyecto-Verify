@@ -18,8 +18,8 @@ public class PagoConfiguration : IEntityTypeConfiguration<Pago>
         builder.Property(p => p.Monto).HasColumnType("decimal(10,2)");
         builder.Property(p => p.FechaPago).HasDefaultValueSql("GETDATE()");
 
-        builder.HasOne(p => p.UsuarioLegacy)
-            .WithMany(ul => ul.Pagos)
+        builder.HasOne(p => p.Usuario)
+            .WithMany()
             .HasForeignKey(p => p.IdUsuario)
             .OnDelete(DeleteBehavior.Cascade);
 

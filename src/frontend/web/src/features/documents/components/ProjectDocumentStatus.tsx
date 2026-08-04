@@ -24,12 +24,42 @@ const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string
   [DocumentType.CertificadoTitulo]: { name: "Certificado de Título de Propiedad", entity: "Registro de Títulos", norm: "Ley 108-05" },
   [DocumentType.CertificacionEstadoJuridico]: { name: "Certificación de Estado Jurídico", entity: "Registro de Títulos", norm: "Ley 108-05" },
   [DocumentType.PlanoMensuraCatastral]: { name: "Plano de Mensura Catastral", entity: "Tribunal de Tierras", norm: "Ley 108-05" },
+  [DocumentType.CopiaCedulaIdentidad]: { name: "Cédula / Identidad del Titular", entity: "Junta Central Electoral", norm: "Ley 8-04" },
   [DocumentType.CertificadoUsoSuelo]: { name: "Certificado de Uso de Suelo", entity: "Ayuntamiento", norm: "Ordenanzas" },
   [DocumentType.CertificacionIPI]: { name: "Certificación IPI al día", entity: "DGII", norm: "Ley 18-88" },
   [DocumentType.RegistroMercantil]: { name: "Registro Mercantil activo", entity: "Cámara de Comercio", norm: "Ley 3-02" },
   [DocumentType.PoderNotarial]: { name: "Poder Notarial", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
   [DocumentType.RNC]: { name: "RNC activo", entity: "DGII", norm: "-" },
+  [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
 };
+
+const ESSENTIAL_TYPES: DocumentType[] = [
+  DocumentType.CertificadoTitulo,
+  DocumentType.CertificacionEstadoJuridico,
+  DocumentType.PlanoMensuraCatastral,
+  DocumentType.CopiaCedulaIdentidad,
+  DocumentType.CertificacionIPI,
+];
+
+const ANEXO_TYPES: DocumentType[] = [
+  DocumentType.CertificadoUsoSuelo,
+  DocumentType.RegistroMercantil,
+  DocumentType.PoderNotarial,
+  DocumentType.RNC,
+  DocumentType.CertificadoEIA,
+];
+
+// Tipos legacy del enum backend que se mapean a su categoría canónica,
+// para que documentos subidos con el tipo antiguo aparezcan en la vista pública.
+const LEGACY_TYPE_ALIASES: Partial<Record<DocumentType, DocumentType>> = {
+  [DocumentType.TITLE]: DocumentType.CertificadoTitulo,
+  [DocumentType.LEGAL_STATUS]: DocumentType.CertificacionEstadoJuridico,
+  [DocumentType.SURVEY]: DocumentType.PlanoMensuraCatastral,
+  [DocumentType.ID]: DocumentType.CopiaCedulaIdentidad,
+  [DocumentType.NOTARIAL_POWER]: DocumentType.PoderNotarial,
+};
+
+const canonicalType = (tipo: DocumentType): DocumentType => LEGACY_TYPE_ALIASES[tipo] ?? tipo;
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId }) => {
   const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
@@ -42,21 +72,28 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
     </div>
   );
 
-  const requiredTypes = Object.keys(DOCUMENT_INFO).map(Number) as DocumentType[];
+  const uploadedEssentials = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ESSENTIAL_TYPES.includes(canonicalType(d.tipoDocumento)));
+  const uploadedAnexos = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ANEXO_TYPES.includes(canonicalType(d.tipoDocumento)));
 
-  const uploadedDocs = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && requiredTypes.includes(d.tipoDocumento));
+  const missingCount = ESSENTIAL_TYPES.length - new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size;
 
-
-  const missingCount = requiredTypes.length - uploadedDocs.length;
-  const progressPercent = requiredTypes.length > 0
-    ? Math.round((uploadedDocs.length / requiredTypes.length) * 100)
-    : 100;
+  // Nivel de Confianza: 5 esenciales valen 80% (16% c/u), 5 anexos valen 20% (4% c/u).
+  // Se cuentan TIPOS ÚNICOS cubiertos — varios documentos del mismo tipo no suman más.
+  const ESSENTIAL_WEIGHT = 80;
+  const ANEXO_WEIGHT = 20;
+  const essentialPercent = ESSENTIAL_TYPES.length > 0
+    ? Math.round((new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size / ESSENTIAL_TYPES.length) * ESSENTIAL_WEIGHT)
+    : ESSENTIAL_WEIGHT;
+  const anexoPercent = ANEXO_TYPES.length > 0
+    ? Math.round((new Set(uploadedAnexos.map((d: any) => canonicalType(d.tipoDocumento))).size / ANEXO_TYPES.length) * ANEXO_WEIGHT)
+    : ANEXO_WEIGHT;
+  const progressPercent = essentialPercent + anexoPercent;
 
   const renderDocItem = (typeId: DocumentType, index: number) => {
     const info = DOCUMENT_INFO[typeId];
     if (!info) return null;
 
-    const doc = documents.find((d: any) => d.tipoDocumento === typeId);
+    const doc = documents.find((d: any) => d.tipoDocumento === typeId || canonicalType(d.tipoDocumento) === typeId);
     const isVerificado = doc?.estadoDocumento === DocumentStatus.Verificado || doc?.estadoDocumento === DocumentStatus.Valid;
     const isPending = doc && doc.estadoDocumento !== DocumentStatus.Invalid && !isVerificado;
     const isObservado = doc?.estadoDocumento === DocumentStatus.Observado;
@@ -216,8 +253,26 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 gap-4">
-        {requiredTypes.map((typeId, idx) => renderDocItem(typeId, idx))}
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-5 bg-primary rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-secondary">Documentos Principales</h3>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {ESSENTIAL_TYPES.map((typeId, idx) => renderDocItem(typeId, idx))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-5 bg-on-surface-variant/30 rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant/60">Anexos</h3>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {ANEXO_TYPES.map((typeId, idx) => renderDocItem(typeId, idx + ESSENTIAL_TYPES.length))}
+          </div>
+        </div>
       </div>
 
       <div className="pt-10 border-t border-surface-container-high/50 flex flex-col items-center gap-4">

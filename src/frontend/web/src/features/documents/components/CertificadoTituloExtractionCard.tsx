@@ -6,6 +6,7 @@ import {
   ExtractedField
 } from "../types";
 import { ResolutionAction } from "../schemas/certificadoTitulo.schema";
+import { fetchMunicipalities } from "../api/geo";
 import { Loader2 } from "lucide-react";
 import { formatMatricula, formatSuperficieM2 } from "../utils/numericFormatter";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
@@ -102,13 +103,11 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
       return;
     }
 
-    const fetchMunicipalities = async () => {
+    const loadMunicipalities = async () => {
       setLoadingMunicipalities(true);
       setMunicipalityError(null);
       try {
-        const response = await fetch(`/api/geo/municipios?provinciaId=${selectedProvinceId}`);
-        if (!response.ok) throw new Error('Failed to fetch municipalities');
-        const data = await response.json();
+        const data = await fetchMunicipalities(selectedProvinceId);
         setMunicipalities(data);
         
         const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
@@ -135,7 +134,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
         setLoadingMunicipalities(false);
       }
     };
-    fetchMunicipalities();
+    loadMunicipalities();
   }, [selectedProvinceId, extraction.municipalityResolution?.resolvedId]);
 
   // Auto-emit suggestion when resolution is ready and action is AutoApply

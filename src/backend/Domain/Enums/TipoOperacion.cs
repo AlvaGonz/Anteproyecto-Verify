@@ -22,6 +22,7 @@ public enum TipoOperacion
     EmailOtpUsado = 17,
     CodigoRecuperacionUsado = 18,
     EmailOtpResendThrottled = 19,
-    EmailOtpFalloEnvio = 20
+    EmailOtpFalloEnvio = 20,
+    CambioEstado = 21
 }
 

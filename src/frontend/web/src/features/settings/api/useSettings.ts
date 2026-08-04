@@ -131,6 +131,19 @@ export const useUpdateMyProfile = () => {
   });
 };
 
+export const useUpdatePublicPreferences = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["useUpdatePublicPreferences"],
+    mutationFn: (data: { nombreModo: Array<"realName" | "nickname">; identificacionModo: Array<"cedula" | "rnc"> }) =>
+      apiClient.patch("/auth/preferences", data).then((res) => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["auth", "me"] });
+      qc.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+};
+
 export const useUploadAvatar = () => {
   const qc = useQueryClient();
   return useMutation({

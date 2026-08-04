@@ -1,3 +1,10 @@
+export interface ProjectRegistrantPresentation {
+  nombreMostrado: string;
+  identificacionMostrada?: string | null;
+  identificacionTipo?: 'cedula' | 'rnc' | null;
+  razonSocialMostrada?: string | null;
+}
+
 export interface ProjectRegistrant {
   id: string;
   nombreCompleto: string;
@@ -10,6 +17,7 @@ export interface ProjectRegistrant {
   verificado: boolean;
   titularId?: string | null;
   direccion?: string | null;
+  presentacionPublica?: ProjectRegistrantPresentation | null;
 }
 
 export interface ProyectoDto {

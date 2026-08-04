@@ -18,6 +18,7 @@ export const useUploadDocument = (projectId: string) => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
       qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] });
+      qc.invalidateQueries({ queryKey: ["statusHistory", projectId] }); // ponytail: upload may auto-promote to REVISION
     },
   });
 };

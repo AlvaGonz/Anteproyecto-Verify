@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Abstractions.Notifications;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Infrastructure.Email;
 using Resend;
@@ -22,7 +24,6 @@ public class ResendEmailServiceTests
     {
         _fakeResend = Substitute.For<IResend>();
 
-        // Set up the mocked call return value using default/null as the value is ignored by our service anyway
         _ = _fakeResend.EmailSendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<ResendResponse<Guid>>(null!));
 
@@ -41,6 +42,26 @@ public class ResendEmailServiceTests
             _configuration,
             NullLogger<ResendEmailService>.Instance
         );
+    }
+
+    private static (ResendEmailService sut, TestLogger<ResendEmailService> logger) CreateSutWithLogger(string apiToken = "re_prod_valid-token-not-mock")
+    {
+        var fakeResend = Substitute.For<IResend>();
+        _ = fakeResend.EmailSendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<ResendResponse<Guid>>(null!));
+
+        var inMemorySettings = new Dictionary<string, string?> {
+            {"Resend:ApiToken", apiToken},
+            {"Resend:FromEmail", "hola@verifinca.com"},
+            {"Resend:FromName", "VeriFinca Test"}
+        };
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+
+        var logger = new TestLogger<ResendEmailService>();
+        var sut = new ResendEmailService(fakeResend, config, logger);
+        return (sut, logger);
     }
 
     [Fact]
@@ -203,4 +224,187 @@ public class ResendEmailServiceTests
         Assert.Contains("My Estate", capturedMsg.HtmlBody);
         Assert.Contains("proj-123", capturedMsg.HtmlBody);
     }
+
+    // ──────────────────────────────────────────────
+    // TDD RED: Error handling tests (these MUST fail before implementation)
+    // ──────────────────────────────────────────────
+
+    [Fact]
+    public async Task SendEmailAsync_WhenResendThrows_LogsErrorWithStructuredContext()
+    {
+        // Arrange
+        var (sut, logger) = CreateSutWithLogger();
+        var fakeResend = Substitute.For<IResend>();
+        _ = fakeResend.EmailSendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<ResendResponse<Guid>>(null!));
+
+        // Override _resend via reflection to inject the throwing mock
+        var resendField = typeof(ResendEmailService).GetField("_resend",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        var originalResend = resendField.GetValue(sut);
+
+        // Make Resend throw a simulated ResendException
+        var resendEx = new Exception("API key is invalid");
+        resendField.SetValue(sut, ThrowingResend(resendEx));
+
+        try
+        {
+            // Act
+            await sut.SendEmailAsync("user@realdomain.com", "Test Subject", "<p>Body</p>");
+
+            // Assert: LogError was called
+            Assert.True(logger.Errors.Count > 0, "Expected at least one LogError call when Resend throws");
+
+            var errorEntry = logger.Errors[0];
+
+            // FAILING assertions — these will fail until structured logging is implemented
+            Assert.True(
+                (errorEntry.State?.ToString() ?? "").Contains("CorrelationId"),
+                "Error log MUST include CorrelationId for tracing");
+            Assert.True(
+                (errorEntry.State?.ToString() ?? "").Contains("StatusCode"),
+                "Error log MUST include HTTP status code from Resend");
+            Assert.True(
+                (errorEntry.State?.ToString() ?? "").Contains("RecipientHash"),
+                "Error log MUST include recipient hash (Ley 172-13)");
+            Assert.True(
+                (errorEntry.Message ?? "").Contains("[RESEND_FAILURE]"),
+                "Error log MUST include [RESEND_FAILURE] marker");
+        }
+        finally
+        {
+            resendField.SetValue(sut, originalResend);
+        }
+    }
+
+    [Fact]
+    public async Task TrySendEmailAsync_WhenResendThrows_ReturnsFailureResult()
+    {
+        // Arrange
+        var (sut, logger) = CreateSutWithLogger();
+        var resendEx = new Exception("Simulated provider failure");
+
+        var resendField = typeof(ResendEmailService).GetField("_resend",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        var originalResend = resendField.GetValue(sut);
+        resendField.SetValue(sut, ThrowingResend(resendEx));
+
+        EmailSendResult? result = null;
+        try
+        {
+            // Act: TrySendEmailAsync MUST return a typed failure, not swallow
+            result = await sut.TrySendEmailAsync("user@realdomain.com", "Test", "<p>Body</p>");
+        }
+        finally
+        {
+            resendField.SetValue(sut, originalResend);
+        }
+
+        // Assert: typed result indicates failure
+        Assert.NotNull(result);
+        Assert.False(result.IsSuccess,
+            "TrySendEmailAsync MUST return IsSuccess=false when Resend fails");
+        Assert.NotEmpty(result.CorrelationId);
+        Assert.NotNull(result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task SendEmailAsync_WhenSuccessful_LogsAtInformationWithCorrelationId()
+    {
+        // Arrange
+        var (sut, logger) = CreateSutWithLogger();
+        var resendField = typeof(ResendEmailService).GetField("_resend",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        var originalResend = resendField.GetValue(sut);
+
+        var successFake = Substitute.For<IResend>();
+        _ = successFake.EmailSendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<ResendResponse<Guid>>(null!));
+        resendField.SetValue(sut, successFake);
+
+        try
+        {
+            // Act
+            await sut.SendEmailAsync("user@realdomain.com", "Subject", "<p>Body</p>");
+
+            // Assert: success is logged
+            var infoLogs = logger.InformationEntries
+                .Where(e => (e.Message ?? "").Contains("successfully") ||
+                            (e.Message ?? "").Contains("sent"))
+                .ToList();
+
+            Assert.True(infoLogs.Count > 0, "Expected at least one success log entry");
+
+            // FAILING: correlationId not yet implemented on success path either
+            var successEntry = infoLogs[0];
+            Assert.True(
+                (successEntry.State?.ToString() ?? "").Contains("CorrelationId"),
+                "Success log MUST include CorrelationId for traceability");
+        }
+        finally
+        {
+            resendField.SetValue(sut, originalResend);
+        }
+    }
+
+    [Fact]
+    public async Task SendEmailOtpAsync_WhenResendThrows_DoesNotSwallow()
+    {
+        // Arrange
+        var (sut, logger) = CreateSutWithLogger();
+        var resendEx = new Exception("OTP provider failure");
+
+        var resendField = typeof(ResendEmailService).GetField("_resend",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        var originalResend = resendField.GetValue(sut);
+        resendField.SetValue(sut, ThrowingResend(resendEx));
+
+        bool exceptionSurfaced = false;
+        try
+        {
+            // Act
+            await sut.SendEmailOtpAsync("user@realdomain.com", "John", "123456");
+        }
+        catch
+        {
+            exceptionSurfaced = true;
+        }
+        finally
+        {
+            resendField.SetValue(sut, originalResend);
+        }
+
+        // Assert: OTP send MUST NOT swallow — it already bubbles per the contract
+        Assert.True(exceptionSurfaced,
+            "SendEmailOtpAsync MUST surface provider failures. This test exists to prevent regression.");
+    }
+
+    private static IResend ThrowingResend(Exception ex)
+    {
+        var fake = Substitute.For<IResend>();
+        _ = fake.EmailSendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<ResendResponse<Guid>>(ex));
+        return fake;
+    }
+}
+
+internal sealed class TestLogger<T> : ILogger<T>
+{
+    public readonly List<LogEntry> Errors = new();
+    public readonly List<LogEntry> InformationEntries = new();
+    public readonly List<LogEntry> All = new();
+
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+    public bool IsEnabled(LogLevel logLevel) => true;
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        var entry = new LogEntry(logLevel, formatter(state, exception), state?.ToString(), exception);
+        All.Add(entry);
+        if (logLevel == LogLevel.Error)
+            Errors.Add(entry);
+        if (logLevel == LogLevel.Information)
+            InformationEntries.Add(entry);
+    }
+
+    public sealed record LogEntry(LogLevel Level, string Message, string? State, Exception? Exception);
 }

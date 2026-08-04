@@ -23,11 +23,8 @@ public class AppDbContext : DbContext
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
     public DbSet<SesionUsuario> SesionesUsuario => Set<SesionUsuario>();
 
-    // Legacy Tables for Admin Settings
-    public DbSet<UsuarioLegacy> UsuariosLegacy => Set<UsuarioLegacy>();
     public DbSet<Perfil> Perfiles => Set<Perfil>();
     public DbSet<Permiso> Permisos => Set<Permiso>();
-    public DbSet<Acceso> Accesos => Set<Acceso>();
     public DbSet<PlanSuscripcion> PlanesSuscripcion => Set<PlanSuscripcion>();
     public DbSet<Pago> Pagos => Set<Pago>();
     public DbSet<PerfilPermiso> PerfilPermisos => Set<PerfilPermiso>();

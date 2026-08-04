@@ -296,6 +296,29 @@ public class ProjectsController : ControllerBase
         }
     }
 
+    [HttpGet("{id:guid}/status-history")]
+    public async Task<ActionResult> GetStatusHistory(Guid id, CancellationToken cancellationToken)
+    {
+        var entries = await _dbContext.Auditorias
+            .Where(a => a.ProyectoId == id && a.TipoOperacion == TipoOperacion.CambioEstado)
+            .OrderByDescending(a => a.FechaEventoUtc)
+            .Select(a => new
+            {
+                id = a.Id,
+                proyectoId = a.ProyectoId,
+                estadoAnteriorId = a.EstadoAnteriorId,
+                estadoAnteriorNombre = a.EstadoAnterior != null ? a.EstadoAnterior.Nombre : null,
+                estadoNuevoId = a.EstadoNuevoId,
+                estadoNuevoNombre = a.EstadoNuevo != null ? a.EstadoNuevo.Nombre : null,
+                usuarioId = a.UsuarioId,
+                usuarioNombre = a.Usuario != null ? a.Usuario.Nombre + " " + a.Usuario.Apellido : null,
+                fechaCambioUtc = a.FechaEventoUtc
+            })
+            .ToListAsync(cancellationToken);
+
+        return Ok(entries);
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteProject(Guid id, CancellationToken cancellationToken)
     {

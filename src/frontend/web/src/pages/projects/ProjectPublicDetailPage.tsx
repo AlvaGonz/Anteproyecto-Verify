@@ -30,12 +30,15 @@ import {
   User,
   ArrowRight,
   Loader2,
+  Building2,
+  MapIcon,
 } from "lucide-react";
 import { m } from "framer-motion";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { usePlanLimits } from "../../features/settings/api/useSettings";
 import { DocumentosModal } from "../../features/documents/components/DocumentosModal";
 import { BackToTopButton } from "../../shared/components/ui/BackToTopButton";
+import { MiniMap } from "../../shared/components/ui/MiniMap";
 
 
 
@@ -61,7 +64,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const [showDocumentos, setShowDocumentos] = React.useState(false);
   const [hasQuota, setHasQuota] = React.useState<boolean | null>(null);
 
-  
+
   const queryClient = useQueryClient();
   const { registerInterest, isRegisteringInterest, unregisterInterest, isUnregisteringInterest, saveProject, unsaveProject, isSaving, isUnsaving } = useProjectsInteractions();
   const { data: interestsList } = useInterests(isAuthenticated);
@@ -90,6 +93,17 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
   const quotaHandledRef = React.useRef(false);
+
+  // Parse GPS coordinates
+  let gpsLat: number | null = null;
+  let gpsLng: number | null = null;
+  if (project?.ubicacionGps) {
+    const parts = project.ubicacionGps.split(",").map((s) => parseFloat(s.trim()));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+      gpsLat = parts[0];
+      gpsLng = parts[1];
+    }
+  }
 
   React.useEffect(() => {
     async function consumeBg() {
@@ -184,7 +198,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
             <ArrowLeft className="w-5 h-5 mr-3" /> VOLVER AL DIRECTORIO
           </Link>
         </div>
-        
+
         {/* Consultation Limit Modal */}
         <LimitReachedModal
           isOpen={showQuotaModal}
@@ -446,116 +460,177 @@ export const ProjectPublicDetailPage: React.FC = () => {
                       )}
                       <div className="font-display min-w-0">
                         <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50 block mb-0.5">Responsable Registral</span>
-                        <span className="text-xl md:text-2xl font-black leading-tight tracking-tighter italic block break-words">
-                          {project.registradoPor.nombreCompleto}
+                        <span className="text-xl md:text-2xl font-black leading-tight tracking-tighter italic block break-words" data-testid="public-registrant-name">
+                          {project.registradoPor.presentacionPublica?.nombreMostrado ?? project.registradoPor.nombreCompleto}
                         </span>
-                        {project.registradoPor.razonSocial && (
-                          <span className="text-xs font-medium text-primary mt-1 block break-words">
-                            {project.registradoPor.razonSocial}
-                          </span>
-                        )}
+                        {project.registradoPor.presentacionPublica
+                          ? project.registradoPor.presentacionPublica.razonSocialMostrada && (
+                              <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
+                                {project.registradoPor.presentacionPublica.razonSocialMostrada}
+                              </span>
+                            )
+                          : project.registradoPor.razonSocial && (
+                              <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
+                                {project.registradoPor.razonSocial}
+                              </span>
+                            )}
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {project.registradoPor.verificado && (
-                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">
-                          <ShieldCheck className="w-3 h-3" />
-                          <span className="text-[9px] font-black uppercase tracking-widest">Verificado</span>
-                        </div>
-                      )}
                     </div>
                   </div>
 
                   {/* Registrant details */}
                   <div className="space-y-6 md:space-y-8">
-                        <div className="p-4 md:p-5 rounded-3xl bg-white/5 border border-white/10 space-y-3">
-                          {project.registradoPor.email && (
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                                <Mail className="w-4 h-4 text-primary" />
-                              </div>
-                              <div className="min-w-0">
-                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Correo Electrónico</span>
-                                <a href={`mailto:${project.registradoPor.email}`} className="text-sm font-medium text-white/90 hover:text-white break-words block">
-                                  {project.registradoPor.email}
-                                </a>
-                              </div>
-                            </div>
-                          )}
-                          {project.registradoPor.telefono && (
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                                <Phone className="w-4 h-4 text-primary" />
-                              </div>
-                              <div className="min-w-0">
-                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Teléfono Directo</span>
-                                <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
-                                  {project.registradoPor.telefono}
-                                </a>
-                              </div>
-                            </div>
-                          )}
+                    <div className="p-4 md:p-5 rounded-3xl bg-white/5 border border-white/10 space-y-3">
+                      {project.registradoPor.email && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <Mail className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Correo Electrónico</span>
+                            <a href={`mailto:${project.registradoPor.email}`} className="text-sm font-medium text-white/90 hover:text-white break-words block">
+                              {project.registradoPor.email}
+                            </a>
+                          </div>
                         </div>
-
-                        {/* Me Interesa / Guardado Button */}
-                        <button
-                          type="button"
-                          disabled={isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving}
-                          onClick={() => {
-                            if (!isAuthenticated) {
-                              addToast("Debe iniciar sesión para registrar su interés en el proyecto.", "info");
-                              return;
-                            }
-                            if (canManage) {
-                              addToast("Esta acción no es posible porque usted es el vendedor o representante de este proyecto.", "error");
-                              return;
-                            }
-                            if (isInterested) {
-                              // Toggle off: unregister interest + unsave
-                              setIsInterested(false);
-                              setLocalSaved(false);
-                              unregisterInterest(project.id, {
-                                onError: () => { setIsInterested(true); setLocalSaved(true); }
-                              });
-                              unsaveProject(project.id, {
-                                onError: () => setLocalSaved(true)
-                              });
-                            } else {
-                              setIsInterested(true);
-                              setLocalSaved(true);
-                              registerInterest(project.id, {
-                                onError: () => { setIsInterested(false); setLocalSaved(false); }
-                              });
-                              saveProject(project.id, {
-                                onError: () => setLocalSaved(false)
-                              });
-                            }
-                          }}
-                          className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${
-                            isInterested
-                              ? "bg-emerald-600 text-white shadow-[0_0_40px_-10px_rgba(5,150,105,0.5)] scale-[1.02] hover:bg-emerald-700"
-                              : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
-                          } disabled:opacity-70 disabled:cursor-not-allowed`}
+                      )}
+                      {project.registradoPor.telefono && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <Phone className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Teléfono Directo</span>
+                            <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white truncate block">
+                              {project.registradoPor.telefono}
+                            </a>
+                          </div>
+                        </div>
+                      )}
+                      {(project.registradoPor.presentacionPublica
+                        ? project.registradoPor.presentacionPublica.identificacionMostrada
+                        : (project.cedulaRncPropietario || project.rncDesarrollador)) && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <Fingerprint className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">RNC/Cédula</span>
+                            <span className="text-sm font-medium text-white/90 break-words block" data-testid="public-registrant-identification">
+                              {project.registradoPor.presentacionPublica
+                                ? project.registradoPor.presentacionPublica.identificacionMostrada
+                                : (project.cedulaRncPropietario || project.rncDesarrollador)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {project.ubicacionTexto && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <MapPin className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Ubicación</span>
+                            <span className="text-sm font-medium text-white/90 break-words block">
+                              {project.ubicacionTexto}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {project.registradoPor.direccion && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <Building2 className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Dirección</span>
+                            <span className="text-sm font-medium text-white/90 break-words block">
+                              {project.registradoPor.direccion}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {project.registradoPor.telefono && (
+                        <a
+                          href={`https://wa.me/${project.registradoPor.telefono.replace(/\D/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                         >
-                          {!isInterested && !isRegisteringInterest && (
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                          )}
-                          <span className="relative z-10 text-center leading-tight">
-                            {(isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving)
-                              ? "Procesando..."
-                              : isInterested
-                              ? "Guardado en tus registros"
-                              : "Me interesa el proyecto"}
-                          </span>
-                          {(isRegisteringInterest || isUnregisteringInterest || isSaving || isUnsaving) ? (
-                            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0 relative z-10" />
-                          ) : isInterested ? (
-                            <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />
-                          ) : (
-                            <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
-                          )}
-                        </button>
+                          <div className="w-9 h-9 rounded-2xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                            <Phone className="w-4 h-4 text-emerald-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/80 block mb-0.5">WhatsApp</span>
+                            <span className="text-sm font-medium text-emerald-300 break-words block">
+                              {project.registradoPor.telefono}
+                            </span>
+                          </div>
+                        </a>
+                      )}
                     </div>
+
+                    {/* Me Interesa Button — solo registra interés, no guarda (el botón Guardar es aparte) */}
+                    <button
+                      type="button"
+                      disabled={isRegisteringInterest || isUnregisteringInterest}
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          addToast("Debe iniciar sesión para registrar su interés en el proyecto.", "info");
+                          return;
+                        }
+                        if (canManage) {
+                          addToast("Esta acción no es posible porque usted es el vendedor o representante de este proyecto.", "error");
+                          return;
+                        }
+                        if (isInterested) {
+                          setIsInterested(false);
+                          unregisterInterest(project.id, {
+                            onError: () => setIsInterested(true)
+                          });
+                        } else {
+                          setIsInterested(true);
+                          registerInterest(project.id, {
+                            onError: () => setIsInterested(false)
+                          });
+                        }
+                      }}
+                      className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
+                          ? "bg-emerald-600 text-white shadow-[0_0_40px_-10px_rgba(5,150,105,0.5)] scale-[1.02] hover:bg-emerald-700"
+                          : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
+                        } disabled:opacity-70 disabled:cursor-not-allowed`}
+                    >
+                      {!isInterested && !isRegisteringInterest && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                      )}
+                      <span className="relative z-10 text-center leading-tight">
+                        {(isRegisteringInterest || isUnregisteringInterest)
+                          ? "Procesando..."
+                          : isInterested
+                            ? "Interés Registrado"
+                            : "Contactar Responsable"}
+                      </span>
+                      {(isRegisteringInterest || isUnregisteringInterest) ? (
+                        <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0 relative z-10" />
+                      ) : isInterested ? (
+                        <CheckCircle2 className="w-5 h-5 relative z-10 shrink-0" />
+                      ) : (
+                        <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
+                      )}
+                    </button>
+
+                    {/* Map */}
+                    <div className="w-full h-48 border border-white/10 rounded-3xl overflow-hidden bg-white/5">
+                      {gpsLat !== null && gpsLng !== null ? (
+                        <MiniMap lat={gpsLat} lng={gpsLng} />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-white/30">
+                          <MapIcon size={24} className="mb-2" />
+                          <span className="text-[10px] font-bold uppercase">Sin coordenadas</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
                 </div>
               </m.div>
@@ -563,43 +638,42 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
             {/* Save button */}
             <button
-                type="button"
-                disabled={isSaving || isUnsaving}
-                onClick={() => {
-                  if (canManage) {
-                    addToast("Esta acción no es posible porque usted es el vendedor o representante de este proyecto.", "error");
-                    return;
-                  }
-                  if (localSaved) {
-                    setLocalSaved(false);
-                    unsaveProject(project.id, {
-                      onError: () => setLocalSaved(true)
-                    });
-                  } else {
-                    setLocalSaved(true);
-                    saveProject(project.id, {
-                      onError: () => setLocalSaved(false)
-                    });
-                  }
-                }}
-                className={`text-xs font-bold px-4 py-2 rounded shadow-sm transition-all duration-300 disabled:opacity-70 flex items-center gap-2 cursor-pointer ${
-                  localSaved ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-[0_0_10px_rgba(5,150,105,0.4)]" : "bg-primary text-white hover:bg-primary/90"
+              type="button"
+              disabled={isSaving || isUnsaving}
+              onClick={() => {
+                if (canManage) {
+                  addToast("Esta acción no es posible porque usted es el vendedor o representante de este proyecto.", "error");
+                  return;
+                }
+                if (localSaved) {
+                  setLocalSaved(false);
+                  unsaveProject(project.id, {
+                    onError: () => setLocalSaved(true)
+                  });
+                } else {
+                  setLocalSaved(true);
+                  saveProject(project.id, {
+                    onError: () => setLocalSaved(false)
+                  });
+                }
+              }}
+              className={`text-xs font-bold px-4 py-2 rounded shadow-sm transition-all duration-300 disabled:opacity-70 flex items-center gap-2 cursor-pointer ${localSaved ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-[0_0_10px_rgba(5,150,105,0.4)]" : "bg-primary text-white hover:bg-primary/90"
                 }`}
-              >
-                {isSaving || isUnsaving ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    <span>Procesando...</span>
-                  </>
-                ) : localSaved ? (
-                  <>
-                    <CheckCircle2 size={14} />
-                    <span>Guardado</span>
-                  </>
-                ) : (
-                  <span>Guardar</span>
-                )}
-              </button>
+            >
+              {isSaving || isUnsaving ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Procesando...</span>
+                </>
+              ) : localSaved ? (
+                <>
+                  <CheckCircle2 size={14} />
+                  <span>Guardado</span>
+                </>
+              ) : (
+                <span>Guardar</span>
+              )}
+            </button>
 
             {/* Integrity Status Card */}
             <m.div
@@ -656,21 +730,21 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
       {/* Institutional Footer */}
       <LandingFooter />
-    
-    {/* Documentos Modal */}
-    <DocumentosModal projectId={project.id} isOpen={showDocumentos} onClose={() => setShowDocumentos(false)} />
 
-    {/* Consultation Limit Modal */}
-    <LimitReachedModal
-      isOpen={showQuotaModal}
-      onClose={handleCloseQuotaModal}
-      onViewPlans={handleViewPlans}
-      limitType="consultations"
-      used={quotaError?.used}
-      max={quotaError?.max}
-    />
+      {/* Documentos Modal */}
+      <DocumentosModal projectId={project.id} isOpen={showDocumentos} onClose={() => setShowDocumentos(false)} />
 
-    <BackToTopButton />
+      {/* Consultation Limit Modal */}
+      <LimitReachedModal
+        isOpen={showQuotaModal}
+        onClose={handleCloseQuotaModal}
+        onViewPlans={handleViewPlans}
+        limitType="consultations"
+        used={quotaError?.used}
+        max={quotaError?.max}
+      />
+
+      <BackToTopButton />
     </div>
   );
 };

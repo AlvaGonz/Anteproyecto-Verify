@@ -15,6 +15,7 @@ using Domain.Policies;
 
 using Application.Abstractions.Notifications;
 using Application.Common.Exceptions;
+using Application.Abstractions;
 
 public class ProjectService : IProjectService
 {
@@ -22,17 +23,20 @@ public class ProjectService : IProjectService
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IEmailNotificationService _emailNotificationService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IAuditLogger _auditLogger;
 
     public ProjectService(
         IProyectoRepository proyectoRepository, 
         IUsuarioRepository usuarioRepository,
         IEmailNotificationService emailNotificationService,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IAuditLogger auditLogger)
     {
         _proyectoRepository = proyectoRepository;
         _usuarioRepository = usuarioRepository;
         _emailNotificationService = emailNotificationService;
         _unitOfWork = unitOfWork;
+        _auditLogger = auditLogger;
     }
 
     public async Task<IEnumerable<ProyectoDto>> GetVisibleProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
@@ -138,6 +142,7 @@ public class ProjectService : IProjectService
         var currentCodigo = proyecto.Estado?.CodigoUnico;
         if (string.IsNullOrEmpty(currentCodigo) || currentCodigo == ProjectStatusCodes.Creado)
         {
+            var oldEstadoId = proyecto.EstadoId;
             var estadoEditado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Editado, cancellationToken);
             if (estadoEditado == null)
             {
@@ -145,6 +150,17 @@ public class ProjectService : IProjectService
                     "Estado 'EDITADO' no encontrado en ProyectosEstados. Ejecute el seeder o la migración de estados.");
             }
             proyecto.UpdateEstado(estadoEditado);
+
+            await _auditLogger.Append(new AuditEntryDto
+            {
+                UsuarioId = proyecto.UsuarioCreadorId,
+                TipoOperacion = TipoOperacion.CambioEstado,
+                Accion = "CambioEstado",
+                Resultado = $"{currentCodigo} → {ProjectStatus.Editado.ToCodigoUnico()}",
+                ReferenciaExpedienteId = id,
+                EstadoAnteriorId = oldEstadoId,
+                EstadoNuevoId = estadoEditado.Id
+            }, cancellationToken);
         }
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -178,6 +194,7 @@ public class ProjectService : IProjectService
         }
 
         var oldStatus = proyecto.Estado?.CodigoUnico;
+        var oldEstadoId = proyecto.EstadoId;
         var estado = await _proyectoRepository.GetEstadoByStatusAsync(status, cancellationToken);
         if (estado == null)
             throw new InvalidOperationException($"Estado {status} no encontrado.");
@@ -185,6 +202,18 @@ public class ProjectService : IProjectService
         proyecto.UpdateEstado(estado);
         
         _proyectoRepository.Update(proyecto);
+
+        await _auditLogger.Append(new AuditEntryDto
+        {
+            UsuarioId = proyecto.UsuarioCreadorId,
+            TipoOperacion = TipoOperacion.CambioEstado,
+            Accion = "CambioEstado",
+            Resultado = $"{oldStatus} → {status.ToCodigoUnico()}",
+            ReferenciaExpedienteId = id,
+            EstadoAnteriorId = oldEstadoId,
+            EstadoNuevoId = estado.Id
+        }, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (oldStatus != status.ToCodigoUnico() && (status == ProjectStatus.Publicado || status == ProjectStatus.ConObservacion))
@@ -355,6 +384,26 @@ public class ProjectService : IProjectService
         return categoria;
     }
 
+    /// <summary>
+    /// Assembler: transforma el resultado del resolver de dominio en el contrato
+    /// público de salida (la UI no conoce las reglas internas de presentación).
+    /// </summary>
+    private static ProjectRegistrantPublicPresentationDto ToPresentationDto(PublicPresentation presentation)
+    {
+        var tipo = presentation.IdentificacionTipo switch
+        {
+            IdentificacionPublicaModo.Cedula => "cedula",
+            IdentificacionPublicaModo.Rnc => "rnc",
+            _ => null
+        };
+
+        return new ProjectRegistrantPublicPresentationDto(
+            presentation.NombreMostrado,
+            presentation.IdentificacionMostrada,
+            tipo,
+            presentation.RazonSocialMostrada);
+    }
+
     private static ProyectoDto MapToDto(Proyecto proyecto)
     {
         ProjectRegistrantDto? registradoPor = null;
@@ -370,7 +419,8 @@ public class ProjectService : IProjectService
                 proyecto.UsuarioCreador.AvatarUrl,
                 proyecto.UsuarioCreador.CreatedAtUtc,
                 proyecto.UsuarioCreador.EmailVerificado,
-                proyecto.UsuarioCreador.TitularId
+                proyecto.UsuarioCreador.TitularId,
+                ToPresentationDto(PublicIdentityResolver.Resolve(proyecto.UsuarioCreador, proyecto))
             );
         }
 

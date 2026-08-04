@@ -5,7 +5,17 @@ using System.Threading.Tasks;
 
 public interface IEmailService
 {
+    /// <summary>
+    /// Legacy fire-and-forget send. Prefer TrySendEmailAsync for callers that
+    /// need to know whether the provider accepted the message.
+    /// </summary>
     Task SendEmailAsync(string to, string subject, string body, string? fromAddress = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sends an email and returns a typed result indicating success or failure.
+    /// Callers that must surface failures should use this instead of SendEmailAsync.
+    /// </summary>
+    Task<EmailSendResult> TrySendEmailAsync(string to, string subject, string body, string? fromAddress = null, CancellationToken cancellationToken = default);
     Task SendAccountVerificationAsync(string toEmail, string userName, string verificationToken, string? returnUrl = null, CancellationToken ct = default);
     Task SendDocumentUploadConfirmationAsync(string toEmail, string userName, string projectName, string documentType, CancellationToken ct = default);
     Task SendDocumentStatusUpdateAsync(string toEmail, string userName, string projectName, string documentType, string status, string? rejectionReason, CancellationToken ct = default);

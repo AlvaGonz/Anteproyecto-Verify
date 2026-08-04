@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
+import { motion, AnimatePresence, MotionConfig, type Variants } from "framer-motion";
 import { ensureLegalResources } from "../../../legalResources";
 import { LandingNav } from "../../../shared/components/layout/LandingNav";
 import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
@@ -66,12 +67,53 @@ const navLabels: Record<string, string> = {
 };
 
 /* =========================================================
+   Drawer motion variants — spring in, snappy tween out
+   ========================================================= */
+const drawerVariants: Variants = {
+  open: {
+    x: "0%",
+    transition: {
+      type: "tween",
+      duration: 0.3,
+      ease: [0.32, 0.72, 0, 1],
+      staggerChildren: 0.045,
+      delayChildren: 0.06,
+    },
+  },
+  closed: {
+    x: "-100%",
+    transition: { type: "tween", duration: 0.22, ease: [0.32, 0.72, 0, 1] },
+  },
+};
+
+const panelItemVariants: Variants = {
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 420, damping: 34 },
+  },
+  closed: {
+    opacity: 0,
+    y: 8,
+    transition: { duration: 0.15, ease: "easeOut" },
+  },
+};
+
+/* =========================================================
    Small checkbox icon component
    ========================================================= */
 const CheckIcon: React.FC<{ checked: boolean }> = ({ checked }) => (
-  <span className={`material-symbols-outlined text-[18px] transition-colors duration-200 ${checked ? "text-orange-600" : "text-slate-300"}`}>
-    {checked ? "check_box" : "check_box_outline_blank"}
-  </span>
+  <motion.div
+    key={checked ? "checked" : "unchecked"}
+    initial={{ scale: 0.4 }}
+    animate={{ scale: 1 }}
+    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+    className="inline-flex"
+  >
+    <span className={`material-symbols-outlined text-[clamp(1.125rem,6.2cqw,1.375rem)] transition-colors duration-200 ${checked ? "text-orange-600" : "text-slate-300"}`}>
+      {checked ? "check_box" : "check_box_outline_blank"}
+    </span>
+  </motion.div>
 );
 
 export const LegalPage: React.FC = () => {
@@ -82,6 +124,10 @@ export const LegalPage: React.FC = () => {
   const [activeSection, setActiveSection] = React.useState<string>("terminos");
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [checkedSections, setCheckedSections] = React.useState<Set<string>>(new Set());
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const drawerRef = React.useRef<HTMLDivElement>(null);
+  const [drawerWidth, setDrawerWidth] = React.useState(300);
 
   const contentRef = React.useRef<HTMLDivElement>(null);
   const printElementRef = React.useRef<HTMLElement | null>(null);
@@ -105,6 +151,14 @@ export const LegalPage: React.FC = () => {
   React.useEffect(() => {
     const timer = setTimeout(() => setIsRevealed(true), 50);
     return () => clearTimeout(timer);
+  }, []);
+
+  /* ── track drawer width so the toggle button travels to its edge ── */
+  React.useLayoutEffect(() => {
+    const update = () => setDrawerWidth(drawerRef.current?.offsetWidth ?? 300);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   /* ── hash scroll ── */
@@ -154,7 +208,11 @@ export const LegalPage: React.FC = () => {
   const toggleCheck = (id: string) => {
     setCheckedSections((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -185,6 +243,17 @@ export const LegalPage: React.FC = () => {
 
     // Small delay so the DOM is settled, then fire the lazy print
     setTimeout(() => handlePrintBatch(() => printElementRef.current), 300);
+
+    // Saved micro-feedback: pop the check icon briefly
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 1500);
+  };
+
+  const downloadFullDocument = () => {
+    setIsDrawerOpen(false);
+    handlePrint();
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 1500);
   };
 
   const selCount = checkedSections.size;
@@ -193,7 +262,7 @@ export const LegalPage: React.FC = () => {
   const navLinkClass = (id: string) => {
     const active = activeSection === id;
     return [
-      "flex-1 flex items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm leading-snug text-left",
+      "flex-1 min-w-0 flex items-center gap-3 rounded-lg px-3 py-2 sm:px-3.5 sm:py-2.5 font-body text-[clamp(0.875rem,5cqw,1.0625rem)] leading-snug text-left",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500",
       "transition-colors duration-150",
       active ? "text-orange-600 bg-orange-50 font-semibold" : "text-slate-600 hover:text-slate-900 hover:bg-surface-container-low",
@@ -206,100 +275,158 @@ export const LegalPage: React.FC = () => {
       <LandingNav />
 
       {/* ── Floating drawer toggle button ── */}
-      <button
-        type="button"
-        onClick={() => setIsDrawerOpen(true)}
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-30 flex items-center gap-2 bg-surface/90 backdrop-blur-md border border-outline-variant/50 border-l-0 rounded-r-xl px-3 py-3 shadow-sm text-slate-600 hover:text-orange-600 hover:bg-surface transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-        aria-label="Abrir índice legal"
-      >
-        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>menu_book</span>
-        <span className="text-[11px] font-semibold uppercase tracking-wider leading-tight hidden sm:block">Índice</span>
-      </button>
+      <MotionConfig reducedMotion="user">
+        <motion.button
+          type="button"
+          onClick={() => setIsDrawerOpen((v) => !v)}
+          initial={{ x: 0, y: "-50%" }}
+          animate={{ x: isDrawerOpen ? drawerWidth : 0, y: "-50%" }}
+          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+          whileTap={{ scale: 0.92 }}
+          className="fixed left-0 top-1/2 z-[60] flex items-center gap-2 bg-surface/90 backdrop-blur-md border border-outline-variant/50 border-l-0 rounded-r-xl px-3 py-3 shadow-sm text-slate-600 hover:text-orange-600 hover:bg-surface transition-colors duration-200 will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+          aria-label={isDrawerOpen ? "Cerrar índice" : "Abrir índice legal"}
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={isDrawerOpen ? "close" : "menu"}
+              initial={{ rotate: -90, opacity: 0, scale: 0.4 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              exit={{ rotate: 90, opacity: 0, scale: 0.4 }}
+              transition={{ type: "spring", stiffness: 500, damping: 24 }}
+              className="inline-flex"
+            >
+              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                {isDrawerOpen ? "close" : "menu_book"}
+              </span>
+            </motion.div>
+          </AnimatePresence>
+          <span className="text-xs font-semibold uppercase tracking-wider leading-tight hidden sm:block">
+            {isDrawerOpen ? "Cerrar" : "Índice"}
+          </span>
+        </motion.button>
 
-      {/* ── Drawer overlay ── */}
-      {isDrawerOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm"
-          onClick={() => setIsDrawerOpen(false)}
-        />
-      )}
+        {/* ── Drawer overlay + panel (framer-motion) ── */}
+        <AnimatePresence>
+          {isDrawerOpen && (
+            <motion.div
+              className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+              onClick={() => setIsDrawerOpen(false)}
+            />
+          )}
+        </AnimatePresence>
 
-      {/* ── Drawer panel (slides from left) ── */}
-      <div
-        className={`fixed left-0 top-0 h-full w-[300px] max-w-[85vw] bg-surface z-50 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"}`}
-      >
-        {/* Drawer header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-outline-variant/40">
-          <h2 className="font-headline text-lg font-bold text-slate-900">Índice Legal</h2>
-          <button
-            type="button"
-            onClick={() => setIsDrawerOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-            aria-label="Cerrar índice"
-          >
-            <span className="material-symbols-outlined text-[22px]">close</span>
-          </button>
-        </div>
+        {/* Drawer panel (slides from left) — width adapts to the longest label */}
+        <motion.div
+          ref={drawerRef}
+          variants={drawerVariants}
+          initial="closed"
+          animate={isDrawerOpen ? "open" : "closed"}
+          className="fixed left-0 top-0 h-full w-fit min-w-[clamp(300px,26vw,380px)] max-w-[85vw] bg-surface z-50 shadow-2xl flex flex-col will-change-transform [container-type:inline-size]"
+        >
+          {/* Drawer header — static so the close button (X) is visible immediately */}
+          <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-outline-variant/40">
+            <h2 className="font-headline text-[clamp(1.0625rem,6cqw,1.5rem)] font-bold text-slate-900">Índice Legal</h2>
+            <button
+              type="button"
+              onClick={() => setIsDrawerOpen(false)}
+              className="p-2 sm:p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-surface-container-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              aria-label="Cerrar índice"
+            >
+              <span className="material-symbols-outlined text-[clamp(1.25rem,7.3cqw,1.5rem)]">close</span>
+            </button>
+          </div>
 
-        {/* Nav items + checkboxes */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-0.5">
-          {navItems.map((item) => {
-            const label = item.label || t(`legal.${item.id}.title`, navLabels[item.id]);
-            return (
-              <div key={item.id} className="flex items-center rounded-lg group hover:bg-surface-container-low transition-colors duration-150">
-                {/* Checkbox */}
-                <button
-                  type="button"
-                  onClick={() => toggleCheck(item.id)}
-                  className="p-2 rounded-lg text-slate-400 hover:text-orange-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-                  title={`Seleccionar ${label}`}
+          {/* Nav items + checkboxes */}
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-0.5">
+            {navItems.map((item) => {
+              const label = item.label || t(`legal.${item.id}.title`, navLabels[item.id]);
+              return (
+                <motion.div
+                  key={item.id}
+                  variants={panelItemVariants}
+                  className="flex items-center rounded-lg group hover:bg-surface-container-low transition-colors duration-150"
                 >
-                  <CheckIcon checked={checkedSections.has(item.id)} />
-                </button>
+                  {/* Checkbox */}
+                  <button
+                    type="button"
+                    onClick={() => toggleCheck(item.id)}
+                    className="p-2.5 sm:p-2 rounded-lg text-slate-400 hover:text-orange-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                    title={`Seleccionar ${label}`}
+                  >
+                    <CheckIcon checked={checkedSections.has(item.id)} />
+                  </button>
 
-                {/* Nav link */}
-                <button
-                  type="button"
-                  className={navLinkClass(item.id)}
-                  onClick={() => { scrollTo(item.id); setIsDrawerOpen(false); }}
-                >
-                  <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: activeSection === item.id ? "'FILL' 1" : "'FILL' 0" }}>
-                    {item.icon}
-                  </span>
-                  <span className="truncate">{label}</span>
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                  {/* Nav link */}
+                  <button
+                    type="button"
+                    className={navLinkClass(item.id)}
+                    onClick={() => { scrollTo(item.id); setIsDrawerOpen(false); }}
+                  >
+                    <span className="material-symbols-outlined text-[clamp(1.25rem,7cqw,1.5rem)]" style={{ fontVariationSettings: activeSection === item.id ? "'FILL' 1" : "'FILL' 0" }}>
+                      {item.icon}
+                    </span>
+                    <span className="break-words">{label}</span>
+                  </button>
+                </motion.div>
+              );
+            })}
+          </div>
 
-        {/* Drawer footer */}
-        <div className="border-t border-outline-variant/40 p-3 space-y-2">
-          <button
-            type="button"
-            onClick={downloadSelected}
-            disabled={selCount === 0}
-            className={`w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-label font-semibold text-sm transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${selCount > 0
-                ? "bg-primary text-on-primary hover:bg-primary-hover shadow-sm"
-                : "bg-surface-container-low text-slate-400 cursor-not-allowed"
-              }`}
+          {/* Drawer footer */}
+          <motion.div
+            variants={panelItemVariants}
+            className="border-t border-outline-variant/40 p-3 sm:p-4 space-y-2"
           >
-            <span className="material-symbols-outlined text-[18px]">{ICONS.download}</span>
-            {selCount > 0
-              ? `Descargar seleccionados (${selCount})`
-              : "Seleccionar secciones"}
-          </button>
+            <button
+              type="button"
+              onClick={downloadSelected}
+              disabled={selCount === 0}
+              className={`w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 sm:py-3 font-label font-semibold text-[clamp(0.875rem,5cqw,1.0625rem)] transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${selCount > 0
+                  ? "bg-primary text-on-primary hover:bg-primary-hover shadow-sm"
+                  : "bg-surface-container-low text-slate-400 cursor-not-allowed"
+                }`}
+            >
+              <motion.div
+                key={isSaving ? "saved" : "idle"}
+                initial={{ scale: 0.4 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                className="inline-flex"
+              >
+                <span className={`material-symbols-outlined text-[clamp(1.125rem,6.2cqw,1.375rem)] ${isSaving ? "text-success" : ""}`}>
+                  {isSaving ? "check_circle" : ICONS.download}
+                </span>
+              </motion.div>
+              {selCount > 0
+                ? (isSaving ? "Guardado" : `Descargar seleccionados (${selCount})`)
+                : "Seleccionar secciones"}
+            </button>
 
-          <button
-            type="button"
-            onClick={() => { setIsDrawerOpen(false); handlePrint(); }}
-            className="w-full flex items-center justify-center gap-2 rounded-xl border border-outline-variant/60 px-4 py-3 font-label font-semibold text-sm text-slate-600 hover:bg-surface-container-low transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-          >
-            <span className="material-symbols-outlined text-[18px]">description</span>
-            Descargar documento completo
-          </button>
-        </div>
-      </div>
+            <button
+              type="button"
+              onClick={downloadFullDocument}
+              className="w-full flex items-center justify-center gap-2 rounded-xl border border-outline-variant/60 px-4 py-2.5 sm:py-3 font-label font-semibold text-[clamp(0.875rem,5cqw,1.0625rem)] text-slate-600 hover:bg-surface-container-low transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+            >
+              <motion.div
+                key={isSaving ? "saved" : "idle"}
+                initial={{ scale: 0.4 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                className="inline-flex"
+              >
+                <span className={`material-symbols-outlined text-[clamp(1.125rem,6.2cqw,1.375rem)] ${isSaving ? "text-success" : ""}`}>
+                  {isSaving ? "check_circle" : "description"}
+                </span>
+              </motion.div>
+              {isSaving ? "Guardado" : "Descargar documento completo"}
+            </button>
+          </motion.div>
+        </motion.div>
+      </MotionConfig>
 
       {/* ── Main content ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">

@@ -116,6 +116,7 @@ public class Disable2FACommandHandlerTests
 
     private sealed class FakeAuditLogger : IAuditLogger
     {
+        public Task Append(AuditEntryDto entry, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task AppendAsync(AuditEntryDto entry, CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }

@@ -27,6 +27,11 @@ public class Usuario : EntityBase, IEffectivePlanUser
     public string? Provincia { get; private set; }
     public string? Nickname { get; private set; }
     public string Identificacion => Cedula;
+
+    // Public presentation preferences — how this user is presented as the
+    // responsible person on public project views (resolved by PublicIdentityResolver)
+    public NombrePublicoModo? NombrePublicoModo { get; private set; }
+    public IdentificacionPublicaModo? IdentificacionPublicaModo { get; private set; }
     public UserRole Rol { get; private set; }
     public bool Activo { get; private set; }
     public UserAccountStatus AccountStatus { get; private set; }
@@ -168,6 +173,13 @@ public class Usuario : EntityBase, IEffectivePlanUser
         Direccion = direccion;
         Provincia = provincia;
         Nickname = nickname;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void UpdatePreferenciasPublicas(NombrePublicoModo? nombreModo, IdentificacionPublicaModo? identificacionModo)
+    {
+        NombrePublicoModo = nombreModo;
+        IdentificacionPublicaModo = identificacionModo;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

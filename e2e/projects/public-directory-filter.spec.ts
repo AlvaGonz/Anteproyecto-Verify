@@ -119,7 +119,9 @@ test.describe("Public Directory Filter — E2E", () => {
       });
     });
     await page.goto("/#/projects");
-    await page.getByText("Comercial").first().click();
+    // Open the collapsible filter panel, then click the checkbox label directly
+    await page.locator('button', { hasText: /Tipo.*acumulativo/ }).click();
+    await page.locator('label', { hasText: /comercial/i }).click();
     await expect(page.getByText("Torre San Gerónimo")).toBeVisible();
     await expect(page.getByText("Plaza Central Mall")).toBeVisible();
     await expect(page.getByText("Residencial Terra Noble")).not.toBeVisible();

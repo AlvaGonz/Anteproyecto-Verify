@@ -52,6 +52,7 @@ export const useUploadDocument = (projectId: string) => {
       qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });
       qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] }); // ponytail: doc count may trigger auto-transition
       qc.invalidateQueries({ queryKey: ["projects", projectId] }); // ponytail: detail depends on status
+      qc.invalidateQueries({ queryKey: ["statusHistory", projectId] }); // ponytail: upload may auto-promote to REVISION
     },
   });
 };
@@ -70,6 +71,7 @@ export const useUploadRequirementDocument = (projectId: string) => {
       qc.invalidateQueries({ queryKey: documentKeys.byProject(projectId) });
       qc.invalidateQueries({ queryKey: ["projectStatusEligibility", projectId] }); // ponytail: doc count may trigger auto-transition
       qc.invalidateQueries({ queryKey: ["projects", projectId] }); // ponytail: detail depends on status
+      qc.invalidateQueries({ queryKey: ["statusHistory", projectId] }); // ponytail: upload may auto-promote to REVISION
     },
   });
 };

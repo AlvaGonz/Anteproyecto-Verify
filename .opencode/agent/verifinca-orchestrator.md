@@ -33,7 +33,7 @@ For complex multi-step processes, invoke the relevant workflow before routing:
 
 - `/new-feature` → `workflows/feature-delivery-workflow.md` → routes to Architect → Developer → Reviewer
 - `/run-validation-pipeline` → `workflows/validation-pipeline-workflow.md` → routes to Validation agent
-- `/security-audit` → `workflows/security-audit-workflow.md` → routes to Reviewer agent
+- `/run-security-audit` → `workflows/security-audit-workflow.md` → routes to Reviewer agent
 
 ## Required Context Files
 

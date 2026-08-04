@@ -46,7 +46,7 @@
 ## Context Dependencies
 
 - `context/domain/verifinca-domain-overview.md`
-- `context/standards/architecture-standards.md`
+- `context/standards/code-quality-standards.md`
 - `context/templates/adr-template.md`
 - `.agents/docs/ARCHITECTURE.md`
 - `.agents/docs/TRD_VeriFinca.md`

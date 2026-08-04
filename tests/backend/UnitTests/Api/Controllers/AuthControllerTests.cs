@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Application.Abstractions.Notifications;
 using Application.Features.Auth.Commands.LoginUser;
 using Application.Features.Auth.Commands.UpdateProfile;
+using Application.Features.Auth.Commands.UpdatePublicPreferences;
 using Application.Features.Auth.Commands.VerifyEmail;
 using Application.Features.Auth.Commands.RegisterUser;
 using Domain.Entities;
@@ -75,6 +76,7 @@ public class AuthControllerTests
             verifyHandler,
             loginHandler,
             updateProfileHandler,
+            new UpdatePublicPreferencesCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object),
             uploadAvatarHandler,
             resendEmailHandler,
             forgotPasswordHandler,

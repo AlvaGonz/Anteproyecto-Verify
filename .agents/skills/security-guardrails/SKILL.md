@@ -1,4 +1,5 @@
 ---
+name: security-guardrails
 description: Apply systemic security validations and adversarial review models.
 ---
 

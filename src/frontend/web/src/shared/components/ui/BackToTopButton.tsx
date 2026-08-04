@@ -1,19 +1,47 @@
 import React from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion, animate } from "framer-motion";
+import type { AnimationPlaybackControls } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 
 const SHOW_THRESHOLD = 400;
+const SCROLL_DURATION = 1.2;
 
 export const BackToTopButton: React.FC = () => {
   const [visible, setVisible] = React.useState(false);
   const reduceMotion = useReducedMotion();
+  const animationRef = React.useRef<AnimationPlaybackControls | null>(null);
 
   React.useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > SHOW_THRESHOLD);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      animationRef.current?.stop();
+      document.documentElement.style.scrollBehavior = "";
+    };
   }, []);
+
+  const scrollToTop = () => {
+    const start = window.scrollY;
+    if (start <= 0) return;
+    if (reduceMotion) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    animationRef.current?.stop();
+    const root = document.documentElement;
+    root.style.scrollBehavior = "auto";
+    animationRef.current = animate(start, 0, {
+      duration: SCROLL_DURATION,
+      ease: "easeInOut",
+      onUpdate: (value) => window.scrollTo(0, value),
+      onComplete: () => {
+        animationRef.current = null;
+        root.style.scrollBehavior = "";
+      },
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -21,7 +49,7 @@ export const BackToTopButton: React.FC = () => {
         <motion.button
           type="button"
           aria-label="Volver arriba"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={scrollToTop}
           initial={{ opacity: 0, y: reduceMotion ? 0 : 16, scale: reduceMotion ? 1 : 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: reduceMotion ? 0 : 16, scale: reduceMotion ? 1 : 0.8 }}

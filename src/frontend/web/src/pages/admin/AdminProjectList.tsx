@@ -168,7 +168,7 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
                         <Timer className="w-3.5 h-3.5" />
                         Act: {toUtcDate(project.updatedAtUtc || project.createdAtUtc)?.toLocaleDateString() ?? ''}
                         {isAdmin && project.registradoPor?.nombreCompleto && (
-                          <span className="text-gray-500">· {project.registradoPor.nombreCompleto}</span>
+                          <span className="text-gray-500">· {project.registradoPor.presentacionPublica?.nombreMostrado ?? project.registradoPor.nombreCompleto}</span>
                         )}
                       </span>
                     </div>

@@ -56,6 +56,10 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.Nickname).HasMaxLength(30).IsRequired(false);
         builder.HasIndex(u => u.Nickname).IsUnique().HasDatabaseName("UQ_Usuario_Nickname").HasFilter("[Nickname] IS NOT NULL");
 
+        // Public presentation preferences (persisted as enum names, no magic strings)
+        builder.Property(u => u.NombrePublicoModo).HasConversion<string>().HasMaxLength(20).IsRequired(false);
+        builder.Property(u => u.IdentificacionPublicaModo).HasConversion<string>().HasMaxLength(20).IsRequired(false);
+
         // Team properties
         builder.Property(u => u.TitularId).IsRequired(false);
 

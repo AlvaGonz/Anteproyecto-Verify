@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Notifications;
+using Application.Common.Exceptions;
 using Application.Contracts.Subscriptions;
 using Application.DTOs.Subscriptions;
 using Domain.Entities;
@@ -41,10 +42,10 @@ public class SubscriptionService : ISubscriptionService
     {
         var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user == null)
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
 
         if (string.IsNullOrEmpty(_configuration["Stripe:SecretKey"]))
-            throw new Exception("Stripe Secret Key is not configured on the server.");
+            throw new BadRequestException("Stripe Secret Key is not configured on the server.");
 
         if (!string.IsNullOrEmpty(request.PlanCode) || !string.IsNullOrEmpty(request.BillingCycle))
         {
@@ -100,7 +101,7 @@ public class SubscriptionService : ISubscriptionService
             .FirstOrDefaultAsync(u => u.Id == userId, ct);
 
         if (user == null)
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
 
         var realConsultasUsadas = await _dbContext.LogConsultas.CountAsync(lc => lc.UsuarioId == userId, ct);
         var realProyectosCreados = await _dbContext.Proyectos.CountAsync(p => p.UsuarioCreadorId == userId, ct);
@@ -189,7 +190,7 @@ public class SubscriptionService : ISubscriptionService
     public async Task<SessionStatusDto> GetSessionStatusAsync(Guid userId, string sessionId, CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(_configuration["Stripe:SecretKey"]))
-            throw new Exception("Stripe Secret Key is not configured on the server.");
+            throw new BadRequestException("Stripe Secret Key is not configured on the server.");
 
         var options = new SessionGetOptions();
         options.AddExpand("line_items");
@@ -225,7 +226,7 @@ public class SubscriptionService : ISubscriptionService
     {
         var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user == null || string.IsNullOrEmpty(user.StripeCustomerId))
-            throw new Exception("Usuario no tiene un Stripe Customer ID asociado.");
+            throw new BadRequestException("Usuario no tiene un Stripe Customer ID asociado.");
 
         var options = new Stripe.BillingPortal.SessionCreateOptions
         {
@@ -243,7 +244,7 @@ public class SubscriptionService : ISubscriptionService
     {
         var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user == null || string.IsNullOrEmpty(user.StripeCustomerId))
-            throw new Exception("Usuario no tiene un Stripe Customer ID asociado.");
+            throw new BadRequestException("Usuario no tiene un Stripe Customer ID asociado.");
 
         var subService = new Stripe.SubscriptionService();
         var options = new SubscriptionListOptions
@@ -344,7 +345,7 @@ public class SubscriptionService : ISubscriptionService
     {
         var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.StripeCustomerId == stripeCustomerId, ct);
         if (user == null)
-            throw new Exception($"Usuario con Stripe Customer ID {stripeCustomerId} no encontrado.");
+            throw new NotFoundException($"Usuario con Stripe Customer ID {stripeCustomerId} no encontrado.");
 
         var subService = new Stripe.SubscriptionService();
         var options = new SubscriptionListOptions
@@ -359,7 +360,7 @@ public class SubscriptionService : ISubscriptionService
                         ?? subscriptions.FirstOrDefault();
 
         if (activeSub == null)
-            throw new Exception($"No Stripe subscriptions found for customer {stripeCustomerId}.");
+            throw new NotFoundException($"No Stripe subscriptions found for customer {stripeCustomerId}.");
 
         var pricePlanMap = _configuration
             .GetSection("Stripe:PricePlanMap")
@@ -381,7 +382,7 @@ public class SubscriptionService : ISubscriptionService
     {
         var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user == null || string.IsNullOrEmpty(user.StripeSubscriptionId))
-            throw new Exception("Suscripción no encontrada o no gestionada por Stripe.");
+            throw new NotFoundException("Suscripción no encontrada o no gestionada por Stripe.");
 
         var subService = new Stripe.SubscriptionService();
         var subscription = await subService.GetAsync(user.StripeSubscriptionId, cancellationToken: ct);
@@ -403,10 +404,10 @@ public class SubscriptionService : ISubscriptionService
     {
         var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user == null || string.IsNullOrEmpty(user.StripeSubscriptionId))
-            throw new Exception("Suscripción no encontrada.");
+            throw new NotFoundException("Suscripción no encontrada.");
 
         if (!user.CancelAtPeriodEnd)
-            throw new Exception("La suscripción no está en proceso de cancelación.");
+            throw new BadRequestException("La suscripción no está en proceso de cancelación.");
 
         var subService = new Stripe.SubscriptionService();
         var updateOptions = new SubscriptionUpdateOptions

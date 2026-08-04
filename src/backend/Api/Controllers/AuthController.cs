@@ -20,6 +20,7 @@ public class AuthController : ControllerBase
     private readonly Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler _verifyHandler;
     private readonly Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler _loginHandler;
     private readonly Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler _updateProfileHandler;
+    private readonly Application.Features.Auth.Commands.UpdatePublicPreferences.UpdatePublicPreferencesCommandHandler _updatePublicPreferencesHandler;
     private readonly Application.Abstractions.Persistence.IUsuarioRepository _usuarioRepository;
     private readonly IConfiguration _configuration;
     private readonly Application.Abstractions.Security.IJwtTokenGenerator _jwtTokenGenerator;
@@ -36,6 +37,7 @@ public class AuthController : ControllerBase
         Application.Features.Auth.Commands.VerifyEmail.VerifyEmailCommandHandler verifyHandler,
         Application.Features.Auth.Commands.LoginUser.LoginUserCommandHandler loginHandler,
         Application.Features.Auth.Commands.UpdateProfile.UpdateProfileCommandHandler updateProfileHandler,
+        Application.Features.Auth.Commands.UpdatePublicPreferences.UpdatePublicPreferencesCommandHandler updatePublicPreferencesHandler,
         Application.Features.Auth.Commands.UploadAvatar.UploadAvatarCommandHandler uploadAvatarHandler,
         Application.Features.Auth.Commands.ResendVerificationEmail.ResendVerificationEmailCommandHandler resendVerificationHandler,
         Application.Features.Auth.Commands.ForgotPassword.ForgotPasswordCommandHandler forgotPasswordHandler,
@@ -50,6 +52,7 @@ public class AuthController : ControllerBase
         _verifyHandler = verifyHandler;
         _loginHandler = loginHandler;
         _updateProfileHandler = updateProfileHandler;
+        _updatePublicPreferencesHandler = updatePublicPreferencesHandler;
         _uploadAvatarHandler = uploadAvatarHandler;
         _resendVerificationHandler = resendVerificationHandler;
         _forgotPasswordHandler = forgotPasswordHandler;
@@ -409,6 +412,8 @@ public class AuthController : ControllerBase
             Direccion = user.Direccion,
             Provincia = user.Provincia,
             Nickname = user.Nickname,
+            NombrePublicoModo = NombrePublicoModoToWire(user.NombrePublicoModo),
+            IdentificacionPublicaModo = IdentificacionPublicaModoToWire(user.IdentificacionPublicaModo),
             RazonSocial = user.RazonSocial ?? dgii?.NombreRazonSocial,
             NombreComercial = user.NombreComercial ?? dgii?.NombreComercial,
             ActividadEconomica = user.ActividadEconomica ?? dgii?.ActividadEconomica,
@@ -537,6 +542,87 @@ public class AuthController : ControllerBase
     }
 
     [Microsoft.AspNetCore.Authorization.Authorize]
+    [HttpPatch("preferences")]
+    public async Task<IActionResult> UpdatePublicPreferences([FromBody] UpdatePublicPreferencesRequestDto request, CancellationToken cancellationToken)
+    {
+        var idClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
+            return Unauthorized(new { Message = "Token inválido o incompleto." });
+
+        var nombreModo = MapNombreModos(request.NombreModo);
+        var identificacionModo = MapIdentificaciones(request.IdentificacionModo);
+        if (nombreModo is null || identificacionModo is null)
+        {
+            return BadRequest(new { Message = "Valores de preferencia inválidos: debe elegir al menos una opción válida por grupo." });
+        }
+
+        var command = new Application.Features.Auth.Commands.UpdatePublicPreferences.UpdatePublicPreferencesCommand(userId, nombreModo, identificacionModo);
+        var result = await _updatePublicPreferencesHandler.Handle(command, cancellationToken);
+        if (!result.IsSuccess)
+            return BadRequest(new { Message = result.ErrorMessage });
+
+        return Ok(new { Message = "Preferencias actualizadas exitosamente." });
+    }
+
+    private static Domain.Enums.NombrePublicoModo? MapNombreModos(string[]? values)
+    {
+        if (values is null || values.Length == 0) return null;
+        Domain.Enums.NombrePublicoModo result = 0;
+        foreach (var value in values)
+        {
+            var modo = ToNombrePublicoModo(value);
+            if (modo is null) return null; // valor desconocido → inválido
+            result |= modo.Value;
+        }
+        return result;
+    }
+
+    private static Domain.Enums.IdentificacionPublicaModo? MapIdentificaciones(string[]? values)
+    {
+        if (values is null || values.Length == 0) return null;
+        Domain.Enums.IdentificacionPublicaModo result = 0;
+        foreach (var value in values)
+        {
+            var modo = ToIdentificacionPublicaModo(value);
+            if (modo is null) return null;
+            result |= modo.Value;
+        }
+        return result;
+    }
+
+    private static Domain.Enums.NombrePublicoModo? ToNombrePublicoModo(string? value) => value switch
+    {
+        "realName" => Domain.Enums.NombrePublicoModo.RealName,
+        "nickname" => Domain.Enums.NombrePublicoModo.Nickname,
+        _ => null
+    };
+
+    private static Domain.Enums.IdentificacionPublicaModo? ToIdentificacionPublicaModo(string? value) => value switch
+    {
+        "cedula" => Domain.Enums.IdentificacionPublicaModo.Cedula,
+        "rnc" => Domain.Enums.IdentificacionPublicaModo.Rnc,
+        _ => null
+    };
+
+    private static string[]? NombrePublicoModoToWire(Domain.Enums.NombrePublicoModo? modo)
+    {
+        if (modo is null) return null;
+        var result = new List<string>();
+        if (modo.Value.HasFlag(Domain.Enums.NombrePublicoModo.RealName)) result.Add("realName");
+        if (modo.Value.HasFlag(Domain.Enums.NombrePublicoModo.Nickname)) result.Add("nickname");
+        return result.ToArray();
+    }
+
+    private static string[]? IdentificacionPublicaModoToWire(Domain.Enums.IdentificacionPublicaModo? modo)
+    {
+        if (modo is null) return null;
+        var result = new List<string>();
+        if (modo.Value.HasFlag(Domain.Enums.IdentificacionPublicaModo.Cedula)) result.Add("cedula");
+        if (modo.Value.HasFlag(Domain.Enums.IdentificacionPublicaModo.Rnc)) result.Add("rnc");
+        return result.ToArray();
+    }
+
+    [Microsoft.AspNetCore.Authorization.Authorize]
     [HttpPost("me/avatar")]
     public async Task<IActionResult> UploadAvatar(IFormFile file, CancellationToken cancellationToken)
     {
@@ -580,6 +666,12 @@ public class UpdateProfileRequestDto
     public string? Provincia { get; set; }
     public string? Nickname { get; set; }
     public string? NewPassword { get; set; }
+}
+
+public class UpdatePublicPreferencesRequestDto
+{
+    public string[]? NombreModo { get; set; }
+    public string[]? IdentificacionModo { get; set; }
 }
 
 public class RegisterRequestDto

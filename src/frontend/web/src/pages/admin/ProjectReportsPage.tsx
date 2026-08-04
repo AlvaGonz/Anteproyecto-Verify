@@ -2,6 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { ReportsList } from "../../features/reports/components/ReportsList";
 import { ReportExportPanel } from "../../features/reports/components/ReportExportPanel";
+import { StatusHistory } from "../../features/reports/components/StatusHistory";
 import { FileText } from "lucide-react";
 
 export const ProjectReportsPage: React.FC = () => {
@@ -21,6 +22,7 @@ export const ProjectReportsPage: React.FC = () => {
 
       {id && (
         <>
+          <StatusHistory projectId={id} />
           <ReportsList projectId={id} />
           <ReportExportPanel projectId={id} />
         </>

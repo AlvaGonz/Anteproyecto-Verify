@@ -276,7 +276,6 @@ public class SettingsController : ControllerBase
             );
             _context.Notificaciones.Add(notification);
 
-            await SyncUserLegacyAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
@@ -340,25 +339,6 @@ public class SettingsController : ControllerBase
             user.UpdateContactInfo(request.Telefono, request.Cedula);
         }
 
-        // Sync legacy record (creates if missing) in same transaction
-        await SyncUserLegacyAsync(user, cancellationToken);
-
-        // Update legacy profile to match new role
-        var perf = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == targetProfileName, cancellationToken);
-        if (perf != null)
-        {
-            var acceso = await _context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == user.Id, cancellationToken);
-            if (acceso == null)
-            {
-                acceso = new Acceso { IdUsuario = user.Id, IdPerfil = perf.IdPerfil };
-                _context.Accesos.Add(acceso);
-            }
-            else
-            {
-                acceso.IdPerfil = perf.IdPerfil;
-            }
-        }
-
         // Update Rnc if provided
         if (request.Rnc != null)
         {
@@ -412,10 +392,6 @@ public class SettingsController : ControllerBase
             }
         } catch {}
 
-        // Remove legacy dependencies first to avoid FK conflicts
-        var access = await _context.Accesos.Where(a => a.IdUsuario == user.Id).ToListAsync(cancellationToken);
-        if (access.Any()) _context.Accesos.RemoveRange(access);
-        
         var pagos = await _context.Pagos.Where(p => p.IdUsuario == user.Id).ToListAsync(cancellationToken);
         if (pagos.Any()) _context.Pagos.RemoveRange(pagos);
 
@@ -454,22 +430,7 @@ public class SettingsController : ControllerBase
             if (interesados.Any()) _context.ProyectosInteresados.RemoveRange(interesados);
         } catch {}
 
-        // Legacy tables with enforced FKs but no EF mappings (same database, raw cleanup)
-        try {
-            await _context.Database.ExecuteSqlRawAsync(
-                "DELETE FROM LogPagos WHERE IdUsuario = @id",
-                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
-        } catch {}
-
-        try {
-            await _context.Database.ExecuteSqlRawAsync(
-                "DELETE FROM Recibo WHERE IdUsuario = @id",
-                new object[] { new Microsoft.Data.SqlClient.SqlParameter("@id", user.Id) }, cancellationToken);
-        } catch {}
-
         _context.Usuarios.Remove(user);
-        
-        // Do not remove from UsuariosLegacy since it is a view over Usuarios
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -504,35 +465,9 @@ public class SettingsController : ControllerBase
         // Update EF user role
         u.UpdateRol(targetRole.Value);
 
-        // Update or sync legacy record
-        var lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
-        if (lu == null)
-        {
-            await SyncUserLegacyAsync(u, cancellationToken);
-            lu = await _context.UsuariosLegacy.FirstOrDefaultAsync(l => l.Email == u.Email, cancellationToken);
-        }
-
-        if (lu != null)
-        {
-            var perf = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == targetProfileName, cancellationToken);
-            if (perf != null)
-            {
-                var acceso = await _context.Accesos.FirstOrDefaultAsync(a => a.IdUsuario == lu.IdUsuario, cancellationToken);
-                if (acceso == null)
-                {
-                    acceso = new Acceso { IdUsuario = lu.IdUsuario, IdPerfil = perf.IdPerfil };
-                    _context.Accesos.Add(acceso);
-                }
-                else
-                {
-                    acceso.IdPerfil = perf.IdPerfil;
-                }
-            }
-        }
-
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Ok(new { Message = "Rol y perfil actualizados exitosamente." });
+        return Ok(new { Message = "Rol actualizado exitosamente." });
     }
 
     [HttpPatch("users/{id}/plan")]
@@ -577,9 +512,6 @@ public class SettingsController : ControllerBase
                 invitee.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2"));
             }
         }
-
-        // Sync legacy user if missing
-        await SyncUserLegacyAsync(u, cancellationToken);
 
         // Insert a new payment/allocation record in Pagos table
         var nuevoPago = new Pago
@@ -732,10 +664,6 @@ public class SettingsController : ControllerBase
         // Save invitation and new user
         await _context.SaveChangesAsync(cancellationToken);
 
-        // Sync legacy (inserts Acceso and Pagos)
-        await SyncUserLegacyAsync(newUser, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
         // 6. Send Invitation Email
         try
         {
@@ -838,65 +766,6 @@ public class SettingsController : ControllerBase
         return Task.FromResult(roles.Any(r => 
             string.Equals(r, "admin", StringComparison.OrdinalIgnoreCase) || 
             string.Equals(r, "Administrator", StringComparison.OrdinalIgnoreCase)));
-    }
-
-    private async Task SyncUserLegacyAsync(Usuario u, CancellationToken cancellationToken = default)
-    {
-        // Check if user already exists in UsuariosLegacy table to avoid duplicates by Id or Email
-        var legacyUserExists = await _context.UsuariosLegacy.AnyAsync(ul => ul.IdUsuario == u.Id || ul.Email == u.CorreoElectronico, cancellationToken);
-        if (!legacyUserExists)
-        {
-            _context.UsuariosLegacy.Add(new Domain.Entities.UsuarioLegacy
-            {
-                IdUsuario = u.Id,
-                Nombre = u.Nombre,
-                Apellido = u.Apellido,
-                Email = u.CorreoElectronico,
-                ContrasenaHash = u.ContrasenaHash,
-                Telefono = u.Telefono ?? "0000000000",
-                Cedula = u.Cedula ?? "00000000000"
-            });
-            
-            // We need to save the legacy user first before adding Acceso and Pagos
-            // because they depend on the foreign key to UsuarioLegacy.
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-
-        // Ensure profiles are loaded (cached for performance)
-        // ponytail: only ADMIN profile matters; DEVELOPER/VALIDATOR profiles don't exist (admin/user roles only per DB)
-        var adminLegacyProfile = await _context.Perfiles.FirstOrDefaultAsync(p => p.NombrePerfil == "ADMIN", cancellationToken);
-
-        var hasAcceso = await _context.Accesos.AnyAsync(a => a.IdUsuario == u.Id, cancellationToken);
-        if (!hasAcceso)
-        {
-            var targetPerfil = u.Rol == UserRole.Administrator ? adminLegacyProfile : null;
-
-            if (targetPerfil != null)
-            {
-                _context.Accesos.Add(new Acceso { IdUsuario = u.Id, IdPerfil = targetPerfil.IdPerfil });
-            }
-        }
-
-        var hasPagos = await _context.Pagos.AnyAsync(p => p.IdUsuario == u.Id, cancellationToken);
-        if (!hasPagos)
-        {
-            var freePlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Gratuito", cancellationToken);
-            var proPlan = await _context.PlanesSuscripcion.FirstOrDefaultAsync(p => p.NombrePlan == "Profesional", cancellationToken);
-            
-            var targetPlan = u.Rol == UserRole.Administrator ? proPlan : freePlan;
-            if (targetPlan != null)
-            {
-                _context.Pagos.Add(new Pago
-                {
-                    IdUsuario = u.Id,
-                    Idsuscripcion = targetPlan.Idsuscripcion,
-                    Monto = targetPlan.Precio,
-                    FechaPago = DateTime.UtcNow
-                });
-            }
-        }
-        
-        // Single SaveChangesAsync at the end - caller is responsible for calling it
     }
 }
 

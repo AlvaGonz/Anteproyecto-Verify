@@ -26,6 +26,17 @@ const ANEXOS: { type: DocumentType; label: string; entity: string; norm: string 
   { type: DocumentType.PoderNotarial, label: "Poder Notarial", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
 ];
 
+// Tipos legacy del enum backend que se mapean a su categoría canónica.
+const LEGACY_TYPE_ALIASES: Partial<Record<DocumentType, DocumentType>> = {
+  [DocumentType.TITLE]: DocumentType.CertificadoTitulo,
+  [DocumentType.LEGAL_STATUS]: DocumentType.CertificacionEstadoJuridico,
+  [DocumentType.SURVEY]: DocumentType.PlanoMensuraCatastral,
+  [DocumentType.ID]: DocumentType.CopiaCedulaIdentidad,
+  [DocumentType.NOTARIAL_POWER]: DocumentType.PoderNotarial,
+};
+
+const canonicalType = (tipo: DocumentType): DocumentType => LEGACY_TYPE_ALIASES[tipo] ?? tipo;
+
 const getDocStatus = (doc: any) => {
   if (!doc) return "missing";
   if (doc.estadoDocumento === DocumentStatus.Verificado || doc.estadoDocumento === DocumentStatus.Valid) return "verificado";
@@ -84,7 +95,7 @@ const DocumentCard: React.FC<{ typeData: { type: DocumentType; label: string; en
 export const DocumentosModal: React.FC<DocumentosModalProps> = ({ projectId, isOpen, onClose }) => {
   const { data: documents = [], isLoading } = useDocuments(projectId);
 
-  const findDoc = (type: DocumentType) => documents.find((d: any) => d.tipoDocumento === type && d.activo);
+  const findDoc = (type: DocumentType) => documents.find((d: any) => canonicalType(d.tipoDocumento) === type && d.activo);
 
   return (
     <AnimatePresence>

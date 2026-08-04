@@ -7,7 +7,7 @@ import { CreateUserDto, UserSettings } from "../../features/settings/types/setti
 import { UsersTable } from "../../features/settings/components/UsersTable";
 import { UserFormModal } from "../../features/settings/components/UserFormModal";
 import { DeleteModal } from "../../features/settings/components/DeleteModal";
-import { Settings, Users, Loader2, User, CreditCard, UserPlus, Shield } from "lucide-react";
+import { Settings, Users, Loader2, User, CreditCard, UserPlus, Shield, Palette } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { validateCedulaCheckDigit } from "../../features/auth/schemas";
 
@@ -17,10 +17,11 @@ const InviteesSettings = lazy(() => import("../../features/settings/components/I
 const DeleteAccountSection = lazy(() => import("../../features/settings/components/DeleteAccountSection").then(m => ({ default: m.DeleteAccountSection })));
 const TwoFactorSection = lazy(() => import("../../features/settings/components/TwoFactorSection").then(m => ({ default: m.TwoFactorSection })));
 const ChangePasswordSection = lazy(() => import("../../features/settings/components/ChangePasswordSection").then(m => ({ default: m.ChangePasswordSection })));
+const PreferenciasSection = lazy(() => import("../../features/settings/components/PreferenciasSection").then(m => ({ default: m.PreferenciasSection })));
 
 const TabFallback = () => <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
-type TabId = "profile" | "subscription" | "users" | "invitees" | "security";
+type TabId = "profile" | "subscription" | "users" | "invitees" | "security" | "preferences";
 
 
 
@@ -173,41 +174,56 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation tabs */}
-      <div className="flex overflow-x-auto border-b border-border hide-scrollbar">
-        <button type="button"
+      {/* Navigation tabs — single line, equal distribution, no scrollbar */}
+      <div role="tablist" className="flex w-full border-b border-border">
+        <button type="button" role="tab" aria-selected={activeTab === "profile"}
           onClick={() => setActiveTab("profile")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "profile"
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "profile"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
-          <User className="w-4 h-4" />
-          Mi Perfil
+          <User className="w-4 h-4 shrink-0" />
+          <span className="truncate">Mi Perfil</span>
         </button>
 
-        <button type="button"
-          onClick={() => setActiveTab("subscription")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "subscription"
+        {/* Preferencias tab - how the user is presented on public projects */}
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "preferences"}
+          onClick={() => setActiveTab("preferences")}
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "preferences"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
-          <CreditCard className="w-4 h-4" />
-          Suscripción
+          <Palette className="w-4 h-4 shrink-0" />
+          <span className="truncate">Preferencias</span>
+        </button>
+
+        <button type="button" role="tab" aria-selected={activeTab === "subscription"}
+          onClick={() => setActiveTab("subscription")}
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "subscription"
+            ? "border-[#223382] text-[#223382]"
+            : "border-transparent text-text-secondary hover:text-text-primary"
+            }`}
+        >
+          <CreditCard className="w-4 h-4 shrink-0" />
+          <span className="truncate">Suscripción</span>
         </button>
 
         {(user?.role === "admin" || user?.role === "owner") && (
           <>
-            <button type="button"
+            <button type="button" role="tab" aria-selected={activeTab === "users"}
               onClick={() => setActiveTab("users")}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "users"
+              className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "users"
                 ? "border-[#223382] text-[#223382]"
                 : "border-transparent text-text-secondary hover:text-text-primary"
                 }`}
             >
-              <Users className="w-4 h-4" />
-              Usuarios y Accesos
+              <Users className="w-4 h-4 shrink-0" />
+              <span className="truncate">Usuarios y Accesos</span>
             </button>
 
           </>
@@ -216,81 +232,91 @@ export const SettingsPage: React.FC = () => {
         {isManagementTier && (
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "invitees"}
             onClick={() => setActiveTab("invitees")}
-            className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "invitees"
+            className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "invitees"
               ? "border-[#223382] text-[#223382]"
               : "border-transparent text-text-secondary hover:text-text-primary"
               }`}
           >
-            <UserPlus className="w-4 h-4" />
-            Usuarios Invitados
+            <UserPlus className="w-4 h-4 shrink-0" />
+            <span className="truncate">Usuarios Invitados</span>
           </button>
         )}
 
         {/* Security tab - available for all authenticated users */}
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === "security"}
           onClick={() => setActiveTab("security")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-display text-sm font-bold transition-all whitespace-nowrap shrink-0 ${activeTab === "security"
+          className={`flex flex-1 min-w-0 items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 border-b-2 font-display text-xs sm:text-sm font-bold transition-all ${activeTab === "security"
             ? "border-[#223382] text-[#223382]"
             : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
         >
-          <Shield className="w-4 h-4" />
-          Seguridad
+          <Shield className="w-4 h-4 shrink-0" />
+          <span className="truncate">Seguridad</span>
         </button>
       </div>
 
       {/* Tab Contents */}
       <div className="mt-6">
         <Suspense fallback={<TabFallback />}>
-        <AnimatePresence mode="wait">
-          {activeTab === "profile" && (
-            <m.div key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <MyProfileForm />
-            </m.div>
-          )}
+          <AnimatePresence mode="wait">
+            {activeTab === "profile" && (
+              <m.div key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <MyProfileForm />
+              </m.div>
+            )}
 
-          {activeTab === "subscription" && (
-            <m.div key="subscription" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <SubscriptionSettings />
-            </m.div>
-          )}
+            {activeTab === "preferences" && (
+              <m.div key="preferences" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <PreferenciasSection />
+              </m.div>
+            )}
 
-          {activeTab === "users" && (
-            <m.div key="users" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <UsersTable
-                users={users}
-                plans={plans}
-                onEdit={handleEditClick}
-                onDelete={(id) => setDeleteId(id)}
-                onAddNew={handleAddNewClick}
-                onRefresh={refetchUsers}
-              />
-            </m.div>
-          )}
+            {activeTab === "subscription" && (
+              <m.div key="subscription" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <SubscriptionSettings />
+              </m.div>
+            )}
 
-          {activeTab === "invitees" && isManagementTier && (
-            <m.div key="invitees" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <InviteesSettings />
-            </m.div>
-          )}
+            {activeTab === "users" && (
+              <m.div key="users" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <UsersTable
+                  users={users}
+                  plans={plans}
+                  onEdit={handleEditClick}
+                  onDelete={(id) => setDeleteId(id)}
+                  onAddNew={handleAddNewClick}
+                  onRefresh={refetchUsers}
+                />
+              </m.div>
+            )}
 
-          {activeTab === "security" && (
-            <m.div key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
-              <TwoFactorSection />
-              <ChangePasswordSection />
-              <section className="bg-red-50 border border-red-200 rounded-lg p-6">
-                <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
-                <p className="text-sm text-red-600 mb-4">
-                  Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
-               </p>
-                <DeleteAccountSection />
-             </section>
-           </m.div>
-          )}
+            {activeTab === "invitees" && isManagementTier && (
+              <m.div key="invitees" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                <InviteesSettings />
+              </m.div>
+            )}
 
-        </AnimatePresence>
+            {activeTab === "security" && (
+              <m.div key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
+                <TwoFactorSection />
+                <ChangePasswordSection />
+                <section className="bg-red-50 border border-red-200 rounded-lg p-6">
+                  <h2 className="text-lg font-bold text-red-700 mb-4">Zona de Peligro</h2>
+                  <p className="text-sm text-red-600 mb-4">
+                    Las acciones en esta zona son irreversibles y afectarán tu cuenta de forma permanente.
+                  </p>
+                  <DeleteAccountSection />
+                </section>
+              </m.div>
+            )}
+
+          </AnimatePresence>
         </Suspense>
       </div>
 

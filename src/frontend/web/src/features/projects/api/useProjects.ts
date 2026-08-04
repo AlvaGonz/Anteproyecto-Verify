@@ -141,6 +141,7 @@ export const useUpdateProjectStatus = () => {
       qc.invalidateQueries({ queryKey: ["dashboardStats"] });
       qc.invalidateQueries({ queryKey: projectKeys.detail(variables.id) });
       qc.invalidateQueries({ queryKey: ["projectStatusEligibility", variables.id] });
+      qc.invalidateQueries({ queryKey: ["statusHistory", variables.id] });
     },
   });
 };

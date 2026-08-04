@@ -1,15 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
-  Plus,
-  Minus,
-  Maximize,
   Building2,
   Phone,
   MapIcon,
@@ -17,7 +12,6 @@ import {
   Camera,
   AlertCircle,
   X,
-  Move,
   Loader2,
 } from "lucide-react";
 import { useProject } from "../../features/projects/api/useProjects";
@@ -30,136 +24,7 @@ import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
 import { usePlanLimits } from "../../features/settings/api/useSettings";
 import { DocumentosModal } from "../../features/documents/components/DocumentosModal";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-// Fix Leaflet default marker icon issue
-delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
-
-const MiniMap: React.FC<{ lat: number; lng: number }> = ({ lat, lng }) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const [showControls, setShowControls] = useState(false);
-
-  useEffect(() => {
-    if (mapRef.current && !mapInstanceRef.current) {
-      const map = L.map(mapRef.current, {
-        center: [lat, lng],
-        zoom: 16,
-        zoomControl: false,
-        attributionControl: false,
-        dragging: true,
-        scrollWheelZoom: true,
-      });
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-      }).addTo(map);
-
-      L.marker([lat, lng]).addTo(map);
-
-      mapInstanceRef.current = map;
-    }
-
-    return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
-  }, [lat, lng]);
-
-  const panMap = (dx: number, dy: number) => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.panBy([dx, dy]);
-    }
-  };
-
-  const changeZoom = (delta: number) => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setZoom(mapInstanceRef.current.getZoom() + delta);
-    }
-  };
-
-  const toggleFullscreen = () => {
-    if (mapContainerRef.current) {
-      if (!document.fullscreenElement) {
-        mapContainerRef.current.requestFullscreen().catch(err => {
-          console.error(`Error attempting to enable fullscreen: ${err.message}`);
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    }
-  };
-
-  return (
-    <div ref={mapContainerRef} className="relative w-full h-full overflow-hidden group bg-slate-100">
-      <div ref={mapRef} className="w-full h-full z-0" />
-      
-      {/* Map Controls */}
-      <div className="absolute right-4 bottom-4 z-10 flex gap-2">
-        {!showControls ? (
-          <button 
-            type="button" 
-            onClick={() => setShowControls(true)} 
-            className="w-8 h-8 bg-white/90 backdrop-blur rounded shadow-md flex items-center justify-center hover:bg-white transition-colors"
-            title="Mostrar controles del mapa"
-          >
-            <Move size={18} className="text-slate-700" />
-          </button>
-        ) : (
-          <div className="flex gap-2 items-center">
-            {/* Directional Pad */}
-            <div className="relative w-[72px] h-[72px]">
-              <button type="button" onClick={() => panMap(0, -50)} className="absolute top-0 left-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
-                <ChevronUp size={16} className="text-slate-700" />
-              </button>
-              <button type="button" onClick={() => panMap(-50, 0)} className="absolute top-1/2 left-0 -translate-y-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
-                <ChevronLeft size={16} className="text-slate-700" />
-              </button>
-              <button type="button" onClick={() => panMap(50, 0)} className="absolute top-1/2 right-0 -translate-y-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
-                <ChevronRight size={16} className="text-slate-700" />
-              </button>
-              <button type="button" onClick={() => panMap(0, 50)} className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
-                <ChevronDown size={16} className="text-slate-700" />
-              </button>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-slate-200 rounded-full" />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-1.5 justify-center ml-1">
-              <button type="button" onClick={() => changeZoom(1)} className="w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
-                <Plus size={16} className="text-slate-700" />
-              </button>
-              <button type="button" onClick={() => changeZoom(-1)} className="w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform">
-                <Minus size={16} className="text-slate-700" />
-              </button>
-              <button type="button" onClick={toggleFullscreen} className="w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 hover:scale-110 transition-transform mt-0.5">
-                <Maximize size={14} className="text-slate-700" />
-              </button>
-            </div>
-            
-            {/* Close Controls Button */}
-            <button 
-              type="button" 
-              onClick={() => setShowControls(false)}
-              className="absolute -top-3 -right-3 w-6 h-6 bg-[#E63946] text-white rounded-full shadow-md flex items-center justify-center hover:bg-red-700 transition-colors z-20"
-            >
-              <X size={12} />
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+import { MiniMap } from "../../shared/components/ui/MiniMap";
 
 export const PublishedProjectDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -383,7 +248,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
       {/* HEADER AREA */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-slate-100 pb-4 mb-6">
         <div>
-          <h1 className="text-3xl font-black text-secondary tracking-tight">
+          <h1 className="text-3xl font-black text-secondary tracking-tight break-words">
             {project.nombre}
           </h1>
           <p className="text-xs text-slate-400 font-semibold mt-1">
@@ -403,7 +268,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* LEFT COLUMN: IMAGES (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col gap-2">
+        <div className="lg:col-span-4 flex flex-col gap-2 min-w-0">
           {uniqueImgs.length > 0 ? (
             <div className="flex flex-col gap-4 items-center w-full">
               {/* Main Image (100% width) */}
@@ -457,7 +322,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
         </div>
 
         {/* CENTER COLUMN: DETAILS (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        <div className="lg:col-span-5 flex flex-col gap-6 min-w-0">
           
           {/* Top Info block (Transmision, Traccion style) */}
           <div className="pb-6 border-b border-slate-100">
@@ -578,18 +443,18 @@ export const PublishedProjectDetailPage: React.FC = () => {
         </div>
 
         {/* RIGHT COLUMN: PUBLISHER & MAP (3 cols) */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 min-w-0">
           
-          <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg overflow-hidden max-w-full">
             <h2 className="text-xl font-bold text-secondary mb-4 border-b border-slate-200 pb-2">
               Publicado por
             </h2>
 
             {/* Seller Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1">
-                <h3 className="font-bold text-primary text-sm leading-tight">
-                  {project.registradoPor?.nombreCompleto || "Usuario Desconocido"}
+            <div className="flex items-center gap-3 mb-4 min-w-0">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-primary text-sm leading-tight break-words" data-testid="registrant-name">
+                  {project.registradoPor?.presentacionPublica?.nombreMostrado ?? (project.registradoPor?.nombreCompleto || "Usuario Desconocido")}
                 </h3>
                 <p className="text-xs text-slate-500 font-semibold">
                   Responsable Registral
@@ -605,57 +470,75 @@ export const PublishedProjectDetailPage: React.FC = () => {
             </div>
 
             {/* Seller Details List */}
-            <ul className="space-y-2 mb-6 text-[11px] text-slate-700">
-              <li className="flex gap-2 items-start">
+            <ul className="space-y-2 mb-6 text-[11px] text-slate-700 min-w-0">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">RNC/Cédula:</span> 
-                <span className="break-all">{project.cedulaRncPropietario || project.rncDesarrollador || "N/D"}</span>
+                <span className="font-bold shrink-0">RNC/Cédula:</span> 
+                <span className="break-all min-w-0" data-testid="registrant-identification">
+                  {project.registradoPor?.presentacionPublica
+                    ? (project.registradoPor.presentacionPublica.identificacionMostrada || "N/D")
+                    : (project.cedulaRncPropietario || project.rncDesarrollador || "N/D")}
+                </span>
               </li>
-              <li className="flex gap-2 items-start">
+              {project.registradoPor?.presentacionPublica ? (
+                project.registradoPor.presentacionPublica.razonSocialMostrada && (
+                  <li className="flex gap-2 items-start min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                    <span className="font-bold shrink-0">R. Social:</span> 
+                    <span className="break-words min-w-0" data-testid="registrant-razon-social">
+                      {project.registradoPor.presentacionPublica.razonSocialMostrada}
+                    </span>
+                  </li>
+                )
+              ) : (
+                <li className="flex gap-2 items-start min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                  <span className="font-bold shrink-0">R. Social:</span> 
+                  <span className="break-words min-w-0" data-testid="registrant-razon-social">
+                    {project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}
+                  </span>
+                </li>
+              )}
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">R. Social:</span> 
-                <span>{project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}</span>
-              </li>
-              <li className="flex gap-2 items-start">
-                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Tel:</span> 
-                <a href={project.registradoPor?.telefono ? `tel:${project.registradoPor.telefono.replace(/\s+/g, '')}` : undefined} className="text-primary hover:underline">
+                <span className="font-bold shrink-0">Tel:</span> 
+                <a href={project.registradoPor?.telefono ? `tel:${project.registradoPor.telefono.replace(/\s+/g, '')}` : undefined} className="text-primary hover:underline break-all min-w-0">
                   {project.registradoPor?.telefono || "N/D"}
                 </a>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Email:</span> 
-                <a href={project.registradoPor?.email ? `mailto:${project.registradoPor.email}` : undefined} className="text-primary hover:underline break-all">
+                <span className="font-bold shrink-0">Email:</span> 
+                <a href={project.registradoPor?.email ? `mailto:${project.registradoPor.email}` : undefined} className="text-primary hover:underline break-all min-w-0">
                   {project.registradoPor?.email || "N/D"}
                 </a>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Ubicación:</span> 
-                <span>{project.ubicacionTexto || "N/D"}</span>
+                <span className="font-bold shrink-0">Ubicación:</span> 
+                <span className="break-words min-w-0">{project.ubicacionTexto || "N/D"}</span>
               </li>
-              <li className="flex gap-2 items-start">
+              <li className="flex gap-2 items-start min-w-0">
                 <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold min-w-[60px]">Dirección:</span> 
-                <span>{project.registradoPor?.direccion || "N/D"}</span>
+                <span className="font-bold shrink-0">Dirección:</span> 
+                <span className="break-words min-w-0">{project.registradoPor?.direccion || "N/D"}</span>
               </li>
             </ul>
 
             {/* WhatsApp badges */}
             {project.registradoPor?.telefono && (
-              <div className="space-y-2 mb-6">
-                <a href={`https://wa.me/${project.registradoPor.telefono.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-emerald-600 hover:underline">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+              <div className="space-y-2 mb-6 min-w-0">
+                <a href={`https://wa.me/${project.registradoPor.telefono.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-emerald-600 hover:underline break-all">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0">
                     <Phone size={10} />
                   </div>
-                  WhatsApp: {project.registradoPor.telefono}
+                  <span className="min-w-0">WhatsApp: {project.registradoPor.telefono}</span>
                 </a>
               </div>
             )}
 
             {/* Action Buttons */}
-            <div className="space-y-2 mb-6">
+            <div className="space-y-2 mb-6 min-w-0">
               <button 
                 type="button" 
                 onClick={() => {
@@ -693,12 +576,12 @@ export const PublishedProjectDetailPage: React.FC = () => {
               >
                 {isRegisteringInterest || isUnregisteringInterest ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={16} className="animate-spin shrink-0" />
                     <span>Procesando...</span>
                   </>
                 ) : interested ? (
                   <>
-                    <CheckCircle2 size={16} />
+                    <CheckCircle2 size={16} className="shrink-0" />
                     <span>Interés Registrado</span>
                   </>
                 ) : (

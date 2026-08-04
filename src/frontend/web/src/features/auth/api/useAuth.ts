@@ -29,6 +29,9 @@ export const useRegister = () =>
         setAccessToken(res.accessToken);
       }
     },
+    onError: (error) => {
+      console.error("[RESEND_FAILURE]", { context: "register", error });
+    },
   });
 
 export const useLogout = () =>

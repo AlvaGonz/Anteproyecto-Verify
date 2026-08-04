@@ -1,4 +1,5 @@
 ---
+name: quality-qa
 description: Enforce rigorous quality assurance via matrix testing and smoke checklists.
 ---
 

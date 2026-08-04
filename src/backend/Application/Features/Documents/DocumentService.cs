@@ -219,8 +219,22 @@ try
         if (estadoRevision == null)
             return;
 
+        var oldEstadoId = project.EstadoId;
+        var oldStatus = project.Estado?.CodigoUnico;
         project.UpdateEstado(estadoRevision);
         _proyectoRepository.Update(project);
+
+        await _auditoriaRepository.AddAsync(new Auditoria(
+            project.UsuarioCreadorId,
+            TipoOperacion.CambioEstado,
+            "CambioEstado",
+            $"{oldStatus} → {ProjectStatus.Revision.ToCodigoUnico()}",
+            project.Id,
+            null,
+            null,
+            oldEstadoId,
+            estadoRevision.Id
+        ), cancellationToken);
     }
 
     public async Task<IEnumerable<DocumentDto>> GetProjectDocumentsAsync(Guid projectId, CancellationToken cancellationToken = default)
