@@ -315,7 +315,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             await SaveValidationResultAsync(request, res);
 
             if (res.IsValid)
-                await UpdateIpiStatusAsync(request.ProyectoId, entity.Estatus, cancellationToken: CancellationToken.None);
+                await UpdateIpiStatusAsync(request.ProyectoId, entity.Estatus);
 
             return res;
         }
@@ -325,43 +325,41 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         return failRes;
     }
 
-    private async Task UpdateIpiStatusAsync(Guid proyectoId, string estatusIpi, CancellationToken cancellationToken = default)
+    private async Task UpdateIpiStatusAsync(Guid proyectoId, string estatusIpi, CancellationToken ct = default)
     {
         var proyecto = await _dbContext.Proyectos.FirstOrDefaultAsync(p => p.Id == proyectoId);
         if (proyecto == null) return;
 
         var prevStatus = proyecto.EstatusIpi;
+        var mappedStatus = MapIpiEstatus(estatusIpi);
+        if (mappedStatus == null || mappedStatus == prevStatus) return;
 
-        if (estatusIpi == "No Pagado")
-        {
-            proyecto.UpdateEstatusIpi("PAGO_PENDIENTE");
-
-            if (prevStatus != "PAGO_PENDIENTE")
-            {
-                var alreadyNotified = await _dbContext.Notificaciones.AnyAsync(n =>
-                    n.TipoNotificacionId == Domain.Enums.TipoNotificacionId.IpiPendiente &&
-                    n.EntidadReferenciaId == proyectoId);
-
-                if (!alreadyNotified)
-                {
-                    await NotifyIpiAlertAsync(proyecto, Domain.Enums.TipoNotificacionId.IpiPendiente,
-                        $"Deuda IPI detectada en \"{proyecto.Nombre}\".", cancellationToken);
-                }
-            }
-        }
-        else if (estatusIpi == "Pagado")
-        {
-            proyecto.UpdateEstatusIpi("AL_DIA");
-
-            if (prevStatus == "PAGO_PENDIENTE")
-            {
-                await NotifyIpiAlertAsync(proyecto, Domain.Enums.TipoNotificacionId.IpiResuelto,
-                    $"Deuda IPI resuelta en \"{proyecto.Nombre}\".", cancellationToken);
-            }
-        }
-
+        proyecto.UpdateEstatusIpi(mappedStatus);
         await _dbContext.SaveChangesAsync();
+
+        if (mappedStatus == "PAGO_PENDIENTE")
+        {
+            var alreadyNotified = await _dbContext.Notificaciones.AnyAsync(n =>
+                n.TipoNotificacionId == Domain.Enums.TipoNotificacionId.IpiPendiente &&
+                n.EntidadReferenciaId == proyectoId);
+
+            if (!alreadyNotified)
+                await NotifyIpiAlertAsync(proyecto, Domain.Enums.TipoNotificacionId.IpiPendiente,
+                    $"Deuda IPI detectada en \"{proyecto.Nombre}\".", ct);
+        }
+        else if (mappedStatus == "AL_DIA" && prevStatus == "PAGO_PENDIENTE")
+        {
+            await NotifyIpiAlertAsync(proyecto, Domain.Enums.TipoNotificacionId.IpiResuelto,
+                $"Deuda IPI resuelta en \"{proyecto.Nombre}\".", ct);
+        }
     }
+
+    private static string? MapIpiEstatus(string rawStatus) => rawStatus switch
+    {
+        "No Pagado" => "PAGO_PENDIENTE",
+        "Pagado" => "AL_DIA",
+        _ => null
+    };
 
     private async Task NotifyIpiAlertAsync(Domain.Entities.Proyecto proyecto, int tipoId, string mensaje, CancellationToken ct)
     {

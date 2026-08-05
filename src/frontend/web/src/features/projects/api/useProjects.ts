@@ -40,6 +40,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   planNombre: apiProj.planNombre || null,
   registradoPor: apiProj.registradoPor || null,
   superficieM2: apiProj.superficieM2,
+  estatusIpi: apiProj.estatusIpi,
 });
 
 interface PaginatedProjectsResponse {
