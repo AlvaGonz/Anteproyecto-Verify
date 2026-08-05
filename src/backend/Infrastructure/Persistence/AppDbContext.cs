@@ -22,6 +22,8 @@ public class AppDbContext : DbContext
     public DbSet<Certificacion> Certificaciones => Set<Certificacion>();
     public DbSet<Invitacion> Invitaciones => Set<Invitacion>();
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
+    public DbSet<TipoNotificacion> TiposNotificaciones => Set<TipoNotificacion>();
+    public DbSet<NotificacionEntrega> NotificacionEntregas => Set<NotificacionEntrega>();
     public DbSet<SesionUsuario> SesionesUsuario => Set<SesionUsuario>();
 
     public DbSet<Perfil> Perfiles => Set<Perfil>();
@@ -138,5 +140,38 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(d => d.ProyectoId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Notification Taxonomy
+        modelBuilder.Entity<TipoNotificacion>(entity =>
+        {
+            entity.ToTable("TiposNotificaciones");
+            entity.HasIndex(e => e.Codigo).IsUnique();
+        });
+
+        modelBuilder.Entity<Notificacion>(entity =>
+        {
+            entity.ToTable("Notificaciones");
+            entity.HasOne(n => n.Usuario)
+                .WithMany()
+                .HasForeignKey(n => n.UsuarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(n => n.TipoNotificacion)
+                .WithMany()
+                .HasForeignKey(n => n.TipoNotificacionId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasIndex(n => new { n.UsuarioId, n.TipoNotificacionId })
+                .HasFilter("[TipoNotificacionId] IS NOT NULL");
+        });
+
+        modelBuilder.Entity<NotificacionEntrega>(entity =>
+        {
+            entity.ToTable("NotificacionEntregas");
+            entity.HasIndex(e => e.NotificacionId);
+            entity.HasIndex(e => new { e.NotificacionId, e.Canal }).IsUnique();
+            entity.HasOne(e => e.Notificacion)
+                .WithMany(n => n.Entregas)
+                .HasForeignKey(e => e.NotificacionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

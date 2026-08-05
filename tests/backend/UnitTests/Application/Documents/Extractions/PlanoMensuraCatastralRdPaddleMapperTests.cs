@@ -146,6 +146,163 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.Municipio.Status.Should().Be(FieldStatus.Missing);
             extraction.SuperficieARegistrarParcelaM2.Status.Should().Be(FieldStatus.Missing);
         }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractDcp505483687149_FromPlano505483687149()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DEPARTAMENTO ESTE" },
+                new OcrLine { Text = "PLANO INDIVIDUAL" },
+                new OcrLine { Text = "OPERACIOSUBDISION" },
+                new OcrLine { Text = "DESIGNACION CATASTRAL POSICIONAL:" },
+                new OcrLine { Text = "505483687149" },
+                new OcrLine { Text = "CATASTRAL DE ORIGEN:" },
+                new OcrLine { Text = "42018023893-1-1" },
+                new OcrLine { Text = "PROVINCIA" },
+                new OcrLine { Text = "LA ALTAGRACIA" },
+                new OcrLine { Text = "MUNICIPIO HIGUEY" },
+                new OcrLine { Text = "LUGAR JUANILLO" },
+                new OcrLine { Text = "SUPERFICIE A REGISTRAR PARCELA 12,130.07m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.ExtractionStatus.Should().Be(ExtractionStatus.Completed);
+            extraction.Operacion.NormalizedValue.Should().Be("SUBDIVISION");
+            extraction.DesignacionCatastralPosicional.NormalizedValue.Should().Be("505483687149");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().Be("4201802389311");
+            extraction.Provincia.RawValue.Should().Be("LA ALTAGRACIA");
+            extraction.Municipio.RawValue.Should().Be("HIGUEY");
+            extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("12130.07");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldHandleConcatOcrWithCalleParcelaNoise()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DEPARTAMENTOESTE" },
+                new OcrLine { Text = "PLANOINDIVIDUAL" },
+                new OcrLine { Text = "OPERACIONSUBDIVISION" },
+                new OcrLine { Text = "DESIGNACIONCATASTRALPOSICIONAL505483687149" },
+                new OcrLine { Text = "CATASTRAL DE ORIGEN CALLE PARCELA" },
+                new OcrLine { Text = "42018023893-1-1" },
+                new OcrLine { Text = "PROVINCIA LA ALTAGRACIA" },
+                new OcrLine { Text = "MUNICIPIO HIGUEY" },
+                new OcrLine { Text = "SECCION BAIGUA" },
+                new OcrLine { Text = "LUGAR JUANILLO" },
+                new OcrLine { Text = "SUPERFICIE PARCELA 12,130.07m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.Operacion.NormalizedValue.Should().Be("SUBDIVISION");
+            extraction.DesignacionCatastralPosicional.NormalizedValue.Should().Be("505483687149");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().Be("4201802389311");
+            extraction.Provincia.RawValue.Should().Be("LA ALTAGRACIA");
+            extraction.Municipio.RawValue.Should().Be("HIGUEY");
+            extraction.Lugar.NormalizedValue.Should().NotBeNullOrEmpty();
+            extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("12130.07");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldRejectCalleParcelaAsDcoValue()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DESIGNACION CATASTRAL POSICIONAL: 505483687149" },
+                new OcrLine { Text = "CATASTRAL DE ORIGEN CALLE PARCELA" },
+                new OcrLine { Text = "42018023893-1-1" },
+                new OcrLine { Text = "PROVINCIA LA ALTAGRACIA" },
+                new OcrLine { Text = "MUNICIPIO HIGUEY" },
+                new OcrLine { Text = "SUPERFICIE 12,130.07m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.DesignacionCatastralOrigen.NormalizedValue.Should().NotBe("CALLE");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().NotBe("CALLEPARCELA");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().Be("4201802389311");
+            extraction.DesignacionCatastralPosicional.NormalizedValue.Should().Be("505483687149");
+            extraction.Provincia.RawValue.Should().Be("LA ALTAGRACIA");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldRejectCATASTRALDEORIGEN_AsDcpValue()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DEPARTAMENTO ESTE" },
+                new OcrLine { Text = "DESIGNACIONCATASTRALPOSICIONALCATASTRALDEORIGEN505483687149" },
+                new OcrLine { Text = "CATASTRAL DE ORIGEN: 42018023893-1-1" },
+                new OcrLine { Text = "PROVINCIA LA ALTAGRACIA" },
+                new OcrLine { Text = "MUNICIPIO HIGUEY" },
+                new OcrLine { Text = "SUPERFICIE 12,130.07m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.DesignacionCatastralPosicional.NormalizedValue.Should().Be("505483687149");
+            extraction.DesignacionCatastralPosicional.NormalizedValue.Should().NotContain("CATASTRAL");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().Be("4201802389311");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractDcp12Digits_FromLabelFollowedByNumber()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DCP" },
+                new OcrLine { Text = "505483687149" },
+                new OcrLine { Text = "DCO: 4201802389311" },
+                new OcrLine { Text = "PROVINCIA LA ALTAGRACIA" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.DesignacionCatastralPosicional.NormalizedValue.Should().Be("505483687149");
+        }
         [Fact]
         public void MapFromOcrResult_ShouldExtractConcatenatedFields_WhenOnSameLine()
         {
@@ -174,6 +331,93 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.Municipio.NormalizedValue.Should().Be("CONCEPCIÓN DE LA VEGA");
             extraction.Seccion.NormalizedValue.Should().Be(string.Empty);
             extraction.Lugar.NormalizedValue.Should().Be("TERRERO");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractSuperficie_WhenSplitAcrossLabelAndParcelaLines()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DEPARTAMENTO ESTE" },
+                new OcrLine { Text = "OPERACION SUBDIVISION" },
+                new OcrLine { Text = "SUPERFICIE A REGISTRAR" },
+                new OcrLine { Text = "PARCELA 12,130.07 m2" },
+                new OcrLine { Text = "PROVINCIA LA ALTAGRACIA" },
+                new OcrLine { Text = "MUNICIPIO HIGUEY" },
+                new OcrLine { Text = "LUGAR JUANILLO" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("12130.07");
+            extraction.Provincia.RawValue.Should().Be("LA ALTAGRACIA");
+            extraction.Municipio.RawValue.Should().Be("HIGUEY");
+            extraction.Lugar.RawValue.Should().Be("JUANILLO");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractLugar_WhenLabelIsMissing_FromProximityToMunicipio()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DEPARTAMENTO ESTE" },
+                new OcrLine { Text = "OPERACION SUBDIVISION" },
+                new OcrLine { Text = "DESIGNACION CATASTRAL POSICIONAL: 505483687149" },
+                new OcrLine { Text = "PROVINCIA LA ALTAGRACIA" },
+                new OcrLine { Text = "MUNICIPIO HIGUEY" },
+                new OcrLine { Text = "JUANILLO" },
+                new OcrLine { Text = "SUPERFICIE PARCELA 12,130.07 m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.Lugar.NormalizedValue.Should().Be("JUANILLO");
+            extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("12130.07");
+            extraction.Provincia.RawValue.Should().Be("LA ALTAGRACIA");
+            extraction.Municipio.RawValue.Should().Be("HIGUEY");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractSeccion_FromOcrOutputWithConcatenatedLabel()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DEPARTAMENTO ESTE" },
+                new OcrLine { Text = "PROVINCIA LA ALTAGRACIA" },
+                new OcrLine { Text = "MUNICIPIO HIGUEY" },
+                new OcrLine { Text = "SECCIONBAIGUA" },
+                new OcrLine { Text = "LUGAR JUANILLO" },
+                new OcrLine { Text = "SUPERFICIE 12,130.07m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.Seccion.NormalizedValue.Should().Be("BAIGUA");
+            extraction.Lugar.NormalizedValue.Should().Be("JUANILLO");
         }
     }
 }

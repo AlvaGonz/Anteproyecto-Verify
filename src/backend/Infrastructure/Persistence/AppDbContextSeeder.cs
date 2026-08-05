@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Application.Abstractions.Storage;
 using Domain.Entities;
@@ -42,6 +44,7 @@ public static class AppDbContextSeeder
             await SeedMunicipiosAsync(context, logger);
             await SeedPlanesSuscripcionAsync(context, logger);
             await SeedProyectoEstadosAsync(context, logger);
+            await SeedTiposNotificacionesAsync(context, logger);
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -329,16 +332,44 @@ public static class AppDbContextSeeder
                     context,
                     proyectoId: p1.Id,
                     codigoSello: "VF-2026-ABC123XYZ",
-                    nombre: "Sello VeriFinca Oro",
-                    nivel: NivelSelloIntegridad.Oro,
-                    urlQr: "https://verifinca.do/verify/VF-2026-ABC123XYZ",
-                    firmaDigital: "firma-digital-simulada");
+                    nombre: "Sello de Integridad",
+                    nivel: NivelSelloIntegridad.Bronce,
+                    urlQr: $"http://localhost:3000/#/q/{GenerateSealToken(p1.Id, "VF-2026-ABC123XYZ")}",
+                    firmaDigital: "firma-digital-simulada",
+                    qrToken: GenerateSealToken(p1.Id, "VF-2026-ABC123XYZ"));
+
+                // Seal seeding for remaining published projects
+                var publishedProjectSeeds = new (int Index, string Codigo)[]
+                {
+                    (3, "VF-2026-OASIS001"),
+                    (4, "VF-2026-PSOL001"),
+                    (5, "VF-2026-LUMI001"),
+                    (6, "VF-2026-ALTOS001"),
+                    (7, "VF-2026-COSTA001"),
+                    (8, "VF-2026-PCNOR001"),
+                    (9, "VF-2026-VISTA001"),
+                };
+
+                foreach (var (idx, codigo) in publishedProjectSeeds)
+                {
+                    var proj = proyectoEntities[idx];
+                    var token = GenerateSealToken(proj.Id, codigo);
+                    await GetOrCreateSelloIntegridadAsync(
+                        context,
+                        proyectoId: proj.Id,
+                        codigoSello: codigo,
+                        nombre: "Sello de Integridad",
+                        nivel: NivelSelloIntegridad.Bronce,
+                        urlQr: $"http://localhost:3000/#/q/{token}",
+                        firmaDigital: "firma-digital-simulada",
+                        qrToken: token);
+                }
 
                 await GetOrCreateNotificacionAsync(
                     context,
                     usuarioId: profesionalUser.Id,
                     mensaje: "El proyecto Torre Bella Vista Piantini ha sido publicado.",
-                    tipo: "ProjectPublished",
+                    tipo: TipoNotificacionId.ProyectoPublicado.ToString(),
                     ruta: $"/admin/projects/{p1.Id}",
                     markRead: false);
 
@@ -346,7 +377,7 @@ public static class AppDbContextSeeder
                     context,
                     usuarioId: profesionalUser.Id,
                     mensaje: "Validación fallida para Proyecto Costero La Romana.",
-                    tipo: "ValidationFailed",
+                    tipo: TipoNotificacionId.ProyectoObservacion.ToString(),
                     ruta: $"/admin/projects/{p3.Id}",
                     markRead: true);
             } catch (Exception ex) {
@@ -755,6 +786,43 @@ WHERE NOT EXISTS (
         }
     }
 
+    private static async Task SeedTiposNotificacionesAsync(AppDbContext context, ILogger logger)
+    {
+        if (await context.TiposNotificaciones.AnyAsync()) return;
+
+        logger.LogInformation("Seeding notification types taxonomy...");
+
+        var tipos = new (string Codigo, string Nombre, string Categoria, byte Prioridad, string Canales)[]
+        {
+            ("BIENVENIDA_REGISTRO",     "Bienvenida a VeriFinca",            "Cuenta",       4, "InApp,Email"),
+            ("CUENTA_CREADA",           "Cuenta creada",                     "Cuenta",       4, "InApp"),
+            ("EMAIL_VERIFICADO",        "Email verificado",                  "Cuenta",       4, "InApp,Email"),
+            ("CAMBIO_CONTRASENA",       "Contraseña actualizada",            "Cuenta",       2, "Email"),
+            ("SUSCRIPCION_ACTIVADA",    "Suscripción activada",              "Billing",      2, "InApp,Email"),
+            ("SUSCRIPCION_CANCELADA",   "Suscripción cancelada",             "Billing",      2, "InApp,Email"),
+            ("PAGO_FALLIDO",            "Pago rechazado",                    "Billing",      1, "InApp,Email,Push"),
+            ("PROYECTO_CREADO",         "Proyecto registrado",               "Proyectos",    4, "InApp"),
+            ("PROYECTO_EDITADO",        "Proyecto actualizado",              "Proyectos",    5, "InApp"),
+            ("PROYECTO_EN_REVISION",    "Proyecto en revisión",              "Proyectos",    3, "InApp,Email"),
+            ("PROYECTO_PUBLICADO",      "Proyecto verificado y publicado",   "Proyectos",    2, "InApp,Email"),
+            ("PROYECTO_OBSERVACION",    "Proyecto con observaciones",        "Proyectos",    2, "InApp,Email"),
+            ("DOCUMENTO_SUBIDO",        "Documento cargado",                 "Documentos",   5, "InApp"),
+            ("DOCUMENTO_VALIDADO",      "Documento validado",                "Documentos",   3, "InApp"),
+            ("DOCUMENTO_RECHAZADO",     "Documento rechazado",               "Documentos",   2, "InApp,Email"),
+            ("INTERES_REGISTRADO",      "Interés registrado en tu proyecto", "Social",       3, "InApp,Email"),
+            ("INVITACION_RECIBIDA",     "Invitación de delegación recibida", "Social",       3, "InApp,Email"),
+            ("LIMITES_DELEGACION",      "Límites de delegación actualizados","Social",       5, "InApp"),
+            ("IPI_PENDIENTE",           "Deuda IPI detectada",               "Validaciones", 2, "InApp,Email"),
+            ("IPI_RESUELTO",            "Deuda IPI resuelta",                "Validaciones", 3, "InApp"),
+        };
+
+        var entities = tipos.Select(t => new TipoNotificacion(
+            t.Codigo, t.Nombre, t.Categoria, t.Prioridad, t.Canales));
+
+        context.TiposNotificaciones.AddRange(entities);
+        await context.SaveChangesAsync();
+    }
+
     private static async Task SeedLegacyProfilesAndPermissionsAsync(AppDbContext context, ILogger logger, Usuario adminUser, Usuario devUser, Usuario publicUser)
     {
         if (!await context.Permisos.AnyAsync())
@@ -885,6 +953,19 @@ WHERE NOT EXISTS (
                 designacionCatastral: "120260167201:0091",
                 status: ProjectStatus.Publicado);
         }
+
+        // Seed QR seal for Torre Playa Dorada Beach
+        var torreCodigo = "VF-2026-TORRE001";
+        var torreToken = GenerateSealToken(torre.Id, torreCodigo);
+        await GetOrCreateSelloIntegridadAsync(
+            context,
+            proyectoId: torre.Id,
+            codigoSello: torreCodigo,
+            nombre: "Sello de Integridad",
+            nivel: NivelSelloIntegridad.Bronce,
+            urlQr: $"http://localhost:3000/#/q/{torreToken}",
+            firmaDigital: "firma-digital-simulada",
+            qrToken: torreToken);
 
         var targetProjects = seedProjects.Concat(new[] { torre }).ToList();
 
@@ -1070,12 +1151,20 @@ WHERE NOT EXISTS (
         var hasWelcome = await context.Notificaciones.AnyAsync(n => n.UsuarioId == returnUser.Id && n.Mensaje.Contains("¡Bienvenido a VeriFinca"));
         if (!hasWelcome)
         {
-            var welcomeNotification = new Notificacion(
-                usuarioId: returnUser.Id,
-                mensaje: $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
-                tipo: "Info",
-                enlaceRelacionado: "/dashboard"
-            );
+            var tipoBienvenida = await context.TiposNotificaciones
+                .FindAsync(TipoNotificacionId.BienvenidaRegistro);
+            var welcomeNotification = tipoBienvenida != null
+                ? new Notificacion(
+                    usuarioId: returnUser.Id,
+                    mensaje: $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
+                    tipoNotificacionId: tipoBienvenida.Id,
+                    tipoCodigo: tipoBienvenida.Codigo,
+                    prioridad: tipoBienvenida.Prioridad,
+                    canales: tipoBienvenida.Canales.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries),
+                    enlaceRelacionado: "/dashboard")
+                : new Notificacion(returnUser.Id,
+                    $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
+                    "Info", "/dashboard");
             context.Notificaciones.Add(welcomeNotification);
             await context.SaveChangesAsync();
         }
@@ -1229,7 +1318,8 @@ WHERE NOT EXISTS (
         string nombre,
         NivelSelloIntegridad nivel,
         string urlQr,
-        string firmaDigital)
+        string firmaDigital,
+        string qrToken = "")
     {
         var existing = await context.SellosIntegridad.FirstOrDefaultAsync(s => 
             s.ProyectoId == proyectoId && s.CodigoSello == codigoSello);
@@ -1241,7 +1331,8 @@ WHERE NOT EXISTS (
             nombre,
             nivel,
             urlQr,
-            firmaDigital);
+            firmaDigital,
+            qrToken);
             
         context.SellosIntegridad.Add(entity);
         await context.SaveChangesAsync();
@@ -1260,7 +1351,28 @@ WHERE NOT EXISTS (
             n.UsuarioId == usuarioId && n.Mensaje == mensaje && n.Tipo == tipo);
         if (existing != null) return existing;
 
-        var notif = new Notificacion(usuarioId, mensaje, tipo, ruta);
+        // ponytail: int Id es fuente de verdad. Codigo string preserved as metadata.
+        Notificacion notif;
+        if (int.TryParse(tipo, out var tipoId))
+        {
+            var tipoFromCatalog = await context.TiposNotificaciones.FindAsync(tipoId);
+            if (tipoFromCatalog != null)
+            {
+                var canales = tipoFromCatalog.Canales
+                    .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                notif = new Notificacion(usuarioId, mensaje, tipoFromCatalog.Id, tipoFromCatalog.Codigo,
+                    tipoFromCatalog.Prioridad, canales, ruta);
+            }
+            else
+            {
+                notif = new Notificacion(usuarioId, mensaje, tipo, ruta);
+            }
+        }
+        else
+        {
+            notif = new Notificacion(usuarioId, mensaje, tipo, ruta);
+        }
+
         if (markRead) notif.MarkAsRead();
         context.Notificaciones.Add(notif);
         await context.SaveChangesAsync();
@@ -1485,5 +1597,15 @@ WHERE NOT EXISTS (
             await context.SaveChangesAsync();
             logger.LogInformation($"EF seed complete! Total rows: {count}.");
         }
+    }
+
+    private static string GenerateSealToken(Guid projectId, string codigoSello)
+    {
+        const string signingSecret = "VERIFINCA_SEAL_SIGNING_KEY_2026";
+        var payload = $"{projectId}|{codigoSello}|{DateTime.UtcNow:yyyyMMddHHmmss}";
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(signingSecret));
+        var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
+        var token = Convert.ToBase64String(hashBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
+        return $"{Convert.ToBase64String(Encoding.UTF8.GetBytes(payload))}.{token}";
     }
 }

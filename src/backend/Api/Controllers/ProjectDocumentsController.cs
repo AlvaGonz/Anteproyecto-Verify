@@ -12,6 +12,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Api.Extensions;
 
 [ApiController]
 [Route("api/projects/{projectId}/documents")]
@@ -79,14 +80,9 @@ public class ProjectDocumentsController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("El archivo es requerido y no puede estar vacío.");
 
-        // Basic validation (can be moved to a validator or options pattern)
-        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".webp" };
-        var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (Array.IndexOf(allowedExtensions, extension) < 0)
-            return BadRequest("Tipo de archivo no permitido.");
-
-        if (file.Length > 10 * 1024 * 1024) // 10MB limit
-            return BadRequest("El archivo excede el tamaño máximo permitido (10MB).");
+        var (isValidPdf, pdfError) = file.IsValidPdf();
+        if (!isValidPdf)
+            return BadRequest(new { error = pdfError });
 
         var userId = GetCurrentUserId();
         if (userId == Guid.Empty)
@@ -133,17 +129,10 @@ public class ProjectDocumentsController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("El archivo es requerido y no puede estar vacío.");
 
-        // Validaciones básicas de archivo (reutilizando la lógica existente)
-        var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".webp" };
-        var extension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (Array.IndexOf(allowedExtensions, extension) < 0)
-            return BadRequest("Tipo de archivo no permitido.");
+        var (isValidPdf, pdfError) = file.IsValidPdf();
+        if (!isValidPdf)
+            return BadRequest(new { error = pdfError });
 
-        if (file.Length > 10 * 1024 * 1024) // 10MB limit
-            return BadRequest("El archivo excede el tamaño máximo permitido (10MB).");
-
-        // TODO: Mapear requirementCode a DocumentType de forma segura
-        // Esto requerirá lógica adicional (por ahora usamos un default o lanzamos si es inválido)
         DocumentType tipoDocumento;
         if (!Enum.TryParse<DocumentType>(requirementCode, true, out tipoDocumento))
         {

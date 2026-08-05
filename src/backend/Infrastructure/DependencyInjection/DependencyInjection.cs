@@ -136,6 +136,7 @@ public static class DependencyInjection
         });
         services.AddScoped<Application.Abstractions.Notifications.IEmailService, Email.ResendEmailService>();
         services.AddScoped<Application.Abstractions.Notifications.IEmailNotificationService, Services.EmailNotificationService>();
+        services.AddScoped<Application.Abstractions.Notifications.INotificationFactory, Services.NotificationFactory>();
 
         // External Services
         services.AddScoped<Application.Abstractions.ExternalServices.IDgiiValidationService, Services.DgiiValidationService>();

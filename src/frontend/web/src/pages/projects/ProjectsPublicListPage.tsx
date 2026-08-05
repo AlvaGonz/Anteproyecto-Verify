@@ -199,11 +199,10 @@ const ProjectsPublicListContent: React.FC = () => {
           <button
             type="button"
             onClick={() => setFiltersVisible(!filtersVisible)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors ${
-              filtersVisible
-                ? "bg-primary text-white border-primary"
-                : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-            }`}
+            className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors ${filtersVisible
+              ? "bg-primary text-white border-primary"
+              : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+              }`}
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -215,208 +214,208 @@ const ProjectsPublicListContent: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Sidebar - Filters */}
           {filtersVisible && (
-          <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
-            {/* Blue Box: Search + Project Types */}
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                <span className="text-primary">●</span> Búsqueda
-              </label>
-              <input
-                type="text"
-                placeholder="RNC, Cédula, Nombre..."
-                value={filters.searchQuery}
-                onChange={(e) => updateFilter("searchQuery", e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-              />
-
-              <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
-            </div>
-
-            {/* Red Box: Price Filter */}
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                <span className="text-rose-500">●</span> Precio (DOP)
-              </label>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold text-slate-600">
-                  <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
-                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "15M+" : filters.priceRange[1].toLocaleString()}</span>
-                </div>
-                <div className="relative h-6">
-                  <input
-                    type="range"
-                    min="0"
-                    max={PRICE_MAX}
-                    step={PRICE_STEPS}
-                    value={filters.priceRange[0]}
-                    onChange={(e) => handlePriceChange([parseInt(e.target.value), filters.priceRange[1]])}
-                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                  />
-                  <input
-                    type="range"
-                    min="0"
-                    max={PRICE_MAX}
-                    step={PRICE_STEPS}
-                    value={filters.priceRange[1]}
-                    onChange={(e) => handlePriceChange([filters.priceRange[0], parseInt(e.target.value)])}
-                    className="absolute top-0 left-0 w-full h-1.5 bg-transparent appearance-none cursor-pointer accent-rose-500"
-                    style={{ pointerEvents: "auto" }}
-                  />
-                </div>
-                <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                  <span>0</span>
-                  <span>7.5M</span>
-                  <span>15M+</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Purple Box: Province + Lat/Lng */}
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                <span className="text-purple-500">●</span> Provincia
-              </label>
-              <select
-                value={filters.province}
-                onChange={(e) => updateFilter("province", e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-              >
-                <option value="">Todas</option>
-                {provincias?.map((p) => (
-                  <option key={p.nombre} value={p.nombre}>{p.nombre}</option>
-                ))}
-              </select>
-
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
-                <span className="text-purple-500">●</span> Coordenadas (Lat, Lng)
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+            <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
+              {/* Blue Box: Search + Project Types */}
+              <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                  <span className="text-primary">●</span> Búsqueda
+                </label>
                 <input
                   type="text"
-                  placeholder="Ej: 18.47186, -69.93988"
-                  value={filters.latLng}
-                  onChange={handleLatLngChange}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                  placeholder="RNC, Cédula, Nombre..."
+                  value={filters.searchQuery}
+                  onChange={(e) => updateFilter("searchQuery", e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
                 />
+
+                <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
               </div>
 
-              {filters.latLng && (
-                <div className="text-[9px] font-bold text-purple-600 bg-purple-50 px-2 py-1.5 rounded-lg border border-purple-100 mt-2">
-                  Se auto-asignará la provincia más cercana
+              {/* Red Box: Price Filter */}
+              <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                  <span className="text-rose-500">●</span> Precio (DOP)
+                </label>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-bold text-slate-600">
+                    <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
+                    <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "15M+" : filters.priceRange[1].toLocaleString()}</span>
+                  </div>
+                  <div className="relative h-6">
+                    <input
+                      type="range"
+                      min="0"
+                      max={PRICE_MAX}
+                      step={PRICE_STEPS}
+                      value={filters.priceRange[0]}
+                      onChange={(e) => handlePriceChange([parseInt(e.target.value), filters.priceRange[1]])}
+                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                    />
+                    <input
+                      type="range"
+                      min="0"
+                      max={PRICE_MAX}
+                      step={PRICE_STEPS}
+                      value={filters.priceRange[1]}
+                      onChange={(e) => handlePriceChange([filters.priceRange[0], parseInt(e.target.value)])}
+                      className="absolute top-0 left-0 w-full h-1.5 bg-transparent appearance-none cursor-pointer accent-rose-500"
+                      style={{ pointerEvents: "auto" }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                    <span>0</span>
+                    <span>7.5M</span>
+                    <span>15M+</span>
+                  </div>
                 </div>
+              </div>
+
+              {/* Purple Box: Province + Lat/Lng */}
+              <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                  <span className="text-purple-500">●</span> Provincia
+                </label>
+                <select
+                  value={filters.province}
+                  onChange={(e) => updateFilter("province", e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                >
+                  <option value="">Todas</option>
+                  {provincias?.map((p) => (
+                    <option key={p.nombre} value={p.nombre}>{p.nombre}</option>
+                  ))}
+                </select>
+
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
+                  <span className="text-purple-500">●</span> Coordenadas (Lat, Lng)
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Ej: 18.47186, -69.93988"
+                    value={filters.latLng}
+                    onChange={handleLatLngChange}
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                  />
+                </div>
+
+                {filters.latLng && (
+                  <div className="text-[9px] font-bold text-purple-600 bg-purple-50 px-2 py-1.5 rounded-lg border border-purple-100 mt-2">
+                    Se auto-asignará la provincia más cercana
+                  </div>
+                )}
+              </div>
+
+              {/* Clear Filters */}
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearAllFilters}
+                  className="w-full px-3 py-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 bg-white rounded-xl border border-slate-100 shadow-sm transition-colors uppercase tracking-widest"
+                >
+                  Limpiar filtros
+                </button>
               )}
             </div>
-
-            {/* Clear Filters */}
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={clearAllFilters}
-                className="w-full px-3 py-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 bg-white rounded-xl border border-slate-100 shadow-sm transition-colors uppercase tracking-widest"
-              >
-                Limpiar filtros
-              </button>
-            )}
-          </div>
           )}
 
           {/* Right - Grid + Pagination */}
           <div className="flex-1 min-w-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence mode="popLayout">
-            {paginatedProjects.map((project, idx) => (
-              <ProjectCard key={project.id} project={project} idx={idx} />
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {filteredProjects.length === 0 && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-[40px] border border-dashed border-slate-200 mt-6 shadow-sm"
-          >
-            <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-6">
-              <AlertCircle size={32} />
+              <AnimatePresence mode="popLayout">
+                {paginatedProjects.map((project, idx) => (
+                  <ProjectCard key={project.id} project={project} idx={idx} />
+                ))}
+              </AnimatePresence>
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
-            <p className="text-slate-500 max-w-xs mx-auto font-medium text-sm">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
-            <button type="button"
-              onClick={clearAllFilters}
-              className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
-            >
-              Limpiar filtros
-            </button>
-          </m.div>
-        )}
 
-        {totalPages > 1 && (
-          <div className="px-6 py-4 bg-white border border-slate-100 rounded-3xl shadow-sm flex items-center justify-between mt-8">
-            <span className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-              Mostrando <span className="font-bold text-primary">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
-              <span className="font-bold text-primary">{Math.min(currentPage * itemsPerPage, filteredProjects.length)}</span> de{' '}
-              <span className="font-bold text-primary">{filteredProjects.length}</span>
-            </span>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            {filteredProjects.length === 0 && (
+              <m.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-[40px] border border-dashed border-slate-200 mt-6 shadow-sm"
               >
-                <ChevronsLeft size={16} />
-              </button>
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft size={16} />
-              </button>
+                <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-6">
+                  <AlertCircle size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron proyectos</h3>
+                <p className="text-slate-500 max-w-xs mx-auto font-medium text-sm">No hay registros que coincidan con su búsqueda o filtros actuales.</p>
+                <button type="button"
+                  onClick={clearAllFilters}
+                  className="mt-6 text-primary font-black text-xs uppercase tracking-widest hover:underline"
+                >
+                  Limpiar filtros
+                </button>
+              </m.div>
+            )}
 
-              <div className="flex items-center gap-1.5 mx-2">
-                <span className="text-sm font-medium text-slate-500">Página</span>
-                <input
-                  ref={pageInputRef}
-                  type="number"
-                  min="1"
-                  max={totalPages}
-                  value={currentPage}
-                  onChange={(e) => {
-                    const val = parseInt(e.target.value);
-                    if (!isNaN(val) && val >= 1 && val <= totalPages) {
-                      setCurrentPage(val);
-                    }
-                  }}
-                  onBlur={() => setCurrentPage(currentPage)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      pageInputRef.current?.blur();
-                    }
-                  }}
-                  className="w-14 h-8 text-center font-bold text-primary bg-white border border-slate-100 rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-                <span className="text-sm font-medium text-slate-500">de {totalPages}</span>
+            {totalPages > 1 && (
+              <div className="px-6 py-4 bg-white border border-slate-100 rounded-3xl shadow-sm flex items-center justify-between mt-8">
+                <span className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
+                  Mostrando <span className="font-bold text-primary">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
+                  <span className="font-bold text-primary">{Math.min(currentPage * itemsPerPage, filteredProjects.length)}</span> de{' '}
+                  <span className="font-bold text-primary">{filteredProjects.length}</span>
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronsLeft size={16} />
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  <div className="flex items-center gap-1.5 mx-2">
+                    <span className="text-sm font-medium text-slate-500">Página</span>
+                    <input
+                      ref={pageInputRef}
+                      type="number"
+                      min="1"
+                      max={totalPages}
+                      value={currentPage}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (!isNaN(val) && val >= 1 && val <= totalPages) {
+                          setCurrentPage(val);
+                        }
+                      }}
+                      onBlur={() => setCurrentPage(currentPage)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          pageInputRef.current?.blur();
+                        }
+                      }}
+                      className="w-14 h-8 text-center font-bold text-primary bg-white border border-slate-100 rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                    <span className="text-sm font-medium text-slate-500">de {totalPages}</span>
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronsRight size={16} />
+                  </button>
+                </div>
               </div>
-
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRight size={16} />
-              </button>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronsRight size={16} />
-              </button>
-            </div>
-          </div>
-        )}
+            )}
           </div>{/* /.flex-1 */}
         </div>{/* /.flex-row */}
       </section>
@@ -470,9 +469,9 @@ const DirectorySkeleton = () => (
 
 export const ProjectsPublicListPage: React.FC = () => {
   const [activeSearch, setActiveSearch] = useState<{ type: string; query: string } | null>(null);
-  
+
   const { data, isLoading, error } = useGlobalSearch(
-    activeSearch?.type || "", 
+    activeSearch?.type || "",
     activeSearch?.query || ""
   );
 
@@ -537,13 +536,13 @@ export const ProjectsPublicListPage: React.FC = () => {
                               Entidad Validada
                             </div>
                           </div>
-                          
+
                           <div className="p-5 space-y-4">
                             <h3 className="font-semibold text-slate-100 flex items-center mb-3 text-base border-b border-slate-700 pb-2">
                               <FileText className="h-4 w-4 mr-2 text-primary" />
                               Detalles Oficiales
                             </h3>
-                            
+
                             <dl className="space-y-3">
                               {Object.entries(data.detalles).map(([key, value]) => (
                                 <div key={key} className="flex flex-col">
@@ -611,7 +610,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                     ¿Desea certificar su propio proyecto?
                   </h2>
                   <p className="text-white/80 font-medium text-lg leading-relaxed mb-8">
-                    Únase a la red de desarrolladores que priorizan la confianza y la seguridad institucional. Inicie su proceso de auditoría hoy.
+                    Únase a la red de desarrolladores que priorizan la confianza y la seguridad institucional para sus clientes. Inicie su proceso de auditoría hoy.
                   </p>
                   <Link to="/register" className="inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-2xl font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all tracking-widest">
                     EMPEZAR REGISTRO <ArrowRight size={18} />
@@ -624,7 +623,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                   </div>
                   <div className="flex gap-4 items-center">
                     <div className="w-10 h-10 bg-white text-primary rounded-xl flex items-center justify-center shrink-0"><CheckCircle2 size={20} /></div>
-                    <span className="text-sm font-bold opacity-90 tracking-tight">Sellado Blockchain Inmutable</span>
+                    <span className="text-sm font-bold opacity-90 tracking-tight">Sellado Inmutable</span>
                   </div>
                   <div className="flex gap-4 items-center">
                     <div className="w-10 h-10 bg-white text-primary rounded-xl flex items-center justify-center shrink-0"><CheckCircle2 size={20} /></div>

@@ -22,7 +22,10 @@ public class ProjectServiceQuotaTests
     private readonly Mock<global::Application.Abstractions.Notifications.IEmailNotificationService> _emailSvc = new();
     private ProjectService CreateSut() =>
         new(_proyectoRepo.Object, _usuarioRepo.Object,
-            _emailSvc.Object, _uow.Object,
+            _emailSvc.Object,
+            new Mock<global::Application.Abstractions.Notifications.INotificationFactory>().Object,
+            new Mock<INotificacionRepository>().Object,
+            _uow.Object,
             new Mock<global::Application.Abstractions.IAuditLogger>().Object);
 
     private static global::Application.DTOs.CreateProyectoDto MakeDto(Guid userId) => new(

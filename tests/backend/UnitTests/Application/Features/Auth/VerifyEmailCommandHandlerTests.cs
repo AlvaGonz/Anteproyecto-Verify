@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Features.Auth.Commands.VerifyEmail;
+using Application.Abstractions.Notifications;
 using Application.Abstractions.Persistence;
 using Domain.Entities;
 using Moq;
@@ -15,7 +16,9 @@ public class VerifyEmailCommandHandlerTests
     private readonly Mock<IUnitOfWork> _uow = new();
 
     private VerifyEmailCommandHandler CreateSut() =>
-        new(_usuarioRepo.Object, _uow.Object);
+        new(_usuarioRepo.Object, _uow.Object,
+            new Mock<INotificationFactory>().Object,
+            new Mock<INotificacionRepository>().Object);
 
     private static Usuario MakeUser(Action<Usuario>? configure = null)
     {

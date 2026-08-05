@@ -12,5 +12,6 @@ public interface ISelloIntegridadRepository
     Task<SelloIntegridad?> GetByProyectoIdAsync(Guid proyectoId, CancellationToken cancellationToken = default);
     Task<List<SelloIntegridad>> GetByProyectoIdsAsync(List<Guid> proyectoIds, CancellationToken cancellationToken = default);
     Task<SelloIntegridad?> GetByCodigoAsync(string codigoSello, CancellationToken cancellationToken = default);
+    Task<SelloIntegridad?> GetByQrTokenAsync(string qrToken, CancellationToken cancellationToken = default);
     void Update(SelloIntegridad sello);
 }

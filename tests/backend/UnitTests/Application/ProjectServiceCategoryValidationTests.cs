@@ -34,7 +34,10 @@ public class ProjectServiceCategoryValidationTests
 
     private ProjectService CreateSut() =>
         new(_proyectoRepo.Object, _usuarioRepo.Object,
-            _emailSvc.Object, _uow.Object,
+            _emailSvc.Object,
+            new Mock<INotificationFactory>().Object,
+            new Mock<INotificacionRepository>().Object,
+            _uow.Object,
             new Mock<global::Application.Abstractions.IAuditLogger>().Object);
 
     private void MockActiveCatalog(params CategoriaProyecto[] categorias) =>

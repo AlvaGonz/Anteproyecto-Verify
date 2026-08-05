@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
-import { Search, Users, Heart, X, BarChart3, Bookmark } from "lucide-react";
+import { Search, Users, Heart, Bookmark, X, BarChart3 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 
 interface InterestRecord {
@@ -114,33 +114,30 @@ export const AdminInterestsView: React.FC = React.memo(() => {
           <button
             type="button"
             onClick={() => setFilterType("Todos")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-              filterType === "Todos"
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filterType === "Todos"
                 ? "bg-white text-primary shadow-sm border border-slate-100"
                 : "text-slate-500 hover:text-slate-900"
-            }`}
+              }`}
           >
             Todos
           </button>
           <button
             type="button"
             onClick={() => setFilterType("Interesados")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-              filterType === "Interesados"
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filterType === "Interesados"
                 ? "bg-white text-primary shadow-sm border border-slate-100"
                 : "text-slate-500 hover:text-slate-900"
-            }`}
+              }`}
           >
             Interesados
           </button>
           <button
             type="button"
             onClick={() => setFilterType("Mis Intereses")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-              filterType === "Mis Intereses"
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filterType === "Mis Intereses"
                 ? "bg-white text-primary shadow-sm border border-slate-100"
                 : "text-slate-500 hover:text-slate-900"
-            }`}
+              }`}
           >
             Mis Intereses
           </button>
@@ -155,7 +152,7 @@ export const AdminInterestsView: React.FC = React.memo(() => {
               {filteredIntereses.map((interes: InterestRecord, idx: number) => {
 
                 const isInteresados = interes.tipo === "Interesados";
-                
+
                 return (
                   <m.div
                     key={`${interes.proyectoId}-${interes.usuarioId}-${idx}`}
@@ -167,11 +164,10 @@ export const AdminInterestsView: React.FC = React.memo(() => {
                         setSelectedInterest(interes);
                       }
                     }}
-                    className={`bg-white border rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center ${
-                      isInteresados
+                    className={`bg-white border rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center ${isInteresados
                         ? "border-slate-200 hover:shadow-md cursor-pointer hover:border-primary/40 hover:bg-slate-50/50 transition-all"
                         : "border-slate-100 opacity-90 cursor-default"
-                    }`}
+                      }`}
                   >
                     <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 border-2 border-white ring-1 ring-slate-200">
                       {interes.avatarUrl ? (
@@ -193,11 +189,10 @@ export const AdminInterestsView: React.FC = React.memo(() => {
                         <h4 className="font-bold text-slate-900 truncate text-base">
                           {interes.nombreUsuario}
                         </h4>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${
-                          isInteresados 
-                            ? "bg-emerald-100 text-emerald-700" 
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${isInteresados
+                            ? "bg-emerald-100 text-emerald-700"
                             : "bg-blue-100 text-blue-700"
-                        }`}>
+                          }`}>
                           {isInteresados ? "Interesado" : "Mis Intereses"}
                         </span>
                       </div>
@@ -222,7 +217,7 @@ export const AdminInterestsView: React.FC = React.memo(() => {
           ) : (
             <div className="text-center py-16 flex flex-col items-center justify-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
               <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <Heart size={28} className="text-slate-300" />
+                <Bookmark size={28} className="text-slate-300" />
               </div>
               <h4 className="text-lg font-bold text-slate-700 mb-1">
                 {searchQuery

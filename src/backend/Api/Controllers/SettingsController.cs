@@ -67,6 +67,7 @@ public class SettingsController : ControllerBase
     private readonly AppDbContext _context;
     private readonly Application.Abstractions.Security.IPasswordHasher _passwordHasher;
     private readonly Application.Abstractions.Notifications.IEmailService _emailService;
+    private readonly Application.Abstractions.Notifications.INotificationFactory _notificationFactory;
     private readonly ILogger<SettingsController> _logger;
     private readonly Application.Abstractions.IStripeService _stripeService;
     private readonly IConfiguration _config;
@@ -75,6 +76,7 @@ public class SettingsController : ControllerBase
         AppDbContext context, 
         Application.Abstractions.Security.IPasswordHasher passwordHasher,
         Application.Abstractions.Notifications.IEmailService emailService,
+        Application.Abstractions.Notifications.INotificationFactory notificationFactory,
         ILogger<SettingsController> logger,
         Application.Abstractions.IStripeService stripeService,
         IConfiguration config)
@@ -82,6 +84,7 @@ public class SettingsController : ControllerBase
         _context = context;
         _passwordHasher = passwordHasher;
         _emailService = emailService;
+        _notificationFactory = notificationFactory;
         _logger = logger;
         _stripeService = stripeService;
         _config = config;
@@ -268,12 +271,11 @@ public class SettingsController : ControllerBase
             _context.Usuarios.Add(user);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var notification = new Notificacion(
+            var notification = await _notificationFactory.CreateAsync(
                 usuarioId: user.Id,
+                tipoNotificacionId: TipoNotificacionId.CuentaCreada,
                 mensaje: $"Tu cuenta fue creada con el plan {request.PlanNombre ?? "sin asignar"}. Por favor, cámbiala en tu perfil.",
-                tipo: "Info",
-                enlaceRelacionado: "/profile"
-            );
+                enlaceRelacionado: "/profile");
             _context.Notificaciones.Add(notification);
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -700,7 +702,11 @@ public class SettingsController : ControllerBase
         var limiteConsultas = request.MaxConsultasDelegadas.HasValue ? request.MaxConsultasDelegadas.Value.ToString() : "Sin límite";
         var mensajeNotificacion = $"El titular {titular.NombreCompleto} ha actualizado tus límites de uso. Proyectos: {limiteProyectos} | Consultas: {limiteConsultas}.";
         
-        var notificacion = new Notificacion(invitee.Id, mensajeNotificacion, "Info", "/settings");
+        var notificacion = await _notificationFactory.CreateAsync(
+            invitee.Id,
+            TipoNotificacionId.LimitesDelegacion,
+            mensajeNotificacion,
+            "/settings");
         _context.Notificaciones.Add(notificacion);
 
         await _context.SaveChangesAsync(cancellationToken);

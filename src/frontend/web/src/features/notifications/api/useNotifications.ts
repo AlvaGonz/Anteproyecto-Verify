@@ -57,6 +57,34 @@ export const useMarkAllAsRead = () => {
   });
 };
 
+export const useDeleteAllNotifications = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ['useDeleteAllNotifications'],
+    mutationFn: () =>
+      apiClient.delete(`/notifications`).then(res => res.data),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ["notifications"] });
+      const previousNotifications = qc.getQueryData(["notifications", true]);
+      const previousAllNotifications = qc.getQueryData(["notifications", false]);
+
+      qc.setQueryData(["notifications", true], []);
+      qc.setQueryData(["notifications", false], []);
+
+      return { previousNotifications, previousAllNotifications };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousNotifications) {
+        qc.setQueryData(["notifications", true], context.previousNotifications);
+      }
+      if (context?.previousAllNotifications) {
+        qc.setQueryData(["notifications", false], context.previousAllNotifications);
+      }
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+  });
+};
+
 export const useDeleteNotification = () => {
   const qc = useQueryClient();
   return useMutation({

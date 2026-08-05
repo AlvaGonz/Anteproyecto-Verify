@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Notifications;
+using Application.Abstractions.Persistence;
 using Application.Common.Exceptions;
 using Application.Contracts.Subscriptions;
 using Application.DTOs.Subscriptions;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Policies;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -24,17 +26,23 @@ public class SubscriptionService : ISubscriptionService
     private readonly IConfiguration _configuration;
     private readonly ILogger<SubscriptionService> _logger;
     private readonly IEmailService _emailService;
+    private readonly INotificationFactory _notificationFactory;
+    private readonly INotificacionRepository _notificacionRepository;
 
     public SubscriptionService(
         AppDbContext dbContext,
         IConfiguration configuration,
         ILogger<SubscriptionService> logger,
-        IEmailService emailService)
+        IEmailService emailService,
+        INotificationFactory notificationFactory,
+        INotificacionRepository notificacionRepository)
     {
         _dbContext = dbContext;
         _configuration = configuration;
         _logger = logger;
         _emailService = emailService;
+        _notificationFactory = notificationFactory;
+        _notificacionRepository = notificacionRepository;
         StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
     }
 
@@ -301,6 +309,24 @@ public class SubscriptionService : ISubscriptionService
                 await HandleSubscriptionActivatedAsync(customerId, subscriptionId, pricePlanMap);
             }
         }
+        else if (stripeEvent.Type == "invoice.payment_failed")
+        {
+            var invoice = stripeEvent.Data.Object as Stripe.Invoice;
+            var customerId = invoice?.CustomerId;
+            if (customerId != null)
+            {
+                var user = await _dbContext.Usuarios.FirstOrDefaultAsync(u => u.StripeCustomerId == customerId);
+                if (user != null)
+                {
+                    var notif = await _notificationFactory.CreateAsync(user.Id,
+                        TipoNotificacionId.PagoFallido,
+                        "El pago de tu suscripción ha fallado. Por favor actualiza tu método de pago para evitar la cancelación.",
+                        "/settings/subscription");
+                    await _notificacionRepository.AddAsync(notif);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+        }
         else if (stripeEvent.Type == "customer.subscription.created" || stripeEvent.Type == "customer.subscription.updated")
         {
             var subscription = stripeEvent.Data.Object as Stripe.Subscription;
@@ -336,6 +362,13 @@ public class SubscriptionService : ISubscriptionService
 
                     await _dbContext.SaveChangesAsync();
                     _logger.LogInformation("Webhook: User {UserId} subscription canceled, reverted user and team to Freemium.", user.Id);
+
+                    var notif = await _notificationFactory.CreateAsync(user.Id,
+                        TipoNotificacionId.SuscripcionCancelada,
+                        "Tu suscripción ha sido cancelada. Has sido movido al plan gratuito.",
+                        "/settings/subscription");
+                    await _notificacionRepository.AddAsync(notif);
+                    await _dbContext.SaveChangesAsync();
                 }
             }
         }
@@ -395,6 +428,13 @@ public class SubscriptionService : ISubscriptionService
 
         var cancelAt = updatedSub.CancelAt;
         user.SetCancellationScheduled(cancelAt);
+        await _dbContext.SaveChangesAsync(ct);
+
+        var notif = await _notificationFactory.CreateAsync(user.Id,
+            TipoNotificacionId.SuscripcionCancelada,
+            $"Tu suscripción será cancelada el {cancelAt?.ToLocalTime():dd/MM/yyyy}. Puedes reactivarla antes de esa fecha.",
+            "/settings/subscription");
+        await _notificacionRepository.AddAsync(notif, ct);
         await _dbContext.SaveChangesAsync(ct);
 
         return cancelAt;
@@ -514,12 +554,11 @@ public class SubscriptionService : ISubscriptionService
     {
         if (isNewPlan)
         {
-            var notification = new Notificacion(
+            var notification = await _notificationFactory.CreateAsync(
                 user.Id,
+                TipoNotificacionId.SuscripcionActivada,
                 $"¡Felicidades! Has contratado exitosamente el plan de suscripción {plan.NombrePlan}.",
-                "Success",
-                "/settings/subscription"
-            );
+                "/settings/subscription");
             _dbContext.Notificaciones.Add(notification);
             
             await _emailService.SendSubscriptionActivatedAsync(

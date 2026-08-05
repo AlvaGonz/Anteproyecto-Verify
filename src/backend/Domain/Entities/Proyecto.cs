@@ -156,6 +156,12 @@ public class Proyecto : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void UpdateEstatusIpi(string estatus)
+    {
+        EstatusIpi = estatus;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     private string GenerateCode()
     {
         return $"PRJ-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";

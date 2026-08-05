@@ -7,8 +7,9 @@
       "ExtractionStatus": "SUCCESS",
       "OverallConfidence": 0.9,
       "Payload": {
-        "DesignacionCatastralPosicional": "42018023893",
-        "DesignacionCatastralOrigen": "42018023893",
+        "DesignacionCatastralPosicional": "505483687149",
+        "DesignacionCatastralOrigen": "42018023893-1-1",
+        "Operacion": "SUBDIVISION",
         "Provincia": "LA ALTAGRACIA",
         "Municipio": "HIGUEY",
         "Lugar": "JUANILLO",

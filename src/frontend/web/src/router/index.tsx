@@ -177,9 +177,17 @@ export const router = createHashRouter([
       {
         path: "/p/:slug",
         element: (
-          <AuthGuard>
+          <Suspense fallback={<PageFallback />}>
             <ProjectPublicDetailPage />
-          </AuthGuard>
+          </Suspense>
+        ),
+      },
+      {
+        path: "/q/:qrToken",
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <ProjectPublicDetailPage />
+          </Suspense>
         ),
       },
       {

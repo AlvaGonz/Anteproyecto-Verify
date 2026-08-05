@@ -52,6 +52,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const handler = () => {
+      // ponytail: QR access routes are public — don't redirect to login
+      if (window.location.hash.startsWith('#/q/')) return;
       queryClient.clear();
       setUser(null);
       setPendingChallenge(null);

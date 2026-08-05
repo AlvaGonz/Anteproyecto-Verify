@@ -15,7 +15,7 @@ interface OcrReviewPanelProps {
 export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
-  
+
   const { mutate: updateField, isPending } = useUpdateDocumentFieldReview(document.proyectoId);
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
@@ -107,30 +107,30 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
   };
 
   const isReviewable = document.estadoDocumento === DocumentStatus.EnRevision;
-  
+
   const mappingInfo = mapDocumentToVerificationPayload(document, fields);
   const isVerifiable = mappingInfo !== null;
 
   const handleVerifyGobernanza = () => {
     if (mappingInfo) {
-      verifyDocument({ 
-        documentType: mappingInfo.apiDocType, 
+      verifyDocument({
+        documentType: mappingInfo.apiDocType,
         payload: mappingInfo.payload,
         proyectoId: document.proyectoId,
-        documentoId: document.id 
+        documentoId: document.id
       });
     }
   };
 
   const getValidationIcon = (uiValue: string) => {
     if (!verificationResponse?.matchedData) return null;
-    
+
     // Normalizar valores para comparación
     const normalizedUi = String(uiValue || '').trim().toLowerCase();
-    
+
     // Buscar en todos los valores devueltos por Gobernanza
     const matchedValues = Object.values(verificationResponse.matchedData).map(v => String(v || '').trim().toLowerCase());
-    
+
     if (normalizedUi === '') {
       return <div title="Dato vacío enviado a revisión"><X className="w-5 h-5 text-rose-500 bg-rose-50 rounded-full p-0.5" /></div>;
     }
@@ -157,7 +157,18 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
     if (lower.includes('matricula') || lower.includes('matrícula')) return 'Ej: 010023456';
     if (lower.includes('fecha')) return 'Ej: 2024-01-30';
     if (lower.includes('rnc')) return 'Ej: 130123456';
-    if (lower.includes('cedula') || lower.includes('cédula')) return 'Ej: 00112345678';
+    if (lower.includes('cedula') || lower.includes('cédula') || lower.includes('cedulanumber')) return 'Ej: 001-1234567-8';
+    if (lower.includes('certificacion') || lower.includes('certificación')) return 'Ej: C0121952878225';
+    if (lower.includes('inmueble')) return 'Ej: 136400513193';
+    if (lower.includes('parcela')) return 'Ej: 309466754512:4-A';
+    if (lower.includes('provincia') || lower.includes('oficina')) return 'Ej: SANTO DOMINGO';
+    if (lower.includes('municipio') || lower.includes('lugar') || lower.includes('seccion')) return 'Ej: SANTO DOMINGO ESTE';
+    if (lower.includes('departamento')) return 'Ej: NORTE';
+    if (lower.includes('operacion')) return 'Ej: DESLINDE';
+    if (lower.includes('viene')) return 'Ej: L.000,F.00';
+    if (lower.includes('superficie') || lower.includes('area') || lower.includes('área')) return 'Ej: 1500.00';
+    if (lower.includes('nombre') || lower.includes('firstname') || lower.includes('titular')) return 'Ej: JUAN CARLOS';
+    if (lower.includes('apellido') || lower.includes('lastname')) return 'Ej: PEREZ GOMEZ';
     return 'Ej: Ingrese el dato correcto';
   };
 
@@ -180,7 +191,7 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
           )}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {fields.map((field) => {
           const badge = getReviewStateBadge(field.reviewState);
@@ -273,20 +284,20 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
               )}
               {isReviewable && !isEditing && (field.reviewState === OcrFieldReviewState.Confirmed || field.reviewState === OcrFieldReviewState.Corrected) && (
                 <div className="flex gap-2 mt-2 pt-3 border-t border-[var(--color-border)]/10">
-                    <button
-                        onClick={() => handleStartEdit(field)}
-                        disabled={isPending}
-                        className="flex-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-sm"
-                    >
-                        <Edit2 className="w-3 h-3" /> Editar de nuevo
-                    </button>
+                  <button
+                    onClick={() => handleStartEdit(field)}
+                    disabled={isPending}
+                    className="flex-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-sm"
+                  >
+                    <Edit2 className="w-3 h-3" /> Editar de nuevo
+                  </button>
                 </div>
               )}
             </div>
           );
         })}
       </div>
-      
+
       {isVerifiable && fields.length > 0 && (
         <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10">
           <div className="flex justify-end">
@@ -299,10 +310,10 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
               {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
             </button>
           </div>
-          
-          <VerificationFeedbackCard 
-            response={verificationResponse || null} 
-            isLoading={isVerifying} 
+
+          <VerificationFeedbackCard
+            response={verificationResponse || null}
+            isLoading={isVerifying}
             error={verificationError}
           />
         </div>

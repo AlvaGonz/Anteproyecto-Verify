@@ -297,6 +297,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet("{id:guid}/status-history")]
+    [AllowAnonymous]
     public async Task<ActionResult> GetStatusHistory(Guid id, CancellationToken cancellationToken)
     {
         var entries = await _dbContext.Auditorias

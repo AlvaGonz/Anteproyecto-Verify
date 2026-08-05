@@ -50,7 +50,13 @@ public class NotificationsController : ControllerBase
             FechaUtc: n.FechaUtc,
             EnlaceRelacionado: n.EnlaceRelacionado,
             Email: email,
-            Telefono: telefono
+            Telefono: telefono,
+            TipoNotificacionCodigo: n.TipoNotificacion?.Codigo,
+            Categoria: n.TipoNotificacion?.Categoria,
+            Prioridad: n.Prioridad,
+            Canales: n.TipoNotificacion?.Canales,
+            EntidadReferenciaId: n.EntidadReferenciaId,
+            EntidadReferenciaTipo: n.EntidadReferenciaTipo
         ));
 
         return Ok(dtos);
@@ -128,6 +134,22 @@ public class NotificationsController : ControllerBase
         }
 
         await _notificacionRepository.DeleteAsync(notification, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpDelete]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<IActionResult> DeleteAllNotifications(CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        await _notificacionRepository.DeleteAllByUsuarioIdAsync(userId, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return NoContent();

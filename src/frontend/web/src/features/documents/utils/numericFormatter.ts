@@ -1,16 +1,16 @@
 /**
  * Numeric formatter for Certificado de Título extraction display.
  *
- * - Matrícula: digit-only integer (preserves leading zeros), US thousands separator
- *   (e.g. "0100035082" → "01,000,350,82").
+ * - Matrícula: digit-only integer (preserves leading zeros), no thousands
+ *   separator (e.g. "0100035082" stays "0100035082").
  * - Superficie M²: decimal number, US thousands separator with 2 decimal places
  *   (e.g. "2000" → "2,000.00", "168.00" → "168.00").
  *
- * The decision to use US notation (comma as thousands separator) was requested
- * explicitly by the Dominican Republic real-estate team. Non-digit characters in
- * the raw OCR output (e.g. "010-003-5082", "168.00 m²") are stripped before
- * formatting so the same field can be displayed whether the value came from the
- * OCR pipeline or was typed manually by the validator.
+ * Matrícula must not contain commas; Superficie M² uses US notation (comma as
+ * thousands separator). Non-digit characters in the raw OCR output (e.g.
+ * "010-003-5082", "168.00 m²") are stripped before formatting so the same
+ * field can be displayed whether the value came from the OCR pipeline or was
+ * typed manually by the validator.
  */
 
 const stripNonDigits = (value: string): string => (value ?? '').replace(/\D+/g, '');
@@ -22,11 +22,8 @@ const stripNonNumeric = (value: string): string => {
 
 export const formatMatricula = (raw: string | null | undefined): string => {
   if (!raw) return '';
-  const digits = stripNonDigits(raw);
-  if (!digits) return '';
-  // Insert US thousands separator (comma) every 3 digits from the right,
-  // preserving leading zeros.
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  // Preserve leading zeros, no thousands separator.
+  return stripNonDigits(raw);
 };
 
 export const formatSuperficieM2 = (raw: string | null | undefined): string => {

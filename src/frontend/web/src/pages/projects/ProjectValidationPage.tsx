@@ -4,21 +4,21 @@ import {
   ValidationExecutionResult 
 } from "../../features/validations/types";
 import { useValidationResult, useFindings, useRunFullValidation } from "../../features/validations/api/useValidations";
-import { useAuditLog } from "../../features/audit/api/useAudit";
 import { AdminErrorFallback } from "../../components/ui/AdminErrorFallback";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { FindingDto, AuditLogDto } from "../../features/validations/types";
+import { FindingDto } from "../../features/validations/types";
 import { ProjectValidationPageLayout } from "./ProjectValidationPageLayout";
+import { useProject } from "../../features/projects/api/useProjects";
 
 export const ProjectValidationPage: React.FC = React.memo(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const [activeTab, setActiveTab] = useState<'analysis' | 'findings' | 'audit'>('analysis');
+  const [activeTab, setActiveTab] = useState<'analysis' | 'findings'>('analysis');
   const projectId = id || "";
   const { data: rawResult, isLoading: isResultLoading, error: resultError } = useValidationResult(projectId);
   const { data: rawFindings = [], isLoading: isFindingsLoading } = useFindings(projectId);
-  const { data: rawAuditLogs = [], isLoading: isAuditLoading } = useAuditLog(projectId);
+  const { data: project } = useProject(projectId);
 
   const runFullValidationMutation = useRunFullValidation(projectId);
 
@@ -31,20 +31,6 @@ export const ProjectValidationPage: React.FC = React.memo(() => {
       validacionId: String(f.idValidacion || f.validacionId),
     })) as unknown as FindingDto[];
   }, [rawFindings]);
-
-  const auditLogs = React.useMemo(() => {
-    return rawAuditLogs.map((l: any) => ({
-      ...l,
-      id: String(l.idLog || l.id),
-      projectId: String(projectId),
-      timestamp: l.fecha,
-      action: l.accion,
-      module: l.modulo,
-      userId: String(l.idUsuario),
-      userEmail: l.usuario || "Desconocido",
-      details: l.detalles || "Sin detalles"
-    })) as unknown as AuditLogDto[];
-  }, [rawAuditLogs, projectId]);
 
   if (resultError) {
     return <AdminErrorFallback error={resultError} />;
@@ -60,7 +46,7 @@ export const ProjectValidationPage: React.FC = React.memo(() => {
     externalSources: rawResult.externalSources || []
   } as unknown as ValidationExecutionResult : null, [rawResult, projectId]);
 
-  const isLoading = isResultLoading || isFindingsLoading || isAuditLoading;
+  const isLoading = isResultLoading || isFindingsLoading;
   const isEvaluating = runFullValidationMutation.isPending;
 
   const handleRunValidation = () => {
@@ -97,9 +83,9 @@ export const ProjectValidationPage: React.FC = React.memo(() => {
       isEvaluating={isEvaluating}
       handleRunValidation={handleRunValidation}
       findings={findings}
-      auditLogs={auditLogs}
       result={result}
       handleScanComplete={handleScanComplete}
+      projectStatus={(project as any)?.estadoProyecto}
     />
   );
 });

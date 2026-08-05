@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using global::Application.Abstractions.Notifications;
 using global::Application.Abstractions.Persistence;
 using global::Application.Features.Validation.Commands.EvaluateDocumentFormality;
 using Domain.Entities;
@@ -30,7 +31,10 @@ public class EvaluateDocumentFormalityCommandHandlerTests
             _proyectoRepositoryMock.Object,
             _documentoRepositoryMock.Object,
             _auditoriaRepositoryMock.Object,
-            _unitOfWorkMock.Object);
+            _unitOfWorkMock.Object,
+            new Mock<INotificationFactory>().Object,
+            new Mock<INotificacionRepository>().Object
+        );
     }
 
     [Fact]

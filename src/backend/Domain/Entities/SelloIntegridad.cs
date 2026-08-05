@@ -14,6 +14,8 @@ public class SelloIntegridad : EntityBase
     public NivelSelloIntegridad Nivel { get; private set; }
     public string UrlQr { get; private set; } = null!;
     public string FirmaDigital { get; private set; } = null!;
+    public string QrToken { get; private set; } = null!;
+    public int ContadorAccesos { get; private set; }
     public DateTime FechaEmisionUtc { get; private set; }
     public DateTime FechaExpiracionUtc { get; private set; }
     public EstadoSello Estado { get; private set; }
@@ -27,6 +29,7 @@ public class SelloIntegridad : EntityBase
         NivelSelloIntegridad nivel,
         string urlQr,
         string firmaDigital,
+        string qrToken = "",
         int vigenciaMeses = 12)
     {
         if (proyectoId == Guid.Empty) throw new ArgumentException("Proyecto requerido", nameof(proyectoId));
@@ -41,9 +44,17 @@ public class SelloIntegridad : EntityBase
         Nivel = nivel;
         UrlQr = urlQr;
         FirmaDigital = firmaDigital;
+        QrToken = qrToken;
+        ContadorAccesos = 0;
         FechaEmisionUtc = DateTime.UtcNow;
         FechaExpiracionUtc = FechaEmisionUtc.AddMonths(vigenciaMeses);
         Estado = EstadoSello.Emitido;
+    }
+
+    public void IncrementarAccesos()
+    {
+        ContadorAccesos++;
+        UpdatedAtUtc = DateTime.UtcNow;
     }
 
     public void Revocar()

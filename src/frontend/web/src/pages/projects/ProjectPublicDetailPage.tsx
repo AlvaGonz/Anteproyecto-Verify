@@ -7,7 +7,8 @@ import { useProject } from "../../features/projects/api/useProjects";
 import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { apiClient } from "../../infrastructure/api/client";
 import { StatusHistory } from "../../features/reports/components/StatusHistory";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
@@ -44,8 +45,17 @@ import { MiniMap } from "../../shared/components/ui/MiniMap";
 
 
 export const ProjectPublicDetailPage: React.FC = () => {
-  const { slug, id } = useParams<{ slug?: string; id?: string }>();
-  const identifier = slug || id || "";
+  const { slug, id, qrToken } = useParams<{ slug?: string; id?: string; qrToken?: string }>();
+  // ponytail: QR access — resolve token to project ID via public endpoint
+  const { data: qrResolvedData } = useQuery({
+    queryKey: ["qrProject", qrToken],
+    queryFn: () => apiClient.get(`/public/projects/qr/${encodeURIComponent(qrToken!)}`).then(r => r.data),
+    enabled: !!qrToken && !slug && !id,
+    staleTime: 0,
+  }) as any;
+  const isQrAccess = !!qrToken && !slug && !id;
+  const resolvedProjectId = isQrAccess && qrResolvedData?.id ? String(qrResolvedData.id) : "";
+  const identifier = slug || id || resolvedProjectId;
   const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
   const error = fetchError ? (fetchError as Error).message : null;
   const { user, isAuthenticated, loading: authLoading } = useAuth();

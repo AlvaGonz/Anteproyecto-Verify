@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Notifications;
+using Application.Abstractions.Persistence;
 using Application.Common.Exceptions;
 using Application.DTOs.Subscriptions;
 using Domain.Entities;
@@ -43,7 +44,9 @@ public class SubscriptionServiceExceptionTests
             db,
             config ?? CreateConfiguration(),
             new Mock<ILogger<SubscriptionService>>().Object,
-            new Mock<IEmailService>().Object);
+            new Mock<IEmailService>().Object,
+            new Mock<INotificationFactory>().Object,
+            new Mock<INotificacionRepository>().Object);
     }
 
     private static Usuario CreateUser(AppDbContext db, string? stripeSubscriptionId = null)

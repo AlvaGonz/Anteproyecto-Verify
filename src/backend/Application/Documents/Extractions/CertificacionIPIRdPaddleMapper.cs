@@ -23,21 +23,29 @@ public static class CertificacionIPIRdPaddleMapper
         extraction = extraction with
         {
             NumeroCertificacion = ExtractField(lines, fullText, "NumeroCertificacion",
-                // Label patterns - more flexible for OCR variations
+                // Label patterns - flexible for OCR variations (ó→6, ó→o, missing spaces)
                 new[] { 
-                    @"NO\.?\s*DE\s*CERTIFICACI[OÓ]N", 
-                    @"N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ]N", 
-                    @"CERTIFICACI[OÓ]N\s*N[ÚU]MERO",
+                    @"NO\.?\s*DE\s*CERTIFICACI[OÓ6]N",
+                    @"N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ6]N", 
+                    @"CERTIFICACI[OÓ6]N\s*N[ÚU]MERO",
                     @"CERTIFICACION\s*NO\.?",
                     @"CERT\.?\s*NO\.?",
                     @"NO\.?\s*CERTIFICACION",
-                    @"NUMERO\s*CERTIFICACION"
+                    @"NUMERO\s*CERTIFICACION",
+                    // ponytail: OCR merges "No.deCertificacion" into one blob
+                    @"NO\.?DE\s*CERTIFICACI[OÓ6]N",
+                    @"NO\.DE\.CERTIFICACI[OÓ6]N"
                 },
                 // Regex patterns - capture alphanumeric with hyphens
                 new[] { 
-                    @"(?:NO\.\s*DE\s*CERTIFICACI[OÓ]N|N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ]N|CERTIFICACI[OÓ]N\s*N[ÚU]MERO|CERTIFICACION\s*NO|NO\s*CERTIFICACION|NUMERO\s*CERTIFICACION)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
-                    @"(?:CERTIFICACI[OÓ]N\s*)([A-Z0-9\-\/]{6,})",
+                    @"(?:NO\.\s*DE\s*CERTIFICACI[OÓ6]N|N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ6]N|CERTIFICACI[OÓ6]N\s*N[ÚU]MERO|CERTIFICACION\s*NO|NO\s*CERTIFICACION|NUMERO\s*CERTIFICACION)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
+                    // ponytail: DGII merged blob — "No.deCertificaci6nC0121952878225"
+                    @"NO\.?DE\s*CERTIFICACI[OÓ6]N\s*([A-Z0-9]{10,})",
+                    @"NO\.DE\.CERTIFICACI[OÓ6]N\s*([A-Z0-9]{10,})",
+                    @"(?:CERTIFICACI[OÓ6]N\s*)([A-Z0-9\-\/]{6,})",
                     @"(?:NO\s*DE\s*CERTIFICACION\s*)([A-Z0-9\-\/]{6,})",
+                    // ponytail: DGII format — C followed by 10+ digits
+                    @"\b([Cc]\d{10,})\b",
                     @"\b([Cc]\d{13})\b"
                 }),
 
@@ -168,20 +176,24 @@ public static class CertificacionIPIRdPaddleMapper
             }
         }
 
-        // Layer 4: Canonical Normalization
+        // Layer 4: Canonical Normalization — field-specific per DGII format
+        // DGII IPI certificate fields have distinct formats:
+        //   Inmueble No.   → pure digits (e.g. 458901236754)
+        //   Parcela No.    → catastral: digits, colons, hyphens (e.g. 150106256710:4-A)
+        //   Certificación  → alphanumeric with optional prefix (e.g. C0348921465789)
         if (!string.IsNullOrWhiteSpace(rawValue))
         {
             rawValue = rawValue.Trim().TrimEnd('.');
-            string normalizedValue = rawValue;
-
-            switch (fieldType)
+            string normalizedValue = fieldType switch
             {
-                case "NumeroCertificacion":
-                case "NumeroInmueble":
-                case "ParcelaNumero":
-                    normalizedValue = SharedFieldNormalizer.NormalizeDesignacionCatastral(rawValue);
-                    break;
-            }
+                // DGII format: pure digits, no hyphens, no colons
+                "NumeroInmueble" => Regex.Replace(rawValue, @"[^0-9]", ""),
+                // Catastral format: digits, optional :digits, optional -letter(s). Truncate noise. (e.g. 150106256710:4-A)
+                "ParcelaNumero" => NormalizeParcela(rawValue),
+                // Certificate format: alphanumeric only, preserve C prefix (e.g. C0348921465789)
+                "NumeroCertificacion" => Regex.Replace(rawValue, @"[^A-Za-z0-9]", "").ToUpperInvariant(),
+                _ => SharedFieldNormalizer.NormalizeDesignacionCatastral(rawValue)
+            };
 
             return new ExtractedField
             {
@@ -194,5 +206,26 @@ public static class CertificacionIPIRdPaddleMapper
         }
 
         return new ExtractedField { Status = FieldStatus.Missing };
+    }
+
+    /// <summary>
+    /// Parcela catastral format: digits → optional :digits → optional -letter(s).
+    /// Truncates noise after the valid suffix (e.g. "89754213098:5-BDCNOS..." → "89754213098:5-B").
+    /// </summary>
+    private static string NormalizeParcela(string raw)
+    {
+        var clean = Regex.Replace(raw, @"[^A-Za-z0-9:-]", "");
+
+        if (!clean.Contains(':'))
+        {
+            var repair = Regex.Match(clean, @"^(\d{10,})(\d)(-[A-Za-z]{1,2})$");
+            if (repair.Success)
+            {
+                clean = $"{repair.Groups[1].Value}:{repair.Groups[2].Value}{repair.Groups[3].Value}";
+            }
+        }
+
+        var match = Regex.Match(clean, @"^(\d+(:\d+)?(-[A-Z])?)");
+        return match.Success ? match.Groups[1].Value.ToUpperInvariant() : clean.ToUpperInvariant();
     }
 }

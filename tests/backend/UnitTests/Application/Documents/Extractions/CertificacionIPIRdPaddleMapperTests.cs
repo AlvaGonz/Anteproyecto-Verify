@@ -202,5 +202,91 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.NumeroInmueble.Status.Should().Be(FieldStatus.Missing);
             extraction.ParcelaNumero.Status.Should().Be(FieldStatus.Missing);
         }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractDGIIFormat_WhenOcrMergesLabelAndValue()
+        {
+            // ponytail: real OCR output from DGII certificate — label+value merged, ó→6
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "CERTIFICACION" },
+                new OcrLine { Text = "No.deCertificaci6nC0121952878225" },
+                new OcrLine { Text = "La Dirección General de Impuestos Internos CERTIFICA: que el inmueble no.136400513193" },
+                new OcrLine { Text = "ubicado en la AVENIDA REPUBLICA DE COLOMBIA" },
+                new OcrLine { Text = "identificado como Parcela No.309466754512:4-A" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.NumeroCertificacion.Status.Should().Be(FieldStatus.Valid);
+            extraction.NumeroCertificacion.RawValue.Should().Be("C0121952878225");
+            extraction.ParcelaNumero.RawValue.Should().Be("309466754512:4-A");
+        }
+
+        [Fact]
+        public void ParcelaNumero_Normalized_PreservesColonAndHyphen()
+        {
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 150106256710:4-A" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 150106256710:4-A" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("150106256710:4-A");
+        }
+
+        [Fact]
+        public void NumeroInmueble_Normalized_IsPurelyNumeric()
+        {
+            var lines = new List<OcrLine> { new OcrLine { Text = "NO. INMUEBLE: 458901236754" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "NO. INMUEBLE: 458901236754" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.NumeroInmueble.NormalizedValue.Should().Be("458901236754");
+        }
+
+        [Fact]
+        public void NumeroCertificacion_Normalized_PreservesAlphanumerics()
+        {
+            var lines = new List<OcrLine> { new OcrLine { Text = "NO. DE CERTIFICACION: C0348921465789" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "NO. DE CERTIFICACION: C0348921465789" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.NumeroCertificacion.NormalizedValue.Should().Be("C0348921465789");
+        }
+        [Fact]
+        public void ParcelaNumero_TruncatesNoiseAfterValidFormat()
+        {
+            // ponytail: OCR merges Parcela label → value → noise into one blob
+            // e.g. "89754213098:5-BDCNOSDCAPTOUNIDAD" should become "89754213098:5-B"
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 89754213098:5-BDCNOSDCAPTOUNIDAD" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 89754213098:5-BDCNOSDCAPTOUNIDAD" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("89754213098:5-B");
+        }
+
+        [Fact]
+        public void ParcelaNumero_RepairsOcrLostColon()
+        {
+            // ponytail: OCR loses colon character, merging sub-parcel digit into the main number
+            // e.g. "876543210983-B" should be repaired to "87654321098:3-B"
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 876543210983-B" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 876543210983-B" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("87654321098:3-B");
+        }
+
+        [Fact]
+        public void ParcelaNumero_RepairsOcrLostColon_WithSingleDigitSubParcel()
+        {
+            // ponytail: OCR loses colon — sub-parcel in DGII format is always 1 digit
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 1234567890145-C" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 1234567890145-C" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("123456789014:5-C");
+        }
     }
 }

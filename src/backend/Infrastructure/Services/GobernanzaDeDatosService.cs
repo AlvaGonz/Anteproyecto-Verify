@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Abstractions.Notifications;
+using Application.Abstractions.Persistence;
 using Application.Contracts.Gobernanza;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +12,17 @@ namespace Infrastructure.Services;
 public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 {
     private readonly AppDbContext _dbContext;
+    private readonly INotificationFactory _notificationFactory;
+    private readonly INotificacionRepository _notificacionRepository;
 
-    public GobernanzaDeDatosService(AppDbContext dbContext)
+    public GobernanzaDeDatosService(
+        AppDbContext dbContext,
+        INotificationFactory notificationFactory,
+        INotificacionRepository notificacionRepository)
     {
         _dbContext = dbContext;
+        _notificationFactory = notificationFactory;
+        _notificacionRepository = notificacionRepository;
     }
 
     private async Task SaveValidationResultAsync(BaseVerificationRequest request, VerificationResult result)
@@ -304,11 +313,70 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
                 MatchedData = new { entity.Rnc, entity.Cuota_ipi, entity.Estatus, entity.NoCertificacion, entity.NoInmueble, entity.ParcelaNo }
             };
             await SaveValidationResultAsync(request, res);
+
+            if (res.IsValid)
+                await UpdateIpiStatusAsync(request.ProyectoId, entity.Estatus);
+
             return res;
         }
 
         var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Certificación de IPI no encontrada o no válida." };
         await SaveValidationResultAsync(request, failRes);
         return failRes;
+    }
+
+    private async Task UpdateIpiStatusAsync(Guid proyectoId, string estatusIpi, CancellationToken ct = default)
+    {
+        var proyecto = await _dbContext.Proyectos.FirstOrDefaultAsync(p => p.Id == proyectoId);
+        if (proyecto == null) return;
+
+        var prevStatus = proyecto.EstatusIpi;
+        var mappedStatus = MapIpiEstatus(estatusIpi);
+        if (mappedStatus == null || mappedStatus == prevStatus) return;
+
+        proyecto.UpdateEstatusIpi(mappedStatus);
+        await _dbContext.SaveChangesAsync();
+
+        if (mappedStatus == "PAGO_PENDIENTE")
+        {
+            var alreadyNotified = await _dbContext.Notificaciones.AnyAsync(n =>
+                n.TipoNotificacionId == Domain.Enums.TipoNotificacionId.IpiPendiente &&
+                n.EntidadReferenciaId == proyectoId);
+
+            if (!alreadyNotified)
+                await NotifyIpiAlertAsync(proyecto, Domain.Enums.TipoNotificacionId.IpiPendiente,
+                    $"Deuda IPI detectada en \"{proyecto.Nombre}\".", ct);
+        }
+        else if (mappedStatus == "AL_DIA" && prevStatus == "PAGO_PENDIENTE")
+        {
+            await NotifyIpiAlertAsync(proyecto, Domain.Enums.TipoNotificacionId.IpiResuelto,
+                $"Deuda IPI resuelta en \"{proyecto.Nombre}\".", ct);
+        }
+    }
+
+    private static string? MapIpiEstatus(string rawStatus) => rawStatus switch
+    {
+        "No Pagado" => "PAGO_PENDIENTE",
+        "Pagado" => "AL_DIA",
+        _ => null
+    };
+
+    private async Task NotifyIpiAlertAsync(Domain.Entities.Proyecto proyecto, int tipoId, string mensaje, CancellationToken ct)
+    {
+        var enlace = $"/admin/projects/{proyecto.Id}";
+
+        var notif = await _notificationFactory.CreateAsync(proyecto.UsuarioCreadorId, tipoId,
+            mensaje, enlace, proyecto.Id, "Proyecto", ct);
+        await _notificacionRepository.AddAsync(notif, ct);
+
+        var admins = await _dbContext.Usuarios
+            .Where(u => u.Rol == Domain.Enums.UserRole.Administrator && u.Activo)
+            .ToListAsync();
+        foreach (var admin in admins)
+        {
+            var adminNotif = await _notificationFactory.CreateAsync(admin.Id, tipoId,
+                $"[Admin] {mensaje}", enlace, proyecto.Id, "Proyecto", ct);
+            await _notificacionRepository.AddAsync(adminNotif, ct);
+        }
     }
 }
