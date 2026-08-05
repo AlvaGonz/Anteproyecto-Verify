@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigation, Globe, Search } from "lucide-react";
+import { Navigation, Globe, Search, X } from "lucide-react";
 import { ProyectoDto } from "../types";
 import { ProjectFormBasicFields } from "./ProjectFormBasicFields";
 import { ProjectFormDetailsFields } from "./ProjectFormDetailsFields";
@@ -79,7 +79,7 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
           <button
             type="button"
             onClick={() => setActiveMapTab("official")}
-            className={`flex-1 py-2.5 text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
+            className={`hidden flex-1 py-2.5 text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
               activeMapTab === "official"
                 ? "bg-primary text-white shadow-raised"
                 : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
@@ -130,21 +130,22 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
           </div>
         </div>
 
-        {/* ── Official RI Cadastral Iframe ── */}
+        {/* ── Official RI Cadastral Iframe (Cropped) ── */}
         <div
-          className={activeMapTab === "official" ? "block relative overflow-hidden rounded-2xl border border-[var(--color-border)]/30 shadow-inner" : "hidden"}
-          style={{ height: 410 }}
+          className={activeMapTab === "official" ? "block relative overflow-hidden rounded-2xl border-b-[8px] border-[#0050dd] shadow-inner" : "hidden"}
+          style={{ height: 500 }}
         >
           <iframe
             ref={iframeRef}
-            src="https://servicios.ri.gob.do/ConsultaGeografica"
-            sandbox="allow-scripts allow-forms allow-popups"
-            className="border-none absolute left-0"
-            title="Consulta Geográfica Registro Inmobiliario"
+            src="https://servicios.ri.gob.do/ConsultaParcelario"
+            sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
+            className="border-none absolute"
+            title="Consulta Parcelario Registro Inmobiliario"
             style={{
-              top: "-132px",
-              width: "100%",
-              height: "calc(100% + 132px)",
+              top: "-340px",
+              left: "-60px",
+              width: "calc(100% + 120px)",
+              height: "calc(100% + 450px)",
             }}
           />
         </div>
