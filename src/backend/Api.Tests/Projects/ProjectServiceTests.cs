@@ -34,6 +34,8 @@ public class ProjectServiceTests
             _proyectoRepoMock,
             _usuarioRepoMock,
             _emailServiceMock,
+            Substitute.For<INotificationFactory>(),
+            Substitute.For<INotificacionRepository>(),
             _uowMock,
             Substitute.For<global::Application.Abstractions.IAuditLogger>()
         );
