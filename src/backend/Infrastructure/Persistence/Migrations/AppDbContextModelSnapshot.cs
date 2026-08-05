@@ -874,6 +874,12 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("EnlaceRelacionado")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("EntidadReferenciaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EntidadReferenciaTipo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("FechaUtc")
                         .HasColumnType("datetime2");
 
@@ -884,9 +890,15 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte>("Prioridad")
+                        .HasColumnType("tinyint");
+
                     b.Property<string>("Tipo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TipoNotificacionId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
@@ -896,7 +908,54 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notificaciones");
+                    b.HasIndex("TipoNotificacionId");
+
+                    b.HasIndex("UsuarioId", "TipoNotificacionId")
+                        .HasFilter("[TipoNotificacionId] IS NOT NULL");
+
+                    b.ToTable("Notificaciones", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.NotificacionEntrega", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Canal")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ErrorMensaje")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaEnvio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaLectura")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("NotificacionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Reintentos")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotificacionId");
+
+                    b.HasIndex("NotificacionId", "Canal")
+                        .IsUnique();
+
+                    b.ToTable("NotificacionEntregas", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Pago", b =>
@@ -1746,6 +1805,53 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("SesionUsuario", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.TipoNotificacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Canales")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Categoria")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlantillaMensaje")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlantillaTitulo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("Prioridad")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
+                    b.ToTable("TiposNotificaciones", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2342,6 +2448,27 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Provincia");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Notificacion", b =>
+                {
+                    b.HasOne("Domain.Entities.TipoNotificacion", "TipoNotificacion")
+                        .WithMany()
+                        .HasForeignKey("TipoNotificacionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("TipoNotificacion");
+                });
+
+            modelBuilder.Entity("Domain.Entities.NotificacionEntrega", b =>
+                {
+                    b.HasOne("Domain.Entities.Notificacion", "Notificacion")
+                        .WithMany("Entregas")
+                        .HasForeignKey("NotificacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Notificacion");
+                });
+
             modelBuilder.Entity("Domain.Entities.Pago", b =>
                 {
                     b.HasOne("Domain.Entities.Usuario", "Usuario")
@@ -2632,6 +2759,11 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Documento", b =>
                 {
                     b.Navigation("Validaciones");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Notificacion", b =>
+                {
+                    b.Navigation("Entregas");
                 });
 
             modelBuilder.Entity("Domain.Entities.Provincia", b =>

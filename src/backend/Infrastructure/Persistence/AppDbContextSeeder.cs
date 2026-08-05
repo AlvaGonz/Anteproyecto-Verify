@@ -44,6 +44,7 @@ public static class AppDbContextSeeder
             await SeedMunicipiosAsync(context, logger);
             await SeedPlanesSuscripcionAsync(context, logger);
             await SeedProyectoEstadosAsync(context, logger);
+            await SeedTiposNotificacionesAsync(context, logger);
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -368,7 +369,7 @@ public static class AppDbContextSeeder
                     context,
                     usuarioId: profesionalUser.Id,
                     mensaje: "El proyecto Torre Bella Vista Piantini ha sido publicado.",
-                    tipo: "ProjectPublished",
+                    tipo: TipoNotificacionId.ProyectoPublicado.ToString(),
                     ruta: $"/admin/projects/{p1.Id}",
                     markRead: false);
 
@@ -376,7 +377,7 @@ public static class AppDbContextSeeder
                     context,
                     usuarioId: profesionalUser.Id,
                     mensaje: "Validación fallida para Proyecto Costero La Romana.",
-                    tipo: "ValidationFailed",
+                    tipo: TipoNotificacionId.ProyectoObservacion.ToString(),
                     ruta: $"/admin/projects/{p3.Id}",
                     markRead: true);
             } catch (Exception ex) {
@@ -785,6 +786,41 @@ WHERE NOT EXISTS (
         }
     }
 
+    private static async Task SeedTiposNotificacionesAsync(AppDbContext context, ILogger logger)
+    {
+        if (await context.TiposNotificaciones.AnyAsync()) return;
+
+        logger.LogInformation("Seeding notification types taxonomy...");
+
+        var tipos = new (string Codigo, string Nombre, string Categoria, byte Prioridad, string Canales)[]
+        {
+            ("BIENVENIDA_REGISTRO",     "Bienvenida a VeriFinca",            "Cuenta",       4, "InApp,Email"),
+            ("CUENTA_CREADA",           "Cuenta creada",                     "Cuenta",       4, "InApp"),
+            ("EMAIL_VERIFICADO",        "Email verificado",                  "Cuenta",       4, "InApp,Email"),
+            ("CAMBIO_CONTRASENA",       "Contraseña actualizada",            "Cuenta",       2, "Email"),
+            ("SUSCRIPCION_ACTIVADA",    "Suscripción activada",              "Billing",      2, "InApp,Email"),
+            ("SUSCRIPCION_CANCELADA",   "Suscripción cancelada",             "Billing",      2, "InApp,Email"),
+            ("PAGO_FALLIDO",            "Pago rechazado",                    "Billing",      1, "InApp,Email,Push"),
+            ("PROYECTO_CREADO",         "Proyecto registrado",               "Proyectos",    4, "InApp"),
+            ("PROYECTO_EDITADO",        "Proyecto actualizado",              "Proyectos",    5, "InApp"),
+            ("PROYECTO_EN_REVISION",    "Proyecto en revisión",              "Proyectos",    3, "InApp,Email"),
+            ("PROYECTO_PUBLICADO",      "Proyecto verificado y publicado",   "Proyectos",    2, "InApp,Email"),
+            ("PROYECTO_OBSERVACION",    "Proyecto con observaciones",        "Proyectos",    2, "InApp,Email"),
+            ("DOCUMENTO_SUBIDO",        "Documento cargado",                 "Documentos",   5, "InApp"),
+            ("DOCUMENTO_VALIDADO",      "Documento validado",                "Documentos",   3, "InApp"),
+            ("DOCUMENTO_RECHAZADO",     "Documento rechazado",               "Documentos",   2, "InApp,Email"),
+            ("INTERES_REGISTRADO",      "Interés registrado en tu proyecto", "Social",       3, "InApp,Email"),
+            ("INVITACION_RECIBIDA",     "Invitación de delegación recibida", "Social",       3, "InApp,Email"),
+            ("LIMITES_DELEGACION",      "Límites de delegación actualizados","Social",       5, "InApp"),
+        };
+
+        var entities = tipos.Select(t => new TipoNotificacion(
+            t.Codigo, t.Nombre, t.Categoria, t.Prioridad, t.Canales));
+
+        context.TiposNotificaciones.AddRange(entities);
+        await context.SaveChangesAsync();
+    }
+
     private static async Task SeedLegacyProfilesAndPermissionsAsync(AppDbContext context, ILogger logger, Usuario adminUser, Usuario devUser, Usuario publicUser)
     {
         if (!await context.Permisos.AnyAsync())
@@ -1113,12 +1149,20 @@ WHERE NOT EXISTS (
         var hasWelcome = await context.Notificaciones.AnyAsync(n => n.UsuarioId == returnUser.Id && n.Mensaje.Contains("¡Bienvenido a VeriFinca"));
         if (!hasWelcome)
         {
-            var welcomeNotification = new Notificacion(
-                usuarioId: returnUser.Id,
-                mensaje: $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
-                tipo: "Info",
-                enlaceRelacionado: "/dashboard"
-            );
+            var tipoBienvenida = await context.TiposNotificaciones
+                .FindAsync(TipoNotificacionId.BienvenidaRegistro);
+            var welcomeNotification = tipoBienvenida != null
+                ? new Notificacion(
+                    usuarioId: returnUser.Id,
+                    mensaje: $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
+                    tipoNotificacionId: tipoBienvenida.Id,
+                    tipoCodigo: tipoBienvenida.Codigo,
+                    prioridad: tipoBienvenida.Prioridad,
+                    canales: tipoBienvenida.Canales.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries),
+                    enlaceRelacionado: "/dashboard")
+                : new Notificacion(returnUser.Id,
+                    $"¡Bienvenido a VeriFinca, {returnUser.Nombre}! Tu cuenta ha sido activada correctamente.",
+                    "Info", "/dashboard");
             context.Notificaciones.Add(welcomeNotification);
             await context.SaveChangesAsync();
         }
@@ -1305,7 +1349,28 @@ WHERE NOT EXISTS (
             n.UsuarioId == usuarioId && n.Mensaje == mensaje && n.Tipo == tipo);
         if (existing != null) return existing;
 
-        var notif = new Notificacion(usuarioId, mensaje, tipo, ruta);
+        // ponytail: int Id es fuente de verdad. Codigo string preserved as metadata.
+        Notificacion notif;
+        if (int.TryParse(tipo, out var tipoId))
+        {
+            var tipoFromCatalog = await context.TiposNotificaciones.FindAsync(tipoId);
+            if (tipoFromCatalog != null)
+            {
+                var canales = tipoFromCatalog.Canales
+                    .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                notif = new Notificacion(usuarioId, mensaje, tipoFromCatalog.Id, tipoFromCatalog.Codigo,
+                    tipoFromCatalog.Prioridad, canales, ruta);
+            }
+            else
+            {
+                notif = new Notificacion(usuarioId, mensaje, tipo, ruta);
+            }
+        }
+        else
+        {
+            notif = new Notificacion(usuarioId, mensaje, tipo, ruta);
+        }
+
         if (markRead) notif.MarkAsRead();
         context.Notificaciones.Add(notif);
         await context.SaveChangesAsync();
