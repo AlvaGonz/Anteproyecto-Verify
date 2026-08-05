@@ -14,6 +14,9 @@ export interface DocumentExtractionPanelProps {
   
   // Custom grid classes if standard 1-2-3 col layout needs overriding
   gridClassName?: string;
+  
+  // Footer content to render below the grid (e.g. for validation buttons)
+  footer?: React.ReactNode;
 }
 
 export const DocumentExtractionPanel: React.FC<DocumentExtractionPanelProps> = ({
@@ -26,7 +29,8 @@ export const DocumentExtractionPanel: React.FC<DocumentExtractionPanelProps> = (
   icon = <FileText className="w-4 h-4 text-primary" />,
   warnings = [],
   children,
-  gridClassName = "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 items-start"
+  gridClassName = "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 items-start",
+  footer
 }) => {
   
   const [isExpanded, setIsExpanded] = useState(true);
@@ -93,6 +97,12 @@ export const DocumentExtractionPanel: React.FC<DocumentExtractionPanelProps> = (
                  {warnings.map((w, i) => <li key={i} className="break-words">{w}</li>)}
                </ul>
              </div>
+          )}
+          
+          {footer && (
+            <div className="mt-5">
+              {footer}
+            </div>
           )}
         </div>
       )}

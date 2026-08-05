@@ -20,7 +20,16 @@ export const mapDocumentToVerificationPayload = (
         apiDocType: 'catastro',
         payload: {
           matricula: getValue('matricula'),
-          designacionCatastral: getValue('designacionCatastral'),
+          designacionCatastral: (() => {
+            let val = getValue('designacionCatastral');
+            if (val && typeof val === 'string') {
+              const digitsOnly = val.replace(/[^0-9]/g, '');
+              if (digitsOnly.length >= 4 && !val.includes(':')) {
+                return digitsOnly.slice(0, -4) + ':' + digitsOnly.slice(-4);
+              }
+            }
+            return val;
+          })(),
           oficina: getValue('oficina'),
           fechaInscripcion: getValue('fechaYHoraInscripcion'),
           fechaEmision: getValue('fechaEmision'),
@@ -81,4 +90,31 @@ export const mapDocumentToVerificationPayload = (
     default:
       return null; // Not supported for verification yet
   }
+};
+
+export const getValidationStatus = (
+  uiValue: string | undefined | null,
+  matchedData: any
+): { status: 'check' | 'warning' | 'error' | null; message: string } => {
+  if (!matchedData) return { status: null, message: '' };
+  
+  const normalizedUi = String(uiValue || '').trim().toLowerCase();
+  const matchedValues = Object.values(matchedData).map(v => String(v || '').trim().toLowerCase());
+  
+  if (normalizedUi === '') {
+    return { status: 'error', message: 'Dato vacío enviado a revisión' };
+  }
+
+  if (matchedValues.includes(normalizedUi)) {
+    return { status: 'check', message: 'Coincide exactamente con Gobernanza' };
+  }
+
+  const hasPartialMatch = matchedValues.some(v => v !== '' && (v.includes(normalizedUi) || normalizedUi.includes(v)));
+  const hasEmptyInDb = matchedValues.includes('');
+
+  if (hasPartialMatch || hasEmptyInDb) {
+    return { status: 'warning', message: 'Coincidencia parcial o campo vacío en BD' };
+  }
+
+  return { status: 'error', message: 'Dato diferente a Gobernanza' };
 };

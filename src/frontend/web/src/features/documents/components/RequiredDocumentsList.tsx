@@ -122,6 +122,8 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
                 <div className="pl-4 sm:pl-12">
                   <CedulaExtractionCard
                     extraction={uploadedDoc.cedulaExtraction}
+                    proyectoId={projectId}
+                    documentoId={uploadedDoc.id}
                     onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)}
                   />
                 </div>
@@ -130,6 +132,8 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
                 <div className="pl-4 sm:pl-12">
                   <CertificadoTituloExtractionCard
                     extraction={uploadedDoc.certificadoTituloExtraction}
+                    proyectoId={projectId}
+                    documentoId={uploadedDoc.id}
                     onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)}
                     onAutoSelectField={(f, v) => handleAutoSelectField(uploadedDoc.id, f, v)}
                   />
@@ -139,6 +143,8 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
                 <div className="pl-4 sm:pl-12">
                   <PlanoMensuraExtractionCard
                     extraction={uploadedDoc.planoMensuraExtraction}
+                    proyectoId={projectId}
+                    documentoId={uploadedDoc.id}
                     onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)}
                     onAutoSelectField={(f, v) => handleAutoSelectField(uploadedDoc.id, f, v)}
                   />
@@ -148,6 +154,8 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
                 <div className="pl-4 sm:pl-12">
                   <EstadoJuridicoExtractionCard
                     extraction={uploadedDoc.estadoJuridicoExtraction}
+                    proyectoId={projectId}
+                    documentoId={uploadedDoc.id}
                     onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)}
                     onAutoSelectField={(f, v) => handleAutoSelectField(uploadedDoc.id, f, v)}
                   />
@@ -157,6 +165,8 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
                 <div className="pl-4 sm:pl-12">
                   <CertificacionIPIExtractionCard
                     extraction={uploadedDoc.certificacionIPIExtraction}
+                    proyectoId={projectId}
+                    documentoId={uploadedDoc.id}
                     onEditField={(f, v) => handleEditField(uploadedDoc.id, f, v)}
                   />
                 </div>

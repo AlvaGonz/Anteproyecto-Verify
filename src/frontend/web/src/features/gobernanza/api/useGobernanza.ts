@@ -5,15 +5,25 @@ import { GobernanzaVerificationResponse, DocumentTypeGobernanza, VerificationPay
 interface VerifyDocumentParams {
   documentType: DocumentTypeGobernanza;
   payload: VerificationPayload;
+  proyectoId?: string;
+  documentoId?: string;
 }
 
 export const useVerifyDocument = () => {
   return useMutation({
     mutationKey: ['verifyDocumentGobernanza'],
-    mutationFn: async ({ documentType, payload }: VerifyDocumentParams) => {
+    mutationFn: async ({ documentType, payload, proyectoId, documentoId }: VerifyDocumentParams) => {
+      // Add context ids to payload so backend can save DatoValidado
+      const enrichedPayload = {
+        ...payload,
+        proyectoId,
+        documentoId,
+        tipoDocumento: documentType
+      };
+
       const res = await apiClient.post<GobernanzaVerificationResponse>(
         `/gobernanzadedatos/verificar/${documentType}`, 
-        payload
+        enrichedPayload
       );
       return res.data;
     },

@@ -13,7 +13,13 @@ export type DocumentTypeGobernanza =
   | 'permisosuelo' 
   | 'pagoipi';
 
-export interface CatastroVerificationRequest {
+export interface BaseVerificationRequest {
+  proyectoId?: string;
+  documentoId?: string;
+  tipoDocumento?: string;
+}
+
+export interface CatastroVerificationRequest extends BaseVerificationRequest {
   matricula?: string;
   designacionCatastral?: string;
   oficina?: string;
@@ -24,7 +30,7 @@ export interface CatastroVerificationRequest {
   desigCatastralPosicional?: string;
 }
 
-export interface JceVerificationRequest {
+export interface JceVerificationRequest extends BaseVerificationRequest {
   cedula?: string;
   nombres?: string;
   apellidos?: string;
@@ -32,14 +38,14 @@ export interface JceVerificationRequest {
   fechaExpiracion?: string;
 }
 
-export interface IpiVerificationRequest {
+export interface IpiVerificationRequest extends BaseVerificationRequest {
   rnc?: string;
   noCertificacion?: string;
   noInmueble?: string;
   parcelaNo?: string;
 }
 
-export interface PermisoSueloVerificationRequest {
+export interface PermisoSueloVerificationRequest extends BaseVerificationRequest {
   numeroPermiso?: string;
   numeroExpediente?: string;
   rnc?: string;
@@ -49,7 +55,7 @@ export interface PermisoSueloVerificationRequest {
   lugar?: string;
 }
 
-export interface DgiiVerificationRequest {
+export interface DgiiVerificationRequest extends BaseVerificationRequest {
   rnc?: string;
   nombreRazonSocial?: string;
   actividadEconomica?: string;

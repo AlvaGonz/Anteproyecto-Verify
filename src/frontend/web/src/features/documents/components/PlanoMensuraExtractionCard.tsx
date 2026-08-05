@@ -46,6 +46,8 @@ const matchesCatalogId = (value: string | null | undefined, options: Array<{ id:
 
 interface PlanoMensuraExtractionCardProps {
   extraction: PlanoMensuraCatastralRdExtractionV1;
+  proyectoId?: string;
+  documentoId?: string;
   onEditField?: (fieldName: string, value: string) => Promise<void>;
   onAutoSelectField?: (fieldName: string, resolvedId: string, action: ResolutionAction) => void;
 }
@@ -60,7 +62,13 @@ interface Municipality {
   nombre: string;
 }
 
-export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProps> = ({ extraction, onEditField, onAutoSelectField }) => {
+export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProps> = ({ 
+  extraction, 
+  proyectoId,
+  documentoId,
+  onEditField, 
+  onAutoSelectField 
+}) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
   
@@ -218,7 +226,9 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
-      documentType: 'permisosuelo', // Or 'planomensura' if there's a specific one, using 'permisosuelo' mapping for now based on mapper.ts
+      documentType: 'catastro',
+      proyectoId,
+      documentoId,
       payload: {
         numeroPermiso: '', // Depending on where it's stored
         numeroExpediente: '', 
