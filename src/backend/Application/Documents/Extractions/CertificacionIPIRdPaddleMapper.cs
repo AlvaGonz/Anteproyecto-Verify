@@ -177,6 +177,10 @@ public static class CertificacionIPIRdPaddleMapper
         }
 
         // Layer 4: Canonical Normalization — field-specific per DGII format
+        // DGII IPI certificate fields have distinct formats:
+        //   Inmueble No.   → pure digits (e.g. 458901236754)
+        //   Parcela No.    → catastral: digits, colons, hyphens (e.g. 150106256710:4-A)
+        //   Certificación  → alphanumeric with optional prefix (e.g. C0348921465789)
         if (!string.IsNullOrWhiteSpace(rawValue))
         {
             rawValue = rawValue.Trim().TrimEnd('.');
