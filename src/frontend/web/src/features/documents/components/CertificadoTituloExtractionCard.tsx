@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { 
-  CertificadoTituloRdExtractionV1, 
-  ExtractionStatus, 
-  FieldStatus, 
+import {
+  CertificadoTituloRdExtractionV1,
+  ExtractionStatus,
+  FieldStatus,
   ExtractedField
 } from "../types";
 import { ResolutionAction } from "../schemas/certificadoTitulo.schema";
@@ -59,16 +59,16 @@ interface Municipality {
   nombre: string;
 }
 
-export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtractionCardProps> = ({ 
-  extraction, 
+export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtractionCardProps> = ({
+  extraction,
   proyectoId,
   documentoId,
-  onEditField, 
-  onAutoSelectField 
+  onEditField,
+  onAutoSelectField
 }) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
-  
+
   // State for dropdowns
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
@@ -89,7 +89,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
         if (!response.ok) throw new Error('Failed to fetch provinces');
         const data = await response.json();
         setProvinces(data);
-        
+
         // If there's a province resolution, select it
         if (extraction.provinceResolution?.resolvedId) {
           setSelectedProvinceId(extraction.provinceResolution.resolvedId);
@@ -118,10 +118,10 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
       try {
         const data = await fetchMunicipalities(selectedProvinceId);
         setMunicipalities(data);
-        
+
         const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
         const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
-        
+
         let initialMunicipalityId = resolvedFromOcr ?? resolvedFromRaw;
         if (extraction.municipio?.normalizedValue === '') {
           initialMunicipalityId = null;
@@ -129,7 +129,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
           const matched = matchesCatalogId(extraction.municipio.normalizedValue, data);
           if (matched) initialMunicipalityId = matched;
         }
-        
+
         setSelectedMunicipalityId(initialMunicipalityId);
 
         // Auto-apply if we found a local match from OCR raw text and it hasn't been saved yet
@@ -149,20 +149,20 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
   // Auto-emit suggestion when resolution is ready and action is AutoApply
   useEffect(() => {
     if (!onAutoSelectField) return;
-    
+
     // Check province resolution
     if (
-      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply &&
       extraction.provinceResolution?.resolvedId &&
       extraction.provincia?.normalizedValue !== extraction.provinceResolution.resolvedId
     ) {
       onAutoSelectField('provincia', extraction.provinceResolution.resolvedId, ResolutionAction.AutoApply);
       return; // Wait for refetch to avoid backend race condition
     }
-    
+
     // Check municipality resolution
     if (
-      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply &&
       extraction.municipalityResolution?.resolvedId &&
       extraction.municipio?.normalizedValue !== extraction.municipalityResolution.resolvedId
     ) {
@@ -170,14 +170,14 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [extraction.provinceResolution, extraction.municipalityResolution, extraction.provincia, extraction.municipio]);
-  
+
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
   const [isSaving, setIsSaving] = React.useState(false);
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
-  const getStatus = (fieldVal: string | undefined | null) => 
+  const getStatus = (fieldVal: string | undefined | null) =>
     getValidationStatus(fieldVal, verificationResponse?.matchedData);
 
   const handleVerifyGobernanza = () => {
@@ -234,11 +234,11 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
     const displayValue = NUMERIC_FIELDS[fieldKey] ? formatNumeric(fieldKey, rawValue) : rawValue;
     const isEditing = editingField === fieldKey;
     const isNumeric = !!NUMERIC_FIELDS[fieldKey];
-    
+
     // Get resolution for this field
-    const resolution = fieldKey === 'provincia' ? extraction.provinceResolution : 
-                       fieldKey === 'municipio' ? extraction.municipalityResolution : null;
-    
+    const resolution = fieldKey === 'provincia' ? extraction.provinceResolution :
+      fieldKey === 'municipio' ? extraction.municipalityResolution : null;
+
     const validation = getStatus(rawValue);
 
     // Render dropdown for provincia and municipio
@@ -251,7 +251,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
       const onChange = isProvincia ? handleProvinceChange : handleMunicipalityChange;
       const disabled = isSaving || loading || (!isProvincia && !selectedProvinceId);
       const defaultOptionText = isProvincia ? "-- Seleccionar Provincia --" : "-- Seleccionar Municipio --";
-      
+
       return (
         <ExtractionFieldCard
           key={fieldKey}
@@ -282,7 +282,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
         </ExtractionFieldCard>
       );
     }
-    
+
     return (
       <ExtractionFieldCard
         key={fieldKey}
@@ -343,20 +343,20 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
               {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
             </button>
           </div>
-          
-          <VerificationFeedbackCard 
-            response={verificationResponse || null} 
-            isLoading={isVerifying} 
+
+          <VerificationFeedbackCard
+            response={verificationResponse || null}
+            isLoading={isVerifying}
             error={verificationError}
           />
         </div>
       }
     >
-      {renderField("Designación Catastral", "designacionCatastral", extraction.designacionCatastral, true, "Ej: 310025847956:0065")}
+      {renderField("Designación Catastral", "designacionCatastral", extraction.designacionCatastral, true, "Ej: 310025847956")}
       {renderField("Oficina", "oficina", extraction.oficina, false, "Ej: SANTO DOMINGO")}
       {renderField("Matrícula", "matricula", extraction.matricula, true, "Ej: 010023456")}
       {renderField("Fecha de Inscripción", "fechaYHoraInscripcion", extraction.fechaYHoraInscripcion, false, "Ej: 2024-01-30")}
-      {renderField("Viene De", "vieneDe", extraction.vieneDe, false, "Ej: 010023455")}
+      {renderField("Viene De", "vieneDe", extraction.vieneDe, false, "Ej: L.000, F.00")}
       {renderField("Municipio", "municipio", extraction.municipio)}
       {renderField("Provincia", "provincia", extraction.provincia)}
       {renderField("Superficie M2", "superficieM2", extraction.superficieM2, false, "Ej: 1500.00")}

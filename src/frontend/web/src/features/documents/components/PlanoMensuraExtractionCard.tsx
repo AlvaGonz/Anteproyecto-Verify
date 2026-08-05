@@ -63,16 +63,16 @@ interface Municipality {
   nombre: string;
 }
 
-export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProps> = ({ 
-  extraction, 
+export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProps> = ({
+  extraction,
   proyectoId,
   documentoId,
-  onEditField, 
-  onAutoSelectField 
+  onEditField,
+  onAutoSelectField
 }) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
-  
+
   // State for dropdowns
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
@@ -97,13 +97,13 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
         // Prefer persisted normalizedValue (user-selected UUID or explicitly cleared "") over OCR-derived provinceResolution
         const resolvedFromOcr = extraction.provinceResolution?.resolvedId ?? null;
         const resolvedFromRaw = matchesCatalogId(extraction.provincia?.rawValue, data);
-        
+
         let initialProvinceId = resolvedFromOcr ?? resolvedFromRaw;
         if (extraction.provincia?.normalizedValue) {
           const matched = matchesCatalogId(extraction.provincia.normalizedValue, data);
           if (matched) initialProvinceId = matched;
         }
-        
+
         setSelectedProvinceId(initialProvinceId);
 
         // Auto-apply if we found a local match from OCR raw text and it hasn't been saved yet
@@ -137,13 +137,13 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
 
           const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
           const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
-          
+
           let initialMunicipalityId = resolvedFromOcr ?? resolvedFromRaw;
           if (extraction.municipio?.normalizedValue) {
             const matched = matchesCatalogId(extraction.municipio.normalizedValue, data);
             if (matched) initialMunicipalityId = matched;
           }
-          
+
           setSelectedMunicipalityId(initialMunicipalityId);
 
           // Auto-apply if we found a local match from OCR raw text and it hasn't been saved yet
@@ -171,13 +171,13 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
 
           const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
           const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
-          
+
           let initialMunicipalityId = resolvedFromOcr ?? resolvedFromRaw;
           if (extraction.municipio?.normalizedValue) {
             const matched = matchesCatalogId(extraction.municipio.normalizedValue, data);
             if (matched) initialMunicipalityId = matched;
           }
-          
+
           setSelectedMunicipalityId(initialMunicipalityId);
         } catch (error) {
           setMunicipalityError('Error al cargar municipios');
@@ -197,20 +197,20 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
   // Auto-emit suggestion when resolution is ready and action is AutoApply
   useEffect(() => {
     if (!onAutoSelectField) return;
-    
+
     // Check province resolution
     if (
-      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply &&
       extraction.provinceResolution?.resolvedId &&
       extraction.provincia?.normalizedValue !== extraction.provinceResolution.resolvedId
     ) {
       onAutoSelectField('provincia', extraction.provinceResolution.resolvedId, ResolutionAction.AutoApply);
       return; // Wait for refetch to avoid backend race condition
     }
-    
+
     // Check municipality resolution
     if (
-      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply &&
       extraction.municipalityResolution?.resolvedId &&
       extraction.municipio?.normalizedValue !== extraction.municipalityResolution.resolvedId
     ) {
@@ -218,14 +218,14 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [extraction.provinceResolution, extraction.municipalityResolution, extraction.provincia, extraction.municipio]);
-   
+
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
-  const getStatus = (fieldVal: string | undefined | null) => 
+  const getStatus = (fieldVal: string | undefined | null) =>
     getValidationStatus(fieldVal, verificationResponse?.matchedData);
 
   const handleVerifyGobernanza = () => {
@@ -235,8 +235,8 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       documentoId,
       payload: {
         numeroPermiso: '', // Depending on where it's stored
-        numeroExpediente: '', 
-        rnc: '', 
+        numeroExpediente: '',
+        rnc: '',
         departamento: extraction.departamento?.normalizedValue || extraction.departamento?.rawValue,
         operacion: extraction.operacion?.normalizedValue || extraction.operacion?.rawValue,
         seccion: extraction.seccion?.normalizedValue || extraction.seccion?.rawValue,
@@ -288,10 +288,10 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
-    
+
     // Get resolution for this field
-    const resolution = fieldKey === 'provincia' ? extraction.provinceResolution : 
-                       fieldKey === 'municipio' ? extraction.municipalityResolution : null;
+    const resolution = fieldKey === 'provincia' ? extraction.provinceResolution :
+      fieldKey === 'municipio' ? extraction.municipalityResolution : null;
 
     const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
 
@@ -305,7 +305,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       const onChange = isProvincia ? handleProvinceChange : handleMunicipalityChange;
       const disabled = isSaving || loading || (!isProvincia && options.length === 0);
       const defaultOptionText = isProvincia ? "-- Seleccionar Provincia --" : "-- Seleccionar Municipio --";
-      
+
       return (
         <ExtractionFieldCard
           key={fieldKey}
@@ -378,11 +378,11 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     >
       {renderField("Departamento", "departamento", extraction.departamento, false, "field-departamento", "Ej: NORTE")}
       {renderField("Operación", "operacion", extraction.operacion, false, "field-operacion", "Ej: DESLINDE")}
-      {renderField("Desig. Catastral Posicional", "designacionCatastralPosicional", extraction.designacionCatastralPosicional, true, "field-dcp", "Ej: 120182783414:0083")}
-      {renderField("Desig. Catastral Origen", "designacionCatastralOrigen", extraction.designacionCatastralOrigen, false, "field-dco", "Ej: 120182783400:0001")}
+      {renderField("Desig. Catastral Posicional", "designacionCatastralPosicional", extraction.designacionCatastralPosicional, true, "field-dcp", "Ej: 535353535353")}
+      {renderField("Desig. Catastral Origen", "designacionCatastralOrigen", extraction.designacionCatastralOrigen, false, "field-dco", "Ej: 42000000000_1-1_1")}
       {renderField("Provincia", "provincia", extraction.provincia, false, "field-provincia")}
       {renderField("Municipio", "municipio", extraction.municipio, false, "field-municipio")}
-      {renderField("Sección", "seccion", extraction.seccion, false, "field-seccion", "Ej: SECCION A")}
+      {renderField("Sección", "seccion", extraction.seccion, false, "field-seccion", "Ej: JINA GARAGUA")}
       {renderField("Lugar", "lugar", extraction.lugar, false, "field-lugar", "Ej: URB. LOS CERROS")}
       {renderField("Superficie A. Regist.", "superficieARegistrarParcelaM2", extraction.superficieARegistrarParcelaM2, true, "field-superficie", "Ej: 1500.00")}
 
@@ -397,10 +397,10 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
             {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
           </button>
         </div>
-        
-        <VerificationFeedbackCard 
-          response={verificationResponse || null} 
-          isLoading={isVerifying} 
+
+        <VerificationFeedbackCard
+          response={verificationResponse || null}
+          isLoading={isVerifying}
           error={verificationError}
         />
       </div>

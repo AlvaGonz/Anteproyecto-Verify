@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { 
-  EstadoJuridicoRdExtractionV1, 
-  ExtractionStatus, 
-  FieldStatus, 
+import {
+  EstadoJuridicoRdExtractionV1,
+  ExtractionStatus,
+  FieldStatus,
   ExtractedField
 } from "../types";
 import { ResolutionAction } from "../schemas/estadoJuridico.schema";
@@ -40,16 +40,16 @@ interface Municipality {
   nombre: string;
 }
 
-export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCardProps> = ({ 
-  extraction, 
+export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCardProps> = ({
+  extraction,
   proyectoId,
   documentoId,
-  onEditField, 
-  onAutoSelectField 
+  onEditField,
+  onAutoSelectField
 }) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
-  
+
   // State for dropdowns
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
@@ -70,7 +70,7 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         if (!response.ok) throw new Error('Failed to fetch provinces');
         const data = await response.json();
         setProvinces(data);
-        
+
         // If there's a province resolution, select it
         if (extraction.provinceResolution?.resolvedId) {
           setSelectedProvinceId(extraction.provinceResolution.resolvedId);
@@ -99,10 +99,10 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       try {
         const data = await fetchMunicipalities(selectedProvinceId);
         setMunicipalities(data);
-        
+
         const resolvedFromOcr = extraction.municipalityResolution?.resolvedId ?? null;
         const resolvedFromRaw = matchesCatalogId(extraction.municipio?.rawValue, data);
-        
+
         let initialMunicipalityId = resolvedFromOcr ?? resolvedFromRaw;
         if (extraction.municipio?.normalizedValue === '') {
           initialMunicipalityId = null;
@@ -110,7 +110,7 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
           const matched = matchesCatalogId(extraction.municipio.normalizedValue, data);
           if (matched) initialMunicipalityId = matched;
         }
-        
+
         setSelectedMunicipalityId(initialMunicipalityId);
 
         // Auto-apply if we found a local match from OCR raw text and it hasn't been saved yet
@@ -130,20 +130,20 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
   // Auto-emit suggestion when resolution is ready and action is AutoApply
   useEffect(() => {
     if (!onAutoSelectField) return;
-    
+
     // Check province resolution
     if (
-      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.provinceResolution?.suggestedAction === ResolutionAction.AutoApply &&
       extraction.provinceResolution?.resolvedId &&
       extraction.provincia?.normalizedValue !== extraction.provinceResolution.resolvedId
     ) {
       onAutoSelectField('provincia', extraction.provinceResolution.resolvedId, ResolutionAction.AutoApply);
       return; // Wait for refetch to avoid backend race condition
     }
-    
+
     // Check municipality resolution
     if (
-      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply && 
+      extraction.municipalityResolution?.suggestedAction === ResolutionAction.AutoApply &&
       extraction.municipalityResolution?.resolvedId &&
       extraction.municipio?.normalizedValue !== extraction.municipalityResolution.resolvedId
     ) {
@@ -151,14 +151,14 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [extraction.provinceResolution, extraction.municipalityResolution, extraction.provincia, extraction.municipio]);
-   
+
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
-  
-  const getStatus = (fieldVal: string | undefined | null) => 
+
+  const getStatus = (fieldVal: string | undefined | null) =>
     getValidationStatus(fieldVal, verificationResponse?.matchedData);
 
   const handleVerifyGobernanza = () => {
@@ -213,10 +213,10 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
-    
+
     // Get resolution for this field
-    const resolution = fieldKey === 'provincia' ? extraction.provinceResolution : 
-                       fieldKey === 'municipio' ? extraction.municipalityResolution : null;
+    const resolution = fieldKey === 'provincia' ? extraction.provinceResolution :
+      fieldKey === 'municipio' ? extraction.municipalityResolution : null;
 
     // Render dropdown for provincia and municipio
     if (fieldKey === 'provincia' || fieldKey === 'municipio') {
@@ -228,7 +228,7 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       const onChange = isProvincia ? handleProvinceChange : handleMunicipalityChange;
       const disabled = isSaving || loading || (!isProvincia && !selectedProvinceId);
       const defaultOptionText = isProvincia ? "-- Seleccionar Provincia --" : "-- Seleccionar Municipio --";
-      
+
       const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
 
       return (
@@ -316,8 +316,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       gridClassName="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
     >
       {renderField("Matrícula", "matricula", extraction.matricula, true, "field-matricula", "Ej: 010023456")}
-      {renderField("Desig. Catastral", "designacionCatastral", extraction.designacionCatastral, true, "field-designacionCatastral", "Ej: 310025847956:0065")}
-      {renderField("Viene De", "vieneDe", extraction.vieneDe, false, "field-vieneDe", "Ej: 010023455")}
+      {renderField("Desig. Catastral", "designacionCatastral", extraction.designacionCatastral, true, "field-designacionCatastral", "Ej: 310025847956")}
+      {renderField("Viene De", "vieneDe", extraction.vieneDe, false, "field-vieneDe", "Ej: L.000,F.00")}
       {renderField("Fecha de Emisión", "fechaHoraInscripcion", extraction.fechaHoraInscripcion, false, "field-fechaEmision", "Ej: 2024-01-30")}
       {renderField("Oficina", "oficina", extraction.oficina, false, "field-oficina", "Ej: SANTO DOMINGO")}
       {renderField("Provincia", "provincia", extraction.provincia, false, "field-provincia")}
@@ -335,10 +335,10 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
             {isVerifying ? "Verificando..." : "Validar contra Estado/Gobernanza"}
           </button>
         </div>
-        
-        <VerificationFeedbackCard 
-          response={verificationResponse || null} 
-          isLoading={isVerifying} 
+
+        <VerificationFeedbackCard
+          response={verificationResponse || null}
+          isLoading={isVerifying}
           error={verificationError}
         />
       </div>

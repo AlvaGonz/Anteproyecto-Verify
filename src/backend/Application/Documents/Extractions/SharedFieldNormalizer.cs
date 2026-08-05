@@ -22,8 +22,8 @@ public static class SharedFieldNormalizer
     {
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
         
-        // Remove spaces, punctuation except hyphen
-        var clean = Regex.Replace(raw, @"[^a-zA-Z0-9-]", "");
+        // Remove spaces, punctuation, and hyphens
+        var clean = Regex.Replace(raw, @"[^a-zA-Z0-9]", "");
         return clean.ToUpperInvariant();
     }
 
@@ -31,8 +31,21 @@ public static class SharedFieldNormalizer
     {
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
         
-        // Typically in DR: 1,200.50 (comma for thousands, dot for decimals)
-        var cleanRaw = raw.Replace(",", "").Replace(" ", "");
+        var cleanRaw = raw.Trim();
+        var dotCount = cleanRaw.Count(c => c == '.');
+
+        if (dotCount >= 2)
+        {
+            var lastDot = cleanRaw.LastIndexOf('.');
+            var beforeDecimal = cleanRaw.Substring(0, lastDot).Replace(".", "");
+            cleanRaw = beforeDecimal + cleanRaw.Substring(lastDot);
+        }
+        else
+        {
+            cleanRaw = cleanRaw.Replace(",", "");
+        }
+
+        cleanRaw = cleanRaw.Replace(" ", "");
         var match = Regex.Match(cleanRaw, @"\d+(\.\d+)?");
         if (match.Success)
         {
