@@ -38,7 +38,7 @@ export const VerificationFeedbackCard: React.FC<VerificationFeedbackCardProps> =
 
   if (!response) return null;
 
-  const { isValid, matchPercentage, message, matchedData } = response;
+  const { isValid, matchPercentage, message } = response;
   
   const isPartialMatch = matchPercentage > 0 && matchPercentage < 100;
   const isNoMatch = matchPercentage === 0 || !isValid;
@@ -82,30 +82,9 @@ export const VerificationFeedbackCard: React.FC<VerificationFeedbackCardProps> =
             </span>
           </div>
           
-          <p className={`text-sm mt-1 mb-3 ${textColor} opacity-90 font-medium`}>
+          <p className={`text-sm mt-1 mb-1 ${textColor} opacity-90 font-medium`}>
             {message}
           </p>
-
-          {/* Render matched data if available and partial/success */}
-          {matchedData && Object.keys(matchedData).length > 0 && (
-            <div className="mt-4 pt-4 border-t border-black/5">
-              <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${textColor} opacity-80`}>
-                Datos Confirmados en Fuente Oficial
-              </h4>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                {Object.entries(matchedData).map(([key, value]) => (
-                  <div key={key} className="flex flex-col">
-                    <span className={`text-[10px] uppercase font-bold opacity-60 ${textColor}`}>
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                    </span>
-                    <span className={`text-xs font-medium truncate ${textColor}`}>
-                      {value !== null && value !== undefined ? String(value) : '-'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

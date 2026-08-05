@@ -12,10 +12,13 @@ import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
 import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
 
 interface EstadoJuridicoExtractionCardProps {
   extraction: EstadoJuridicoRdExtractionV1;
+  proyectoId?: string;
+  documentoId?: string;
   onEditField?: (fieldName: string, value: string) => Promise<void>;
   onAutoSelectField?: (fieldName: string, resolvedId: string, action: ResolutionAction) => void;
 }
@@ -37,7 +40,13 @@ interface Municipality {
   nombre: string;
 }
 
-export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCardProps> = ({ extraction, onEditField, onAutoSelectField }) => {
+export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCardProps> = ({ 
+  extraction, 
+  proyectoId,
+  documentoId,
+  onEditField, 
+  onAutoSelectField 
+}) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
   
@@ -148,10 +157,15 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
   const [isSaving, setIsSaving] = useState(false);
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+  
+  const getStatus = (fieldVal: string | undefined | null) => 
+    getValidationStatus(fieldVal, verificationResponse?.matchedData);
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
-      documentType: 'catastro', // mapping Estado Jurídico to Catastro for governance
+      documentType: 'catastro',
+      proyectoId,
+      documentoId,
       payload: {
         matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue,
         designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue,
@@ -245,6 +259,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       );
     }
 
+    const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
+
     return (
       <ExtractionFieldCard
         key={fieldKey}
@@ -264,6 +280,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         onSave={() => handleSave(fieldKey)}
         onCancel={handleCancel}
         onEditAllowed={!!onEditField}
+        validationStatus={validation.status}
+        validationMessage={validation.message}
         testId={testId}
       />
     );

@@ -91,8 +91,17 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
   };
 
   const handleSaveEdit = (fieldName: string) => {
+    let valueToSave = editValue;
+    // Auto-formatear Designación Catastral
+    if (fieldName.toLowerCase().includes('designacioncatastral') || fieldName.toLowerCase().includes('designación catastral')) {
+      const digitsOnly = valueToSave.replace(/[^0-9]/g, '');
+      if (digitsOnly.length >= 4 && !valueToSave.includes(':')) {
+        valueToSave = digitsOnly.slice(0, -4) + ':' + digitsOnly.slice(-4);
+      }
+    }
+
     updateField(
-      { documentId: document.id, fieldName, data: { reviewState: OcrFieldReviewState.Corrected, correctedValue: editValue } },
+      { documentId: document.id, fieldName, data: { reviewState: OcrFieldReviewState.Corrected, correctedValue: valueToSave } },
       { onSuccess: () => setEditingField(null) }
     );
   };
@@ -104,8 +113,52 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
 
   const handleVerifyGobernanza = () => {
     if (mappingInfo) {
-      verifyDocument({ documentType: mappingInfo.apiDocType, payload: mappingInfo.payload });
+      verifyDocument({ 
+        documentType: mappingInfo.apiDocType, 
+        payload: mappingInfo.payload,
+        proyectoId: document.proyectoId,
+        documentoId: document.id 
+      });
     }
+  };
+
+  const getValidationIcon = (uiValue: string) => {
+    if (!verificationResponse?.matchedData) return null;
+    
+    // Normalizar valores para comparación
+    const normalizedUi = String(uiValue || '').trim().toLowerCase();
+    
+    // Buscar en todos los valores devueltos por Gobernanza
+    const matchedValues = Object.values(verificationResponse.matchedData).map(v => String(v || '').trim().toLowerCase());
+    
+    if (normalizedUi === '') {
+      return <div title="Dato vacío enviado a revisión"><X className="w-5 h-5 text-rose-500 bg-rose-50 rounded-full p-0.5" /></div>;
+    }
+
+    // Match exacto
+    if (matchedValues.includes(normalizedUi)) {
+      return <div title="Coincide exactamente"><Check className="w-5 h-5 text-emerald-500 bg-emerald-50 rounded-full p-0.5" /></div>;
+    }
+
+    // Match parcial o vacío en DB (pero el usuario mandó algo)
+    const hasPartialMatch = matchedValues.some(v => v !== '' && (v.includes(normalizedUi) || normalizedUi.includes(v)));
+    const hasEmptyInDb = matchedValues.includes('');
+
+    if (hasPartialMatch || hasEmptyInDb) {
+      return <div title="Coincidencia parcial o vacío en BD"><AlertTriangle className="w-5 h-5 text-amber-500 bg-amber-50 rounded-full p-0.5" /></div>;
+    }
+
+    return <div title="Dato diferente a Gobernanza"><X className="w-5 h-5 text-rose-500 bg-rose-50 rounded-full p-0.5" /></div>;
+  };
+
+  const getPlaceholder = (fieldName: string) => {
+    const lower = fieldName.toLowerCase();
+    if (lower.includes('designacion catastral') || lower.includes('designación catastral')) return 'Ej: 120182783414:0083';
+    if (lower.includes('matricula') || lower.includes('matrícula')) return 'Ej: 010023456';
+    if (lower.includes('fecha')) return 'Ej: 2024-01-30';
+    if (lower.includes('rnc')) return 'Ej: 130123456';
+    if (lower.includes('cedula') || lower.includes('cédula')) return 'Ej: 00112345678';
+    return 'Ej: Ingrese el dato correcto';
   };
 
   return (
@@ -138,9 +191,12 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
             <div key={field.name} className="p-4 rounded-xl bg-white border border-[var(--color-border)]/20 shadow-sm flex flex-col gap-3 group hover:border-[var(--color-border)]/40 transition-colors">
               <div className="flex justify-between items-start">
                 <span className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">{field.name}</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badge.className}`}>
-                  {badge.label}
-                </span>
+                <div className="flex items-center gap-2">
+                  {getValidationIcon(field.correctedValue || field.value || '')}
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badge.className}`}>
+                    {badge.label}
+                  </span>
+                </div>
               </div>
 
               <div className="flex-1 flex flex-col justify-center min-h-[2.5rem]">
@@ -148,8 +204,9 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      className="flex-1 bg-[var(--color-background)] border border-[var(--color-border)]/30 rounded-lg px-3 py-1.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-primary/50 shadow-inner"
+                      className="flex-1 bg-[var(--color-background)] border border-[var(--color-border)]/30 rounded-lg px-3 py-1.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-primary/50 shadow-inner placeholder:text-gray-400 placeholder:text-xs"
                       value={editValue}
+                      placeholder={getPlaceholder(field.name)}
                       onChange={(e) => setEditValue(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -180,9 +237,11 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
                     <span className="text-sm font-semibold text-[var(--color-text-primary)] break-all">
                       {field.correctedValue || field.value || <span className="text-[var(--color-text-secondary)]/50 italic">Vacío</span>}
                     </span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${confColor} ml-2 shrink-0 opacity-80`} title={`Confianza: ${(field.confidence * 100).toFixed(0)}%`}>
-                      {(field.confidence * 100).toFixed(0)}%
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${confColor} ml-2 shrink-0 opacity-80`} title={`Confianza: ${(field.confidence * 100).toFixed(0)}%`}>
+                        {(field.confidence * 100).toFixed(0)}%
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>

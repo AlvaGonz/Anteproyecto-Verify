@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldStatus, ExtractedField, GeographicResolutionResult } from "../../types";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, AlertTriangle } from "lucide-react";
 
 
 
@@ -39,6 +39,10 @@ export interface ExtractionFieldCardProps {
   
   // Override internal status checks if we have custom children
   isCustomContent?: boolean;
+
+  // Validation Status for Gobernanza
+  validationStatus?: 'check' | 'warning' | 'error' | null;
+  validationMessage?: string;
 }
 
 export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
@@ -61,7 +65,9 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
   onCancel,
   onEditAllowed = true,
   children,
-  isCustomContent = false
+  isCustomContent = false,
+  validationStatus,
+  validationMessage
 }) => {
   const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
   const rawValue = safeField.normalizedValue || safeField.rawValue || '';
@@ -101,9 +107,26 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
       className="flex flex-col p-3 rounded-lg bg-white border border-border/40 shadow-sm relative group min-h-[64px]" 
       data-testid={testId || `field-card-${fieldKey}`}
     >
-      <span className="text-[9px] font-black uppercase tracking-widest text-text-secondary/70 mb-1 break-words">
-        {label}
-      </span>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[9px] font-black uppercase tracking-widest text-text-secondary/70 break-words">
+          {label}
+        </span>
+        {validationStatus === 'check' && (
+          <div title={validationMessage || 'Coincide con Gobernanza'}>
+            <Check className="w-4 h-4 text-success bg-success/10 rounded-full p-0.5" />
+          </div>
+        )}
+        {validationStatus === 'warning' && (
+          <div title={validationMessage || 'Coincidencia parcial o campo vacío en BD'}>
+            <AlertTriangle className="w-4 h-4 text-warning bg-warning/10 rounded-full p-0.5" />
+          </div>
+        )}
+        {validationStatus === 'error' && (
+          <div title={validationMessage || 'No coincide con Gobernanza'}>
+            <X className="w-4 h-4 text-error bg-error/10 rounded-full p-0.5" />
+          </div>
+        )}
+      </div>
       
       <div className="flex items-center justify-between gap-2 min-h-[24px]">
         {isCustomContent ? (

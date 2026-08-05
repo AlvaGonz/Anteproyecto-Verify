@@ -19,7 +19,14 @@ public class VerificationResult
     public object? MatchedData { get; set; }
 }
 
-public class CatastroVerificationRequest
+public class BaseVerificationRequest
+{
+    public Guid ProyectoId { get; set; }
+    public Guid? DocumentoId { get; set; }
+    public string TipoDocumento { get; set; } = string.Empty;
+}
+
+public class CatastroVerificationRequest : BaseVerificationRequest
 {
     public string? Matricula { get; set; }
     public string? DesignacionCatastral { get; set; }
@@ -33,7 +40,7 @@ public class CatastroVerificationRequest
     public string? DesigCatastralPosicional { get; set; }
 }
 
-public class JceVerificationRequest
+public class JceVerificationRequest : BaseVerificationRequest
 {
     public string? Cedula { get; set; }
     public string? Nombres { get; set; }
@@ -42,14 +49,14 @@ public class JceVerificationRequest
     public string? FechaExpiracion { get; set; }
 }
 
-public class DgiiVerificationRequest
+public class DgiiVerificationRequest : BaseVerificationRequest
 {
     public string? Rnc { get; set; }
     public string? NombreRazonSocial { get; set; }
     public string? ActividadEconomica { get; set; }
 }
 
-public class PermisoSueloVerificationRequest
+public class PermisoSueloVerificationRequest : BaseVerificationRequest
 {
     public string? NumeroPermiso { get; set; }
     public string? NumeroExpediente { get; set; }
@@ -60,7 +67,7 @@ public class PermisoSueloVerificationRequest
     public string? Lugar { get; set; }
 }
 
-public class IpiVerificationRequest
+public class IpiVerificationRequest : BaseVerificationRequest
 {
     public string? Rnc { get; set; }
     public string? NoCertificacion { get; set; }

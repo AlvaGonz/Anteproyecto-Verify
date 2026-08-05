@@ -16,6 +16,32 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         _dbContext = dbContext;
     }
 
+    private async Task SaveValidationResultAsync(BaseVerificationRequest request, VerificationResult result)
+    {
+        if (request.ProyectoId == Guid.Empty || !request.DocumentoId.HasValue) return;
+
+        var jsonOptions = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+        string datosOcrJson = System.Text.Json.JsonSerializer.Serialize((object)request, jsonOptions);
+        string datosMatchJson = System.Text.Json.JsonSerializer.Serialize(result.MatchedData ?? new {}, jsonOptions);
+
+        var existing = await _dbContext.DatosValidados
+            .FirstOrDefaultAsync(d => d.ProyectoId == request.ProyectoId && d.DocumentoId == request.DocumentoId);
+
+        if (existing != null)
+        {
+            existing.UpdateResultados(datosOcrJson, datosMatchJson, (double)result.MatchPercentage);
+            _dbContext.DatosValidados.Update(existing);
+        }
+        else
+        {
+            var newDato = new Domain.Entities.DatoValidado(request.ProyectoId, request.DocumentoId.Value, string.IsNullOrEmpty(request.TipoDocumento) ? "Desconocido" : request.TipoDocumento);
+            newDato.UpdateResultados(datosOcrJson, datosMatchJson, (double)result.MatchPercentage);
+            _dbContext.DatosValidados.Add(newDato);
+        }
+
+        await _dbContext.SaveChangesAsync();
+    }
+
     private (int total, int matched) CompareStr(string? reqVal, string? dbVal)
     {
         if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
@@ -69,7 +95,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             
             decimal percentage = total == 0 ? 100m : Math.Round((decimal)matched / total * 100m, 2);
 
-            return new VerificationResult
+            var res = new VerificationResult
             {
                 IsValid = percentage >= 60m,
                 MatchPercentage = percentage,
@@ -86,9 +112,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
                     entity.DesigCatastralPosicional
                 }
             };
+            await SaveValidationResultAsync(request, res);
+            return res;
         }
 
-        return new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "No se encontraron coincidencias en Catastro." };
+        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "No se encontraron coincidencias en Catastro." };
+        await SaveValidationResultAsync(request, failRes);
+        return failRes;
     }
 
     public async Task<VerificationResult> VerificarJceAsync(JceVerificationRequest request)
@@ -109,16 +139,20 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
             decimal percentage = total == 0 ? 100m : Math.Round((decimal)matched / total * 100m, 2);
 
-            return new VerificationResult
+            var res = new VerificationResult
             {
                 IsValid = percentage >= 60m,
                 MatchPercentage = percentage,
                 Message = percentage >= 99m ? "Ciudadano validado correctamente." : $"Ciudadano validado parcialmente ({percentage}%).",
                 MatchedData = new { entity.Cedula, entity.Nombres, entity.Apellidos, entity.FechaNacimiento, entity.FechaExpiracion }
             };
+            await SaveValidationResultAsync(request, res);
+            return res;
         }
 
-        return new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Cédula no encontrada en el padrón de la JCE." };
+        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Cédula no encontrada en el padrón de la JCE." };
+        await SaveValidationResultAsync(request, failRes);
+        return failRes;
     }
 
     public async Task<VerificationResult> VerificarDgiiAsync(DgiiVerificationRequest request)
@@ -137,16 +171,20 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
             decimal percentage = total == 0 ? 100m : Math.Round((decimal)matched / total * 100m, 2);
 
-            return new VerificationResult
+            var res = new VerificationResult
             {
                 IsValid = percentage >= 60m,
                 MatchPercentage = percentage,
                 Message = percentage >= 99m ? "RNC Validado correctamente en la DGII." : $"RNC validado parcialmente ({percentage}%).",
                 MatchedData = new { entity.Rnc, entity.NombreRazonSocial, entity.ActividadEconomica, entity.Estado }
             };
+            await SaveValidationResultAsync(request, res);
+            return res;
         }
 
-        return new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "RNC no registrado en la DGII." };
+        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "RNC no registrado en la DGII." };
+        await SaveValidationResultAsync(request, failRes);
+        return failRes;
     }
 
     public async Task<VerificationResult> VerificarPermisoSueloAsync(PermisoSueloVerificationRequest request)
@@ -169,16 +207,20 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
             decimal percentage = total == 0 ? 100m : Math.Round((decimal)matched / total * 100m, 2);
 
-            return new VerificationResult
+            var res = new VerificationResult
             {
                 IsValid = percentage >= 60m,
                 MatchPercentage = percentage,
                 Message = percentage >= 99m ? "Permiso de uso de suelo verificado." : $"Permiso de uso de suelo validado parcialmente ({percentage}%).",
                 MatchedData = new { entity.NumeroPermiso, entity.TienePermiso, entity.Departamento, entity.Operacion, entity.Seccion, entity.Lugar }
             };
+            await SaveValidationResultAsync(request, res);
+            return res;
         }
 
-        return new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Permiso de suelo no encontrado." };
+        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Permiso de suelo no encontrado." };
+        await SaveValidationResultAsync(request, failRes);
+        return failRes;
     }
 
     public async Task<VerificationResult> VerificarIpiAsync(IpiVerificationRequest request)
@@ -198,15 +240,19 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
             decimal percentage = total == 0 ? 100m : Math.Round((decimal)matched / total * 100m, 2);
 
-            return new VerificationResult
+            var res = new VerificationResult
             {
                 IsValid = percentage >= 60m,
                 MatchPercentage = percentage,
                 Message = percentage >= 99m ? "Certificación de IPI validada." : $"Certificación de IPI validada parcialmente ({percentage}%).",
                 MatchedData = new { entity.Rnc, entity.Cuota_ipi, entity.Estatus, entity.NoCertificacion, entity.NoInmueble, entity.ParcelaNo }
             };
+            await SaveValidationResultAsync(request, res);
+            return res;
         }
 
-        return new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Certificación de IPI no encontrada o no válida." };
+        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Certificación de IPI no encontrada o no válida." };
+        await SaveValidationResultAsync(request, failRes);
+        return failRes;
     }
 }

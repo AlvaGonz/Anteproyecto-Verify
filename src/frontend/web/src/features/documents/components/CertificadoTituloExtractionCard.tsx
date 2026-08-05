@@ -35,6 +35,8 @@ const formatNumeric = (fieldKey: string, raw: string): string => {
 
 interface CertificadoTituloExtractionCardProps {
   extraction: CertificadoTituloRdExtractionV1;
+  proyectoId?: string;
+  documentoId?: string;
   onEditField?: (fieldName: string, value: string) => Promise<void>;
   onAutoSelectField?: (fieldName: string, resolvedId: string, action: ResolutionAction) => void;
 }
@@ -56,7 +58,13 @@ interface Municipality {
   nombre: string;
 }
 
-export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtractionCardProps> = ({ extraction, onEditField, onAutoSelectField }) => {
+export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtractionCardProps> = ({ 
+  extraction, 
+  proyectoId,
+  documentoId,
+  onEditField, 
+  onAutoSelectField 
+}) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
   
@@ -171,6 +179,8 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
   const handleVerifyGobernanza = () => {
     verifyDocument({
       documentType: 'catastro',
+      proyectoId,
+      documentoId,
       payload: {
         matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue,
         designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue,

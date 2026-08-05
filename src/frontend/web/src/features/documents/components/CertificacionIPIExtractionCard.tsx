@@ -8,10 +8,17 @@ import { ShieldCheck } from "lucide-react";
 
 interface CertificacionIPIExtractionCardProps {
   extraction: CertificacionIPIExtraction;
+  proyectoId?: string;
+  documentoId?: string;
   onEditField?: (fieldName: string, value: string) => Promise<void>;
 }
 
-export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtractionCardProps> = ({ extraction, onEditField }) => {
+export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtractionCardProps> = ({ 
+  extraction, 
+  proyectoId,
+  documentoId,
+  onEditField 
+}) => {
   const isProcessing = extraction.extractionStatus === ExtractionStatus.Queued || extraction.extractionStatus === ExtractionStatus.Processing;
   const isError = extraction.extractionStatus === ExtractionStatus.Failed;
 
@@ -24,6 +31,8 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
   const handleVerifyGobernanza = () => {
     verifyDocument({
       documentType: 'pagoipi',
+      proyectoId,
+      documentoId,
       payload: {
         rnc: '', // Depending on where it's stored, maybe empty for IPI
         noCertificacion: extraction.numeroCertificacion?.normalizedValue || extraction.numeroCertificacion?.rawValue,

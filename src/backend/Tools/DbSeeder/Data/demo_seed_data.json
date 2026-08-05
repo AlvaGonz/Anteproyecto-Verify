@@ -1,0 +1,693 @@
+{
+    "projects": [
+        {
+            "matricula": "1057518533",
+            "designacion": "080023162493:0093",
+            "desarrollador_rnc": "00000627836"
+        },
+        {
+            "matricula": "1058288938",
+            "designacion": "230227507532:0098",
+            "desarrollador_rnc": "00010032696"
+        },
+        {
+            "matricula": "1057991427",
+            "designacion": "170252490408:0087",
+            "desarrollador_rnc": "00010067171"
+        },
+        {
+            "matricula": "1057662624",
+            "designacion": "100464733089:0084",
+            "desarrollador_rnc": "00010171411"
+        },
+        {
+            "matricula": "1058764777",
+            "designacion": "320486856268:0037",
+            "desarrollador_rnc": "00010259331"
+        },
+        {
+            "matricula": "1058277811",
+            "designacion": "230116609032:0071",
+            "desarrollador_rnc": "00010350890"
+        },
+        {
+            "matricula": "1058218023",
+            "designacion": "220018304591:0083",
+            "desarrollador_rnc": "00010728194"
+        },
+        {
+            "matricula": "1057479620",
+            "designacion": "070134479792:0080",
+            "desarrollador_rnc": "00011332939"
+        },
+        {
+            "matricula": "1058471363",
+            "designacion": "270052313547:0023",
+            "desarrollador_rnc": "00100000132"
+        },
+        {
+            "matricula": "1058674710",
+            "designacion": "310085662102:0070",
+            "desarrollador_rnc": "00100000207"
+        },
+        {
+            "matricula": "1058381406",
+            "designacion": "250152842923:0066",
+            "desarrollador_rnc": "00100000470"
+        },
+        {
+            "matricula": "1058531510",
+            "designacion": "280153144890:0070",
+            "desarrollador_rnc": "00100000496"
+        },
+        {
+            "matricula": "1057318570",
+            "designacion": "040024512024:0030",
+            "desarrollador_rnc": "00100000637"
+        },
+        {
+            "matricula": "1058132716",
+            "designacion": "200165986304:0076",
+            "desarrollador_rnc": "00100000884"
+        },
+        {
+            "matricula": "1057887376",
+            "designacion": "150212797276:0036",
+            "desarrollador_rnc": "00100000934"
+        },
+        {
+            "matricula": "1057478967",
+            "designacion": "070128632570:0027",
+            "desarrollador_rnc": "00100001072"
+        },
+        {
+            "matricula": "1058146045",
+            "designacion": "200299740159:0005",
+            "desarrollador_rnc": "00100001403"
+        },
+        {
+            "matricula": "1057749743",
+            "designacion": "120336733127:0003",
+            "desarrollador_rnc": "00100001551"
+        },
+        {
+            "matricula": "1057609026",
+            "designacion": "090428868062:0086",
+            "desarrollador_rnc": "00100001585"
+        },
+        {
+            "matricula": "1058638328",
+            "designacion": "300221479194:0088",
+            "desarrollador_rnc": "00100001742"
+        },
+        {
+            "matricula": "1058485497",
+            "designacion": "270193304524:0057",
+            "desarrollador_rnc": "00100001775"
+        },
+        {
+            "matricula": "1057375619",
+            "designacion": "050094594068:0079",
+            "desarrollador_rnc": "00100001791"
+        },
+        {
+            "matricula": "1057244244",
+            "designacion": "020281220077:0004",
+            "desarrollador_rnc": "00100001866"
+        },
+        {
+            "matricula": "1058513311",
+            "designacion": "270471653619:0071",
+            "desarrollador_rnc": "00100001999"
+        },
+        {
+            "matricula": "1058058210",
+            "designacion": "180420782264:0070",
+            "desarrollador_rnc": "00100002070"
+        },
+        {
+            "matricula": "1057900607",
+            "designacion": "150344647614:0067",
+            "desarrollador_rnc": "00100002138"
+        },
+        {
+            "matricula": "1058139472",
+            "designacion": "200233704091:0032",
+            "desarrollador_rnc": "00100002179"
+        },
+        {
+            "matricula": "1058745632",
+            "designacion": "320294953742:0092",
+            "desarrollador_rnc": "00100002427"
+        },
+        {
+            "matricula": "1058706166",
+            "designacion": "310400356640:0026",
+            "desarrollador_rnc": "00100002476"
+        },
+        {
+            "matricula": "1058055817",
+            "designacion": "180396215704:0077",
+            "desarrollador_rnc": "00100002542"
+        },
+        {
+            "matricula": "1057913007",
+            "designacion": "150468364570:0067",
+            "desarrollador_rnc": "00100002666"
+        },
+        {
+            "matricula": "1057717018",
+            "designacion": "120008523839:0078",
+            "desarrollador_rnc": "00100002682"
+        },
+        {
+            "matricula": "1058031773",
+            "designacion": "180156390432:0033",
+            "desarrollador_rnc": "00100002781"
+        },
+        {
+            "matricula": "1057213533",
+            "designacion": "010473311962:0093",
+            "desarrollador_rnc": "00100003011"
+        },
+        {
+            "matricula": "1057203198",
+            "designacion": "010370993937:0058",
+            "desarrollador_rnc": "00100003052"
+        },
+        {
+            "matricula": "1057791082",
+            "designacion": "130249914782:0042",
+            "desarrollador_rnc": "00100003128"
+        },
+        {
+            "matricula": "1057562629",
+            "designacion": "080464707393:0089",
+            "desarrollador_rnc": "00100003268"
+        },
+        {
+            "matricula": "1057338707",
+            "designacion": "040225938983:0067",
+            "desarrollador_rnc": "00100003367"
+        },
+        {
+            "matricula": "1058193878",
+            "designacion": "210277834721:0038",
+            "desarrollador_rnc": "00100003391"
+        },
+        {
+            "matricula": "1058561054",
+            "designacion": "280449863783:0014",
+            "desarrollador_rnc": "00100003516"
+        },
+        {
+            "matricula": "1058555878",
+            "designacion": "280397129982:0038",
+            "desarrollador_rnc": "00100003789"
+        },
+        {
+            "matricula": "1058652922",
+            "designacion": "300367425315:0082",
+            "desarrollador_rnc": "00100003854"
+        },
+        {
+            "matricula": "1058473176",
+            "designacion": "270070517797:0036",
+            "desarrollador_rnc": "00100003862"
+        },
+        {
+            "matricula": "1058127275",
+            "designacion": "200111326015:0035",
+            "desarrollador_rnc": "00100004050"
+        },
+        {
+            "matricula": "1058716679",
+            "designacion": "320005793567:0039",
+            "desarrollador_rnc": "00100004183"
+        },
+        {
+            "matricula": "1058075436",
+            "designacion": "190092823839:0096",
+            "desarrollador_rnc": "00100004316"
+        },
+        {
+            "matricula": "1058132764",
+            "designacion": "200166743478:0024",
+            "desarrollador_rnc": "00100004332"
+        },
+        {
+            "matricula": "1057975880",
+            "designacion": "170097157279:0040",
+            "desarrollador_rnc": "00100004449"
+        },
+        {
+            "matricula": "1058412586",
+            "designacion": "250464536481:0046",
+            "desarrollador_rnc": "00100004530"
+        },
+        {
+            "matricula": "1057541706",
+            "designacion": "080255106148:0066",
+            "desarrollador_rnc": "00100004548"
+        },
+        {
+            "matricula": "1057191894",
+            "designacion": "010257909394:0054",
+            "desarrollador_rnc": "00100004597"
+        },
+        {
+            "matricula": "1057187712",
+            "designacion": "010215229434:0072",
+            "desarrollador_rnc": "00100004654"
+        },
+        {
+            "matricula": "1058179623",
+            "designacion": "210134193640:0083",
+            "desarrollador_rnc": "00100004860"
+        },
+        {
+            "matricula": "1057417857",
+            "designacion": "060017238040:0017",
+            "desarrollador_rnc": "00100004936"
+        },
+        {
+            "matricula": "1057892596",
+            "designacion": "150264764133:0056",
+            "desarrollador_rnc": "00100004969"
+        },
+        {
+            "matricula": "1058649814",
+            "designacion": "300336619611:0074",
+            "desarrollador_rnc": "00100004993"
+        },
+        {
+            "matricula": "1058549580",
+            "designacion": "280334219242:0040",
+            "desarrollador_rnc": "00100005016"
+        },
+        {
+            "matricula": "1057864930",
+            "designacion": "140487811176:0090",
+            "desarrollador_rnc": "00100005172"
+        },
+        {
+            "matricula": "1057206740",
+            "designacion": "010405202739:0100",
+            "desarrollador_rnc": "00100005180"
+        },
+        {
+            "matricula": "1058438543",
+            "designacion": "260224846092:0003",
+            "desarrollador_rnc": "00100005263"
+        },
+        {
+            "matricula": "1057413367",
+            "designacion": "050472673779:0027",
+            "desarrollador_rnc": "00100005388"
+        },
+        {
+            "matricula": "1057358032",
+            "designacion": "040418802891:0092",
+            "desarrollador_rnc": "00100005578"
+        },
+        {
+            "matricula": "1057688510",
+            "designacion": "110223760925:0070",
+            "desarrollador_rnc": "00100005651"
+        },
+        {
+            "matricula": "1058128941",
+            "designacion": "200128444037:0001",
+            "desarrollador_rnc": "00100005784"
+        },
+        {
+            "matricula": "1058743822",
+            "designacion": "320276293657:0082",
+            "desarrollador_rnc": "00100005933"
+        },
+        {
+            "matricula": "1057753157",
+            "designacion": "120370554804:0017",
+            "desarrollador_rnc": "00100006014"
+        },
+        {
+            "matricula": "1058304804",
+            "designacion": "230386722828:0064",
+            "desarrollador_rnc": "00100006188"
+        },
+        {
+            "matricula": "1058234063",
+            "designacion": "220179927872:0023",
+            "desarrollador_rnc": "00100006246"
+        },
+        {
+            "matricula": "1058322310",
+            "designacion": "240061787965:0070",
+            "desarrollador_rnc": "00100006360"
+        },
+        {
+            "matricula": "1057922393",
+            "designacion": "160062789169:0053",
+            "desarrollador_rnc": "00100006378"
+        },
+        {
+            "matricula": "1057360210",
+            "designacion": "040440865213:0070",
+            "desarrollador_rnc": "00100006402"
+        },
+        {
+            "matricula": "1057832639",
+            "designacion": "140164496723:0099",
+            "desarrollador_rnc": "00100006568"
+        },
+        {
+            "matricula": "1057342869",
+            "designacion": "040267197348:0029",
+            "desarrollador_rnc": "00100006691"
+        },
+        {
+            "matricula": "1057388888",
+            "designacion": "050227626731:0048",
+            "desarrollador_rnc": "00100006741"
+        },
+        {
+            "matricula": "1057856578",
+            "designacion": "140404184643:0038",
+            "desarrollador_rnc": "00100006832"
+        },
+        {
+            "matricula": "1057480492",
+            "designacion": "070143657497:0052",
+            "desarrollador_rnc": "00100006998"
+        },
+        {
+            "matricula": "1058374025",
+            "designacion": "250078329622:0085",
+            "desarrollador_rnc": "00100007038"
+        },
+        {
+            "matricula": "1057448299",
+            "designacion": "060321602031:0059",
+            "desarrollador_rnc": "00100007061"
+        },
+        {
+            "matricula": "1057356658",
+            "designacion": "040405257394:0018",
+            "desarrollador_rnc": "00100007145"
+        },
+        {
+            "matricula": "1058327449",
+            "designacion": "240113336532:0009",
+            "desarrollador_rnc": "00100007178"
+        },
+        {
+            "matricula": "1058439739",
+            "designacion": "260235306880:0099",
+            "desarrollador_rnc": "00100007244"
+        },
+        {
+            "matricula": "1057823674",
+            "designacion": "140075477112:0034",
+            "desarrollador_rnc": "00100007459"
+        },
+        {
+            "matricula": "1058301405",
+            "designacion": "230352705865:0065",
+            "desarrollador_rnc": "00100007483"
+        },
+        {
+            "matricula": "1058361520",
+            "designacion": "240453150606:0080",
+            "desarrollador_rnc": "00100007558"
+        },
+        {
+            "matricula": "1057940229",
+            "designacion": "160240428501:0089",
+            "desarrollador_rnc": "00100007731"
+        },
+        {
+            "matricula": "1058122546",
+            "designacion": "200064494445:0006",
+            "desarrollador_rnc": "00100007764"
+        },
+        {
+            "matricula": "1057767392",
+            "designacion": "130012423106:0052",
+            "desarrollador_rnc": "00100007939"
+        },
+        {
+            "matricula": "1058755693",
+            "designacion": "320395398983:0053",
+            "desarrollador_rnc": "00100008028"
+        },
+        {
+            "matricula": "1057308411",
+            "designacion": "030422271271:0071",
+            "desarrollador_rnc": "00100008101"
+        },
+        {
+            "matricula": "1058148859",
+            "designacion": "200327650936:0019",
+            "desarrollador_rnc": "00100008150"
+        },
+        {
+            "matricula": "1057995755",
+            "designacion": "170296114988:0015",
+            "desarrollador_rnc": "00100008366"
+        },
+        {
+            "matricula": "1057927091",
+            "designacion": "160109691134:0051",
+            "desarrollador_rnc": "00100008408"
+        },
+        {
+            "matricula": "1058121553",
+            "designacion": "200054813746:0013",
+            "desarrollador_rnc": "00100008622"
+        },
+        {
+            "matricula": "1057628888",
+            "designacion": "100127132079:0048",
+            "desarrollador_rnc": "00100008713"
+        },
+        {
+            "matricula": "1057767371",
+            "designacion": "130012423106:0031",
+            "desarrollador_rnc": "00100008747"
+        },
+        {
+            "matricula": "1058110528",
+            "designacion": "190443528921:0088",
+            "desarrollador_rnc": "00100008853"
+        },
+        {
+            "matricula": "1057714388",
+            "designacion": "110482233651:0048",
+            "desarrollador_rnc": "00100009125"
+        },
+        {
+            "matricula": "1057269242",
+            "designacion": "030031591833:0002",
+            "desarrollador_rnc": "00100009216"
+        },
+        {
+            "matricula": "1057718698",
+            "designacion": "120025835655:0058",
+            "desarrollador_rnc": "00100009281"
+        },
+        {
+            "matricula": "1057892043",
+            "designacion": "150259948715:0003",
+            "desarrollador_rnc": "00100009356"
+        },
+        {
+            "matricula": "1058401800",
+            "designacion": "250356568367:0060",
+            "desarrollador_rnc": "00100009505"
+        },
+        {
+            "matricula": "1058389414",
+            "designacion": "250232804987:0074",
+            "desarrollador_rnc": "00100009638"
+        },
+        {
+            "matricula": "1058753241",
+            "designacion": "320371396843:0001",
+            "desarrollador_rnc": "00100009679"
+        },
+        {
+            "matricula": "1057582947",
+            "designacion": "090168470998:0007",
+            "desarrollador_rnc": "00100009729"
+        },
+        {
+            "matricula": "1057552950",
+            "designacion": "080368305115:0010",
+            "desarrollador_rnc": "00100009877"
+        },
+        {
+            "matricula": "1058564862",
+            "designacion": "280487186100:0022",
+            "desarrollador_rnc": "00100009950"
+        },
+        {
+            "matricula": "1057337283",
+            "designacion": "040211207927:0043",
+            "desarrollador_rnc": "00100010008"
+        },
+        {
+            "matricula": "1058696947",
+            "designacion": "310308518463:0007",
+            "desarrollador_rnc": "00100010016"
+        },
+        {
+            "matricula": "1058603925",
+            "designacion": "290377559812:0085",
+            "desarrollador_rnc": "00100010297"
+        },
+        {
+            "matricula": "1057703074",
+            "designacion": "110369124778:0034",
+            "desarrollador_rnc": "00100010404"
+        },
+        {
+            "matricula": "1058103442",
+            "designacion": "190373651426:0002",
+            "desarrollador_rnc": "00100010412"
+        },
+        {
+            "matricula": "1058710766",
+            "designacion": "310446104999:0026",
+            "desarrollador_rnc": "00100010420"
+        },
+        {
+            "matricula": "1057561171",
+            "designacion": "080450632129:0031",
+            "desarrollador_rnc": "00100010438"
+        },
+        {
+            "matricula": "1058677482",
+            "designacion": "310113778318:0042",
+            "desarrollador_rnc": "00100010453"
+        },
+        {
+            "matricula": "1058713546",
+            "designacion": "310474464429:0006",
+            "desarrollador_rnc": "00100010669"
+        },
+        {
+            "matricula": "1057870320",
+            "designacion": "150041517479:0080",
+            "desarrollador_rnc": "00100010826"
+        },
+        {
+            "matricula": "1057397804",
+            "designacion": "050316500566:0064",
+            "desarrollador_rnc": "00100010891"
+        },
+        {
+            "matricula": "1057828844",
+            "designacion": "140127206072:0004",
+            "desarrollador_rnc": "00100010933"
+        },
+        {
+            "matricula": "1058625347",
+            "designacion": "300092635356:0007",
+            "desarrollador_rnc": "00100011246"
+        },
+        {
+            "matricula": "1057697783",
+            "designacion": "110316383658:0043",
+            "desarrollador_rnc": "00100011261"
+        }
+    ],
+    "golden_path": [
+        {
+            "matricula": "1057518533",
+            "designacion": "080023162493:0093",
+            "desarrollador_rnc": "00000627836"
+        },
+        {
+            "matricula": "1058288938",
+            "designacion": "230227507532:0098",
+            "desarrollador_rnc": "00010032696"
+        },
+        {
+            "matricula": "1057991427",
+            "designacion": "170252490408:0087",
+            "desarrollador_rnc": "00010067171"
+        },
+        {
+            "matricula": "1057662624",
+            "designacion": "100464733089:0084",
+            "desarrollador_rnc": "00010171411"
+        },
+        {
+            "matricula": "1058764777",
+            "designacion": "320486856268:0037",
+            "desarrollador_rnc": "00010259331"
+        }
+    ],
+    "users": [
+        {
+            "email": "inversionista1@verifinca.do",
+            "nombres": "RAMON ROSA",
+            "apellidos": "GONZALEZ MARTINEZ",
+            "cedula": "00000627836"
+        },
+        {
+            "email": "inversionista2@verifinca.do",
+            "nombres": "ANA ANA",
+            "apellidos": "LOPEZ RAMIREZ",
+            "cedula": "00010032696"
+        },
+        {
+            "email": "inversionista3@verifinca.do",
+            "nombres": "ROSA CARMEN",
+            "apellidos": "RAMIREZ RODRIGUEZ",
+            "cedula": "00010067171"
+        },
+        {
+            "email": "inversionista4@verifinca.do",
+            "nombres": "CARMEN LUIS",
+            "apellidos": "SANCHEZ FERNANDEZ",
+            "cedula": "00010171411"
+        },
+        {
+            "email": "inversionista5@verifinca.do",
+            "nombres": "LUIS RAMON",
+            "apellidos": "PEREZ SANTANA",
+            "cedula": "00010259331"
+        },
+        {
+            "email": "inversionista6@verifinca.do",
+            "nombres": "JOSE ANTONIO",
+            "apellidos": "MARTINEZ RAMIREZ",
+            "cedula": "00010350890"
+        },
+        {
+            "email": "inversionista7@verifinca.do",
+            "nombres": "ANTONIO LUIS",
+            "apellidos": "SANCHEZ GOMEZ",
+            "cedula": "00010728194"
+        },
+        {
+            "email": "inversionista8@verifinca.do",
+            "nombres": "ANTONIO CARMEN",
+            "apellidos": "GOMEZ SANTANA",
+            "cedula": "00011332939"
+        },
+        {
+            "email": "inversionista9@verifinca.do",
+            "nombres": "ALTAGRACIA JOSE",
+            "apellidos": "FERNANDEZ MARTINEZ",
+            "cedula": "00100000132"
+        },
+        {
+            "email": "inversionista10@verifinca.do",
+            "nombres": "MARIA MIGUEL",
+            "apellidos": "RAMIREZ RAMIREZ",
+            "cedula": "00100000207"
+        }
+    ]
+}
