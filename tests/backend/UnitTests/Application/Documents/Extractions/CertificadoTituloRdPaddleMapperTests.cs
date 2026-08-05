@@ -43,7 +43,7 @@ namespace UnitTests.Application.Documents.Extractions
             
             extraction.Oficina.RawValue.Should().Be("de Santo Domingo");
             extraction.Matricula.NormalizedValue.Should().Be("0100234567");
-            extraction.DesignacionCatastral.NormalizedValue.Should().Be("12345-67");
+            extraction.DesignacionCatastral.NormalizedValue.Should().Be("1234567");
             extraction.FechaYHoraInscripcion.RawValue.Should().Be("DE INSCRIPCION 15/01/2023");
             extraction.VieneDe.RawValue.Should().Be("54321");
             extraction.Municipio.RawValue.Should().Be("San Pedro de Macoris");
@@ -370,6 +370,141 @@ namespace UnitTests.Application.Documents.Extractions
             // DesignaciónCatastral: "Parcela" + nearby alphanumeric code must be captured.
             extraction.DesignacionCatastral.Status.Should().Be(FieldStatus.Valid,
                 "'Parcela' label must trigger designacion catastral extraction");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_TP_0001_ShouldExtractAllFieldsCleanly()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "1063" },
+                new OcrLine { Text = "CERUIECADODEXTITULO" },
+                new OcrLine { Text = "VERIFICAR LA PRESENCIA DE LA MARCA" },
+                new OcrLine { Text = "LOGO SOSTENIENDO EL DOCUMENTO A CONTRALUZ" },
+                new OcrLine { Text = "MATRiCUL" },
+                new OcrLine { Text = "3000362328" },
+                new OcrLine { Text = "FECHA Y HORA DE INSCRIPCION" },
+                new OcrLine { Text = "REGISTRO DETITULOS" },
+                new OcrLine { Text = "26/7/202203:34p.m" },
+                new OcrLine { Text = "VIENE DE" },
+                new OcrLine { Text = "L.948F.73" },
+                new OcrLine { Text = "JURISDICCIONINMOBILIARIA" },
+                new OcrLine { Text = "MUNICIPIO" },
+                new OcrLine { Text = "HIGUEY" },
+                new OcrLine { Text = "PROVINCIA" },
+                new OcrLine { Text = "LAALTAGRACIA" },
+                new OcrLine { Text = "OFICINA" },
+                new OcrLine { Text = "SUPERFICIE EN METROS CUADRADOS" },
+                new OcrLine { Text = "Registro de Titulos de Higey" },
+                new OcrLine { Text = "12,130.07m" },
+                new OcrLine { Text = "DESIGNACIóN CATASTRAL S" },
+                new OcrLine { Text = "505483687149" },
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.DesignacionCatastral.Status.Should().Be(FieldStatus.Valid);
+            extraction.DesignacionCatastral.RawValue.Should().Contain("505483687149");
+            extraction.DesignacionCatastral.RawValue.Should().NotContain("RNC");
+
+            extraction.Oficina.Status.Should().Be(FieldStatus.Valid);
+            extraction.Oficina.RawValue.Should().Contain("Higey");
+            extraction.Oficina.RawValue.Should().NotMatchRegex(@"\d{1,2}/\d{1,2}/\d{4}");
+
+            extraction.Matricula.Status.Should().Be(FieldStatus.Valid);
+
+            extraction.FechaYHoraInscripcion.Status.Should().Be(FieldStatus.Valid);
+            extraction.FechaYHoraInscripcion.RawValue.Should().Contain("26/7/2022");
+            extraction.FechaYHoraInscripcion.RawValue.Should().NotContain("INVESTMENTS");
+
+            extraction.VieneDe.Status.Should().Be(FieldStatus.Valid);
+            extraction.VieneDe.RawValue.Should().Contain("L.948");
+
+            extraction.Municipio.Status.Should().Be(FieldStatus.Valid);
+            extraction.Municipio.RawValue.Should().Contain("HIGUEY");
+
+            extraction.Provincia.Status.Should().Be(FieldStatus.Valid);
+            extraction.Provincia.RawValue.Should().Contain("LAALTAGRACIA");
+
+            extraction.SuperficieM2.Status.Should().Be(FieldStatus.Valid);
+            extraction.SuperficieM2.NormalizedValue.Should().Be("12130.07");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_TP_0002_ShouldIsolateFields_NoDataBleeding()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "2794" },
+                new OcrLine { Text = "CCERTIFICADODETITULOCC" },
+                new OcrLine { Text = "VERIFICAR LA PRESENCIA DE LA MARCA DE AOUA" },
+                new OcrLine { Text = "MATRiCULA" },
+                new OcrLine { Text = "5109847102" },
+                new OcrLine { Text = "FECHA YHORADEINSCRIPCION" },
+                new OcrLine { Text = "REGISTRO DE TITULOS" },
+                new OcrLine { Text = "14/9/202311:15a.m" },
+                new OcrLine { Text = "VIENEFE" },
+                new OcrLine { Text = "L.716,F.52" },
+                new OcrLine { Text = "JURISDICCIONINMOBILIARIA" },
+                new OcrLine { Text = "MUNICIPIO" },
+                new OcrLine { Text = "BANi" },
+                new OcrLine { Text = "PROVINCIA" },
+                new OcrLine { Text = "PERAVIA" },
+                new OcrLine { Text = "OFICINA" },
+                new OcrLine { Text = "SUPERFICIE EN METROS.CUADRADOS" },
+                new OcrLine { Text = "Registro de Titulos de Bani" },
+                new OcrLine { Text = "14.792.83m²" },
+                new OcrLine { Text = "DESIGNACION CATASTRAL LTOR" },
+                new OcrLine { Text = "616792103504" },
+                new OcrLine { Text = "Inscrito a las 11:15a,m.el.el 14/sep/2023" },
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+
+            extraction!.DesignacionCatastral.Status.Should().Be(FieldStatus.Valid);
+            extraction.DesignacionCatastral.RawValue.Should().Contain("616792103504");
+            extraction.DesignacionCatastral.RawValue.Should().NotContain("RNC");
+            extraction.DesignacionCatastral.RawValue.Should().NotContain("ORIGEN");
+
+            extraction.Oficina.Status.Should().Be(FieldStatus.Valid);
+            extraction.Oficina.RawValue.Should().Contain("Bani");
+            extraction.Oficina.RawValue.Should().NotMatchRegex(@"\d{1,2}/\d{1,2}/\d{4}");
+
+            extraction.Matricula.Status.Should().Be(FieldStatus.Valid);
+            extraction.Matricula.NormalizedValue.Should().Be("5109847102");
+
+            extraction.FechaYHoraInscripcion.Status.Should().Be(FieldStatus.Valid);
+            extraction.FechaYHoraInscripcion.RawValue.Should().MatchRegex(@"14/\w+/2023");
+            extraction.FechaYHoraInscripcion.RawValue.Should().NotContain("HOLDINGS");
+
+            extraction.VieneDe.Status.Should().Be(FieldStatus.Valid);
+            extraction.VieneDe.RawValue.Should().Contain("L.716");
+
+            extraction.Municipio.Status.Should().Be(FieldStatus.Valid);
+            extraction.Municipio.RawValue.Should().MatchRegex("(?i)bani");
+
+            extraction.Provincia.Status.Should().Be(FieldStatus.Valid);
+            extraction.Provincia.RawValue.Should().Contain("PERAVIA");
+
+            extraction.SuperficieM2.Status.Should().Be(FieldStatus.Valid);
+            extraction.SuperficieM2.NormalizedValue.Should().Be("14792.83");
         }
     }
 }

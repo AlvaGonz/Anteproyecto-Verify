@@ -28,16 +28,16 @@ namespace Application.Documents.Extractions
                     new[] { @"DEPARTAMENTO\s*([a-zA-Z]+)", @"DEPARTAMENTO\s*([a-zA-Z]+)\b", @"(ESTE|NORTE|SUR|OESTE|CENTRAL)" }),
 
                 Operacion = ExtractField(lines, fullText, "Operacion",
-                    new[] { @"OPERACION", @"OPERACIOSUBDISION", @"OPEACIONSUBDIVISIN" },
-                    new[] { @"OPERACION[A-Z\s:]*([A-Za-z]+)", @"(SUBDIVISION|PLANO CATASTRAL|SANEAMIENTO|DESLINDE|REFUNDICION)" }),
+                    new[] { @"OPERACION", @"OPERACIOSUBDISION", @"OPEACIONSUBDIVISIN", @"OPERACIONSUBDIVISION" },
+                    new[] { @"OPERACION\s*[A-Za-z]*\s*[:\-]?\s*([A-Za-z]+)", @"(SUBDIVISION|PLANO\s*CATASTRAL|SANEAMIENTO|DESLINDE|REFUNDICION)" }),
 
                 DesignacionCatastralPosicional = ExtractField(lines, fullText, "DesignacionCatastralPosicional",
-                    new[] { @"DESIGNACION CATASTRAL POSICIONAL", @"DESIGNACION TEMPORA" },
-                    new[] { @"DESIGNACION CATASTRAL POSICIONAL:?\s*(?:CATASTRAL DE ORIGEN CALLE\s*|DESIGNACION TEMPORA(?:L)?\s*)?([\d_]+)", @"(420[\d_]+)" }),
+                    new[] { @"DESIGNACION\s*CATASTRAL\s*POSICIONAL", @"DESIGNACIONCATASTRALPOSICIONAL", @"DESIGNACION\s*TEMPORA", @"DCP" },
+                    new[] { @"(?:DESIGNACION\s*CATASTRAL\s*POSICIONAL:?|DESIGNACIONCATASTRALPOSICIONAL)\s*(?:CATASTRAL\s*DE\s*ORIGEN\s*(?:CALLE|PARCELA)\s*|CATASTRALDEORIGEN\s*|DESIGNACION\s*TEMPORA(?:L)?\s*)?([\d_-]+)", @"\b(\d{12})\b", @"(505[\d_-]+)", @"(420[\d_-]+)" }),
 
                 DesignacionCatastralOrigen = ExtractField(lines, fullText, "DesignacionCatastralOrigen",
                     new[] { @"CATASTRAL DE ORIGEN(?: TEMPORAL)?", @"TEMPORAL:" },
-                    new[] { @"(?:CATASTRAL DE ORIGEN(?: TEMPORAL)?:?|TEMPORAL:)\s*([\d_]+)", @"(420[\d_]+)" }),
+                    new[] { @"(?:CATASTRAL DE ORIGEN(?: TEMPORAL)?:?|TEMPORAL:)\s*([\d_-]+)", @"(420[\d_-]+)" }),
 
                 Provincia = ExtractField(lines, fullText, "Provincia",
                     new[] { @"PROVINCIA" },
@@ -48,16 +48,16 @@ namespace Application.Documents.Extractions
                     new[] { @"MUNICIPIO:?\s*([a-zA-Z\s]+?)(?=\s*SECCION|\s*LUGAR|\s*PROVINCIA|\s*SUPERFICIE|$)", @"(?:MUNICIPIO:?\s*)([A-Z\s]{4,})" }),
 
                 Seccion = ExtractField(lines, fullText, "Seccion",
-                    new[] { @"SECCI[OÓ]N", @"SECCI" },
-                    new[] { @"SECCI[OÓ]N:?\s*([a-zA-Z\s]+?)(?=\s*LUGAR|\s*PROVINCIA|\s*MUNICIPIO|\s*SUPERFICIE|$)", @"(?:SECCI[OÓ]N:?\s*)([A-Z\s]{4,})" }),
+                    new[] { @"SECCI[OÓ]N", @"SECCI", @"SECCION\s*[A-Z]" },
+                    new[] { @"SECCI[OÓ]N:?\s*([a-zA-Z\s]+?)(?=\s*LUGAR|\s*PROVINCIA|\s*MUNICIPIO|\s*SUPERFICIE|$)", @"(?:SECCI[OÓ]N:?\s*)([A-Z\s]{4,})", @"SECCION([A-Z]+)" }),
 
                 Lugar = ExtractField(lines, fullText, "Lugar",
                     new[] { @"LUGAR", @"LUGARTDC" },
-                    new[] { @"LUGAR:?\s*([a-zA-Z\s]+?)(?=\s*PROVINCIA|\s*MUNICIPIO|\s*SECCION|\s*SUPERFICIE|$)", @"(?:LUGAR:?\s*)([A-Z\s]{4,})" }),
+                    new[] { @"LUGAR:?\s*([a-zA-Z\s]+?)(?=\s*PROVINCIA|\s*MUNICIPIO|\s*SECCION|\s*SUPERFICIE|$)", @"(?:LUGAR:?\s*)([A-Z\s]{4,})", @"MUNICIPIO\s+\S+\s+([A-Z]{3,})(?=\s+(?:SECCION|SUPERFICIE|$))" }),
 
                 SuperficieARegistrarParcelaM2 = ExtractField(lines, fullText, "SuperficieM2",
                     new[] { @"SUPERFICIE\s*(?:A\s*REGISTRAR\s*)?PARCELA:?", @"SUPERFICIE\s*A\s*REGISTRAR:?", @"SUPERFICIE:?", @"FICIEAREGISTRAR" },
-                    new[] { @"(?:SUPERFICIE(?: A REGISTRAR)? PARCELA:?)\s*([\d,.]+)", @"(?:SUPERFICIE A REGISTRAR|FICIEAREGISTRAR) PARCELA:?\s*([\d,.]+)", @"([\d,.]+)\s*m2", @"([\d,.]+)\s*m\b" })
+                    new[] { @"(?:SUPERFICIE(?: A REGISTRAR)? PARCELA:?)\s*([\d,.]+)", @"(?:SUPERFICIE A REGISTRAR|FICIEAREGISTRAR)\s*PARCELA:?\s*([\d,.]+)", @"([\d,.]+)\s*m2", @"([\d,.]+)\s*m\b" })
             };
 
             var warnings = new List<string>();
@@ -123,7 +123,6 @@ namespace Application.Documents.Extractions
                         {
                             rawValue = inlineMatch.Groups[1].Value;
                             
-                            // Let's refine for DEPARTAMENTOESTE or DEPARTAMENTONORTE
                             if (labelPattern == @"DEPARTAMENTO") 
                             {
                                 var textWithoutDep = Regex.Replace(line, @"DEPARTAMENTO", "", RegexOptions.IgnoreCase).Trim();
@@ -131,15 +130,29 @@ namespace Application.Documents.Extractions
                                     rawValue = textWithoutDep;
                                 }
                             }
+
+                            if ((fieldType == "DesignacionCatastralPosicional" || fieldType == "DesignacionCatastralOrigen")
+                                && !Regex.IsMatch(rawValue, @"\d"))
+                            {
+                                rawValue = null;
+                            }
                         }
                         
                         // Check next line for proximity block if empty or too short
                         if ((string.IsNullOrWhiteSpace(rawValue) || rawValue.Length < 3) && i + 1 < lines.Count)
                         {
                             var nextLine = lines[i + 1];
-                            if (!Regex.IsMatch(nextLine, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|HOJA|LAMINA|DESIGNACION)", RegexOptions.IgnoreCase))
+                            if (!Regex.IsMatch(nextLine, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|HOJA|LAMINA|DESIGNACION|CALLE|PARCELA|SUPERFICIE)", RegexOptions.IgnoreCase))
                             {
                                 rawValue = nextLine;
+                            }
+                            else if (i + 2 < lines.Count)
+                            {
+                                var lineAfter = lines[i + 2];
+                                if (!Regex.IsMatch(lineAfter, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|HOJA|LAMINA|DESIGNACION|CALLE|PARCELA|SUPERFICIE)", RegexOptions.IgnoreCase))
+                                {
+                                    rawValue = lineAfter;
+                                }
                             }
                         }
                         break;
@@ -163,20 +176,18 @@ namespace Application.Documents.Extractions
             }
             else
             {
-                // Refine rawValue if the regex pattern provides a better match (e.g. stripping subsequent labels)
-                foreach (var p in regexPatterns)
-                {
-                    // Prepend the label pattern to rawValue to allow regex patterns that expect the label to match
-                    // Or match against the original fullText line?
-                    // Actually, if we just match `rawValue` with a modified pattern, it might be complex since the label is stripped.
-                    // Instead, let's just see if we can match the exact expected format against the rawValue.
-                    // Wait, the regex patterns in Layer 3 usually include the label, e.g., @"PROVINCIA:?\s*(.+)"
-                    // If rawValue is already stripped, matching PROVINCIA on it will fail.
-                    // Let's match against fullText using regexPatterns, but only if the refined match is contained in or overlapping?
-                    // Even simpler: just strip known trailing labels from rawValue.
-                    rawValue = Regex.Replace(rawValue, @"(?=\s*(?:1\s*No\.|MUNICIPIO|SECCI[OÓ]N|LUGAR|SUPERFICIE)).*", "", RegexOptions.IgnoreCase).Trim();
-                    break; // Just run the strip once
-                }
+                rawValue = Regex.Replace(rawValue, @"(?=\s*(?:1\s*No\.|MUNICIPIO|SECCI[OÓ]N|LUGAR|SUPERFICIE)).*", "", RegexOptions.IgnoreCase).Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(rawValue)
+                && (fieldType == "DesignacionCatastralPosicional" || fieldType == "DesignacionCatastralOrigen"))
+            {
+                rawValue = Regex.Replace(rawValue, @"^CATASTRALDEORIGEN", "", RegexOptions.IgnoreCase);
+            }
+
+            if (!string.IsNullOrWhiteSpace(rawValue) && fieldType == "SuperficieM2")
+            {
+                rawValue = Regex.Replace(rawValue, @"^PARCELA\s*", "", RegexOptions.IgnoreCase);
             }
 
             // Layer 4: Canonical Normalization
