@@ -40,6 +40,62 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
 
         await _dbContext.SaveChangesAsync();
+
+        await EvaluateAutoPublishAsync(request.ProyectoId);
+    }
+
+    private async Task EvaluateAutoPublishAsync(Guid proyectoId)
+    {
+        var proyecto = await _dbContext.Proyectos
+            .Include(p => p.Estado)
+            .FirstOrDefaultAsync(p => p.Id == proyectoId);
+
+        if (proyecto == null) return;
+        
+        // Si ya está publicado, no hacemos nada
+        if (proyecto.Estado?.CodigoUnico == Domain.Enums.ProjectStatusCodes.Publicado) return;
+
+        var totalDocumentos = await _dbContext.Documentos.CountAsync(d => d.ProyectoId == proyectoId);
+        
+        // Debe haber subido al menos 3 documentos
+        if (totalDocumentos >= 3)
+        {
+            var datosValidados = await _dbContext.DatosValidados
+                .Where(d => d.ProyectoId == proyectoId)
+                .ToListAsync();
+
+            // El puntaje total de los documentos asociados en la variable [PorcentajeTotal] 
+            // debe ser igual o mayor a 50 porcciento de TODOs los subidos a ese proyecto.
+            double sumPorcentaje = datosValidados.Sum(d => d.PorcentajeTotal);
+            double average = totalDocumentos > 0 ? sumPorcentaje / totalDocumentos : 0;
+
+            if (average >= 50)
+            {
+                var estadoPublicado = await _dbContext.ProyectoEstados
+                    .FirstOrDefaultAsync(e => e.CodigoUnico == Domain.Enums.ProjectStatusCodes.Publicado);
+
+                if (estadoPublicado != null)
+                {
+                    proyecto.UpdateEstado(estadoPublicado);
+                    _dbContext.Proyectos.Update(proyecto);
+                    
+                    var auditoria = new Domain.Entities.Auditoria(
+                        proyecto.UsuarioCreadorId,
+                        Domain.Enums.TipoOperacion.CambioEstado,
+                        "CambioEstado",
+                        $"Auto-Publicación por Validaciones. Promedio {average:F2}% (>=50%) con {totalDocumentos} documentos.",
+                        proyectoId,
+                        null,
+                        null,
+                        proyecto.EstadoId,
+                        estadoPublicado.Id
+                    );
+                    _dbContext.Auditorias.Add(auditoria);
+                    
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+        }
     }
 
     private (int total, int matched) CompareStr(string? reqVal, string? dbVal)

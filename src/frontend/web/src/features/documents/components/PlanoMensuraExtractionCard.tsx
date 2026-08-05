@@ -12,6 +12,7 @@ import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
 import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -224,6 +225,9 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
+  const getStatus = (fieldVal: string | undefined | null) => 
+    getValidationStatus(fieldVal, verificationResponse?.matchedData);
+
   const handleVerifyGobernanza = () => {
     verifyDocument({
       documentType: 'catastro',
@@ -289,6 +293,8 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     const resolution = fieldKey === 'provincia' ? extraction.provinceResolution : 
                        fieldKey === 'municipio' ? extraction.municipalityResolution : null;
 
+    const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
+
     // Render dropdown for provincia and municipio
     if (fieldKey === 'provincia' || fieldKey === 'municipio') {
       const isProvincia = fieldKey === 'provincia';
@@ -309,6 +315,8 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
           resolution={resolution}
           isCustomContent={true}
           testId={testId}
+          validationStatus={validation.status}
+          validationMessage={validation.message}
         >
           <div className="flex-1 flex items-center min-w-0 pr-2">
             <select
@@ -349,6 +357,8 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
         onSave={() => handleSave(fieldKey)}
         onCancel={handleCancel}
         onEditAllowed={!!onEditField}
+        validationStatus={validation.status}
+        validationMessage={validation.message}
         testId={testId}
       />
     );

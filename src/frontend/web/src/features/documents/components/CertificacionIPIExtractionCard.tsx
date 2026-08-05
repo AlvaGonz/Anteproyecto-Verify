@@ -4,6 +4,7 @@ import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
 import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
+import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
 
 interface CertificacionIPIExtractionCardProps {
@@ -27,6 +28,9 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
   const [isSaving, setIsSaving] = useState(false);
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+
+  const getStatus = (fieldVal: string | undefined | null) => 
+    getValidationStatus(fieldVal, verificationResponse?.matchedData);
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
@@ -68,6 +72,8 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
+    
+    const validation = getStatus(displayValue);
 
     return (
       <ExtractionFieldCard
@@ -85,6 +91,8 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
         onSave={() => handleSave(fieldKey)}
         onCancel={handleCancel}
         onEditAllowed={!!onEditField}
+        validationStatus={validation.status}
+        validationMessage={validation.message}
         testId={testId}
       />
     );
