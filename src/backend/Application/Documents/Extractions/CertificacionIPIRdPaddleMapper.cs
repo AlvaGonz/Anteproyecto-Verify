@@ -215,7 +215,16 @@ public static class CertificacionIPIRdPaddleMapper
     private static string NormalizeParcela(string raw)
     {
         var clean = Regex.Replace(raw, @"[^A-Za-z0-9:-]", "");
-        // DGII catastral: digits, optional :sub-parcel, optional -single-letter suffix
+
+        if (!clean.Contains(':'))
+        {
+            var repair = Regex.Match(clean, @"^(\d{10,})(\d)(-[A-Za-z]{1,2})$");
+            if (repair.Success)
+            {
+                clean = $"{repair.Groups[1].Value}:{repair.Groups[2].Value}{repair.Groups[3].Value}";
+            }
+        }
+
         var match = Regex.Match(clean, @"^(\d+(:\d+)?(-[A-Z])?)");
         return match.Success ? match.Groups[1].Value.ToUpperInvariant() : clean.ToUpperInvariant();
     }

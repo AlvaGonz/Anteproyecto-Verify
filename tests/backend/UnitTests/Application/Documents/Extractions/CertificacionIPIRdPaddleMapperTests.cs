@@ -267,5 +267,26 @@ namespace UnitTests.Application.Documents.Extractions
             var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
             extraction!.ParcelaNumero.NormalizedValue.Should().Be("89754213098:5-B");
         }
+
+        [Fact]
+        public void ParcelaNumero_RepairsOcrLostColon()
+        {
+            // ponytail: OCR loses colon character, merging sub-parcel digit into the main number
+            // e.g. "876543210983-B" should be repaired to "87654321098:3-B"
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 876543210983-B" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 876543210983-B" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("87654321098:3-B");
+        }
+
+        [Fact]
+        public void ParcelaNumero_RepairsOcrLostColon_WithSingleDigitSubParcel()
+        {
+            // ponytail: OCR loses colon — sub-parcel in DGII format is always 1 digit
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 1234567890145-C" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 1234567890145-C" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("123456789014:5-C");
+        }
     }
 }
