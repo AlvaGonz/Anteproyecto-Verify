@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Bell, Trash2, UserCheck, Building2, FileCheck, CreditCard, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotificationDto } from "../types";
-import { useNotifications, useMarkAsRead, useMarkAllAsRead, useDeleteNotification } from "../api/useNotifications";
+import { useNotifications, useMarkAsRead, useDeleteNotification, useDeleteAllNotifications } from "../api/useNotifications";
 import { toUtcDate } from "../../../shared/utils/dates";
 
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -27,8 +27,8 @@ export const NotificationBell: React.FC = () => {
 
   const { data: rawNotifications = [] } = useNotifications(false);
   const markAsReadMutation = useMarkAsRead();
-  const markAllAsReadMutation = useMarkAllAsRead();
   const deleteMutation = useDeleteNotification();
+  const deleteAllMutation = useDeleteAllNotifications();
 
   // Mapping from API model to UI model
   const notifications = React.useMemo(() => {
@@ -64,12 +64,12 @@ export const NotificationBell: React.FC = () => {
     }
   };
 
-  const handleMarkAllAsRead = async () => {
+  const handleClearAll = async () => {
     try {
-      await markAllAsReadMutation.mutateAsync();
+      await deleteAllMutation.mutateAsync();
       setIsOpen(false);
     } catch (error) {
-      console.error("Error marking all as read", error);
+      console.error("Error clearing notifications", error);
     }
   };
 
@@ -139,8 +139,8 @@ export const NotificationBell: React.FC = () => {
                 {unreadCount > 0 && (
                   <button
                     type="button"
-                    onClick={handleMarkAllAsRead}
-                    disabled={markAllAsReadMutation.isPending}
+                    onClick={handleClearAll}
+                    disabled={deleteAllMutation.isPending}
                     className="text-xs text-primary hover:text-primary-hover hover:underline font-medium transition-colors"
                   >
                     Limpiar

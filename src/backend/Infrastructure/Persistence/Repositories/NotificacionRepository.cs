@@ -55,4 +55,13 @@ public class NotificacionRepository : INotificacionRepository
         _context.Notificaciones.Remove(notificacion);
         return Task.CompletedTask;
     }
+
+    public async Task DeleteAllByUsuarioIdAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        var notifications = await _context.Notificaciones
+            .Where(n => n.UsuarioId == usuarioId)
+            .ToListAsync(cancellationToken);
+
+        _context.Notificaciones.RemoveRange(notifications);
+    }
 }

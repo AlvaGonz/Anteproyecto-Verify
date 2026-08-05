@@ -138,4 +138,20 @@ public class NotificationsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpDelete]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<IActionResult> DeleteAllNotifications(CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        await _notificacionRepository.DeleteAllByUsuarioIdAsync(userId, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
 }
