@@ -4,7 +4,7 @@ import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { ProjectCoverImage } from "../../features/projects/components/ProjectCoverImage";
 import { AdminProjectContextMenu } from "./AdminProjectContextMenu";
-import { FolderKanban, ArrowRight, CheckCircle2, AlertTriangle, Timer, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { FolderKanban, ArrowRight, CheckCircle2, AlertTriangle, Timer, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Banknote } from "lucide-react";
 import { toUtcDate } from "../../shared/utils/dates";
 
 const getStatusBadge = (status: ProjectStatus, t: any) => {
@@ -154,6 +154,12 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
                         </span>
                       )}
                       {getIntegrityBadge(project.estadoIntegridad)}
+                      {project.estatusIpi === "PAGO_PENDIENTE" && (
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md border border-rose-100">
+                          <Banknote className="w-3 h-3" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">IPI Pendiente</span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 font-medium">
                       <span className="flex items-center gap-1.5 font-mono bg-gray-50 px-2 py-0.5 rounded-md">

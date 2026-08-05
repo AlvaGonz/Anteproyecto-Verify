@@ -812,6 +812,8 @@ WHERE NOT EXISTS (
             ("INTERES_REGISTRADO",      "Interés registrado en tu proyecto", "Social",       3, "InApp,Email"),
             ("INVITACION_RECIBIDA",     "Invitación de delegación recibida", "Social",       3, "InApp,Email"),
             ("LIMITES_DELEGACION",      "Límites de delegación actualizados","Social",       5, "InApp"),
+            ("IPI_PENDIENTE",           "Deuda IPI detectada",               "Validaciones", 2, "InApp,Email"),
+            ("IPI_RESUELTO",            "Deuda IPI resuelta",                "Validaciones", 3, "InApp"),
         };
 
         var entities = tipos.Select(t => new TipoNotificacion(

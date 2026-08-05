@@ -21,4 +21,7 @@ public static class TipoNotificacionId
     public const int InteresRegistrado     = 16;
     public const int InvitacionRecibida    = 17;
     public const int LimitesDelegacion     = 18;
+    // ponytail: IPI debt detection
+    public const int IpiPendiente          = 19;
+    public const int IpiResuelto           = 20;
 }
