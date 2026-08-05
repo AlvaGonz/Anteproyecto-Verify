@@ -9,7 +9,6 @@ const CheckoutPage = lazy(() => import("../features/pricing/pages/CheckoutPage")
 const CheckoutReturnPage = lazy(() => import("../features/pricing/pages/CheckoutReturnPage").then(m => ({ default: m.CheckoutReturnPage })));
 const ProjectsPublicListPage = lazy(() => import("../pages/projects/ProjectsPublicListPage").then(m => ({ default: m.ProjectsPublicListPage })));
 const ProjectPublicDetailPage = lazy(() => import("../pages/projects/ProjectPublicDetailPage").then(m => ({ default: m.ProjectPublicDetailPage })));
-const QrPublicProjectPage = lazy(() => import("../pages/projects/QrPublicProjectPage").then(m => ({ default: m.QrPublicProjectPage })));
 const ProjectManagePage = lazy(() => import("../pages/projects/ProjectManagePage").then(m => ({ default: m.ProjectManagePage })));
 const ProjectManageLayout = lazy(() => import("../pages/projects/ProjectManageLayout").then(m => ({ default: m.ProjectManageLayout })));
 const ProjectValidationPage = lazy(() => import("../pages/projects/ProjectValidationPage").then(m => ({ default: m.ProjectValidationPage })));
@@ -196,7 +195,7 @@ export const router = createHashRouter([
         path: "/q/:qrToken",
         element: (
           <Suspense fallback={<PageFallback />}>
-            <QrPublicProjectPage />
+            <ProjectPublicDetailPage />
           </Suspense>
         ),
       },

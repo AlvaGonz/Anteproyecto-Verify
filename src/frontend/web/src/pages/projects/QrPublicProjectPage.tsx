@@ -29,8 +29,7 @@ export const QrPublicProjectPage: React.FC = () => {
 
     const fetchProject = async () => {
       try {
-        const baseUrl = import.meta.env.VITE_API_URL ?? "";
-        const apiUrl = `${baseUrl}/api/public/projects/qr/${encodeURIComponent(qrToken)}`;
+        const apiUrl = `/api/public/projects/qr/${encodeURIComponent(qrToken)}`;
         const resp = await fetch(apiUrl);
         if (!resp.ok) {
           if (resp.status === 404) {

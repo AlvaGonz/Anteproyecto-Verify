@@ -331,34 +331,34 @@ public static class AppDbContextSeeder
                     context,
                     proyectoId: p1.Id,
                     codigoSello: "VF-2026-ABC123XYZ",
-                    nombre: "Sello VeriFinca Oro",
-                    nivel: NivelSelloIntegridad.Oro,
+                    nombre: "Sello de Integridad",
+                    nivel: NivelSelloIntegridad.Bronce,
                     urlQr: $"http://localhost:3000/#/q/{GenerateSealToken(p1.Id, "VF-2026-ABC123XYZ")}",
                     firmaDigital: "firma-digital-simulada",
                     qrToken: GenerateSealToken(p1.Id, "VF-2026-ABC123XYZ"));
 
                 // Seal seeding for remaining published projects
-                var publishedProjectSeeds = new (int Index, string Codigo, string Nombre, NivelSelloIntegridad Nivel)[]
+                var publishedProjectSeeds = new (int Index, string Codigo)[]
                 {
-                    (3, "VF-2026-OASIS001", "Sello Condominio Oasis", NivelSelloIntegridad.Plata),
-                    (4, "VF-2026-PSOL001", "Sello Plaza del Sol", NivelSelloIntegridad.Oro),
-                    (5, "VF-2026-LUMI001", "Sello Torre Lumiere", NivelSelloIntegridad.Oro),
-                    (6, "VF-2026-ALTOS001", "Sello Altos del Mar", NivelSelloIntegridad.Bronce),
-                    (7, "VF-2026-COSTA001", "Sello Villa Costa Marina", NivelSelloIntegridad.Plata),
-                    (8, "VF-2026-PCNOR001", "Sello Plaza Comercial Norte", NivelSelloIntegridad.Bronce),
-                    (9, "VF-2026-VISTA001", "Sello Condominio Vista Bella", NivelSelloIntegridad.Plata),
+                    (3, "VF-2026-OASIS001"),
+                    (4, "VF-2026-PSOL001"),
+                    (5, "VF-2026-LUMI001"),
+                    (6, "VF-2026-ALTOS001"),
+                    (7, "VF-2026-COSTA001"),
+                    (8, "VF-2026-PCNOR001"),
+                    (9, "VF-2026-VISTA001"),
                 };
 
-                foreach (var s in publishedProjectSeeds)
+                foreach (var (idx, codigo) in publishedProjectSeeds)
                 {
-                    var proj = proyectoEntities[s.Index];
-                    var token = GenerateSealToken(proj.Id, s.Codigo);
+                    var proj = proyectoEntities[idx];
+                    var token = GenerateSealToken(proj.Id, codigo);
                     await GetOrCreateSelloIntegridadAsync(
                         context,
                         proyectoId: proj.Id,
-                        codigoSello: s.Codigo,
-                        nombre: s.Nombre,
-                        nivel: s.Nivel,
+                        codigoSello: codigo,
+                        nombre: "Sello de Integridad",
+                        nivel: NivelSelloIntegridad.Bronce,
                         urlQr: $"http://localhost:3000/#/q/{token}",
                         firmaDigital: "firma-digital-simulada",
                         qrToken: token);
@@ -923,8 +923,8 @@ WHERE NOT EXISTS (
             context,
             proyectoId: torre.Id,
             codigoSello: torreCodigo,
-            nombre: "Sello Torre Playa Dorada",
-            nivel: NivelSelloIntegridad.Oro,
+            nombre: "Sello de Integridad",
+            nivel: NivelSelloIntegridad.Bronce,
             urlQr: $"http://localhost:3000/#/q/{torreToken}",
             firmaDigital: "firma-digital-simulada",
             qrToken: torreToken);

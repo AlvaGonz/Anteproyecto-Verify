@@ -77,7 +77,8 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
 
   const hasSeal = selloData && (selloData.vigente !== false && selloData.estado !== "Revocado" && selloData.estado !== "Expirado");
   const sealCode = selloData?.codigoSello || selloData?.codigoQR || "";
-  const qrUrl = `${window.location.origin}/#/p/${projectId}`;
+  const qrToken = selloData?.qrToken || "";
+  const qrUrl = qrToken ? `${window.location.origin}/#/q/${qrToken}` : "";
   const accessCount = selloData?.contadorAccesos ?? selloData?.accessCount ?? 0;
   const sealStatus = selloData?.estado === "Revocado" ? 4 : selloData?.estado === "Expirado" ? 3 : 2;
 
@@ -243,14 +244,6 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
                 </dt>
                 <dd className="mt-1 text-sm text-[#111144] font-semibold">
                   {accessCount}
-                </dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-[#5C5C5C]">
-                  Nivel del Sello
-                </dt>
-                <dd className="mt-1 text-sm text-[#111144]">
-                  {selloData?.nivel || "Bronce"}
                 </dd>
               </div>
             </dl>

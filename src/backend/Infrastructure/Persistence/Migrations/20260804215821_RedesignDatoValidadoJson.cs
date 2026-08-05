@@ -47,14 +47,26 @@ namespace Infrastructure.Persistence.Migrations
                 table: "DatoValidado",
                 newName: "IX_DatoValidado_ProyectoId");
 
-            migrationBuilder.AlterColumn<Guid>(
-                name: "Id",
-                table: "DatoValidado",
-                type: "uniqueidentifier",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
+            // ponytail: IDENTITY → Guid requires drop+recreate, not alter
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'Id' AND Object_ID = Object_ID(N'DatoValidado')
+                           AND TYPE_NAME(system_type_id) = 'int')
+                BEGIN
+                    DECLARE @pkName nvarchar(256)
+                    SELECT @pkName = name FROM sys.key_constraints
+                    WHERE parent_object_id = OBJECT_ID('DatoValidado') AND type = 'PK'
+                    IF @pkName IS NOT NULL
+                        EXEC('ALTER TABLE DatoValidado DROP CONSTRAINT ' + @pkName)
+                    
+                    ALTER TABLE [DatoValidado] DROP COLUMN [Id]
+                    ALTER TABLE [DatoValidado] ADD [Id] uniqueidentifier NOT NULL DEFAULT NEWSEQUENTIALID()
+                    ALTER TABLE [DatoValidado] ADD CONSTRAINT [PK_DatoValidado] PRIMARY KEY ([Id])
+                END
+                ELSE IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'Id' AND Object_ID = Object_ID(N'DatoValidado'))
+                BEGIN
+                    ALTER TABLE [DatoValidado] ADD [Id] uniqueidentifier NOT NULL DEFAULT NEWSEQUENTIALID()
+                    ALTER TABLE [DatoValidado] ADD CONSTRAINT [PK_DatoValidado] PRIMARY KEY ([Id])
+                END");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAtUtc",
@@ -109,7 +121,7 @@ namespace Infrastructure.Persistence.Migrations
                 column: "ProyectoId",
                 principalTable: "ProyectosInmobiliarios",
                 principalColumn: "IdProyecto",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
         }
 
         /// <inheritdoc />

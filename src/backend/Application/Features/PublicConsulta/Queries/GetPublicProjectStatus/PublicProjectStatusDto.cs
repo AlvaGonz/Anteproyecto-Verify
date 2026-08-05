@@ -5,8 +5,10 @@ using System.Collections.Generic;
 
 public class PublicProjectStatusDto
 {
+    public Guid Id { get; set; }
     public string CodigoPublico { get; set; } = string.Empty;
     public string NombreProyecto { get; set; } = string.Empty;
+    public string? Ubicacion { get; set; }
     public string EstadoValidacion { get; set; } = string.Empty;
     public DateTime FechaEmision { get; set; }
     public List<DimensionResumenDto> ResumenDimensiones { get; set; } = new();

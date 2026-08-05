@@ -76,8 +76,10 @@ public class GetPublicProjectStatusQueryHandler
 
         var dto = new PublicProjectStatusDto
         {
+            Id = proyecto.Id,
             CodigoPublico = sello.CodigoSello,
             NombreProyecto = proyecto.Nombre,
+            Ubicacion = proyecto.UbicacionTexto,
             EstadoValidacion = proyecto.Estado?.CodigoUnico == ProjectStatus.Publicado.ToCodigoUnico() ? "Verificado" : 
                                proyecto.Estado?.CodigoUnico == ProjectStatus.ConObservacion.ToCodigoUnico() ? "NoVerificado" : "ConObservaciones",
             FechaEmision = sello.FechaEmisionUtc,
