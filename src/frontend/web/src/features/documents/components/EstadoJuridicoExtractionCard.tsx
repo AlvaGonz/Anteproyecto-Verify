@@ -229,6 +229,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       const disabled = isSaving || loading || (!isProvincia && !selectedProvinceId);
       const defaultOptionText = isProvincia ? "-- Seleccionar Provincia --" : "-- Seleccionar Municipio --";
       
+      const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
+
       return (
         <ExtractionFieldCard
           key={fieldKey}
@@ -238,6 +240,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
           resolution={resolution}
           isCustomContent={true}
           testId={testId}
+          validationStatus={validation.status}
+          validationMessage={validation.message}
         >
           <div className="flex-1 flex items-center min-w-0 pr-2">
             <select

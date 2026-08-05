@@ -87,6 +87,16 @@ export const mapDocumentToVerificationPayload = (
         }
       };
 
+    case DocumentType.PoderNotarial:
+      return {
+        apiDocType: 'jce',
+        payload: {
+          cedula: getValue('cedulaApoderado') || getValue('cedulaPoderdante') || getValue('cedula'),
+          nombres: getValue('nombres'),
+          apellidos: getValue('apellidos')
+        }
+      };
+
     default:
       return null; // Not supported for verification yet
   }
