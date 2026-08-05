@@ -2,19 +2,27 @@ namespace Application.Features.Auth.Commands.VerifyEmail;
 
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Abstractions.Notifications;
 using Application.Abstractions.Persistence;
+using Domain.Enums;
 
 public class VerifyEmailCommandHandler
 {
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly INotificationFactory _notificationFactory;
+    private readonly INotificacionRepository _notificacionRepository;
 
     public VerifyEmailCommandHandler(
         IUsuarioRepository usuarioRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        INotificationFactory notificationFactory,
+        INotificacionRepository notificacionRepository)
     {
         _usuarioRepository = usuarioRepository;
         _unitOfWork = unitOfWork;
+        _notificationFactory = notificationFactory;
+        _notificacionRepository = notificacionRepository;
     }
 
     public async Task<VerifyEmailResultDto> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
@@ -45,6 +53,13 @@ public class VerifyEmailCommandHandler
         _usuarioRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         System.Console.WriteLine($"[DEBUG] VerifyEmail: SaveChangesAsync completed.");
+
+        var notif = await _notificationFactory.CreateAsync(user.Id,
+            TipoNotificacionId.EmailVerificado,
+            "Tu correo electrónico ha sido verificado exitosamente.",
+            "/dashboard");
+        await _notificacionRepository.AddAsync(notif, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Compute next step based on user's pending plan and subscription status
         // ponytail: centralize routing decision — frontend just navigates where told
