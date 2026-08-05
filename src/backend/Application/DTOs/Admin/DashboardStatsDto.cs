@@ -23,6 +23,7 @@ namespace Application.DTOs.Admin
 
         // Trend
         public List<ProyectosPorMesDto> ProyectosPorMes { get; init; } = new();
+        public List<UsuariosPorMesDto> UsuariosPorMes { get; init; } = new();
     }
 
     public record SuscripcionRecienteDto
@@ -43,6 +44,13 @@ namespace Application.DTOs.Admin
     }
 
     public record ProyectosPorMesDto
+    {
+        public int Year { get; init; }
+        public int Month { get; init; }
+        public int Count { get; init; }
+    }
+
+    public record UsuariosPorMesDto
     {
         public int Year { get; init; }
         public int Month { get; init; }

@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useRef, useEffect, useState } from "react";
+import React, { useMemo, useRef, useEffect, useState } from "react";
 import { Shield } from "lucide-react";
 import { m } from "framer-motion";
 import type { ProyectosPorMesDto } from "../../../infrastructure/api/dashboard.api";
@@ -12,10 +12,10 @@ export interface DashboardChartsProps {
 const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
 const Sparkline: React.FC<{ data: { month: string; count: number }[] }> = ({ data }) => {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [width, setWidth] = useState(0);
+  const svgRef = React.useRef<SVGSVGElement>(null);
+  const [width, setWidth] = React.useState(0);
   const height = 200;
-  const pad = { t: 12, r: 4, b: 28, l: 32 };
+  const pad = { t: 30, r: 24, b: 28, l: 32 };
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -24,7 +24,7 @@ const Sparkline: React.FC<{ data: { month: string; count: number }[] }> = ({ dat
     return () => ro.disconnect();
   }, []);
 
-  const { path, area, yMax, yMin, gridLines } = useMemo(() => {
+  const { path, area, yMax, yMin, gridLines } = React.useMemo(() => {
     if (!data.length || !width) return { path: "", area: "", yMax: 0, yMin: 0, gridLines: [] as number[] };
     const vals = data.map(d => d.count);
     const yMax = Math.max(...vals) * 1.15 || 1;
@@ -32,7 +32,7 @@ const Sparkline: React.FC<{ data: { month: string; count: number }[] }> = ({ dat
     const plotW = width - pad.l - pad.r;
     const plotH = height - pad.t - pad.b;
     const x = (i: number) => pad.l + (i / Math.max(data.length - 1, 1)) * plotW;
-    const y = (v: number) => pad.t + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+    const y = (v: number) => pad.t + plotH - ((v - yMin) / (yMax - yMin || 1)) * plotH;
     const pts = data.map((d, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(d.count).toFixed(1)}`);
     const area = `M${x(0).toFixed(1)},${pad.t + plotH} ${pts.join(" ")} L${x(data.length - 1).toFixed(1)},${pad.t + plotH}Z`;
     const tickCount = 4;
@@ -41,13 +41,13 @@ const Sparkline: React.FC<{ data: { month: string; count: number }[] }> = ({ dat
   }, [data, width]);
 
   return (
-    <svg ref={svgRef} width="100%" height={height} style={{ display: "block" }}>
+    <svg ref={svgRef} width="100%" height={height} style={{ display: "block", overflow: "visible" }}>
       {gridLines.map((v, i) => {
         const yPos = pad.t + (height - pad.t - pad.b) * (1 - (v - yMin) / (yMax - yMin || 1));
         return (
           <g key={i}>
             <text x={pad.l - 6} y={yPos + 3.5} textAnchor="end" fontSize="10" fill="#9ca3af">{Math.round(v)}</text>
-            {i > 0 && <line x1={pad.l} y1={yPos} x2={width - pad.r} y2={yPos} stroke="#e5e7eb" strokeWidth={1} />}
+            <line x1={pad.l} y1={yPos} x2={width - pad.r} y2={yPos} stroke="#e5e7eb" strokeWidth={1} />
           </g>
         );
       })}
@@ -64,7 +64,19 @@ const Sparkline: React.FC<{ data: { month: string; count: number }[] }> = ({ dat
         const plotW = width - pad.l - pad.r;
         const plotH = height - pad.t - pad.b;
         const cx = pad.l + (i / Math.max(data.length - 1, 1)) * plotW;
-        return <text key={i} x={cx} y={pad.t + plotH + 16} textAnchor="middle" fontSize="10" fill="#9ca3af">{d.month}</text>;
+        const cy = pad.t + plotH - ((d.count - yMin) / (yMax - yMin || 1)) * plotH;
+        return (
+          <g key={i} className="group cursor-pointer">
+            <text x={cx} y={pad.t + plotH + 16} textAnchor="middle" fontSize="10" fill="#9ca3af">{d.month}</text>
+            <circle cx={cx} cy={cy} r="4" fill="#223382" className="group-hover:r-6 group-hover:fill-[#F98513] transition-all" />
+            {/* Invisible rect for easier hovering */}
+            <rect x={cx - 15} y={pad.t} width="30" height={plotH + 20} fill="transparent" />
+            <g className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <rect x={cx - 24} y={cy - 26} width="48" height="18" rx="4" fill="#1f2937" />
+              <text x={cx} y={cy - 14} textAnchor="middle" fontSize="10" fill="#ffffff" fontWeight="bold">{d.count}</text>
+            </g>
+          </g>
+        );
       })}
     </svg>
   );
