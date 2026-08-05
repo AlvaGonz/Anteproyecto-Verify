@@ -257,5 +257,15 @@ namespace UnitTests.Application.Documents.Extractions
             var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
             extraction!.NumeroCertificacion.NormalizedValue.Should().Be("C0348921465789");
         }
+        [Fact]
+        public void ParcelaNumero_TruncatesNoiseAfterValidFormat()
+        {
+            // ponytail: OCR merges Parcela label → value → noise into one blob
+            // e.g. "89754213098:5-BDCNOSDCAPTOUNIDAD" should become "89754213098:5-B"
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 89754213098:5-BDCNOSDCAPTOUNIDAD" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 89754213098:5-BDCNOSDCAPTOUNIDAD" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("89754213098:5-B");
+        }
     }
 }

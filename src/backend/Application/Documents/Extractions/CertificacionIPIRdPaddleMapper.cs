@@ -188,8 +188,8 @@ public static class CertificacionIPIRdPaddleMapper
             {
                 // DGII format: pure digits, no hyphens, no colons
                 "NumeroInmueble" => Regex.Replace(rawValue, @"[^0-9]", ""),
-                // Catastral format: preserve colons, hyphens, alphanumeric (e.g. 150106256710:4-A)
-                "ParcelaNumero" => Regex.Replace(rawValue, @"[^A-Za-z0-9:-]", "").ToUpperInvariant(),
+                // Catastral format: digits, optional :digits, optional -letter(s). Truncate noise. (e.g. 150106256710:4-A)
+                "ParcelaNumero" => NormalizeParcela(rawValue),
                 // Certificate format: alphanumeric only, preserve C prefix (e.g. C0348921465789)
                 "NumeroCertificacion" => Regex.Replace(rawValue, @"[^A-Za-z0-9]", "").ToUpperInvariant(),
                 _ => SharedFieldNormalizer.NormalizeDesignacionCatastral(rawValue)
@@ -206,5 +206,17 @@ public static class CertificacionIPIRdPaddleMapper
         }
 
         return new ExtractedField { Status = FieldStatus.Missing };
+    }
+
+    /// <summary>
+    /// Parcela catastral format: digits → optional :digits → optional -letter(s).
+    /// Truncates noise after the valid suffix (e.g. "89754213098:5-BDCNOS..." → "89754213098:5-B").
+    /// </summary>
+    private static string NormalizeParcela(string raw)
+    {
+        var clean = Regex.Replace(raw, @"[^A-Za-z0-9:-]", "");
+        // DGII catastral: digits, optional :sub-parcel, optional -single-letter suffix
+        var match = Regex.Match(clean, @"^(\d+(:\d+)?(-[A-Z])?)");
+        return match.Success ? match.Groups[1].Value.ToUpperInvariant() : clean.ToUpperInvariant();
     }
 }
