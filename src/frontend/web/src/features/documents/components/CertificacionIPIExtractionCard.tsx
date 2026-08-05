@@ -141,9 +141,9 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
       warnings={generateUserFriendlyWarnings()}
       gridClassName="grid grid-cols-1 sm:grid-cols-3 gap-3"
     >
-      {renderField("No. de Certificación", "numeroCertificacion", extraction.numeroCertificacion, true, "field-numeroCertificacion", "C0000000000000")}
-      {renderField("No. Inmueble", "numeroInmueble", extraction.numeroInmueble, true, "field-numeroInmueble", "000000000000")}
-      {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero", "000000000000:0-A")}
+      {renderField("No. de Certificación", "numeroCertificacion", extraction.numeroCertificacion, true, "field-numeroCertificacion", "Ej: C0121952878225")}
+      {renderField("No. Inmueble", "numeroInmueble", extraction.numeroInmueble, true, "field-numeroInmueble", "Ej: 136400513193")}
+      {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero", "Ej: 309466754512:4-A")}
       
       <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
         <div className="flex justify-end">

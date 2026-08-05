@@ -157,7 +157,18 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
     if (lower.includes('matricula') || lower.includes('matrícula')) return 'Ej: 010023456';
     if (lower.includes('fecha')) return 'Ej: 2024-01-30';
     if (lower.includes('rnc')) return 'Ej: 130123456';
-    if (lower.includes('cedula') || lower.includes('cédula')) return 'Ej: 00112345678';
+    if (lower.includes('cedula') || lower.includes('cédula') || lower.includes('cedulanumber')) return 'Ej: 001-1234567-8';
+    if (lower.includes('certificacion') || lower.includes('certificación')) return 'Ej: C0121952878225';
+    if (lower.includes('inmueble')) return 'Ej: 136400513193';
+    if (lower.includes('parcela')) return 'Ej: 309466754512:4-A';
+    if (lower.includes('provincia') || lower.includes('oficina')) return 'Ej: SANTO DOMINGO';
+    if (lower.includes('municipio') || lower.includes('lugar') || lower.includes('seccion')) return 'Ej: SANTO DOMINGO ESTE';
+    if (lower.includes('departamento')) return 'Ej: NORTE';
+    if (lower.includes('operacion')) return 'Ej: DESLINDE';
+    if (lower.includes('viene')) return 'Ej: 010023455';
+    if (lower.includes('superficie') || lower.includes('area') || lower.includes('área')) return 'Ej: 1500.00';
+    if (lower.includes('nombre') || lower.includes('firstname') || lower.includes('titular')) return 'Ej: JUAN CARLOS';
+    if (lower.includes('apellido') || lower.includes('lastname')) return 'Ej: PEREZ GOMEZ';
     return 'Ej: Ingrese el dato correcto';
   };
 

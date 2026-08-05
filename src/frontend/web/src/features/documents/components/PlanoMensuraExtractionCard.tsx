@@ -284,7 +284,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     }
   };
 
-  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string) => {
+  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string, placeholder?: string) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
@@ -352,6 +352,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
         isSaving={isSaving}
         isNumeric={fieldKey === 'superficieARegistrarParcelaM2'}
         step={fieldKey === 'superficieARegistrarParcelaM2' ? "0.01" : undefined}
+        placeholder={placeholder}
         onEditClick={() => handleEditClick(fieldKey, displayValue)}
         onEditValueChange={setEditValue}
         onSave={() => handleSave(fieldKey)}
@@ -375,15 +376,15 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       warnings={extraction.warnings || []}
       gridClassName="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
     >
-      {renderField("Departamento", "departamento", extraction.departamento, false, "field-departamento")}
-      {renderField("Operación", "operacion", extraction.operacion, false, "field-operacion")}
-      {renderField("Desig. Catastral Posicional", "designacionCatastralPosicional", extraction.designacionCatastralPosicional, true, "field-dcp")}
-      {renderField("Desig. Catastral Origen", "designacionCatastralOrigen", extraction.designacionCatastralOrigen, false, "field-dco")}
+      {renderField("Departamento", "departamento", extraction.departamento, false, "field-departamento", "Ej: NORTE")}
+      {renderField("Operación", "operacion", extraction.operacion, false, "field-operacion", "Ej: DESLINDE")}
+      {renderField("Desig. Catastral Posicional", "designacionCatastralPosicional", extraction.designacionCatastralPosicional, true, "field-dcp", "Ej: 120182783414:0083")}
+      {renderField("Desig. Catastral Origen", "designacionCatastralOrigen", extraction.designacionCatastralOrigen, false, "field-dco", "Ej: 120182783400:0001")}
       {renderField("Provincia", "provincia", extraction.provincia, false, "field-provincia")}
       {renderField("Municipio", "municipio", extraction.municipio, false, "field-municipio")}
-      {renderField("Sección", "seccion", extraction.seccion, false, "field-seccion")}
-      {renderField("Lugar", "lugar", extraction.lugar, false, "field-lugar")}
-      {renderField("Superficie A. Regist.", "superficieARegistrarParcelaM2", extraction.superficieARegistrarParcelaM2, true, "field-superficie")}
+      {renderField("Sección", "seccion", extraction.seccion, false, "field-seccion", "Ej: SECCION A")}
+      {renderField("Lugar", "lugar", extraction.lugar, false, "field-lugar", "Ej: URB. LOS CERROS")}
+      {renderField("Superficie A. Regist.", "superficieARegistrarParcelaM2", extraction.superficieARegistrarParcelaM2, true, "field-superficie", "Ej: 1500.00")}
 
       <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
         <div className="flex justify-end">

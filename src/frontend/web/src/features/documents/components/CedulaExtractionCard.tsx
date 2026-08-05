@@ -70,7 +70,7 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
     setEditingField(null);
   };
 
-  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isCedula = false) => {
+  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isCedula = false, placeholder?: string) => {
     if (!field) return null;
     const isEditing = editingField === fieldKey;
     const displayValue = field.normalizedValue || field.rawValue || '';
@@ -87,6 +87,7 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
         isEditing={isEditing}
         editValue={editValue}
         isSaving={isSaving}
+        placeholder={placeholder}
         onEditClick={() => handleEditClick(fieldKey, displayValue)}
         onEditValueChange={setEditValue}
         onSave={() => handleSave(fieldKey)}
@@ -129,11 +130,11 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
         </div>
       }
     >
-      {renderField("Cédula / ID", "cedulaNumber", extraction.cedulaNumber, true)}
-      {renderField("Nombres", "firstNames", extraction.firstNames)}
-      {renderField("Apellidos", "lastNames", extraction.lastNames)}
-      {renderField("Fecha Nacimiento", "birthDate", extraction.birthDate)}
-      {renderField("Fecha Expiración", "expiryDate", extraction.expiryDate)}
+      {renderField("Cédula / ID", "cedulaNumber", extraction.cedulaNumber, true, "Ej: 001-1234567-8")}
+      {renderField("Nombres", "firstNames", extraction.firstNames, false, "Ej: JUAN CARLOS")}
+      {renderField("Apellidos", "lastNames", extraction.lastNames, false, "Ej: PEREZ GOMEZ")}
+      {renderField("Fecha Nacimiento", "birthDate", extraction.birthDate, false, "Ej: 1990-05-15")}
+      {renderField("Fecha Expiración", "expiryDate", extraction.expiryDate, false, "Ej: 2028-05-15")}
     </DocumentExtractionPanel>
   );
 };

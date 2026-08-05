@@ -228,7 +228,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
     setSelectedMunicipalityId(e.target.value || null);
   };
 
-  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false) => {
+  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, placeholder?: string) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const rawValue = safeField.normalizedValue || safeField.rawValue || '';
     const displayValue = NUMERIC_FIELDS[fieldKey] ? formatNumeric(fieldKey, rawValue) : rawValue;
@@ -297,6 +297,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
         isSaving={isSaving}
         isNumeric={isNumeric}
         step={fieldKey === "superficieM2" ? "0.01" : undefined}
+        placeholder={placeholder}
         onEditClick={() => handleEditClick(fieldKey, rawValue)}
         onEditValueChange={setEditValue}
         onSave={() => handleSave(fieldKey)}
@@ -351,14 +352,14 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
         </div>
       }
     >
-      {renderField("Designación Catastral", "designacionCatastral", extraction.designacionCatastral, true)}
-      {renderField("Oficina", "oficina", extraction.oficina)}
-      {renderField("Matrícula", "matricula", extraction.matricula, true)}
-      {renderField("Fecha de Inscripción", "fechaYHoraInscripcion", extraction.fechaYHoraInscripcion)}
-      {renderField("Viene De", "vieneDe", extraction.vieneDe)}
+      {renderField("Designación Catastral", "designacionCatastral", extraction.designacionCatastral, true, "Ej: 310025847956:0065")}
+      {renderField("Oficina", "oficina", extraction.oficina, false, "Ej: SANTO DOMINGO")}
+      {renderField("Matrícula", "matricula", extraction.matricula, true, "Ej: 010023456")}
+      {renderField("Fecha de Inscripción", "fechaYHoraInscripcion", extraction.fechaYHoraInscripcion, false, "Ej: 2024-01-30")}
+      {renderField("Viene De", "vieneDe", extraction.vieneDe, false, "Ej: 010023455")}
       {renderField("Municipio", "municipio", extraction.municipio)}
       {renderField("Provincia", "provincia", extraction.provincia)}
-      {renderField("Superficie M2", "superficieM2", extraction.superficieM2)}
+      {renderField("Superficie M2", "superficieM2", extraction.superficieM2, false, "Ej: 1500.00")}
     </DocumentExtractionPanel>
   );
 };

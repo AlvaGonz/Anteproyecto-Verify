@@ -209,7 +209,7 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
     setSelectedMunicipalityId(e.target.value || null);
   };
 
-  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string) => {
+  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string, placeholder?: string) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
@@ -279,6 +279,7 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         isSaving={isSaving}
         isNumeric={fieldKey === 'superficieMetrosCuadrados'}
         step={fieldKey === 'superficieMetrosCuadrados' ? "0.01" : undefined}
+        placeholder={placeholder}
         onEditClick={() => handleEditClick(fieldKey, displayValue)}
         onEditValueChange={setEditValue}
         onSave={() => handleSave(fieldKey)}
@@ -314,14 +315,14 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       warnings={filteredWarnings}
       gridClassName="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
     >
-      {renderField("Matrícula", "matricula", extraction.matricula, true, "field-matricula")}
-      {renderField("Desig. Catastral", "designacionCatastral", extraction.designacionCatastral, true, "field-designacionCatastral")}
-      {renderField("Viene De", "vieneDe", extraction.vieneDe, false, "field-vieneDe")}
-      {renderField("Fecha de Emisión", "fechaHoraInscripcion", extraction.fechaHoraInscripcion, false, "field-fechaEmision")}
-      {renderField("Oficina", "oficina", extraction.oficina, false, "field-oficina")}
+      {renderField("Matrícula", "matricula", extraction.matricula, true, "field-matricula", "Ej: 010023456")}
+      {renderField("Desig. Catastral", "designacionCatastral", extraction.designacionCatastral, true, "field-designacionCatastral", "Ej: 310025847956:0065")}
+      {renderField("Viene De", "vieneDe", extraction.vieneDe, false, "field-vieneDe", "Ej: 010023455")}
+      {renderField("Fecha de Emisión", "fechaHoraInscripcion", extraction.fechaHoraInscripcion, false, "field-fechaEmision", "Ej: 2024-01-30")}
+      {renderField("Oficina", "oficina", extraction.oficina, false, "field-oficina", "Ej: SANTO DOMINGO")}
       {renderField("Provincia", "provincia", extraction.provincia, false, "field-provincia")}
       {renderField("Municipio", "municipio", extraction.municipio, false, "field-municipio")}
-      {renderField("Superficie M²", "superficieMetrosCuadrados", extraction.superficieMetrosCuadrados, true, "field-superficie")}
+      {renderField("Superficie M²", "superficieMetrosCuadrados", extraction.superficieMetrosCuadrados, true, "field-superficie", "Ej: 1500.00")}
 
       <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
         <div className="flex justify-end">
