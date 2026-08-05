@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -47,26 +47,25 @@ namespace Infrastructure.Persistence.Migrations
                 table: "DatoValidado",
                 newName: "IX_DatoValidado_ProyectoId");
 
-            // ponytail: IDENTITY → Guid requires drop+recreate, not alter
-            migrationBuilder.Sql(@"
-                IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'Id' AND Object_ID = Object_ID(N'DatoValidado')
-                           AND TYPE_NAME(system_type_id) = 'int')
-                BEGIN
-                    DECLARE @pkName nvarchar(256)
-                    SELECT @pkName = name FROM sys.key_constraints
-                    WHERE parent_object_id = OBJECT_ID('DatoValidado') AND type = 'PK'
-                    IF @pkName IS NOT NULL
-                        EXEC('ALTER TABLE DatoValidado DROP CONSTRAINT ' + @pkName)
-                    
-                    ALTER TABLE [DatoValidado] DROP COLUMN [Id]
-                    ALTER TABLE [DatoValidado] ADD [Id] uniqueidentifier NOT NULL DEFAULT NEWSEQUENTIALID()
-                    ALTER TABLE [DatoValidado] ADD CONSTRAINT [PK_DatoValidado] PRIMARY KEY ([Id])
-                END
-                ELSE IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'Id' AND Object_ID = Object_ID(N'DatoValidado'))
-                BEGIN
-                    ALTER TABLE [DatoValidado] ADD [Id] uniqueidentifier NOT NULL DEFAULT NEWSEQUENTIALID()
-                    ALTER TABLE [DatoValidado] ADD CONSTRAINT [PK_DatoValidado] PRIMARY KEY ([Id])
-                END");
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado");
+
+            migrationBuilder.DropColumn(
+                name: "Id",
+                table: "DatoValidado");
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "Id",
+                table: "DatoValidado",
+                type: "uniqueidentifier",
+                nullable: false,
+                defaultValueSql: "NEWSEQUENTIALID()");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado",
+                column: "Id");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAtUtc",
@@ -179,14 +178,25 @@ namespace Infrastructure.Persistence.Migrations
                 table: "DatoValidado",
                 newName: "IX_DatoValidado_ValidacionId");
 
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado");
+
+            migrationBuilder.DropColumn(
+                name: "Id",
+                table: "DatoValidado");
+
+            migrationBuilder.AddColumn<int>(
                 name: "Id",
                 table: "DatoValidado",
                 type: "int",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "uniqueidentifier")
+                nullable: false)
                 .Annotation("SqlServer:Identity", "1, 1");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado",
+                column: "Id");
 
             migrationBuilder.AddColumn<string>(
                 name: "Campo",

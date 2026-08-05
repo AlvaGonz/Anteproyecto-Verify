@@ -19,6 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
+import { useAuth } from "../../../shared/context/AuthContext";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -27,6 +28,7 @@ function cn(...inputs: ClassValue[]) {
 interface VerifySearchFormProps {
   className?: string;
   variant?: "light" | "dark";
+  onSearch?: (type: string, query: string) => void;
 }
 
 const SEARCH_TYPES = [
@@ -116,9 +118,51 @@ const validateInput = (value: string, typeId: string): string | null => {
   return null;
 };
 
+const formatValue = (value: string, typeId: string): string => {
+  if (typeId === "cedula") {
+    const clean = value.replace(/[^0-9]/g, "");
+    if (clean.length > 3 && clean.length <= 10) {
+      return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+    } else if (clean.length > 10) {
+      return `${clean.slice(0, 3)}-${clean.slice(3, 10)}-${clean.slice(10, 11)}`;
+    }
+    return clean;
+  } else if (typeId === "rnc" || typeId === "ipi") {
+    const clean = value.replace(/[^0-9]/g, "");
+    if (clean.length > 1 && clean.length <= 3) {
+      return `${clean.slice(0, 1)}-${clean.slice(1)}`;
+    } else if (clean.length > 3 && clean.length <= 8) {
+      return `${clean.slice(0, 1)}-${clean.slice(1, 3)}-${clean.slice(3)}`;
+    } else if (clean.length > 8) {
+      return `${clean.slice(0, 1)}-${clean.slice(1, 3)}-${clean.slice(3, 8)}-${clean.slice(8, 9)}`;
+    }
+    return clean;
+  } else if (typeId === "suelo") {
+    const clean = value.replace(/[^0-9]/g, "");
+    if (clean.length > 3 && clean.length <= 5) {
+      return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+    } else if (clean.length > 5) {
+      return `${clean.slice(0, 3)}-${clean.slice(3, 5)}-${clean.slice(5, 8)}`;
+    }
+    return clean;
+  } else {
+    // Para Sello VeriFinca u otros
+    let clean = value.replace(/[^a-zA-Z0-9-]/g, "").toUpperCase();
+    if (typeId === "cert") {
+      // Intentar auto formatear si es puro alfanumerico
+      const justChars = value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      if (justChars.startsWith("VF") && justChars.length > 6) {
+        return `VF-${justChars.slice(2, 6)}-${justChars.slice(6, 16)}`;
+      }
+    }
+    return clean;
+  }
+};
+
 export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
   className,
-  variant = "light"
+  variant = "light",
+  onSearch
 }) => {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +172,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
+  const { user, isAuthenticated } = useAuth();
 
   const isDark = variant === "dark";
 
@@ -151,24 +196,39 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     }
 
     if (code.trim()) {
+      if (!isAuthenticated) {
+        addToast("Debe iniciar sesión para realizar consultas.", "info");
+        navigate("/login");
+        return;
+      }
+
       const { projectsApi } = await import("../../projects/api/projectsApi");
       const result = await projectsApi.consumeQuota({ codigo: code.trim() });
-      
       if (result._tag === 'Failure') {
-        if ((result as any).error?._tag === 'LimitReached') {
-          addToast("Límite de consultas alcanzado. Mejora tu plan para continuar.", "error");
-        } else {
-          addToast("Error al procesar la consulta del proyecto.", "error");
+        const errorTag = (result as any).error?._tag || result.error?._tag;
+        if (errorTag === 'LimitReached') {
+          if (user?.role === 'Administrator') {
+            console.warn("Quota limit reached but bypassed for Administrator.");
+          } else {
+            addToast("Límite de consultas alcanzado. Mejora tu plan para continuar.", "error");
+            return;
+          }
+        } else if (errorTag !== 'Unauthorized') {
+          // Log errors other than unauthorized, but allow the search to proceed for public users
+          console.warn("Quota check failed, but proceeding with search.", result);
         }
-        return;
       }
       
       queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
       
-      if (searchType.id === "cert") {
-        navigate(`/projects/verify/${encodeURIComponent(code.trim())}`);
+      if (onSearch) {
+        onSearch(searchType.id, code.trim());
       } else {
-        navigate(`/verification-result?type=${encodeURIComponent(searchType.id)}&q=${encodeURIComponent(code.trim())}`);
+        if (searchType.id === "cert") {
+          navigate(`/projects/verify/${encodeURIComponent(code.trim())}`);
+        } else {
+          navigate(`/projects?type=${encodeURIComponent(searchType.id)}&q=${encodeURIComponent(code.trim())}`);
+        }
       }
     }
   };
@@ -267,7 +327,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
             placeholder={searchType.placeholder}
             aria-label={searchType.placeholder}
             value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onChange={(e) => setCode(formatValue(e.target.value, searchType.id))}
             className={cn(
               "w-full h-18 px-8 rounded-2xl border-2 transition-all text-2xl font-mono font-black text-center placeholder:opacity-20 flex items-center justify-center",
               isDark

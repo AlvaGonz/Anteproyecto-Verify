@@ -15,6 +15,9 @@ import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
 import { VerifySearchForm } from "../../features/public/components/VerifySearchForm";
+import { VerificationNetworkGraph } from "../../features/public/components/VerificationNetworkGraph";
+import { useGlobalSearch } from "../../features/projects/api/useGlobalSearch";
+import { FileText, Activity, Home } from "lucide-react";
 
 import {
   useSuspensePublishedProjects,
@@ -106,11 +109,11 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
 
 const ProjectsPublicListContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialQuery = searchParams.get("q") || "";
+  const queryParam = searchParams.get("q") || "";
   const [filtersVisible, setFiltersVisible] = useState(true);
 
   const [filters, setFilters] = useState<PublishedProjectFilters>({
-    searchQuery: initialQuery,
+    searchQuery: "",
     projectTypes: [],
     priceRange: [0, PRICE_MAX],
     province: "",
@@ -466,6 +469,17 @@ const DirectorySkeleton = () => (
 );
 
 export const ProjectsPublicListPage: React.FC = () => {
+  const [activeSearch, setActiveSearch] = useState<{ type: string; query: string } | null>(null);
+  
+  const { data, isLoading, error } = useGlobalSearch(
+    activeSearch?.type || "", 
+    activeSearch?.query || ""
+  );
+
+  const handleSearch = (type: string, query: string) => {
+    setActiveSearch({ type, query });
+  };
+
   return (
     <Suspense fallback={<DirectorySkeleton />}>
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-primary/10 selection:text-primary">
@@ -489,8 +503,98 @@ export const ProjectsPublicListPage: React.FC = () => {
               </p>
 
               <div className="w-full max-w-2xl">
-                <VerifySearchForm variant="dark" className="border-white/5" />
+                <VerifySearchForm variant="dark" className="border-white/5" onSearch={handleSearch} />
               </div>
+
+              {/* Dynamic Global Search Results Section */}
+              {(isLoading || error || data) && (
+                <div className="w-full max-w-5xl mt-12 animate-fade-in-up text-left">
+                  {isLoading && (
+                    <div className="flex justify-center items-center py-12">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className="bg-red-900/40 border border-red-800 rounded-2xl p-6 text-center shadow-lg">
+                      <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-3" />
+                      <h2 className="text-xl font-bold text-red-300 mb-1">No se encontraron resultados</h2>
+                      <p className="text-red-400 text-sm">
+                        No pudimos encontrar ninguna coincidencia en las bases de datos para esta consulta.
+                      </p>
+                    </div>
+                  )}
+
+                  {data && (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Entity Info */}
+                      <div className="col-span-1 space-y-6">
+                        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden border border-slate-700">
+                          <div className="bg-gradient-to-r from-primary to-orange-500 p-5 text-white flex flex-col items-center">
+                            <CheckCircle2 className="h-12 w-12 mb-3 text-white/90" />
+                            <h2 className="text-lg font-bold text-center">{data.tituloPrincipal}</h2>
+                            <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-xs font-medium">
+                              Entidad Validada
+                            </div>
+                          </div>
+                          
+                          <div className="p-5 space-y-4">
+                            <h3 className="font-semibold text-slate-100 flex items-center mb-3 text-base border-b border-slate-700 pb-2">
+                              <FileText className="h-4 w-4 mr-2 text-primary" />
+                              Detalles Oficiales
+                            </h3>
+                            
+                            <dl className="space-y-3">
+                              {Object.entries(data.detalles).map(([key, value]) => (
+                                <div key={key} className="flex flex-col">
+                                  <dt className="text-xs font-bold uppercase tracking-wider text-slate-400">{key}</dt>
+                                  <dd className="mt-0.5 text-sm font-medium text-slate-100 break-words">{value as string}</dd>
+                                </div>
+                              ))}
+                            </dl>
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-5 border border-slate-700">
+                          <h3 className="font-semibold text-slate-100 flex items-center mb-3 text-base border-b border-slate-700 pb-2">
+                            <Home className="h-4 w-4 mr-2 text-primary" />
+                            Proyectos ({data.proyectosRelacionados.length})
+                          </h3>
+                          {data.proyectosRelacionados.length > 0 ? (
+                            <ul className="space-y-2">
+                              {data.proyectosRelacionados.map((p) => (
+                                <li key={p.id} className="p-3 bg-slate-900/50 rounded-xl hover:bg-slate-700 transition-colors border border-slate-700/50">
+                                  <a href={`/#/projects/${p.id}`} className="block">
+                                    <span className="block font-semibold text-slate-100 text-sm">{p.nombre}</span>
+                                    <span className="mt-1 flex items-center text-xs text-slate-400">
+                                      <Activity className="h-3 w-3 mr-1" /> {p.estado}
+                                    </span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-slate-400 text-xs text-center py-3">No hay proyectos asociados a esta entidad.</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Network Graph */}
+                      <div className="col-span-1 lg:col-span-2">
+                        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden h-full min-h-[500px] flex flex-col border border-slate-700">
+                          <div className="p-5 border-b border-slate-700">
+                            <h3 className="text-lg font-bold text-slate-100">Grafo de Relaciones</h3>
+                            <p className="text-xs text-slate-400 mt-0.5">Visualización de entidades y proyectos vinculados</p>
+                          </div>
+                          <div className="flex-1 p-2 bg-slate-900/50 flex justify-center items-center">
+                            <VerificationNetworkGraph graph={data.grafoRed} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </section>
 

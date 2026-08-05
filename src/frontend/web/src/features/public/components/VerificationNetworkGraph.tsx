@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { NetworkGraphDto, NetworkNodeDto, NetworkEdgeDto } from "../../../features/projects/api/useGlobalSearch";
+import { NetworkGraphDto, NetworkNodeDto, NetworkEdgeDto } from "../../projects/api/useGlobalSearch";
 import { motion } from "framer-motion";
 
 interface Props {
