@@ -43,6 +43,7 @@ export interface ExtractionFieldCardProps {
   // Validation Status for Gobernanza
   validationStatus?: 'check' | 'warning' | 'error' | null;
   validationMessage?: string;
+  placeholder?: string;
 }
 
 export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
@@ -67,7 +68,8 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
   children,
   isCustomContent = false,
   validationStatus,
-  validationMessage
+  validationMessage,
+  placeholder
 }) => {
   const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
   const rawValue = safeField.normalizedValue || safeField.rawValue || '';
@@ -151,6 +153,7 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
               data-testid={`field-input-${fieldKey}`}
               className="flex-1 text-sm border-b border-primary outline-none px-1 py-0.5 bg-transparent min-w-0"
               value={editValue}
+              placeholder={placeholder}
               onChange={handleChange}
               autoFocus
               disabled={isSaving}

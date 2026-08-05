@@ -68,7 +68,7 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
     setEditingField(null);
   };
 
-  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string) => {
+  const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, testId?: string, placeholder?: string) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
@@ -80,6 +80,7 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
         key={fieldKey}
         label={label}
         fieldKey={fieldKey}
+        placeholder={placeholder}
         field={safeField}
         isPrimary={isPrimary}
         displayValue={displayValue}
@@ -140,9 +141,9 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
       warnings={generateUserFriendlyWarnings()}
       gridClassName="grid grid-cols-1 sm:grid-cols-3 gap-3"
     >
-      {renderField("No. de Certificación", "numeroCertificacion", extraction.numeroCertificacion, true, "field-numeroCertificacion")}
-      {renderField("No. Inmueble", "numeroInmueble", extraction.numeroInmueble, true, "field-numeroInmueble")}
-      {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero")}
+      {renderField("No. de Certificación", "numeroCertificacion", extraction.numeroCertificacion, true, "field-numeroCertificacion", "C0000000000000")}
+      {renderField("No. Inmueble", "numeroInmueble", extraction.numeroInmueble, true, "field-numeroInmueble", "000000000000")}
+      {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero", "000000000000:0-A")}
       
       <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
         <div className="flex justify-end">
