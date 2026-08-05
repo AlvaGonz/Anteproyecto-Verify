@@ -202,5 +202,33 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.NumeroInmueble.Status.Should().Be(FieldStatus.Missing);
             extraction.ParcelaNumero.Status.Should().Be(FieldStatus.Missing);
         }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractDGIIFormat_WhenOcrMergesLabelAndValue()
+        {
+            // ponytail: real OCR output from DGII certificate — label+value merged, ó→6
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "CERTIFICACION" },
+                new OcrLine { Text = "No.deCertificaci6nC0121952878225" },
+                new OcrLine { Text = "La Dirección General de Impuestos Internos CERTIFICA: que el inmueble no.136400513193" },
+                new OcrLine { Text = "ubicado en la AVENIDA REPUBLICA DE COLOMBIA" },
+                new OcrLine { Text = "identificado como Parcela No.309466754512:4-A" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.NumeroCertificacion.Status.Should().Be(FieldStatus.Valid);
+            extraction.NumeroCertificacion.RawValue.Should().Be("C0121952878225");
+            extraction.ParcelaNumero.RawValue.Should().Be("309466754512:4-A");
+        }
     }
 }

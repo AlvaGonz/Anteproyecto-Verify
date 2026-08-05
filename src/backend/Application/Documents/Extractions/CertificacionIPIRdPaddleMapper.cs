@@ -23,21 +23,29 @@ public static class CertificacionIPIRdPaddleMapper
         extraction = extraction with
         {
             NumeroCertificacion = ExtractField(lines, fullText, "NumeroCertificacion",
-                // Label patterns - more flexible for OCR variations
+                // Label patterns - flexible for OCR variations (ó→6, ó→o, missing spaces)
                 new[] { 
-                    @"NO\.?\s*DE\s*CERTIFICACI[OÓ]N", 
-                    @"N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ]N", 
-                    @"CERTIFICACI[OÓ]N\s*N[ÚU]MERO",
+                    @"NO\.?\s*DE\s*CERTIFICACI[OÓ6]N",
+                    @"N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ6]N", 
+                    @"CERTIFICACI[OÓ6]N\s*N[ÚU]MERO",
                     @"CERTIFICACION\s*NO\.?",
                     @"CERT\.?\s*NO\.?",
                     @"NO\.?\s*CERTIFICACION",
-                    @"NUMERO\s*CERTIFICACION"
+                    @"NUMERO\s*CERTIFICACION",
+                    // ponytail: OCR merges "No.deCertificacion" into one blob
+                    @"NO\.?DE\s*CERTIFICACI[OÓ6]N",
+                    @"NO\.DE\.CERTIFICACI[OÓ6]N"
                 },
                 // Regex patterns - capture alphanumeric with hyphens
                 new[] { 
-                    @"(?:NO\.\s*DE\s*CERTIFICACI[OÓ]N|N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ]N|CERTIFICACI[OÓ]N\s*N[ÚU]MERO|CERTIFICACION\s*NO|NO\s*CERTIFICACION|NUMERO\s*CERTIFICACION)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
-                    @"(?:CERTIFICACI[OÓ]N\s*)([A-Z0-9\-\/]{6,})",
+                    @"(?:NO\.\s*DE\s*CERTIFICACI[OÓ6]N|N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ6]N|CERTIFICACI[OÓ6]N\s*N[ÚU]MERO|CERTIFICACION\s*NO|NO\s*CERTIFICACION|NUMERO\s*CERTIFICACION)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
+                    // ponytail: DGII merged blob — "No.deCertificaci6nC0121952878225"
+                    @"NO\.?DE\s*CERTIFICACI[OÓ6]N\s*([A-Z0-9]{10,})",
+                    @"NO\.DE\.CERTIFICACI[OÓ6]N\s*([A-Z0-9]{10,})",
+                    @"(?:CERTIFICACI[OÓ6]N\s*)([A-Z0-9\-\/]{6,})",
                     @"(?:NO\s*DE\s*CERTIFICACION\s*)([A-Z0-9\-\/]{6,})",
+                    // ponytail: DGII format — C followed by 10+ digits
+                    @"\b([Cc]\d{10,})\b",
                     @"\b([Cc]\d{13})\b"
                 }),
 

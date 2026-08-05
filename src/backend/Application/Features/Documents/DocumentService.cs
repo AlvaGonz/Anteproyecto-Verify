@@ -155,14 +155,9 @@ public class DocumentService : IDocumentService
         document.SetHash(hashString);
         await _documentoRepository.AddAsync(document, cancellationToken);
 
-        if (contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-        {
-            if (string.IsNullOrEmpty(project.ImagenUrl))
-            {
-                project.SetImagenUrl(blobUrl);
-                _proyectoRepository.Update(project);
-            }
-        }
+        // ponytail: los documentos (incluso imágenes) jamás se asignan como portada del proyecto;
+        // la portada solo se define mediante el flujo explícito de fotos del proyecto.
+        // (Se eliminó el bloque que llamaba a project.SetImagenUrl en uploads de tipo image/)
 
         // RS9: Registrar resultado de validación de integridad (exitoso)
         var validacion = new Validacion(projectId, "IntegridadDocumental", document.Id);

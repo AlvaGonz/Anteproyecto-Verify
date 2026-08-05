@@ -162,6 +162,46 @@ public class DocumentServiceTests
         _documentStateEngineMock.Verify(e => e.ApplyOcrResult(savedDoc, It.IsAny<global::Application.Abstractions.Ocr.OcrResult>()), Times.Once);
     }
 
+    [Fact]
+    public async Task UploadDocumentAsync_WithImageDocument_DoesNotSetProjectCoverImage()
+    {
+        // Arrange
+        var projectId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var project = new Proyecto("Test", "Loc", userId, 16);
+        var usuario = new Usuario("Test", "User", "test@test.com", "hash", UserRole.Profesional, "123", "456");
+        var plan = PlanSuscripcion.Create(Guid.NewGuid(), "Profesional", 0m, -1, -1, true, true, 2, 1024, true, true, true, true, true, true, "Comunidad", true);
+        typeof(Usuario).GetProperty("Plan")!.SetValue(usuario, plan);
+
+        var dto = new global::Application.DTOs.Documents.UploadDocumentDto(
+            DocumentType.CertificadoTitulo,
+            userId,
+            DateTime.UtcNow,
+            "Institucion",
+            null
+        );
+
+        // Real JPEG magic bytes so the file-signature validator accepts it as an image
+        var fileBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00 };
+        using var stream = new System.IO.MemoryStream(fileBytes);
+
+        _proyectoRepositoryMock.Setup(r => r.GetByIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(project);
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(usuario);
+        _documentoRepositoryMock.Setup(r => r.GetByProyectoIdAsync(projectId, It.IsAny<CancellationToken>())).ReturnsAsync(new List<Documento>());
+        _documentValidationServiceMock.Setup(s => s.ValidateDocumentAsync(It.IsAny<System.IO.Stream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new DocumentValidationResult { IsValid = true, ValidatedFieldsJson = "{}" });
+        _blobStorageServiceMock.Setup(s => s.UploadAsync(It.IsAny<System.IO.Stream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UploadResult("blobName", "http://test/blob"));
+        _ocrProviderMock.Setup(p => p.ProcessDocumentAsync(It.IsAny<System.IO.Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new global::Application.Abstractions.Ocr.OcrResult { Success = true, RawJson = "{}" });
+
+        // Act
+        await _documentService.UploadDocumentAsync(projectId, dto, stream, "test.jpg", "image/jpeg", fileBytes.Length);
+
+        // Assert: subir un documento (aunque sea imagen) nunca debe convertirse en la portada del proyecto
+        Assert.True(string.IsNullOrEmpty(project.ImagenUrl), "Un documento subido no debe asignarse como imagen de portada del proyecto.");
+    }
+
     /// <summary>
     /// RED TEST: Reproduces the bug where EstadoJuridico documents do not get
     /// their geographic resolution (provinceResolution, municipalityResolution)

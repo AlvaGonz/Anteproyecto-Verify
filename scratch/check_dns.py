@@ -14,3 +14,7 @@ def check_record(qtype):
 # Check MX, SPF (TXT)
 check_record("MX")
 check_record("TXT")
+
+
+def watch_probe_function():
+    return domain.upper()
