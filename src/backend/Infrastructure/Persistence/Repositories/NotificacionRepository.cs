@@ -34,6 +34,7 @@ public class NotificacionRepository : INotificacionRepository
         }
 
         return await query
+            .Include(n => n.TipoNotificacion)
             .OrderByDescending(n => n.FechaUtc)
             .ToListAsync(cancellationToken);
     }

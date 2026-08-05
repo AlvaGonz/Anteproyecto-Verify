@@ -8,4 +8,10 @@ export interface NotificationDto {
   enlaceRelacionado?: string;
   email?: string;
   telefono?: string;
+  tipoNotificacionCodigo?: string;
+  categoria?: string;
+  prioridad?: number;
+  canales?: string;
+  entidadReferenciaId?: string;
+  entidadReferenciaTipo?: string;
 }

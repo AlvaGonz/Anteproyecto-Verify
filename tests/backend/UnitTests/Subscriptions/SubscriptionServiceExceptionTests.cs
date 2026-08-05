@@ -43,7 +43,8 @@ public class SubscriptionServiceExceptionTests
             db,
             config ?? CreateConfiguration(),
             new Mock<ILogger<SubscriptionService>>().Object,
-            new Mock<IEmailService>().Object);
+            new Mock<IEmailService>().Object,
+            new Mock<INotificationFactory>().Object);
     }
 
     private static Usuario CreateUser(AppDbContext db, string? stripeSubscriptionId = null)

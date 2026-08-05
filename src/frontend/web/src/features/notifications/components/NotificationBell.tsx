@@ -1,9 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Bell, Trash2 } from "lucide-react";
+import { Bell, Trash2, UserCheck, Building2, FileCheck, CreditCard, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotificationDto } from "../types";
 import { useNotifications, useMarkAsRead, useMarkAllAsRead, useDeleteNotification } from "../api/useNotifications";
 import { toUtcDate } from "../../../shared/utils/dates";
+
+const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  Cuenta: UserCheck,
+  Proyectos: Building2,
+  Documentos: FileCheck,
+  Billing: CreditCard,
+  Social: Users,
+};
+
+const CATEGORY_LABEL: Record<string, string> = {
+  Cuenta: "Cuenta",
+  Proyectos: "Proyectos",
+  Documentos: "Documentos",
+  Billing: "Facturación",
+  Social: "Social",
+};
 
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,6 +80,24 @@ export const NotificationBell: React.FC = () => {
     } catch (error) {
       console.error("Error deleting notification", error);
     }
+  };
+
+  const resolveBorderColor = (n: NotificationDto) => {
+    const p = n.prioridad ?? 5;
+    if (!n.leida) {
+      if (p <= 2) return "border-l-error/60 bg-error/5";
+      if (p === 3) return "border-l-warning/60 bg-warning/5";
+      return "border-l-primary bg-primary/5";
+    }
+    return "border-l-transparent";
+  };
+
+  const renderCategoryIcon = (n: NotificationDto) => {
+    const cat = n.categoria ?? "";
+    const IconComponent = CATEGORY_ICONS[cat];
+    if (!IconComponent) return null;
+    const iconClass = n.leida ? "opacity-40" : "opacity-70";
+    return <IconComponent className={`h-3.5 w-3.5 ${iconClass}`} />;
   };
 
   return (
@@ -133,14 +167,17 @@ export const NotificationBell: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95, backgroundColor: 'rgb(var(--color-error) / 0.1)' }}
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        key={notification.id} 
-                        className={`p-3 hover:bg-surface-raised/50 transition-colors relative group ${!notification.leida ? 'bg-primary/5 border-l-2 border-primary' : 'border-l-2 border-transparent'}`}
+                        key={notification.id}
+                        className={`p-3 hover:bg-surface-raised/50 transition-colors relative group border-l-2 ${resolveBorderColor(notification)}`}
                       >
                         <div className="flex justify-between items-start gap-2">
                           <div className="flex-1 pr-6">
-                            <p className={`text-xs font-semibold ${!notification.leida ? 'text-primary' : 'text-text-primary opacity-70'}`}>
-                              {notification.tipo}
-                            </p>
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              {renderCategoryIcon(notification)}
+                              <p className={`text-xs font-semibold ${!notification.leida ? 'text-text-primary' : 'text-text-primary opacity-70'}`}>
+                                {notification.categoria ? CATEGORY_LABEL[notification.categoria] ?? notification.categoria : notification.tipo}
+                              </p>
+                            </div>
                             <p className="text-sm text-text-primary mt-0.5 leading-snug">
                               {notification.mensaje}
                             </p>

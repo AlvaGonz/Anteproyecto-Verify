@@ -50,7 +50,13 @@ public class NotificationsController : ControllerBase
             FechaUtc: n.FechaUtc,
             EnlaceRelacionado: n.EnlaceRelacionado,
             Email: email,
-            Telefono: telefono
+            Telefono: telefono,
+            TipoNotificacionCodigo: n.TipoNotificacion?.Codigo,
+            Categoria: n.TipoNotificacion?.Categoria,
+            Prioridad: n.Prioridad,
+            Canales: n.TipoNotificacion?.Canales,
+            EntidadReferenciaId: n.EntidadReferenciaId,
+            EntidadReferenciaTipo: n.EntidadReferenciaTipo
         ));
 
         return Ok(dtos);

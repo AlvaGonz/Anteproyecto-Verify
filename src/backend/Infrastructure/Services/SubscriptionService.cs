@@ -8,6 +8,7 @@ using Application.Common.Exceptions;
 using Application.Contracts.Subscriptions;
 using Application.DTOs.Subscriptions;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Policies;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -24,17 +25,20 @@ public class SubscriptionService : ISubscriptionService
     private readonly IConfiguration _configuration;
     private readonly ILogger<SubscriptionService> _logger;
     private readonly IEmailService _emailService;
+    private readonly INotificationFactory _notificationFactory;
 
     public SubscriptionService(
         AppDbContext dbContext,
         IConfiguration configuration,
         ILogger<SubscriptionService> logger,
-        IEmailService emailService)
+        IEmailService emailService,
+        INotificationFactory notificationFactory)
     {
         _dbContext = dbContext;
         _configuration = configuration;
         _logger = logger;
         _emailService = emailService;
+        _notificationFactory = notificationFactory;
         StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
     }
 
@@ -514,12 +518,11 @@ public class SubscriptionService : ISubscriptionService
     {
         if (isNewPlan)
         {
-            var notification = new Notificacion(
+            var notification = await _notificationFactory.CreateAsync(
                 user.Id,
+                TipoNotificacionId.SuscripcionActivada,
                 $"¡Felicidades! Has contratado exitosamente el plan de suscripción {plan.NombrePlan}.",
-                "Success",
-                "/settings/subscription"
-            );
+                "/settings/subscription");
             _dbContext.Notificaciones.Add(notification);
             
             await _emailService.SendSubscriptionActivatedAsync(

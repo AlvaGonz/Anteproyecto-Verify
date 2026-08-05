@@ -11,5 +11,11 @@ public record NotificationDto(
     DateTime FechaUtc,
     string? EnlaceRelacionado,
     string? Email,
-    string? Telefono
+    string? Telefono,
+    string? TipoNotificacionCodigo = null,
+    string? Categoria = null,
+    byte Prioridad = 3,
+    string? Canales = null,
+    Guid? EntidadReferenciaId = null,
+    string? EntidadReferenciaTipo = null
 );
