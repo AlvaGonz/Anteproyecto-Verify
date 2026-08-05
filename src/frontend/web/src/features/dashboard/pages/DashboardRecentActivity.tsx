@@ -90,57 +90,103 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = R
   return (
   <>
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-      <div className="vf-card p-5 shadow-sm">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-            <Users className="w-5 h-5 text-secondary" />
+      {/* Total Usuarios */}
+      <m.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.0, duration: 0.5 }}
+        className="vf-card p-0 overflow-hidden group hover:border-primary/40 transition-all shadow-sm"
+      >
+        <div className="p-4 sm:p-6 flex items-center gap-4 sm:gap-5 min-w-0">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500 overflow-hidden relative">
+            <div className="absolute inset-0 opacity-10 bg-secondary" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent" />
+            <Users className="h-7 w-7 sm:h-8 sm:w-8 text-secondary" />
           </div>
-          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Total Usuarios</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-text-secondary leading-snug mb-1 opacity-70">Total Usuarios</p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalUsuarios}</p>
+            </div>
+          </div>
         </div>
-        <p className="text-3xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalUsuarios}</p>
-      </div>
+      </m.div>
 
-      <div className="vf-card p-5 shadow-sm">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
-            <Activity className="w-5 h-5 text-success" />
+      {/* Suscripciones Activas */}
+      <m.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+        className="vf-card p-0 overflow-hidden group hover:border-primary/40 transition-all shadow-sm"
+      >
+        <div className="p-4 sm:p-6 flex items-center gap-4 sm:gap-5 min-w-0">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500 overflow-hidden relative">
+            <div className="absolute inset-0 opacity-10 bg-success" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent" />
+            <Activity className="h-7 w-7 sm:h-8 sm:w-8 text-success" />
           </div>
-          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Suscripciones Activas</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-text-secondary leading-snug mb-1 opacity-70">Suscripciones Activas</p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.suscripcionesActivas}</p>
+            </div>
+          </div>
         </div>
-        <p className="text-3xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.suscripcionesActivas}</p>
-      </div>
+      </m.div>
 
-      <div className="vf-card p-5 shadow-sm">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <FileCheck className="w-5 h-5 text-primary" />
+      {/* Consultas / Proyectos */}
+      <m.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="vf-card p-0 overflow-hidden group hover:border-primary/40 transition-all shadow-sm"
+      >
+        <div className="p-4 sm:p-6 flex items-center gap-4 sm:gap-5 min-w-0">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500 overflow-hidden relative">
+            <div className="absolute inset-0 opacity-10 bg-primary" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent" />
+            <FileCheck className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
           </div>
-          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Consultas · Proyectos</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-text-secondary leading-snug mb-1 opacity-70 whitespace-nowrap">Consultas · Proyectos</p>
+            <div className="flex justify-between items-end gap-2">
+              <div>
+                <p className="text-[9px] font-black text-text-secondary/50 uppercase tracking-wider mb-0.5">Consultas</p>
+                <p className="text-xl sm:text-2xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalConsultasRealizadas || 0}</p>
+              </div>
+              <div className="w-px h-8 bg-border self-center" />
+              <div className="text-right">
+                <p className="text-[9px] font-black text-text-secondary/50 uppercase tracking-wider mb-0.5">Proyectos</p>
+                <p className="text-xl sm:text-2xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalProyectosRegistrados || 0}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex justify-between items-end">
-          <div>
-            <p className="text-[10px] font-black text-text-secondary/50 uppercase tracking-wider mb-0.5">Consultas</p>
-            <p className="text-2xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalConsultasRealizadas || 0}</p>
-          </div>
-          <div className="w-px h-10 bg-border self-center" />
-          <div className="text-right">
-            <p className="text-[10px] font-black text-text-secondary/50 uppercase tracking-wider mb-0.5">Proyectos</p>
-            <p className="text-2xl font-display font-black text-text-primary tracking-tighter">{loading ? "..." : statsData?.totalProyectosRegistrados || 0}</p>
-          </div>
-        </div>
-      </div>
+      </m.div>
 
-      <div className="vf-card p-5 shadow-sm">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-xl bg-warning/10 flex items-center justify-center flex-shrink-0">
-            <CreditCard className="w-5 h-5 text-warning" />
+      {/* Flujo Mensual Estimado */}
+      <m.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="vf-card p-0 overflow-hidden group hover:border-primary/40 transition-all shadow-sm"
+      >
+        <div className="p-4 sm:p-6 flex items-center gap-4 sm:gap-5 min-w-0">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500 overflow-hidden relative">
+            <div className="absolute inset-0 opacity-10 bg-warning" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent" />
+            <CreditCard className="h-7 w-7 sm:h-8 sm:w-8 text-warning" />
           </div>
-          <p className="text-xs font-bold text-text-secondary leading-snug min-w-0">Flujo Mensual Estimado</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-text-secondary leading-snug mb-1 opacity-70">Flujo Mensual</p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-2xl sm:text-3xl font-display font-black text-text-primary tracking-tighter">
+                ${loading ? "..." : statsData?.ingresosMensualesEstimados.toLocaleString()}
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="text-3xl font-display font-black text-text-primary tracking-tighter">
-          ${loading ? "..." : statsData?.ingresosMensualesEstimados.toLocaleString()}
-        </p>
-      </div>
+      </m.div>
     </div>
 
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
