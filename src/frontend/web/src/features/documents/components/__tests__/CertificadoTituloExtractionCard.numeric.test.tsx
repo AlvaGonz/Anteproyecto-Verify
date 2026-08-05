@@ -47,12 +47,13 @@ describe("CertificadoTituloExtractionCard numeric fields", () => {
     } as Response);
   });
 
-  it("renders matricula with US thousands separator in display", () => {
+  it("renders matricula without thousands separator", () => {
     render(
       <CertificadoTituloExtractionCard extraction={baseExtraction} />,
       { wrapper: createWrapper() },
     );
-    expect(screen.getByText("0,100,035,082")).toBeInTheDocument();
+    expect(screen.getByText("0100035082")).toBeInTheDocument();
+    expect(screen.queryByText("0,100,035,082")).not.toBeInTheDocument();
   });
 
   it("renders superficie M2 with US thousands separator and 2 decimals", () => {

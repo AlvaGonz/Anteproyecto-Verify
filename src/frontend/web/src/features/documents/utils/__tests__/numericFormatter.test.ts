@@ -8,17 +8,16 @@ import {
 
 describe('numericFormatter', () => {
   describe('formatMatricula', () => {
-    it('preserves leading zeros and applies US thousands separator', () => {
-      // 10-digit matricula → leading 1 digit + 3 groups of 3 = "0,100,035,082"
-      expect(formatMatricula('0100035082')).toBe('0,100,035,082');
+    it('preserves leading zeros without thousands separator', () => {
+      expect(formatMatricula('0100035082')).toBe('0100035082');
     });
 
-    it('formats 7-digit matricula as 1 + 3 + 3 grouping', () => {
-      expect(formatMatricula('1234567')).toBe('1,234,567');
+    it('keeps 7-digit matricula unchanged', () => {
+      expect(formatMatricula('1234567')).toBe('1234567');
     });
 
-    it('formats 5-digit matricula as 2 + 3 grouping', () => {
-      expect(formatMatricula('12345')).toBe('12,345');
+    it('keeps 5-digit matricula unchanged', () => {
+      expect(formatMatricula('12345')).toBe('12345');
     });
 
     it('returns empty string for null/undefined/empty', () => {
@@ -28,8 +27,8 @@ describe('numericFormatter', () => {
     });
 
     it('strips non-digit characters before formatting', () => {
-      expect(formatMatricula('010-003-5082')).toBe('0,100,035,082');
-      expect(formatMatricula('010.003.5082')).toBe('0,100,035,082');
+      expect(formatMatricula('010-003-5082')).toBe('0100035082');
+      expect(formatMatricula('010.003.5082')).toBe('0100035082');
     });
   });
 

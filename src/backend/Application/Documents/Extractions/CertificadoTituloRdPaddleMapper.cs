@@ -75,7 +75,7 @@ public static class CertificadoTituloRdPaddleMapper
                 }),
             
             FechaYHoraInscripcion = ExtractField(lines, fullText, "Fecha", 
-                new[] { @"FECHA\s+Y\s+HORA", @"INSCRITO\s+A\s+LAS", @"EMITIDO\s+EL", @"EMITIDO\s+EL" }, 
+                new[] { @"FECHA\s+Y\s*HORA", @"INSCRITO\s+A\s+LAS", @"EMITIDO\s+EL", @"EMITIDO\s+EL" }, 
                 new[] { 
                     @"(?:Inscrito a las.*?el\s*)(\d{1,2}/[a-zA-Z]+/\d{4})", 
                     @"(?:FECHA Y HORA DE INSCRIPCION.*?)(?:\d{1,2}/\d{1,2}/\d{4})", 
@@ -86,8 +86,8 @@ public static class CertificadoTituloRdPaddleMapper
                 }),
             
             VieneDe = ExtractField(lines, fullText, "VieneDe", 
-                new[] { @"CANCELA\s+LA\s+ANTERIOR", @"VIENE\s+DE" }, 
-                new[] { @"(?:cancela la anterior|viene de)\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([\w\.\-]{2,30})" }),
+                new[] { @"CANCELA\s+LA\s+ANTERIOR", @"VIENE\s+DE", @"VIENEDE", @"VIENEFE" }, 
+                new[] { @"(?:cancela la anterior|viene de|vienede|vienefe)\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([\w\.\-]{2,30})" }),
             
             Matricula = ExtractField(lines, fullText, "Matricula",
                 new[] { @"MATR[IÍ]CULA", @"MATRICUL", @"MATR[IÍ]CUL", @"[Mm]atric\b" },
@@ -189,6 +189,54 @@ public static class CertificadoTituloRdPaddleMapper
         return lines;
     }
 
+    private static bool IsProximityDateLeak(string candidate, string fieldType)
+    {
+        if (fieldType == "Oficina" && Regex.IsMatch(candidate, @"\d{1,2}/\d{1,2}/\d{4}"))
+            return true;
+        if (fieldType == "SuperficieM2" && !Regex.IsMatch(candidate, @"\d"))
+            return true;
+        if (fieldType == "Fecha" && !Regex.IsMatch(candidate, @"\d"))
+            return true;
+        return false;
+    }
+
+    private static bool IsLabelContinuation(string candidate, string fieldType)
+    {
+        var trimmed = candidate.Trim();
+        if (SpanishStopwords.Contains(trimmed)) return true;
+        if (trimmed.Length == 1) return true;
+
+        if (fieldType == "Fecha")
+        {
+            if (trimmed == "DE INSCRIPCION" || trimmed == "DE EMISION")
+                return true;
+            if (!Regex.IsMatch(trimmed, @"\d"))
+                return true;
+        }
+
+        if (fieldType == "DesignacionCatastral")
+        {
+            if (Regex.IsMatch(trimmed, @"^[A-Z]{1,4}$"))
+                return true;
+            if (!Regex.IsMatch(trimmed, @"\d"))
+                return true;
+        }
+
+        if (fieldType == "Matricula")
+        {
+            var longDigits = Regex.Matches(trimmed, @"\d{8,}");
+            if (longDigits.Count > 0) return false;
+        }
+
+        if (fieldType == "SuperficieM2")
+        {
+            if (!Regex.IsMatch(trimmed, @"\d"))
+                return true;
+        }
+
+        return false;
+    }
+
     private static ExtractedField ExtractField(List<string> lines, string fullText, string fieldType, string[] labelPatterns, string[] regexPatterns)
     {
         string? rawValue = null;
@@ -205,8 +253,12 @@ public static class CertificadoTituloRdPaddleMapper
                     var inlineMatch = Regex.Match(line, $@"{labelPattern}\s*[:\-]?\s*(.+)", RegexOptions.IgnoreCase);
                     if (inlineMatch.Success && !string.IsNullOrWhiteSpace(inlineMatch.Groups[1].Value))
                     {
-                        rawValue = inlineMatch.Groups[1].Value;
-                        break;
+                        var candidate = inlineMatch.Groups[1].Value;
+                        if (!IsLabelContinuation(candidate, fieldType))
+                        {
+                            rawValue = candidate;
+                            break;
+                        }
                     }
                     
                     // Check next line for proximity block.
@@ -216,8 +268,12 @@ public static class CertificadoTituloRdPaddleMapper
                         && !Regex.IsMatch(lines[i + 1], @"^[A-Z\s]+$")
                         && IsValueLike(lines[i + 1]))
                     {
-                        rawValue = lines[i + 1];
-                        break;
+                        var nextLine = lines[i + 1];
+                        if (!IsProximityDateLeak(nextLine, fieldType))
+                        {
+                            rawValue = nextLine;
+                            break;
+                        }
                     }
                 }
             }
