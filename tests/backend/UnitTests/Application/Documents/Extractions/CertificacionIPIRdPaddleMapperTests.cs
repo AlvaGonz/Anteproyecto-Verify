@@ -230,5 +230,32 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.NumeroCertificacion.RawValue.Should().Be("C0121952878225");
             extraction.ParcelaNumero.RawValue.Should().Be("309466754512:4-A");
         }
+
+        [Fact]
+        public void ParcelaNumero_Normalized_PreservesColonAndHyphen()
+        {
+            var lines = new List<OcrLine> { new OcrLine { Text = "PARCELA NO.: 150106256710:4-A" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "PARCELA NO.: 150106256710:4-A" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.ParcelaNumero.NormalizedValue.Should().Be("150106256710:4-A");
+        }
+
+        [Fact]
+        public void NumeroInmueble_Normalized_IsPurelyNumeric()
+        {
+            var lines = new List<OcrLine> { new OcrLine { Text = "NO. INMUEBLE: 458901236754" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "NO. INMUEBLE: 458901236754" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.NumeroInmueble.NormalizedValue.Should().Be("458901236754");
+        }
+
+        [Fact]
+        public void NumeroCertificacion_Normalized_PreservesAlphanumerics()
+        {
+            var lines = new List<OcrLine> { new OcrLine { Text = "NO. DE CERTIFICACION: C0348921465789" } };
+            var ocrResult = new OcrResult { Success = true, Lines = lines, ExtractedText = "NO. DE CERTIFICACION: C0348921465789" };
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+            extraction!.NumeroCertificacion.NormalizedValue.Should().Be("C0348921465789");
+        }
     }
 }

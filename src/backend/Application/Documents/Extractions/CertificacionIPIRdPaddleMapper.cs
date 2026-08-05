@@ -176,20 +176,20 @@ public static class CertificacionIPIRdPaddleMapper
             }
         }
 
-        // Layer 4: Canonical Normalization
+        // Layer 4: Canonical Normalization — field-specific per DGII format
         if (!string.IsNullOrWhiteSpace(rawValue))
         {
             rawValue = rawValue.Trim().TrimEnd('.');
-            string normalizedValue = rawValue;
-
-            switch (fieldType)
+            string normalizedValue = fieldType switch
             {
-                case "NumeroCertificacion":
-                case "NumeroInmueble":
-                case "ParcelaNumero":
-                    normalizedValue = SharedFieldNormalizer.NormalizeDesignacionCatastral(rawValue);
-                    break;
-            }
+                // DGII format: pure digits, no hyphens, no colons
+                "NumeroInmueble" => Regex.Replace(rawValue, @"[^0-9]", ""),
+                // Catastral format: preserve colons, hyphens, alphanumeric (e.g. 150106256710:4-A)
+                "ParcelaNumero" => Regex.Replace(rawValue, @"[^A-Za-z0-9:-]", "").ToUpperInvariant(),
+                // Certificate format: alphanumeric only, preserve C prefix (e.g. C0348921465789)
+                "NumeroCertificacion" => Regex.Replace(rawValue, @"[^A-Za-z0-9]", "").ToUpperInvariant(),
+                _ => SharedFieldNormalizer.NormalizeDesignacionCatastral(rawValue)
+            };
 
             return new ExtractedField
             {
