@@ -3,6 +3,7 @@ namespace Application.Features.Auth.Commands.InviteTeamMember;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Abstractions.Notifications;
 using Application.Abstractions.Persistence;
 using Application.Abstractions.Security;
 using Domain.Entities;
@@ -14,15 +15,21 @@ public class InviteTeamMemberCommandHandler
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly INotificationFactory _notificationFactory;
+    private readonly INotificacionRepository _notificacionRepository;
 
     public InviteTeamMemberCommandHandler(
         IUsuarioRepository usuarioRepository, 
         IUnitOfWork unitOfWork,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        INotificationFactory notificationFactory,
+        INotificacionRepository notificacionRepository)
     {
         _usuarioRepository = usuarioRepository;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
+        _notificationFactory = notificationFactory;
+        _notificacionRepository = notificacionRepository;
     }
 
     public async Task<InviteTeamMemberResult> Handle(InviteTeamMemberCommand request, CancellationToken cancellationToken)
@@ -67,6 +74,13 @@ public class InviteTeamMemberCommandHandler
         }
 
         await _usuarioRepository.AddAsync(nuevoUsuario, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var notif = await _notificationFactory.CreateAsync(nuevoUsuario.Id,
+            TipoNotificacionId.InvitacionRecibida,
+            $"{titular.NombreCompleto} te ha invitado a su equipo en VeriFinca.",
+            "/dashboard");
+        await _notificacionRepository.AddAsync(notif, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // TODO: Send email with temp password (outside this scope but conceptually needed)
