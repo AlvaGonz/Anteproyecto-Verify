@@ -33,7 +33,8 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
     private async Task<SearchResultDto?> SearchRncAsync(string query, CancellationToken ct)
     {
-        var dgii = await _context.DGII.FirstOrDefaultAsync(d => d.Rnc == query, ct);
+        var cleanQuery = query.Replace("-", "").Trim();
+        var dgii = await _context.DGII.FirstOrDefaultAsync(d => d.Rnc == cleanQuery || d.Rnc == query, ct);
         if (dgii == null) return null;
 
         var result = new SearchResultDto
@@ -52,7 +53,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         // Buscar proyectos asociados
         var proyectos = await _context.Proyectos
             .Include(p => p.Estado)
-            .Where(p => p.RncDesarrollador == query || p.CedulaRncPropietario == query)
+            .Where(p => p.RncDesarrollador == cleanQuery || p.CedulaRncPropietario == cleanQuery || p.RncDesarrollador == query || p.CedulaRncPropietario == query)
             .ToListAsync(ct);
 
         BuildGraph(result, query, dgii.NombreRazonSocial, "Entidad", proyectos);
@@ -62,7 +63,8 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
     private async Task<SearchResultDto?> SearchCedulaAsync(string query, CancellationToken ct)
     {
-        var persona = await _context.JCE_Ciudadanos.FirstOrDefaultAsync(c => c.Cedula == query, ct);
+        var cleanQuery = query.Replace("-", "").Trim();
+        var persona = await _context.JCE_Ciudadanos.FirstOrDefaultAsync(c => c.Cedula == cleanQuery || c.Cedula == query, ct);
         if (persona == null) return null;
 
         var result = new SearchResultDto
@@ -82,7 +84,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
         var proyectos = await _context.Proyectos
             .Include(p => p.Estado)
-            .Where(p => p.CedulaRncPropietario == query)
+            .Where(p => p.CedulaRncPropietario == cleanQuery || p.CedulaRncPropietario == query)
             .ToListAsync(ct);
 
         BuildGraph(result, query, "Ciudadano Registrado", "Ciudadano", proyectos);
@@ -92,7 +94,8 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
     private async Task<SearchResultDto?> SearchSueloAsync(string query, CancellationToken ct)
     {
-        var licencia = await _context.LicenciasConstruccion.FirstOrDefaultAsync(l => l.NumeroPermiso == query, ct);
+        var cleanQuery = query.Replace("-", "").Trim();
+        var licencia = await _context.LicenciasConstruccion.FirstOrDefaultAsync(l => l.NumeroPermiso == cleanQuery || l.NumeroPermiso == query, ct);
         if (licencia == null) return null;
 
         var result = new SearchResultDto
@@ -120,7 +123,8 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
     private async Task<SearchResultDto?> SearchIpiAsync(string query, CancellationToken ct)
     {
-        var ipi = await _context.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == query, ct);
+        var cleanQuery = query.Replace("-", "").Trim();
+        var ipi = await _context.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == cleanQuery || p.NoCertificacion == query, ct);
         if (ipi == null) return null;
 
         var result = new SearchResultDto
@@ -138,7 +142,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
         var proyectos = await _context.Proyectos
             .Include(p => p.Estado)
-            .Where(p => p.Ipi == query)
+            .Where(p => p.Ipi == cleanQuery || p.Ipi == query)
             .ToListAsync(ct);
 
         BuildGraph(result, query, $"IPI {ipi.NoCertificacion}", "Impuesto", proyectos);

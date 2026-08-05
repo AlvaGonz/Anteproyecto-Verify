@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -47,14 +47,25 @@ namespace Infrastructure.Persistence.Migrations
                 table: "DatoValidado",
                 newName: "IX_DatoValidado_ProyectoId");
 
-            migrationBuilder.AlterColumn<Guid>(
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado");
+
+            migrationBuilder.DropColumn(
+                name: "Id",
+                table: "DatoValidado");
+
+            migrationBuilder.AddColumn<Guid>(
                 name: "Id",
                 table: "DatoValidado",
                 type: "uniqueidentifier",
                 nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
+                defaultValueSql: "NEWSEQUENTIALID()");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado",
+                column: "Id");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAtUtc",
@@ -109,7 +120,7 @@ namespace Infrastructure.Persistence.Migrations
                 column: "ProyectoId",
                 principalTable: "ProyectosInmobiliarios",
                 principalColumn: "IdProyecto",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
         }
 
         /// <inheritdoc />
@@ -167,14 +178,25 @@ namespace Infrastructure.Persistence.Migrations
                 table: "DatoValidado",
                 newName: "IX_DatoValidado_ValidacionId");
 
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado");
+
+            migrationBuilder.DropColumn(
+                name: "Id",
+                table: "DatoValidado");
+
+            migrationBuilder.AddColumn<int>(
                 name: "Id",
                 table: "DatoValidado",
                 type: "int",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "uniqueidentifier")
+                nullable: false)
                 .Annotation("SqlServer:Identity", "1, 1");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_DatoValidado",
+                table: "DatoValidado",
+                column: "Id");
 
             migrationBuilder.AddColumn<string>(
                 name: "Campo",
