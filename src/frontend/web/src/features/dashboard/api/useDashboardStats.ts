@@ -12,7 +12,7 @@ export const useDashboardStats = () => {
     staleTime: 60_000,
     refetchInterval: 30_000,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: "always",
     enabled: !!user,
   });
 };
