@@ -4,6 +4,69 @@ import { m, AnimatePresence } from "framer-motion";
 import type { DashboardStatsDto, SuscripcionRecienteDto } from "../../../infrastructure/api/dashboard.api";
 import { toUtcDate } from "../../../shared/utils/dates";
 
+const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+const BarChart: React.FC<{ data: { month: string; count: number }[] }> = ({ data }) => {
+  const svgRef = React.useRef<SVGSVGElement>(null);
+  const [width, setWidth] = React.useState(0);
+  const height = 180;
+  const pad = { t: 20, r: 4, b: 28, l: 32 };
+
+  React.useEffect(() => {
+    if (!svgRef.current) return;
+    const ro = new ResizeObserver(([e]) => setWidth(e.contentRect.width));
+    ro.observe(svgRef.current.parentElement!);
+    return () => ro.disconnect();
+  }, []);
+
+  const { yMax, yMin, gridLines } = React.useMemo(() => {
+    if (!data.length || !width) return { yMax: 0, yMin: 0, gridLines: [] as number[] };
+    const vals = data.map(d => d.count);
+    const yMax = Math.max(...vals) * 1.15 || 1;
+    const yMin = 0;
+    const tickCount = 3;
+    const gridLines = Array.from({ length: tickCount + 1 }, (_, i) => yMin + (yMax - yMin) * (i / tickCount));
+    return { yMax, yMin, gridLines };
+  }, [data, width]);
+
+  return (
+    <svg ref={svgRef} width="100%" height={height} style={{ display: "block" }}>
+      {gridLines.map((v, i) => {
+        const yPos = pad.t + (height - pad.t - pad.b) * (1 - (v - yMin) / (yMax - yMin || 1));
+        return (
+          <g key={i}>
+            <text x={pad.l - 6} y={yPos + 3.5} textAnchor="end" fontSize="10" fill="#9ca3af">{Math.round(v)}</text>
+            {i > 0 && <line x1={pad.l} y1={yPos} x2={width - pad.r} y2={yPos} stroke="#e5e7eb" strokeWidth={1} strokeDasharray="4 4" />}
+          </g>
+        );
+      })}
+      {data.map((d, i) => {
+        if (!width) return null;
+        const plotW = width - pad.l - pad.r;
+        const plotH = height - pad.t - pad.b;
+        const barW = Math.min(plotW / Math.max(data.length, 1) * 0.6, 40);
+        const cx = pad.l + (i + 0.5) * (plotW / Math.max(data.length, 1));
+        const barH = ((d.count - yMin) / (yMax - yMin || 1)) * plotH;
+        const yPos = pad.t + plotH - barH;
+        
+        return (
+          <g key={i} className="group cursor-pointer">
+            <text x={cx} y={pad.t + plotH + 16} textAnchor="middle" fontSize="10" fill="#9ca3af">{d.month}</text>
+            <rect x={cx - barW / 2} y={yPos} width={barW} height={barH} fill="#223382" rx="2" className="group-hover:fill-[#F98513] transition-colors" />
+            
+            {/* Invisible rect for easier hovering */}
+            <rect x={cx - barW / 2} y={pad.t} width={barW} height={plotH} fill="transparent" />
+            <g className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <rect x={cx - 16} y={yPos - 22} width="32" height="18" rx="4" fill="#1f2937" />
+              <text x={cx} y={yPos - 10} textAnchor="middle" fontSize="10" fill="#ffffff" fontWeight="bold">{d.count}</text>
+            </g>
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
 export interface DashboardRecentActivityProps {
   loading: boolean;
   statsData: DashboardStatsDto | undefined;
@@ -15,6 +78,14 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = R
   const itemsPerPage = 5;
   const totalPages = Math.ceil(recentSubscriptions.length / itemsPerPage);
   const paginatedSubscriptions = recentSubscriptions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const usuariosPorMesChartData = React.useMemo(() => {
+    if (!statsData?.usuariosPorMes) return [];
+    return statsData.usuariosPorMes.map(d => ({
+      month: MONTHS[d.month - 1],
+      count: d.count
+    }));
+  }, [statsData?.usuariosPorMes]);
 
   return (
   <>
@@ -73,8 +144,9 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = R
     </div>
 
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
-        <div className="px-6 py-4 border-b border-border bg-surface-raised/20">
+      <div className="flex flex-col gap-6">
+        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
+          <div className="px-6 py-4 border-b border-border bg-surface-raised/20">
           <h3 className="text-lg font-display font-black text-[#223382] tracking-tight">
             Flujo de <span className="text-[#F98513]">Usuarios</span>
           </h3>
@@ -108,6 +180,22 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = R
           )}
         </div>
       </div>
+
+      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col p-6">
+        <h3 className="text-lg font-display font-black text-[#223382] tracking-tight mb-4">
+          Usuarios por <span className="text-[#F98513]">Mes</span>
+        </h3>
+        <div className="flex-1 min-h-[180px]">
+          {loading ? (
+             <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#223382]" /></div>
+          ) : usuariosPorMesChartData.length > 0 ? (
+             <BarChart data={usuariosPorMesChartData} />
+          ) : (
+             <div className="text-sm text-text-secondary text-center opacity-70 mt-10">No hay datos de meses</div>
+          )}
+        </div>
+      </div>
+    </div>
 
       <div className="lg:col-span-2 bg-white border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
         <div className="px-8 py-6 border-b border-border flex items-center justify-between bg-surface-raised/20">

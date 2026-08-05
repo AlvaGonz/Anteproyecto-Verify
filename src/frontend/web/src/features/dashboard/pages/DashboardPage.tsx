@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { FolderKanban, FileCheck, Heart, TrendingUp } from "lucide-react";
+import { FolderKanban, FileCheck, Bookmark, TrendingUp } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useDashboardStats } from "../api/useDashboardStats";
@@ -68,9 +68,9 @@ export const DashboardPage: React.FC = React.memo(() => {
       bgColor: "bg-success",
     },
     {
-      name: "Proyectos de Interés",
+      name: "Mis Intereses",
       stat: loading ? "..." : intereses.toString(),
-      icon: Heart,
+      icon: Bookmark,
       bgColor: "bg-warning",
       onClick: () => navigate("/admin/projects?tab=intereses"),
     },

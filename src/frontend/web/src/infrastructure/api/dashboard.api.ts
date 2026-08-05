@@ -15,9 +15,16 @@ export interface DashboardStatsDto {
   totalProyectosRegistrados: number;
   totalIntereses: number;
   proyectosPorMes: ProyectosPorMesDto[];
+  usuariosPorMes: UsuariosPorMesDto[];
 }
 
 export interface ProyectosPorMesDto {
+  year: number;
+  month: number;
+  count: number;
+}
+
+export interface UsuariosPorMesDto {
   year: number;
   month: number;
   count: number;

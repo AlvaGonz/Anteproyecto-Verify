@@ -46,7 +46,7 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 .Include(u => u.Plan)
                 .Where(u => u.PlanSuscripcionId != null)
                 .OrderByDescending(u => u.UpdatedAtUtc ?? u.CreatedAtUtc)
-                .Take(15)
+                .Take(50)
                 .Select(u => new SuscripcionRecienteDto
                 {
                     FechaAlta = u.UpdatedAtUtc ?? u.CreatedAtUtc,
@@ -60,7 +60,7 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 .Include(p => p.UsuarioCreador)
                 .Include(p => p.Estado)
                 .OrderByDescending(p => p.CreatedAtUtc)
-                .Take(15)
+                .Take(50)
                 .Select(p => new ProyectoRecienteDto
                 {
                     FechaRegistro = p.CreatedAtUtc,
@@ -92,6 +92,18 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 })
                 .ToListAsync(cancellationToken);
 
+            var usuariosPorMes = await activeUsersQuery
+                .GroupBy(u => new { u.CreatedAtUtc.Year, u.CreatedAtUtc.Month })
+                .OrderBy(g => g.Key.Year)
+                .ThenBy(g => g.Key.Month)
+                .Select(g => new UsuariosPorMesDto
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Count = g.Count()
+                })
+                .ToListAsync(cancellationToken);
+
             return new DashboardStatsDto
             {
                 TotalUsuarios = totalUsuarios,
@@ -107,7 +119,8 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 TotalConsultasRealizadas = totalConsultas,
                 TotalProyectosRegistrados = totalProyectos,
                 TotalIntereses = totalIntereses,
-                ProyectosPorMes = proyectosPorMes
+                ProyectosPorMes = proyectosPorMes,
+                UsuariosPorMes = usuariosPorMes
             };
         }
 

@@ -144,7 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </div>
 
         <motion.nav
-          className={clsx("flex flex-col justify-evenly flex-1 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]", isCollapsed ? "px-2" : "px-4")}
+          className={clsx("flex flex-col gap-1 overflow-y-auto flex-1 min-h-0 scrollbar-hide", isCollapsed ? "px-2" : "px-4")}
           initial={shouldReduceMotion ? false : "hidden"}
           animate="visible"
           variants={{
@@ -230,7 +230,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
               hidden: { opacity: 0, x: -12 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
             }}
-            className="shrink-0"
+            className="shrink-0 mt-auto pt-4"
           >
             <Link
               to="/admin/projects/new"
