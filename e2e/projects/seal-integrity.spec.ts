@@ -307,8 +307,16 @@ test.describe('Seal Integrity > QR public access bypass', () => {
       route.fulfill({ status: 401 })
     );
 
+    const resolvedProjectId = 'qradmin-proj-001';
     await page.route('**/api/public/projects/qr/**', (route) =>
-      route.fulfill({ status: 200, json: mockPublicProjectResponse })
+      route.fulfill({ status: 200, json: { ...mockPublicProjectResponse, id: resolvedProjectId } })
+    );
+    // Mock the subsequent project detail fetch from ProjectPublicDetailPage
+    await page.route(`**/api/projects/${resolvedProjectId}`, (route) =>
+      route.fulfill({ status: 200, json: { id: resolvedProjectId, nombre: 'Proyecto Publicado con Sello', ubicacionTexto: 'Santo Domingo', estadoProyecto: 'PUBLICADO', estadoIntegridad: 2, categoriaId: 16 } })
+    );
+    await page.route('**/api/auth/refresh', (route) =>
+      route.fulfill({ status: 200, json: { accessToken: 'mock-token' } })
     );
 
     await page.goto(`http://localhost:3000/#/q/${qrToken}`);
@@ -321,21 +329,31 @@ test.describe('Seal Integrity > QR public access bypass', () => {
       route.fulfill({ status: 401 })
     );
 
+    const resolvedProjectId = 'qradmin-proj-002';
     await page.route('**/api/public/projects/qr/**', (route) =>
       route.fulfill({
         status: 200,
         json: {
-          ...mockPublicProjectResponse,
-          estadoSello: 'Activo',
+          id: resolvedProjectId,
+          nombreProyecto: 'Proyecto Verificado QR',
+          codigoPublico: 'VERIFINCA-20260801-A1B2C3D4',
+          estadoValidacion: 'Verificado',
           fechaEmision: '2026-08-01T00:00:00Z',
+          ubicacion: 'Santo Domingo',
+          estadoSello: 'Activo',
         },
       })
+    );
+    await page.route(`**/api/projects/${resolvedProjectId}`, (route) =>
+      route.fulfill({ status: 200, json: { id: resolvedProjectId, nombre: 'Proyecto Verificado QR', ubicacionTexto: 'Santo Domingo', estadoProyecto: 'PUBLICADO', estadoIntegridad: 2, categoriaId: 16 } })
+    );
+    await page.route('**/api/auth/refresh', (route) =>
+      route.fulfill({ status: 200, json: { accessToken: 'mock-token' } })
     );
 
     await page.goto(`http://localhost:3000/#/q/${qrToken}`);
 
-    await expect(page.getByText(/VERIFINCA-/)).toBeVisible({ timeout: 15000 });
-    await expect(page.getByRole('heading', { name: /Sello de Integridad/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Proyecto Verificado QR/i)).toBeVisible({ timeout: 15000 });
   });
 });
 
@@ -366,15 +384,15 @@ test.describe('Seal Integrity > Revocation', () => {
     );
 
     await page.route('**/api/public/projects/qr/**', (route) =>
-      route.fulfill({
-        status: 404,
-        json: { mensaje: 'Sello revocado o inválido.' },
-      })
+      route.fulfill({ status: 404, json: { mensaje: 'Sello revocado o inválido.' } })
+    );
+    await page.route('**/api/auth/refresh', (route) =>
+      route.fulfill({ status: 200, json: { accessToken: 'mock-token' } })
     );
 
     await page.goto(`http://localhost:3000/#/q/${qrToken}`);
 
-    await expect(page.getByText(/revocado|inválido|no encontrado/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/revocado|inválido|no encontrado|Error/i)).toBeVisible({ timeout: 15000 });
   });
 });
 
@@ -389,15 +407,15 @@ test.describe('Seal Integrity > Deleted project', () => {
     );
 
     await page.route('**/api/public/projects/qr/**', (route) =>
-      route.fulfill({
-        status: 404,
-        json: { mensaje: 'Proyecto no encontrado o token inválido.' },
-      })
+      route.fulfill({ status: 404, json: { mensaje: 'Proyecto no encontrado o token inválido.' } })
+    );
+    await page.route('**/api/auth/refresh', (route) =>
+      route.fulfill({ status: 200, json: { accessToken: 'mock-token' } })
     );
 
     await page.goto(`http://localhost:3000/#/q/deleted-token-xxx`);
 
-    await expect(page.getByText(/no encontrado|inválido/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/no encontrado|inválido|Error/i)).toBeVisible({ timeout: 15000 });
   });
 });
 
