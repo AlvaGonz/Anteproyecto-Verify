@@ -22,6 +22,8 @@ public class ProjectService : IProjectService
     private readonly IProyectoRepository _proyectoRepository;
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IEmailNotificationService _emailNotificationService;
+    private readonly INotificationFactory _notificationFactory;
+    private readonly INotificacionRepository _notificacionRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuditLogger _auditLogger;
 
@@ -29,12 +31,16 @@ public class ProjectService : IProjectService
         IProyectoRepository proyectoRepository, 
         IUsuarioRepository usuarioRepository,
         IEmailNotificationService emailNotificationService,
+        INotificationFactory notificationFactory,
+        INotificacionRepository notificacionRepository,
         IUnitOfWork unitOfWork,
         IAuditLogger auditLogger)
     {
         _proyectoRepository = proyectoRepository;
         _usuarioRepository = usuarioRepository;
         _emailNotificationService = emailNotificationService;
+        _notificationFactory = notificationFactory;
+        _notificacionRepository = notificacionRepository;
         _unitOfWork = unitOfWork;
         _auditLogger = auditLogger;
     }
@@ -145,6 +151,10 @@ public class ProjectService : IProjectService
         }, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        await NotifyProjectEvent(usuario, proyecto, TipoNotificacionId.ProyectoCreado,
+            $"Proyecto \"{proyecto.Nombre}\" registrado exitosamente.",
+            proyecto.Id, "Proyecto", cancellationToken);
+
         return MapToDto(proyecto);
     }
 
@@ -188,6 +198,11 @@ public class ProjectService : IProjectService
         }
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var updater = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
+        if (updater != null)
+            await NotifyProjectEvent(updater, proyecto, TipoNotificacionId.ProyectoEditado,
+                $"Proyecto \"{proyecto.Nombre}\" actualizado.", proyecto.Id, "Proyecto", cancellationToken);
 
         return MapToDto(proyecto);
     }
@@ -240,6 +255,23 @@ public class ProjectService : IProjectService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        var tipoNotif = status switch
+        {
+            ProjectStatus.Publicado => TipoNotificacionId.ProyectoPublicado,
+            ProjectStatus.ConObservacion => TipoNotificacionId.ProyectoObservacion,
+            ProjectStatus.Revision => TipoNotificacionId.ProyectoEnRevision,
+            _ => (int?)null
+        };
+
+        if (tipoNotif.HasValue)
+        {
+            var creator = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
+            if (creator != null)
+                await NotifyProjectEvent(creator, proyecto, tipoNotif.Value,
+                    $"Proyecto \"{proyecto.Nombre}\" cambió a {estado.Nombre}.",
+                    proyecto.Id, "Proyecto", cancellationToken);
+        }
+
         if (oldStatus != status.ToCodigoUnico() && (status == ProjectStatus.Publicado || status == ProjectStatus.ConObservacion))
         {
             var usuario = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
@@ -283,19 +315,25 @@ public class ProjectService : IProjectService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Send email notification without blocking
         try
         {
             var creador = await _usuarioRepository.GetByIdAsync(proyecto.UsuarioCreadorId, cancellationToken);
             var interesado = await _usuarioRepository.GetByIdAsync(usuarioInteresadoId, cancellationToken);
-            if (creador != null && !string.IsNullOrWhiteSpace(creador.Email) && interesado != null)
+            if (creador != null && interesado != null)
             {
-                await _emailNotificationService.SendInterestRegisteredAsync(creador.Email, proyecto, interesado.NombreCompleto, cancellationToken);
+                var notif = await _notificationFactory.CreateAsync(creador.Id,
+                    TipoNotificacionId.InteresRegistrado,
+                    $"{interesado.NombreCompleto} mostró interés en \"{proyecto.Nombre}\".",
+                    $"/admin/projects/{proyecto.Id}", proyecto.Id, "Proyecto", cancellationToken);
+                await _notificacionRepository.AddAsync(notif, cancellationToken);
+
+                if (!string.IsNullOrWhiteSpace(creador.Email))
+                    await _emailNotificationService.SendInterestRegisteredAsync(creador.Email, proyecto, interesado.NombreCompleto, cancellationToken);
             }
         }
         catch (Exception)
         {
-            // Ignore email errors to prevent breaking the flow
+            // Ignore notification errors to prevent breaking the flow
         }
     }
 
@@ -484,6 +522,25 @@ public class ProjectService : IProjectService
             proyecto.ProvinciaId,
             proyecto.Provincia?.NombreProvincia
         );
+    }
+
+    private async Task NotifyProjectEvent(Usuario creator, Proyecto proyecto, int tipoId,
+        string mensaje, Guid entidadId, string entidadTipo, CancellationToken ct)
+    {
+        // ponytail: notify creator + titular if delegate
+        var enlace = $"/admin/projects/{proyecto.Id}";
+        var notif = await _notificationFactory.CreateAsync(
+            creator.Id, tipoId, mensaje, enlace, entidadId, entidadTipo, ct);
+        await _notificacionRepository.AddAsync(notif, ct);
+
+        if (creator.TitularId.HasValue && creator.TitularId != creator.Id)
+        {
+            var titularNotif = await _notificationFactory.CreateAsync(
+                creator.TitularId.Value, tipoId,
+                $"{creator.NombreCompleto} — {mensaje}",
+                enlace, entidadId, entidadTipo, ct);
+            await _notificacionRepository.AddAsync(titularNotif, ct);
+        }
     }
 }
 // test codebase-memory-mcp

@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
 using Application.Abstractions.Storage;
+using Application.Abstractions.Notifications;
 using Application.Contracts.Documents;
 using Application.Contracts.Geo;
 using Application.DTOs.Documents;
@@ -31,6 +32,8 @@ public class DocumentService : IDocumentService
     private readonly Application.Abstractions.Ocr.IOcrProvider _ocrProvider;
     private readonly Application.Services.DocumentProcessing.IDocumentStateEngine _documentStateEngine;
     private readonly IGeoResolutionService _geoResolutionService;
+    private readonly INotificationFactory _notificationFactory;
+    private readonly INotificacionRepository _notificacionRepository;
 
     public DocumentService(
         IDocumentoRepository documentoRepository,
@@ -43,7 +46,9 @@ public class DocumentService : IDocumentService
         Application.Abstractions.Persistence.IAuditoriaRepository auditoriaRepository,
         Application.Abstractions.Ocr.IOcrProvider ocrProvider,
         Application.Services.DocumentProcessing.IDocumentStateEngine documentStateEngine,
-        IGeoResolutionService geoResolutionService)
+        IGeoResolutionService geoResolutionService,
+        INotificationFactory notificationFactory,
+        INotificacionRepository notificacionRepository)
     {
         _documentoRepository = documentoRepository;
         _proyectoRepository = proyectoRepository;
@@ -56,6 +61,8 @@ public class DocumentService : IDocumentService
         _ocrProvider = ocrProvider;
         _documentStateEngine = documentStateEngine;
         _geoResolutionService = geoResolutionService;
+        _notificationFactory = notificationFactory;
+        _notificacionRepository = notificacionRepository;
     }
 
     public async Task<DocumentDto> UploadDocumentAsync(Guid projectId, UploadDocumentDto dto, Stream fileStream, string fileName, string contentType, long length, CancellationToken cancellationToken = default)
@@ -200,6 +207,14 @@ try
         }
         
         _documentoRepository.Update(document);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var notif = await _notificationFactory.CreateAsync(usuario.Id,
+            TipoNotificacionId.DocumentoSubido,
+            $"Documento \"{document.TipoDocumento}\" subido al proyecto \"{project.Nombre}\".",
+            $"/admin/projects/{projectId}/documents",
+            project.Id, "Proyecto", cancellationToken);
+        await _notificacionRepository.AddAsync(notif, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToDto(document);

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Abstractions.Notifications;
 using Application.Abstractions.Persistence;
 using Application.DTOs.Validation;
 using Domain.Entities;
@@ -15,17 +16,23 @@ public class EvaluateDocumentFormalityCommandHandler
     private readonly IDocumentoRepository _documentoRepository;
     private readonly IAuditoriaRepository _auditoriaRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly INotificationFactory _notificationFactory;
+    private readonly INotificacionRepository _notificacionRepository;
 
     public EvaluateDocumentFormalityCommandHandler(
         IProyectoRepository proyectoRepository,
         IDocumentoRepository documentoRepository,
         IAuditoriaRepository auditoriaRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        INotificationFactory notificationFactory,
+        INotificacionRepository notificacionRepository)
     {
         _proyectoRepository = proyectoRepository;
         _documentoRepository = documentoRepository;
         _auditoriaRepository = auditoriaRepository;
         _unitOfWork = unitOfWork;
+        _notificationFactory = notificationFactory;
+        _notificacionRepository = notificacionRepository;
     }
 
     public async Task<List<DocumentFormalEvaluationDto>> Handle(EvaluateDocumentFormalityCommand request, CancellationToken cancellationToken)
@@ -39,14 +46,12 @@ public class EvaluateDocumentFormalityCommandHandler
 
         foreach (var doc in documents)
         {
-            // Simple rule engine logic
             DocumentFormalStatus status = DocumentFormalStatus.Vigente;
             DateTime? fechaVencimiento = null;
             string versionRegla = "v1.0";
 
             if (doc.FechaEmision.HasValue)
             {
-                // Example rule: documents expire after 1 year
                 fechaVencimiento = doc.FechaEmision.Value.AddYears(1);
                 if (fechaVencimiento < DateTime.UtcNow)
                 {
@@ -65,6 +70,20 @@ public class EvaluateDocumentFormalityCommandHandler
 
             doc.UpdateFormalStatus(status, fechaVencimiento, versionRegla);
             _documentoRepository.Update(doc);
+
+            var tipoNotif = status == DocumentFormalStatus.Vigente
+                ? TipoNotificacionId.DocumentoValidado
+                : TipoNotificacionId.DocumentoRechazado;
+
+            var mensaje = status == DocumentFormalStatus.Vigente
+                ? $"Documento \"{doc.TipoDocumento}\" validado exitosamente en \"{project.Nombre}\"."
+                : $"Documento \"{doc.TipoDocumento}\" requiere atención en \"{project.Nombre}\".";
+
+            var notif = await _notificationFactory.CreateAsync(request.UsuarioId,
+                tipoNotif, mensaje,
+                $"/admin/projects/{project.Id}/documents",
+                project.Id, "Proyecto", cancellationToken);
+            await _notificacionRepository.AddAsync(notif, cancellationToken);
 
             results.Add(new DocumentFormalEvaluationDto
             {

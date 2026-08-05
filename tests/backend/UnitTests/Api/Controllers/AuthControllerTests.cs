@@ -46,7 +46,9 @@ public class AuthControllerTests
         var mockJwtTokenGenerator = new Mock<global::Application.Abstractions.Security.IJwtTokenGenerator>();
         mockJwtTokenGenerator.Setup(j => j.GenerateToken(It.IsAny<Usuario>(), It.IsAny<bool>())).Returns("test-jwt-token");
         var mockChallengeStore = new Mock<ITwoFactorChallengeStore>();
-        var verifyHandler = new VerifyEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object);
+        var mockNotifFactory = new Mock<INotificationFactory>();
+        var mockNotifRepo = new Mock<INotificacionRepository>();
+        var verifyHandler = new VerifyEmailCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object, mockNotifFactory.Object, mockNotifRepo.Object);
         var loginHandler = new LoginUserCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, mockJwtTokenGenerator.Object, uowMock.Object, mockChallengeStore.Object);
         var updateProfileHandler = new UpdateProfileCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object);
 
@@ -64,7 +66,7 @@ public class AuthControllerTests
         var mockValidatorForgotPassword = new Mock<FluentValidation.IValidator<ForgotPasswordCommand>>();
         var forgotPasswordHandler = new ForgotPasswordCommandHandler(_usuarioRepositoryMock.Object, uowMock.Object, mockValidatorForgotPassword.Object, mockEmailService.Object);
         var mockValidatorResetPassword = new Mock<FluentValidation.IValidator<ResetPasswordCommand>>();
-        var resetPasswordHandler = new ResetPasswordCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object, mockValidatorResetPassword.Object);
+        var resetPasswordHandler = new ResetPasswordCommandHandler(_usuarioRepositoryMock.Object, _passwordHasherMock.Object, uowMock.Object, mockValidatorResetPassword.Object, mockNotifFactory.Object, mockNotifRepo.Object);
         var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
         var dbOptions = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<global::Infrastructure.Persistence.AppDbContext>()
             .UseInMemoryDatabase(databaseName: "AuthControllerTests")

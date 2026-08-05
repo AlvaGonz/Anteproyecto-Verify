@@ -12,6 +12,7 @@ using Domain.Enums;
 using Moq;
 using Xunit;
 using global::Application.Abstractions.Storage;
+using global::Application.Abstractions.Notifications;
 using global::Application.Abstractions.DocumentIntelligence;
 using global::Application.Contracts.Documents;
 using global::Application.Contracts.Geo;
@@ -56,7 +57,9 @@ public class DocumentServiceTests
             _auditoriaRepositoryMock.Object,
             _ocrProviderMock.Object,
             _documentStateEngineMock.Object,
-            _geoResolutionServiceMock.Object
+            _geoResolutionServiceMock.Object,
+            new Mock<INotificationFactory>().Object,
+            new Mock<INotificacionRepository>().Object
         );
     }
 
