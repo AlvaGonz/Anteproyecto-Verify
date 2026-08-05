@@ -186,14 +186,14 @@ test.describe('Seal Integrity > Admin visibility', () => {
     await page.route(`**/api/projects/${PUBLISHED_PROJECT_ID}`, (route) =>
       route.fulfill({ status: 200, json: mockPublishedProject })
     );
-    await page.route(`**/api/projects/${PUBLISHED_PROJECT_ID}/seal`, (route) =>
+    await page.route(`**/api/proyectos/${PUBLISHED_PROJECT_ID}/sello-integridad`, (route) =>
       route.fulfill({ status: 200, json: mockNoSeal })
     );
 
     await page.goto(`http://localhost:3000/#/admin/projects/${PUBLISHED_PROJECT_ID}/validations`);
 
     await expect(
-      page.getByText(/Certificación Verificable/i)
+      page.getByRole('heading', { name: /Certificación Verificable/i })
     ).toBeVisible({ timeout: 15000 });
   });
 
@@ -203,7 +203,7 @@ test.describe('Seal Integrity > Admin visibility', () => {
     await page.route(`**/api/projects/${DRAFT_PROJECT_ID}`, (route) =>
       route.fulfill({ status: 200, json: mockDraftProject })
     );
-    await page.route(`**/api/projects/${DRAFT_PROJECT_ID}/seal`, (route) =>
+    await page.route(`**/api/proyectos/${DRAFT_PROJECT_ID}/sello-integridad`, (route) =>
       route.fulfill({ status: 200, json: mockNoSeal })
     );
 
@@ -229,7 +229,7 @@ test.describe('Seal Integrity > Admin issuance', () => {
     await page.route(`**/api/projects/${PUBLISHED_PROJECT_ID}`, (route) =>
       route.fulfill({ status: 200, json: mockPublishedProject })
     );
-    await page.route(`**/api/projects/${PUBLISHED_PROJECT_ID}/seal`, (route) => {
+    await page.route(`**/api/proyectos/${PUBLISHED_PROJECT_ID}/sello-integridad`, (route) => {
       if (route.request().method() === 'GET') {
         return route.fulfill({ status: 200, json: sealIssued ? mockActiveSeal : mockNoSeal });
       }
@@ -259,7 +259,7 @@ test.describe('Seal Integrity > Admin issuance', () => {
     await page.route(`**/api/projects/${SEALED_PROJECT_ID}`, (route) =>
       route.fulfill({ status: 200, json: mockSealedProject })
     );
-    await page.route(`**/api/projects/${SEALED_PROJECT_ID}/seal`, (route) =>
+    await page.route(`**/api/proyectos/${SEALED_PROJECT_ID}/sello-integridad`, (route) =>
       route.fulfill({ status: 200, json: mockActiveSeal })
     );
 
@@ -283,7 +283,7 @@ test.describe('Seal Integrity > QR export', () => {
     await page.route(`**/api/projects/${SEALED_PROJECT_ID}`, (route) =>
       route.fulfill({ status: 200, json: mockSealedProject })
     );
-    await page.route(`**/api/projects/${SEALED_PROJECT_ID}/seal`, (route) =>
+    await page.route(`**/api/proyectos/${SEALED_PROJECT_ID}/sello-integridad`, (route) =>
       route.fulfill({ status: 200, json: mockActiveSeal })
     );
 
@@ -413,7 +413,7 @@ test.describe('Seal Integrity > Subscription enforcement', () => {
     await page.route(`**/api/projects/${PUBLISHED_PROJECT_ID}`, (route) =>
       route.fulfill({ status: 200, json: mockPublishedProject })
     );
-    await page.route(`**/api/projects/${PUBLISHED_PROJECT_ID}/seal`, (route) =>
+    await page.route(`**/api/proyectos/${PUBLISHED_PROJECT_ID}/sello-integridad`, (route) =>
       route.fulfill({ status: 200, json: mockNoSeal })
     );
 
@@ -436,7 +436,7 @@ test.describe('Seal Integrity > Access counting', () => {
     await page.route(`**/api/projects/${SEALED_PROJECT_ID}`, (route) =>
       route.fulfill({ status: 200, json: mockSealedProject })
     );
-    await page.route(`**/api/projects/${SEALED_PROJECT_ID}/seal`, (route) =>
+    await page.route(`**/api/proyectos/${SEALED_PROJECT_ID}/sello-integridad`, (route) =>
       route.fulfill({
         status: 200,
         json: { ...mockActiveSeal, accessCount: 42 },
