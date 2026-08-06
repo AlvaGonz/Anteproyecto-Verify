@@ -57,8 +57,8 @@ describe("ProjectDocumentStatus", () => {
     
     // Check if the filename is displayed
     expect(screen.getByText("titulo_original.pdf")).toBeInTheDocument();
-    // Check if the status VERIFICADO (OCR) is displayed
-    expect(screen.getByText("VERIFICADO")).toBeInTheDocument();
+    // Check if the status SUMINISTRADO (OCR) is displayed
+    expect(screen.getByText("SUMINISTRADO")).toBeInTheDocument();
   });
 
   it("displays observed document without verified status", () => {
@@ -79,8 +79,8 @@ describe("ProjectDocumentStatus", () => {
     
     // Check if the filename is displayed
     expect(screen.getByText("titulo_invalido.pdf")).toBeInTheDocument();
-    // Check if the status OBSERVADO is displayed
-    expect(screen.getByText("OBSERVADO")).toBeInTheDocument();
+    // Check if the status SUMINISTRADO is displayed
+    expect(screen.getByText("SUMINISTRADO")).toBeInTheDocument();
   });
 
   it("counts essential documents using only the 5 Documentos Principales (not anexos)", () => {

@@ -31,14 +31,6 @@ export const ProjectManageLayout: React.FC = React.memo(() => {
         description: "Consulta el historial operativo y reportes."
       };
     }
-    
-    if (location.pathname.includes("/audit")) {
-      return {
-        title: "Auditoría",
-        description: "Historial de acciones de los usuarios."
-      };
-    }
-
     // Default to Edit / Project Details
     return {
       title: "Editar Proyecto",

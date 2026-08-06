@@ -275,12 +275,6 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-6"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-px h-4 bg-primary"></div>
-                  <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.5em] block">
-                    EXPEDIENTE INSTITUCIONAL #{project.codigoInterno}
-                  </span>
-                </div>
                 <h1 className="text-5xl md:text-5xl xl:text-8xl font-display font-black text-secondary leading-[0.85] tracking-[-0.05em] uppercase italic break-words">
                   {project.nombre}
                 </h1>
@@ -300,7 +294,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                       <Fingerprint className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.1em] block">Token ID</span>
+                      <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.1em] block">ID</span>
                       <span className="text-sm font-black text-secondary uppercase tracking-tight">{project.id.split("-")[0].toUpperCase()}</span>
                     </div>
                   </div>
@@ -463,15 +457,15 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         </span>
                         {project.registradoPor.presentacionPublica
                           ? project.registradoPor.presentacionPublica.razonSocialMostrada && (
-                              <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
-                                {project.registradoPor.presentacionPublica.razonSocialMostrada}
-                              </span>
-                            )
+                            <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
+                              {project.registradoPor.presentacionPublica.razonSocialMostrada}
+                            </span>
+                          )
                           : project.registradoPor.razonSocial && (
-                              <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
-                                {project.registradoPor.razonSocial}
-                              </span>
-                            )}
+                            <span className="text-xs font-medium text-primary mt-1 block break-words" data-testid="public-registrant-razon-social">
+                              {project.registradoPor.razonSocial}
+                            </span>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -499,7 +493,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           </div>
                           <div className="min-w-0">
                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">Teléfono Directo</span>
-                             <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white break-words block">
+                            <a href={`tel:${project.registradoPor.telefono.replace(/\s+/g, '')}`} className="text-sm font-medium text-white/90 hover:text-white break-words block">
                               {project.registradoPor.telefono}
                             </a>
                           </div>
@@ -508,20 +502,20 @@ export const ProjectPublicDetailPage: React.FC = () => {
                       {(project.registradoPor.presentacionPublica
                         ? project.registradoPor.presentacionPublica.identificacionMostrada
                         : (project.cedulaRncPropietario || project.rncDesarrollador)) && (
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                            <Fingerprint className="w-4 h-4 text-primary" />
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                              <Fingerprint className="w-4 h-4 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">RNC/Cédula</span>
+                              <span className="text-sm font-medium text-white/90 break-words block" data-testid="public-registrant-identification">
+                                {project.registradoPor.presentacionPublica
+                                  ? project.registradoPor.presentacionPublica.identificacionMostrada
+                                  : (project.cedulaRncPropietario || project.rncDesarrollador)}
+                              </span>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">RNC/Cédula</span>
-                            <span className="text-sm font-medium text-white/90 break-words block" data-testid="public-registrant-identification">
-                              {project.registradoPor.presentacionPublica
-                                ? project.registradoPor.presentacionPublica.identificacionMostrada
-                                : (project.cedulaRncPropietario || project.rncDesarrollador)}
-                            </span>
-                          </div>
-                        </div>
-                      )}
+                        )}
                       {project.ubicacionTexto && (
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
@@ -594,8 +588,8 @@ export const ProjectPublicDetailPage: React.FC = () => {
                         }
                       }}
                       className={`w-full relative overflow-hidden group font-black text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase py-3.5 px-4 rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer ${isInterested
-                          ? "bg-emerald-600 text-white shadow-[0_0_40px_-10px_rgba(5,150,105,0.5)] scale-[1.02] hover:bg-emerald-700"
-                          : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
+                        ? "bg-emerald-600 text-white shadow-[0_0_40px_-10px_rgba(5,150,105,0.5)] scale-[1.02] hover:bg-emerald-700"
+                        : "bg-white text-secondary hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] hover:scale-[1.02]"
                         } disabled:opacity-70 disabled:cursor-not-allowed`}
                     >
                       {!isInterested && !isRegisteringInterest && (
