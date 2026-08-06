@@ -161,7 +161,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
   }
 
   const getIntegrityLabel = () => {
-    if (!project || project.integridadValidada === 0) return "Proyecto de prueba sin % de integridad";
+    if (!project || !project.integridadValidada || project.integridadValidada === 0) return "Proyecto dummy sin Integridad";
     return `${project.integridadValidada}%`;
   };
 
@@ -405,10 +405,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
                   <span className="block font-bold text-slate-700">Estado:</span>
                   <span className="block text-slate-600">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span>
                 </div>
-                <div className="min-w-0 border-b border-slate-200 pb-1.5">
-                  <span className="block font-bold text-slate-700">Integridad:</span>
-                  <span className="block text-slate-600">{getIntegrityLabel()}</span>
-                </div>
+
                 <div className="min-w-0 border-b border-slate-200 pb-1.5">
                   <span className="block font-bold text-slate-700">Ubicación:</span>
                   <span className="block break-words text-slate-600">{project.ubicacionTexto || "N/D"}</span>
