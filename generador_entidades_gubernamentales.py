@@ -561,7 +561,7 @@ def generate_catastro_ps_ipi_records(rncs_list):
                     rnc_ipi_generated.add(rnc)
                     cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
                     estatus_ipi = random.choice(["Pagado", "No Pagado"])
-                    num_cert = "CERT" + str(random.randint(10000, 999999)) + "JUICIODEVALOR"
+                    num_cert = str(random.randint(100000000000, 999999999999))
                     day_offset_ipi = random.randint(0, 183)
                     fecha_creacion_ipi = start_date + datetime.timedelta(days=day_offset_ipi)
                     ipi_record = {

@@ -38,7 +38,7 @@ private async Task<DashboardStatsDto> GetAdminDashboardStatsInternalAsync(Guid? 
                 .SumAsync(u => u.Plan!.Precio, cancellationToken);
 
             var totalProyectos = await proyectosQuery.CountAsync(cancellationToken);
-            var proyectosPendientes = await proyectosQuery.CountAsync(p => p.Estado != null && (p.Estado.CodigoUnico == ProjectStatusCodes.Creado || p.Estado.CodigoUnico == ProjectStatusCodes.Revision), cancellationToken);
+            var proyectosPendientes = await proyectosQuery.CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == ProjectStatusCodes.Revision, cancellationToken);
             var proyectosAprobados = await proyectosQuery.CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == ProjectStatusCodes.Publicado, cancellationToken);
             var proyectosRechazados = await proyectosQuery.CountAsync(p => p.Estado != null && p.Estado.CodigoUnico == ProjectStatusCodes.Observacion, cancellationToken);
 
