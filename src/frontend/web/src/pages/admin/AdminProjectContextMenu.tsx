@@ -95,11 +95,11 @@ export const AdminProjectContextMenu: React.FC<AdminProjectContextMenuProps> = R
               Documentos
            </Link>
             <Link
-              to={`/admin/projects/${project.id}/audit`}
+              to={`/admin/projects/${project.id}/validations`}
               className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <Activity className="w-4 h-4 text-gray-400" />
-              Auditoría
+              Hallazgos
            </Link>
 
             <div className="my-1 border-t border-gray-100"></div>
