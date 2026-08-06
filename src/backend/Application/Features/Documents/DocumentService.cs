@@ -162,6 +162,17 @@ public class DocumentService : IDocumentService
         document.SetHash(hashString);
         await _documentoRepository.AddAsync(document, cancellationToken);
 
+        var auditoriaSuccess = new Auditoria(
+            dto.UsuarioCargaId,
+            "Carga de documento",
+            "UploadDocument",
+            "Documento",
+            document.Id.ToString(),
+            projectId,
+            $"Documento cargado: {fileName} ({dto.TipoDocumento})"
+        );
+        await _auditoriaRepository.AddAsync(auditoriaSuccess, cancellationToken);
+
         // ponytail: los documentos (incluso imágenes) jamás se asignan como portada del proyecto;
         // la portada solo se define mediante el flujo explícito de fotos del proyecto.
         // (Se eliminó el bloque que llamaba a project.SetImagenUrl en uploads de tipo image/)

@@ -58,10 +58,10 @@ export const AuditLogPage: React.FC = () => {
     let filtered = rawLogs.map((l: any) => ({
       ...l,
       id: String(l.idLog || l.id),
-      proyectoId: String(l.proyectoId || l.projectId),
+      proyectoId: l.proyectoId || l.projectId ? String(l.proyectoId || l.projectId) : null,
       fechaEventoUtc: l.fecha || l.fechaEventoUtc,
       tipoEvento: l.accion || "General",
-      usuarioId: String(l.idUsuario || ""),
+      usuarioId: l.idUsuario ? String(l.idUsuario) : null,
       userEmail: l.nombreUsuario || "Desconocido",
       detalle: l.descripcion || "Sin detalles",
     })) as unknown as AuditDto[];

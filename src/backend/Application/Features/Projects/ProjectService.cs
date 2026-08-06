@@ -83,6 +83,16 @@ public class ProjectService : IProjectService
     {
         var proyecto = await _proyectoRepository.GetByIdAsync(id, cancellationToken);
         if (proyecto == null) return null;
+
+        await _auditLogger.Append(new AuditEntryDto
+        {
+            UsuarioId = proyecto.UsuarioCreadorId,
+            TipoOperacion = TipoOperacion.ConsultaPublica,
+            Accion = "Visualización de proyecto",
+            Resultado = "Exitosa",
+            ReferenciaExpedienteId = proyecto.Id
+        }, cancellationToken);
+
         var integridadValidada = await _proyectoRepository.GetAverageIntegridadValidadaAsync(id, cancellationToken);
         return MapToDto(proyecto, (int)Math.Round(integridadValidada));
     }
@@ -182,9 +192,30 @@ public class ProjectService : IProjectService
             throw new InvalidOperationException("DUPLICATE_LOCATION"); // using this specific string to catch in frontend
         }
 
+        var changedFields = new List<string>();
+        if (proyecto.Nombre != dto.Nombre) changedFields.Add("Nombre");
+        if (proyecto.UbicacionTexto != dto.UbicacionTexto) changedFields.Add("Ubicacion");
+        if (proyecto.ValorEstimado != dto.ValorEstimado) changedFields.Add("ValorEstimado");
+        if (proyecto.CategoriaId != dto.CategoriaId) changedFields.Add("Categoria");
+        if (proyecto.DatosDesarrollador != dto.DatosDesarrollador) changedFields.Add("Desarrollador");
+        if (proyecto.Propietario != dto.Propietario) changedFields.Add("Propietario");
+        if (proyecto.SuperficieM2 != dto.SuperficieM2) changedFields.Add("Superficie");
+        
         proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5, dto.ProvinciaId);
         proyecto.AsignarCategoria(categoria);
         proyecto.UpdateRncYMatricula(dto.RncDesarrollador, dto.Matricula);
+
+        if (changedFields.Any())
+        {
+            await _auditLogger.Append(new AuditEntryDto
+            {
+                UsuarioId = proyecto.UsuarioCreadorId,
+                TipoOperacion = TipoOperacion.General,
+                Accion = "Actualización de datos",
+                Resultado = $"Campos modificados: {string.Join(", ", changedFields)}",
+                ReferenciaExpedienteId = proyecto.Id
+            }, cancellationToken);
+        }
 
         // Auto-promote CREADO → EDITADO when the expediente is modified
         var currentCodigo = proyecto.Estado?.CodigoUnico;
