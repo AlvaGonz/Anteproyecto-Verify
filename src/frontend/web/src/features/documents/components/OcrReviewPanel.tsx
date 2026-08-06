@@ -5,7 +5,7 @@ import { getConfidenceColor, getReviewStateBadge } from '../utils/ocrReviewUtils
 import { useUpdateDocumentFieldReview } from '../api/useDocumentMutations';
 import { useVerifyDocument } from '../../gobernanza/api/useGobernanza';
 import { VerificationFeedbackCard } from '../../gobernanza/components/VerificationFeedbackCard';
-import { mapDocumentToVerificationPayload } from '../../gobernanza/utils/mapper';
+import { mapDocumentToVerificationPayload, getValidationStatus } from '../../gobernanza/utils/mapper';
 import { ShieldCheck } from 'lucide-react';
 
 interface OcrReviewPanelProps {
@@ -122,33 +122,25 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
     }
   };
 
-  const getValidationIcon = (uiValue: string) => {
+  const getValidationIcon = (uiValue: string, fieldName: string) => {
     if (!verificationResponse?.matchedData) return null;
 
-    // Normalizar valores para comparación
-    const normalizedUi = String(uiValue || '').trim().toLowerCase();
+    const validation = getValidationStatus(
+      uiValue, 
+      verificationResponse.matchedData, 
+      fieldName, 
+      verificationResponse.failedFields
+    );
 
-    // Buscar en todos los valores devueltos por Gobernanza
-    const matchedValues = Object.values(verificationResponse.matchedData).map(v => String(v || '').trim().toLowerCase());
-
-    if (normalizedUi === '') {
-      return <div title="Dato vacío enviado a revisión"><X className="w-5 h-5 text-rose-500 bg-rose-50 rounded-full p-0.5" /></div>;
+    if (validation.status === 'check') {
+      return <div><Check className="w-5 h-5 text-emerald-500 bg-emerald-50 rounded-full p-0.5" /></div>;
     }
-
-    // Match exacto
-    if (matchedValues.includes(normalizedUi)) {
-      return <div title="Coincide exactamente"><Check className="w-5 h-5 text-emerald-500 bg-emerald-50 rounded-full p-0.5" /></div>;
+    
+    if (validation.status === 'warning') {
+      return <div><AlertTriangle className="w-5 h-5 text-amber-500 bg-amber-50 rounded-full p-0.5" /></div>;
     }
-
-    // Match parcial o vacío en DB (pero el usuario mandó algo)
-    const hasPartialMatch = matchedValues.some(v => v !== '' && (v.includes(normalizedUi) || normalizedUi.includes(v)));
-    const hasEmptyInDb = matchedValues.includes('');
-
-    if (hasPartialMatch || hasEmptyInDb) {
-      return <div title="Coincidencia parcial o vacío en BD"><AlertTriangle className="w-5 h-5 text-amber-500 bg-amber-50 rounded-full p-0.5" /></div>;
-    }
-
-    return <div title="Dato diferente a Gobernanza"><X className="w-5 h-5 text-rose-500 bg-rose-50 rounded-full p-0.5" /></div>;
+    
+    return <div><X className="w-5 h-5 text-rose-500 bg-rose-50 rounded-full p-0.5" /></div>;
   };
 
   const getPlaceholder = (fieldName: string) => {
@@ -203,7 +195,7 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
               <div className="flex justify-between items-start">
                 <span className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">{field.name}</span>
                 <div className="flex items-center gap-2">
-                  {getValidationIcon(field.correctedValue || field.value || '')}
+                  {getValidationIcon(field.correctedValue || field.value || '', field.name)}
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badge.className}`}>
                     {badge.label}
                   </span>

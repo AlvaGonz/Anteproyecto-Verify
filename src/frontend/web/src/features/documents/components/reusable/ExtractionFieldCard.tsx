@@ -114,17 +114,17 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
           {label}
         </span>
         {validationStatus === 'check' && (
-          <div title={validationMessage || 'Coincide con Gobernanza'}>
+          <div>
             <Check className="w-4 h-4 text-success bg-success/10 rounded-full p-0.5" />
           </div>
         )}
         {validationStatus === 'warning' && (
-          <div title={validationMessage || 'Coincidencia parcial o campo vacío en BD'}>
+          <div>
             <AlertTriangle className="w-4 h-4 text-warning bg-warning/10 rounded-full p-0.5" />
           </div>
         )}
         {validationStatus === 'error' && (
-          <div title={validationMessage || 'No coincide con Gobernanza'}>
+          <div>
             <X className="w-4 h-4 text-error bg-error/10 rounded-full p-0.5" />
           </div>
         )}
@@ -169,8 +169,8 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
             </div>
           </div>
         ) : (
-          <>
-            <span className={`text-sm font-bold break-all sm:break-words ${isMissing ? 'text-error/60 italic' : (isPrimary || isCedula) ? 'text-primary font-mono' : 'text-secondary'}`}>
+          <div className="flex items-center justify-between w-full gap-2 min-w-0">
+            <span className={`flex-1 text-sm font-bold break-all sm:break-words ${isMissing ? 'text-error/60 italic' : (isPrimary || isCedula) ? 'text-primary font-mono' : 'text-secondary'}`}>
               {isMissing ? 'NO DETECTADO' : finalDisplayValue}
             </span>
             <div className="flex items-center gap-2 shrink-0">
@@ -182,16 +182,10 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
                    <Pencil className="w-3.5 h-3.5" />
                  </button>
                )}
-             </div>
-          </>
+            </div>
+          </div>
         )}
       </div>
-      
-      {validationStatus && validationStatus !== 'check' && (
-        <div className={`mt-2 text-[9px] font-bold uppercase tracking-wider ${validationStatus === 'error' ? 'text-error' : 'text-warning'}`}>
-          {validationMessage}
-        </div>
-      )}
     </div>
   );
 };

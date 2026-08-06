@@ -262,13 +262,8 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             var f1 = CompareStr(request.Matricula, entity.Matricula);
             var f2 = CompareStr(request.DesignacionCatastral, entity.CodigoDesignacionCatastral);
 
-            // Si se proporciona al menos una y coincide, se da por buena la otra (o si una falla pero la otra acierta, la que falló se perdona).
-            // Esto soluciona que si la matrícula tiene un error de OCR pero la designación catastral está bien, el documento pase.
-            if (f1.matched == 1 || f2.matched == 1)
-            {
-                if (f1.total > 0 && f1.matched == 0) f1.matched = 1;
-                if (f2.total > 0 && f2.matched == 0) f2.matched = 1;
-            }
+            // Se eliminó la validación cruzada relajada por solicitud del usuario: 
+            // ambas variables (Matrícula y Designación) deben coincidir estrictamente con la base de datos si fueron enviadas.
 
             var f3 = CompareStr(request.Oficina, entity.Oficina);
             var f4 = CompareDate(request.FechaInscripcion, entity.FechaInscripcion);
@@ -321,7 +316,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             return res;
         }
 
-        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "No se encontraron coincidencias en Catastro." };
+        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "" };
         if (!string.IsNullOrWhiteSpace(request.Matricula)) failRes.FailedFields.Add("Matricula");
         if (!string.IsNullOrWhiteSpace(request.DesignacionCatastral)) failRes.FailedFields.Add("DesignacionCatastral");
         if (!string.IsNullOrWhiteSpace(request.Oficina)) failRes.FailedFields.Add("Oficina");
@@ -374,7 +369,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             return res;
         }
 
-        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Cédula no encontrada en el padrón de la JCE." };
+        var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "" };
         if (!string.IsNullOrWhiteSpace(request.Cedula)) failRes.FailedFields.Add("Cedula");
         if (!string.IsNullOrWhiteSpace(request.Nombres)) failRes.FailedFields.Add("Nombres");
         if (!string.IsNullOrWhiteSpace(request.Apellidos)) failRes.FailedFields.Add("Apellidos");

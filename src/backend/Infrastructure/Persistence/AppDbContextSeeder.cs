@@ -171,33 +171,98 @@ public static class AppDbContextSeeder
 
             await SeedLegacyProfilesAndPermissionsAsync(context, logger, adminUser, profesionalUser, freemiumUser);
 
-            var proyectos = new[]
+            var dummyUsers = new List<Usuario>();
+            var dummyEmails = new[] { 
+                "juan.sanchez.134@example.com", 
+                "elena.alvarez.133@example.com", 
+                "antonio.torres.132@example.com", 
+                "isabel.fernandez.131@example.com", 
+                "jose.rodriguez.130@example.com" 
+            };
+            var dummyNames = new[] { "Juan", "Elena", "Antonio", "Isabel", "Jose" };
+            var dummyLastnames = new[] { "Sanchez", "Alvarez", "Torres", "Fernandez", "Rodriguez" };
+            for(int i=0; i<5; i++) {
+                var dUser = await GetOrCreateUsuarioAsync(
+                    context, dummyNames[i], dummyLastnames[i], dummyEmails[i], 
+                    passwordHasher.HashPassword("Test1234!"), UserRole.User, 
+                    "809-555-000"+i, "402-000001"+i+"-1", "M", logger);
+                dUser.AsignarPlan(Guid.Parse("5F1F3417-402F-4CAC-AE39-F9802A5E72D2")); // Consultor / Invitado
+                dummyUsers.Add(dUser);
+            }
+            await context.SaveChangesAsync();
+
+            var baseProyectos = new[]
             {
-                new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = 3, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Publicado }, // APARTAMENTOS
-                new { Nombre = "Residencial Los Cacicazgos", Ubicacion = "Los Cacicazgos, Distrito Nacional", Categoria = 16, Dev = "Desarrollos Inmobiliarios XYZ", Cat = "DC-67890", Status = ProjectStatus.Creado }, // VIVIENDAS
-                new { Nombre = "Proyecto Costero La Romana", Ubicacion = "La Romana, RD", Categoria = 12, Dev = "Grupo Turístico del Este", Cat = "DC-11223", Status = ProjectStatus.Revision }, // HOSPEDAJE
-                new { Nombre = "Condominio Oasis", Ubicacion = "Bávaro, Punta Cana", Categoria = 3, Dev = "Desarrollos Inmobiliarios", Cat = "DC-22334", Status = ProjectStatus.Publicado }, // APARTAMENTOS
-                new { Nombre = "Plaza del Sol", Ubicacion = "Santiago", Categoria = 8, Dev = "Grupo Constructor Sur", Cat = "DC-33445", Status = ProjectStatus.Publicado }, // COMERCIAL Y OFICINAS
-                new { Nombre = "Torre Lumiere", Ubicacion = "Santo Domingo Centro", Categoria = 8, Dev = "Inversiones Caribe", Cat = "DC-44556", Status = ProjectStatus.Publicado }, // COMERCIAL Y OFICINAS
-                new { Nombre = "Residencial Altos del Mar", Ubicacion = "Puerto Plata", Categoria = 16, Dev = "Constructora del Norte", Cat = "DC-55667", Status = ProjectStatus.Publicado }, // VIVIENDAS
-                new { Nombre = "Villa Costa Marina", Ubicacion = "Samaná", Categoria = 12, Dev = "Desarrollos Marinos", Cat = "DC-66778", Status = ProjectStatus.Publicado }, // HOSPEDAJE
-                new { Nombre = "Plaza Comercial Norte", Ubicacion = "Santo Domingo Norte", Categoria = 8, Dev = "Inmobiliaria del Este", Cat = "DC-77889", Status = ProjectStatus.Publicado }, // COMERCIAL Y OFICINAS
-                new { Nombre = "Condominio Vista Bella", Ubicacion = "La Vega", Categoria = 3, Dev = "Constructora VIP", Cat = "DC-88990", Status = ProjectStatus.Publicado }, // APARTAMENTOS
+                new { Nombre = "Torre Bella Vista Piantini", Ubicacion = "Ensanche Piantini, Distrito Nacional", Categoria = 3, Dev = "Constructora ABC", Cat = "DC-12345", Status = ProjectStatus.Publicado },
+                new { Nombre = "Residencial Los Cacicazgos", Ubicacion = "Los Cacicazgos, Distrito Nacional", Categoria = 16, Dev = "Desarrollos Inmobiliarios XYZ", Cat = "DC-67890", Status = ProjectStatus.Creado },
+                new { Nombre = "Proyecto Costero La Romana", Ubicacion = "La Romana, RD", Categoria = 12, Dev = "Grupo Turístico del Este", Cat = "DC-11223", Status = ProjectStatus.Revision },
+                new { Nombre = "Condominio Oasis", Ubicacion = "Bávaro, Punta Cana", Categoria = 3, Dev = "Desarrollos Inmobiliarios", Cat = "DC-22334", Status = ProjectStatus.Publicado },
+                new { Nombre = "Plaza del Sol", Ubicacion = "Santiago", Categoria = 8, Dev = "Grupo Constructor Sur", Cat = "DC-33445", Status = ProjectStatus.Publicado },
+                new { Nombre = "Torre Lumiere", Ubicacion = "Santo Domingo Centro", Categoria = 8, Dev = "Inversiones Caribe", Cat = "DC-44556", Status = ProjectStatus.Publicado },
+                new { Nombre = "Residencial Altos del Mar", Ubicacion = "Puerto Plata", Categoria = 16, Dev = "Constructora del Norte", Cat = "DC-55667", Status = ProjectStatus.Publicado },
+                new { Nombre = "Villa Costa Marina", Ubicacion = "Samaná", Categoria = 12, Dev = "Desarrollos Marinos", Cat = "DC-66778", Status = ProjectStatus.Publicado },
+                new { Nombre = "Plaza Comercial Norte", Ubicacion = "Santo Domingo Norte", Categoria = 8, Dev = "Inmobiliaria del Este", Cat = "DC-77889", Status = ProjectStatus.Publicado },
+                new { Nombre = "Condominio Vista Bella", Ubicacion = "La Vega", Categoria = 3, Dev = "Constructora VIP", Cat = "DC-88990", Status = ProjectStatus.Publicado },
             };
 
-            var proyectoEntities = new List<Proyecto>();
-            var rnd = new Random();
-            foreach (var p in proyectos)
+            var baseNombres = new[] { "Torre", "Residencial", "Plaza", "Condominio", "Villa", "Proyecto", "Centro Comercial", "Edificio" };
+            var baseUbicaciones = new[] { "Piantini", "Naco", "Bávaro", "Santiago", "Puerto Plata", "Samaná", "La Romana", "Punta Cana", "Zona Colonial" };
+            
+            var rnd = new Random(1234);
+            var generatedProyectos = new List<dynamic>();
+            for (int i = 0; i < 120; i++)
             {
+                if (i < baseProyectos.Length)
+                {
+                    generatedProyectos.Add(baseProyectos[i]);
+                }
+                else
+                {
+                    generatedProyectos.Add(new {
+                        Nombre = $"{baseNombres[rnd.Next(baseNombres.Length)]} {baseUbicaciones[rnd.Next(baseUbicaciones.Length)]} {i}",
+                        Ubicacion = $"{baseUbicaciones[rnd.Next(baseUbicaciones.Length)]}, RD",
+                        Categoria = new[] { 3, 8, 12, 16 }[rnd.Next(4)],
+                        Dev = $"Desarrollador {i}",
+                        Cat = $"DC-{rnd.Next(10000, 99999)}",
+                        Status = (rnd.Next(10) > 7) ? ProjectStatus.Revision : ProjectStatus.Publicado
+                    });
+                }
+            }
+
+            var creatorList = new List<Guid>();
+            creatorList.Add(consultorUser.Id); // 1
+            for (int i = 0; i < 5; i++) creatorList.Add(profesionalUser.Id); // 5
+            for (int i = 0; i < 5; i++) creatorList.Add(testUser.Id); // 5
+            for (int i = 0; i < 10; i++) creatorList.Add(empresaUser.Id); // 10
+            for (int i = 0; i < 5; i++) creatorList.Add(dummyUsers[i].Id); // 5 (1 each)
+            
+            int remaining = 120 - 26; // 94
+            for (int i = 0; i < remaining; i++) {
+                creatorList.Add(corporativoUser.Id); // Unlimited
+            }
+
+            var proyectoEntities = new List<Proyecto>();
+            for (int i = 0; i < 120; i++)
+            {
+                var p = generatedProyectos[i];
+                var creatorId = creatorList[i];
+                var currentStatus = p.Status;
+
+                // Enforce Consultor condition: no more than 1, and not Published
+                if (creatorId == consultorUser.Id && currentStatus == ProjectStatus.Publicado)
+                {
+                    currentStatus = ProjectStatus.Creado;
+                }
+
                 var proyecto = await GetOrCreateProyectoAsync(
                     context,
-                    nombre: p.Nombre,
-                    ubicacionTexto: p.Ubicacion,
-                    usuarioCreadorId: corporativoUser.Id,
-                    categoria: p.Categoria,
-                    datosDesarrollador: p.Dev,
-                    designacionCatastral: p.Cat,
-                    status: p.Status);
+                    nombre: (string)p.Nombre,
+                    ubicacionTexto: (string)p.Ubicacion,
+                    usuarioCreadorId: creatorId,
+                    categoria: (int)p.Categoria,
+                    datosDesarrollador: (string)p.Dev,
+                    designacionCatastral: (string)p.Cat,
+                    status: (ProjectStatus)currentStatus);
 
                 decimal baseSuperficie = rnd.Next(100, 1000);
                 decimal superficieCalculada = baseSuperficie * 7.9m;

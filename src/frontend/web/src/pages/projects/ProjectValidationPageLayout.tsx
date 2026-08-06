@@ -29,7 +29,7 @@ interface ProjectValidationPageLayoutProps {
   projectStatus?: string;
 }
 
-export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutProps> = React.memo(({
+export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutProps> = ({
   id,
   error,
   activeTab,
@@ -237,4 +237,4 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
       </Suspense>}
     </div>
   );
-});
+};

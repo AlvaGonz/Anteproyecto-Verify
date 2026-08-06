@@ -10,7 +10,7 @@ import { FindingDto } from "../../features/validations/types";
 import { ProjectValidationPageLayout } from "./ProjectValidationPageLayout";
 import { useProject } from "../../features/projects/api/useProjects";
 
-export const ProjectValidationPage: React.FC = React.memo(() => {
+export const ProjectValidationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -88,4 +88,4 @@ export const ProjectValidationPage: React.FC = React.memo(() => {
       projectStatus={(project as any)?.estadoProyecto}
     />
   );
-});
+};

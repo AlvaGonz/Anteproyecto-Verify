@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/infrastructure/api/client";
 import { GobernanzaVerificationResponse, DocumentTypeGobernanza, VerificationPayload } from "../types";
 
@@ -10,6 +10,8 @@ interface VerifyDocumentParams {
 }
 
 export const useVerifyDocument = () => {
+  const queryClient = useQueryClient();
+  
   return useMutation({
     mutationKey: ['verifyDocumentGobernanza'],
     mutationFn: async ({ documentType, payload, proyectoId, documentoId }: VerifyDocumentParams) => {
@@ -27,5 +29,11 @@ export const useVerifyDocument = () => {
       );
       return res.data;
     },
+    onSuccess: (_, variables) => {
+      const pId = variables.proyectoId || variables.payload.proyectoId;
+      if (pId) {
+        queryClient.invalidateQueries({ queryKey: ["findings", pId] });
+      }
+    }
   });
 };
