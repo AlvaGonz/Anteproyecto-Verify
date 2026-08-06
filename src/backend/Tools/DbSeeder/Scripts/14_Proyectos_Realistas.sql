@@ -21,131 +21,113 @@ IF NOT EXISTS (SELECT 1 FROM Usuario WHERE Email = 'corporativo@verifinca.do')
     INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, TitularId, Rnc)
     VALUES (NEWID(), 'CARMEN LUIS', 'SANCHEZ FERNANDEZ', 'corporativo@verifinca.do', 'HASHED_PWD', '809-555-2005', '00010171411', 2, 1, 1, 'F8B2465E-19D3-4FA0-90BB-65AEF8BAF6D4', GETUTCDATE(), GETUTCDATE(), NULL, NULL);
 
+DECLARE @uId UNIQUEIDENTIFIER;
+DECLARE @estId UNIQUEIDENTIFIER;
 -- ============================================================
 -- Consultor (consultor@verifinca.do) -- 5 projects
 -- ============================================================
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'CON-19289')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '3EB13B90-4668-5257-BDD6-40FB06671AD1', 'Residencial Bella Vista Golf & Country Club 0', 'Higuey, La Altagracia', 4, 200,
+        '3EB13B90-4668-5257-BDD6-40FB06671AD1', 'CON-19289', 'Residencial Bella Vista Golf & Country Club 0', 'Higuey, La Altagracia', '18.626159,-68.692932', 4, 200,
         38598928, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'CON-19289', 'DAVID ARMANDO JAAR SANTAMARIA', 'Desarrollo', @estId,
-        '00000627836', '080023162493:0093', '1057518533',
-        18.626159, -68.692932
+        0, @uId, DATEADD(day, -14, GETUTCDATE()), DATEADD(day, -14, GETUTCDATE()),
+        'DAVID ARMANDO JAAR SANTAMARIA', @estId,
+        '00000627836', '080023162493:0093', '1057518533'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'CON-49480')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F59BA799-24D8-CEA5-C33F-4584B23BC1D8', 'Torre Punta Cana Turistico 1', 'Santo Domingo de Guzman, Distrito Nacional', 4, 100,
+        'F59BA799-24D8-CEA5-C33F-4584B23BC1D8', 'CON-49480', 'Torre Punta Cana Turistico 1', 'Santo Domingo de Guzman, Distrito Nacional', '18.501787,-69.947722', 4, 100,
         42185321, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'CON-49480', 'RAFAEL AYBAR DE CASTRO', 'Desarrollo', @estId,
-        '00010032696', '230227507532:0098', '1058288938',
-        18.501787, -69.947722
+        0, @uId, DATEADD(day, -1, GETUTCDATE()), DATEADD(day, -1, GETUTCDATE()),
+        'RAFAEL AYBAR DE CASTRO', @estId,
+        '00010032696', '230227507532:0098', '1058288938'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'CON-30450')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '4A212290-39A4-0DFE-612B-6CD52D39F5AB', 'Complejo Evaristo Morales Boutique 2', 'Santiago de los Caballeros, Santiago', 4, 200,
+        '4A212290-39A4-0DFE-612B-6CD52D39F5AB', 'CON-30450', 'Complejo Evaristo Morales Boutique 2', 'Santiago de los Caballeros, Santiago', '19.446877,-70.718808', 4, 200,
         2590935, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'CON-30450', 'ALBERTO JANA TACTUK', 'Desarrollo', @estId,
-        '00010067171', '170252490408:0087', '1057991427',
-        19.446877, -70.718808
+        0, @uId, DATEADD(day, -144, GETUTCDATE()), DATEADD(day, -144, GETUTCDATE()),
+        'ALBERTO JANA TACTUK', @estId,
+        '00010067171', '170252490408:0087', '1057991427'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'CON-3830')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '4D9DFF97-14F6-0B7A-41F6-0BE07CEF6AA3', 'Plaza Cacicazgos Tower 3', 'Santiago de los Caballeros, Santiago', 3, 100,
+        '4D9DFF97-14F6-0B7A-41F6-0BE07CEF6AA3', 'CON-3830', 'Plaza Cacicazgos Tower 3', 'Santiago de los Caballeros, Santiago', '19.438746,-70.699786', 3, 100,
         2740638, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'CON-3830', 'TERESA MEDRANO DE AYBAR', 'Desarrollo', @estId,
-        '00010171411', '100464733089:0084', '1057662624',
-        19.438746, -70.699786
+        0, @uId, DATEADD(day, -145, GETUTCDATE()), DATEADD(day, -145, GETUTCDATE()),
+        'TERESA MEDRANO DE AYBAR', @estId,
+        '00010171411', '100464733089:0084', '1057662624'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'CON-10036')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'consultor@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '083D0A2F-CD6A-4292-F27B-AAF989BC15A5', 'Residencial Cacicazgos Residencial 4', 'Santo Domingo de Guzman, Distrito Nacional', 11, 200,
+        '083D0A2F-CD6A-4292-F27B-AAF989BC15A5', 'CON-10036', 'Residencial Cacicazgos Residencial 4', 'Santo Domingo de Guzman, Distrito Nacional', '18.467161,-69.943246', 11, 200,
         5654635, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'CON-10036', 'JORGE LUIS SUERO', 'Desarrollo', @estId,
-        '00010259331', '320486856268:0037', '1058764777',
-        18.467161, -69.943246
+        0, @uId, DATEADD(day, -137, GETUTCDATE()), DATEADD(day, -137, GETUTCDATE()),
+        'JORGE LUIS SUERO', @estId,
+        '00010259331', '320486856268:0037', '1058764777'
     );
     END
 END
@@ -154,376 +136,316 @@ END
 -- ============================================================
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-34741')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '921F54D1-7423-C60D-8DBB-5B2A6E20AF8E', 'Condominio Piantini Suites 5', 'Santiago de los Caballeros, Santiago', 13, 100,
+        '921F54D1-7423-C60D-8DBB-5B2A6E20AF8E', 'PRO-34741', 'Condominio Piantini Suites 5', 'Santiago de los Caballeros, Santiago', '19.444359,-70.706242', 13, 100,
         43309621, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-34741', 'HUMBERTO AYBAR B', 'Desarrollo', @estId,
-        '00010350890', '230116609032:0071', '1058277811',
-        19.444359, -70.706242
+        0, @uId, DATEADD(day, -141, GETUTCDATE()), DATEADD(day, -141, GETUTCDATE()),
+        'HUMBERTO AYBAR B', @estId,
+        '00010350890', '230116609032:0071', '1058277811'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-67232')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '88E7E802-B627-EF1D-8E91-579A21C3A39E', 'Jardines de Serralles Turistico 6', 'San Rafael del Yuma, La Altagracia', 7, 200,
+        '88E7E802-B627-EF1D-8E91-579A21C3A39E', 'PRO-67232', 'Jardines de Serralles Turistico 6', 'San Rafael del Yuma, La Altagracia', '18.607281,-68.718262', 7, 200,
         31249909, 1, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-67232', 'AUGUSTO DIAZ', 'Desarrollo', @estId,
-        '00010728194', '220018304591:0083', '1058218023',
-        18.607281, -68.718262
+        0, @uId, DATEADD(day, -150, GETUTCDATE()), DATEADD(day, -150, GETUTCDATE()),
+        'AUGUSTO DIAZ', @estId,
+        '00010728194', '220018304591:0083', '1058218023'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-60614')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '46A32F42-BC66-323A-C223-2D710B7880D7', 'Residencial Serralles Suites 7', 'Santo Domingo de Guzman, Distrito Nacional', 2, 200,
+        '46A32F42-BC66-323A-C223-2D710B7880D7', 'PRO-60614', 'Residencial Serralles Suites 7', 'Santo Domingo de Guzman, Distrito Nacional', '18.484477,-69.946207', 2, 200,
         38648043, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-60614', 'ING SANTIAGO JHONSON', 'Desarrollo', @estId,
-        '00011332939', '070134479792:0080', '1057479620',
-        18.484477, -69.946207
+        0, @uId, DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -10, GETUTCDATE()),
+        'ING SANTIAGO JHONSON', @estId,
+        '00011332939', '070134479792:0080', '1057479620'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-71581')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '547E1371-F867-F338-C453-B92E79219369', 'Altos de Punta Cana Beach Resort 8', 'Santiago de los Caballeros, Santiago', 11, 50,
+        '547E1371-F867-F338-C453-B92E79219369', 'PRO-71581', 'Altos de Punta Cana Beach Resort 8', 'Santiago de los Caballeros, Santiago', '19.466892,-70.716848', 11, 50,
         47395385, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-71581', 'MERCEDES ALONZO LEON', 'Desarrollo', @estId,
-        '00100000132', '270052313547:0023', '1058471363',
-        19.466892, -70.716848
+        0, @uId, DATEADD(day, -131, GETUTCDATE()), DATEADD(day, -131, GETUTCDATE()),
+        'MERCEDES ALONZO LEON', @estId,
+        '00100000132', '270052313547:0023', '1058471363'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-72865')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'DE053771-ED25-C282-417E-93AF8D6568E2', 'Villa Evaristo Morales Boutique 9', 'Santo Domingo de Guzman, Distrito Nacional', 15, 200,
+        'DE053771-ED25-C282-417E-93AF8D6568E2', 'PRO-72865', 'Villa Evaristo Morales Boutique 9', 'Santo Domingo de Guzman, Distrito Nacional', '18.477827,-69.926054', 15, 200,
         48703646, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-72865', 'VINCULA AMPARO Y DE LA CRUZ', 'Desarrollo', @estId,
-        '00100000207', '310085662102:0070', '1058674710',
-        18.477827, -69.926054
+        0, @uId, DATEADD(day, -22, GETUTCDATE()), DATEADD(day, -22, GETUTCDATE()),
+        'VINCULA AMPARO Y DE LA CRUZ', @estId,
+        '00100000207', '310085662102:0070', '1058674710'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-58615')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F71AF8D7-2EE2-D18C-D49F-93BD69B906E3', 'Plaza Bella Vista Boutique 10', 'Santiago de los Caballeros, Santiago', 1, 50,
+        'F71AF8D7-2EE2-D18C-D49F-93BD69B906E3', 'PRO-58615', 'Plaza Bella Vista Boutique 10', 'Santiago de los Caballeros, Santiago', '19.465418,-70.705535', 1, 50,
         38516308, 3, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-58615', 'ELSA VICTORIA BEATO GOMEZ DE ROSARIO', 'Desarrollo', @estId,
-        '00100000470', '250152842923:0066', '1058381406',
-        19.465418, -70.705535
+        0, @uId, DATEADD(day, -120, GETUTCDATE()), DATEADD(day, -120, GETUTCDATE()),
+        'ELSA VICTORIA BEATO GOMEZ DE ROSARIO', @estId,
+        '00100000470', '250152842923:0066', '1058381406'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-96424')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'BBDCF311-5C57-35EA-8543-68B8B7C8A1BA', 'Vista Bavaro Tower 11', 'Higuey, La Altagracia', 1, 50,
+        'BBDCF311-5C57-35EA-8543-68B8B7C8A1BA', 'PRO-96424', 'Vista Bavaro Tower 11', 'Higuey, La Altagracia', '18.604392,-68.717218', 1, 50,
         13361006, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-96424', 'CARMEN MILAGROS DE FATIMA BELLO DIAZ', 'Desarrollo', @estId,
-        '00100000496', '280153144890:0070', '1058531510',
-        18.604392, -68.717218
+        0, @uId, DATEADD(day, -124, GETUTCDATE()), DATEADD(day, -124, GETUTCDATE()),
+        'CARMEN MILAGROS DE FATIMA BELLO DIAZ', @estId,
+        '00100000496', '280153144890:0070', '1058531510'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-76679')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '724DD9D9-3810-7C57-6161-390B7CCF00A0', 'Edificio La Esperilla Boutique 12', 'Santo Domingo de Guzman, Distrito Nacional', 13, 50,
+        '724DD9D9-3810-7C57-6161-390B7CCF00A0', 'PRO-76679', 'Edificio La Esperilla Boutique 12', 'Santo Domingo de Guzman, Distrito Nacional', '18.492551,-69.920277', 13, 50,
         15424394, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-76679', 'JOSE RAFAEL BORRELL VALVERDE', 'Desarrollo', @estId,
-        '00100000637', '040024512024:0030', '1057318570',
-        18.492551, -69.920277
+        0, @uId, DATEADD(day, -26, GETUTCDATE()), DATEADD(day, -26, GETUTCDATE()),
+        'JOSE RAFAEL BORRELL VALVERDE', @estId,
+        '00100000637', '040024512024:0030', '1057318570'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-47088')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '4D4BC856-2F0B-8152-BF44-5E191464D57D', 'Residencial Bavaro Turistico 13', 'Santo Domingo de Guzman, Distrito Nacional', 16, 200,
+        '4D4BC856-2F0B-8152-BF44-5E191464D57D', 'PRO-47088', 'Residencial Bavaro Turistico 13', 'Santo Domingo de Guzman, Distrito Nacional', '18.505509,-69.916987', 16, 200,
         27859710, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-47088', 'HECTOR ENMANUEL CARRASCO ZAPATA', 'Desarrollo', @estId,
-        '00100000884', '200165986304:0076', '1058132716',
-        18.505509, -69.916987
+        0, @uId, DATEADD(day, -132, GETUTCDATE()), DATEADD(day, -132, GETUTCDATE()),
+        'HECTOR ENMANUEL CARRASCO ZAPATA', @estId,
+        '00100000884', '200165986304:0076', '1058132716'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-45218')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '9E4369DD-5FEB-85B8-1831-B3953B1EA24D', 'Jardines de Bella Vista Tower 14', 'Higuey, La Altagracia', 9, 200,
+        '9E4369DD-5FEB-85B8-1831-B3953B1EA24D', 'PRO-45218', 'Jardines de Bella Vista Tower 14', 'Higuey, La Altagracia', '18.631359,-68.704795', 9, 200,
         15906085, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-45218', 'EFRAIN CASTILLO ROCHET', 'Desarrollo', @estId,
-        '00100000934', '150212797276:0036', '1057887376',
-        18.631359, -68.704795
+        0, @uId, DATEADD(day, -126, GETUTCDATE()), DATEADD(day, -126, GETUTCDATE()),
+        'EFRAIN CASTILLO ROCHET', @estId,
+        '00100000934', '150212797276:0036', '1057887376'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-68725')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'BC532A3D-DDB3-E957-0509-225A60C2E6A3', 'Torre Serralles Palace 15', 'Santo Domingo de Guzman, Distrito Nacional', 12, 100,
+        'BC532A3D-DDB3-E957-0509-225A60C2E6A3', 'PRO-68725', 'Torre Serralles Palace 15', 'Santo Domingo de Guzman, Distrito Nacional', '18.484236,-69.917836', 12, 100,
         28721797, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-68725', 'WADILYS AMADA CRUZ CRUZ', 'Desarrollo', @estId,
-        '00100001072', '070128632570:0027', '1057478967',
-        18.484236, -69.917836
+        0, @uId, DATEADD(day, -148, GETUTCDATE()), DATEADD(day, -148, GETUTCDATE()),
+        'WADILYS AMADA CRUZ CRUZ', @estId,
+        '00100001072', '070128632570:0027', '1057478967'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-47326')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '730BDA74-3141-CBCA-0A8C-81DB337FDF27', 'Vista Bavaro Premium 16', 'Higuey, La Altagracia', 10, 100,
+        '730BDA74-3141-CBCA-0A8C-81DB337FDF27', 'PRO-47326', 'Vista Bavaro Premium 16', 'Higuey, La Altagracia', '18.603206,-68.705789', 10, 100,
         32203834, 3, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-47326', 'SANTA ISABEL DIAZ BUENO', 'Desarrollo', @estId,
-        '00100001403', '200299740159:0005', '1058146045',
-        18.603206, -68.705789
+        0, @uId, DATEADD(day, -147, GETUTCDATE()), DATEADD(day, -147, GETUTCDATE()),
+        'SANTA ISABEL DIAZ BUENO', @estId,
+        '00100001403', '200299740159:0005', '1058146045'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-18848')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '75A29378-F21C-40C5-A689-EE27EEC183B6', 'Villa Piantini Tower 17', 'Santo Domingo de Guzman, Distrito Nacional', 10, 200,
+        '75A29378-F21C-40C5-A689-EE27EEC183B6', 'PRO-18848', 'Villa Piantini Tower 17', 'Santo Domingo de Guzman, Distrito Nacional', '18.492907,-69.923127', 10, 200,
         3561451, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-18848', 'MOISES EDUARDO FELIZ DIAZ', 'Desarrollo', @estId,
-        '00100001551', '120336733127:0003', '1057749743',
-        18.492907, -69.923127
+        0, @uId, DATEADD(day, -132, GETUTCDATE()), DATEADD(day, -132, GETUTCDATE()),
+        'MOISES EDUARDO FELIZ DIAZ', @estId,
+        '00100001551', '120336733127:0003', '1057749743'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-52108')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '2F7A4B6B-DB8E-6E7F-AA72-C4DE1799C361', 'Plaza Punta Cana Palace 18', 'Santiago de los Caballeros, Santiago', 2, 50,
+        '2F7A4B6B-DB8E-6E7F-AA72-C4DE1799C361', 'PRO-52108', 'Plaza Punta Cana Palace 18', 'Santiago de los Caballeros, Santiago', '19.457342,-70.717144', 2, 50,
         44873847, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-52108', 'MANUEL GUILLERMO FELIZ RUIZ', 'Desarrollo', @estId,
-        '00100001585', '090428868062:0086', '1057609026',
-        19.457342, -70.717144
+        0, @uId, DATEADD(day, -145, GETUTCDATE()), DATEADD(day, -145, GETUTCDATE()),
+        'MANUEL GUILLERMO FELIZ RUIZ', @estId,
+        '00100001585', '090428868062:0086', '1057609026'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'PRO-39446')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'profesional@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'E8337BE0-CF4B-4D1F-377E-6FF88E835961', 'Altos de Naco Boutique 19', 'Santiago de los Caballeros, Santiago', 11, 200,
+        'E8337BE0-CF4B-4D1F-377E-6FF88E835961', 'PRO-39446', 'Altos de Naco Boutique 19', 'Santiago de los Caballeros, Santiago', '19.455399,-70.698634', 11, 200,
         3860358, 3, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'PRO-39446', 'MARIA DE LOS MILAGROS GARCIA', 'Desarrollo', @estId,
-        '00100001742', '300221479194:0088', '1058638328',
-        19.455399, -70.698634
+        0, @uId, DATEADD(day, -12, GETUTCDATE()), DATEADD(day, -12, GETUTCDATE()),
+        'MARIA DE LOS MILAGROS GARCIA', @estId,
+        '00100001742', '300221479194:0088', '1058638328'
     );
     END
 END
@@ -532,1001 +454,841 @@ END
 -- ============================================================
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-23425')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'ABBC0048-E5D3-B432-4F54-1E8B76F9FDBB', 'Vista Naco Empresarial 20', 'Higuey, La Altagracia', 6, 50,
+        'ABBC0048-E5D3-B432-4F54-1E8B76F9FDBB', 'EMP-23425', 'Vista Naco Empresarial 20', 'Higuey, La Altagracia', '18.623911,-68.715418', 6, 50,
         2521628, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-23425', 'JUANA TERESA GARCIA CABA', 'Desarrollo', @estId,
-        '00100001775', '270193304524:0057', '1058485497',
-        18.623911, -68.715418
+        0, @uId, DATEADD(day, -125, GETUTCDATE()), DATEADD(day, -125, GETUTCDATE()),
+        'JUANA TERESA GARCIA CABA', @estId,
+        '00100001775', '270193304524:0057', '1058485497'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-87483')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '40C01E4B-E8D0-54B6-EE34-CF804B4961F1', 'Altos de La Esperilla Golf & Country Club 21', 'Santiago de los Caballeros, Santiago', 3, 100,
+        '40C01E4B-E8D0-54B6-EE34-CF804B4961F1', 'EMP-87483', 'Altos de La Esperilla Golf & Country Club 21', 'Santiago de los Caballeros, Santiago', '19.465392,-70.689965', 3, 100,
         7270186, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-87483', 'PEDRO RADHAMES GARCIA FERMIN', 'Desarrollo', @estId,
-        '00100001791', '050094594068:0079', '1057375619',
-        19.465392, -70.689965
+        0, @uId, DATEADD(day, -126, GETUTCDATE()), DATEADD(day, -126, GETUTCDATE()),
+        'PEDRO RADHAMES GARCIA FERMIN', @estId,
+        '00100001791', '050094594068:0079', '1057375619'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-93289')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'FCD40B9D-3419-4E29-0450-6350AFD60B62', 'Altos de Piantini Palace 22', 'Santiago de los Caballeros, Santiago', 7, 200,
+        'FCD40B9D-3419-4E29-0450-6350AFD60B62', 'EMP-93289', 'Altos de Piantini Palace 22', 'Santiago de los Caballeros, Santiago', '19.460744,-70.706393', 7, 200,
         45820001, 1, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-93289', 'GEISHA HAYDEE GARCIA VASQUEZ', 'Desarrollo', @estId,
-        '00100001866', '020281220077:0004', '1057244244',
-        19.460744, -70.706393
+        0, @uId, DATEADD(day, -147, GETUTCDATE()), DATEADD(day, -147, GETUTCDATE()),
+        'GEISHA HAYDEE GARCIA VASQUEZ', @estId,
+        '00100001866', '020281220077:0004', '1057244244'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-61090')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '384E79CF-D83F-117E-83A5-2DF249A6B7EC', 'Complejo Punta Cana Golf & Country Club 23', 'Santiago de los Caballeros, Santiago', 15, 200,
+        '384E79CF-D83F-117E-83A5-2DF249A6B7EC', 'EMP-61090', 'Complejo Punta Cana Golf & Country Club 23', 'Santiago de los Caballeros, Santiago', '19.44174,-70.713674', 15, 200,
         24743399, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-61090', 'CHICHI MERCEDES GONZALEZ', 'Desarrollo', @estId,
-        '00100001999', '270471653619:0071', '1058513311',
-        19.44174, -70.713674
+        0, @uId, DATEADD(day, -3, GETUTCDATE()), DATEADD(day, -3, GETUTCDATE()),
+        'CHICHI MERCEDES GONZALEZ', @estId,
+        '00100001999', '270471653619:0071', '1058513311'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-39540')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'C975CCD5-3F0A-3984-EC7D-42226F412481', 'Residencial Punta Cana Suites 24', 'Santo Domingo de Guzman, Distrito Nacional', 9, 200,
+        'C975CCD5-3F0A-3984-EC7D-42226F412481', 'EMP-39540', 'Residencial Punta Cana Suites 24', 'Santo Domingo de Guzman, Distrito Nacional', '18.46623,-69.922316', 9, 200,
         8388090, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-39540', 'RHINA MERCEDES GONZALEZ SANCHEZ', 'Desarrollo', @estId,
-        '00100002070', '180420782264:0070', '1058058210',
-        18.46623, -69.922316
+        0, @uId, DATEADD(day, -134, GETUTCDATE()), DATEADD(day, -134, GETUTCDATE()),
+        'RHINA MERCEDES GONZALEZ SANCHEZ', @estId,
+        '00100002070', '180420782264:0070', '1058058210'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-35976')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '77B71249-F8DB-217C-688B-F8CAC4189FCD', 'Residencial Piantini Suites 25', 'Santo Domingo de Guzman, Distrito Nacional', 14, 100,
+        '77B71249-F8DB-217C-688B-F8CAC4189FCD', 'EMP-35976', 'Residencial Piantini Suites 25', 'Santo Domingo de Guzman, Distrito Nacional', '18.494887,-69.912324', 14, 100,
         43715806, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-35976', 'BIENVENIDO EMILIANO GUERRERO TEJEDA', 'Desarrollo', @estId,
-        '00100002138', '150344647614:0067', '1057900607',
-        18.494887, -69.912324
+        0, @uId, DATEADD(day, -140, GETUTCDATE()), DATEADD(day, -140, GETUTCDATE()),
+        'BIENVENIDO EMILIANO GUERRERO TEJEDA', @estId,
+        '00100002138', '150344647614:0067', '1057900607'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-57605')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '946C03E0-9B51-1C04-1C69-01D180332FD4', 'Altos de Arroyo Hondo Boutique 26', 'San Rafael del Yuma, La Altagracia', 16, 100,
+        '946C03E0-9B51-1C04-1C69-01D180332FD4', 'EMP-57605', 'Altos de Arroyo Hondo Boutique 26', 'San Rafael del Yuma, La Altagracia', '18.627178,-68.699693', 16, 100,
         47309877, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-57605', 'MARTHA GISELA GUZMAN', 'Desarrollo', @estId,
-        '00100002179', '200233704091:0032', '1058139472',
-        18.627178, -68.699693
+        0, @uId, DATEADD(day, -137, GETUTCDATE()), DATEADD(day, -137, GETUTCDATE()),
+        'MARTHA GISELA GUZMAN', @estId,
+        '00100002179', '200233704091:0032', '1058139472'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-61924')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '8C98B8AB-DD5C-B6DB-CB75-6907C9BDB7C8', 'Torre Piantini Turistico 27', 'Higuey, La Altagracia', 14, 200,
+        '8C98B8AB-DD5C-B6DB-CB75-6907C9BDB7C8', 'EMP-61924', 'Torre Piantini Turistico 27', 'Higuey, La Altagracia', '18.600956,-68.694988', 14, 200,
         31370098, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-61924', 'OLGA CECILIA EDUVIGIS JIMENEZ GRULLON GRULLON', 'Desarrollo', @estId,
-        '00100002427', '320294953742:0092', '1058745632',
-        18.600956, -68.694988
+        0, @uId, DATEADD(day, -18, GETUTCDATE()), DATEADD(day, -18, GETUTCDATE()),
+        'OLGA CECILIA EDUVIGIS JIMENEZ GRULLON GRULLON', @estId,
+        '00100002427', '320294953742:0092', '1058745632'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-15014')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '22E86787-7337-4AE0-759D-7578B3FB08F3', 'Residencial Punta Cana Tower 28', 'Santo Domingo de Guzman, Distrito Nacional', 5, 200,
+        '22E86787-7337-4AE0-759D-7578B3FB08F3', 'EMP-15014', 'Residencial Punta Cana Tower 28', 'Santo Domingo de Guzman, Distrito Nacional', '18.499767,-69.930893', 5, 200,
         47317355, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-15014', 'MABEL ELIZABETH JONES LUCIANO', 'Desarrollo', @estId,
-        '00100002476', '310400356640:0026', '1058706166',
-        18.499767, -69.930893
+        0, @uId, DATEADD(day, -141, GETUTCDATE()), DATEADD(day, -141, GETUTCDATE()),
+        'MABEL ELIZABETH JONES LUCIANO', @estId,
+        '00100002476', '310400356640:0026', '1058706166'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-68139')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '1634DD0D-436A-ECF3-3303-44EFFFBFC2CB', 'Condominio Evaristo Morales Palace 29', 'Santiago de los Caballeros, Santiago', 2, 200,
+        '1634DD0D-436A-ECF3-3303-44EFFFBFC2CB', 'EMP-68139', 'Condominio Evaristo Morales Palace 29', 'Santiago de los Caballeros, Santiago', '19.437956,-70.705043', 2, 200,
         15005857, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-68139', 'YLDA TERESA LAMA MELO', 'Desarrollo', @estId,
-        '00100002542', '180396215704:0077', '1058055817',
-        19.437956, -70.705043
+        0, @uId, DATEADD(day, -136, GETUTCDATE()), DATEADD(day, -136, GETUTCDATE()),
+        'YLDA TERESA LAMA MELO', @estId,
+        '00100002542', '180396215704:0077', '1058055817'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-41230')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '9EAA87FD-8B41-E63B-B2EC-7273580F5876', 'Residencial Mirador Sur Palace 30', 'Santo Domingo de Guzman, Distrito Nacional', 5, 200,
+        '9EAA87FD-8B41-E63B-B2EC-7273580F5876', 'EMP-41230', 'Residencial Mirador Sur Palace 30', 'Santo Domingo de Guzman, Distrito Nacional', '18.472562,-69.91306', 5, 200,
         48661382, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-41230', 'JUAN BAUTISTA ANTONIO LORA REYES', 'Desarrollo', @estId,
-        '00100002666', '150468364570:0067', '1057913007',
-        18.472562, -69.91306
+        0, @uId, DATEADD(day, -13, GETUTCDATE()), DATEADD(day, -13, GETUTCDATE()),
+        'JUAN BAUTISTA ANTONIO LORA REYES', @estId,
+        '00100002666', '150468364570:0067', '1057913007'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-40015')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '2EE2002F-906B-FDC1-7AEF-F54E808C46A6', 'Plaza Piantini Boutique 31', 'Santiago de los Caballeros, Santiago', 3, 100,
+        '2EE2002F-906B-FDC1-7AEF-F54E808C46A6', 'EMP-40015', 'Plaza Piantini Boutique 31', 'Santiago de los Caballeros, Santiago', '19.466897,-70.68326', 3, 100,
         29129759, 1, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-40015', 'ANDRES LUGO VIZCAINO', 'Desarrollo', @estId,
-        '00100002682', '120008523839:0078', '1057717018',
-        19.466897, -70.68326
+        0, @uId, DATEADD(day, -123, GETUTCDATE()), DATEADD(day, -123, GETUTCDATE()),
+        'ANDRES LUGO VIZCAINO', @estId,
+        '00100002682', '120008523839:0078', '1057717018'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-29391')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '4F2291BB-CCCC-33D9-1EE0-A0FB51BBCBC5', 'Vista Evaristo Morales Empresarial 32', 'Higuey, La Altagracia', 12, 50,
+        '4F2291BB-CCCC-33D9-1EE0-A0FB51BBCBC5', 'EMP-29391', 'Vista Evaristo Morales Empresarial 32', 'Higuey, La Altagracia', '18.620658,-68.700456', 12, 50,
         31639598, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-29391', 'RAMON ANTONIO MARTE HERNANDEZ', 'Desarrollo', @estId,
-        '00100002781', '180156390432:0033', '1058031773',
-        18.620658, -68.700456
+        0, @uId, DATEADD(day, -149, GETUTCDATE()), DATEADD(day, -149, GETUTCDATE()),
+        'RAMON ANTONIO MARTE HERNANDEZ', @estId,
+        '00100002781', '180156390432:0033', '1058031773'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-89176')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'ED151405-ABBD-51C5-DA17-B2DCAC6791FB', 'Altos de Los Rios Suites 33', 'Santiago de los Caballeros, Santiago', 12, 50,
+        'ED151405-ABBD-51C5-DA17-B2DCAC6791FB', 'EMP-89176', 'Altos de Los Rios Suites 33', 'Santiago de los Caballeros, Santiago', '19.434475,-70.705481', 12, 50,
         48459233, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-89176', 'EMILIA DE LOS ANGELES          MEJIA GUZMAN', 'Desarrollo', @estId,
-        '00100003011', '010473311962:0093', '1057213533',
-        19.434475, -70.705481
+        0, @uId, DATEADD(day, -25, GETUTCDATE()), DATEADD(day, -25, GETUTCDATE()),
+        'EMILIA DE LOS ANGELES          MEJIA GUZMAN', @estId,
+        '00100003011', '010473311962:0093', '1057213533'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-7916')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'E89B0901-3336-3EBA-63BF-9DE9F33F5A58', 'Condominio La Esperilla Suites 34', 'Santiago de los Caballeros, Santiago', 14, 50,
+        'E89B0901-3336-3EBA-63BF-9DE9F33F5A58', 'EMP-7916', 'Condominio La Esperilla Suites 34', 'Santiago de los Caballeros, Santiago', '19.469413,-70.687729', 14, 50,
         20899955, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-7916', 'MARIS ANTONIA MENDEZ SENA', 'Desarrollo', @estId,
-        '00100003052', '010370993937:0058', '1057203198',
-        19.469413, -70.687729
+        0, @uId, DATEADD(day, -16, GETUTCDATE()), DATEADD(day, -16, GETUTCDATE()),
+        'MARIS ANTONIA MENDEZ SENA', @estId,
+        '00100003052', '010370993937:0058', '1057203198'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-23633')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F5097B4F-D5DE-6E91-0742-06E247AA2DBA', 'Plaza Serralles Premium 35', 'Santiago de los Caballeros, Santiago', 7, 200,
+        'F5097B4F-D5DE-6E91-0742-06E247AA2DBA', 'EMP-23633', 'Plaza Serralles Premium 35', 'Santiago de los Caballeros, Santiago', '19.439578,-70.710365', 7, 200,
         28075364, 1, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-23633', 'VALENTIN RAFAEL MIRANDA SEVERINO', 'Desarrollo', @estId,
-        '00100003128', '130249914782:0042', '1057791082',
-        19.439578, -70.710365
+        0, @uId, DATEADD(day, -130, GETUTCDATE()), DATEADD(day, -130, GETUTCDATE()),
+        'VALENTIN RAFAEL MIRANDA SEVERINO', @estId,
+        '00100003128', '130249914782:0042', '1057791082'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-86919')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'E67AAD0B-6D6F-93E1-BE4F-5EEA41E10912', 'Villa Piantini Golf & Country Club 36', 'Santo Domingo de Guzman, Distrito Nacional', 5, 200,
+        'E67AAD0B-6D6F-93E1-BE4F-5EEA41E10912', 'EMP-86919', 'Villa Piantini Golf & Country Club 36', 'Santo Domingo de Guzman, Distrito Nacional', '18.488794,-69.94805', 5, 200,
         28891316, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-86919', 'RAFAEL AMERICO MORETA CASTILLO', 'Desarrollo', @estId,
-        '00100003268', '080464707393:0089', '1057562629',
-        18.488794, -69.94805
+        0, @uId, DATEADD(day, -135, GETUTCDATE()), DATEADD(day, -135, GETUTCDATE()),
+        'RAFAEL AMERICO MORETA CASTILLO', @estId,
+        '00100003268', '080464707393:0089', '1057562629'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-95859')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '3DAC4E90-29B6-29A9-988A-0C48597991D1', 'Edificio La Esperilla Beach Resort 37', 'Santo Domingo de Guzman, Distrito Nacional', 16, 50,
+        '3DAC4E90-29B6-29A9-988A-0C48597991D1', 'EMP-95859', 'Edificio La Esperilla Beach Resort 37', 'Santo Domingo de Guzman, Distrito Nacional', '18.495376,-69.918559', 16, 50,
         6439815, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-95859', 'RAMON ANTONIO NUÑEZ', 'Desarrollo', @estId,
-        '00100003367', '040225938983:0067', '1057338707',
-        18.495376, -69.918559
+        0, @uId, DATEADD(day, -7, GETUTCDATE()), DATEADD(day, -7, GETUTCDATE()),
+        'RAMON ANTONIO NUÑEZ', @estId,
+        '00100003367', '040225938983:0067', '1057338707'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-50115')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '886507B3-5D79-BAF5-5E7B-F0986BB92D99', 'Plaza Cacicazgos Boutique 38', 'Santiago de los Caballeros, Santiago', 1, 200,
+        '886507B3-5D79-BAF5-5E7B-F0986BB92D99', 'EMP-50115', 'Plaza Cacicazgos Boutique 38', 'Santiago de los Caballeros, Santiago', '19.469119,-70.698692', 1, 200,
         27724468, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-50115', 'JOSE NUÑEZ CACERES', 'Desarrollo', @estId,
-        '00100003391', '210277834721:0038', '1058193878',
-        19.469119, -70.698692
+        0, @uId, DATEADD(day, -2, GETUTCDATE()), DATEADD(day, -2, GETUTCDATE()),
+        'JOSE NUÑEZ CACERES', @estId,
+        '00100003391', '210277834721:0038', '1058193878'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-3274')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '625C4CBC-8812-6EB0-8ED7-2D0D568CEC2B', 'Jardines de La Esperilla Beach Resort 39', 'San Rafael del Yuma, La Altagracia', 6, 50,
+        '625C4CBC-8812-6EB0-8ED7-2D0D568CEC2B', 'EMP-3274', 'Jardines de La Esperilla Beach Resort 39', 'San Rafael del Yuma, La Altagracia', '18.60173,-68.69361', 6, 50,
         32221649, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-3274', 'JOSE ORTIZ PEGUERO', 'Desarrollo', @estId,
-        '00100003516', '280449863783:0014', '1058561054',
-        18.60173, -68.69361
+        0, @uId, DATEADD(day, -129, GETUTCDATE()), DATEADD(day, -129, GETUTCDATE()),
+        'JOSE ORTIZ PEGUERO', @estId,
+        '00100003516', '280449863783:0014', '1058561054'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-57817')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'E9C28AA3-C357-882C-2816-18A142B95460', 'Edificio Mirador Sur Tower 40', 'Santo Domingo de Guzman, Distrito Nacional', 16, 200,
+        'E9C28AA3-C357-882C-2816-18A142B95460', 'EMP-57817', 'Edificio Mirador Sur Tower 40', 'Santo Domingo de Guzman, Distrito Nacional', '18.503974,-69.944595', 16, 200,
         8675682, 1, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-57817', 'ROSA LOURDES PEREZ PEREZ DE ARAUJO PEREZ DE ARAUJO', 'Desarrollo', @estId,
-        '00100003789', '280397129982:0038', '1058555878',
-        18.503974, -69.944595
+        0, @uId, DATEADD(day, -137, GETUTCDATE()), DATEADD(day, -137, GETUTCDATE()),
+        'ROSA LOURDES PEREZ PEREZ DE ARAUJO PEREZ DE ARAUJO', @estId,
+        '00100003789', '280397129982:0038', '1058555878'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-86169')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '08CE66D9-60E0-4456-20CB-F68A16B4AA27', 'Altos de La Esperilla Empresarial 41', 'Santiago de los Caballeros, Santiago', 7, 50,
+        '08CE66D9-60E0-4456-20CB-F68A16B4AA27', 'EMP-86169', 'Altos de La Esperilla Empresarial 41', 'Santiago de los Caballeros, Santiago', '19.451107,-70.695736', 7, 50,
         13666053, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-86169', 'PETRONIO PIMENTEL VALERA', 'Desarrollo', @estId,
-        '00100003854', '300367425315:0082', '1058652922',
-        19.451107, -70.695736
+        0, @uId, DATEADD(day, -146, GETUTCDATE()), DATEADD(day, -146, GETUTCDATE()),
+        'PETRONIO PIMENTEL VALERA', @estId,
+        '00100003854', '300367425315:0082', '1058652922'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-69380')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '7D37E306-098E-7486-C660-1970E9FFF41D', 'Plaza Mirador Sur Residencial 42', 'San Rafael del Yuma, La Altagracia', 11, 50,
+        '7D37E306-098E-7486-C660-1970E9FFF41D', 'EMP-69380', 'Plaza Mirador Sur Residencial 42', 'San Rafael del Yuma, La Altagracia', '18.635275,-68.682843', 11, 50,
         32891056, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-69380', 'REBECA PIMENTEL VALERA', 'Desarrollo', @estId,
-        '00100003862', '270070517797:0036', '1058473176',
-        18.635275, -68.682843
+        0, @uId, DATEADD(day, -144, GETUTCDATE()), DATEADD(day, -144, GETUTCDATE()),
+        'REBECA PIMENTEL VALERA', @estId,
+        '00100003862', '270070517797:0036', '1058473176'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-61453')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '312BF0CC-F20E-59D3-E7B9-BCEE5224BA81', 'Villa Arroyo Hondo Palace 43', 'Santo Domingo de Guzman, Distrito Nacional', 12, 200,
+        '312BF0CC-F20E-59D3-E7B9-BCEE5224BA81', 'EMP-61453', 'Villa Arroyo Hondo Palace 43', 'Santo Domingo de Guzman, Distrito Nacional', '18.496311,-69.923605', 12, 200,
         16930807, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-61453', 'LINA MERCEDES RAMIREZ GARCIA', 'Desarrollo', @estId,
-        '00100004050', '200111326015:0035', '1058127275',
-        18.496311, -69.923605
+        0, @uId, DATEADD(day, -28, GETUTCDATE()), DATEADD(day, -28, GETUTCDATE()),
+        'LINA MERCEDES RAMIREZ GARCIA', @estId,
+        '00100004050', '200111326015:0035', '1058127275'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-23585')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '5DC33D19-355D-2E8E-366A-06D1C26DCC58', 'Torre Evaristo Morales Beach Resort 44', 'Santo Domingo de Guzman, Distrito Nacional', 13, 100,
+        '5DC33D19-355D-2E8E-366A-06D1C26DCC58', 'EMP-23585', 'Torre Evaristo Morales Beach Resort 44', 'Santo Domingo de Guzman, Distrito Nacional', '18.494618,-69.93524', 13, 100,
         7655223, 3, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-23585', 'ANA ANTONIA REYES DE MERINO DE MERINO', 'Desarrollo', @estId,
-        '00100004183', '320005793567:0039', '1058716679',
-        18.494618, -69.93524
+        0, @uId, DATEADD(day, -3, GETUTCDATE()), DATEADD(day, -3, GETUTCDATE()),
+        'ANA ANTONIA REYES DE MERINO DE MERINO', @estId,
+        '00100004183', '320005793567:0039', '1058716679'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-37813')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '8A6145F9-D02F-C873-D6CF-BF25E008364F', 'Edificio Arroyo Hondo Premium 45', 'Santo Domingo de Guzman, Distrito Nacional', 11, 200,
+        '8A6145F9-D02F-C873-D6CF-BF25E008364F', 'EMP-37813', 'Edificio Arroyo Hondo Premium 45', 'Santo Domingo de Guzman, Distrito Nacional', '18.492967,-69.936263', 11, 200,
         38460723, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-37813', 'REYNA DE JESUS RODRIGUEZ ALMANZAR', 'Desarrollo', @estId,
-        '00100004316', '190092823839:0096', '1058075436',
-        18.492967, -69.936263
+        0, @uId, DATEADD(day, -149, GETUTCDATE()), DATEADD(day, -149, GETUTCDATE()),
+        'REYNA DE JESUS RODRIGUEZ ALMANZAR', @estId,
+        '00100004316', '190092823839:0096', '1058075436'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-70031')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'A0233784-2F5A-E757-E706-437B5532E8BA', 'Complejo Bavaro Beach Resort 46', 'Santiago de los Caballeros, Santiago', 1, 100,
+        'A0233784-2F5A-E757-E706-437B5532E8BA', 'EMP-70031', 'Complejo Bavaro Beach Resort 46', 'Santiago de los Caballeros, Santiago', '19.465985,-70.701941', 1, 100,
         48038570, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-70031', 'VICTOR JOSE RODRIGUEZ ALMANZAR', 'Desarrollo', @estId,
-        '00100004332', '200166743478:0024', '1058132764',
-        19.465985, -70.701941
+        0, @uId, DATEADD(day, -8, GETUTCDATE()), DATEADD(day, -8, GETUTCDATE()),
+        'VICTOR JOSE RODRIGUEZ ALMANZAR', @estId,
+        '00100004332', '200166743478:0024', '1058132764'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-55528')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '108ED79C-DA2F-6B1D-5822-D7B023FD7E36', 'Residencial Mirador Sur Palace 47', 'Santo Domingo de Guzman, Distrito Nacional', 11, 50,
+        '108ED79C-DA2F-6B1D-5822-D7B023FD7E36', 'EMP-55528', 'Residencial Mirador Sur Palace 47', 'Santo Domingo de Guzman, Distrito Nacional', '18.476016,-69.948639', 11, 50,
         22112241, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-55528', 'AUGUSTO ROMERO', 'Desarrollo', @estId,
-        '00100004449', '170097157279:0040', '1057975880',
-        18.476016, -69.948639
+        0, @uId, DATEADD(day, -19, GETUTCDATE()), DATEADD(day, -19, GETUTCDATE()),
+        'AUGUSTO ROMERO', @estId,
+        '00100004449', '170097157279:0040', '1057975880'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-84153')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '960C93F3-9319-4FB9-A8D3-AE7C7B24B13F', 'Villa Arroyo Hondo Empresarial 48', 'Santo Domingo de Guzman, Distrito Nacional', 12, 100,
+        '960C93F3-9319-4FB9-A8D3-AE7C7B24B13F', 'EMP-84153', 'Villa Arroyo Hondo Empresarial 48', 'Santo Domingo de Guzman, Distrito Nacional', '18.466941,-69.929043', 12, 100,
         40675534, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-84153', 'ANGEL ANTONIO RUIZ BURGOS', 'Desarrollo', @estId,
-        '00100004530', '250464536481:0046', '1058412586',
-        18.466941, -69.929043
+        0, @uId, DATEADD(day, -16, GETUTCDATE()), DATEADD(day, -16, GETUTCDATE()),
+        'ANGEL ANTONIO RUIZ BURGOS', @estId,
+        '00100004530', '250464536481:0046', '1058412586'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-61159')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '294EDE10-ADB3-F6A0-AF0E-4600F7AE9466', 'Residencial Los Rios Turistico 49', 'Santo Domingo de Guzman, Distrito Nacional', 15, 100,
+        '294EDE10-ADB3-F6A0-AF0E-4600F7AE9466', 'EMP-61159', 'Residencial Los Rios Turistico 49', 'Santo Domingo de Guzman, Distrito Nacional', '18.489638,-69.950912', 15, 100,
         32740810, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-61159', 'VALDEMAR MALAQUIAS RUIZ NINA', 'Desarrollo', @estId,
-        '00100004548', '080255106148:0066', '1057541706',
-        18.489638, -69.950912
+        0, @uId, DATEADD(day, -126, GETUTCDATE()), DATEADD(day, -126, GETUTCDATE()),
+        'VALDEMAR MALAQUIAS RUIZ NINA', @estId,
+        '00100004548', '080255106148:0066', '1057541706'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-9146')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'A18BBF33-AAFD-3633-9294-BF5313FAC390', 'Complejo Evaristo Morales Palace 50', 'Santiago de los Caballeros, Santiago', 2, 50,
+        'A18BBF33-AAFD-3633-9294-BF5313FAC390', 'EMP-9146', 'Complejo Evaristo Morales Palace 50', 'Santiago de los Caballeros, Santiago', '19.458314,-70.717645', 2, 50,
         45070087, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-9146', 'JOSE ISABEL SANCHEZ ALCANTARA', 'Desarrollo', @estId,
-        '00100004597', '010257909394:0054', '1057191894',
-        19.458314, -70.717645
+        0, @uId, DATEADD(day, -6, GETUTCDATE()), DATEADD(day, -6, GETUTCDATE()),
+        'JOSE ISABEL SANCHEZ ALCANTARA', @estId,
+        '00100004597', '010257909394:0054', '1057191894'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-23654')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '5AFA301F-1780-C658-1D15-F88EE21516CA', 'Altos de Los Rios Beach Resort 51', 'Santiago de los Caballeros, Santiago', 13, 50,
+        '5AFA301F-1780-C658-1D15-F88EE21516CA', 'EMP-23654', 'Altos de Los Rios Beach Resort 51', 'Santiago de los Caballeros, Santiago', '19.432696,-70.718743', 13, 50,
         12809537, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-23654', 'MANUEL MARINO SANTANA CAMPUSANO', 'Desarrollo', @estId,
-        '00100004654', '010215229434:0072', '1057187712',
-        19.432696, -70.718743
+        0, @uId, DATEADD(day, -137, GETUTCDATE()), DATEADD(day, -137, GETUTCDATE()),
+        'MANUEL MARINO SANTANA CAMPUSANO', @estId,
+        '00100004654', '010215229434:0072', '1057187712'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-3214')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '4D704815-47B4-370D-D2E2-70F91FC64186', 'Jardines de Naco Empresarial 52', 'Higuey, La Altagracia', 16, 100,
+        '4D704815-47B4-370D-D2E2-70F91FC64186', 'EMP-3214', 'Jardines de Naco Empresarial 52', 'Higuey, La Altagracia', '18.609917,-68.699434', 16, 100,
         22491455, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-3214', 'ROBERTO OCTAVIO SUBERVI MATOS', 'Desarrollo', @estId,
-        '00100004860', '210134193640:0083', '1058179623',
-        18.609917, -68.699434
+        0, @uId, DATEADD(day, -146, GETUTCDATE()), DATEADD(day, -146, GETUTCDATE()),
+        'ROBERTO OCTAVIO SUBERVI MATOS', @estId,
+        '00100004860', '210134193640:0083', '1058179623'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-26401')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'A17DC948-15B6-0223-99E4-1110034B17BA', 'Jardines de Evaristo Morales Boutique 53', 'Higuey, La Altagracia', 2, 200,
+        'A17DC948-15B6-0223-99E4-1110034B17BA', 'EMP-26401', 'Jardines de Evaristo Morales Boutique 53', 'Higuey, La Altagracia', '18.607839,-68.700583', 2, 200,
         37511902, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-26401', 'PEDRO JULIO DE JESUS TAVERAS ALEMANY', 'Desarrollo', @estId,
-        '00100004936', '060017238040:0017', '1057417857',
-        18.607839, -68.700583
+        0, @uId, DATEADD(day, -140, GETUTCDATE()), DATEADD(day, -140, GETUTCDATE()),
+        'PEDRO JULIO DE JESUS TAVERAS ALEMANY', @estId,
+        '00100004936', '060017238040:0017', '1057417857'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-13583')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'EC9C82D7-6562-001D-AC62-89F7E85A1EE9', 'Condominio Serralles Suites 54', 'Santiago de los Caballeros, Santiago', 11, 50,
+        'EC9C82D7-6562-001D-AC62-89F7E85A1EE9', 'EMP-13583', 'Condominio Serralles Suites 54', 'Santiago de los Caballeros, Santiago', '19.451569,-70.691066', 11, 50,
         48860968, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-13583', 'HECTOR RAFAEL TEJADA GARCIA', 'Desarrollo', @estId,
-        '00100004969', '150264764133:0056', '1057892596',
-        19.451569, -70.691066
+        0, @uId, DATEADD(day, -133, GETUTCDATE()), DATEADD(day, -133, GETUTCDATE()),
+        'HECTOR RAFAEL TEJADA GARCIA', @estId,
+        '00100004969', '150264764133:0056', '1057892596'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-74124')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '93087555-0D0A-BFA9-CBDA-00F7D1135800', 'Villa Cacicazgos Beach Resort 55', 'Santo Domingo de Guzman, Distrito Nacional', 2, 50,
+        '93087555-0D0A-BFA9-CBDA-00F7D1135800', 'EMP-74124', 'Villa Cacicazgos Beach Resort 55', 'Santo Domingo de Guzman, Distrito Nacional', '18.501395,-69.928152', 2, 50,
         20277037, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-74124', 'MIGUELINA MERCEDES TEJEDA MELO DE GUERRERO', 'Desarrollo', @estId,
-        '00100004993', '300336619611:0074', '1058649814',
-        18.501395, -69.928152
+        0, @uId, DATEADD(day, -122, GETUTCDATE()), DATEADD(day, -122, GETUTCDATE()),
+        'MIGUELINA MERCEDES TEJEDA MELO DE GUERRERO', @estId,
+        '00100004993', '300336619611:0074', '1058649814'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-37949')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F8D2074A-0F08-96D2-6B0D-4FF75A357CB1', 'Condominio Los Rios Residencial 56', 'Santiago de los Caballeros, Santiago', 3, 100,
+        'F8D2074A-0F08-96D2-6B0D-4FF75A357CB1', 'EMP-37949', 'Condominio Los Rios Residencial 56', 'Santiago de los Caballeros, Santiago', '19.43972,-70.701081', 3, 100,
         15148298, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-37949', 'ANA GERTRUDIS TORRES JIMENEZ DE VALERIO', 'Desarrollo', @estId,
-        '00100005016', '280334219242:0040', '1058549580',
-        19.43972, -70.701081
+        0, @uId, DATEADD(day, -140, GETUTCDATE()), DATEADD(day, -140, GETUTCDATE()),
+        'ANA GERTRUDIS TORRES JIMENEZ DE VALERIO', @estId,
+        '00100005016', '280334219242:0040', '1058549580'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-18464')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '3AF27F80-2DC5-FD3D-9974-D75B333824FE', 'Complejo Cacicazgos Premium 57', 'Santiago de los Caballeros, Santiago', 3, 100,
+        '3AF27F80-2DC5-FD3D-9974-D75B333824FE', 'EMP-18464', 'Complejo Cacicazgos Premium 57', 'Santiago de los Caballeros, Santiago', '19.446282,-70.716227', 3, 100,
         27707230, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-18464', 'ILONKA MIGUELINA VASQUEZ ARVELO', 'Desarrollo', @estId,
-        '00100005172', '140487811176:0090', '1057864930',
-        19.446282, -70.716227
+        0, @uId, DATEADD(day, -16, GETUTCDATE()), DATEADD(day, -16, GETUTCDATE()),
+        'ILONKA MIGUELINA VASQUEZ ARVELO', @estId,
+        '00100005172', '140487811176:0090', '1057864930'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-97562')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '1F0E4B4A-886C-3A30-1C26-FFA8CCCE240C', 'Edificio La Esperilla Tower 58', 'Santo Domingo de Guzman, Distrito Nacional', 15, 100,
+        '1F0E4B4A-886C-3A30-1C26-FFA8CCCE240C', 'EMP-97562', 'Edificio La Esperilla Tower 58', 'Santo Domingo de Guzman, Distrito Nacional', '18.492459,-69.937028', 15, 100,
         5213676, 1, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-97562', 'IVAN APOLINAR VASQUEZ CORLETTO', 'Desarrollo', @estId,
-        '00100005180', '010405202739:0100', '1057206740',
-        18.492459, -69.937028
+        0, @uId, DATEADD(day, -127, GETUTCDATE()), DATEADD(day, -127, GETUTCDATE()),
+        'IVAN APOLINAR VASQUEZ CORLETTO', @estId,
+        '00100005180', '010405202739:0100', '1057206740'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'EMP-62228')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'empresa@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'EC89B7A6-8A0A-C984-F71A-B247E88B7591', 'Vista Bavaro Boutique 59', 'Higuey, La Altagracia', 2, 200,
+        'EC89B7A6-8A0A-C984-F71A-B247E88B7591', 'EMP-62228', 'Vista Bavaro Boutique 59', 'Higuey, La Altagracia', '18.613144,-68.685447', 2, 200,
         35790679, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'EMP-62228', 'RAMON CANDELARIO ADONIS HERNANDEZ', 'Desarrollo', @estId,
-        '00100005263', '260224846092:0003', '1058438543',
-        18.613144, -68.685447
+        0, @uId, DATEADD(day, -8, GETUTCDATE()), DATEADD(day, -8, GETUTCDATE()),
+        'RAMON CANDELARIO ADONIS HERNANDEZ', @estId,
+        '00100005263', '260224846092:0003', '1058438543'
     );
     END
 END
@@ -1535,1501 +1297,1261 @@ END
 -- ============================================================
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-75219')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '9E145325-4AF5-2599-6263-F0DB2EB749C1', 'Edificio Paraiso Palace 60', 'Santo Domingo de Guzman, Distrito Nacional', 2, 200,
+        '9E145325-4AF5-2599-6263-F0DB2EB749C1', 'COR-75219', 'Edificio Paraiso Palace 60', 'Santo Domingo de Guzman, Distrito Nacional', '18.492889,-69.938633', 2, 200,
         37575634, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-75219', 'FRANCISCO DE ASIS ALVAREZ CABREJA', 'Desarrollo', @estId,
-        '00100005388', '050472673779:0027', '1057413367',
-        18.492889, -69.938633
+        0, @uId, DATEADD(day, -145, GETUTCDATE()), DATEADD(day, -145, GETUTCDATE()),
+        'FRANCISCO DE ASIS ALVAREZ CABREJA', @estId,
+        '00100005388', '050472673779:0027', '1057413367'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-45319')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '61D99AC1-A782-0E12-1F36-1DCDBD387424', 'Altos de Arroyo Hondo Premium 61', 'San Rafael del Yuma, La Altagracia', 4, 100,
+        '61D99AC1-A782-0E12-1F36-1DCDBD387424', 'COR-45319', 'Altos de Arroyo Hondo Premium 61', 'San Rafael del Yuma, La Altagracia', '18.607325,-68.714765', 4, 100,
         7518627, 1, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-45319', 'FELIX AMADO BAEZ MARTINEZ', 'Desarrollo', @estId,
-        '00100005578', '040418802891:0092', '1057358032',
-        18.607325, -68.714765
+        0, @uId, DATEADD(day, -19, GETUTCDATE()), DATEADD(day, -19, GETUTCDATE()),
+        'FELIX AMADO BAEZ MARTINEZ', @estId,
+        '00100005578', '040418802891:0092', '1057358032'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-1883')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '641A7DC4-3A45-7647-C54E-6F4ABB5E253D', 'Torre Bavaro Premium 62', 'Santo Domingo de Guzman, Distrito Nacional', 5, 50,
+        '641A7DC4-3A45-7647-C54E-6F4ABB5E253D', 'COR-1883', 'Torre Bavaro Premium 62', 'Santo Domingo de Guzman, Distrito Nacional', '18.49192,-69.932911', 5, 50,
         13186627, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-1883', 'LUIS EMILIO BUENO PILARTE PILARTE', 'Desarrollo', @estId,
-        '00100005651', '110223760925:0070', '1057688510',
-        18.49192, -69.932911
+        0, @uId, DATEADD(day, -123, GETUTCDATE()), DATEADD(day, -123, GETUTCDATE()),
+        'LUIS EMILIO BUENO PILARTE PILARTE', @estId,
+        '00100005651', '110223760925:0070', '1057688510'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-41923')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F39B3CE8-1BC1-EA75-CA6C-DDBF94AA3BFF', 'Vista Serralles Palace 63', 'San Rafael del Yuma, La Altagracia', 11, 100,
+        'F39B3CE8-1BC1-EA75-CA6C-DDBF94AA3BFF', 'COR-41923', 'Vista Serralles Palace 63', 'San Rafael del Yuma, La Altagracia', '18.633861,-68.682571', 11, 100,
         12991663, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-41923', 'JOSE APOLO CARDOZA GUZMAN', 'Desarrollo', @estId,
-        '00100005784', '200128444037:0001', '1058128941',
-        18.633861, -68.682571
+        0, @uId, DATEADD(day, -144, GETUTCDATE()), DATEADD(day, -144, GETUTCDATE()),
+        'JOSE APOLO CARDOZA GUZMAN', @estId,
+        '00100005784', '200128444037:0001', '1058128941'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-9371')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'CE6B7BAE-F40B-4328-0E82-E7B379E1D9F5', 'Altos de Bella Vista Boutique 64', 'San Rafael del Yuma, La Altagracia', 7, 100,
+        'CE6B7BAE-F40B-4328-0E82-E7B379E1D9F5', 'COR-9371', 'Altos de Bella Vista Boutique 64', 'San Rafael del Yuma, La Altagracia', '18.597073,-68.695154', 7, 100,
         26423258, 3, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-9371', 'LOURDES YNES ALTAGRACIA CONCEPCION RAMIREZ DE FRIAS', 'Desarrollo', @estId,
-        '00100005933', '320276293657:0082', '1058743822',
-        18.597073, -68.695154
+        0, @uId, DATEADD(day, -143, GETUTCDATE()), DATEADD(day, -143, GETUTCDATE()),
+        'LOURDES YNES ALTAGRACIA CONCEPCION RAMIREZ DE FRIAS', @estId,
+        '00100005933', '320276293657:0082', '1058743822'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-56647')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F4FB23C6-4F19-9094-C360-FA347B867235', 'Villa Los Rios Palace 65', 'Santo Domingo de Guzman, Distrito Nacional', 4, 100,
+        'F4FB23C6-4F19-9094-C360-FA347B867235', 'COR-56647', 'Villa Los Rios Palace 65', 'Santo Domingo de Guzman, Distrito Nacional', '18.48862,-69.947201', 4, 100,
         21838216, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-56647', 'LUIS EMILIO CRUZ SANCHEZ', 'Desarrollo', @estId,
-        '00100006014', '120370554804:0017', '1057753157',
-        18.48862, -69.947201
+        0, @uId, DATEADD(day, -141, GETUTCDATE()), DATEADD(day, -141, GETUTCDATE()),
+        'LUIS EMILIO CRUZ SANCHEZ', @estId,
+        '00100006014', '120370554804:0017', '1057753157'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-50562')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'BA7037AF-6295-67D6-A96A-46ACE1648ED3', 'Edificio Arroyo Hondo Empresarial 66', 'Santo Domingo de Guzman, Distrito Nacional', 7, 50,
+        'BA7037AF-6295-67D6-A96A-46ACE1648ED3', 'COR-50562', 'Edificio Arroyo Hondo Empresarial 66', 'Santo Domingo de Guzman, Distrito Nacional', '18.487605,-69.930965', 7, 50,
         22095264, 1, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-50562', 'MARIA DURAN ROMERO', 'Desarrollo', @estId,
-        '00100006188', '230386722828:0064', '1058304804',
-        18.487605, -69.930965
+        0, @uId, DATEADD(day, -126, GETUTCDATE()), DATEADD(day, -126, GETUTCDATE()),
+        'MARIA DURAN ROMERO', @estId,
+        '00100006188', '230386722828:0064', '1058304804'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-30839')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '0EC99DBA-8C17-507A-7336-11DA75934E8D', 'Plaza Bavaro Tower 67', 'Santiago de los Caballeros, Santiago', 16, 100,
+        '0EC99DBA-8C17-507A-7336-11DA75934E8D', 'COR-30839', 'Plaza Bavaro Tower 67', 'Santiago de los Caballeros, Santiago', '19.435298,-70.70604', 16, 100,
         39760905, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-30839', 'ONELIA MARGARITA ESTRADA SANCHEZ', 'Desarrollo', @estId,
-        '00100006246', '220179927872:0023', '1058234063',
-        19.435298, -70.70604
+        0, @uId, DATEADD(day, -134, GETUTCDATE()), DATEADD(day, -134, GETUTCDATE()),
+        'ONELIA MARGARITA ESTRADA SANCHEZ', @estId,
+        '00100006246', '220179927872:0023', '1058234063'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-66693')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '8B5896EC-1332-A650-B058-3DE68AC1DBCA', 'Complejo Mirador Sur Palace 68', 'Santiago de los Caballeros, Santiago', 11, 200,
+        '8B5896EC-1332-A650-B058-3DE68AC1DBCA', 'COR-66693', 'Complejo Mirador Sur Palace 68', 'Santiago de los Caballeros, Santiago', '19.432752,-70.710229', 11, 200,
         4689183, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-66693', 'DULCE MARIA DE LOS A FILMONT NOVA', 'Desarrollo', @estId,
-        '00100006360', '240061787965:0070', '1058322310',
-        19.432752, -70.710229
+        0, @uId, DATEADD(day, -30, GETUTCDATE()), DATEADD(day, -30, GETUTCDATE()),
+        'DULCE MARIA DE LOS A FILMONT NOVA', @estId,
+        '00100006360', '240061787965:0070', '1058322310'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-5341')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', 'Villa Serralles Tower 69', 'Santo Domingo de Guzman, Distrito Nacional', 11, 200,
+        '59A9536F-C5C9-D7A6-E70D-A804B982A0A5', 'COR-5341', 'Villa Serralles Tower 69', 'Santo Domingo de Guzman, Distrito Nacional', '18.477499,-69.933673', 11, 200,
         47729671, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-5341', 'JOSE MIGUEL FILMONT NOVA', 'Desarrollo', @estId,
-        '00100006378', '160062789169:0053', '1057922393',
-        18.477499, -69.933673
+        0, @uId, DATEADD(day, -15, GETUTCDATE()), DATEADD(day, -15, GETUTCDATE()),
+        'JOSE MIGUEL FILMONT NOVA', @estId,
+        '00100006378', '160062789169:0053', '1057922393'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-47077')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '77E7B607-74BF-780D-BA8D-87863C785CCE', 'Altos de Paraiso Palace 70', 'Santiago de los Caballeros, Santiago', 7, 50,
+        '77E7B607-74BF-780D-BA8D-87863C785CCE', 'COR-47077', 'Altos de Paraiso Palace 70', 'Santiago de los Caballeros, Santiago', '19.451729,-70.707899', 7, 50,
         42452754, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-47077', 'JOSE MANUEL FLORES', 'Desarrollo', @estId,
-        '00100006402', '040440865213:0070', '1057360210',
-        19.451729, -70.707899
+        0, @uId, DATEADD(day, -134, GETUTCDATE()), DATEADD(day, -134, GETUTCDATE()),
+        'JOSE MANUEL FLORES', @estId,
+        '00100006402', '040440865213:0070', '1057360210'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-58208')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '590CBABC-8CC8-A0F8-7A77-210104936248', 'Torre Paraiso Golf & Country Club 71', 'Santo Domingo de Guzman, Distrito Nacional', 1, 50,
+        '590CBABC-8CC8-A0F8-7A77-210104936248', 'COR-58208', 'Torre Paraiso Golf & Country Club 71', 'Santo Domingo de Guzman, Distrito Nacional', '18.505454,-69.918916', 1, 50,
         22243401, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-58208', 'JESUS MARIA GUERRERO VICTORIA', 'Desarrollo', @estId,
-        '00100006568', '140164496723:0099', '1057832639',
-        18.505454, -69.918916
+        0, @uId, DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -10, GETUTCDATE()),
+        'JESUS MARIA GUERRERO VICTORIA', @estId,
+        '00100006568', '140164496723:0099', '1057832639'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-52800')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'CBE33928-E4F7-C36B-17ED-08DBFA499D11', 'Villa Los Rios Empresarial 72', 'Santo Domingo de Guzman, Distrito Nacional', 4, 200,
+        'CBE33928-E4F7-C36B-17ED-08DBFA499D11', 'COR-52800', 'Villa Los Rios Empresarial 72', 'Santo Domingo de Guzman, Distrito Nacional', '18.487258,-69.924485', 4, 200,
         37403764, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-52800', 'SAMUEL JONES WILLMORE', 'Desarrollo', @estId,
-        '00100006691', '040267197348:0029', '1057342869',
-        18.487258, -69.924485
+        0, @uId, DATEADD(day, -136, GETUTCDATE()), DATEADD(day, -136, GETUTCDATE()),
+        'SAMUEL JONES WILLMORE', @estId,
+        '00100006691', '040267197348:0029', '1057342869'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-99868')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '1CBBCDDF-898F-0EB2-1D06-61D2C702A3D5', 'Plaza Bavaro Empresarial 73', 'Santiago de los Caballeros, Santiago', 10, 200,
+        '1CBBCDDF-898F-0EB2-1D06-61D2C702A3D5', 'COR-99868', 'Plaza Bavaro Empresarial 73', 'Santiago de los Caballeros, Santiago', '19.452184,-70.68273', 10, 200,
         44950067, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-99868', 'HECTOR RENE DE JESUS LEON PICHARDO', 'Desarrollo', @estId,
-        '00100006741', '050227626731:0048', '1057388888',
-        19.452184, -70.68273
+        0, @uId, DATEADD(day, -11, GETUTCDATE()), DATEADD(day, -11, GETUTCDATE()),
+        'HECTOR RENE DE JESUS LEON PICHARDO', @estId,
+        '00100006741', '050227626731:0048', '1057388888'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-60238')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '92A87FE5-EEF9-3EBC-DD84-9C006C767031', 'Vista Evaristo Morales Golf & Country Club 74', 'San Rafael del Yuma, La Altagracia', 3, 100,
+        '92A87FE5-EEF9-3EBC-DD84-9C006C767031', 'COR-60238', 'Vista Evaristo Morales Golf & Country Club 74', 'San Rafael del Yuma, La Altagracia', '18.600843,-68.684875', 3, 100,
         36651604, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-60238', 'JUAN DEL CARMEN MAÑAN JIMENEZ', 'Desarrollo', @estId,
-        '00100006832', '140404184643:0038', '1057856578',
-        18.600843, -68.684875
+        0, @uId, DATEADD(day, -121, GETUTCDATE()), DATEADD(day, -121, GETUTCDATE()),
+        'JUAN DEL CARMEN MAÑAN JIMENEZ', @estId,
+        '00100006832', '140404184643:0038', '1057856578'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-74210')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'D7D4CAC3-665C-7567-35B4-8AE62A164769', 'Villa Naco Turistico 75', 'Santo Domingo de Guzman, Distrito Nacional', 14, 200,
+        'D7D4CAC3-665C-7567-35B4-8AE62A164769', 'COR-74210', 'Villa Naco Turistico 75', 'Santo Domingo de Guzman, Distrito Nacional', '18.476679,-69.915611', 14, 200,
         9874942, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-74210', 'JUAN FRANCISCO MEDINA POLANCO', 'Desarrollo', @estId,
-        '00100006998', '070143657497:0052', '1057480492',
-        18.476679, -69.915611
+        0, @uId, DATEADD(day, -15, GETUTCDATE()), DATEADD(day, -15, GETUTCDATE()),
+        'JUAN FRANCISCO MEDINA POLANCO', @estId,
+        '00100006998', '070143657497:0052', '1057480492'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-3357')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '5CBDEE96-B3DE-E3C6-1959-17FA4FEA6A7A', 'Edificio Punta Cana Empresarial 76', 'Higuey, La Altagracia', 10, 100,
+        '5CBDEE96-B3DE-E3C6-1959-17FA4FEA6A7A', 'COR-3357', 'Edificio Punta Cana Empresarial 76', 'Higuey, La Altagracia', '18.626397,-68.713782', 10, 100,
         3765896, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-3357', 'ANA CECILIA MEJIA PIMENTEL', 'Desarrollo', @estId,
-        '00100007038', '250078329622:0085', '1058374025',
-        18.626397, -68.713782
+        0, @uId, DATEADD(day, -150, GETUTCDATE()), DATEADD(day, -150, GETUTCDATE()),
+        'ANA CECILIA MEJIA PIMENTEL', @estId,
+        '00100007038', '250078329622:0085', '1058374025'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-15224')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'C1733693-8DA0-F4C0-C11A-9350FA6B384D', 'Plaza Naco Boutique 77', 'Santiago de los Caballeros, Santiago', 3, 100,
+        'C1733693-8DA0-F4C0-C11A-9350FA6B384D', 'COR-15224', 'Plaza Naco Boutique 77', 'Santiago de los Caballeros, Santiago', '19.44127,-70.711575', 3, 100,
         44323471, 1, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-15224', 'JOSE MANUEL MELO ORTIZ', 'Desarrollo', @estId,
-        '00100007061', '060321602031:0059', '1057448299',
-        19.44127, -70.711575
+        0, @uId, DATEADD(day, -128, GETUTCDATE()), DATEADD(day, -128, GETUTCDATE()),
+        'JOSE MANUEL MELO ORTIZ', @estId,
+        '00100007061', '060321602031:0059', '1057448299'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-12958')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F0BFA54F-ABC3-0F70-96F4-1453BBDE4BEF', 'Jardines de Bavaro Premium 78', 'Higuey, La Altagracia', 11, 50,
+        'F0BFA54F-ABC3-0F70-96F4-1453BBDE4BEF', 'COR-12958', 'Jardines de Bavaro Premium 78', 'Higuey, La Altagracia', '18.610415,-68.6925', 11, 50,
         16975216, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-12958', 'RAFAEL LEONARDO MORROS DRAIBY', 'Desarrollo', @estId,
-        '00100007145', '040405257394:0018', '1057356658',
-        18.610415, -68.6925
+        0, @uId, DATEADD(day, -130, GETUTCDATE()), DATEADD(day, -130, GETUTCDATE()),
+        'RAFAEL LEONARDO MORROS DRAIBY', @estId,
+        '00100007145', '040405257394:0018', '1057356658'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-44319')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '85C42B76-CC8F-CC15-9D4E-A3942D2BCB9E', 'Residencial Bavaro Palace 79', 'Santo Domingo de Guzman, Distrito Nacional', 10, 50,
+        '85C42B76-CC8F-CC15-9D4E-A3942D2BCB9E', 'COR-44319', 'Residencial Bavaro Palace 79', 'Santo Domingo de Guzman, Distrito Nacional', '18.500217,-69.930984', 10, 50,
         44757101, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-44319', 'MIGUEL ANGEL NADAL PEREZ', 'Desarrollo', @estId,
-        '00100007178', '240113336532:0009', '1058327449',
-        18.500217, -69.930984
+        0, @uId, DATEADD(day, -141, GETUTCDATE()), DATEADD(day, -141, GETUTCDATE()),
+        'MIGUEL ANGEL NADAL PEREZ', @estId,
+        '00100007178', '240113336532:0009', '1058327449'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-61044')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'C2D1D78B-5DD6-450C-BAD0-18BF122C0589', 'Jardines de Bavaro Palace 80', 'Higuey, La Altagracia', 6, 50,
+        'C2D1D78B-5DD6-450C-BAD0-18BF122C0589', 'COR-61044', 'Jardines de Bavaro Palace 80', 'Higuey, La Altagracia', '18.606745,-68.683674', 6, 50,
         22359694, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-61044', 'GUSTAVO DANIEL OLIVO CABRERA', 'Desarrollo', @estId,
-        '00100007244', '260235306880:0099', '1058439739',
-        18.606745, -68.683674
+        0, @uId, DATEADD(day, -127, GETUTCDATE()), DATEADD(day, -127, GETUTCDATE()),
+        'GUSTAVO DANIEL OLIVO CABRERA', @estId,
+        '00100007244', '260235306880:0099', '1058439739'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-6000')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '443CDEF3-6840-FF07-C4DA-537C1651DDAE', 'Torre Punta Cana Empresarial 81', 'Santo Domingo de Guzman, Distrito Nacional', 13, 200,
+        '443CDEF3-6840-FF07-C4DA-537C1651DDAE', 'COR-6000', 'Torre Punta Cana Empresarial 81', 'Santo Domingo de Guzman, Distrito Nacional', '18.468132,-69.925829', 13, 200,
         39736570, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-6000', 'EDELCIA NARCISA ALT PEREZ GUZMAN GUZMAN', 'Desarrollo', @estId,
-        '00100007459', '140075477112:0034', '1057823674',
-        18.468132, -69.925829
+        0, @uId, DATEADD(day, -28, GETUTCDATE()), DATEADD(day, -28, GETUTCDATE()),
+        'EDELCIA NARCISA ALT PEREZ GUZMAN GUZMAN', @estId,
+        '00100007459', '140075477112:0034', '1057823674'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-37629')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '0F2D810D-F72A-5C49-F287-C9BF2D5514C4', 'Plaza Evaristo Morales Residencial 82', 'Santiago de los Caballeros, Santiago', 12, 50,
+        '0F2D810D-F72A-5C49-F287-C9BF2D5514C4', 'COR-37629', 'Plaza Evaristo Morales Residencial 82', 'Santiago de los Caballeros, Santiago', '19.463174,-70.718237', 12, 50,
         23258433, 1, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-37629', 'ERNESTINA PEREZ PEREZ DE POURIET', 'Desarrollo', @estId,
-        '00100007483', '230352705865:0065', '1058301405',
-        19.463174, -70.718237
+        0, @uId, DATEADD(day, -150, GETUTCDATE()), DATEADD(day, -150, GETUTCDATE()),
+        'ERNESTINA PEREZ PEREZ DE POURIET', @estId,
+        '00100007483', '230352705865:0065', '1058301405'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-93898')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '0117348F-A1C0-C8CC-9D6E-C9FC4E57E501', 'Villa Bavaro Palace 83', 'Santo Domingo de Guzman, Distrito Nacional', 5, 100,
+        '0117348F-A1C0-C8CC-9D6E-C9FC4E57E501', 'COR-93898', 'Villa Bavaro Palace 83', 'Santo Domingo de Guzman, Distrito Nacional', '18.479442,-69.945967', 5, 100,
         35850668, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-93898', 'BASILIA POLANCO TAVAREZ', 'Desarrollo', @estId,
-        '00100007558', '240453150606:0080', '1058361520',
-        18.479442, -69.945967
+        0, @uId, DATEADD(day, -123, GETUTCDATE()), DATEADD(day, -123, GETUTCDATE()),
+        'BASILIA POLANCO TAVAREZ', @estId,
+        '00100007558', '240453150606:0080', '1058361520'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-21584')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '790A5302-E157-421D-78CA-E60D2CDE10DC', 'Vista Bella Vista Palace 84', 'Higuey, La Altagracia', 5, 200,
+        '790A5302-E157-421D-78CA-E60D2CDE10DC', 'COR-21584', 'Vista Bella Vista Palace 84', 'Higuey, La Altagracia', '18.635892,-68.713537', 5, 200,
         34671483, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-21584', 'ISIS ELVIRA RIVERA ESTEPHEN', 'Desarrollo', @estId,
-        '00100007731', '160240428501:0089', '1057940229',
-        18.635892, -68.713537
+        0, @uId, DATEADD(day, -22, GETUTCDATE()), DATEADD(day, -22, GETUTCDATE()),
+        'ISIS ELVIRA RIVERA ESTEPHEN', @estId,
+        '00100007731', '160240428501:0089', '1057940229'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-54493')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F0AC05F8-44A9-68E8-07A3-577D060877BE', 'Torre Los Rios Palace 85', 'Santo Domingo de Guzman, Distrito Nacional', 8, 100,
+        'F0AC05F8-44A9-68E8-07A3-577D060877BE', 'COR-54493', 'Torre Los Rios Palace 85', 'Santo Domingo de Guzman, Distrito Nacional', '18.483773,-69.922973', 8, 100,
         47282222, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-54493', 'LUZ MARIA RODRIGUEZ', 'Desarrollo', @estId,
-        '00100007764', '200064494445:0006', '1058122546',
-        18.483773, -69.922973
+        0, @uId, DATEADD(day, -150, GETUTCDATE()), DATEADD(day, -150, GETUTCDATE()),
+        'LUZ MARIA RODRIGUEZ', @estId,
+        '00100007764', '200064494445:0006', '1058122546'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-21212')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '7BB2DAE3-2250-963D-5D2D-816782F2681E', 'Villa Cacicazgos Boutique 86', 'Santo Domingo de Guzman, Distrito Nacional', 11, 200,
+        '7BB2DAE3-2250-963D-5D2D-816782F2681E', 'COR-21212', 'Villa Cacicazgos Boutique 86', 'Santo Domingo de Guzman, Distrito Nacional', '18.488536,-69.946725', 11, 200,
         38206152, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-21212', 'MARIA DOLORES ROSARIO CONCEPCION', 'Desarrollo', @estId,
-        '00100007939', '130012423106:0052', '1057767392',
-        18.488536, -69.946725
+        0, @uId, DATEADD(day, -22, GETUTCDATE()), DATEADD(day, -22, GETUTCDATE()),
+        'MARIA DOLORES ROSARIO CONCEPCION', @estId,
+        '00100007939', '130012423106:0052', '1057767392'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-31459')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '398604AA-A180-8A5C-6617-DD57F48280A5', 'Vista Mirador Sur Boutique 87', 'San Rafael del Yuma, La Altagracia', 4, 200,
+        '398604AA-A180-8A5C-6617-DD57F48280A5', 'COR-31459', 'Vista Mirador Sur Boutique 87', 'San Rafael del Yuma, La Altagracia', '18.634502,-68.692359', 4, 200,
         38807171, 1, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-31459', 'GERMAN SANCHEZ GONZALEZ', 'Desarrollo', @estId,
-        '00100008028', '320395398983:0053', '1058755693',
-        18.634502, -68.692359
+        0, @uId, DATEADD(day, -22, GETUTCDATE()), DATEADD(day, -22, GETUTCDATE()),
+        'GERMAN SANCHEZ GONZALEZ', @estId,
+        '00100008028', '320395398983:0053', '1058755693'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-32458')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '059DA57B-7579-03E1-A5B1-D8EF70ADA6B4', 'Jardines de Cacicazgos Golf & Country Club 88', 'San Rafael del Yuma, La Altagracia', 11, 50,
+        '059DA57B-7579-03E1-A5B1-D8EF70ADA6B4', 'COR-32458', 'Jardines de Cacicazgos Golf & Country Club 88', 'San Rafael del Yuma, La Altagracia', '18.602662,-68.718559', 11, 50,
         24793631, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-32458', 'RICHARD ANTONIO SANTIAGO NIN', 'Desarrollo', @estId,
-        '00100008101', '030422271271:0071', '1057308411',
-        18.602662, -68.718559
+        0, @uId, DATEADD(day, -141, GETUTCDATE()), DATEADD(day, -141, GETUTCDATE()),
+        'RICHARD ANTONIO SANTIAGO NIN', @estId,
+        '00100008101', '030422271271:0071', '1057308411'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-3224')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '64951784-166C-1A92-820C-33D3C516171B', 'Condominio Serralles Boutique 89', 'Santiago de los Caballeros, Santiago', 13, 50,
+        '64951784-166C-1A92-820C-33D3C516171B', 'COR-3224', 'Condominio Serralles Boutique 89', 'Santiago de los Caballeros, Santiago', '19.444769,-70.697899', 13, 50,
         25360126, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-3224', 'MARIA VICTORIA SAVIÑON', 'Desarrollo', @estId,
-        '00100008150', '200327650936:0019', '1058148859',
-        19.444769, -70.697899
+        0, @uId, DATEADD(day, -6, GETUTCDATE()), DATEADD(day, -6, GETUTCDATE()),
+        'MARIA VICTORIA SAVIÑON', @estId,
+        '00100008150', '200327650936:0019', '1058148859'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-33526')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '8BE278FF-D5FF-4ECB-CAE6-62E8F54EFA85', 'Complejo Naco Suites 90', 'Santiago de los Caballeros, Santiago', 15, 100,
+        '8BE278FF-D5FF-4ECB-CAE6-62E8F54EFA85', 'COR-33526', 'Complejo Naco Suites 90', 'Santiago de los Caballeros, Santiago', '19.447191,-70.718327', 15, 100,
         15612285, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-33526', 'GILBERTO DE JESUS TEJADA HERRERA', 'Desarrollo', @estId,
-        '00100008366', '170296114988:0015', '1057995755',
-        19.447191, -70.718327
+        0, @uId, DATEADD(day, -141, GETUTCDATE()), DATEADD(day, -141, GETUTCDATE()),
+        'GILBERTO DE JESUS TEJADA HERRERA', @estId,
+        '00100008366', '170296114988:0015', '1057995755'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-87942')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'DFBAFD16-14B6-0ECA-BE7B-040A0844D756', 'Altos de Serralles Tower 91', 'Santiago de los Caballeros, Santiago', 9, 100,
+        'DFBAFD16-14B6-0ECA-BE7B-040A0844D756', 'COR-87942', 'Altos de Serralles Tower 91', 'Santiago de los Caballeros, Santiago', '19.444586,-70.682676', 9, 100,
         16668493, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-87942', 'JUAN DAGOBERTO TEJEDA ORTIZ', 'Desarrollo', @estId,
-        '00100008408', '160109691134:0051', '1057927091',
-        19.444586, -70.682676
+        0, @uId, DATEADD(day, -136, GETUTCDATE()), DATEADD(day, -136, GETUTCDATE()),
+        'JUAN DAGOBERTO TEJEDA ORTIZ', @estId,
+        '00100008408', '160109691134:0051', '1057927091'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-86890')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '20725940-D5EE-75D0-A35B-139EBF011ACC', 'Altos de Evaristo Morales Premium 92', 'Santiago de los Caballeros, Santiago', 16, 50,
+        '20725940-D5EE-75D0-A35B-139EBF011ACC', 'COR-86890', 'Altos de Evaristo Morales Premium 92', 'Santiago de los Caballeros, Santiago', '19.468888,-70.718404', 16, 50,
         28037918, 1, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-86890', 'MARIO MIGUEL WALWYN', 'Desarrollo', @estId,
-        '00100008622', '200054813746:0013', '1058121553',
-        19.468888, -70.718404
+        0, @uId, DATEADD(day, -150, GETUTCDATE()), DATEADD(day, -150, GETUTCDATE()),
+        'MARIO MIGUEL WALWYN', @estId,
+        '00100008622', '200054813746:0013', '1058121553'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-39526')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '46BD969B-9530-AE7E-A4AF-29B2A01EB7A2', 'Condominio Paraiso Palace 93', 'San Rafael del Yuma, La Altagracia', 4, 100,
+        '46BD969B-9530-AE7E-A4AF-29B2A01EB7A2', 'COR-39526', 'Condominio Paraiso Palace 93', 'San Rafael del Yuma, La Altagracia', '18.611012,-68.692717', 4, 100,
         20986082, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-39526', 'MARGARITA MARIA ACOSTA LOPEZ', 'Desarrollo', @estId,
-        '00100008713', '100127132079:0048', '1057628888',
-        18.611012, -68.692717
+        0, @uId, DATEADD(day, -27, GETUTCDATE()), DATEADD(day, -27, GETUTCDATE()),
+        'MARGARITA MARIA ACOSTA LOPEZ', @estId,
+        '00100008713', '100127132079:0048', '1057628888'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-84554')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '23CEB501-B207-CBCC-6C35-7809339F3DCC', 'Vista Cacicazgos Boutique 94', 'San Rafael del Yuma, La Altagracia', 16, 50,
+        '23CEB501-B207-CBCC-6C35-7809339F3DCC', 'COR-84554', 'Vista Cacicazgos Boutique 94', 'San Rafael del Yuma, La Altagracia', '18.623377,-68.705853', 16, 50,
         13005034, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-84554', 'IRIS CONSUELO ALCANTARA', 'Desarrollo', @estId,
-        '00100008747', '130012423106:0031', '1057767371',
-        18.623377, -68.705853
+        0, @uId, DATEADD(day, -20, GETUTCDATE()), DATEADD(day, -20, GETUTCDATE()),
+        'IRIS CONSUELO ALCANTARA', @estId,
+        '00100008747', '130012423106:0031', '1057767371'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-65008')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '3143FF7D-FD81-555B-535D-918968FBFE79', 'Residencial Naco Suites 95', 'Santo Domingo de Guzman, Distrito Nacional', 12, 50,
+        '3143FF7D-FD81-555B-535D-918968FBFE79', 'COR-65008', 'Residencial Naco Suites 95', 'Santo Domingo de Guzman, Distrito Nacional', '18.488495,-69.916211', 12, 50,
         29171206, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-65008', 'OLGA MARIA ARIAS PEREZ', 'Desarrollo', @estId,
-        '00100008853', '190443528921:0088', '1058110528',
-        18.488495, -69.916211
+        0, @uId, DATEADD(day, -27, GETUTCDATE()), DATEADD(day, -27, GETUTCDATE()),
+        'OLGA MARIA ARIAS PEREZ', @estId,
+        '00100008853', '190443528921:0088', '1058110528'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-69460')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '4D2E2A4E-B2BA-F035-F268-D1C3733A2A58', 'Villa Cacicazgos Tower 96', 'Santo Domingo de Guzman, Distrito Nacional', 9, 50,
+        '4D2E2A4E-B2BA-F035-F268-D1C3733A2A58', 'COR-69460', 'Villa Cacicazgos Tower 96', 'Santo Domingo de Guzman, Distrito Nacional', '18.505053,-69.921221', 9, 50,
         14420665, 1, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-69460', 'HENRY BRENE MARTINEZ', 'Desarrollo', @estId,
-        '00100009125', '110482233651:0048', '1057714388',
-        18.505053, -69.921221
+        0, @uId, DATEADD(day, -6, GETUTCDATE()), DATEADD(day, -6, GETUTCDATE()),
+        'HENRY BRENE MARTINEZ', @estId,
+        '00100009125', '110482233651:0048', '1057714388'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-46849')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'C24E6F8B-578A-5324-E38C-003DE297E9D0', 'Torre Arroyo Hondo Palace 97', 'Santo Domingo de Guzman, Distrito Nacional', 5, 200,
+        'C24E6F8B-578A-5324-E38C-003DE297E9D0', 'COR-46849', 'Torre Arroyo Hondo Palace 97', 'Santo Domingo de Guzman, Distrito Nacional', '18.503131,-69.941731', 5, 200,
         20217162, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-46849', 'ANA MARIA CALCAÑO GUERRERO', 'Desarrollo', @estId,
-        '00100009216', '030031591833:0002', '1057269242',
-        18.503131, -69.941731
+        0, @uId, DATEADD(day, -129, GETUTCDATE()), DATEADD(day, -129, GETUTCDATE()),
+        'ANA MARIA CALCAÑO GUERRERO', @estId,
+        '00100009216', '030031591833:0002', '1057269242'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-90053')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'BB571C99-881E-8076-04A8-A6154451DC0C', 'Residencial Bella Vista Golf & Country Club 98', 'Santo Domingo de Guzman, Distrito Nacional', 8, 50,
+        'BB571C99-881E-8076-04A8-A6154451DC0C', 'COR-90053', 'Residencial Bella Vista Golf & Country Club 98', 'Santo Domingo de Guzman, Distrito Nacional', '18.4726,-69.919205', 8, 50,
         36557245, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-90053', 'JULIANA CAPELLAN', 'Desarrollo', @estId,
-        '00100009281', '120025835655:0058', '1057718698',
-        18.4726, -69.919205
+        0, @uId, DATEADD(day, -132, GETUTCDATE()), DATEADD(day, -132, GETUTCDATE()),
+        'JULIANA CAPELLAN', @estId,
+        '00100009281', '120025835655:0058', '1057718698'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-86326')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'ECD3A884-006A-FFF4-7659-C43DB29FF1D0', 'Jardines de Mirador Sur Residencial 99', 'Higuey, La Altagracia', 1, 200,
+        'ECD3A884-006A-FFF4-7659-C43DB29FF1D0', 'COR-86326', 'Jardines de Mirador Sur Residencial 99', 'Higuey, La Altagracia', '18.603782,-68.703508', 1, 200,
         25008037, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-86326', 'HERMOGENES CASADO MATOS', 'Desarrollo', @estId,
-        '00100009356', '150259948715:0003', '1057892043',
-        18.603782, -68.703508
+        0, @uId, DATEADD(day, -128, GETUTCDATE()), DATEADD(day, -128, GETUTCDATE()),
+        'HERMOGENES CASADO MATOS', @estId,
+        '00100009356', '150259948715:0003', '1057892043'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-35327')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '5867873B-4918-6FF4-7C6C-B6242A540945', 'Vista Arroyo Hondo Tower 100', 'San Rafael del Yuma, La Altagracia', 2, 50,
+        '5867873B-4918-6FF4-7C6C-B6242A540945', 'COR-35327', 'Vista Arroyo Hondo Tower 100', 'San Rafael del Yuma, La Altagracia', '18.603874,-68.683021', 2, 50,
         21644816, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-35327', 'MARGIA LUISA CEDENO OLEA DE TEJEDA OLEA DE TEJEDA', 'Desarrollo', @estId,
-        '00100009505', '250356568367:0060', '1058401800',
-        18.603874, -68.683021
+        0, @uId, DATEADD(day, -18, GETUTCDATE()), DATEADD(day, -18, GETUTCDATE()),
+        'MARGIA LUISA CEDENO OLEA DE TEJEDA OLEA DE TEJEDA', @estId,
+        '00100009505', '250356568367:0060', '1058401800'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-97087')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '3E98D9BD-2443-A56D-39E0-488D04114FA8', 'Edificio Bella Vista Residencial 101', 'Santo Domingo de Guzman, Distrito Nacional', 14, 100,
+        '3E98D9BD-2443-A56D-39E0-488D04114FA8', 'COR-97087', 'Edificio Bella Vista Residencial 101', 'Santo Domingo de Guzman, Distrito Nacional', '18.497395,-69.934731', 14, 100,
         11313295, 1, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-97087', 'RAMONA ALTAGRACIA CONTRERAS FERNANDEZ', 'Desarrollo', @estId,
-        '00100009638', '250232804987:0074', '1058389414',
-        18.497395, -69.934731
+        0, @uId, DATEADD(day, -138, GETUTCDATE()), DATEADD(day, -138, GETUTCDATE()),
+        'RAMONA ALTAGRACIA CONTRERAS FERNANDEZ', @estId,
+        '00100009638', '250232804987:0074', '1058389414'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-90822')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '3C0A4EDD-9670-2F11-7F3E-17DF68DC7037', 'Altos de Bella Vista Tower 102', 'Santiago de los Caballeros, Santiago', 5, 50,
+        '3C0A4EDD-9670-2F11-7F3E-17DF68DC7037', 'COR-90822', 'Altos de Bella Vista Tower 102', 'Santiago de los Caballeros, Santiago', '19.456796,-70.690598', 5, 50,
         30154909, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-90822', 'TEMISTOCLES EUGENIO CREALES POUERIE', 'Desarrollo', @estId,
-        '00100009679', '320371396843:0001', '1058753241',
-        19.456796, -70.690598
+        0, @uId, DATEADD(day, -123, GETUTCDATE()), DATEADD(day, -123, GETUTCDATE()),
+        'TEMISTOCLES EUGENIO CREALES POUERIE', @estId,
+        '00100009679', '320371396843:0001', '1058753241'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-34487')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '444676DE-9B78-9872-0BB1-4FE871C5BD09', 'Complejo Evaristo Morales Residencial 103', 'Santiago de los Caballeros, Santiago', 13, 50,
+        '444676DE-9B78-9872-0BB1-4FE871C5BD09', 'COR-34487', 'Complejo Evaristo Morales Residencial 103', 'Santiago de los Caballeros, Santiago', '19.439927,-70.713632', 13, 50,
         23665992, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-34487', 'MANUEL AURELIO DE LA CRUZ ANGELES', 'Desarrollo', @estId,
-        '00100009729', '090168470998:0007', '1057582947',
-        19.439927, -70.713632
+        0, @uId, DATEADD(day, -135, GETUTCDATE()), DATEADD(day, -135, GETUTCDATE()),
+        'MANUEL AURELIO DE LA CRUZ ANGELES', @estId,
+        '00100009729', '090168470998:0007', '1057582947'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-21836')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'CEB407D2-C5C9-F201-5401-B8889F91FF8A', 'Edificio Naco Palace 104', 'Santo Domingo de Guzman, Distrito Nacional', 10, 50,
+        'CEB407D2-C5C9-F201-5401-B8889F91FF8A', 'COR-21836', 'Edificio Naco Palace 104', 'Santo Domingo de Guzman, Distrito Nacional', '18.494151,-69.935898', 10, 50,
         25288527, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-21836', 'MILAGROS ALTAGRACIA DE LA CRUZ SOLANO', 'Desarrollo', @estId,
-        '00100009877', '080368305115:0010', '1057552950',
-        18.494151, -69.935898
+        0, @uId, DATEADD(day, -141, GETUTCDATE()), DATEADD(day, -141, GETUTCDATE()),
+        'MILAGROS ALTAGRACIA DE LA CRUZ SOLANO', @estId,
+        '00100009877', '080368305115:0010', '1057552950'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-96166')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '58346AE6-5902-7CB9-CFF2-B6B96B7B54D7', 'Vista Paraiso Turistico 105', 'Higuey, La Altagracia', 7, 50,
+        '58346AE6-5902-7CB9-CFF2-B6B96B7B54D7', 'COR-96166', 'Vista Paraiso Turistico 105', 'Higuey, La Altagracia', '18.598249,-68.701172', 7, 50,
         15091271, 0, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-96166', 'CACIANA DEL ROSARIO', 'Desarrollo', @estId,
-        '00100009950', '280487186100:0022', '1058564862',
-        18.598249, -68.701172
+        0, @uId, DATEADD(day, -25, GETUTCDATE()), DATEADD(day, -25, GETUTCDATE()),
+        'CACIANA DEL ROSARIO', @estId,
+        '00100009950', '280487186100:0022', '1058564862'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-38238')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'FA5D34DF-67E7-AAF4-ADDB-7AD1DC4254B5', 'Complejo Arroyo Hondo Residencial 106', 'Santiago de los Caballeros, Santiago', 9, 50,
+        'FA5D34DF-67E7-AAF4-ADDB-7AD1DC4254B5', 'COR-38238', 'Complejo Arroyo Hondo Residencial 106', 'Santiago de los Caballeros, Santiago', '19.437983,-70.683262', 9, 50,
         15035716, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-38238', 'IAN DIAZ GOMEZ', 'Desarrollo', @estId,
-        '00100010008', '040211207927:0043', '1057337283',
-        19.437983, -70.683262
+        0, @uId, DATEADD(day, -122, GETUTCDATE()), DATEADD(day, -122, GETUTCDATE()),
+        'IAN DIAZ GOMEZ', @estId,
+        '00100010008', '040211207927:0043', '1057337283'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-3817')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '22A9AAC4-2383-A48F-6091-0F864070C540', 'Residencial Piantini Golf & Country Club 107', 'Santo Domingo de Guzman, Distrito Nacional', 6, 200,
+        '22A9AAC4-2383-A48F-6091-0F864070C540', 'COR-3817', 'Residencial Piantini Golf & Country Club 107', 'Santo Domingo de Guzman, Distrito Nacional', '18.480086,-69.918379', 6, 200,
         4636803, 3, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-3817', 'FELICIDAD ALTAGRACIA DIAZ LAO', 'Desarrollo', @estId,
-        '00100010016', '310308518463:0007', '1058696947',
-        18.480086, -69.918379
+        0, @uId, DATEADD(day, -121, GETUTCDATE()), DATEADD(day, -121, GETUTCDATE()),
+        'FELICIDAD ALTAGRACIA DIAZ LAO', @estId,
+        '00100010016', '310308518463:0007', '1058696947'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-20046')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'CFEC44F6-4DC9-B394-3A39-EF91301824E4', 'Condominio Cacicazgos Premium 108', 'Santiago de los Caballeros, Santiago', 6, 100,
+        'CFEC44F6-4DC9-B394-3A39-EF91301824E4', 'COR-20046', 'Condominio Cacicazgos Premium 108', 'Santiago de los Caballeros, Santiago', '19.464853,-70.711083', 6, 100,
         8158242, 2, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-20046', 'MIGUEL ANGEL FELIX TEJERA', 'Desarrollo', @estId,
-        '00100010297', '290377559812:0085', '1058603925',
-        19.464853, -70.711083
+        0, @uId, DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -10, GETUTCDATE()),
+        'MIGUEL ANGEL FELIX TEJERA', @estId,
+        '00100010297', '290377559812:0085', '1058603925'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-49431')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F92BC22C-5A22-718A-3461-5655B95042E2', 'Complejo Arroyo Hondo Premium 109', 'San Rafael del Yuma, La Altagracia', 4, 100,
+        'F92BC22C-5A22-718A-3461-5655B95042E2', 'COR-49431', 'Complejo Arroyo Hondo Premium 109', 'San Rafael del Yuma, La Altagracia', '18.623101,-68.704061', 4, 100,
         34845774, 0, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-49431', 'PEDRO NICOLAS FERNANDEZ CAMARENA', 'Desarrollo', @estId,
-        '00100010404', '110369124778:0034', '1057703074',
-        18.623101, -68.704061
+        0, @uId, DATEADD(day, -123, GETUTCDATE()), DATEADD(day, -123, GETUTCDATE()),
+        'PEDRO NICOLAS FERNANDEZ CAMARENA', @estId,
+        '00100010404', '110369124778:0034', '1057703074'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-82877')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'CC628E5C-333E-DD37-F8BB-20A861C4090D', 'Complejo Paraiso Turistico 110', 'Santiago de los Caballeros, Santiago', 1, 50,
+        'CC628E5C-333E-DD37-F8BB-20A861C4090D', 'COR-82877', 'Complejo Paraiso Turistico 110', 'Santiago de los Caballeros, Santiago', '19.441144,-70.717223', 1, 50,
         44026284, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-82877', 'AGUSTIN ALFREDO FERNANDEZ HERRERA HERRERA', 'Desarrollo', @estId,
-        '00100010412', '190373651426:0002', '1058103442',
-        19.441144, -70.717223
+        0, @uId, DATEADD(day, -131, GETUTCDATE()), DATEADD(day, -131, GETUTCDATE()),
+        'AGUSTIN ALFREDO FERNANDEZ HERRERA HERRERA', @estId,
+        '00100010412', '190373651426:0002', '1058103442'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-77383')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'D9FF1F9B-B41E-6725-4290-0ACF09919063', 'Altos de Piantini Residencial 111', 'Santiago de los Caballeros, Santiago', 11, 100,
+        'D9FF1F9B-B41E-6725-4290-0ACF09919063', 'COR-77383', 'Altos de Piantini Residencial 111', 'Santiago de los Caballeros, Santiago', '19.460933,-70.705954', 11, 100,
         18452445, 2, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-77383', 'SAQUEO FERNANDEZ MINAYA', 'Desarrollo', @estId,
-        '00100010420', '310446104999:0026', '1058710766',
-        19.460933, -70.705954
+        0, @uId, DATEADD(day, -139, GETUTCDATE()), DATEADD(day, -139, GETUTCDATE()),
+        'SAQUEO FERNANDEZ MINAYA', @estId,
+        '00100010420', '310446104999:0026', '1058710766'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-22695')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'DA8A2E92-4356-E06C-12A2-6C4398B6F984', 'Villa Mirador Sur Suites 112', 'Santo Domingo de Guzman, Distrito Nacional', 2, 100,
+        'DA8A2E92-4356-E06C-12A2-6C4398B6F984', 'COR-22695', 'Villa Mirador Sur Suites 112', 'Santo Domingo de Guzman, Distrito Nacional', '18.486476,-69.924019', 2, 100,
         47159639, 2, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-22695', 'MARIA VICTORIA FERNANDEZ SANCHEZ SANCHEZ', 'Desarrollo', @estId,
-        '00100010438', '080450632129:0031', '1057561171',
-        18.486476, -69.924019
+        0, @uId, DATEADD(day, -22, GETUTCDATE()), DATEADD(day, -22, GETUTCDATE()),
+        'MARIA VICTORIA FERNANDEZ SANCHEZ SANCHEZ', @estId,
+        '00100010438', '080450632129:0031', '1057561171'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-71732')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'REVISION';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'F0ECFEFA-C675-0ED4-AFBA-51ABFBA749EC', 'Vista Evaristo Morales Boutique 113', 'San Rafael del Yuma, La Altagracia', 14, 200,
+        'F0ECFEFA-C675-0ED4-AFBA-51ABFBA749EC', 'COR-71732', 'Vista Evaristo Morales Boutique 113', 'San Rafael del Yuma, La Altagracia', '18.630446,-68.706754', 14, 200,
         20462043, 1, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-71732', 'CLARA LUZ FERNANDEZ TEJADA', 'Desarrollo', @estId,
-        '00100010453', '310113778318:0042', '1058677482',
-        18.630446, -68.706754
+        0, @uId, DATEADD(day, -150, GETUTCDATE()), DATEADD(day, -150, GETUTCDATE()),
+        'CLARA LUZ FERNANDEZ TEJADA', @estId,
+        '00100010453', '310113778318:0042', '1058677482'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-20918')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'C47CE18B-3F59-CB00-BD83-1E51E3920B4C', 'Altos de Cacicazgos Premium 114', 'Santiago de los Caballeros, Santiago', 8, 50,
+        'C47CE18B-3F59-CB00-BD83-1E51E3920B4C', 'COR-20918', 'Altos de Cacicazgos Premium 114', 'Santiago de los Caballeros, Santiago', '19.431104,-70.684918', 8, 50,
         11121365, 3, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-20918', 'CLAUDIO GIL', 'Desarrollo', @estId,
-        '00100010669', '310474464429:0006', '1058713546',
-        19.431104, -70.684918
+        0, @uId, DATEADD(day, -130, GETUTCDATE()), DATEADD(day, -130, GETUTCDATE()),
+        'CLAUDIO GIL', @estId,
+        '00100010669', '310474464429:0006', '1058713546'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-46427')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '0799FB3E-0434-2F08-291D-9A1C398C8574', 'Vista La Esperilla Premium 115', 'San Rafael del Yuma, La Altagracia', 8, 100,
+        '0799FB3E-0434-2F08-291D-9A1C398C8574', 'COR-46427', 'Vista La Esperilla Premium 115', 'San Rafael del Yuma, La Altagracia', '18.607149,-68.696776', 8, 100,
         11302571, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-46427', 'MERCEDES MIGUELINA GUERRERO TEJEDA', 'Desarrollo', @estId,
-        '00100010826', '150041517479:0080', '1057870320',
-        18.607149, -68.696776
+        0, @uId, DATEADD(day, -127, GETUTCDATE()), DATEADD(day, -127, GETUTCDATE()),
+        'MERCEDES MIGUELINA GUERRERO TEJEDA', @estId,
+        '00100010826', '150041517479:0080', '1057870320'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-74881')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'PUBLICADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '0F741C8D-1A37-8F65-D5E8-644CEF324BB7', 'Villa Piantini Residencial 116', 'Higuey, La Altagracia', 11, 200,
+        '0F741C8D-1A37-8F65-D5E8-644CEF324BB7', 'COR-74881', 'Villa Piantini Residencial 116', 'Higuey, La Altagracia', '18.636042,-68.71847', 11, 200,
         33003508, 0, 0,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-74881', 'FRANCISCO DE JESUS HALL MARTE', 'Desarrollo', @estId,
-        '00100010891', '050316500566:0064', '1057397804',
-        18.636042, -68.71847
+        0, @uId, DATEADD(day, -146, GETUTCDATE()), DATEADD(day, -146, GETUTCDATE()),
+        'FRANCISCO DE JESUS HALL MARTE', @estId,
+        '00100010891', '050316500566:0064', '1057397804'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-36827')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        'E639C51C-6110-1B6B-7CF0-2CE6B71491FF', 'Complejo Naco Tower 117', 'Santiago de los Caballeros, Santiago', 13, 50,
+        'E639C51C-6110-1B6B-7CF0-2CE6B71491FF', 'COR-36827', 'Complejo Naco Tower 117', 'Santiago de los Caballeros, Santiago', '19.453863,-70.706173', 13, 50,
         33939057, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-36827', 'JOSE RAFAEL HERMON TRABOUS', 'Desarrollo', @estId,
-        '00100010933', '140127206072:0004', '1057828844',
-        19.453863, -70.706173
+        0, @uId, DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -10, GETUTCDATE()),
+        'JOSE RAFAEL HERMON TRABOUS', @estId,
+        '00100010933', '140127206072:0004', '1057828844'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-94200')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'EDITADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '967AAC8F-EB5F-D397-2CA5-839D6643FFF1', 'Residencial Evaristo Morales Beach Resort 118', 'Santo Domingo de Guzman, Distrito Nacional', 16, 200,
+        '967AAC8F-EB5F-D397-2CA5-839D6643FFF1', 'COR-94200', 'Residencial Evaristo Morales Beach Resort 118', 'Santo Domingo de Guzman, Distrito Nacional', '18.497557,-69.933744', 16, 200,
         16276682, 3, 1,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-94200', 'YOLANDA LAJARA B DE VALENZUELA B DE VALENZUELA', 'Desarrollo', @estId,
-        '00100011246', '300092635356:0007', '1058625347',
-        18.497557, -69.933744
+        0, @uId, DATEADD(day, -1, GETUTCDATE()), DATEADD(day, -1, GETUTCDATE()),
+        'YOLANDA LAJARA B DE VALENZUELA B DE VALENZUELA', @estId,
+        '00100011246', '300092635356:0007', '1058625347'
     );
     END
 END
 IF NOT EXISTS (SELECT 1 FROM ProyectosInmobiliarios WHERE CodigoInterno = 'COR-99889')
 BEGIN
-    DECLARE @uId UNIQUEIDENTIFIER;
     SELECT @uId = IdUsuario FROM Usuario WHERE Email = 'corporativo@verifinca.do';
-    DECLARE @estId UNIQUEIDENTIFIER;
     SELECT @estId = Id FROM ProyectosEstados WHERE CodigoUnico = 'CREADO';
     IF @uId IS NOT NULL AND @estId IS NOT NULL
     BEGIN
     INSERT INTO ProyectosInmobiliarios (
-        Id, Titulo, UbicacionString, CategoriaId, Superficie,
-        ValorEstimado, EstadoJuridico, NivelIntegridad,
-        TieneSelloOficial, UsuarioCreadorId, CreatedAtUtc, UpdatedAtUtc,
-        CodigoInterno, NombreDesarrollador, ActividadDesarrollador, EstadoId,
-        RncDesarrollador, DesignacionCatastral, Matricula,
-        Latitud, Longitud
+        IdProyecto, CodigoInterno, NombreProyecto, UbicacionTexto, UbicacionGps, CategoriaId, SuperficieM2,
+        ValorEstimado, EstadoJuridico, EstadoIntegridad,
+        SelladoBloqueado, IdUsuario, CreatedAtUtc, UpdatedAtUtc,
+        DatosDesarrollador, EstadoId,
+        RncDesarrollador, DesignacionCatastral, Matricula
     ) VALUES (
-        '7ADCCEEE-9714-9C72-A309-6FABF2C0A829', 'Jardines de Bavaro Boutique 119', 'Higuey, La Altagracia', 16, 100,
+        '7ADCCEEE-9714-9C72-A309-6FABF2C0A829', 'COR-99889', 'Jardines de Bavaro Boutique 119', 'Higuey, La Altagracia', '18.636069,-68.715374', 16, 100,
         5298255, 3, 2,
-        0, @uId, GETUTCDATE(), GETUTCDATE(),
-        'COR-99889', 'FRANCISCO MANUEL LARA HIDALGO HIDALGO', 'Desarrollo', @estId,
-        '00100011261', '110316383658:0043', '1057697783',
-        18.636069, -68.715374
+        0, @uId, DATEADD(day, -2, GETUTCDATE()), DATEADD(day, -2, GETUTCDATE()),
+        'FRANCISCO MANUEL LARA HIDALGO HIDALGO', @estId,
+        '00100011261', '110316383658:0043', '1057697783'
     );
     END
 END

@@ -467,13 +467,12 @@ def get_rncs(file_path):
 def generate_jce_records(cedulas_list):
     import datetime
     
-    jce_records = []
-    base_ced = 40200000000
-    for idx, (nombre, apellido) in enumerate(NOMBRE_APELLIDO_PAIRS):
-        cedula = str(base_ced + idx)
-        cedula = f"{cedula[:3]}-{cedula[3:10]}-{cedula[-1]}"
-        if idx < len(cedulas_list):
-            cedula = cedulas_list[idx]
+    nombres_pool = ["JUAN", "MARIA", "PEDRO", "LUIS", "ANA", "CARMEN", "JOSE", "FRANCISCO", "RAMON", "ALTAGRACIA", "MIGUEL", "ANTONIO", "ROSA", "JUANA"]
+    apellidos_pool = ["PEREZ", "RODRIGUEZ", "SANCHEZ", "GARCIA", "MARTINEZ", "GONZALEZ", "LOPEZ", "FERNANDEZ", "GOMEZ", "SANTANA", "RAMIREZ", "CRUZ"]
+    
+    for ced in cedulas_list:
+        nombre = random.choice(nombres_pool) + " " + random.choice(nombres_pool)
+        apellido = random.choice(apellidos_pool) + " " + random.choice(apellidos_pool)
         
         sexo = random.choice(["M", "F"])
         estado_civil = random.choice(["Soltero(a)", "Casado(a)", "Divorciado(a)"])
@@ -485,14 +484,13 @@ def generate_jce_records(cedulas_list):
         fecha_exp = (datetime.date(2025, 1, 1) + datetime.timedelta(days=random.randint(0, 3650)))
         
         # Use DD-MM-YYYY string for DB
-        jce_records.append({
-            "cedula": cedula, "nombres": nombre, "apellidos": apellido,
+        yield {
+            "cedula": ced, "nombres": nombre, "apellidos": apellido,
             "sexo": sexo, "estado_civil": estado_civil, "lugar_nacimiento": lugar_nacimiento,
             "fnac": fecha_nac.strftime("%d-%m-%Y"),
             "nacionalidad": nacionalidad,
             "fexp": fecha_exp.strftime("%d-%m-%Y")
-        })
-    return jce_records
+        }
 
 def generate_ipi_records(rncs_list):
     pass # Replaced by integrated generator

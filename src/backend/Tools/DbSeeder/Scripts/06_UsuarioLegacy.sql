@@ -1,0 +1,293 @@
+-- Seed for UsuarioLegacy
+SET NOCOUNT ON;
+SET QUOTED_IDENTIFIER ON;
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '052D8615-34A1-4FF1-B34C-9333A14114BD')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('052D8615-34A1-4FF1-B34C-9333A14114BD', 'Elena', 'Ruiz', 'elena.ruiz.0@example.com', 'HASHED_PWD', '809-555-0000', '402-0000000-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '95F51825-2A39-45E5-97C7-D3A3A27D8A28')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('95F51825-2A39-45E5-97C7-D3A3A27D8A28', 'Francisco', 'Ruiz', 'francisco.ruiz.1@example.com', 'HASHED_PWD', '809-555-0000', '402-0000001-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0C9623BB-A536-452A-893C-961284A70AFA')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0C9623BB-A536-452A-893C-961284A70AFA', 'Elena', 'Martinez', 'elena.martinez.2@example.com', 'HASHED_PWD', '809-555-0000', '402-0000002-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0EFBDDDB-21BF-4EE6-BD5C-F88BD647B816')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0EFBDDDB-21BF-4EE6-BD5C-F88BD647B816', 'Maria', 'Romero', 'maria.romero.3@example.com', 'HASHED_PWD', '809-555-0000', '402-0000003-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '8022BFB1-B9D2-48EC-A66D-A5A4640192F4')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('8022BFB1-B9D2-48EC-A66D-A5A4640192F4', 'Pedro', 'Romero', 'pedro.romero.4@example.com', 'HASHED_PWD', '809-555-0000', '402-0000004-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '3866F3D1-22D1-450A-84C3-CB2C284F6CCD')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('3866F3D1-22D1-450A-84C3-CB2C284F6CCD', 'Sofia', 'Alvarez', 'sofia.alvarez.5@example.com', 'HASHED_PWD', '809-555-0000', '402-0000005-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'E61C7CF5-9B4C-4E42-A1B6-EDBCDF4750D1')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('E61C7CF5-9B4C-4E42-A1B6-EDBCDF4750D1', 'Luis', 'Fernandez', 'luis.fernandez.6@example.com', 'HASHED_PWD', '809-555-0000', '402-0000006-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0A8F6188-11AB-42E5-8DBE-E5A323F7AB80')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0A8F6188-11AB-42E5-8DBE-E5A323F7AB80', 'Antonio', 'Martinez', 'antonio.martinez.7@example.com', 'HASHED_PWD', '809-555-0000', '402-0000007-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'EE473D86-3038-4DF4-B74D-8403A1605369')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('EE473D86-3038-4DF4-B74D-8403A1605369', 'Ana', 'Alvarez', 'ana.alvarez.8@example.com', 'HASHED_PWD', '809-555-0000', '402-0000008-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '93822937-3662-462F-9E4B-28C6E7B5EB36')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('93822937-3662-462F-9E4B-28C6E7B5EB36', 'Maria', 'Diaz', 'maria.diaz.9@example.com', 'HASHED_PWD', '809-555-0000', '402-0000009-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'C090F997-184E-4392-B227-303ACC4D9ACD')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('C090F997-184E-4392-B227-303ACC4D9ACD', 'Antonio', 'Romero', 'antonio.romero.10@example.com', 'HASHED_PWD', '809-555-0000', '402-0000010-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '52A67818-E98B-4D90-8A3D-BB9691B496AD')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('52A67818-E98B-4D90-8A3D-BB9691B496AD', 'Carlos', 'Fernandez', 'carlos.fernandez.11@example.com', 'HASHED_PWD', '809-555-0000', '402-0000011-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '33C7EA58-33DA-47BF-B1A2-9B54EDB73789')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('33C7EA58-33DA-47BF-B1A2-9B54EDB73789', 'Antonio', 'Diaz', 'antonio.diaz.12@example.com', 'HASHED_PWD', '809-555-0000', '402-0000012-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'B7D9EF4D-0E34-4234-87C7-394081E088E7')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('B7D9EF4D-0E34-4234-87C7-394081E088E7', 'Pedro', 'Fernandez', 'pedro.fernandez.13@example.com', 'HASHED_PWD', '809-555-0000', '402-0000013-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'E554FCE7-8AEB-4E7A-B115-DED84581E131')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('E554FCE7-8AEB-4E7A-B115-DED84581E131', 'Isabel', 'Perez', 'isabel.perez.14@example.com', 'HASHED_PWD', '809-555-0000', '402-0000014-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'F0FCF803-485A-4F28-B560-DAF019E50FF6')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('F0FCF803-485A-4F28-B560-DAF019E50FF6', 'Francisco', 'Martinez', 'francisco.martinez.15@example.com', 'HASHED_PWD', '809-555-0000', '402-0000015-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'D3749B58-73FF-4403-802D-B79D6B260804')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('D3749B58-73FF-4403-802D-B79D6B260804', 'Juan', 'Perez', 'juan.perez.16@example.com', 'HASHED_PWD', '809-555-0000', '402-0000016-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '6246F820-024E-4889-B3F6-F9B98CEA028F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('6246F820-024E-4889-B3F6-F9B98CEA028F', 'Luis', 'Fernandez', 'luis.fernandez.17@example.com', 'HASHED_PWD', '809-555-0000', '402-0000017-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2F97151E-E9D0-4ECB-AE14-CB18D4C50609')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2F97151E-E9D0-4ECB-AE14-CB18D4C50609', 'Carlos', 'Romero', 'carlos.romero.18@example.com', 'HASHED_PWD', '809-555-0000', '402-0000018-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2CB5A394-9431-4D27-9BD6-52BDB8512F04')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2CB5A394-9431-4D27-9BD6-52BDB8512F04', 'Carlos', 'Ruiz', 'carlos.ruiz.19@example.com', 'HASHED_PWD', '809-555-0000', '402-0000019-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '73BCDF46-A415-46AE-89A4-FF8F8B10593A')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('73BCDF46-A415-46AE-89A4-FF8F8B10593A', 'Francisco', 'Diaz', 'francisco.diaz.20@example.com', 'HASHED_PWD', '809-555-0000', '402-0000020-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '83A517C8-1077-4CFD-832C-D23FF0004C9F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('83A517C8-1077-4CFD-832C-D23FF0004C9F', 'Laura', 'Diaz', 'laura.diaz.21@example.com', 'HASHED_PWD', '809-555-0000', '402-0000021-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '4435DFD0-0231-4877-AED8-0338C0E56EB9')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('4435DFD0-0231-4877-AED8-0338C0E56EB9', 'Carmen', 'Lopez', 'carmen.lopez.22@example.com', 'HASHED_PWD', '809-555-0000', '402-0000022-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '33A2AAA5-816F-4B4D-A26A-8FCEFDA3509C')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('33A2AAA5-816F-4B4D-A26A-8FCEFDA3509C', 'Luis', 'Lopez', 'luis.lopez.23@example.com', 'HASHED_PWD', '809-555-0000', '402-0000023-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'FB249F72-13A7-4A35-B550-536950543B34')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('FB249F72-13A7-4A35-B550-536950543B34', 'Carmen', 'Sanchez', 'carmen.sanchez.24@example.com', 'HASHED_PWD', '809-555-0000', '402-0000024-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '1C50AE21-FA05-4617-B415-E761C098C757')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('1C50AE21-FA05-4617-B415-E761C098C757', 'Sofia', 'Romero', 'sofia.romero.25@example.com', 'HASHED_PWD', '809-555-0000', '402-0000025-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2C1F4184-6A6F-4EAB-9BAE-3509EE665104')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2C1F4184-6A6F-4EAB-9BAE-3509EE665104', 'Isabel', 'Perez', 'isabel.perez.26@example.com', 'HASHED_PWD', '809-555-0000', '402-0000026-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '51E2DF2A-3E78-477A-8DD4-85FDEA30E579')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('51E2DF2A-3E78-477A-8DD4-85FDEA30E579', 'Pedro', 'Perez', 'pedro.perez.27@example.com', 'HASHED_PWD', '809-555-0000', '402-0000027-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '72888ADE-C7B4-444B-847F-81981BF7E1E2')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('72888ADE-C7B4-444B-847F-81981BF7E1E2', 'Juan', 'Gonzalez', 'juan.gonzalez.28@example.com', 'HASHED_PWD', '809-555-0000', '402-0000028-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'E63A7CDD-549E-48B0-AB40-18E60B64D9DB')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('E63A7CDD-549E-48B0-AB40-18E60B64D9DB', 'Ana', 'Gomez', 'ana.gomez.29@example.com', 'HASHED_PWD', '809-555-0000', '402-0000029-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2D97353A-B104-410D-A55D-A83197BC2F6E')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2D97353A-B104-410D-A55D-A83197BC2F6E', 'Laura', 'Martinez', 'laura.martinez.30@example.com', 'HASHED_PWD', '809-555-0000', '402-0000030-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '7410D1EC-AC99-40CC-9669-12520146E4B3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('7410D1EC-AC99-40CC-9669-12520146E4B3', 'Jose', 'Torres', 'jose.torres.31@example.com', 'HASHED_PWD', '809-555-0000', '402-0000031-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '1A136C68-E965-4106-8310-CB6B13DBC0F3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('1A136C68-E965-4106-8310-CB6B13DBC0F3', 'Pedro', 'Perez', 'pedro.perez.32@example.com', 'HASHED_PWD', '809-555-0000', '402-0000032-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0A6FC405-21B2-40C3-A418-387CBE6D4625')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0A6FC405-21B2-40C3-A418-387CBE6D4625', 'Miguel', 'Rodriguez', 'miguel.rodriguez.33@example.com', 'HASHED_PWD', '809-555-0000', '402-0000033-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'E81B693D-F460-452E-86E7-BFC71F656E0E')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('E81B693D-F460-452E-86E7-BFC71F656E0E', 'Antonio', 'Gomez', 'antonio.gomez.34@example.com', 'HASHED_PWD', '809-555-0000', '402-0000034-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '4B13078E-D882-47C8-9F2D-E597E7AF906D')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('4B13078E-D882-47C8-9F2D-E597E7AF906D', 'Maria', 'Fernandez', 'maria.fernandez.35@example.com', 'HASHED_PWD', '809-555-0000', '402-0000035-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '887A8BC9-165F-4291-AD48-18573DB2CB66')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('887A8BC9-165F-4291-AD48-18573DB2CB66', 'Jose', 'Gomez', 'jose.gomez.36@example.com', 'HASHED_PWD', '809-555-0000', '402-0000036-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '9C945575-DD3A-4802-AFA1-869E5838AB52')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('9C945575-DD3A-4802-AFA1-869E5838AB52', 'Juan', 'Diaz', 'juan.diaz.37@example.com', 'HASHED_PWD', '809-555-0000', '402-0000037-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '44178B99-E65E-4B13-B6D4-87E2EECDE4CB')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('44178B99-E65E-4B13-B6D4-87E2EECDE4CB', 'Juan', 'Diaz', 'juan.diaz.38@example.com', 'HASHED_PWD', '809-555-0000', '402-0000038-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '63710CDF-095B-449B-9BC3-85295F4EC7CA')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('63710CDF-095B-449B-9BC3-85295F4EC7CA', 'Ana', 'Martinez', 'ana.martinez.39@example.com', 'HASHED_PWD', '809-555-0000', '402-0000039-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '6C180CFB-D4BD-432B-AB14-BD9B6F4B8033')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('6C180CFB-D4BD-432B-AB14-BD9B6F4B8033', 'Carlos', 'Fernandez', 'carlos.fernandez.40@example.com', 'HASHED_PWD', '809-555-0000', '402-0000040-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '543C97E6-D8CB-4505-8AA7-E8F4B8B880F4')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('543C97E6-D8CB-4505-8AA7-E8F4B8B880F4', 'Miguel', 'Romero', 'miguel.romero.41@example.com', 'HASHED_PWD', '809-555-0000', '402-0000041-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '9BF68C4D-E7F8-4F9B-93CD-CC5274A4B096')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('9BF68C4D-E7F8-4F9B-93CD-CC5274A4B096', 'Carmen', 'Gomez', 'carmen.gomez.42@example.com', 'HASHED_PWD', '809-555-0000', '402-0000042-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2583799F-EC62-4065-B804-982D0E5E0FF4')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2583799F-EC62-4065-B804-982D0E5E0FF4', 'Carmen', 'Lopez', 'carmen.lopez.43@example.com', 'HASHED_PWD', '809-555-0000', '402-0000043-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'C1B5876F-9798-43CF-BA57-CE4BC811307D')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('C1B5876F-9798-43CF-BA57-CE4BC811307D', 'Antonio', 'Gomez', 'antonio.gomez.44@example.com', 'HASHED_PWD', '809-555-0000', '402-0000044-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '1461B742-EF92-43B4-A20C-B805F3A9D9DD')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('1461B742-EF92-43B4-A20C-B805F3A9D9DD', 'Miguel', 'Ruiz', 'miguel.ruiz.45@example.com', 'HASHED_PWD', '809-555-0000', '402-0000045-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'D51A128D-D120-4E7B-BF92-8F683C9DF8F5')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('D51A128D-D120-4E7B-BF92-8F683C9DF8F5', 'Luis', 'Martinez', 'luis.martinez.46@example.com', 'HASHED_PWD', '809-555-0000', '402-0000046-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '99B9EB4B-2609-44EC-9F4E-5903A8858F90')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('99B9EB4B-2609-44EC-9F4E-5903A8858F90', 'Pedro', 'Lopez', 'pedro.lopez.47@example.com', 'HASHED_PWD', '809-555-0000', '402-0000047-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '6ACFA157-4482-4C5D-A513-E8A5AF849915')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('6ACFA157-4482-4C5D-A513-E8A5AF849915', 'Francisco', 'Ruiz', 'francisco.ruiz.48@example.com', 'HASHED_PWD', '809-555-0000', '402-0000048-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '52570C31-A7E3-43E9-8DF5-33552884AE51')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('52570C31-A7E3-43E9-8DF5-33552884AE51', 'Juan', 'Lopez', 'juan.lopez.49@example.com', 'HASHED_PWD', '809-555-0000', '402-0000049-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '491129D7-0E2A-47FE-9F2D-C194F45AEE8C')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('491129D7-0E2A-47FE-9F2D-C194F45AEE8C', 'Ana', 'Martinez', 'ana.martinez.50@example.com', 'HASHED_PWD', '809-555-0000', '402-0000050-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2490F193-8B49-4DC2-9FAC-F966DC43A725')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2490F193-8B49-4DC2-9FAC-F966DC43A725', 'Jose', 'Ruiz', 'jose.ruiz.51@example.com', 'HASHED_PWD', '809-555-0000', '402-0000051-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0336A7D6-B5CF-4DD6-A44D-848D061985ED')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0336A7D6-B5CF-4DD6-A44D-848D061985ED', 'Jose', 'Gomez', 'jose.gomez.52@example.com', 'HASHED_PWD', '809-555-0000', '402-0000052-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2CEF774A-D131-4AE3-AE1A-1B61D5F98893')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2CEF774A-D131-4AE3-AE1A-1B61D5F98893', 'Sofia', 'Gomez', 'sofia.gomez.53@example.com', 'HASHED_PWD', '809-555-0000', '402-0000053-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '731F3A1C-D863-4FDB-B7AB-D4B2EC158913')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('731F3A1C-D863-4FDB-B7AB-D4B2EC158913', 'Juan', 'Rodriguez', 'juan.rodriguez.54@example.com', 'HASHED_PWD', '809-555-0000', '402-0000054-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '1F4D66C2-64F4-44A9-A9E9-E320266025DF')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('1F4D66C2-64F4-44A9-A9E9-E320266025DF', 'Miguel', 'Fernandez', 'miguel.fernandez.55@example.com', 'HASHED_PWD', '809-555-0000', '402-0000055-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'B0019279-52D0-49D9-96B1-1FB87CD9D8BF')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('B0019279-52D0-49D9-96B1-1FB87CD9D8BF', 'Elena', 'Ruiz', 'elena.ruiz.56@example.com', 'HASHED_PWD', '809-555-0000', '402-0000056-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '31A635BF-05A8-4B92-981B-ED5D12D6EFF5')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('31A635BF-05A8-4B92-981B-ED5D12D6EFF5', 'Ana', 'Rodriguez', 'ana.rodriguez.57@example.com', 'HASHED_PWD', '809-555-0000', '402-0000057-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '5E2A50D5-0923-41C7-BDA7-77897425E90F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('5E2A50D5-0923-41C7-BDA7-77897425E90F', 'Carlos', 'Fernandez', 'carlos.fernandez.58@example.com', 'HASHED_PWD', '809-555-0000', '402-0000058-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '9825BBBE-2B7E-4B81-96BA-99248B26A3BB')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('9825BBBE-2B7E-4B81-96BA-99248B26A3BB', 'Juan', 'Alvarez', 'juan.alvarez.59@example.com', 'HASHED_PWD', '809-555-0000', '402-0000059-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '99376627-2E4C-4111-8FB0-6390C69016D2')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('99376627-2E4C-4111-8FB0-6390C69016D2', 'Isabel', 'Diaz', 'isabel.diaz.60@example.com', 'HASHED_PWD', '809-555-0000', '402-0000060-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'C04AD61B-C493-4EEA-B3D2-B12BF9947885')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('C04AD61B-C493-4EEA-B3D2-B12BF9947885', 'Pedro', 'Gomez', 'pedro.gomez.61@example.com', 'HASHED_PWD', '809-555-0000', '402-0000061-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '84DFE78C-F781-4BA3-9CF4-6490688540AA')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('84DFE78C-F781-4BA3-9CF4-6490688540AA', 'Juan', 'Torres', 'juan.torres.62@example.com', 'HASHED_PWD', '809-555-0000', '402-0000062-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '6AD59882-BFAC-4E39-B957-415A1706080F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('6AD59882-BFAC-4E39-B957-415A1706080F', 'Luis', 'Torres', 'luis.torres.63@example.com', 'HASHED_PWD', '809-555-0000', '402-0000063-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'B643A719-741E-48F4-9F06-FBDC4BF85F02')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('B643A719-741E-48F4-9F06-FBDC4BF85F02', 'Francisco', 'Alvarez', 'francisco.alvarez.64@example.com', 'HASHED_PWD', '809-555-0000', '402-0000064-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '56091D30-3177-4B44-99C7-DFD89932AFC3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('56091D30-3177-4B44-99C7-DFD89932AFC3', 'Francisco', 'Ruiz', 'francisco.ruiz.65@example.com', 'HASHED_PWD', '809-555-0000', '402-0000065-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'A87F18BF-5A74-4809-BAB1-15578223524B')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('A87F18BF-5A74-4809-BAB1-15578223524B', 'Antonio', 'Diaz', 'antonio.diaz.66@example.com', 'HASHED_PWD', '809-555-0000', '402-0000066-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'CD6B2FF7-FC70-47E1-981D-69A42EF985F9')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('CD6B2FF7-FC70-47E1-981D-69A42EF985F9', 'Luis', 'Sanchez', 'luis.sanchez.67@example.com', 'HASHED_PWD', '809-555-0000', '402-0000067-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '7DB43EE1-5D19-48BC-B476-5E60FB867223')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('7DB43EE1-5D19-48BC-B476-5E60FB867223', 'Ana', 'Ruiz', 'ana.ruiz.68@example.com', 'HASHED_PWD', '809-555-0000', '402-0000068-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '7954C8F9-9EE7-4E94-B8EE-3DCD59854DEF')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('7954C8F9-9EE7-4E94-B8EE-3DCD59854DEF', 'Maria', 'Lopez', 'maria.lopez.69@example.com', 'HASHED_PWD', '809-555-0000', '402-0000069-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'B55038C8-FD08-4502-8710-EAE7DBE5A575')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('B55038C8-FD08-4502-8710-EAE7DBE5A575', 'Maria', 'Ruiz', 'maria.ruiz.70@example.com', 'HASHED_PWD', '809-555-0000', '402-0000070-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '81E2667B-18A4-4AA3-9BBE-289E953C54D6')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('81E2667B-18A4-4AA3-9BBE-289E953C54D6', 'Francisco', 'Gonzalez', 'francisco.gonzalez.71@example.com', 'HASHED_PWD', '809-555-0000', '402-0000071-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '4F87836D-6238-4E50-B191-4074838500B3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('4F87836D-6238-4E50-B191-4074838500B3', 'Carmen', 'Martinez', 'carmen.martinez.72@example.com', 'HASHED_PWD', '809-555-0000', '402-0000072-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '80BCB1AA-AAC2-43E5-9870-70BEDB7423B1')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('80BCB1AA-AAC2-43E5-9870-70BEDB7423B1', 'Sofia', 'Perez', 'sofia.perez.73@example.com', 'HASHED_PWD', '809-555-0000', '402-0000073-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '1EBAE89F-6901-4D59-9EBC-1E84EB644272')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('1EBAE89F-6901-4D59-9EBC-1E84EB644272', 'Jose', 'Lopez', 'jose.lopez.74@example.com', 'HASHED_PWD', '809-555-0000', '402-0000074-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'AEC526DD-3367-4B84-8B84-2F3B4C519DA3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('AEC526DD-3367-4B84-8B84-2F3B4C519DA3', 'Luis', 'Gonzalez', 'luis.gonzalez.75@example.com', 'HASHED_PWD', '809-555-0000', '402-0000075-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '8287756E-D10F-4470-941A-795F4CD942A4')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('8287756E-D10F-4470-941A-795F4CD942A4', 'Jose', 'Diaz', 'jose.diaz.76@example.com', 'HASHED_PWD', '809-555-0000', '402-0000076-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '06E65FB4-781B-4586-8696-0C783E46E2E3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('06E65FB4-781B-4586-8696-0C783E46E2E3', 'Sofia', 'Ruiz', 'sofia.ruiz.77@example.com', 'HASHED_PWD', '809-555-0000', '402-0000077-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'C338C2C0-C855-4574-99F4-644079825385')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('C338C2C0-C855-4574-99F4-644079825385', 'Laura', 'Torres', 'laura.torres.78@example.com', 'HASHED_PWD', '809-555-0000', '402-0000078-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '5A26E461-9044-446E-8895-2DEA374C12C4')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('5A26E461-9044-446E-8895-2DEA374C12C4', 'Maria', 'Diaz', 'maria.diaz.79@example.com', 'HASHED_PWD', '809-555-0000', '402-0000079-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'D2CCA79F-A8FE-4710-BB1F-EBFA0090E15B')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('D2CCA79F-A8FE-4710-BB1F-EBFA0090E15B', 'Luis', 'Romero', 'luis.romero.80@example.com', 'HASHED_PWD', '809-555-0000', '402-0000080-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'BBBF4ED7-6C14-484A-B9BF-EA2DC4A8F521')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('BBBF4ED7-6C14-484A-B9BF-EA2DC4A8F521', 'Juan', 'Gonzalez', 'juan.gonzalez.81@example.com', 'HASHED_PWD', '809-555-0000', '402-0000081-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'EC89B53B-3E29-4AA1-BC25-B5EAF9223A9F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('EC89B53B-3E29-4AA1-BC25-B5EAF9223A9F', 'Francisco', 'Diaz', 'francisco.diaz.82@example.com', 'HASHED_PWD', '809-555-0000', '402-0000082-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'A70FF9E7-A347-43F9-A338-5308E35DF4C3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('A70FF9E7-A347-43F9-A338-5308E35DF4C3', 'Juan', 'Sanchez', 'juan.sanchez.83@example.com', 'HASHED_PWD', '809-555-0000', '402-0000083-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'EAAC4E7A-8F3C-4A86-AF06-B3EA322BCE00')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('EAAC4E7A-8F3C-4A86-AF06-B3EA322BCE00', 'Elena', 'Lopez', 'elena.lopez.84@example.com', 'HASHED_PWD', '809-555-0000', '402-0000084-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '4ACB8839-C983-414A-896B-0D53D8A1B8D4')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('4ACB8839-C983-414A-896B-0D53D8A1B8D4', 'Jose', 'Perez', 'jose.perez.85@example.com', 'HASHED_PWD', '809-555-0000', '402-0000085-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'ACF21510-605E-4645-8132-3BB9DE078D96')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('ACF21510-605E-4645-8132-3BB9DE078D96', 'Laura', 'Romero', 'laura.romero.86@example.com', 'HASHED_PWD', '809-555-0000', '402-0000086-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0F929DB2-4698-43EA-81BF-74F463833827')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0F929DB2-4698-43EA-81BF-74F463833827', 'Juan', 'Fernandez', 'juan.fernandez.87@example.com', 'HASHED_PWD', '809-555-0000', '402-0000087-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '9E421A9D-EEBE-44E8-9616-B8347B4E9701')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('9E421A9D-EEBE-44E8-9616-B8347B4E9701', 'Isabel', 'Diaz', 'isabel.diaz.88@example.com', 'HASHED_PWD', '809-555-0000', '402-0000088-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '3D5BE806-4C66-46FA-A0C0-C77DDDB7F968')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('3D5BE806-4C66-46FA-A0C0-C77DDDB7F968', 'Pedro', 'Romero', 'pedro.romero.89@example.com', 'HASHED_PWD', '809-555-0000', '402-0000089-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'BDB3C056-9DBE-4F86-9D1E-24E872F7B3D0')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('BDB3C056-9DBE-4F86-9D1E-24E872F7B3D0', 'Luis', 'Perez', 'luis.perez.90@example.com', 'HASHED_PWD', '809-555-0000', '402-0000090-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '78543728-9322-494E-9976-CEBCA0872FCA')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('78543728-9322-494E-9976-CEBCA0872FCA', 'Antonio', 'Ruiz', 'antonio.ruiz.91@example.com', 'HASHED_PWD', '809-555-0000', '402-0000091-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '826E6F90-CCF2-44E1-9283-95400C6C3C15')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('826E6F90-CCF2-44E1-9283-95400C6C3C15', 'Juan', 'Alvarez', 'juan.alvarez.92@example.com', 'HASHED_PWD', '809-555-0000', '402-0000092-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '101A5B14-1466-4EF5-9582-7366C2A3DFAE')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('101A5B14-1466-4EF5-9582-7366C2A3DFAE', 'Miguel', 'Martinez', 'miguel.martinez.93@example.com', 'HASHED_PWD', '809-555-0000', '402-0000093-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'A6572C7C-FFCE-495F-B470-A17AAAB267B2')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('A6572C7C-FFCE-495F-B470-A17AAAB267B2', 'Juan', 'Romero', 'juan.romero.94@example.com', 'HASHED_PWD', '809-555-0000', '402-0000094-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '757163E9-606E-4261-9BCE-A30DC77AF91D')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('757163E9-606E-4261-9BCE-A30DC77AF91D', 'Luis', 'Alvarez', 'luis.alvarez.95@example.com', 'HASHED_PWD', '809-555-0000', '402-0000095-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '4103AE3C-66F1-432C-85BF-0611BB39B952')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('4103AE3C-66F1-432C-85BF-0611BB39B952', 'Ana', 'Perez', 'ana.perez.96@example.com', 'HASHED_PWD', '809-555-0000', '402-0000096-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'C1B8AD75-707E-4331-B781-B8E39DBCBEB1')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('C1B8AD75-707E-4331-B781-B8E39DBCBEB1', 'Luis', 'Romero', 'luis.romero.97@example.com', 'HASHED_PWD', '809-555-0000', '402-0000097-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'AED6A660-4B18-4945-9ED0-4D1D4F2E4AFC')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('AED6A660-4B18-4945-9ED0-4D1D4F2E4AFC', 'Carmen', 'Perez', 'carmen.perez.98@example.com', 'HASHED_PWD', '809-555-0000', '402-0000098-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0C0D21EF-8729-4C2D-9AC1-DED9C3CB6610')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0C0D21EF-8729-4C2D-9AC1-DED9C3CB6610', 'Francisco', 'Romero', 'francisco.romero.99@example.com', 'HASHED_PWD', '809-555-0000', '402-0000099-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '9811EB6E-35C5-452A-A51E-2E96B4253170')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('9811EB6E-35C5-452A-A51E-2E96B4253170', 'Ana', 'Perez', 'ana.perez.100@example.com', 'HASHED_PWD', '809-555-0000', '402-0000100-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'F74D0167-D40F-437D-8C8C-CA5FDB9A76EA')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('F74D0167-D40F-437D-8C8C-CA5FDB9A76EA', 'Laura', 'Perez', 'laura.perez.101@example.com', 'HASHED_PWD', '809-555-0000', '402-0000101-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '6BA51356-D636-4F3D-8316-48BD2F402403')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('6BA51356-D636-4F3D-8316-48BD2F402403', 'Miguel', 'Perez', 'miguel.perez.102@example.com', 'HASHED_PWD', '809-555-0000', '402-0000102-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'A2A9BD25-74F7-4DEC-B421-1DEE4BD7DCB3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('A2A9BD25-74F7-4DEC-B421-1DEE4BD7DCB3', 'Elena', 'Ruiz', 'elena.ruiz.103@example.com', 'HASHED_PWD', '809-555-0000', '402-0000103-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'BEFFF06A-9E0F-4EEA-85A2-09865BEA7782')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('BEFFF06A-9E0F-4EEA-85A2-09865BEA7782', 'Maria', 'Diaz', 'maria.diaz.104@example.com', 'HASHED_PWD', '809-555-0000', '402-0000104-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '74628A0D-5EF2-4716-BCF4-1A6AE28CF6A0')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('74628A0D-5EF2-4716-BCF4-1A6AE28CF6A0', 'Francisco', 'Rodriguez', 'francisco.rodriguez.105@example.com', 'HASHED_PWD', '809-555-0000', '402-0000105-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '144781EA-196F-4EDC-932F-F4AAA017ED21')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('144781EA-196F-4EDC-932F-F4AAA017ED21', 'Elena', 'Lopez', 'elena.lopez.106@example.com', 'HASHED_PWD', '809-555-0000', '402-0000106-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '5AC56FE3-42A2-4713-8077-8D9427F79C63')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('5AC56FE3-42A2-4713-8077-8D9427F79C63', 'Carlos', 'Lopez', 'carlos.lopez.107@example.com', 'HASHED_PWD', '809-555-0000', '402-0000107-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'CFE8C7E1-89B2-431F-B222-FC851ABDA34A')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('CFE8C7E1-89B2-431F-B222-FC851ABDA34A', 'Jose', 'Gonzalez', 'jose.gonzalez.108@example.com', 'HASHED_PWD', '809-555-0000', '402-0000108-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'E1A4E286-A28C-47DC-B641-6DC424A8FEBB')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('E1A4E286-A28C-47DC-B641-6DC424A8FEBB', 'Juan', 'Sanchez', 'juan.sanchez.109@example.com', 'HASHED_PWD', '809-555-0000', '402-0000109-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'FACC8341-BBE9-4C41-9F9B-8D19FF587ADE')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('FACC8341-BBE9-4C41-9F9B-8D19FF587ADE', 'Jose', 'Ruiz', 'jose.ruiz.110@example.com', 'HASHED_PWD', '809-555-0000', '402-0000110-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '6D697E75-0DA0-4CB3-B36A-A8A3586BB11D')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('6D697E75-0DA0-4CB3-B36A-A8A3586BB11D', 'Juan', 'Fernandez', 'juan.fernandez.111@example.com', 'HASHED_PWD', '809-555-0000', '402-0000111-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'C96555FC-9549-43BC-BDA9-4B1D07250050')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('C96555FC-9549-43BC-BDA9-4B1D07250050', 'Maria', 'Lopez', 'maria.lopez.112@example.com', 'HASHED_PWD', '809-555-0000', '402-0000112-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'C3DC0C89-2384-4D57-9E82-99F170A3F541')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('C3DC0C89-2384-4D57-9E82-99F170A3F541', 'Jose', 'Sanchez', 'jose.sanchez.113@example.com', 'HASHED_PWD', '809-555-0000', '402-0000113-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '84F6C335-6F70-4BF2-A7F7-A1A31EF38234')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('84F6C335-6F70-4BF2-A7F7-A1A31EF38234', 'Laura', 'Torres', 'laura.torres.114@example.com', 'HASHED_PWD', '809-555-0000', '402-0000114-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '25951A0A-B8DD-4A02-9C30-C0E5897298EF')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('25951A0A-B8DD-4A02-9C30-C0E5897298EF', 'Carmen', 'Romero', 'carmen.romero.115@example.com', 'HASHED_PWD', '809-555-0000', '402-0000115-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '837C574F-C073-43C3-8174-B19DB6108C97')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('837C574F-C073-43C3-8174-B19DB6108C97', 'Luis', 'Martinez', 'luis.martinez.116@example.com', 'HASHED_PWD', '809-555-0000', '402-0000116-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'FFF65D74-8C72-4CF8-9D1A-9BF8196D8335')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('FFF65D74-8C72-4CF8-9D1A-9BF8196D8335', 'Carlos', 'Romero', 'carlos.romero.117@example.com', 'HASHED_PWD', '809-555-0000', '402-0000117-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '835353E7-B810-421C-9408-059E8FE30D0A')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('835353E7-B810-421C-9408-059E8FE30D0A', 'Jose', 'Fernandez', 'jose.fernandez.118@example.com', 'HASHED_PWD', '809-555-0000', '402-0000118-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '901311C8-9083-4F49-A043-C8345BFAD1EB')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('901311C8-9083-4F49-A043-C8345BFAD1EB', 'Luis', 'Ruiz', 'luis.ruiz.119@example.com', 'HASHED_PWD', '809-555-0000', '402-0000119-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '9505735C-3CDD-4C9B-A664-EFB5974C816F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('9505735C-3CDD-4C9B-A664-EFB5974C816F', 'Maria', 'Alvarez', 'maria.alvarez.120@example.com', 'HASHED_PWD', '809-555-0000', '402-0000120-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '728138E3-876B-4F8E-B616-DB6F994D4B40')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('728138E3-876B-4F8E-B616-DB6F994D4B40', 'Pedro', 'Gonzalez', 'pedro.gonzalez.121@example.com', 'HASHED_PWD', '809-555-0000', '402-0000121-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '948E3DB0-C7F3-4E0B-924D-EEBC17E05A71')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('948E3DB0-C7F3-4E0B-924D-EEBC17E05A71', 'Carmen', 'Rodriguez', 'carmen.rodriguez.122@example.com', 'HASHED_PWD', '809-555-0000', '402-0000122-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'FAF95C98-D728-472F-AE2B-FEA281C72EB1')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('FAF95C98-D728-472F-AE2B-FEA281C72EB1', 'Luis', 'Diaz', 'luis.diaz.123@example.com', 'HASHED_PWD', '809-555-0000', '402-0000123-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '6DB33884-6A02-4591-A447-8E86BA59DB9F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('6DB33884-6A02-4591-A447-8E86BA59DB9F', 'Laura', 'Sanchez', 'laura.sanchez.124@example.com', 'HASHED_PWD', '809-555-0000', '402-0000124-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '2BF15120-9768-4796-BDA7-A917C07C2837')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('2BF15120-9768-4796-BDA7-A917C07C2837', 'Luis', 'Ruiz', 'luis.ruiz.125@example.com', 'HASHED_PWD', '809-555-0000', '402-0000125-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '0A3A182D-D1C2-48C1-88CB-9695779B6167')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('0A3A182D-D1C2-48C1-88CB-9695779B6167', 'Miguel', 'Perez', 'miguel.perez.126@example.com', 'HASHED_PWD', '809-555-0000', '402-0000126-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'DB9C6D36-D35A-4199-8C0C-4D4D35ADD507')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('DB9C6D36-D35A-4199-8C0C-4D4D35ADD507', 'Maria', 'Gonzalez', 'maria.gonzalez.127@example.com', 'HASHED_PWD', '809-555-0000', '402-0000127-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '8109B67E-A45B-46E2-9C33-01E936F5127C')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('8109B67E-A45B-46E2-9C33-01E936F5127C', 'Carlos', 'Gonzalez', 'carlos.gonzalez.128@example.com', 'HASHED_PWD', '809-555-0000', '402-0000128-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'F92BAFC1-E1F1-478C-9569-AC9B3EF6BEB2')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('F92BAFC1-E1F1-478C-9569-AC9B3EF6BEB2', 'Isabel', 'Lopez', 'isabel.lopez.129@example.com', 'HASHED_PWD', '809-555-0000', '402-0000129-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '9E299695-955C-415F-A845-69127242469F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('9E299695-955C-415F-A845-69127242469F', 'Jose', 'Rodriguez', 'jose.rodriguez.130@example.com', 'HASHED_PWD', '809-555-0000', '402-0000130-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '5C0E7ABA-A66C-43CE-A5D8-F8A4ACFE4A7F')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('5C0E7ABA-A66C-43CE-A5D8-F8A4ACFE4A7F', 'Isabel', 'Fernandez', 'isabel.fernandez.131@example.com', 'HASHED_PWD', '809-555-0000', '402-0000131-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '5EF30776-828E-4A2B-8BCF-D23AAD1744F3')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('5EF30776-828E-4A2B-8BCF-D23AAD1744F3', 'Antonio', 'Torres', 'antonio.torres.132@example.com', 'HASHED_PWD', '809-555-0000', '402-0000132-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '899B08FE-54ED-4950-8FA2-32768052B14B')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('899B08FE-54ED-4950-8FA2-32768052B14B', 'Elena', 'Alvarez', 'elena.alvarez.133@example.com', 'HASHED_PWD', '809-555-0000', '402-0000133-1');
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '331F0334-2C31-4CBA-B7B3-EAB15A9ED6D2')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('331F0334-2C31-4CBA-B7B3-EAB15A9ED6D2', 'Juan', 'Sanchez', 'juan.sanchez.134@example.com', 'HASHED_PWD', '809-555-0000', '402-0000134-1');
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = 'EECEC931-679B-455C-A59B-DF238E7AF293')
+INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas) VALUES ('EECEC931-679B-455C-A59B-DF238E7AF293', 'Legacy0', 'User0', 'legacy0@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '5F1F3417-402F-4CAC-AE39-F9802A5E72D2', GETUTCDATE(), GETUTCDATE(), 0);
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'EECEC931-679B-455C-A59B-DF238E7AF293')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('EECEC931-679B-455C-A59B-DF238E7AF293', 'Legacy0', 'User0', 'legacy0@example.com', 'HASH', '809-000-0000', '000-0000000-0');
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = '3926B6DC-E0C8-4509-9AF1-C0364751E405')
+INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas) VALUES ('3926B6DC-E0C8-4509-9AF1-C0364751E405', 'Legacy1', 'User1', 'legacy1@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '5F1F3417-402F-4CAC-AE39-F9802A5E72D2', GETUTCDATE(), GETUTCDATE(), 0);
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '3926B6DC-E0C8-4509-9AF1-C0364751E405')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('3926B6DC-E0C8-4509-9AF1-C0364751E405', 'Legacy1', 'User1', 'legacy1@example.com', 'HASH', '809-000-0000', '000-0000000-0');
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = 'E6B5CC34-CB8A-4B4D-BF9C-21E42714AFBB')
+INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas) VALUES ('E6B5CC34-CB8A-4B4D-BF9C-21E42714AFBB', 'Legacy2', 'User2', 'legacy2@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '5F1F3417-402F-4CAC-AE39-F9802A5E72D2', GETUTCDATE(), GETUTCDATE(), 0);
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = 'E6B5CC34-CB8A-4B4D-BF9C-21E42714AFBB')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('E6B5CC34-CB8A-4B4D-BF9C-21E42714AFBB', 'Legacy2', 'User2', 'legacy2@example.com', 'HASH', '809-000-0000', '000-0000000-0');
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = '5D2B659B-FB95-4AE5-8091-38BE3BC09CCE')
+INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas) VALUES ('5D2B659B-FB95-4AE5-8091-38BE3BC09CCE', 'Legacy3', 'User3', 'legacy3@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '5F1F3417-402F-4CAC-AE39-F9802A5E72D2', GETUTCDATE(), GETUTCDATE(), 0);
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '5D2B659B-FB95-4AE5-8091-38BE3BC09CCE')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('5D2B659B-FB95-4AE5-8091-38BE3BC09CCE', 'Legacy3', 'User3', 'legacy3@example.com', 'HASH', '809-000-0000', '000-0000000-0');
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = '19DC2A0E-D779-435F-86B8-7F3CDAAB3C75')
+INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas) VALUES ('19DC2A0E-D779-435F-86B8-7F3CDAAB3C75', 'Legacy4', 'User4', 'legacy4@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '5F1F3417-402F-4CAC-AE39-F9802A5E72D2', GETUTCDATE(), GETUTCDATE(), 0);
+IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '19DC2A0E-D779-435F-86B8-7F3CDAAB3C75')
+INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('19DC2A0E-D779-435F-86B8-7F3CDAAB3C75', 'Legacy4', 'User4', 'legacy4@example.com', 'HASH', '809-000-0000', '000-0000000-0');

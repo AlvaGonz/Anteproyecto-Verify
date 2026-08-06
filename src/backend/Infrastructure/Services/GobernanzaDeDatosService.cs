@@ -322,6 +322,17 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
 
         var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "No se encontraron coincidencias en Catastro." };
+        if (!string.IsNullOrWhiteSpace(request.Matricula)) failRes.FailedFields.Add("Matricula");
+        if (!string.IsNullOrWhiteSpace(request.DesignacionCatastral)) failRes.FailedFields.Add("DesignacionCatastral");
+        if (!string.IsNullOrWhiteSpace(request.Oficina)) failRes.FailedFields.Add("Oficina");
+        if (!string.IsNullOrWhiteSpace(request.FechaInscripcion)) failRes.FailedFields.Add("FechaInscripcion");
+        if (!string.IsNullOrWhiteSpace(request.FechaEmision)) failRes.FailedFields.Add("FechaEmision");
+        if (!string.IsNullOrWhiteSpace(request.VieneDe)) failRes.FailedFields.Add("VieneDe");
+        if (!string.IsNullOrWhiteSpace(request.DesignCatastralOrigen)) failRes.FailedFields.Add("DesignCatastralOrigen");
+        if (!string.IsNullOrWhiteSpace(request.DesigCatastralPosicional)) failRes.FailedFields.Add("DesigCatastralPosicional");
+        if (!string.IsNullOrWhiteSpace(request.Provincia)) failRes.FailedFields.Add("Provincia");
+        if (!string.IsNullOrWhiteSpace(request.Municipio)) failRes.FailedFields.Add("Municipio");
+        if (!string.IsNullOrWhiteSpace(request.SuperficieM2)) failRes.FailedFields.Add("SuperficieM2");
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
@@ -364,6 +375,11 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
 
         var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Cédula no encontrada en el padrón de la JCE." };
+        if (!string.IsNullOrWhiteSpace(request.Cedula)) failRes.FailedFields.Add("Cedula");
+        if (!string.IsNullOrWhiteSpace(request.Nombres)) failRes.FailedFields.Add("Nombres");
+        if (!string.IsNullOrWhiteSpace(request.Apellidos)) failRes.FailedFields.Add("Apellidos");
+        if (!string.IsNullOrWhiteSpace(request.FechaNacimiento)) failRes.FailedFields.Add("FechaNacimiento");
+        if (!string.IsNullOrWhiteSpace(request.FechaExpiracion)) failRes.FailedFields.Add("FechaExpiracion");
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
@@ -402,6 +418,9 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
 
         var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "RNC no registrado en la DGII." };
+        if (!string.IsNullOrWhiteSpace(request.Rnc)) failRes.FailedFields.Add("Rnc");
+        if (!string.IsNullOrWhiteSpace(request.NombreRazonSocial)) failRes.FailedFields.Add("NombreRazonSocial");
+        if (!string.IsNullOrWhiteSpace(request.ActividadEconomica)) failRes.FailedFields.Add("ActividadEconomica");
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
@@ -465,6 +484,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
 
         var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Permiso de suelo no encontrado." };
+        if (!string.IsNullOrWhiteSpace(request.NumeroPermiso)) failRes.FailedFields.Add("NumeroPermiso");
+        if (!string.IsNullOrWhiteSpace(request.NumeroExpediente)) failRes.FailedFields.Add("NumeroExpediente");
+        if (!string.IsNullOrWhiteSpace(request.Rnc)) failRes.FailedFields.Add("Rnc");
+        if (!string.IsNullOrWhiteSpace(request.Departamento)) failRes.FailedFields.Add("Departamento");
+        if (!string.IsNullOrWhiteSpace(request.Operacion)) failRes.FailedFields.Add("Operacion");
+        if (!string.IsNullOrWhiteSpace(request.Seccion)) failRes.FailedFields.Add("Seccion");
+        if (!string.IsNullOrWhiteSpace(request.Lugar)) failRes.FailedFields.Add("Lugar");
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
@@ -517,6 +543,10 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
 
         var failRes = new VerificationResult { IsValid = false, MatchPercentage = 0m, Message = "Certificación de IPI no encontrada o no válida." };
+        if (!string.IsNullOrWhiteSpace(request.Rnc)) failRes.FailedFields.Add("Rnc");
+        if (!string.IsNullOrWhiteSpace(request.NoCertificacion)) failRes.FailedFields.Add("NoCertificacion");
+        if (!string.IsNullOrWhiteSpace(request.NoInmueble)) failRes.FailedFields.Add("NoInmueble");
+        if (!string.IsNullOrWhiteSpace(request.ParcelaNo)) failRes.FailedFields.Add("ParcelaNo");
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }

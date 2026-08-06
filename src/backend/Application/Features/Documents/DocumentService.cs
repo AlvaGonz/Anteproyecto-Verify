@@ -612,11 +612,11 @@ try
 
         try
         {
-            await _blobStorageService.DeleteFileAsync(document.RutaArchivo);
+            await _blobStorageService.DeleteAsync(document.RutaArchivo, cancellationToken);
         }
-        catch (RequestFailedException ex) when (ex.ErrorCode == "BlobNotFound")
+        catch (Exception)
         {
-            // If the blob is already gone, that's fine
+            // Ignore storage deletion errors to allow DB deletion to proceed
         }
 
         // Entity Framework Core will automatically delete the Hallazgos associated with this document
