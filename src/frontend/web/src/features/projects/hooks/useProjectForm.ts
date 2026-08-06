@@ -11,6 +11,8 @@ import { getProjectErrorMessage } from "../types";
 import { useProvinces } from "../../provinces/api/useProvinces";
 import { useCategories } from "../api/useCategories";
 
+import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
+
 // Fix Leaflet default marker icon paths broken by Vite's asset bundler
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -48,27 +50,22 @@ const toProvinciaInfo = (apiData: { id: string; nombre: string; latitud: number;
 const getClosestProvincia = (provinces: ProvinciaInfo[], lat: number, lng: number): string => {
   if (provinces.length === 0) return "Distrito Nacional";
   let closestProvince = provinces[0].nombre;
-  let minDistance = Infinity;
+  let minDistance = Number.MAX_VALUE;
 
-  provinces.forEach(p => {
-    const dLat = p.lat - lat;
-    const dLng = p.lng - lng;
-    const distance = Math.sqrt(dLat * dLat + dLng * dLng);
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestProvince = p.nombre;
+  for (const province of provinces) {
+    const dist = Math.sqrt(Math.pow(lat - province.lat, 2) + Math.pow(lng - province.lng, 2));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestProvince = province.nombre;
     }
-  });
-
+  }
   return closestProvince;
 };
 
 export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: ProjectFormProps) {
-  // useAuth must be called unconditionally at the top level (React rules).
-  // In unit tests the component is wrapped in a test AuthProvider, so this is safe.
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { addToast } = useToast();
 
   const { data: provinciasApi } = useProvinces();
   const provincias = toProvinciaInfo(provinciasApi ?? []);
@@ -273,6 +270,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const [nombreTouched, setNombreTouched] = useState(false);
   const [ubicacionTouched, setUbicacionTouched] = useState(false);
   const [desarrolladorTouched, setDesarrolladorTouched] = useState(false);
+  const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -563,7 +561,13 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         await onSubmit(createData);
       }
     } catch (err: any) {
-      setError(err.message || "Error al guardar el proyecto");
+      if (err.message && err.message.includes("DUPLICATE_LOCATION")) {
+        setDuplicateError("No se puede porque ya hay un proyecto en esa locación");
+        addToast("No se puede porque ya hay un proyecto en esa locación", "error");
+      } else {
+        setError(err.message || "Error al guardar el proyecto");
+        addToast(err.message || "Error al guardar el proyecto", "error");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -599,12 +603,14 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       isSearchingRnc, handleRncSearch,
       datosDesarrollador, setDatosDesarrollador,
       desarrolladorTouched, setDesarrolladorTouched,
+      duplicateError,
     } as const,
     detailsFields: {
       ubicacionGps, designacionCatastral,
       matricula, setMatricula,
       valorEstimado, setValorEstimado,
       superficieM2, setSuperficieM2,
+      duplicateError,
     } as const,
     documentSection: {
       portraitUrl: imagenUrl,

@@ -116,6 +116,12 @@ public class ProjectService : IProjectService
             }
         }
 
+        bool isDuplicate = await _proyectoRepository.ExistsByUniquenessCriteriaAsync(null, dto.UbicacionGps, dto.DesignacionCatastral, dto.Matricula, cancellationToken);
+        if (isDuplicate)
+        {
+            throw new InvalidOperationException("DUPLICATE_LOCATION"); // using this specific string to catch in frontend
+        }
+
         var estadoCreado = await _proyectoRepository.GetEstadoByStatusAsync(ProjectStatus.Creado, cancellationToken);
         if (estadoCreado == null)
         {
@@ -167,6 +173,12 @@ public class ProjectService : IProjectService
         }
 
         var categoria = await ValidateCategoriaAsync(dto.CategoriaId, cancellationToken);
+
+        bool isDuplicate = await _proyectoRepository.ExistsByUniquenessCriteriaAsync(id, dto.UbicacionGps, dto.DesignacionCatastral, dto.Matricula, cancellationToken);
+        if (isDuplicate)
+        {
+            throw new InvalidOperationException("DUPLICATE_LOCATION"); // using this specific string to catch in frontend
+        }
 
         proyecto.UpdateDetails(dto.Nombre, dto.UbicacionTexto, dto.UbicacionGps, dto.ValorEstimado, dto.CategoriaId, dto.DatosDesarrollador, dto.DesignacionCatastral, dto.Propietario, dto.CedulaRncPropietario, dto.Ipi, dto.EstatusIpi, dto.SuperficieM2, dto.ImagenUrl, dto.ImagenAdicional1, dto.ImagenAdicional2, dto.ImagenAdicional3, dto.ImagenAdicional4, dto.ImagenAdicional5, dto.ProvinciaId);
         proyecto.AsignarCategoria(categoria);

@@ -10,6 +10,7 @@ interface ProjectFormDetailsFieldsProps {
   setValorEstimado: (v: number | "") => void;
   superficieM2: string | number;
   setSuperficieM2: (v: string | number) => void;
+  duplicateError?: string | null;
 }
 
 export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> = ({
@@ -21,6 +22,7 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
   setValorEstimado,
   superficieM2,
   setSuperficieM2: _setSuperficieM2,
+  duplicateError,
 }) => (
   <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
     <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
@@ -38,11 +40,16 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
           type="text"
           disabled={true}
           value={ubicacionGps}
-          className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
+          className={`vf-input font-mono pl-10 bg-gray-50 cursor-not-allowed ${duplicateError ? 'border-red-400 focus:ring-red-200 focus:border-red-500' : 'border-gray-200'}`}
           placeholder="Haga clic en el mapa para marcar"
         />
         <MapPin className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
       </div>
+      {duplicateError && (
+        <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
+          {duplicateError}
+        </p>
+      )}
     </div>
 
     {/* Designación Catastral */}
@@ -56,26 +63,34 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
           type="text"
           disabled={true}
           value={designacionCatastral}
-          className="vf-input font-mono pl-10 bg-gray-50 border-gray-200 cursor-not-allowed"
+          className={`vf-input font-mono pl-10 bg-gray-50 cursor-not-allowed ${duplicateError ? 'border-red-400 focus:ring-red-200 focus:border-red-500' : 'border-gray-200'}`}
           placeholder="Se genera al marcar la ubicación"
         />
         <Compass className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
       </div>
     </div>
 
-    {/* Matrícula */}
+    {/* Matrícula (Opcional) */}
     <div>
       <label htmlFor="matricula" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
-        Matrícula del Inmueble
+        Matrícula del Inmueble <span className="text-gray-400 font-normal">(Opcional)</span>
       </label>
       <input
         id="matricula"
         type="text"
-        disabled={true}
         value={matricula}
-        className="vf-input font-mono bg-gray-50 border-gray-200 cursor-not-allowed"
-        placeholder="Se obtiene desde Catastro"
+        onChange={(e) => _setMatricula(e.target.value)}
+        className={`vf-input font-mono uppercase ${duplicateError ? 'border-red-400 focus:ring-red-200 focus:border-red-500' : ''}`}
+        placeholder="Ej: 0100203040"
       />
+      {duplicateError && (
+        <p className="mt-1.5 text-xs text-red-600 font-semibold animate-fade-in">
+          {duplicateError}
+        </p>
+      )}
+      <p className="mt-1.5 text-xs text-[var(--color-text-secondary)]">
+        Si el inmueble ya posee un certificado de título, ingrese la matrícula para validación automática.
+      </p>
     </div>
 
     {/* Valor Estimado */}

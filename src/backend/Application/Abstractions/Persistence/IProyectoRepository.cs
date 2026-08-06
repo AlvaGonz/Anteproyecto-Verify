@@ -37,5 +37,6 @@ public interface IProyectoRepository
     Task AddLogProyectoAsync(LogProyecto log, CancellationToken cancellationToken = default);
     Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, int categoryId, CancellationToken cancellationToken = default);
     Task<bool> ExistsProvinciaAsync(Guid provinciaId, CancellationToken cancellationToken = default);
+    Task<bool> ExistsByUniquenessCriteriaAsync(Guid? excludeProjectId, string? gps, string? catastral, string? matricula, CancellationToken cancellationToken = default);
 }
 

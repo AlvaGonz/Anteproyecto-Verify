@@ -1144,6 +1144,11 @@ WHERE NOT EXISTS (
             context.Entry(user).Property("EmailVerificado").CurrentValue = true;
             context.Entry(user).Property("Activo").CurrentValue = true;
             
+            // Asignar fechas historicas aleatorias (hasta 4 meses atras)
+            var rnd = new Random();
+            user.CreatedAtUtc = DateTime.UtcNow.AddDays(-rnd.Next(10, 120));
+            user.UpdatedAtUtc = user.CreatedAtUtc;
+            
             await context.SaveChangesAsync();
             returnUser = user;
         }
@@ -1190,6 +1195,16 @@ WHERE NOT EXISTS (
 
         var proyecto = new Proyecto(nombre, ubicacionTexto, usuarioCreadorId, categoria, datosDesarrollador, designacionCatastral);
         proyecto.UpdateEstado(estado);
+        
+        // Asignar fechas historicas segun estado (Published/Review = 2-4 meses atras, otros = 0-1 mes)
+        var rnd = new Random();
+        if (status == ProjectStatus.Publicado || status == ProjectStatus.Revision) {
+            proyecto.CreatedAtUtc = DateTime.UtcNow.AddDays(-rnd.Next(60, 120));
+        } else {
+            proyecto.CreatedAtUtc = DateTime.UtcNow.AddDays(-rnd.Next(1, 30));
+        }
+        proyecto.UpdatedAtUtc = proyecto.CreatedAtUtc;
+
         context.Proyectos.Add(proyecto);
         await context.SaveChangesAsync();
         return proyecto;
