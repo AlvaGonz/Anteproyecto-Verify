@@ -37,6 +37,7 @@ interface ProjectFormBasicFieldsProps {
   setDatosDesarrollador: (v: string) => void;
   desarrolladorTouched: boolean;
   setDesarrolladorTouched: (v: boolean) => void;
+  duplicateError?: string | null;
 }
 
 export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
@@ -64,6 +65,7 @@ export const ProjectFormBasicFields: React.FC<ProjectFormBasicFieldsProps> = ({
   setDatosDesarrollador,
   desarrolladorTouched,
   setDesarrolladorTouched,
+  duplicateError,
 }) => (
   <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
     <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">

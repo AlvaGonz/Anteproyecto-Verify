@@ -418,4 +418,54 @@ public class ProyectoRepository : IProyectoRepository
     {
         return await _context.Provincias.AnyAsync(p => p.IdProvincia == provinciaId, cancellationToken);
     }
+
+    public async Task<bool> ExistsByUniquenessCriteriaAsync(Guid? excludeProjectId, string? gps, string? catastral, string? matricula, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Proyectos.AsQueryable();
+        if (excludeProjectId.HasValue)
+        {
+            query = query.Where(p => p.Id != excludeProjectId.Value);
+        }
+
+        if (string.IsNullOrEmpty(gps) && string.IsNullOrEmpty(catastral) && string.IsNullOrEmpty(matricula)) return false;
+
+        bool checkCatastral = !string.IsNullOrEmpty(catastral);
+        bool checkMatricula = !string.IsNullOrEmpty(matricula);
+        
+        // Exact match in DB for catastral or matricula
+        if (checkCatastral || checkMatricula)
+        {
+            bool exactDbMatch = await query.AnyAsync(p => 
+                (checkCatastral && p.DesignacionCatastral == catastral) ||
+                (checkMatricula && p.Matricula == matricula), cancellationToken);
+            if (exactDbMatch) return true;
+        }
+
+        // GPS logic in memory (5 meters proximity = ~0.000045 degrees)
+        if (!string.IsNullOrEmpty(gps))
+        {
+            var parts = gps.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2 && double.TryParse(parts[0], out var targetLat) && double.TryParse(parts[1], out var targetLng))
+            {
+                var gpsList = await query.Where(p => p.UbicacionGps != null && p.UbicacionGps != "")
+                                         .Select(p => p.UbicacionGps)
+                                         .ToListAsync(cancellationToken);
+                
+                foreach(var pGps in gpsList)
+                {
+                    if (string.IsNullOrEmpty(pGps)) continue;
+                    var pParts = pGps.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (pParts.Length >= 2 && double.TryParse(pParts[0], out var pLat) && double.TryParse(pParts[1], out var pLng))
+                    {
+                        if (Math.Abs(pLat - targetLat) <= 0.000045 && Math.Abs(pLng - targetLng) <= 0.000045)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }

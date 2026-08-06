@@ -476,7 +476,7 @@ def generate_jce_records(cedulas_list):
         fexp = datetime.date(2030, 1, 1) + datetime.timedelta(days=random.randint(0, 3650))
         yield {
             "cedula": ced, "nombres": nombres, "apellidos": apellidos,
-            "fnac": fnac.strftime("%Y-%m-%d"), "fexp": fexp.strftime("%Y-%m-%d")
+            "fnac": fnac.strftime("%d-%m-%Y"), "fexp": fexp.strftime("%d-%m-%Y")
         }
 
 def generate_ipi_records(rncs_list):
@@ -515,9 +515,9 @@ def generate_catastro_ps_ipi_records(rncs_list):
                     "oficina": random.choice(oficinas),
                     "fecha_inscripcion": (datetime.datetime.now() - datetime.timedelta(days=random.randint(1000, 5000))).strftime('%Y-%m-%d %H:%M:%S'),
                     "fecha_emision": (datetime.datetime.now() - datetime.timedelta(days=random.randint(100, 999))).strftime('%Y-%m-%d %H:%M:%S'),
-                    "viene_de": f"Parcela {random.randint(1,99)}, DC-{random.randint(1,99):02d}",
+                    "viene_de": f"{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}.{random.randint(10,999)},{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}.{random.randint(10,99)}",
                     "desig_catastral_origen": f"Parc. {random.randint(10,99)}, DC-{random.randint(1,99):02d}",
-                    "desig_catastral_posicional": f"Posicional-{random.randint(1000,9999)}"
+                    "desig_catastral_posicional": f"{random.randint(100000000000, 999999999999)}"
                 }
                 
                 ps_record = None

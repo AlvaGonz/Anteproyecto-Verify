@@ -134,15 +134,17 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     public async Task<VerificationResult> VerificarCatastroAsync(CatastroVerificationRequest request)
     {
-        var query = _dbContext.CatastroTitulos.AsQueryable();
+        Domain.Entities.CatastroTitulos entity = null;
 
         if (!string.IsNullOrEmpty(request.Matricula))
-            query = query.Where(c => c.Matricula == request.Matricula);
+        {
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => c.Matricula == request.Matricula);
+        }
             
-        if (!string.IsNullOrEmpty(request.DesignacionCatastral))
-            query = query.Where(c => c.CodigoDesignacionCatastral == request.DesignacionCatastral);
-            
-        var entity = await query.FirstOrDefaultAsync();
+        if (entity == null && !string.IsNullOrEmpty(request.DesignacionCatastral))
+        {
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => c.CodigoDesignacionCatastral == request.DesignacionCatastral);
+        }
 
         if (entity != null)
         {
@@ -254,8 +256,17 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     public async Task<VerificationResult> VerificarPermisoSueloAsync(PermisoSueloVerificationRequest request)
     {
-        var entity = await _dbContext.PermisosSuelo
-            .FirstOrDefaultAsync(p => p.NumeroPermiso == request.NumeroPermiso || (p.Rnc == request.Rnc && request.Rnc != null));
+        Domain.Entities.PermisoSuelo entity = null;
+        
+        if (!string.IsNullOrEmpty(request.NumeroPermiso))
+        {
+            entity = await _dbContext.PermisosSuelo.FirstOrDefaultAsync(p => p.NumeroPermiso == request.NumeroPermiso);
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.Rnc))
+        {
+            entity = await _dbContext.PermisosSuelo.FirstOrDefaultAsync(p => p.Rnc == request.Rnc);
+        }
 
         if (entity != null)
         {
@@ -290,8 +301,17 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     public async Task<VerificationResult> VerificarIpiAsync(IpiVerificationRequest request)
     {
-        var entity = await _dbContext.PagosIPI
-            .FirstOrDefaultAsync(p => p.NoCertificacion == request.NoCertificacion || (p.Rnc == request.Rnc && request.Rnc != null));
+        Domain.Entities.PagoIPI entity = null;
+        
+        if (!string.IsNullOrEmpty(request.NoCertificacion))
+        {
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == request.NoCertificacion);
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.Rnc))
+        {
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.Rnc == request.Rnc);
+        }
 
         if (entity != null)
         {

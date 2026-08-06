@@ -234,13 +234,10 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       proyectoId,
       documentoId,
       payload: {
-        numeroPermiso: '', // Depending on where it's stored
-        numeroExpediente: '',
-        rnc: '',
-        departamento: extraction.departamento?.normalizedValue || extraction.departamento?.rawValue,
-        operacion: extraction.operacion?.normalizedValue || extraction.operacion?.rawValue,
-        seccion: extraction.seccion?.normalizedValue || extraction.seccion?.rawValue,
-        lugar: extraction.lugar?.normalizedValue || extraction.lugar?.rawValue
+        designacionCatastral: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue,
+        desigCatastralPosicional: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue,
+        designCatastralOrigen: extraction.designacionCatastralOrigen?.normalizedValue || extraction.designacionCatastralOrigen?.rawValue,
+        oficina: extraction.jurisdiccionInmobiliaria?.normalizedValue || extraction.jurisdiccionInmobiliaria?.rawValue
       }
     });
   };

@@ -21,31 +21,7 @@ const getStatusBadge = (status: ProjectStatus, t: any) => {
   }
 };
 
-const getIntegrityBadge = (status: IntegrityStatus) => {
-  switch (status) {
-    case IntegrityStatus.Verified:
-      return (
-        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100">
-          <CheckCircle2 className="w-3 h-3" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Verificado</span>
-        </div>
-      );
-    case IntegrityStatus.Failed:
-      return (
-        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md border border-rose-100">
-          <AlertTriangle className="w-3 h-3" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Invalido</span>
-        </div>
-      );
-    default:
-      return (
-        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md border border-amber-100">
-          <Timer className="w-3 h-3" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Pendiente</span>
-        </div>
-      );
-  }
-};
+
 
 interface AdminProjectListProps {
   t: any;
@@ -153,7 +129,6 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
                           Plan: {project.planNombre}
                         </span>
                       )}
-                      {getIntegrityBadge(project.estadoIntegridad)}
                       {project.estatusIpi === "PAGO_PENDIENTE" && (
                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md border border-rose-100">
                           <Banknote className="w-3 h-3" />

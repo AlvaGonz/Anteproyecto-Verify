@@ -106,7 +106,12 @@ export const getValidationStatus = (
   uiValue: string | undefined | null,
   matchedData: any
 ): { status: 'check' | 'warning' | 'error' | null; message: string } => {
-  if (!matchedData) return { status: null, message: '' };
+  // If matchedData is explicitly null (which happens when verification fails with 0% match), mark all as error
+  if (matchedData === null) {
+    return { status: 'error', message: 'No se encontraron coincidencias en la base de datos' };
+  }
+  
+  if (matchedData === undefined) return { status: null, message: '' };
   
   const normalizedUi = String(uiValue || '').trim().toLowerCase();
   const matchedValues = Object.values(matchedData).map(v => String(v || '').trim().toLowerCase());
