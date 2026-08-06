@@ -22,7 +22,8 @@ public static class RequiredDocumentsPolicy
             DocumentType.CertificacionIPI,
             DocumentType.RegistroMercantil,
             DocumentType.PoderNotarial,
-            DocumentType.RNC
+            DocumentType.RNC,
+            DocumentType.CertificadoEIA
         };
 
         if (categoryId == 8 || categoryId == 12 || categoryId == 7) // 8=COMERCIAL Y OFICINAS, 12=HOSPEDAJE, 7=COMBINADOS

@@ -16,4 +16,5 @@ public enum DocumentType
     RegistroMercantil = 9,
     PoderNotarial = 11,
     RNC = 12,
+    CertificadoEIA = 29,
 }
