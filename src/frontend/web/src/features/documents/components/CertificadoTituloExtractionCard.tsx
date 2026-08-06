@@ -177,8 +177,8 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
-  const getStatus = (fieldVal: string | undefined | null) =>
-    getValidationStatus(fieldVal, verificationResponse?.matchedData);
+  const getStatus = (fieldVal: string | undefined | null, fieldKey: string) =>
+    getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
@@ -186,12 +186,15 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
       proyectoId,
       documentoId,
       payload: {
-        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue,
-        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue,
-        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue,
-        fechaInscripcion: extraction.fechaYHoraInscripcion?.normalizedValue || extraction.fechaYHoraInscripcion?.rawValue,
-        fechaEmision: '', // Titulo extraction model doesn't output this yet directly here?
-        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue,
+        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue || "",
+        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue || "",
+        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue || "",
+        fechaInscripcion: extraction.fechaYHoraInscripcion?.normalizedValue || extraction.fechaYHoraInscripcion?.rawValue || "",
+        fechaEmision: "", // Titulo extraction model doesn't output this yet directly here?
+        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue || "",
+        provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || "",
+        municipio: municipalities.find(m => m.id === selectedMunicipalityId)?.nombre || "",
+        superficieM2: extraction.superficieM2?.normalizedValue || extraction.superficieM2?.rawValue || ""
       }
     });
   };
@@ -231,6 +234,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
   const renderField = (label: string, fieldKey: string, field?: ExtractedField, isPrimary = false, placeholder?: string) => {
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const rawValue = safeField.normalizedValue || safeField.rawValue || '';
+    const validation = getStatus(rawValue, fieldKey);
     const displayValue = NUMERIC_FIELDS[fieldKey] ? formatNumeric(fieldKey, rawValue) : rawValue;
     const isEditing = editingField === fieldKey;
     const isNumeric = !!NUMERIC_FIELDS[fieldKey];
@@ -238,8 +242,6 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
     // Get resolution for this field
     const resolution = fieldKey === 'provincia' ? extraction.provinceResolution :
       fieldKey === 'municipio' ? extraction.municipalityResolution : null;
-
-    const validation = getStatus(rawValue);
 
     // Render dropdown for provincia and municipio
     if (fieldKey === 'provincia' || fieldKey === 'municipio') {

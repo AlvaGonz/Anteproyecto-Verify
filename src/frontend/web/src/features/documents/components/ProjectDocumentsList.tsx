@@ -149,9 +149,9 @@ export const ProjectDocumentsList: React.FC<ProjectDocumentsListProps> = ({
             {/* Include OCR Review Panel */}
             <div className="border-t border-[var(--color-border)]/10 bg-surface-container-lowest">
               {doc.tipoDocumento === DocumentType.ID 
-                ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} proyectoId={projectId} documentoId={doc.id} /> : null)
+                ? (doc.cedulaExtraction ? <CedulaExtractionCard extraction={doc.cedulaExtraction} proyectoId={doc.proyectoId} documentoId={doc.id} /> : null)
                 : (doc.tipoDocumento === DocumentType.CertificadoTitulo || doc.tipoDocumento === DocumentType.TITLE)
-                ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} proyectoId={projectId} documentoId={doc.id} /> : null)
+                ? (doc.certificadoTituloExtraction ? <CertificadoTituloExtractionCard extraction={doc.certificadoTituloExtraction} proyectoId={doc.proyectoId} documentoId={doc.id} /> : null)
                 : <OcrReviewPanel document={doc} />
               }
             </div>

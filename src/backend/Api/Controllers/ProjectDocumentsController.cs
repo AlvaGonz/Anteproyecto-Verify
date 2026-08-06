@@ -254,6 +254,22 @@ public class ProjectDocumentsController : ControllerBase
         }
     }
 
+    [HttpDelete("{documentId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteDocument(Guid projectId, Guid documentId)
+    {
+        try
+        {
+            await _documentService.DeleteDocumentAsync(documentId);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
     [HttpPatch("{documentId}/type")]
     [ProducesResponseType(typeof(ValidationDocumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -44,9 +44,9 @@ touch /tmp/db_ready
 
 # ── 3. Background: wait for EF Core schema + C# seed to finish, then run seed data ──
 (
-    echo "[Seed] Waiting for EF Core migrations and API seeding (DGII table populated)..."
+    echo "[Seed] Waiting for EF Core migrations and API seeding (ProyectoGuardado populated)..."
     for i in $(seq 1 300); do
-        if $SQLCMD $SQLCMD_OPTS -b -d "$DB_NAME" -Q "IF NOT EXISTS (SELECT TOP 1 1 FROM DGII) THROW 50000, 'not ready', 1" &>/dev/null; then
+        if $SQLCMD $SQLCMD_OPTS -b -d "$DB_NAME" -Q "IF (SELECT COUNT(*) FROM ProyectoGuardado) < 10 THROW 50000, 'not ready', 1" &>/dev/null; then
             echo "[Seed] Schema and API seeding detected (attempt $i)."
             break
         fi

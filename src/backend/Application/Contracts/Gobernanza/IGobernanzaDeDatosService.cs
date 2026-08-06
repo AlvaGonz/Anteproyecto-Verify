@@ -17,6 +17,7 @@ public class VerificationResult
     public decimal MatchPercentage { get; set; }
     public string Message { get; set; } = string.Empty;
     public object? MatchedData { get; set; }
+    public List<string> FailedFields { get; set; } = new();
 }
 
 public class BaseVerificationRequest
@@ -38,6 +39,9 @@ public class CatastroVerificationRequest : BaseVerificationRequest
     public string? VieneDe { get; set; }
     public string? DesignCatastralOrigen { get; set; }
     public string? DesigCatastralPosicional { get; set; }
+    public string? Provincia { get; set; }
+    public string? Municipio { get; set; }
+    public string? SuperficieM2 { get; set; }
 }
 
 public class JceVerificationRequest : BaseVerificationRequest

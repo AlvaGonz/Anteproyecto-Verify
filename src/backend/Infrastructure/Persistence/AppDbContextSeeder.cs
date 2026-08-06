@@ -186,6 +186,7 @@ public static class AppDbContextSeeder
             };
 
             var proyectoEntities = new List<Proyecto>();
+            var rnd = new Random();
             foreach (var p in proyectos)
             {
                 var proyecto = await GetOrCreateProyectoAsync(
@@ -197,8 +198,33 @@ public static class AppDbContextSeeder
                     datosDesarrollador: p.Dev,
                     designacionCatastral: p.Cat,
                     status: p.Status);
+
+                decimal baseSuperficie = rnd.Next(100, 1000);
+                decimal superficieCalculada = baseSuperficie * 7.9m;
+                decimal valorEstimado = rnd.Next(1000000, 50000000);
+                string ubicacionGps = $"{18.4 + rnd.NextDouble() * 1.5:F5}, {-70.6 + rnd.NextDouble() * 1.5:F5}";
+                string rnc = $"1-{rnd.Next(10, 99)}-{rnd.Next(10000, 99999)}-{rnd.Next(1, 9)}";
+                string matricula = $"001-0{rnd.Next(1, 9)}-{rnd.Next(100, 999)}";
+
+                proyecto.UpdateDetails(
+                    nombre: proyecto.Nombre,
+                    ubicacionTexto: proyecto.UbicacionTexto,
+                    ubicacionGps: ubicacionGps,
+                    valorEstimado: valorEstimado,
+                    categoriaId: proyecto.CategoriaId,
+                    datosDesarrollador: proyecto.DatosDesarrollador,
+                    designacionCatastral: proyecto.DesignacionCatastral,
+                    propietario: "Propietario " + p.Dev,
+                    cedulaRncPropietario: $"402-{rnd.Next(1000000, 9999999)}-{rnd.Next(0, 9)}",
+                    ipi: $"1-01-{rnd.Next(10000, 99999)}-{rnd.Next(0, 9)}",
+                    superficieM2: superficieCalculada
+                );
+                
+                proyecto.UpdateRncYMatricula(rnc, matricula);
+
                 proyectoEntities.Add(proyecto);
             }
+            await context.SaveChangesAsync();
 
             await SeedTestDocumentsAsync(context, scope.ServiceProvider, adminUser.Id, corporativoUser, proyectoEntities, logger);
 
@@ -244,10 +270,6 @@ public static class AppDbContextSeeder
                 var p1 = proyectoEntities[0];
                 var p2 = proyectoEntities[1];
                 var p3 = proyectoEntities[2];
-
-                p1.UpdateDetails(p1.Nombre, p1.UbicacionTexto, null, null, p1.CategoriaId, p1.DatosDesarrollador, p1.DesignacionCatastral, "Propietario Test", "402-1234567-8", "1-01-99999-9");
-                p1.UpdateRncYMatricula("1-30-12345-1", "001-02-003");
-                await context.SaveChangesAsync();
 
                 await GetOrCreateDocumentoAsync(
                     context,

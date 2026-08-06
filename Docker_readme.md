@@ -71,6 +71,26 @@ docker compose up --build -d
 ```
 *(El argumento `-v` elimina los volúmenes persistentes creados por Docker, obligando al contenedor de SQL Server a ejecutar nuevamente la inicialización desde cero en su próximo arranque).*
 
+### E) Reconstruir o Reiniciar Servicios Específicos
+Si necesitas aplicar cambios en el código de la API, scripts de base de datos o forzar la actualización de un contenedor específico sin detener todo el ecosistema, utiliza estos comandos:
+
+**Reiniciar solo la API (backend):**
+```bash
+docker compose restart api
+```
+
+**Reconstruir y aplicar cambios estructurales a la base de datos (SQL Server):**
+*(Útil cuando modificas archivos estructurales como `entrypoint.sh` o el `Dockerfile` de SQL)*
+```bash
+docker compose up -d --build --force-recreate sqlserver
+```
+
+**Generar y Aplicar Nuevas Semillas (Ej: 120 Proyectos Realistas):**
+Si has regenerado los scripts SQL (como al correr `python generate_dummy_projects.py` u otros generadores), debes reiniciar el contenedor SQL para que el `entrypoint.sh` los detecte y aplique en la base de datos:
+```bash
+docker compose restart sqlserver
+```
+
 ---
 
 ## ⏱️ Ciclo de Vida del Arranque, Tiempos Estimados y Siembra Automática

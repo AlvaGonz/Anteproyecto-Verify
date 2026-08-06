@@ -182,10 +182,16 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
                    <Pencil className="w-3.5 h-3.5" />
                  </button>
                )}
-            </div>
+             </div>
           </>
         )}
       </div>
+      
+      {validationStatus && validationStatus !== 'check' && (
+        <div className={`mt-2 text-[9px] font-bold uppercase tracking-wider ${validationStatus === 'error' ? 'text-error' : 'text-warning'}`}>
+          {validationMessage}
+        </div>
+      )}
     </div>
   );
 };

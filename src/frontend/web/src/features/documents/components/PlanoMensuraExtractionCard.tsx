@@ -225,8 +225,8 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
-  const getStatus = (fieldVal: string | undefined | null) =>
-    getValidationStatus(fieldVal, verificationResponse?.matchedData);
+  const getStatus = (fieldVal: string | undefined | null, fieldKey: string) =>
+    getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
@@ -234,10 +234,10 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
       proyectoId,
       documentoId,
       payload: {
-        designacionCatastral: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue,
-        desigCatastralPosicional: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue,
-        designCatastralOrigen: extraction.designacionCatastralOrigen?.normalizedValue || extraction.designacionCatastralOrigen?.rawValue,
-        oficina: extraction.jurisdiccionInmobiliaria?.normalizedValue || extraction.jurisdiccionInmobiliaria?.rawValue
+        designacionCatastral: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
+        desigCatastralPosicional: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
+        designCatastralOrigen: extraction.designacionCatastralOrigen?.normalizedValue || extraction.designacionCatastralOrigen?.rawValue || "",
+        oficina: extraction.jurisdiccionInmobiliaria?.normalizedValue || extraction.jurisdiccionInmobiliaria?.rawValue || ""
       }
     });
   };
@@ -290,7 +290,7 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     const resolution = fieldKey === 'provincia' ? extraction.provinceResolution :
       fieldKey === 'municipio' ? extraction.municipalityResolution : null;
 
-    const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
+    const validation = getStatus(safeField.normalizedValue || safeField.rawValue, fieldKey);
 
     // Render dropdown for provincia and municipio
     if (fieldKey === 'provincia' || fieldKey === 'municipio') {

@@ -104,22 +104,59 @@ export const mapDocumentToVerificationPayload = (
 
 export const getValidationStatus = (
   uiValue: string | undefined | null,
-  matchedData: any
+  matchedData: any,
+  fieldName?: string,
+  failedFields?: string[]
 ): { status: 'check' | 'warning' | 'error' | null; message: string } => {
-  // If matchedData is explicitly null (which happens when verification fails with 0% match), mark all as error
   if (matchedData === null) {
     return { status: 'error', message: 'No se encontraron coincidencias en la base de datos' };
   }
   
   if (matchedData === undefined) return { status: null, message: '' };
-  
+
   const normalizedUi = String(uiValue || '').trim().toLowerCase();
-  const matchedValues = Object.values(matchedData).map(v => String(v || '').trim().toLowerCase());
-  
+
+  if (fieldName && failedFields) {
+    const nameMap: Record<string, string> = {
+        'fechaYHoraInscripcion': 'FechaInscripcion',
+        'fechaHoraInscripcion': 'FechaEmision',
+        'superficieM2': 'SuperficieM2',
+        'superficieMetrosCuadrados': 'SuperficieM2',
+        'superficieARegistrarParcelaM2': 'SuperficieM2',
+        'vieneDe': 'VieneDe',
+        'designacionCatastral': 'DesignacionCatastral',
+        'designacionCatastralPosicional': 'DesigCatastralPosicional',
+        'designacionCatastralOrigen': 'DesignCatastralOrigen',
+        'cedulaNumber': 'Cedula',
+        'firstNames': 'Nombres',
+        'lastNames': 'Apellidos',
+        'birthDate': 'FechaNacimiento',
+        'expiryDate': 'FechaExpiracion',
+        'numeroCertificacion': 'NoCertificacion',
+        'numeroInmueble': 'NoInmueble',
+        'parcelaNumero': 'ParcelaNo'
+    };
+    
+    const backendFieldName = nameMap[fieldName] || fieldName;
+    const isFailed = failedFields.some(f => f.toLowerCase() === backendFieldName.toLowerCase() || f.toLowerCase() === fieldName.toLowerCase());
+    
+    if (isFailed) {
+      return { status: 'error', message: 'Dato diferente a Gobernanza' };
+    }
+    
+    if (normalizedUi === '') {
+      return { status: 'warning', message: 'Dato vacío enviado a revisión' };
+    }
+    
+    return { status: 'check', message: 'Coincide exactamente con Gobernanza' };
+  }
+
   if (normalizedUi === '') {
     return { status: 'error', message: 'Dato vacío enviado a revisión' };
   }
 
+  const matchedValues = Object.values(matchedData).map(v => String(v || '').trim().toLowerCase());
+  
   if (matchedValues.includes(normalizedUi)) {
     return { status: 'check', message: 'Coincide exactamente con Gobernanza' };
   }
@@ -131,5 +168,5 @@ export const getValidationStatus = (
     return { status: 'warning', message: 'Coincidencia parcial o campo vacío en BD' };
   }
 
-  return { status: 'error', message: 'Dato diferente a Gobernanza' };
+  return { status: 'error', message: 'No coincide con Gobernanza' };
 };

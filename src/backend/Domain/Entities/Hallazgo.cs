@@ -12,12 +12,16 @@ public class Hallazgo : EntityBase
     public Guid? ValidacionId { get; private set; }
     public Validacion? Validacion { get; private set; }
 
+    public Guid? DatoValidadoId { get; private set; }
+    public DatoValidado? DatoValidado { get; private set; }
+
     public FindingSeverity Severidad { get; private set; }
     public string Codigo { get; private set; } = null!;
     public string Titulo { get; private set; } = null!;
     public string Descripcion { get; private set; } = null!;
     public string? Recomendacion { get; private set; }
     public string? SistemaOrigen { get; private set; }
+    public string? Campo { get; private set; }
     public bool Resuelto { get; private set; }
     
     // Aliases for backward compatibility
@@ -45,6 +49,24 @@ public class Hallazgo : EntityBase
         Resuelto = false;
     }
 
+    public Hallazgo(Guid proyectoId, Guid datoValidadoId, string campo, string descripcion, FindingSeverity severidad)
+    {
+        if (proyectoId == Guid.Empty) throw new ArgumentException("Proyecto requerido", nameof(proyectoId));
+        if (datoValidadoId == Guid.Empty) throw new ArgumentException("DatoValidado requerido", nameof(datoValidadoId));
+        if (string.IsNullOrWhiteSpace(campo)) throw new ArgumentException("Campo requerido", nameof(campo));
+        if (string.IsNullOrWhiteSpace(descripcion)) throw new ArgumentException("Descripción requerida", nameof(descripcion));
+
+        ProyectoId = proyectoId;
+        DatoValidadoId = datoValidadoId;
+        Campo = campo;
+        Titulo = $"Discrepancia en {campo}";
+        Descripcion = descripcion;
+        Severidad = severidad;
+        SistemaOrigen = "API Validación";
+        Codigo = GenerateCode(Titulo);
+        Resuelto = false;
+    }
+
     // Constructor compatible with legacy calls
     public Hallazgo(Guid proyectoId, FindingSeverity severidad, string codigo, string titulo, string descripcion, Guid? validacionId = null)
     {
@@ -66,6 +88,12 @@ public class Hallazgo : EntityBase
     public void MarkAsResolved()
     {
         Resuelto = true;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void MarkAsUnresolved()
+    {
+        Resuelto = false;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

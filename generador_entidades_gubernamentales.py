@@ -466,17 +466,30 @@ def get_rncs(file_path):
 
 def generate_jce_records(cedulas_list):
     import datetime
+    
     nombres_pool = ["JUAN", "MARIA", "PEDRO", "LUIS", "ANA", "CARMEN", "JOSE", "FRANCISCO", "RAMON", "ALTAGRACIA", "MIGUEL", "ANTONIO", "ROSA", "JUANA"]
     apellidos_pool = ["PEREZ", "RODRIGUEZ", "SANCHEZ", "GARCIA", "MARTINEZ", "GONZALEZ", "LOPEZ", "FERNANDEZ", "GOMEZ", "SANTANA", "RAMIREZ", "CRUZ"]
-    start_nac = datetime.date(1950, 1, 1)
+    
     for ced in cedulas_list:
-        nombres = random.choice(nombres_pool) + " " + random.choice(nombres_pool)
-        apellidos = random.choice(apellidos_pool) + " " + random.choice(apellidos_pool)
-        fnac = start_nac + datetime.timedelta(days=random.randint(0, 18000))
-        fexp = datetime.date(2030, 1, 1) + datetime.timedelta(days=random.randint(0, 3650))
+        nombre = random.choice(nombres_pool) + " " + random.choice(nombres_pool)
+        apellido = random.choice(apellidos_pool) + " " + random.choice(apellidos_pool)
+        
+        sexo = random.choice(["M", "F"])
+        estado_civil = random.choice(["Soltero(a)", "Casado(a)", "Divorciado(a)"])
+        lugar_nacimiento = random.choice(PROVINCIA_NAMES)
+        nacionalidad = "DOMINICANA"
+        
+        # Fecha Nacimiento y FechaExpiracion en formato DD-MM-YYYY
+        fecha_nac = (datetime.date(1960, 1, 1) + datetime.timedelta(days=random.randint(0, 15000)))
+        fecha_exp = (datetime.date(2025, 1, 1) + datetime.timedelta(days=random.randint(0, 3650)))
+        
+        # Use DD-MM-YYYY string for DB
         yield {
-            "cedula": ced, "nombres": nombres, "apellidos": apellidos,
-            "fnac": fnac.strftime("%d-%m-%Y"), "fexp": fexp.strftime("%d-%m-%Y")
+            "cedula": ced, "nombres": nombre, "apellidos": apellido,
+            "sexo": sexo, "estado_civil": estado_civil, "lugar_nacimiento": lugar_nacimiento,
+            "fnac": fecha_nac.strftime("%d-%m-%Y"),
+            "nacionalidad": nacionalidad,
+            "fexp": fecha_exp.strftime("%d-%m-%Y")
         }
 
 def generate_ipi_records(rncs_list):
