@@ -134,7 +134,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     public async Task<VerificationResult> VerificarCatastroAsync(CatastroVerificationRequest request)
     {
-        Domain.Entities.CatastroTitulos entity = null;
+        Domain.Entities.CatastroTitulo? entity = null;
 
         if (!string.IsNullOrEmpty(request.Matricula))
         {
