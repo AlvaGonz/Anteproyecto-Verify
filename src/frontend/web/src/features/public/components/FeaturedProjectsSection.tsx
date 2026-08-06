@@ -45,7 +45,7 @@ export const FeaturedProjectsSection: React.FC = () => {
       name: p.nombreProyecto ?? p.nombre,
       location: p.ubicacionTexto || "Ubicación no especificada",
       image: p.imagenUrl || getDefaultProjectImage(p.categoria),
-      completionRate: p.completionRate ?? 80,
+      completionRate: p.completionRate ?? 0,
       isVerified: p.estadoValidacion === "Verificado" || p.estadoProyecto === "Publicado",
     }))
     .slice(0, 12);

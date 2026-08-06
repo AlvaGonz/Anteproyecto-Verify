@@ -368,8 +368,6 @@ public class ProyectoRepository : IProyectoRepository
     {
         var requiredTypes = GetRequiredDocumentTypesForCategory(categoryId);
 
-        if (requiredTypes.Count == 0) return 100;
-
         var uploadedTypes = await _context.Documentos
             .AsNoTracking()
             .Where(d => d.ProyectoId == proyectoId
