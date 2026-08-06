@@ -28,7 +28,7 @@ export const usePublishedProjects = () =>
     queryFn: () =>
       apiClient
         .get<PublicProjectSearchResultDto[]>(`/public/projects/search`)
-        .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO")),
+        .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO" || p.estadoProyecto === "OBSERVACION")),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -39,7 +39,7 @@ export const useSuspensePublishedProjects = () =>
     queryFn: () =>
       apiClient
         .get<PublicProjectSearchResultDto[]>(`/public/projects/search`)
-        .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO")),
+        .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO" || p.estadoProyecto === "OBSERVACION")),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });

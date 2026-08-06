@@ -10,19 +10,25 @@ export const ProjectStatusBadge: React.FC<ProjectStatusBadgeProps> = ({ status }
   let label = status;
 
   switch (status) {
-    case 'Verificado':
+    case 'Publicado':
       bgColor = 'bg-green-100';
       textColor = 'text-green-800';
       break;
-    case 'ConObservaciones':
-      bgColor = 'bg-yellow-100';
-      textColor = 'text-yellow-800';
-      label = 'Con Observaciones';
+    case 'En Revisión':
+      bgColor = 'bg-blue-100';
+      textColor = 'text-blue-800';
       break;
-    case 'NoVerificado':
-      bgColor = 'bg-red-100';
-      textColor = 'text-red-800';
-      label = 'No Verificado';
+    case 'Con Observación':
+      bgColor = 'bg-amber-100';
+      textColor = 'text-amber-800';
+      break;
+    case 'Creado':
+      bgColor = 'bg-gray-100';
+      textColor = 'text-gray-600';
+      break;
+    case 'Editado':
+      bgColor = 'bg-indigo-100';
+      textColor = 'text-indigo-800';
       break;
   }
 
