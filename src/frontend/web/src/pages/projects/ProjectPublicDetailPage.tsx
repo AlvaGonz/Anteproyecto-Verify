@@ -56,8 +56,9 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const isQrAccess = !!qrToken && !slug && !id;
   const resolvedProjectId = isQrAccess && qrResolvedData?.id ? String(qrResolvedData.id) : "";
   const identifier = slug || id || resolvedProjectId;
-  const { data: project, isLoading: loading, error: fetchError } = useProject(identifier);
-  const error = fetchError ? (fetchError as Error).message : null;
+  const { data: projectFromApi, isLoading: loading, error: fetchError } = useProject(identifier);
+  const project = isQrAccess && qrResolvedData ? (qrResolvedData as any) : projectFromApi;
+  const error = isQrAccess ? null : (fetchError ? (fetchError as Error).message : null);
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [isInterested, setIsInterested] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
@@ -417,7 +418,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 <div className="w-2 h-8 bg-primary rounded-full"></div>
                 <h2 className="text-2xl md:text-3xl font-display font-black text-secondary italic tracking-tighter uppercase">Estatus de Expediente</h2>
               </div>
-              <ProjectDocumentStatus projectId={project.id} categoriaId={project.categoriaId} />
+              <ProjectDocumentStatus projectId={project.id} categoriaId={project.categoriaId} preloadedDocuments={isQrAccess ? (qrResolvedData as any)?.documentos : undefined} />
             </div>
           </div>
 
