@@ -144,6 +144,7 @@ public class ProyectoRepository : IProyectoRepository
     public async Task<IEnumerable<Proyecto>> GetPublishedAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+        var conObservacionCode = ProjectStatus.ConObservacion.ToCodigoUnico();
 
         return await _context.Proyectos
             .AsNoTracking()
@@ -151,16 +152,41 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.UsuarioCreador)
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
-            .Where(p => p.Estado.CodigoUnico == publicadoCode)
+            .Where(p => p.Estado.CodigoUnico == publicadoCode || p.Estado.CodigoUnico == conObservacionCode)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetPublishedPaginatedAsync(int page = 1, int pageSize = 12, CancellationToken cancellationToken = default)
+    {
+        var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+        var conObservacionCode = ProjectStatus.ConObservacion.ToCodigoUnico();
+
+        var query = _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
+            .Include(p => p.Estado)
+            .Where(p => p.Estado.CodigoUnico == publicadoCode || p.Estado.CodigoUnico == conObservacionCode);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(p => p.CreatedAtUtc)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task<IEnumerable<Proyecto>> SearchPublishedAsync(string query, CancellationToken cancellationToken = default)
     {
         var cleanQuery = query.Replace("-", "").Replace(" ", "");
         var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+        var conObservacionCode = ProjectStatus.ConObservacion.ToCodigoUnico();
         
         return await _context.Proyectos
             .AsNoTracking()
@@ -173,7 +199,7 @@ public class ProyectoRepository : IProyectoRepository
                 p.RncDesarrollador != null && p.RncDesarrollador.Replace("-", "").Replace(" ", "") == cleanQuery ||
                 p.Matricula != null && p.Matricula.Replace("-", "").Replace(" ", "") == cleanQuery ||
                 _context.SellosIntegridad.Any(s => s.ProyectoId == p.Id && s.CodigoSello == query))
-                && p.Estado.CodigoUnico == publicadoCode
+                && (p.Estado.CodigoUnico == publicadoCode || p.Estado.CodigoUnico == conObservacionCode)
             )
             .ToListAsync(cancellationToken);
     }
@@ -366,22 +392,37 @@ public class ProyectoRepository : IProyectoRepository
 
     public async Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, int categoryId, CancellationToken cancellationToken = default)
     {
-        // Define required document types for the project category (same logic as ProjectDocumentStatus component)
         var requiredTypes = GetRequiredDocumentTypesForCategory(categoryId);
 
-        if (requiredTypes.Count == 0) return 100;
-
-        // Get uploaded documents for this project that match required types and are not invalid
-        var uploadedCount = await _context.Documentos
+        var uploadedTypes = await _context.Documentos
             .AsNoTracking()
             .Where(d => d.ProyectoId == proyectoId
                 && d.Activo
                 && d.EstadoDocumento != DocumentStatus.Invalid
                 && requiredTypes.Contains(d.TipoDocumento))
-            .CountAsync(cancellationToken);
+            .Select(d => d.TipoDocumento)
+            .Distinct()
+            .ToListAsync(cancellationToken);
 
-        var rate = (int)Math.Round((double)uploadedCount / requiredTypes.Count * 100);
-        return Math.Min(rate, 100);
+        var uploadedSet = new HashSet<DocumentType>(uploadedTypes);
+
+        var essentials = new[] { DocumentType.CertificadoTitulo, DocumentType.CertificacionEstadoJuridico, DocumentType.PlanoMensuraCatastral, DocumentType.ID, DocumentType.CertificacionIPI };
+        var anexos = new[] { DocumentType.CertificadoUsoSuelo, DocumentType.RegistroMercantil, DocumentType.PoderNotarial, DocumentType.RNC, DocumentType.CertificadoEIA };
+
+        const int essentialWeight = 80;
+        const int anexoWeight = 20;
+
+        int essentialCount = essentials.Count(t => uploadedSet.Contains(t));
+        int anexoCount = anexos.Count(t => uploadedSet.Contains(t));
+
+        int essentialPercent = essentials.Length > 0
+            ? (int)Math.Round((double)essentialCount / essentials.Length * essentialWeight)
+            : essentialWeight;
+        int anexoPercent = anexos.Length > 0
+            ? (int)Math.Round((double)anexoCount / anexos.Length * anexoWeight)
+            : anexoWeight;
+
+        return Math.Min(essentialPercent + anexoPercent, 100);
     }
 
     private static List<DocumentType> GetRequiredDocumentTypesForCategory(int categoryId)
@@ -403,6 +444,7 @@ public class ProyectoRepository : IProyectoRepository
             { DocumentType.RegistroMercantil, new List<int> { 1, 2, 3, 4, 99 } },
             { DocumentType.PoderNotarial, new List<int> { 1, 2, 3, 4, 99 } },
             { DocumentType.RNC, new List<int> { 1, 2, 3, 4, 99 } },
+            { DocumentType.CertificadoEIA, new List<int> { 1, 2, 3, 4, 99 } },
         };
 
         var result = new List<DocumentType>();

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 public class SearchPublicProjectsQuery
 {
     public string Query { get; set; } = string.Empty;
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 12;
     public string? IpOrigen { get; set; }
     public string? UserAgent { get; set; }
 }
@@ -31,4 +33,12 @@ public class PublicProjectSearchResultDto
     public string? CedulaRncPropietario { get; set; }
     public int CompletionRate { get; set; }
     public int IntegridadValidada { get; set; }
+}
+
+public class PublicProjectSearchResponseDto
+{
+    public List<PublicProjectSearchResultDto> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
 }

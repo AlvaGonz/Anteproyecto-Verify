@@ -69,10 +69,37 @@ public class ReporteBuilderService : IReporteBuilder
                 }).ToList()
         }).ToList();
 
+        var orphanHallazgos = hallazgos.Where(h => h.ValidacionId == null).ToList();
+        if (orphanHallazgos.Any())
+        {
+            validacionesDto.Add(new ValidacionResumenDto
+            {
+                TipoValidacion = "General / No Vinculado",
+                Estado = orphanHallazgos.Count.ToString() + " hallazgo(s)",
+                Hallazgos = orphanHallazgos.Select(h => new HallazgoResumenDto
+                {
+                    Descripcion = h.Descripcion,
+                    Severidad = h.Severity.ToString()
+                }).ToList()
+            });
+        }
+
         return new ReporteHallazgosDto
         {
             ProyectoId = project.Id,
             NombreProyecto = project.Nombre,
+            CodigoInterno = project.CodigoInterno,
+            UbicacionTexto = project.UbicacionTexto,
+            ValorEstimado = project.ValorEstimado,
+            DatosDesarrollador = project.DatosDesarrollador,
+            RncDesarrollador = project.RncDesarrollador,
+            Matricula = project.Matricula,
+            DesignacionCatastral = project.DesignacionCatastral,
+            SuperficieM2 = project.SuperficieM2,
+            EstatusIpi = project.EstatusIpi,
+            CategoriaNombre = project.CategoriaProyecto?.Nombre ?? "N/A",
+            EstadoNombre = project.Estado?.Nombre ?? "N/A",
+            ProvinciaNombre = project.Provincia?.NombreProvincia,
             FechaGeneracionUtc = DateTime.UtcNow,
             TotalHallazgos = hallazgos.Count(),
             HallazgosCriticos = criticos,
@@ -82,7 +109,16 @@ public class ReporteBuilderService : IReporteBuilder
             EsAptoParaSello = esApto,
             ResumenEjecutivo = resumen,
             Detalles = detalles,
-            Validaciones = validacionesDto
+            Validaciones = validacionesDto,
+            Documentos = project.Documentos
+                .Where(d => d.Activo)
+                .Select(d => new DocumentoResumenDto
+                {
+                    NombreArchivo = d.NombreArchivoOriginal,
+                    TipoDocumento = d.TipoDocumento.ToString(),
+                    Estado = d.EstadoDocumento.ToString(),
+                    TamanoBytes = d.TamanoBytes
+                }).ToList()
         };
     }
 }

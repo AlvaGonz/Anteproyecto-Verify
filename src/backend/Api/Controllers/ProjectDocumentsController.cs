@@ -159,9 +159,19 @@ public class ProjectDocumentsController : ControllerBase
                 case "CERTIFICACION_IPI":
                     tipoDocumento = DocumentType.CertificacionIPI;
                     break;
-
+                case "USO_SUELO":
+                case "CERTIFICADO_USO_SUELO":
+                    tipoDocumento = DocumentType.CertificadoUsoSuelo;
+                    break;
+                case "REGISTRO_MERCANTIL":
+                    tipoDocumento = DocumentType.RegistroMercantil;
+                    break;
                 case "RNC":
                     tipoDocumento = DocumentType.RNC;
+                    break;
+                case "EIA":
+                case "CERTIFICADO_EIA":
+                    tipoDocumento = DocumentType.CertificadoEIA;
                     break;
                 default:
                     return BadRequest($"Código de requerimiento no soportado: {requirementCode}");

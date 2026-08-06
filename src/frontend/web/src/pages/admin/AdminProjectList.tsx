@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ProjectStatus, IntegrityStatus } from "../../features/projects/types";
+import { ProjectStatus } from "../../features/projects/types";
 import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { ProjectCoverImage } from "../../features/projects/components/ProjectCoverImage";
 import { AdminProjectContextMenu } from "./AdminProjectContextMenu";
-import { FolderKanban, ArrowRight, CheckCircle2, AlertTriangle, Timer, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Banknote } from "lucide-react";
+import { FolderKanban, ArrowRight, Timer, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Banknote } from "lucide-react";
 import { toUtcDate } from "../../shared/utils/dates";
 
 const getStatusBadge = (status: ProjectStatus, t: any) => {
@@ -138,7 +138,7 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 font-medium">
                       <span className="flex items-center gap-1.5 font-mono bg-gray-50 px-2 py-0.5 rounded-md">
-                        ID: {project.codigoInterno}
+                        #{project.codigoInterno}
                       </span>
                       {project.matricula && (
                         <span className="flex items-center gap-1.5 font-mono bg-blue-50/50 text-blue-600 px-2 py-0.5 rounded-md">

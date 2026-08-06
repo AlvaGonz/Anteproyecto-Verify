@@ -104,30 +104,26 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
-        className={`group relative flex flex-col p-6 rounded-[2rem] transition-all border ${isVerificado
+        className={`group relative flex flex-col p-6 rounded-[2rem] transition-all border ${(isVerificado || isObservado)
           ? "bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30"
-          : isObservado
-            ? "bg-rose-500/[0.03] border-rose-500/10 hover:border-rose-500/30"
-            : isPending
-              ? "bg-amber-500/[0.03] border-amber-500/10 hover:border-amber-500/30"
-              : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
+          : isPending
+            ? "bg-amber-500/[0.03] border-amber-500/10 hover:border-amber-500/30"
+            : "bg-on-surface-variant/[0.02] border-on-surface-variant/5 grayscale opacity-60"
           }`}
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${isVerificado
+            <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${(isVerificado || isObservado)
               ? "bg-emerald-500/10 text-emerald-500"
-              : isObservado
-                ? "bg-rose-500/10 text-rose-500"
-                : isPending
-                  ? "bg-amber-500/10 text-amber-500"
-                  : "bg-on-surface-variant/10 text-on-surface-variant"
+              : isPending
+                ? "bg-amber-500/10 text-amber-500"
+                : "bg-on-surface-variant/10 text-on-surface-variant"
               }`}>
-              {isVerificado ? <ShieldCheck className="w-5 h-5" /> : isObservado ? <AlertTriangle className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+              {(isVerificado || isObservado) ? <ShieldCheck className="w-5 h-5" /> : isPending ? <Clock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
             </div>
 
             <div className="space-y-1">
-              <h4 className={`text-sm font-black uppercase tracking-tight ${isVerificado ? "text-secondary" : "text-on-surface-variant"}`}>
+              <h4 className={`text-sm font-black uppercase tracking-tight ${(isVerificado || isObservado) ? "text-secondary" : "text-on-surface-variant"}`}>
                 {info.name}
               </h4>
               <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
@@ -154,14 +150,9 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
           </div>
 
           <div className="flex items-center gap-4">
-            {isVerificado && (
+            {(isVerificado || isObservado) && (
               <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-                VERIFICADO
-              </div>
-            )}
-            {isObservado && (
-              <div className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest border border-rose-500/20">
-                OBSERVADO
+                SUMINISTRADO
               </div>
             )}
             {!isVerificado && !isPending && !isObservado && (

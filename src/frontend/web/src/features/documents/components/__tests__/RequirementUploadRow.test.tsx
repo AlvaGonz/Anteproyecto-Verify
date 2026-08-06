@@ -62,7 +62,7 @@ describe('RequirementUploadRow', () => {
       { wrapper: createWrapper() }
     );
     
-    expect(screen.getByText('Verificado')).toBeInTheDocument();
+    expect(screen.getByText('Cargado')).toBeInTheDocument();
     expect(screen.getByText('mi_titulo.pdf')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /subir/i })).not.toBeInTheDocument();
   });

@@ -80,8 +80,7 @@ public class GetPublicProjectStatusQueryHandler
             CodigoPublico = sello.CodigoSello,
             NombreProyecto = proyecto.Nombre,
             Ubicacion = proyecto.UbicacionTexto,
-            EstadoValidacion = proyecto.Estado?.CodigoUnico == ProjectStatus.Publicado.ToCodigoUnico() ? "Verificado" : 
-                               proyecto.Estado?.CodigoUnico == ProjectStatus.ConObservacion.ToCodigoUnico() ? "NoVerificado" : "ConObservaciones",
+            EstadoValidacion = proyecto.Estado?.Nombre ?? "Desconocido",
             FechaEmision = sello.FechaEmisionUtc,
             ResumenDimensiones = resumen
         };

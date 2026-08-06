@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Lock, ShieldCheck, AlertTriangle, Clock, FileText, Building2, Gavel } from "lucide-react";
+import { X, Lock, ShieldCheck, Clock, FileText, Building2, Gavel } from "lucide-react";
 import { DocumentType, DocumentStatus } from "../types";
 import { useDocuments } from "../api/useDocuments";
 
@@ -46,9 +46,9 @@ const DocumentCard: React.FC<{ typeData: { type: DocumentType; label: string; en
   const status = getDocStatus(doc);
 
   const statusConfig = {
-    verificado: { icon: ShieldCheck, cls: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", badge: "VERIFICADO", badgeCls: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" },
+    verificado: { icon: ShieldCheck, cls: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", badge: "SUMINISTRADO", badgeCls: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" },
     presentado: { icon: Clock, cls: "bg-amber-500/10 text-amber-500 border-amber-500/20", badge: "PRESENTADO", badgeCls: "bg-amber-500/10 text-amber-500 border border-amber-500/20" },
-    observado: { icon: AlertTriangle, cls: "bg-rose-500/10 text-rose-500 border-rose-500/20", badge: "OBSERVADO", badgeCls: "bg-rose-500/10 text-rose-500 border border-rose-500/20" },
+    observado: { icon: ShieldCheck, cls: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", badge: "SUMINISTRADO", badgeCls: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" },
     missing: { icon: Lock, cls: "bg-on-surface-variant/10 text-on-surface-variant border-on-surface-variant/5", badge: "NO SUMINISTRADO", badgeCls: "bg-on-surface-variant/5 text-on-surface-variant/40 border border-on-surface-variant/5" },
   };
 

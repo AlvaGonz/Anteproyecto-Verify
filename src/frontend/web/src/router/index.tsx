@@ -12,7 +12,6 @@ const ProjectPublicDetailPage = lazy(() => import("../pages/projects/ProjectPubl
 const ProjectManagePage = lazy(() => import("../pages/projects/ProjectManagePage").then(m => ({ default: m.ProjectManagePage })));
 const ProjectManageLayout = lazy(() => import("../pages/projects/ProjectManageLayout").then(m => ({ default: m.ProjectManageLayout })));
 const ProjectValidationPage = lazy(() => import("../pages/projects/ProjectValidationPage").then(m => ({ default: m.ProjectValidationPage })));
-const ProjectAuditPage = lazy(() => import("../pages/admin/ProjectAuditPage").then(m => ({ default: m.ProjectAuditPage })));
 const ProjectReportsPage = lazy(() => import("../pages/admin/ProjectReportsPage").then(m => ({ default: m.ProjectReportsPage })));
 const RulesManagePage = lazy(() => import("../pages/admin/RulesManagePage").then(m => ({ default: m.RulesManagePage })));
 const SettingsPage = lazy(() => import("../pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
@@ -294,8 +293,7 @@ export const router = createHashRouter([
               { index: true, element: <Navigate to="edit" replace /> },
               { path: "edit", element: <ProjectManagePage /> },
               { path: "validations", element: <ProjectValidationPage /> },
-              { path: "reports", element: <ProjectReportsPage /> },
-              { path: "audit", element: <ProjectAuditPage /> }
+              { path: "reports", element: <ProjectReportsPage /> }
             ]
           },
           {

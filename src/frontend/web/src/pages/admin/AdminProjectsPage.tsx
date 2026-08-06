@@ -66,7 +66,7 @@ export const AdminProjectsPage: React.FC = () => {
 
   const estadosParam = useMemo(() => {
     if (selectedStatuses.length > 0) return [...new Set(selectedStatuses)].join(",");
-    if (activeFilter === "published") return ProjectStatus.Published;
+    if (activeFilter === "published") return `${ProjectStatus.Published},${ProjectStatus.Observed}`;
     if (activeFilter === "review") return ProjectStatus.InReview;
     return undefined;
   }, [selectedStatuses, activeFilter]);

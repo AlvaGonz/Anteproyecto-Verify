@@ -9,6 +9,18 @@ public class ReporteHallazgosDto
 {
     public Guid ProyectoId { get; set; }
     public string NombreProyecto { get; set; } = string.Empty;
+    public string CodigoInterno { get; set; } = string.Empty;
+    public string UbicacionTexto { get; set; } = string.Empty;
+    public decimal? ValorEstimado { get; set; }
+    public string? DatosDesarrollador { get; set; }
+    public string? RncDesarrollador { get; set; }
+    public string? Matricula { get; set; }
+    public string? DesignacionCatastral { get; set; }
+    public decimal? SuperficieM2 { get; set; }
+    public string? EstatusIpi { get; set; }
+    public string CategoriaNombre { get; set; } = string.Empty;
+    public string EstadoNombre { get; set; } = string.Empty;
+    public string? ProvinciaNombre { get; set; }
     public DateTime FechaGeneracionUtc { get; set; }
     public int TotalHallazgos { get; set; }
     public int HallazgosCriticos { get; set; }
@@ -19,6 +31,15 @@ public class ReporteHallazgosDto
     public string ResumenEjecutivo { get; set; } = string.Empty;
     public object Detalles { get; set; } = new object();
     public List<ValidacionResumenDto> Validaciones { get; set; } = new List<ValidacionResumenDto>();
+    public List<DocumentoResumenDto> Documentos { get; set; } = new List<DocumentoResumenDto>();
+}
+
+public class DocumentoResumenDto
+{
+    public string NombreArchivo { get; set; } = string.Empty;
+    public string TipoDocumento { get; set; } = string.Empty;
+    public string Estado { get; set; } = string.Empty;
+    public long TamanoBytes { get; set; }
 }
 
 public class ValidacionResumenDto

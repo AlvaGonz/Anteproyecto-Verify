@@ -83,13 +83,13 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
             <span>Integridad Validada</span>
             <span className="text-primary">
-              {project.estadoIntegridad === 1 ? "100%" : project.estadoIntegridad === 0 ? "—" : "0%"}
+              {project.completionRate || 0}%
             </span>
           </div>
           <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
             <m.div
               initial={{ width: 0 }}
-              animate={{ width: `${project.estadoIntegridad === 1 ? 100 : 0}%` }}
+              animate={{ width: `${project.completionRate || 0}%` }}
               transition={{ duration: 1, delay: 0.5 }}
               className="h-full bg-primary"
             />
@@ -108,8 +108,8 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
 ));
 
 const ProjectsPublicListContent: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryParam = searchParams.get("q") || "";
   const [filtersVisible, setFiltersVisible] = useState(true);
 
   const [filters, setFilters] = useState<PublishedProjectFilters>({
@@ -125,7 +125,7 @@ const ProjectsPublicListContent: React.FC = () => {
   const pageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: provincias } = useProvinces();
-  const { data: searchResults } = useSuspensePublishedProjects();
+  const { data: searchResults } = useSuspensePublishedProjects({ page: 1, pageSize: 200 });
 
   const filteredProjects = useMemo(() => {
     return filterPublishedProjects(searchResults, filters);
@@ -239,7 +239,7 @@ const ProjectsPublicListContent: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-slate-600">
                     <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
-                    <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "15M+" : filters.priceRange[1].toLocaleString()}</span>
+                    <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "100M+" : filters.priceRange[1].toLocaleString()}</span>
                   </div>
                   <div className="relative h-6">
                     <input
@@ -264,8 +264,8 @@ const ProjectsPublicListContent: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
                     <span>0</span>
-                    <span>7.5M</span>
-                    <span>15M+</span>
+                    <span>50M</span>
+                    <span>100M+</span>
                   </div>
                 </div>
               </div>

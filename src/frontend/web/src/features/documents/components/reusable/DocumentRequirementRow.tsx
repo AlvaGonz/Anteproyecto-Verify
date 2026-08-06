@@ -57,7 +57,7 @@ export const DocumentRequirementRow: React.FC<DocumentRequirementRowProps> = ({
     }
   };
 
-  const isRequired = requirementCode !== "poder";
+  const isRequired = !["poder", "uso_suelo", "registro_mercantil", "rnc", "eia"].includes(requirementCode);
 
   let containerStyle = "border-border/30 bg-surface hover:border-border/60";
   if (isUploaded && documentStatus === 6) {

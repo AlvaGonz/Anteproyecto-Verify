@@ -1,6 +1,13 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 
+export interface PublishedProjectsResponse {
+  items: PublicProjectSearchResultDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface PublicProjectSearchResultDto {
   id: string;
   nombreProyecto: string;
@@ -23,24 +30,40 @@ export interface PublicProjectSearchResultDto {
   integridadValidada: number;
 }
 
-export const usePublishedProjects = () =>
+interface UsePublishedProjectsParams {
+  page?: number;
+  pageSize?: number;
+}
+
+export const usePublishedProjects = ({ page = 1, pageSize = 12 }: UsePublishedProjectsParams = {}) =>
   useQuery({
-    queryKey: ["publishedProjects"],
+    queryKey: ["publishedProjects", page, pageSize],
     queryFn: () =>
       apiClient
-        .get<PublicProjectSearchResultDto[]>(`/public/projects/search`)
-        .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO")),
+        .get<PublishedProjectsResponse>(`/public/projects/search`, { params: { page, pageSize } })
+        .then((res) => res.data.items.filter((p) => p.estadoProyecto === "PUBLICADO" || p.estadoProyecto === "OBSERVACION")),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
-export const useSuspensePublishedProjects = () =>
-  useSuspenseQuery({
-    queryKey: ["publishedProjects"],
+export const usePublishedProjectsCount = () =>
+  useQuery({
+    queryKey: ["publishedProjectsCount"],
     queryFn: () =>
       apiClient
-        .get<PublicProjectSearchResultDto[]>(`/public/projects/search`)
-        .then((res) => res.data.filter((p) => p.estadoProyecto === "PUBLICADO")),
+        .get<PublishedProjectsResponse>(`/public/projects/search`, { params: { page: 1, pageSize: 1 } })
+        .then((res) => res.data.totalCount),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+export const useSuspensePublishedProjects = ({ page = 1, pageSize = 12 }: UsePublishedProjectsParams = {}) =>
+  useSuspenseQuery({
+    queryKey: ["publishedProjects", page, pageSize],
+    queryFn: () =>
+      apiClient
+        .get<PublishedProjectsResponse>(`/public/projects/search`, { params: { page, pageSize } })
+        .then((res) => res.data.items.filter((p) => p.estadoProyecto === "PUBLICADO" || p.estadoProyecto === "OBSERVACION")),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -152,4 +175,4 @@ export function getDefaultProjectImage(categoryId?: number): string {
 }
 
 export const PRICE_STEPS = 100_000;
-export const PRICE_MAX = 15_000_000;
+export const PRICE_MAX = 100_000_000;

@@ -26,6 +26,18 @@ describe('AdminProjectContextMenu - destructive delete confirmation', () => {
     vi.clearAllMocks();
   });
 
+  it('renders a Hallazgos link pointing to the validations route', () => {
+    render(
+      <MemoryRouter>
+        <AdminProjectContextMenu {...defaultProps} />
+      </MemoryRouter>
+    );
+    
+    const hallazgosLink = screen.getByRole('link', { name: /hallazgos/i });
+    expect(hallazgosLink).toBeInTheDocument();
+    expect(hallazgosLink).toHaveAttribute('href', '/admin/projects/project-1/validations');
+  });
+
   it('does not use the native window.confirm dialog when delete is triggered', async () => {
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
