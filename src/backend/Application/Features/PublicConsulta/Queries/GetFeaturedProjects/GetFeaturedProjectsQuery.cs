@@ -44,11 +44,13 @@ public class GetFeaturedProjectsQueryHandler
         var sellos = await _selloRepository.GetByProyectoIdsAsync(proyectoIds, cancellationToken);
         var sellosPorProyecto = sellos.ToDictionary(s => s.ProyectoId);
 
-        var results = proyectoList.Select(p =>
+        var results = new List<PublicProjectSearchResultDto>();
+
+        foreach (var p in proyectoList)
         {
             var sello = sellosPorProyecto.GetValueOrDefault(p.Id);
-            var completionRate = CalculateCompletionRate(p);
-            return new PublicProjectSearchResultDto
+            var completionRate = await _proyectoRepository.GetDocumentCompletionRateAsync(p.Id, p.CategoriaId, cancellationToken);
+            results.Add(new PublicProjectSearchResultDto
             {
                 Id = p.Id,
                 NombreProyecto = p.Nombre,
@@ -68,8 +70,8 @@ public class GetFeaturedProjectsQueryHandler
                 RncDesarrollador = p.RncDesarrollador,
                 CedulaRncPropietario = p.CedulaRncPropietario,
                 CompletionRate = completionRate
-            };
-        }).ToList();
+            });
+        }
 
         await _auditLogger.AppendAsync(new AuditEntryDto
         {
@@ -82,50 +84,5 @@ public class GetFeaturedProjectsQueryHandler
         }, cancellationToken);
 
         return results;
-    }
-
-    private int CalculateCompletionRate(Proyecto proyecto)
-    {
-        // Same logic as ProjectDocumentStatus component
-        // Define required document types per project category
-        var docCategories = new Dictionary<int, int[]>
-        {
-            [1] = new[] { 1, 2, 3, 4, 99 },   // TITLE
-            [2] = new[] { 1, 2, 3, 4, 99 },   // LEGAL_STATUS
-            [3] = new[] { 1, 2, 3, 4, 99 },   // SURVEY
-            [4] = new[] { 1, 2, 3, 4, 99 },   // ID
-            [5] = new[] { 1, 2, 3, 4, 99 },   // NOTARIAL_POWER
-            [6] = new[] { 2, 3, 4 },          // CERTIFICADO_USO_SUELO
-            [8] = new[] { 1, 2, 3, 4, 99 },   // CERTIFICACION_IPI
-            [9] = new[] { 1, 2, 3, 4, 99 },   // REGISTRO_MERCANTIL
-            [11] = new[] { 1, 2, 3, 4, 99 },  // NOTARIAL_POWER
-            [12] = new[] { 1, 2, 3, 4, 99 },  // RNC
-            [21] = new[] { 1, 2, 3, 4, 99 },  // CERTIFICADO_TITULO
-            [22] = new[] { 1, 2, 3, 4, 99 },  // CERTIFICACION_ESTADO_JURIDICO
-            [24] = new[] { 1, 2, 3, 4, 99 },  // PLANO_MENSURA_CATASTRAL
-            [25] = new[] { 1, 2, 3, 4, 99 },  // PERMISO_CONSTRUCCION
-        };
-
-        var requiredTypes = docCategories
-            .Where(kvp => kvp.Value.Contains(proyecto.CategoriaId))
-            .Select(kvp => (DocumentType)kvp.Key)
-            .ToList();
-
-        if (requiredTypes.Count == 0) return 100;
-
-        // Estimate based on project status since we don't fetch documents here for performance
-        // Projects in "Publicado" typically have 90%+ completion
-        // Projects in "ConObservacion" typically have 75% completion
-        // Projects in "Revision" typically have 70% completion
-        var statusCode = proyecto.Estado?.CodigoUnico ?? "Publicado";
-        
-        if (statusCode == ProjectStatus.Publicado.ToCodigoUnico())
-            return 90;
-        if (statusCode == ProjectStatus.ConObservacion.ToCodigoUnico())
-            return 75;
-        if (statusCode == ProjectStatus.Revision.ToCodigoUnico())
-            return 70;
-        
-        return 80;
     }
 }
