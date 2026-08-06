@@ -165,8 +165,8 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
           type="button"
           onClick={() => setFiltersVisible(!filtersVisible)}
           className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors ${filtersVisible
-              ? "bg-primary text-white border-primary"
-              : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+            ? "bg-primary text-white border-primary"
+            : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
             }`}
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,7 +309,7 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute top-4 left-4">
-                      <ProjectStatusBadge status={project.estadoValidacion} />
+                      <ProjectStatusBadge status={project.estadoValidacion} integridadValidada={project.integridadValidada} />
                     </div>
                     <div className="absolute bottom-4 right-4">
                       <span className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 flex items-center gap-1">
@@ -360,13 +360,13 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
                         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
                           <span>Integridad Validada</span>
                           <span className="text-primary">
-                            {project.integridadValidada > 0 ? `${project.integridadValidada}%` : "—"}
+                            {(project.integridadValidada !== undefined && project.integridadValidada > 0) ? `${project.integridadValidada}%` : (project.completionRate !== undefined ? `${project.completionRate}%` : "—")}
                           </span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                           <m.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${project.integridadValidada}%` }}
+                            animate={{ width: `${project.integridadValidada ?? project.completionRate ?? 0}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
                             className="h-full bg-primary"
                           />

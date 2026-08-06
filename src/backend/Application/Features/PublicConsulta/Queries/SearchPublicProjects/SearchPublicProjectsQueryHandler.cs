@@ -36,8 +36,9 @@ public class SearchPublicProjectsQueryHandler
 
         if (string.IsNullOrWhiteSpace(request.Query))
         {
-            proyectosList = await _proyectoRepository.GetPublishedAsync(1, int.MaxValue, cancellationToken);
-            totalCount = proyectosList.Count();
+var (items, count) = await _proyectoRepository.GetPublishedPaginatedAsync(page, pageSize, cancellationToken);
+proyectosList = items;
+totalCount = count;
         }
         else
         {

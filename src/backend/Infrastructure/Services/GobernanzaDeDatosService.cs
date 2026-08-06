@@ -208,8 +208,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     private (int total, int matched) CompareStr(string? reqVal, string? dbVal)
     {
-        if (reqVal == null) return (0, 0); // Not included in the request payload
-        if (string.IsNullOrWhiteSpace(reqVal)) return (1, 0); // Included in payload but empty -> miss
+        if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
         var r = reqVal.Trim().ToLowerInvariant();
         var d = (dbVal ?? "").Trim().ToLowerInvariant();
         bool isMatch = d.Contains(r) || r.Contains(d) || r == d;
@@ -225,8 +224,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     private (int total, int matched) CompareSuperficie(string? reqVal, decimal? dbVal)
     {
-        if (reqVal == null) return (0, 0);
-        if (string.IsNullOrWhiteSpace(reqVal)) return (1, 0);
+        if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
         if (!decimal.TryParse(reqVal, out var reqDec)) return (1, 0);
         if (!dbVal.HasValue) return (1, 0);
         return (1, Math.Abs(reqDec - dbVal.Value) < 1m ? 1 : 0);
@@ -234,8 +232,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     private (int total, int matched) CompareDate(string? reqVal, DateTime? dbVal)
     {
-        if (reqVal == null) return (0, 0);
-        if (string.IsNullOrWhiteSpace(reqVal)) return (1, 0);
+        if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
         if (dbVal == null) return (1, 0);
         var r = reqVal.Trim();
         var d = dbVal.Value.ToString("yyyy-MM-dd");

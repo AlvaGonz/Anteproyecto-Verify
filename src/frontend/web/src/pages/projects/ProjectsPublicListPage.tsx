@@ -58,7 +58,7 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
       <div className="absolute top-6 left-6">
-        <ProjectStatusBadge status={project.estadoValidacion} />
+        <ProjectStatusBadge status={project.estadoValidacion} integridadValidada={project.integridadValidada} />
       </div>
     </div>
 
