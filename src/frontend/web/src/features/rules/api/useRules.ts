@@ -23,6 +23,16 @@ export interface CreateRuleCommand {
   tipoProyecto: number;
 }
 
+export interface UpdateRuleCommand {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  condicionLogica: string;
+  tipoDocumentoAplicable: number;
+  nivelAlerta: number;
+  tipoProyecto: number;
+}
+
 export const ruleKeys = {
   all: ["rules"] as const,
   list: (page?: number, pageSize?: number) => ["rules", "list", page, pageSize] as const,
@@ -63,3 +73,14 @@ export const useToggleRule = () => {
   });
 };
 
+export const useUpdateRule = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["rules", "update"],
+    mutationFn: ({ id, ...body }: UpdateRuleCommand) =>
+      apiClient.put<void>(`/admin/rules/${id}`, body).then((res) => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ruleKeys.all });
+    },
+  });
+};
