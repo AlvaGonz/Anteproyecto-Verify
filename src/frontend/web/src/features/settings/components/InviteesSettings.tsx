@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useRemoveInvitee } from "../api/useSettings";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
-import { Users, UserPlus, UserMinus, Edit3, AlertTriangle, Loader2 } from "lucide-react";
+import { Users, UserPlus, UserMinus, Edit3, AlertTriangle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { InviteUserModal } from "./InviteUserModal";
 import { EditInviteeLimitsModal } from "./EditInviteeLimitsModal";
+
+const SLOTS_PER_PAGE = 10;
 
 export const InviteesSettings: React.FC = () => {
   const { user } = useAuth();
@@ -13,6 +15,7 @@ export const InviteesSettings: React.FC = () => {
   const [selectedInvitee, setSelectedInvitee] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [userToRemove, setUserToRemove] = useState<any>(null);
+  const [page, setPage] = useState(1);
 
   const removeInviteeMutation = useRemoveInvitee();
 
@@ -74,7 +77,7 @@ export const InviteesSettings: React.FC = () => {
                 const invitees = (user as any)?.inviteesList || [];
                 const slots = [];
 
-                for (let i = 0; i < limit; i++) {
+                for (let i = (page - 1) * SLOTS_PER_PAGE; i < limit && i < page * SLOTS_PER_PAGE; i++) {
                   const invitee = invitees[i];
                   if (invitee) {
                     slots.push(
@@ -136,6 +139,25 @@ export const InviteesSettings: React.FC = () => {
               })()}
             </div>
           )}
+
+          {(() => {
+            let limit = (user as any)?.maxUsuariosSecundarios || 0;
+            if (limit <= 0 && (user as any)?.plan === "Profesional") limit = 5;
+            else if (limit <= 0) limit = Math.max((user as any)?.inviteesList?.length || 0, 5);
+            const totalPages = Math.ceil(limit / SLOTS_PER_PAGE) || 1;
+            if (totalPages <= 1) return null;
+            return (
+              <div className="flex items-center justify-center gap-3 mt-4 pt-4 border-t border-border/50">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 rounded-lg hover:bg-surface-raised disabled:opacity-30">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-sm font-medium text-text-secondary">Página {page} de {totalPages}</span>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-2 rounded-lg hover:bg-surface-raised disabled:opacity-30">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            );
+          })()}
         </div>
       </div>
       
