@@ -26,6 +26,7 @@ public class ProjectService : IProjectService
     private readonly INotificacionRepository _notificacionRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuditLogger _auditLogger;
+    private readonly IReglaValidacionRepository _reglaValidacionRepository;
 
     public ProjectService(
         IProyectoRepository proyectoRepository, 
@@ -34,7 +35,8 @@ public class ProjectService : IProjectService
         INotificationFactory notificationFactory,
         INotificacionRepository notificacionRepository,
         IUnitOfWork unitOfWork,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IReglaValidacionRepository reglaValidacionRepository)
     {
         _proyectoRepository = proyectoRepository;
         _usuarioRepository = usuarioRepository;
@@ -43,6 +45,7 @@ public class ProjectService : IProjectService
         _notificacionRepository = notificacionRepository;
         _unitOfWork = unitOfWork;
         _auditLogger = auditLogger;
+        _reglaValidacionRepository = reglaValidacionRepository;
     }
 
     public async Task<IEnumerable<ProyectoDto>> GetVisibleProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
@@ -241,6 +244,16 @@ public class ProjectService : IProjectService
                     SubscriptionTierPolicy.GetTierName(usuario), 
                     "PresentacionPublica", 
                     "Su plan actual (Consultor) no permite la publicación de proyectos.");
+            }
+
+            if (!string.IsNullOrEmpty(proyecto.EstatusIpi) && proyecto.EstatusIpi == "PAGO_PENDIENTE")
+            {
+                var activeRules = await _reglaValidacionRepository.GetActiveRulesAsync(
+                    (TipoProyecto)99, DocumentType.CertificacionIPI, cancellationToken);
+                if (activeRules.Any())
+                {
+                    status = ProjectStatus.ConObservacion;
+                }
             }
         }
 

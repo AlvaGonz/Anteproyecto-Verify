@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useCreateRule, useToggleRule } from "../../features/rules/api/useRules";
 
 export const RulesManagePageLayout: React.FC = React.memo(() => (
   <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
@@ -38,24 +39,47 @@ export const RulesManagePageLayout: React.FC = React.memo(() => (
 
 // ─── IPI Oposición Configurable Card ──────────────────────────────────────────
 
-const IPI_OPOSICION_KEY = "vf_ipi_oposicion_block";
+const IPI_RULE_ID_KEY = "vf_ipi_rule_id";
 
 const IpiOposicionCard: React.FC = () => {
+  const createRule = useCreateRule();
+  const toggleRule = useToggleRule();
+
   const [blockOnOposicion, setBlockOnOposicion] = React.useState<boolean>(() => {
     try {
-      const stored = localStorage.getItem(IPI_OPOSICION_KEY);
-      return stored !== null ? JSON.parse(stored) : true;
+      return localStorage.getItem(IPI_RULE_ID_KEY) !== null;
     } catch {
-      return true;
+      return false;
     }
   });
   const [saved, setSaved] = React.useState(false);
 
-  const handleToggle = () => {
+  const handleToggle = async () => {
     const next = !blockOnOposicion;
     setBlockOnOposicion(next);
-    localStorage.setItem(IPI_OPOSICION_KEY, JSON.stringify(next));
-    setSaved(true);
+
+    try {
+      if (next) {
+        const result = await createRule.mutateAsync({
+          nombre: "Denegación de Publicación por Estatus IPI",
+          descripcion: "Bloquea la publicación cuando el estatus IPI es No Pagado",
+          condicionLogica: "ipi.estatus == 'No Pagado' → BLOCK_PUBLISH",
+          tipoDocumentoAplicable: 8,
+          nivelAlerta: 2,
+          tipoProyecto: 99,
+        });
+        localStorage.setItem(IPI_RULE_ID_KEY, result.id);
+      } else {
+        const ruleId = localStorage.getItem(IPI_RULE_ID_KEY);
+        if (ruleId) {
+          await toggleRule.mutateAsync(ruleId);
+          localStorage.removeItem(IPI_RULE_ID_KEY);
+        }
+      }
+      setSaved(true);
+    } catch {
+      setBlockOnOposicion(!next);
+    }
     setTimeout(() => setSaved(false), 2000);
   };
 

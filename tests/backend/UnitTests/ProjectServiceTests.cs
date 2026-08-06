@@ -38,7 +38,8 @@ public class ProjectServiceTests
             _notificationFactoryMock.Object,
             new Mock<INotificacionRepository>().Object,
             _unitOfWorkMock.Object,
-            new Mock<global::Application.Abstractions.IAuditLogger>().Object);
+            new Mock<global::Application.Abstractions.IAuditLogger>().Object,
+            new Mock<IReglaValidacionRepository>().Object);
     }
 
     [Fact]

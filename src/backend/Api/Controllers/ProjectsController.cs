@@ -211,7 +211,8 @@ public class ProjectsController : ControllerBase
         // Sync: projects that already have documents but stayed on CREADO/EDITADO
         // (e.g. docs uploaded before auto-promotion existed) enter REVISION here.
         var currentStatus = project.EstadoProyecto;
-        if (ProjectLifecyclePolicy.ShouldEnterReview(currentStatus, docList.Count))
+        if (ProjectLifecyclePolicy.ShouldEnterReview(currentStatus, docList.Count)
+            && currentStatus != ProjectStatusCodes.Observacion)
         {
             project = await _projectService.UpdateProjectStatusAsync(id, ProjectStatus.Revision, cancellationToken);
             currentStatus = project.EstadoProyecto;

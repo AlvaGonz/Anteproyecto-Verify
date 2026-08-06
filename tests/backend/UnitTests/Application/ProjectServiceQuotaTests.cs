@@ -26,7 +26,8 @@ public class ProjectServiceQuotaTests
             new Mock<global::Application.Abstractions.Notifications.INotificationFactory>().Object,
             new Mock<INotificacionRepository>().Object,
             _uow.Object,
-            new Mock<global::Application.Abstractions.IAuditLogger>().Object);
+            new Mock<global::Application.Abstractions.IAuditLogger>().Object,
+            new Mock<IReglaValidacionRepository>().Object);
 
     private static global::Application.DTOs.CreateProyectoDto MakeDto(Guid userId) => new(
         "Test Project", "Santo Domingo", userId,

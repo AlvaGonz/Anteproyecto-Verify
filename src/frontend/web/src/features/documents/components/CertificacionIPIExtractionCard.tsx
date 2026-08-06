@@ -5,7 +5,13 @@ import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
 import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
 import { getValidationStatus } from "../../gobernanza/utils/mapper";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, AlertTriangle } from "lucide-react";
+
+const isIpiNoPagado = (response: any) => {
+  if (!response?.matchedData) return false;
+  const estatus = response.matchedData.Estatus || response.matchedData.estatus || "";
+  return estatus.toUpperCase().includes("NO PAGADO") || estatus === "PAGO_PENDIENTE";
+};
 
 interface CertificacionIPIExtractionCardProps {
   extraction: CertificacionIPIExtraction;
@@ -146,6 +152,12 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
       {renderField("Parcela No.", "parcelaNumero", extraction.parcelaNumero, true, "field-parcelaNumero", "Ej: 309466754512:4-A")}
       
       <div className="mt-6 pt-6 border-t border-[var(--color-border)]/10 col-span-full">
+        {isIpiNoPagado(verificationResponse) && (
+          <div className="mb-4 px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-2 text-amber-700">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span className="text-sm font-bold">Estado del IPI no pagado</span>
+          </div>
+        )}
         <div className="flex justify-end">
           <button
             onClick={handleVerifyGobernanza}
