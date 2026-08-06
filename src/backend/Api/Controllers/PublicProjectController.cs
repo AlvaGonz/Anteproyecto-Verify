@@ -42,12 +42,14 @@ public class PublicProjectController : ControllerBase
     }
 
     [HttpGet("search")]
-    [ResponseCache(Duration = 120, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "q" })]
-    public async Task<IActionResult> Search([FromQuery] string? q, CancellationToken ct)
+    [ResponseCache(Duration = 120, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "q", "page", "pageSize" })]
+    public async Task<IActionResult> Search([FromQuery] string? q, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, CancellationToken ct = default)
     {
         var query = new Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQuery
         {
             Query = q ?? "",
+            Page = page,
+            PageSize = pageSize,
             IpOrigen = HttpContext.Connection.RemoteIpAddress?.ToString(),
             UserAgent = Request.Headers["User-Agent"].ToString()
         };

@@ -38,7 +38,7 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
   const [itemsPerPage] = useState(20);
   const pageInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: publishedProjects = [], isLoading } = usePublishedProjects();
+  const { data: publishedProjects = [], isLoading } = usePublishedProjects({ pageSize: 200 });
 
   const filteredProjects = useMemo(() => {
     return publishedProjects.filter((p) => {

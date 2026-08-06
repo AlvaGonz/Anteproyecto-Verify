@@ -125,7 +125,7 @@ const ProjectsPublicListContent: React.FC = () => {
   const pageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: provincias } = useProvinces();
-  const { data: searchResults } = useSuspensePublishedProjects();
+  const { data: searchResults } = useSuspensePublishedProjects({ page: 1, pageSize: 200 });
 
   const filteredProjects = useMemo(() => {
     return filterPublishedProjects(searchResults, filters);

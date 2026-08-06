@@ -26,20 +26,28 @@ public class SearchPublicProjectsQueryHandler
         _auditLogger = auditLogger;
     }
 
-    public async Task<List<PublicProjectSearchResultDto>> Handle(SearchPublicProjectsQuery request, CancellationToken cancellationToken)
+    public async Task<PublicProjectSearchResponseDto> Handle(SearchPublicProjectsQuery request, CancellationToken cancellationToken)
     {
-        IEnumerable<Domain.Entities.Proyecto> proyectos;
+        var page = Math.Max(1, request.Page);
+        var pageSize = Math.Clamp(request.PageSize, 1, 200);
+
+        IEnumerable<Domain.Entities.Proyecto> proyectosList;
+        int totalCount;
 
         if (string.IsNullOrWhiteSpace(request.Query))
         {
-            proyectos = await _proyectoRepository.GetPublishedAsync(1, 50, cancellationToken);
+            var (items, count) = await _proyectoRepository.GetPublishedPaginatedAsync(page, pageSize, cancellationToken);
+            proyectosList = items;
+            totalCount = count;
         }
         else
         {
-            proyectos = await _proyectoRepository.SearchPublishedAsync(request.Query, cancellationToken);
+            var searchResults = await _proyectoRepository.SearchPublishedAsync(request.Query, cancellationToken);
+            proyectosList = searchResults;
+            totalCount = searchResults.Count();
         }
 
-        var proyectoList = proyectos.ToList();
+        var proyectoList = proyectosList.ToList();
         var proyectoIds = proyectoList.Select(p => p.Id).ToList();
 
         var sellos = await _selloRepository.GetByProyectoIdsAsync(proyectoIds, cancellationToken);
@@ -80,11 +88,17 @@ public class SearchPublicProjectsQueryHandler
             UsuarioId = null,
             TipoOperacion = TipoOperacion.ConsultaPublica,
             Accion = "Búsqueda pública de proyectos",
-            Resultado = $"Encontrados: {results.Count} para término {request.Query}",
+            Resultado = $"Encontrados: {results.Count} para término {request.Query}, página {page}",
             IpOrigen = request.IpOrigen,
             UserAgent = request.UserAgent
         }, cancellationToken);
 
-        return results;
+        return new PublicProjectSearchResponseDto
+        {
+            Items = results,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 }

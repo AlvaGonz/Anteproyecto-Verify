@@ -158,6 +158,30 @@ public class ProyectoRepository : IProyectoRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetPublishedPaginatedAsync(int page = 1, int pageSize = 12, CancellationToken cancellationToken = default)
+    {
+        var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
+        var conObservacionCode = ProjectStatus.ConObservacion.ToCodigoUnico();
+
+        var query = _context.Proyectos
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(p => p.UsuarioCreador)
+                .ThenInclude(u => u.Plan)
+            .Include(p => p.Estado)
+            .Where(p => p.Estado.CodigoUnico == publicadoCode || p.Estado.CodigoUnico == conObservacionCode);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(p => p.CreatedAtUtc)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
     public async Task<IEnumerable<Proyecto>> SearchPublishedAsync(string query, CancellationToken cancellationToken = default)
     {
         var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
