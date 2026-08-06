@@ -181,7 +181,7 @@ export const DashboardRecentActivity: React.FC<DashboardRecentActivityProps> = R
             <p className="text-xs font-bold text-text-secondary leading-snug mb-1 opacity-70">Flujo Mensual</p>
             <div className="flex items-baseline gap-2">
               <p className="text-2xl sm:text-3xl font-display font-black text-text-primary tracking-tighter">
-                ${loading ? "..." : statsData?.ingresosMensualesEstimados.toLocaleString('en-US')}
+                ${loading ? "..." : statsData?.ingresosMensualesEstimados.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
           </div>

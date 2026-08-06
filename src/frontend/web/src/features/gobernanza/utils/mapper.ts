@@ -109,64 +109,69 @@ export const getValidationStatus = (
   failedFields?: string[]
 ): { status: 'check' | 'warning' | 'error' | null; message: string } => {
   if (matchedData === null) {
-    return { status: 'error', message: 'No se encontraron coincidencias en la base de datos' };
+    return { status: 'error', message: '' };
   }
   
   if (matchedData === undefined) return { status: null, message: '' };
 
   const normalizedUi = String(uiValue || '').trim().toLowerCase();
 
-  if (fieldName && failedFields) {
-    const nameMap: Record<string, string> = {
-        'fechaYHoraInscripcion': 'FechaInscripcion',
-        'fechaHoraInscripcion': 'FechaEmision',
-        'superficieM2': 'SuperficieM2',
-        'superficieMetrosCuadrados': 'SuperficieM2',
-        'superficieARegistrarParcelaM2': 'SuperficieM2',
-        'vieneDe': 'VieneDe',
-        'designacionCatastral': 'DesignacionCatastral',
-        'designacionCatastralPosicional': 'DesigCatastralPosicional',
-        'designacionCatastralOrigen': 'DesignCatastralOrigen',
-        'cedulaNumber': 'Cedula',
-        'firstNames': 'Nombres',
-        'lastNames': 'Apellidos',
-        'birthDate': 'FechaNacimiento',
-        'expiryDate': 'FechaExpiracion',
-        'numeroCertificacion': 'NoCertificacion',
-        'numeroInmueble': 'NoInmueble',
-        'parcelaNumero': 'ParcelaNo'
-    };
+  if (normalizedUi === '') {
+    return { status: 'error', message: '' };
+  }
+
+  const nameMap: Record<string, string> = {
+      'fechaYHoraInscripcion': 'FechaInscripcion',
+      'fechaHoraInscripcion': 'FechaEmision',
+      'superficieM2': 'SuperficieM2',
+      'superficieMetrosCuadrados': 'SuperficieM2',
+      'superficieARegistrarParcelaM2': 'SuperficieM2',
+      'vieneDe': 'VieneDe',
+      'designacionCatastral': 'DesignacionCatastral',
+      'designacionCatastralPosicional': 'DesigCatastralPosicional',
+      'designacionCatastralOrigen': 'DesignCatastralOrigen',
+      'cedulaNumber': 'Cedula',
+      'firstNames': 'Nombres',
+      'lastNames': 'Apellidos',
+      'birthDate': 'FechaNacimiento',
+      'expiryDate': 'FechaExpiracion',
+      'numeroCertificacion': 'NoCertificacion',
+      'numeroInmueble': 'NoInmueble',
+      'parcelaNumero': 'ParcelaNo',
+      'matricula': 'Matricula',
+      'oficina': 'Oficina',
+      'municipio': 'Municipio',
+      'provincia': 'Provincia'
+  };
+
+  // If we know the field name, we compare directly with that field in the DB.
+  if (fieldName) {
+    const mappedName = nameMap[fieldName] || fieldName;
+    const actualKey = Object.keys(matchedData).find(k => k.toLowerCase() === mappedName.toLowerCase() || k.toLowerCase() === fieldName.toLowerCase());
     
-    const backendFieldName = nameMap[fieldName] || fieldName;
-    const isFailed = failedFields.some(f => f.toLowerCase() === backendFieldName.toLowerCase() || f.toLowerCase() === fieldName.toLowerCase());
+    if (actualKey) {
+      const dbValue = String(matchedData[actualKey] || '').trim().toLowerCase();
+      if (dbValue === normalizedUi) {
+        return { status: 'check', message: '' };
+      }
+      if (dbValue !== '' && (dbValue.includes(normalizedUi) || normalizedUi.includes(dbValue))) {
+        return { status: 'warning', message: '' };
+      }
+      return { status: 'error', message: '' };
+    }
+  }
+
+  // If no fieldName provided or not found in matchedData, check failedFields as fallback
+  if (fieldName && failedFields) {
+    const mappedName = nameMap[fieldName] || fieldName;
+    const isFailed = failedFields.some(f => f.toLowerCase() === mappedName.toLowerCase() || f.toLowerCase() === fieldName.toLowerCase());
     
     if (isFailed) {
-      return { status: 'error', message: 'Dato diferente a Gobernanza' };
+      return { status: 'error', message: '' };
     }
-    
-    if (normalizedUi === '') {
-      return { status: 'warning', message: 'Dato vacío enviado a revisión' };
-    }
-    
-    return { status: 'check', message: 'Coincide exactamente con Gobernanza' };
+    return { status: 'check', message: '' };
   }
 
-  if (normalizedUi === '') {
-    return { status: 'error', message: 'Dato vacío enviado a revisión' };
-  }
-
-  const matchedValues = Object.values(matchedData).map(v => String(v || '').trim().toLowerCase());
-  
-  if (matchedValues.includes(normalizedUi)) {
-    return { status: 'check', message: 'Coincide exactamente con Gobernanza' };
-  }
-
-  const hasPartialMatch = matchedValues.some(v => v !== '' && (v.includes(normalizedUi) || normalizedUi.includes(v)));
-  const hasEmptyInDb = matchedValues.includes('');
-
-  if (hasPartialMatch || hasEmptyInDb) {
-    return { status: 'warning', message: 'Coincidencia parcial o campo vacío en BD' };
-  }
-
-  return { status: 'error', message: 'No coincide con Gobernanza' };
+  // Fallback if everything else fails (should not happen with proper field mapping)
+  return { status: 'error', message: '' };
 };
