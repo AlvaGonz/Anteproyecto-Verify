@@ -184,6 +184,7 @@ public class ProyectoRepository : IProyectoRepository
 
     public async Task<IEnumerable<Proyecto>> SearchPublishedAsync(string query, CancellationToken cancellationToken = default)
     {
+        var cleanQuery = query.Replace("-", "").Replace(" ", "");
         var publicadoCode = ProjectStatus.Publicado.ToCodigoUnico();
         var conObservacionCode = ProjectStatus.ConObservacion.ToCodigoUnico();
         
@@ -193,10 +194,10 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Where(p => 
-                (p.CedulaRncPropietario == query ||
-                p.Ipi == query ||
-                p.RncDesarrollador == query ||
-                p.Matricula == query ||
+                (p.CedulaRncPropietario != null && p.CedulaRncPropietario.Replace("-", "").Replace(" ", "") == cleanQuery ||
+                p.Ipi != null && p.Ipi.Replace("-", "").Replace(" ", "") == cleanQuery ||
+                p.RncDesarrollador != null && p.RncDesarrollador.Replace("-", "").Replace(" ", "") == cleanQuery ||
+                p.Matricula != null && p.Matricula.Replace("-", "").Replace(" ", "") == cleanQuery ||
                 _context.SellosIntegridad.Any(s => s.ProyectoId == p.Id && s.CodigoSello == query))
                 && (p.Estado.CodigoUnico == publicadoCode || p.Estado.CodigoUnico == conObservacionCode)
             )
@@ -234,6 +235,7 @@ public class ProyectoRepository : IProyectoRepository
 
     public async Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default)
     {
+        var cleanQuery = query.Replace("-", "").Replace(" ", "");
         return await _context.Proyectos
             .AsNoTracking()
             .Include(p => p.UsuarioCreador)
@@ -241,10 +243,10 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.Estado)
             .Include(p => p.CategoriaProyecto)
             .Where(p => 
-                p.CedulaRncPropietario == query ||
-                p.Ipi == query ||
-                p.RncDesarrollador == query ||
-                p.Matricula == query ||
+                (p.CedulaRncPropietario != null && p.CedulaRncPropietario.Replace("-", "").Replace(" ", "") == cleanQuery) ||
+                (p.Ipi != null && p.Ipi.Replace("-", "").Replace(" ", "") == cleanQuery) ||
+                (p.RncDesarrollador != null && p.RncDesarrollador.Replace("-", "").Replace(" ", "") == cleanQuery) ||
+                (p.Matricula != null && p.Matricula.Replace("-", "").Replace(" ", "") == cleanQuery) ||
                 _context.SellosIntegridad.Any(s => s.ProyectoId == p.Id && s.CodigoSello == query)
             )
             .ToListAsync(cancellationToken);
@@ -509,5 +511,21 @@ public class ProyectoRepository : IProyectoRepository
         }
 
         return false;
+    }
+
+    public async Task<double> GetAverageIntegridadValidadaAsync(Guid proyectoId, CancellationToken cancellationToken = default)
+    {
+        var validaciones = await _context.DatosValidados
+            .AsNoTracking()
+            .Where(dv => dv.ProyectoId == proyectoId)
+            .Select(dv => dv.PorcentajeTotal)
+            .ToListAsync(cancellationToken);
+
+        if (validaciones == null || !validaciones.Any())
+        {
+            return 0;
+        }
+
+        return validaciones.Average();
     }
 }

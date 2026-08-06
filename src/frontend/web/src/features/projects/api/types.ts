@@ -30,4 +30,5 @@ export interface ProyectoDto {
   estatusIpi?: string;
   planNombre?: string | null;
   registradoPor?: ProjectRegistrant | null;
+  integridadValidada: number;
 }

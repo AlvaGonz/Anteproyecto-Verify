@@ -10,7 +10,16 @@ public class SearchResultDto
     public string TituloPrincipal { get; set; } = string.Empty;
     public Dictionary<string, string> Detalles { get; set; } = new();
     public List<ProjectoBasicDto> ProyectosRelacionados { get; set; } = new();
+    public List<DocumentoBasicDto> DocumentosRelacionados { get; set; } = new();
     public NetworkGraphDto GrafoRed { get; set; } = new();
+}
+
+public class DocumentoBasicDto
+{
+    public Guid Id { get; set; }
+    public string Nombre { get; set; } = string.Empty;
+    public string Tipo { get; set; } = string.Empty;
+    public string Estado { get; set; } = string.Empty;
 }
 
 public class ProjectoBasicDto

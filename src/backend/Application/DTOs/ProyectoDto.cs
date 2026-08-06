@@ -37,7 +37,8 @@ public record ProyectoDto(
     ProjectRegistrantDto? RegistradoPor = null,
     string? PlanNombre = null,
     Guid? ProvinciaId = null,
-    string? ProvinciaNombre = null
+    string? ProvinciaNombre = null,
+    int IntegridadValidada = 0
 );
 
 public record ProjectRegistrantDto(

@@ -79,7 +79,7 @@ export const AuditTable: React.FC<AuditTableProps> = ({ logs, isLoading }) => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {log.entidad}{" "}
-                      {log.entidadId
+                      {log.entidadId && log.entidadId !== "undefined"
                         ? `(${log.entidadId.substring(0, 8)}...)`
                         : ""}
                     </td>

@@ -20,9 +20,6 @@ const DOCUMENTOS_PRINCIPALES: { type: DocumentType; label: string; entity: strin
 
 const ANEXOS: { type: DocumentType; label: string; entity: string; norm: string }[] = [
   { type: DocumentType.CertificadoUsoSuelo, label: "Certificado Uso de Suelo", entity: "Ayuntamiento", norm: "Ordenanzas" },
-  { type: DocumentType.RegistroMercantil, label: "Registro Mercantil", entity: "Cámara de Comercio", norm: "Ley 3-02" },
-  { type: DocumentType.RNC, label: "RNC activo", entity: "DGII", norm: "-" },
-  { type: DocumentType.CertificadoEIA, label: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
   { type: DocumentType.PoderNotarial, label: "Poder Notarial", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
 ];
 

@@ -469,6 +469,7 @@ const DirectorySkeleton = () => (
 
 export const ProjectsPublicListPage: React.FC = () => {
   const [activeSearch, setActiveSearch] = useState<{ type: string; query: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<"proyectos" | "documentos">("proyectos");
 
   const { data, isLoading, error } = useGlobalSearch(
     activeSearch?.type || "",
@@ -477,6 +478,7 @@ export const ProjectsPublicListPage: React.FC = () => {
 
   const handleSearch = (type: string, query: string) => {
     setActiveSearch({ type, query });
+    setActiveTab("proyectos");
   };
 
   return (
@@ -525,7 +527,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                   )}
 
                   {data && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Entity Info */}
                       <div className="col-span-1 space-y-6">
                         <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden border border-slate-700">
@@ -553,40 +555,74 @@ export const ProjectsPublicListPage: React.FC = () => {
                             </dl>
                           </div>
                         </div>
-
-                        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-5 border border-slate-700">
-                          <h3 className="font-semibold text-slate-100 flex items-center mb-3 text-base border-b border-slate-700 pb-2">
-                            <Home className="h-4 w-4 mr-2 text-primary" />
-                            Proyectos ({data.proyectosRelacionados.length})
-                          </h3>
-                          {data.proyectosRelacionados.length > 0 ? (
-                            <ul className="space-y-2">
-                              {data.proyectosRelacionados.map((p) => (
-                                <li key={p.id} className="p-3 bg-slate-900/50 rounded-xl hover:bg-slate-700 transition-colors border border-slate-700/50">
-                                  <a href={`/#/projects/${p.id}`} className="block">
-                                    <span className="block font-semibold text-slate-100 text-sm">{p.nombre}</span>
-                                    <span className="mt-1 flex items-center text-xs text-slate-400">
-                                      <Activity className="h-3 w-3 mr-1" /> {p.estado}
-                                    </span>
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-slate-400 text-xs text-center py-3">No hay proyectos asociados a esta entidad.</p>
-                          )}
-                        </div>
                       </div>
 
-                      {/* Network Graph */}
-                      <div className="col-span-1 lg:col-span-2">
-                        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden h-full min-h-[500px] flex flex-col border border-slate-700">
-                          <div className="p-5 border-b border-slate-700">
-                            <h3 className="text-lg font-bold text-slate-100">Grafo de Relaciones</h3>
-                            <p className="text-xs text-slate-400 mt-0.5">Visualización de entidades y proyectos vinculados</p>
+                      {/* Linked Projects and Documents */}
+                      <div className="col-span-1 space-y-6">
+                        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-5 border border-slate-700 h-full flex flex-col">
+                          
+                          {/* Tabs */}
+                          <div className="flex items-center gap-4 border-b border-slate-700 pb-2 mb-4">
+                            <button
+                              onClick={() => setActiveTab("proyectos")}
+                              className={`font-semibold flex items-center text-sm pb-2 -mb-[9px] border-b-2 transition-colors ${
+                                activeTab === "proyectos" ? "text-slate-100 border-primary" : "text-slate-400 border-transparent hover:text-slate-200"
+                              }`}
+                            >
+                              <Home className="h-4 w-4 mr-2" />
+                              Proyectos Vinculados ({data.proyectosRelacionados.length})
+                            </button>
+                            <button
+                              onClick={() => setActiveTab("documentos")}
+                              className={`font-semibold flex items-center text-sm pb-2 -mb-[9px] border-b-2 transition-colors ${
+                                activeTab === "documentos" ? "text-slate-100 border-primary" : "text-slate-400 border-transparent hover:text-slate-200"
+                              }`}
+                            >
+                              <FileText className="h-4 w-4 mr-2" />
+                              Documentos Vinculados ({data.documentosRelacionados?.length || 0})
+                            </button>
                           </div>
-                          <div className="flex-1 p-2 bg-slate-900/50 flex justify-center items-center">
-                            <VerificationNetworkGraph graph={data.grafoRed} />
+
+                          <div className="flex-1 overflow-y-auto pr-1">
+                            {activeTab === "proyectos" ? (
+                              data.proyectosRelacionados.length > 0 ? (
+                                <ul className="space-y-3 mt-2">
+                                  {data.proyectosRelacionados.map((p) => (
+                                    <li key={p.id} className="p-4 bg-slate-900/50 rounded-xl hover:bg-slate-700 transition-colors border border-slate-700/50">
+                                      <a href={`/#/projects/${p.id}`} className="block">
+                                        <span className="block font-bold text-slate-100 text-base">{p.nombre}</span>
+                                        <span className="mt-2 flex items-center text-xs text-slate-400 font-medium tracking-wide">
+                                          <Activity className="h-3.5 w-3.5 mr-1.5 text-primary" /> {p.estado}
+                                        </span>
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <div className="flex flex-col items-center justify-center h-48 text-slate-400 opacity-60">
+                                  <AlertCircle className="w-10 h-10 mb-2" />
+                                  <p className="text-sm text-center">No hay proyectos asociados a esta entidad.</p>
+                                </div>
+                              )
+                            ) : (
+                              data.documentosRelacionados?.length > 0 ? (
+                                <ul className="space-y-3 mt-2">
+                                  {data.documentosRelacionados.map((d) => (
+                                    <li key={d.id} className="p-4 bg-slate-900/50 rounded-xl border border-slate-700/50 flex flex-col gap-1">
+                                      <span className="block font-bold text-slate-100 text-sm break-words">{d.nombre}</span>
+                                      <span className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-primary mt-1">
+                                        <FileText className="w-3 h-3" /> {d.tipo}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <div className="flex flex-col items-center justify-center h-48 text-slate-400 opacity-60">
+                                  <AlertCircle className="w-10 h-10 mb-2" />
+                                  <p className="text-sm text-center">No hay documentos asociados a esta entidad.</p>
+                                </div>
+                              )
+                            )}
                           </div>
                         </div>
                       </div>

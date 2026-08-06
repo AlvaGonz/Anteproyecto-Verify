@@ -43,30 +43,30 @@ const SEARCH_TYPES = [
   },
   {
     id: "suelo",
-    label: "Número Suelo",
+    label: "Permiso Suelo",
     icon: MapPin,
-    placeholder: "Ej: 001-02-003",
-    title: "Catastro Nacional",
-    subtitle: "Búsqueda por número de registro de suelo",
-    example: "001-02-003"
+    placeholder: "Ej: 12345",
+    title: "Catastro Nacional / Uso de Suelo",
+    subtitle: "Búsqueda por Número de Permiso de Suelo",
+    example: "12345"
   },
   {
     id: "ipi",
     label: "IPI",
     icon: FileText,
-    placeholder: "Ej: 1-01-99999-9",
+    placeholder: "Ej: 101999999999",
     title: "Consulta IPI",
     subtitle: "Búsqueda por Impuesto al Patrimonio Inmobiliario",
-    example: "1-01-999999-9"
+    example: "101999999999"
   },
   {
     id: "rnc",
     label: "RNC",
     icon: Building2,
-    placeholder: "Ej: 1-01-23456-7",
+    placeholder: "Ej: 101234567",
     title: "Registro RNC",
     subtitle: "Búsqueda por Registro Nacional de Contribuyentes",
-    example: "1-01-23456-7"
+    example: "101234567"
   },
   {
     id: "cedula",
@@ -86,18 +86,18 @@ const VALIDATION_PATTERNS = {
     name: "Sello VeriFinca"
   },
   suelo: {
-    regex: /^\d{3}-\d{2}-\d{3}$/,
-    example: "001-02-003",
-    name: "Número Suelo"
+    regex: /^\d{4,10}$/,
+    example: "12345",
+    name: "Número Permiso"
   },
   rnc: {
-    regex: /^\d-\d{2}-\d{5}-\d$/,
-    example: "1-01-23456-7",
+    regex: /^\d{9,11}$/,
+    example: "101234567",
     name: "RNC"
   },
   ipi: {
-    regex: /^\d-\d{2}-\d{5}-\d$/,
-    example: "1-01-23456-7",
+    regex: /^\d{12}$/,
+    example: "101999999999",
     name: "IPI"
   },
   cedula: {
@@ -127,15 +127,11 @@ const formatValue = (value: string, typeId: string): string => {
       return `${clean.slice(0, 3)}-${clean.slice(3, 10)}-${clean.slice(10, 11)}`;
     }
     return clean;
-  } else if (typeId === "rnc" || typeId === "ipi") {
+  } else if (typeId === "ipi") {
     const clean = value.replace(/[^0-9]/g, "");
-    if (clean.length > 1 && clean.length <= 3) {
-      return `${clean.slice(0, 1)}-${clean.slice(1)}`;
-    } else if (clean.length > 3 && clean.length <= 8) {
-      return `${clean.slice(0, 1)}-${clean.slice(1, 3)}-${clean.slice(3)}`;
-    } else if (clean.length > 8) {
-      return `${clean.slice(0, 1)}-${clean.slice(1, 3)}-${clean.slice(3, 8)}-${clean.slice(8, 9)}`;
-    }
+    return clean;
+  } else if (typeId === "rnc") {
+    const clean = value.replace(/[^0-9]/g, "");
     return clean;
   } else if (typeId === "suelo") {
     const clean = value.replace(/[^0-9]/g, "");

@@ -10,6 +10,7 @@ export interface PublicProjectSearchResultDto {
   estadoJuridico: number;
   estadoProyecto: string;
   estadoIntegridad: number;
+  integridadValidada: number;
   constructora?: string;
   registrante?: string;
   imagenUrl?: string;

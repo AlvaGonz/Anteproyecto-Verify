@@ -27,6 +27,7 @@ export interface PublicProjectSearchResultDto {
   rncDesarrollador?: string;
   cedulaRncPropietario?: string;
   completionRate: number;
+  integridadValidada: number;
 }
 
 interface UsePublishedProjectsParams {
@@ -99,9 +100,8 @@ export function filterPublishedProjects(
 
     // Price range
     if (p.valorEstimado !== undefined && p.valorEstimado !== null) {
-      if (p.valorEstimado < filters.priceRange[0] || p.valorEstimado > filters.priceRange[1]) {
-        return false;
-      }
+      if (p.valorEstimado < filters.priceRange[0]) return false;
+      if (filters.priceRange[1] < PRICE_MAX && p.valorEstimado > filters.priceRange[1]) return false;
     } else {
       // If no price, exclude unless price range starts at 0
       if (filters.priceRange[0] > 0) return false;

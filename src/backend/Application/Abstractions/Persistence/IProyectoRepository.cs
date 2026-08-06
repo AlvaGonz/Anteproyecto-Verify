@@ -39,5 +39,6 @@ public interface IProyectoRepository
     Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, int categoryId, CancellationToken cancellationToken = default);
     Task<bool> ExistsProvinciaAsync(Guid provinciaId, CancellationToken cancellationToken = default);
     Task<bool> ExistsByUniquenessCriteriaAsync(Guid? excludeProjectId, string? gps, string? catastral, string? matricula, CancellationToken cancellationToken = default);
+    Task<double> GetAverageIntegridadValidadaAsync(Guid proyectoId, CancellationToken cancellationToken = default);
 }
 

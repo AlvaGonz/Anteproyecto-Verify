@@ -462,7 +462,7 @@ def get_rncs(file_path):
                         rncs.append(rnc)
                     if len(rnc) == 11:
                         cedulas.append(rnc)
-    return list(set(rncs)), list(set(cedulas))
+    return sorted(list(set(rncs))), sorted(list(set(cedulas)))
 
 def generate_jce_records(cedulas_list):
     import datetime
@@ -483,13 +483,13 @@ def generate_jce_records(cedulas_list):
         fecha_nac = (datetime.date(1960, 1, 1) + datetime.timedelta(days=random.randint(0, 15000)))
         fecha_exp = (datetime.date(2025, 1, 1) + datetime.timedelta(days=random.randint(0, 3650)))
         
-        # Use DD-MM-YYYY string for DB
+        # Use YYYY-MM-DD string for DB
         yield {
             "cedula": ced, "nombres": nombre, "apellidos": apellido,
             "sexo": sexo, "estado_civil": estado_civil, "lugar_nacimiento": lugar_nacimiento,
-            "fnac": fecha_nac.strftime("%d-%m-%Y"),
+            "fnac": fecha_nac.strftime("%Y-%m-%d"),
             "nacionalidad": nacionalidad,
-            "fexp": fecha_exp.strftime("%d-%m-%Y")
+            "fexp": fecha_exp.strftime("%Y-%m-%d")
         }
 
 def generate_ipi_records(rncs_list):

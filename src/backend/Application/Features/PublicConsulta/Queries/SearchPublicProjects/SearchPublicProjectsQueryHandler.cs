@@ -36,9 +36,7 @@ public class SearchPublicProjectsQueryHandler
 
         if (string.IsNullOrWhiteSpace(request.Query))
         {
-            var (items, count) = await _proyectoRepository.GetPublishedPaginatedAsync(page, pageSize, cancellationToken);
-            proyectosList = items;
-            totalCount = count;
+            proyectos = await _proyectoRepository.GetPublishedAsync(1, int.MaxValue, cancellationToken);
         }
         else
         {
@@ -59,6 +57,7 @@ public class SearchPublicProjectsQueryHandler
         {
             var sello = sellosPorProyecto.GetValueOrDefault(p.Id);
             var completionRate = await _proyectoRepository.GetDocumentCompletionRateAsync(p.Id, p.CategoriaId, cancellationToken);
+            var integridadValidada = await _proyectoRepository.GetAverageIntegridadValidadaAsync(p.Id, cancellationToken);
 
             results.Add(new PublicProjectSearchResultDto
             {
@@ -79,7 +78,8 @@ public class SearchPublicProjectsQueryHandler
                 Matricula = p.Matricula,
                 RncDesarrollador = p.RncDesarrollador,
                 CedulaRncPropietario = p.CedulaRncPropietario,
-                CompletionRate = completionRate
+                CompletionRate = completionRate,
+                IntegridadValidada = (int)Math.Round(integridadValidada)
             });
         }
 

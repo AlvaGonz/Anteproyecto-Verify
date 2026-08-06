@@ -32,6 +32,7 @@ public class PublicProjectSearchResultDto
     public string? RncDesarrollador { get; set; }
     public string? CedulaRncPropietario { get; set; }
     public int CompletionRate { get; set; }
+    public int IntegridadValidada { get; set; }
 }
 
 public class PublicProjectSearchResponseDto
