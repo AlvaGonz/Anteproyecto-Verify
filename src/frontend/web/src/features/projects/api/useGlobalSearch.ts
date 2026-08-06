@@ -24,12 +24,20 @@ export interface NetworkGraphDto {
   enlaces: NetworkEdgeDto[];
 }
 
+export interface DocumentoBasicDto {
+  id: string;
+  nombre: string;
+  tipo: string;
+  estado: string;
+}
+
 export interface SearchResultDto {
   tipoConsulta: string;
   esValido: boolean;
   tituloPrincipal: string;
   detalles: Record<string, string>;
   proyectosRelacionados: ProjectoBasicDto[];
+  documentosRelacionados: DocumentoBasicDto[];
   grafoRed: NetworkGraphDto;
 }
 

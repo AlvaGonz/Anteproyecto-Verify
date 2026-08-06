@@ -56,7 +56,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
             .Where(p => p.RncDesarrollador == cleanQuery || p.CedulaRncPropietario == cleanQuery || p.RncDesarrollador == query || p.CedulaRncPropietario == query)
             .ToListAsync(ct);
 
-        BuildGraph(result, query, dgii.NombreRazonSocial, "Entidad", proyectos);
+        await BuildGraphAndDocumentsAsync(result, query, dgii.NombreRazonSocial, "Entidad", proyectos, ct);
 
         return result;
     }
@@ -87,7 +87,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
             .Where(p => p.CedulaRncPropietario == cleanQuery || p.CedulaRncPropietario == query)
             .ToListAsync(ct);
 
-        BuildGraph(result, query, "Ciudadano Registrado", "Ciudadano", proyectos);
+        await BuildGraphAndDocumentsAsync(result, query, "Ciudadano Registrado", "Ciudadano", proyectos, ct);
 
         return result;
     }
@@ -116,7 +116,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
             .Where(p => p.Nombre.Contains(licencia.NombreProyecto) || licencia.NombreProyecto.Contains(p.Nombre))
             .ToListAsync(ct);
 
-        BuildGraph(result, query, $"Permiso {licencia.NumeroPermiso}", "Permiso", proyectos);
+        await BuildGraphAndDocumentsAsync(result, query, $"Permiso {licencia.NumeroPermiso}", "Permiso", proyectos, ct);
 
         return result;
     }
@@ -145,12 +145,12 @@ public class GlobalSearchRepository : IGlobalSearchRepository
             .Where(p => p.Ipi == cleanQuery || p.Ipi == query)
             .ToListAsync(ct);
 
-        BuildGraph(result, query, $"IPI {ipi.NoCertificacion}", "Impuesto", proyectos);
+        await BuildGraphAndDocumentsAsync(result, query, $"IPI {ipi.NoCertificacion}", "Impuesto", proyectos, ct);
 
         return result;
     }
 
-    private void BuildGraph(SearchResultDto result, string rootId, string rootLabel, string rootType, List<Proyecto> proyectos)
+    private async Task BuildGraphAndDocumentsAsync(SearchResultDto result, string rootId, string rootLabel, string rootType, List<Proyecto> proyectos, CancellationToken ct)
     {
         result.ProyectosRelacionados = proyectos.Select(p => new ProjectoBasicDto
         {
@@ -162,12 +162,29 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         // Node for the entity itself
         result.GrafoRed.Nodos.Add(new NetworkNodeDto { Id = rootId, Etiqueta = rootLabel, Tipo = rootType });
 
+        var proyectoIds = new List<Guid>();
         // Nodes for projects
         foreach (var p in proyectos)
         {
             var pId = p.Id.ToString();
+            proyectoIds.Add(p.Id);
             result.GrafoRed.Nodos.Add(new NetworkNodeDto { Id = pId, Etiqueta = p.Nombre, Tipo = "Proyecto" });
             result.GrafoRed.Enlaces.Add(new NetworkEdgeDto { OrigenId = rootId, DestinoId = pId, Relacion = "Vinculado A" });
+        }
+
+        if (proyectoIds.Any())
+        {
+            var documentos = await _context.Documentos
+                .Where(d => proyectoIds.Contains(d.ProyectoId) && d.Activo)
+                .Select(d => new DocumentoBasicDto
+                {
+                    Id = d.Id,
+                    Nombre = d.NombreArchivoOriginal,
+                    Tipo = d.TipoDocumento.ToString(),
+                    Estado = d.EstadoDocumento.ToString()
+                })
+                .ToListAsync(ct);
+            result.DocumentosRelacionados = documentos;
         }
     }
 
