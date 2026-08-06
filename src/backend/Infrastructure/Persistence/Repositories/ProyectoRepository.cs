@@ -407,7 +407,7 @@ public class ProyectoRepository : IProyectoRepository
         var uploadedSet = new HashSet<DocumentType>(uploadedTypes);
 
         var essentials = new[] { DocumentType.CertificadoTitulo, DocumentType.CertificacionEstadoJuridico, DocumentType.PlanoMensuraCatastral, DocumentType.ID, DocumentType.CertificacionIPI };
-        var anexos = new[] { DocumentType.CertificadoUsoSuelo, DocumentType.RegistroMercantil, DocumentType.PoderNotarial, DocumentType.RNC, DocumentType.CertificadoEIA };
+        var anexos = new[] { DocumentType.CertificadoUsoSuelo, DocumentType.PoderNotarial };
 
         const int essentialWeight = 80;
         const int anexoWeight = 20;

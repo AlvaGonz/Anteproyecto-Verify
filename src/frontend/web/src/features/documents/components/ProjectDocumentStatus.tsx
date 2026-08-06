@@ -49,6 +49,12 @@ const ANEXO_TYPES: DocumentType[] = [
   DocumentType.CertificadoEIA,
 ];
 
+// ponytail: only these 2 anexos are shown publicly; the rest are hidden but kept in ANEXO_TYPES for completeness calculation
+const VISIBLE_ANEXO_TYPES: DocumentType[] = [
+  DocumentType.CertificadoUsoSuelo,
+  DocumentType.PoderNotarial,
+];
+
 // Tipos legacy del enum backend que se mapean a su categoría canónica,
 // para que documentos subidos con el tipo antiguo aparezcan en la vista pública.
 const LEGACY_TYPE_ALIASES: Partial<Record<DocumentType, DocumentType>> = {
@@ -77,15 +83,15 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
 
   const missingCount = ESSENTIAL_TYPES.length - new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size;
 
-  // Nivel de Confianza: 5 esenciales valen 80% (16% c/u), 5 anexos valen 20% (4% c/u).
+  // Nivel de Confianza: 5 esenciales valen 80% (16% c/u), 2 anexos visibles valen 20% (10% c/u).
   // Se cuentan TIPOS ÚNICOS cubiertos — varios documentos del mismo tipo no suman más.
   const ESSENTIAL_WEIGHT = 80;
   const ANEXO_WEIGHT = 20;
   const essentialPercent = ESSENTIAL_TYPES.length > 0
     ? Math.round((new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size / ESSENTIAL_TYPES.length) * ESSENTIAL_WEIGHT)
     : ESSENTIAL_WEIGHT;
-  const anexoPercent = ANEXO_TYPES.length > 0
-    ? Math.round((new Set(uploadedAnexos.map((d: any) => canonicalType(d.tipoDocumento))).size / ANEXO_TYPES.length) * ANEXO_WEIGHT)
+  const anexoPercent = VISIBLE_ANEXO_TYPES.length > 0
+    ? Math.round((new Set(uploadedAnexos.map((d: any) => canonicalType(d.tipoDocumento))).size / VISIBLE_ANEXO_TYPES.length) * ANEXO_WEIGHT)
     : ANEXO_WEIGHT;
   const progressPercent = essentialPercent + anexoPercent;
 
@@ -261,7 +267,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant/60">Anexos</h3>
           </div>
           <div className="grid grid-cols-1 gap-4">
-            {ANEXO_TYPES.map((typeId, idx) => renderDocItem(typeId, idx + ESSENTIAL_TYPES.length))}
+            {VISIBLE_ANEXO_TYPES.map((typeId, idx) => renderDocItem(typeId, idx + ESSENTIAL_TYPES.length))}
           </div>
         </div>
       </div>
