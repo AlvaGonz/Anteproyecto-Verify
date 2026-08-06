@@ -152,4 +152,4 @@ export function getDefaultProjectImage(categoryId?: number): string {
 }
 
 export const PRICE_STEPS = 100_000;
-export const PRICE_MAX = 15_000_000;
+export const PRICE_MAX = 100_000_000;

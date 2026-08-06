@@ -206,7 +206,7 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-bold text-slate-600">
                 <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
-                <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "15M+" : filters.priceRange[1].toLocaleString()}</span>
+                <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "100M+" : filters.priceRange[1].toLocaleString()}</span>
               </div>
               <div className="relative h-6">
                 <input
@@ -231,8 +231,8 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
               </div>
               <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
                 <span>0</span>
-                <span>7.5M</span>
-                <span>15M+</span>
+                <span>50M</span>
+                <span>100M+</span>
               </div>
             </div>
           </div>
