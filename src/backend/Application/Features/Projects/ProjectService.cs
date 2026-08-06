@@ -82,7 +82,9 @@ public class ProjectService : IProjectService
     public async Task<ProyectoDto?> GetProjectByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var proyecto = await _proyectoRepository.GetByIdAsync(id, cancellationToken);
-        return proyecto != null ? MapToDto(proyecto) : null;
+        if (proyecto == null) return null;
+        var integridadValidada = await _proyectoRepository.GetAverageIntegridadValidadaAsync(id, cancellationToken);
+        return MapToDto(proyecto, (int)Math.Round(integridadValidada));
     }
 
     public async Task<ProyectoDto> CreateProjectAsync(CreateProyectoDto dto, CancellationToken cancellationToken = default)
@@ -478,7 +480,7 @@ public class ProjectService : IProjectService
             presentation.RazonSocialMostrada);
     }
 
-    private static ProyectoDto MapToDto(Proyecto proyecto)
+    private static ProyectoDto MapToDto(Proyecto proyecto, int integridadValidada = 0)
     {
         ProjectRegistrantDto? registradoPor = null;
         if (proyecto.UsuarioCreador != null)
@@ -532,7 +534,8 @@ public class ProjectService : IProjectService
             registradoPor,
             proyecto.UsuarioCreador?.Plan?.NombrePlan,
             proyecto.ProvinciaId,
-            proyecto.Provincia?.NombreProvincia
+            proyecto.Provincia?.NombreProvincia,
+            integridadValidada
         );
     }
 

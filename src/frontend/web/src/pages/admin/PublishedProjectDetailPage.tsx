@@ -161,12 +161,8 @@ export const PublishedProjectDetailPage: React.FC = () => {
   }
 
   const getIntegrityLabel = () => {
-    if (!project) return "—";
-    switch (project.estadoIntegridad) {
-      case IntegrityStatus.Verified: return "Verificado";
-      case IntegrityStatus.Failed: return "Falló";
-      default: return "Pendiente";
-    }
+    if (!project || project.integridadValidada === 0) return "Proyecto de prueba sin % de integridad";
+    return `${project.integridadValidada}%`;
   };
 
   if (isLoading || hasQuota === null) {
@@ -328,7 +324,6 @@ export const PublishedProjectDetailPage: React.FC = () => {
           <div className="pb-6 border-b border-slate-100">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-slate-700">Estado: <span className="font-bold">{(project as any).estado === 1 ? "Activo" : "Inactivo"}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Clasificación: <span className="font-bold">{categoriaNombre}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Integridad: <span className="font-bold">{getIntegrityLabel()}</span></p>
                 <p className="text-sm font-semibold text-slate-700">Ubicación: <span className="font-bold">{project.ubicacionTexto || "N/D"}</span></p>

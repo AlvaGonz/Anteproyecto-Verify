@@ -57,6 +57,7 @@ export interface ProyectoDto {
   fotoUrls?: string[];
   planNombre?: string | null;
   registradoPor?: ProjectRegistrant | null;
+  integridadValidada: number;
 }
 
 export interface CreateProyectoDto {

@@ -470,4 +470,20 @@ public class ProyectoRepository : IProyectoRepository
 
         return false;
     }
+
+    public async Task<double> GetAverageIntegridadValidadaAsync(Guid proyectoId, CancellationToken cancellationToken = default)
+    {
+        var validaciones = await _context.DatosValidados
+            .AsNoTracking()
+            .Where(dv => dv.ProyectoId == proyectoId)
+            .Select(dv => dv.PorcentajeTotal)
+            .ToListAsync(cancellationToken);
+
+        if (validaciones == null || !validaciones.Any())
+        {
+            return 0;
+        }
+
+        return validaciones.Average();
+    }
 }

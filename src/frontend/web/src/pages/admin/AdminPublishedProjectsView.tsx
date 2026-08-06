@@ -35,7 +35,7 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(20);
+  const [itemsPerPage] = useState(8);
   const pageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: publishedProjects = [], isLoading } = usePublishedProjects();
@@ -56,9 +56,8 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
       }
 
       if (p.valorEstimado !== undefined && p.valorEstimado !== null) {
-        if (p.valorEstimado < filters.priceRange[0] || p.valorEstimado > filters.priceRange[1]) {
-          return false;
-        }
+        if (p.valorEstimado < filters.priceRange[0]) return false;
+        if (filters.priceRange[1] < PRICE_MAX && p.valorEstimado > filters.priceRange[1]) return false;
       } else {
         if (filters.priceRange[0] > 0) return false;
       }
@@ -362,13 +361,13 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
                         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
                           <span>Integridad Validada</span>
                           <span className="text-primary">
-                            {project.estadoIntegridad === 1 ? "100%" : project.estadoIntegridad === 0 ? "—" : "0%"}
+                            {project.integridadValidada > 0 ? `${project.integridadValidada}%` : "—"}
                           </span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                           <m.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${project.estadoIntegridad === 1 ? 100 : 0}%` }}
+                            animate={{ width: `${project.integridadValidada}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
                             className="h-full bg-primary"
                           />
@@ -424,25 +423,24 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
           {totalPages > 1 && (
             <div className="px-6 py-4 bg-white border border-slate-100 rounded-3xl shadow-sm flex items-center justify-between mt-8">
               <span className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-                Mostrando <span className="font-bold text-primary">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
-                <span className="font-bold text-primary">{Math.min(currentPage * itemsPerPage, filteredProjects.length)}</span> de{' '}
-                <span className="font-bold text-primary">{filteredProjects.length}</span>
+                Página <span className="font-bold text-primary">{currentPage}</span> de{' '}
+                <span className="font-bold text-primary">{totalPages}</span>
               </span>
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setCurrentPage(1)}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronsLeft size={16} />
-                </button>
-                <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
                 >
-                  <ChevronLeft size={16} />
+                  &lt;
+                </button>
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold tracking-tighter"
+                >
+                  &lt;&lt;
                 </button>
 
                 <div className="flex items-center gap-1.5 mx-2">
@@ -471,18 +469,18 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
                 </div>
 
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight size={16} />
-                </button>
-                <button
                   onClick={() => setCurrentPage(totalPages)}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold tracking-tighter"
                 >
-                  <ChevronsRight size={16} />
+                  &gt;&gt;
+                </button>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-100 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
+                >
+                  &gt;
                 </button>
               </div>
             </div>
