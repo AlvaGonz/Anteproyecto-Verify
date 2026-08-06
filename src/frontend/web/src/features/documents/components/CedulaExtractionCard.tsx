@@ -30,8 +30,8 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
   
-  const getStatus = (fieldVal: string | undefined | null) => 
-    getValidationStatus(fieldVal, verificationResponse?.matchedData);
+  const getStatus = (fieldVal: string | undefined | null, fieldKey: string) => 
+    getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
@@ -39,11 +39,11 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
       proyectoId,
       documentoId,
       payload: {
-        cedula: extraction.cedulaNumber?.normalizedValue || extraction.cedulaNumber?.rawValue,
-        nombres: extraction.firstNames?.normalizedValue || extraction.firstNames?.rawValue,
-        apellidos: extraction.lastNames?.normalizedValue || extraction.lastNames?.rawValue,
-        fechaNacimiento: extraction.birthDate?.normalizedValue || extraction.birthDate?.rawValue,
-        fechaExpiracion: extraction.expiryDate?.normalizedValue || extraction.expiryDate?.rawValue
+        cedula: extraction.cedulaNumber?.normalizedValue || extraction.cedulaNumber?.rawValue || "",
+        nombres: extraction.firstNames?.normalizedValue || extraction.firstNames?.rawValue || "",
+        apellidos: extraction.lastNames?.normalizedValue || extraction.lastNames?.rawValue || "",
+        fechaNacimiento: extraction.birthDate?.normalizedValue || extraction.birthDate?.rawValue || "",
+        fechaExpiracion: extraction.expiryDate?.normalizedValue || extraction.expiryDate?.rawValue || ""
       }
     });
   };
@@ -75,7 +75,7 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
     const isEditing = editingField === fieldKey;
     const displayValue = field.normalizedValue || field.rawValue || '';
     
-    const validation = getStatus(displayValue);
+    const validation = getStatus(displayValue, fieldKey);
 
     return (
       <ExtractionFieldCard

@@ -29,8 +29,8 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
-  const getStatus = (fieldVal: string | undefined | null) => 
-    getValidationStatus(fieldVal, verificationResponse?.matchedData);
+  const getStatus = (fieldVal: string | undefined | null, fieldKey: string) => 
+    getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
@@ -38,10 +38,10 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
       proyectoId,
       documentoId,
       payload: {
-        rnc: '', // Depending on where it's stored, maybe empty for IPI
-        noCertificacion: extraction.numeroCertificacion?.normalizedValue || extraction.numeroCertificacion?.rawValue,
-        noInmueble: extraction.numeroInmueble?.normalizedValue || extraction.numeroInmueble?.rawValue,
-        parcelaNo: extraction.parcelaNumero?.normalizedValue || extraction.parcelaNumero?.rawValue
+        rnc: "", // Depending on where it's stored, maybe empty for IPI
+        noCertificacion: extraction.numeroCertificacion?.normalizedValue || extraction.numeroCertificacion?.rawValue || "",
+        noInmueble: extraction.numeroInmueble?.normalizedValue || extraction.numeroInmueble?.rawValue || "",
+        parcelaNo: extraction.parcelaNumero?.normalizedValue || extraction.parcelaNumero?.rawValue || ""
       }
     });
   };
@@ -73,7 +73,7 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
     
-    const validation = getStatus(displayValue);
+    const validation = getStatus(displayValue, fieldKey);
 
     return (
       <ExtractionFieldCard

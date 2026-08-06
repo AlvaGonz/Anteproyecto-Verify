@@ -33,6 +33,6 @@ public class DatoValidadoConfiguration : IEntityTypeConfiguration<DatoValidado>
         builder.HasOne(d => d.Documento)
             .WithMany()
             .HasForeignKey(d => d.DocumentoId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

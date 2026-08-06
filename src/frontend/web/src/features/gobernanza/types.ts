@@ -3,6 +3,7 @@ export interface GobernanzaVerificationResponse {
   matchPercentage: number;
   message: string;
   matchedData: any;
+  failedFields?: string[];
 }
 
 export type DocumentTypeGobernanza = 

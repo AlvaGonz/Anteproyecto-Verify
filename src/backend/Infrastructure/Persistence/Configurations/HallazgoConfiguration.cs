@@ -23,5 +23,12 @@ public class HallazgoConfiguration : IEntityTypeConfiguration<Hallazgo>
             .WithMany(v => v.Hallazgos)
             .HasForeignKey(h => h.ValidacionId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(h => h.Campo).HasMaxLength(100);
+
+        builder.HasOne(h => h.DatoValidado)
+            .WithMany()
+            .HasForeignKey(h => h.DatoValidadoId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

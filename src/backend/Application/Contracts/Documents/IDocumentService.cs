@@ -19,4 +19,5 @@ public interface IDocumentService
     Task<IEnumerable<RequiredDocumentDto>> GetRequiredDocumentsAsync(Guid projectId, CancellationToken cancellationToken = default);
     Task<ProjectDiagnosticDto> GetProjectDiagnosticAsync(Guid projectId, CancellationToken cancellationToken = default);
     Task<DocumentDto> UpdateDocumentFieldReviewAsync(Guid documentId, string fieldName, UpdateDocumentFieldReviewDto dto, CancellationToken cancellationToken = default);
+    Task DeleteDocumentAsync(Guid documentId, CancellationToken cancellationToken = default);
 }

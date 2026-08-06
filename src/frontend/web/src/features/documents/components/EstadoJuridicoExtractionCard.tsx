@@ -158,8 +158,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
 
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
-  const getStatus = (fieldVal: string | undefined | null) =>
-    getValidationStatus(fieldVal, verificationResponse?.matchedData);
+  const getStatus = (fieldVal: string | undefined | null, fieldKey: string) =>
+    getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
   const handleVerifyGobernanza = () => {
     verifyDocument({
@@ -167,12 +167,12 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       proyectoId,
       documentoId,
       payload: {
-        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue,
-        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue,
-        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue,
-        fechaInscripcion: '', // Emision is what's on Estado Juridico
-        fechaEmision: extraction.fechaHoraInscripcion?.normalizedValue || extraction.fechaHoraInscripcion?.rawValue,
-        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue,
+        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue || "",
+        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue || "",
+        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue || "",
+        fechaInscripcion: "", // Emision is what's on Estado Juridico
+        fechaEmision: extraction.fechaHoraInscripcion?.normalizedValue || extraction.fechaHoraInscripcion?.rawValue || "",
+        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue || ""
       }
     });
   };
@@ -213,6 +213,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
     const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
     const isEditing = editingField === fieldKey;
     const displayValue = safeField.normalizedValue || safeField.rawValue || '';
+    
+    const validation = getStatus(displayValue, fieldKey);
 
     // Get resolution for this field
     const resolution = fieldKey === 'provincia' ? extraction.provinceResolution :
@@ -228,8 +230,6 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
       const onChange = isProvincia ? handleProvinceChange : handleMunicipalityChange;
       const disabled = isSaving || loading || (!isProvincia && !selectedProvinceId);
       const defaultOptionText = isProvincia ? "-- Seleccionar Provincia --" : "-- Seleccionar Municipio --";
-
-      const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
 
       return (
         <ExtractionFieldCard
@@ -262,8 +262,6 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
         </ExtractionFieldCard>
       );
     }
-
-    const validation = getStatus(safeField.normalizedValue || safeField.rawValue);
 
     return (
       <ExtractionFieldCard

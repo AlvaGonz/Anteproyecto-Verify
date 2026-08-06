@@ -604,4 +604,33 @@ try
             // Log and continue with original OCR result
         }
     }
+    public async Task DeleteDocumentAsync(Guid documentId, CancellationToken cancellationToken = default)
+    {
+        var document = await _documentoRepository.GetByIdAsync(documentId, cancellationToken);
+        if (document == null)
+            throw new KeyNotFoundException($"Documento con ID {documentId} no encontrado.");
+
+        try
+        {
+            await _blobStorageService.DeleteFileAsync(document.RutaArchivo);
+        }
+        catch (RequestFailedException ex) when (ex.ErrorCode == "BlobNotFound")
+        {
+            // If the blob is already gone, that's fine
+        }
+
+        // Entity Framework Core will automatically delete the Hallazgos associated with this document
+        // if the relationship is configured with Cascade Delete.
+        _documentoRepository.Delete(document);
+
+        // Actualizar estado del proyecto si es necesario
+        var project = await _proyectoRepository.GetByIdAsync(document.ProyectoId, cancellationToken);
+        if (project != null)
+        {
+            // Aquí podríamos llamar a GobernanzaDeDatosService para reevaluar el estado del proyecto
+            // o simplemente guardarlo.
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
 }

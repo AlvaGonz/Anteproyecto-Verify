@@ -45,13 +45,13 @@ PROVINCIAS_COORDENADAS = {
 }
 PROVINCIA_NAMES = list(PROVINCIAS_COORDENADAS.keys())
 
-PREFIXES = ["Torre", "Residencial", "Edificio", "Villa", "Plaza"]
-NAMES = ["Bella Vista", "Piantini", "Naco", "Bavaro", "Punta Cana"]
-SUFFIXES = ["Residencial", "Empresarial", "Turistico", "Premium"]
+PREFIXES = ["Torre", "Residencial", "Edificio", "Villa", "Plaza", "Condominio", "Complejo", "Altos de", "Jardines de", "Vista"]
+NAMES = ["Bella Vista", "Piantini", "Naco", "Bavaro", "Punta Cana", "Serralles", "Cacicazgos", "La Esperilla", "Evaristo Morales", "Los Rios", "Paraiso", "Arroyo Hondo", "Mirador Sur"]
+SUFFIXES = ["Residencial", "Empresarial", "Turistico", "Premium", "Golf & Country Club", "Beach Resort", "Suites", "Tower", "Boutique", "Palace"]
 
 def generate_project_name(idx: int) -> str:
     r = random.Random(SEED + idx)
-    return f"{r.choice(PREFIXES)} {r.choice(NAMES)} {r.choice(SUFFIXES)}"
+    return f"{r.choice(PREFIXES)} {r.choice(NAMES)} {r.choice(SUFFIXES)} {idx}"
 
 def make_codigo_interno(label: str, idx: int, r: random.Random) -> str:
     return f"{label.upper()[:3]}-{r.randint(1000, 99999)}"
@@ -152,7 +152,9 @@ for email, label, max_count, is_freemium in PLAN_CONFIG:
         lines.append("    ) VALUES (")
         lines.append(f"        '{rid}', '{codigo}', '{project_name}', '{ubicacion}', '{ubicacion_gps}', {r.randint(1,16)}, {r.choice([50,100,200])},")
         lines.append(f"        {r.randint(2000000, 50000000)}, {r.randint(0,3)}, {r.randint(0,2)},")
-        lines.append(f"        0, @uId, GETUTCDATE(), GETUTCDATE(),")
+        # 4 months ago is roughly 120 days
+        date_offset = r.randint(120, 150) if status in [3, 4] else r.randint(1, 30)
+        lines.append(f"        0, @uId, DATEADD(day, -{date_offset}, GETUTCDATE()), DATEADD(day, -{date_offset}, GETUTCDATE()),")
         lines.append(f"        '{desarrollador}', @estId,")
         lines.append(f"        '{real_rnc}', '{dc}', '{matricula}'")
         lines.append("    );")
