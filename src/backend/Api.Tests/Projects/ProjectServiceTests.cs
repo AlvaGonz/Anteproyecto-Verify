@@ -37,7 +37,8 @@ public class ProjectServiceTests
             Substitute.For<INotificationFactory>(),
             Substitute.For<INotificacionRepository>(),
             _uowMock,
-            Substitute.For<global::Application.Abstractions.IAuditLogger>()
+            Substitute.For<global::Application.Abstractions.IAuditLogger>(),
+            Substitute.For<IReglaValidacionRepository>()
         );
     }
 
