@@ -21,6 +21,14 @@ public static class ApplicationBuilderExtensions
 
         app.UseCors("ViteDev");
 
+        // RNF-3: fuera de Development el API jamás sirve contenido en claro
+        // (el entorno dev/docker corre HTTP puro, donde no aplica redirigir).
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHsts();
+            app.UseHttpsRedirection();
+        }
+
         var wwwrootPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "uploads");
         if (!System.IO.Directory.Exists(wwwrootPath))
         {

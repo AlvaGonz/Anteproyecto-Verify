@@ -24,7 +24,21 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-        services.AddScoped<IBlobStorageService, AzureBlobStorageService>();
+        // RNF-3: blob storage cifrado en reposo (AES-256) — el decorador cifra
+        // todo stream antes de persistir y descifra de forma transparente al leer.
+        services.AddScoped<AzureBlobStorageService>();
+        services.AddScoped<IBlobStorageService>(sp =>
+        {
+            var keyConfig = configuration["Storage:AesEncryptionKey"]
+                ?? Environment.GetEnvironmentVariable("STORAGE_AES_KEY")
+                ?? throw new InvalidOperationException("Storage:AesEncryptionKey is not configured. RNF-3 requires AES-256 at rest.");
+            var key = Convert.FromBase64String(keyConfig);
+            if (key.Length != 32)
+            {
+                throw new InvalidOperationException("Storage:AesEncryptionKey must decode to 32 bytes (AES-256).");
+            }
+            return new AesEncryptingBlobStorageDecorator(sp.GetRequiredService<AzureBlobStorageService>(), key);
+        });
         services.AddHttpClient<Application.Abstractions.Ocr.IOcrProvider, Ocr.PaddleOcrProvider>();
 
         services.AddScoped<Application.Abstractions.Persistence.IProyectoRepository, Persistence.Repositories.ProyectoRepository>();

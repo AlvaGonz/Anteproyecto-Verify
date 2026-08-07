@@ -17,6 +17,12 @@ public class HttpsRedirectionTests
 {
     private sealed class ProductionFactory : WebApplicationFactory<Program>
     {
+        static ProductionFactory()
+        {
+            Environment.SetEnvironmentVariable("JWT_KEY", "test-jwt-key-0123456789abcdef0123456789abcdef");
+            Environment.SetEnvironmentVariable("STORAGE_AES_KEY", Convert.ToBase64String(Enumerable.Repeat((byte)7, 32).ToArray()));
+        }
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Production");
@@ -25,8 +31,6 @@ public class HttpsRedirectionTests
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     { "Stripe:SecretKey", "sk_test_mock" },
-                    { "Jwt:Key", "test-jwt-key-0123456789abcdef0123456789abcdef" },
-                    { "Storage:AesEncryptionKey", "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=" },
                     { "ConnectionStrings:DefaultConnection", "Server=localhost;Database=test;Integrated Security=True;TrustServerCertificate=True" },
                 });
             });
