@@ -10,7 +10,7 @@ const CATALOG = [
   { estadoId: "s5", codigoUnico: "OBSERVACION", nombre: "Con Observación", colorHex: "#EF4444", activo: true },
 ];
 
-vi.mock("../hooks/useProjectStatusBar", () => ({
+vi.mock("../../hooks/useProjectStatusBar", () => ({
   useProjectStatusBar: () => ({
     eligibility: {
       documentCount: 1,
@@ -24,7 +24,7 @@ vi.mock("../hooks/useProjectStatusBar", () => ({
   }),
 }));
 
-vi.mock("../api/useEstadosCatalogo", () => ({
+vi.mock("../../api/useEstadosCatalogo", () => ({
   useEstadosCatalogo: () => ({ data: CATALOG, isLoading: false }),
 }));
 

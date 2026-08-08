@@ -12,3 +12,4 @@ export const getStatusLabel = (status: ProjectStatus, t: any): string => {
     default: return t("status.unknown");
   }
 };
+
