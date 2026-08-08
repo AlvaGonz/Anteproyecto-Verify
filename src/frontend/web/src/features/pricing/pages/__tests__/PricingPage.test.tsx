@@ -18,13 +18,6 @@ vi.mock("framer-motion", async () => {
   };
 });
 
-// Mock react-i18next translation
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
 // Mock react-router-dom useNavigate
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
@@ -54,7 +47,7 @@ describe("PricingPage", () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText("pricing.header.tag")).toBeInTheDocument();
+    expect(screen.getByText("PLANES Y PRECIOS")).toBeInTheDocument();
   });
 
   it("navigates to /register when clicking Free plan and unauthenticated", () => {
@@ -65,7 +58,7 @@ describe("PricingPage", () => {
       </BrowserRouter>
     );
 
-    const freeButton = screen.getByText("pricing.cards.free.button");
+    const freeButton = screen.getByText("Comenzar gratis");
     fireEvent.click(freeButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/register");
@@ -79,7 +72,7 @@ describe("PricingPage", () => {
       </BrowserRouter>
     );
 
-    const freeButton = screen.getByText("pricing.cards.free.button");
+    const freeButton = screen.getByText("Comenzar gratis");
     fireEvent.click(freeButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/admin/dashboard");
@@ -93,7 +86,7 @@ describe("PricingPage", () => {
       </BrowserRouter>
     );
 
-    const proButton = screen.getByText("pricing.cards.pro.button");
+    const proButton = screen.getByText("Elegir Profesional");
     fireEvent.click(proButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/register?redirect=%2Fcheckout%3Fplan%3Dprofesional%26billing%3Dmonthly");
@@ -107,7 +100,7 @@ describe("PricingPage", () => {
       </BrowserRouter>
     );
 
-    const proButton = screen.getByText("pricing.cards.pro.button");
+    const proButton = screen.getByText("Elegir Profesional");
     fireEvent.click(proButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/checkout?plan=profesional&billing=monthly");
@@ -134,7 +127,7 @@ describe("PricingPage", () => {
       </BrowserRouter>
     );
 
-    const yearlyButton = screen.getByText("pricing.header.yearly");
+    const yearlyButton = screen.getByText("Anual");
     fireEvent.click(yearlyButton);
 
     expect(screen.getByText("$48 USD")).toBeInTheDocument();

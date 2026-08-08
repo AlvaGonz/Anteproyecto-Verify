@@ -1,15 +1,15 @@
 import React from "react";
 import { useRouteError, isRouteErrorResponse, useNavigate } from "react-router-dom";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
-import { useTranslation } from "react-i18next";
+
 
 export const AdminErrorFallback: React.FC<{ error?: unknown }> = ({ error: propError }) => {
   const routeError = useRouteError();
   const error = propError || routeError;
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
-  let errorMessage = t("errors.unexpected", "Ha ocurrido un error inesperado.");
+
+  let errorMessage = "Ha ocurrido un error inesperado.";
   
   if (isRouteErrorResponse(error)) {
     errorMessage = error.statusText || error.data?.message || errorMessage;

@@ -44,6 +44,7 @@ vi.mock("../../api/useCategories", () => ({
 }));
 
 import { useProjectForm } from "../useProjectForm";
+import { ToastProvider } from "../../../../shared/components/ui/Toast/ToastContext";
 
 function Probe() {
   const { basicFields } = useProjectForm({
@@ -56,7 +57,11 @@ function Probe() {
 
 describe("useProjectForm category default", () => {
   it("defaults categoriaId to the first API-sourced category, not a hardcoded magic number", () => {
-    render(<Probe />);
+    render(
+      <ToastProvider>
+        <Probe />
+      </ToastProvider>
+    );
     expect(screen.getByTestId("default-categoria-id").textContent).toBe("1");
   });
 });

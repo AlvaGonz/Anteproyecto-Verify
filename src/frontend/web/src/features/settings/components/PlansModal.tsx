@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { m, AnimatePresence } from "framer-motion";
-import { useTranslation } from "react-i18next";
 import { BillingToggle } from "../../pricing/components/BillingToggle";
 import { PricingCards } from "../../pricing/components/PricingCards";
 import { useAuth } from "../../../shared/context/AuthContext";
@@ -16,8 +15,7 @@ interface PlansModalProps {
 }
 
 export const PlansModal: React.FC<PlansModalProps> = ({ isOpen, onClose, source, currentPlan }) => {
-  const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isAnnual, setIsAnnual] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -73,7 +71,7 @@ export const PlansModal: React.FC<PlansModalProps> = ({ isOpen, onClose, source,
               
               <div className="mb-6 md:mb-10 w-full flex justify-center mt-2 md:mt-4">
                 <BillingToggle
-                  t={t}
+                  
                   isRevealed={isRevealed}
                   isAnnual={isAnnual}
                   setIsAnnual={setIsAnnual}
@@ -82,7 +80,7 @@ export const PlansModal: React.FC<PlansModalProps> = ({ isOpen, onClose, source,
               
               <div className="w-full">
                 <PricingCards
-                  t={t}
+                  
                   isRevealed={isRevealed}
                   prices={prices}
                   handleFreePlan={handleFreePlan}

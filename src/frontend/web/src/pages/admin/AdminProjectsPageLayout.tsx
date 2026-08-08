@@ -5,7 +5,6 @@ import { AdminProjectToolbar } from "./AdminProjectToolbar";
 import { AdminProjectList } from "./AdminProjectList";
 
 interface AdminProjectsPageLayoutProps {
-  t: any;
   isAdmin: boolean;
   searchTerm: string;
   setSearchTerm: (v: string) => void;
@@ -28,9 +27,7 @@ interface AdminProjectsPageLayoutProps {
   onPageChange: (page: number) => void;
 }
 
-export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = React.memo(({
-  t,
-  isAdmin,
+export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = React.memo(({  isAdmin,
   searchTerm,
   setSearchTerm,
   activeFilter,
@@ -67,7 +64,7 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = R
       />
 
       <AdminProjectList
-        t={t}
+        
         isAdmin={isAdmin}
         isLoading={isLoading}
         filtered={filtered}

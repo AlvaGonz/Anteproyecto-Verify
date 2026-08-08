@@ -5,10 +5,7 @@ import {
   Search,
   DollarSign,
   Building2,
-  ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   AlertCircle,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";

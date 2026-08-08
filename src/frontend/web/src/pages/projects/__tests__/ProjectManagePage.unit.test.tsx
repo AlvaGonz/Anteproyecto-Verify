@@ -9,9 +9,6 @@ import { ProjectStatus, IntegrityStatus, ProyectoDto } from "../../../features/p
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: (key: string, defaultValue: string) => defaultValue || key }),
-}));
 
 vi.mock("../../../shared/context/AuthContext", () => ({
   useAuth: () => ({ user: { plan: "premium" } }),

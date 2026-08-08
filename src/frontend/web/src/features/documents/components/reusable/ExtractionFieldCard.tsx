@@ -67,9 +67,7 @@ export const ExtractionFieldCard: React.FC<ExtractionFieldCardProps> = ({
   onEditAllowed = true,
   children,
   isCustomContent = false,
-  validationStatus,
-  validationMessage,
-  placeholder
+  validationStatus,  placeholder
 }) => {
   const safeField = field || { rawValue: '', normalizedValue: '', confidence: 0, status: FieldStatus.Missing, sourcePage: 1 };
   const rawValue = safeField.normalizedValue || safeField.rawValue || '';

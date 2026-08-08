@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { PricingPageLayout } from "./PricingPageLayout";
 
 export const PricingPage: React.FC = () => {
-  const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
 
@@ -43,7 +41,7 @@ export const PricingPage: React.FC = () => {
 
   return (
     <PricingPageLayout
-      t={t}
+      
       isRevealed={isRevealed}
       isAnnual={isAnnual}
       setIsAnnual={setIsAnnual}

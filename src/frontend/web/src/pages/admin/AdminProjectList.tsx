@@ -7,8 +7,8 @@ import { AdminProjectContextMenu } from "./AdminProjectContextMenu";
 import { FolderKanban, ArrowRight, Timer, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Banknote } from "lucide-react";
 import { toUtcDate } from "../../shared/utils/dates";
 
-const getStatusBadge = (status: ProjectStatus, t: any) => {
-  const label = getStatusLabel(status, t);
+const getStatusBadge = (status: ProjectStatus) => {
+  const label = getStatusLabel(status);
   switch (status) {
     case ProjectStatus.Draft: return { label, cls: "bg-gray-100 text-gray-600 border-gray-200" };
     case ProjectStatus.Edited: return { label, cls: "bg-indigo-50 text-indigo-600 border-indigo-100" };
@@ -24,7 +24,6 @@ const getStatusBadge = (status: ProjectStatus, t: any) => {
 
 
 interface AdminProjectListProps {
-  t: any;
   isAdmin: boolean;
   isLoading: boolean;
   filtered: any[];
@@ -38,9 +37,7 @@ interface AdminProjectListProps {
   onPageChange: (page: number) => void;
 }
 
-export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
-  t,
-  isAdmin,
+export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({  isAdmin,
   isLoading,
   filtered,
   totalCount,
@@ -103,7 +100,7 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4">
         {filtered.map((project, idx) => {
-          const badge = getStatusBadge(project.estadoProyecto, t);
+          const badge = getStatusBadge(project.estadoProyecto);
           return (
             <div
               key={`${project.id}-${idx}`}

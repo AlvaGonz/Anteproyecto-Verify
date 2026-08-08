@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
-import { useRoutePrefetch } from "../../hooks/useRoutePrefetch";
 
 const NAV_LINKS = [
   { label: "Proyectos", href: "/projects" },
@@ -15,7 +14,6 @@ export const LandingNav: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
-  const { prefetchRoute } = useRoutePrefetch();
 
   const [prevPath, setPrevPath] = useState(location.pathname);
 
@@ -73,8 +71,6 @@ export const LandingNav: React.FC = () => {
                   key={item.label}
                   to={item.href}
                   className={linkClassName}
-                  onMouseEnter={() => prefetchRoute(item.href)}
-                  onFocus={() => prefetchRoute(item.href)}
                 >
                   {item.label}
                 </Link>

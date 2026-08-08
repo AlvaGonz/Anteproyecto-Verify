@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { ProjectStatus } from "../../features/projects/types";
 import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
 import { useDashboardStats } from "../../features/dashboard/api/useDashboardStats";
@@ -28,8 +27,7 @@ const PLAN_LIMITS: Record<string, number> = {
 type TabType = "proyectos" | "publicados" | "intereses" | "guardados";
 
 export const AdminProjectsPage: React.FC = () => {
-  const { t } = useTranslation();
-  const { user } = useAuth();
+    const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
@@ -216,7 +214,7 @@ export const AdminProjectsPage: React.FC = () => {
 
       {activeTab === "proyectos" ? (
         <AdminProjectsPageLayout
-          t={t}
+          
           isAdmin={user?.role === "admin" || user?.role === "owner"}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigation, Globe, Search, X } from "lucide-react";
+import { Navigation, Globe, Search} from "lucide-react";
 import { ProyectoDto } from "../types";
 import { ProjectFormBasicFields } from "./ProjectFormBasicFields";
 import { ProjectFormDetailsFields } from "./ProjectFormDetailsFields";
