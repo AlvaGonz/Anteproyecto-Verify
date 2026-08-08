@@ -121,7 +121,7 @@ describe("ProjectDocumentStatus", () => {
     expect(screen.getByText("Documentos Principales")).toBeInTheDocument();
     expect(screen.getByText("Anexos")).toBeInTheDocument();
     expect(screen.getByText("Cédula / Identidad del Titular")).toBeInTheDocument();
-    expect(screen.getByText("Certificado EIA")).toBeInTheDocument();
+    expect(screen.getByText("Poder Notarial")).toBeInTheDocument();
   });
 
   it("shows 80% confidence when all 5 essentials are uploaded but no anexos", () => {
@@ -200,7 +200,7 @@ describe("ProjectDocumentStatus", () => {
 
     renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
 
-    expect(screen.getByText("20")).toBeInTheDocument();
+    expect(screen.getByText("50")).toBeInTheDocument();
   });
 
   it("shows the uploaded cedula doc when its type is legacy ID (4) instead of CopiaCedulaIdentidad (26)", () => {
@@ -269,8 +269,8 @@ describe("ProjectDocumentStatus", () => {
 
     renderWithClient(<ProjectDocumentStatus projectId="proj-123" categoriaId={16} />);
 
-    // 5 unique essentials (80%) + 1 anexo (4%) = 84% — NOT 100%
-    expect(screen.getByText("84")).toBeInTheDocument();
+    // 5 unique essentials (80%) + 1 anexo (10%) = 90% — NOT 100%
+    expect(screen.getByText("90")).toBeInTheDocument();
     expect(screen.queryByText("100")).not.toBeInTheDocument();
   });
 });

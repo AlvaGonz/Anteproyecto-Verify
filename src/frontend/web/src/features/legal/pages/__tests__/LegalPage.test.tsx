@@ -13,17 +13,12 @@ vi.mock("framer-motion", async () => {
       section: ({ children, ...props }: any) => <section {...props}>{children}</section>,
       h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
       p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
+      button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
     },
     AnimatePresence: ({ children }: any) => <>{children}</>,
+    MotionConfig: ({ children }: any) => <>{children}</>,
   };
 });
-
-// Mock react-i18next translation
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
 
 // Mock AuthContext
 vi.mock("../../../../shared/context/AuthContext", () => ({
@@ -51,14 +46,14 @@ beforeAll(() => {
 });
 
 describe("LegalPage", () => {
-  it("renders the LegalPage and utilizes internationalized translation keys", () => {
+  it("renders the LegalPage and its sections", () => {
     render(
       <BrowserRouter>
         <LegalPage />
       </BrowserRouter>
     );
 
-    expect(screen.getAllByText(/legal\.billing\.title/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Servicio/i).length).toBeGreaterThan(0);
   });
 
   it("renders the print/download PDF button when dropdown is opened", () => {

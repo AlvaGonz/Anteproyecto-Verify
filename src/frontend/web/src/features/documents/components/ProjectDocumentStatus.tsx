@@ -85,7 +85,8 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
   const anexoPercent = VISIBLE_ANEXO_TYPES.length > 0
     ? Math.round((new Set(uploadedAnexos.map((d: any) => canonicalType(d.tipoDocumento))).size / VISIBLE_ANEXO_TYPES.length) * ANEXO_WEIGHT)
     : ANEXO_WEIGHT;
-  const progressPercent = essentialPercent + anexoPercent;
+  const progressPercent = Math.min(100, essentialPercent + anexoPercent);
+
 
   const renderDocItem = (typeId: DocumentType, index: number) => {
     const info = DOCUMENT_INFO[typeId];
