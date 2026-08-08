@@ -33,3 +33,8 @@
 
 ### Nota de entorno
 - Stack corre en Docker (`docker compose`): api:5000 (health en `/health`, no `/api/health`), web:3000, sqlserver:1433. Los cambios frontend se hot-reloadan vÃ­a volumen + VITE_WATCH_POLLING.
+
+## 2026-08-07 — Ponytail audit application (session 2, continuation)
+- Applied audit findings: removed xlsx dep (package.json), Google.Apis.Auth (Infrastructure.csproj), file-saver usage (ExportProjectsModal -> native URL.createObjectURL), deleted useSearchPublicProjects.ts (0 callers), removed useAuditLog from useAudit.ts, consolidated 4 duplicate cn() into src/shared/utils/cn.ts, removed 8 debug console.logs (CheckoutReturnPage, useProjectForm), deleted stale obj artifact.
+- USER OVERRIDE: evals/ folder + .github/workflows/eval.yml + .waza.yaml RESTORED (revert of audit finding 1) — skills eval harness is intentional, keep it.
+- Verified: dotnet build Infrastructure 0/0; typecheck only pre-existing errors; frontend vitest 18 failed files all PRE-EXISTING (proven via git stash for VerifySearchForm + useProjectFormCategoryDefault tests — same failures with my edits reverted).

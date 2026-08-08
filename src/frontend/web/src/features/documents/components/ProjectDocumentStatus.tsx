@@ -1,5 +1,6 @@
 import React from "react";
 import { DocumentType, DocumentStatus, DocumentDto } from "../types";
+import { canonicalType } from "../utils/documentTypes";
 import { useDocuments, useDownloadDocument } from "../api/useDocuments";
 
 import {
@@ -55,18 +56,6 @@ const VISIBLE_ANEXO_TYPES: DocumentType[] = [
   DocumentType.CertificadoUsoSuelo,
   DocumentType.PoderNotarial,
 ];
-
-// Tipos legacy del enum backend que se mapean a su categoría canónica,
-// para que documentos subidos con el tipo antiguo aparezcan en la vista pública.
-const LEGACY_TYPE_ALIASES: Partial<Record<DocumentType, DocumentType>> = {
-  [DocumentType.TITLE]: DocumentType.CertificadoTitulo,
-  [DocumentType.LEGAL_STATUS]: DocumentType.CertificacionEstadoJuridico,
-  [DocumentType.SURVEY]: DocumentType.PlanoMensuraCatastral,
-  [DocumentType.ID]: DocumentType.CopiaCedulaIdentidad,
-  [DocumentType.NOTARIAL_POWER]: DocumentType.PoderNotarial,
-};
-
-const canonicalType = (tipo: DocumentType): DocumentType => LEGACY_TYPE_ALIASES[tipo] ?? tipo;
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, preloadedDocuments }) => {
   const { data: fetchedDocuments = [], isLoading: loading } = useDocuments(projectId || "");

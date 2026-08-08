@@ -37,33 +37,3 @@ export function useRoutePrefetch() {
 
   return { prefetchRoute };
 }
-
-/**
- * Prefetches data queries for a route on hover
- */
-export function useQueryPrefetch() {
-  const prefetched = useRef<Set<string>>(new Set());
-
-  const prefetchQueries = useCallback(async (path: string) => {
-    if (prefetched.current.has(path)) return;
-    prefetched.current.add(path);
-
-    try {
-      // Import and prefetch queries for specific routes
-      switch (path) {
-        case '/projects': {
-          // The query will be prefetched when the component mounts
-          break;
-        }
-        case '/admin/dashboard': {
-          // Dashboard stats queries
-          break;
-        }
-      }
-    } catch (error) {
-      console.warn(`Failed to prefetch queries for ${path}:`, error);
-    }
-  }, []);
-
-  return { prefetchQueries };
-}

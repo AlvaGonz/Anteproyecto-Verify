@@ -1,4 +1,4 @@
-import { OcrField, OcrFieldReviewState } from '../types';
+import { OcrFieldReviewState } from '../types';
 
 export const getConfidenceColor = (confidence: number): string => {
   if (confidence >= 0.8) return 'bg-emerald-500/20 text-emerald-500 border-emerald-500/30';
@@ -18,12 +18,4 @@ export const getReviewStateBadge = (state: OcrFieldReviewState) => {
     default:
       return { label: 'Pendiente', className: 'bg-orange-500/20 text-orange-500 border-orange-500/30' };
   }
-};
-
-export const isFieldReviewed = (state: OcrFieldReviewState): boolean => {
-  return state !== OcrFieldReviewState.Unreviewed;
-};
-
-export const canSubmitReview = (fields: Record<string, OcrField>): boolean => {
-  return Object.values(fields).every(field => isFieldReviewed(field.reviewState));
 };

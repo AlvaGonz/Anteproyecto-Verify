@@ -93,17 +93,14 @@ export const CheckoutReturnPage = () => {
         // mount 1's flag to false, and mount 2's verify can only see mount 2's flag.
         if (_processedSessions.has(sessionId)) {
           // Already processed — navigate directly without calling API again
-          console.log('[CheckoutReturn] Session already processed, navigating to dashboard');
           safeNavigate('/admin/dashboard', { replace: true })
           return
         }
 
         try {
-          console.log('[CheckoutReturn] Verifying session:', sessionId);
           const { data } = await apiClient.get(
             `/v1/subscriptions/session-status?sessionId=${sessionId}`
           )
-          console.log('[CheckoutReturn] Session status response:', data);
 
           let state = resolvePostCheckoutState({
             sessionStatus: data.status,
@@ -112,7 +109,6 @@ export const CheckoutReturnPage = () => {
             userPlanName: user?.plan ?? undefined
           });
           let resolvedPlan = data.plan || user?.plan;
-          console.log('[CheckoutReturn] Initial state:', state, { sessionStatus: data.status, userSubscriptionStatus: user?.subscriptionStatus, sessionPlan: data.plan, userPlanName: user?.plan });
 
           if (state === 'error') {
             safeStatus('error')
@@ -128,7 +124,6 @@ export const CheckoutReturnPage = () => {
           let attempts = 0;
           while (state === 'pending_confirmation' && attempts < 15 && mounted && isPolling) {
             attempts++;
-            console.log('[CheckoutReturn] Polling attempt:', attempts);
             await new Promise(resolve => {
               timeoutId = setTimeout(resolve, 2000);
             });
@@ -144,7 +139,6 @@ export const CheckoutReturnPage = () => {
             const latestStatus = statusRes.data.subscriptionStatus;
             const latestPlan = statusRes.data.plan;
             resolvedPlan = latestPlan || resolvedPlan;
-            console.log('[CheckoutReturn] Polling - latest status:', latestStatus, 'latest plan:', latestPlan);
 
             state = resolvePostCheckoutState({
               sessionStatus: data.status,
@@ -152,7 +146,6 @@ export const CheckoutReturnPage = () => {
               sessionPlan: data.plan ?? undefined,
               userPlanName: latestPlan ?? undefined
             });
-            console.log('[CheckoutReturn] Polling - new state:', state);
           }
 
           if (state !== 'dashboard') {

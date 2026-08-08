@@ -2,6 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Lock, ShieldCheck, Clock, FileText, Building2, Gavel } from "lucide-react";
 import { DocumentType, DocumentStatus } from "../types";
+import { canonicalType } from "../utils/documentTypes";
 import { useDocuments } from "../api/useDocuments";
 
 interface DocumentosModalProps {
@@ -22,17 +23,6 @@ const ANEXOS: { type: DocumentType; label: string; entity: string; norm: string 
   { type: DocumentType.CertificadoUsoSuelo, label: "Certificado Uso de Suelo", entity: "Ayuntamiento", norm: "Ordenanzas" },
   { type: DocumentType.PoderNotarial, label: "Poder Notarial", entity: "Notaría Pública", norm: "Ley 301 Notarial" },
 ];
-
-// Tipos legacy del enum backend que se mapean a su categoría canónica.
-const LEGACY_TYPE_ALIASES: Partial<Record<DocumentType, DocumentType>> = {
-  [DocumentType.TITLE]: DocumentType.CertificadoTitulo,
-  [DocumentType.LEGAL_STATUS]: DocumentType.CertificacionEstadoJuridico,
-  [DocumentType.SURVEY]: DocumentType.PlanoMensuraCatastral,
-  [DocumentType.ID]: DocumentType.CopiaCedulaIdentidad,
-  [DocumentType.NOTARIAL_POWER]: DocumentType.PoderNotarial,
-};
-
-const canonicalType = (tipo: DocumentType): DocumentType => LEGACY_TYPE_ALIASES[tipo] ?? tipo;
 
 const getDocStatus = (doc: any) => {
   if (!doc) return "missing";
