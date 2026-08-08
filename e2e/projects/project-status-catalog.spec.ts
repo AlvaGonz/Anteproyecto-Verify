@@ -32,6 +32,18 @@ const project = {
 
 test.describe('Project status stepper > catalog driven (ProyectosEstados)', () => {
   test.beforeEach(async ({ page }) => {
+    await page.route('**/api/auth/me', (route) =>
+      route.fulfill({
+        status: 200,
+        json: { id: 'admin-001', email: 'admin@verifinca.do', name: 'Admin User', role: 'admin', aceptoDescargo: true },
+      })
+    );
+    await page.route('**/api/auth/refresh', (route) =>
+      route.fulfill({
+        status: 200,
+        json: { accessToken: 'fake-jwt-token', user: { id: 'admin-001', email: 'admin@verifinca.do', role: 'admin' } },
+      })
+    );
     await page.route('**/api/projects/estados', (route) =>
       route.fulfill({ status: 200, json: catalog })
     );
