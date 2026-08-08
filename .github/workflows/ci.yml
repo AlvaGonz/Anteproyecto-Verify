@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - front-dev-ui-fixes
+      - feat
   pull_request:
     branches:
       - main
       - develop
+      - feat
 
 env:
   DOTNET_VERSION: '8.0.x'
