@@ -9,6 +9,7 @@ using Application.Abstractions.Persistence;
 using Application.Contracts.Projects;
 using Application.DTOs;
 using Application.DTOs.Common;
+using Application.DTOs.Projects;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Policies;
@@ -52,6 +53,16 @@ public class ProjectService : IProjectService
     {
         var proyectos = await _proyectoRepository.GetVisibleAsync(page, pageSize, cancellationToken);
         return proyectos.Select(MapToDto);
+    }
+
+    public async Task<IEnumerable<ProyectoEstadoCatalogoDto>> GetEstadosCatalogoAsync(CancellationToken cancellationToken = default)
+    {
+        var estados = await _proyectoRepository.GetEstadosCatalogoAsync(cancellationToken);
+        return estados.Select(e => new ProyectoEstadoCatalogoDto(
+            e.Id,
+            e.CodigoUnico,
+            e.Nombre,
+            e.ColorHex));
     }
 
     public async Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)

@@ -90,6 +90,14 @@ public class ProjectsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("estados")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<ProyectoEstadoCatalogoDto>>> GetEstadosCatalogo(CancellationToken cancellationToken)
+    {
+        var estados = await _projectService.GetEstadosCatalogoAsync(cancellationToken);
+        return Ok(estados);
+    }
+
     [HttpGet("{id:guid}")]
     [AllowAnonymous]
     public async Task<ActionResult<ProyectoDto>> GetProjectById(Guid id, CancellationToken cancellationToken)

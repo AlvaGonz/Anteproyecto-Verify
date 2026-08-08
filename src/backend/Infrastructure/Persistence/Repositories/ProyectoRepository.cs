@@ -233,6 +233,15 @@ public class ProyectoRepository : IProyectoRepository
             .FirstOrDefaultAsync(e => e.CodigoUnico == codigo, cancellationToken);
     }
 
+    public async Task<IEnumerable<ProyectoEstado>> GetEstadosCatalogoAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectoEstados
+            .AsNoTracking()
+            .Where(e => e.Activo)
+            .OrderBy(e => e.CreatedAtUtc)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default)
     {
         var cleanQuery = query.Replace("-", "").Replace(" ", "");
