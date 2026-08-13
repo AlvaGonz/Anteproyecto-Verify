@@ -9,7 +9,12 @@ app = FastAPI(title="PaddleOCR API for VeriFinca", version="1.0.0")
 
 # Initialize PaddleOCR model in memory (loaded once on startup)
 # using use_angle_cls=True to auto-rotate if needed, lang='es' for Spanish
-ocr = PaddleOCR(use_angle_cls=True, lang='es')
+ocr = PaddleOCR(
+    use_angle_cls=True, 
+    lang='es',
+    use_doc_orientation_classify=True,
+    use_doc_unwarping=True
+)
 
 @app.get("/health")
 def health_check():

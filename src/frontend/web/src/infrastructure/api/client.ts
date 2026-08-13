@@ -121,7 +121,26 @@ instance.interceptors.response.use(
     }
 
     // Default error handling
-    const message = (error.response?.data as any)?.message ?? error.message ?? "Unknown API error";
+    let message = (error.response?.data as any)?.message ?? error.message ?? "Unknown API error";
+    
+    if (error.response?.data) {
+      const data = error.response.data as any;
+      if (typeof data === "string") {
+        message = data;
+      } else if (data.title && data.errors) {
+        const errors = Object.values(data.errors).flat();
+        if (errors.length > 0) {
+          message = `${data.title}: ${errors.join(", ")}`;
+        } else {
+          message = data.title;
+        }
+      } else if (data.detail) {
+        message = data.detail;
+      } else if (data.title) {
+        message = data.title;
+      }
+    }
+
     const rejectError = new Error(message) as any;
     rejectError.response = error.response;
     return Promise.reject(rejectError);

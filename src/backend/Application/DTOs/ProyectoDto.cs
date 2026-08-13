@@ -88,5 +88,6 @@ public record CreateProyectoDto(
     string? ImagenAdicional3 = null,
     string? ImagenAdicional4 = null,
     string? ImagenAdicional5 = null,
-    Guid? ProvinciaId = null
+    Guid? ProvinciaId = null,
+    bool Force = false
 );

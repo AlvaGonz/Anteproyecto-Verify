@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigation, Globe, Search} from "lucide-react";
+import { Navigation, Globe, Search, AlertTriangle } from "lucide-react";
 import { ProyectoDto } from "../types";
 import { ProjectFormBasicFields } from "./ProjectFormBasicFields";
 import { ProjectFormDetailsFields } from "./ProjectFormDetailsFields";
@@ -18,10 +18,12 @@ interface ProjectFormLayoutProps {
   initialData?: ProyectoDto;
   onCancel: () => void;
   onDelete?: () => void;
-  handleSubmit: (e: React.FormEvent) => Promise<void>;
+  handleSubmit: (e?: React.FormEvent | boolean) => Promise<void>;
   mapSearchText: string;
   setMapSearchText: (val: string) => void;
   handleSearchCoordinates: () => void;
+  duplicateWarningOpen: boolean;
+  setDuplicateWarningOpen: (val: boolean) => void;
   // ponytail: grouped to keep interface slim, spread into sub-components
   basicFields: React.ComponentProps<typeof ProjectFormBasicFields>;
   detailsFields: React.ComponentProps<typeof ProjectFormDetailsFields>;
@@ -44,6 +46,8 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
   mapSearchText,
   setMapSearchText,
   handleSearchCoordinates,
+  duplicateWarningOpen,
+  setDuplicateWarningOpen,
   basicFields,
   detailsFields,
   documentSection,
@@ -179,6 +183,42 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
         >
           {isSubmitting ? "Guardando..." : "Guardar Proyecto"}
         </button>
+      </div>
+    )}
+
+    {duplicateWarningOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-scale-in">
+          <div className="flex items-center gap-4 mb-4 text-[#223382]">
+            <div className="p-3 bg-red-100 rounded-full text-red-600">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold">Posible Duplicado</h3>
+          </div>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            Hemos detectado que ya existe un proyecto registrado con datos idénticos (Matrícula, Designación Catastral o Coordenadas GPS). 
+            ¿Está seguro de que desea continuar registrando este expediente?
+          </p>
+          <div className="flex gap-3 justify-end">
+            <button
+              type="button"
+              onClick={() => setDuplicateWarningOpen(false)}
+              className="vf-btn-secondary"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDuplicateWarningOpen(false);
+                handleSubmit(true as any); // pass forceSubmit=true
+              }}
+              className="vf-btn-primary bg-red-600 hover:bg-red-700"
+            >
+              Sí, Registrar Duplicado
+            </button>
+          </div>
+        </div>
       </div>
     )}
   </form>

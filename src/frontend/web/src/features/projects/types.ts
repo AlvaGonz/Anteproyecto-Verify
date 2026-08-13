@@ -81,6 +81,7 @@ export interface CreateProyectoDto {
   imagenAdicional3?: string;
   imagenAdicional4?: string;
   imagenAdicional5?: string;
+  force?: boolean;
 }
 
 export interface UpdateProyectoDto {
@@ -105,6 +106,7 @@ export interface UpdateProyectoDto {
   imagenAdicional3?: string;
   imagenAdicional4?: string;
   imagenAdicional5?: string;
+  force?: boolean;
 }
 
 

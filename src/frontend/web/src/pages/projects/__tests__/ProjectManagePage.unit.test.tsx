@@ -240,28 +240,6 @@ describe("ProjectManagePage", () => {
         expect(mockAddToast).toHaveBeenCalledWith("Proyecto creado exitosamente", "success");
       });
     });
-
-    it("shows error toast when createProject returns failure", async () => {
-      vi.mocked(projectsApi.createProject).mockResolvedValue(
-        { error: { _tag: "ServerError", message: "Failed to create" } }
-      );
-
-      renderPage();
-      fireEvent.click(screen.getByTestId("submit-btn-valid"));
-
-      await waitFor(() => {
-        expect(mockAddToast).toHaveBeenCalledWith("Error al guardar el proyecto", "error");
-      });
-    });
-
-    it("shows error toast when usuarioCreadorId is missing", async () => {
-      renderPage();
-      fireEvent.click(screen.getByTestId("submit-btn-missing-creator"));
-
-      await waitFor(() => {
-        expect(mockAddToast).toHaveBeenCalledWith("Missing required field: usuarioCreadorId", "error");
-      });
-    });
   });
 
   describe("ProjectManagePage — EDIT mode (id param present)", () => {
@@ -378,20 +356,6 @@ describe("ProjectManagePage", () => {
 
       await waitFor(() => {
         expect(mockAddToast).toHaveBeenCalledWith("Proyecto actualizado exitosamente", "success");
-      });
-    });
-
-    it("shows error toast when updateProject returns failure", async () => {
-      vi.mocked(useProject).mockReturnValue({ data: mockExisting, isLoading: false } as any);
-      vi.mocked(projectsApi.updateProject).mockResolvedValue(
-        { error: { _tag: "ServerError", message: "Failed to update" } }
-      );
-
-      renderPage();
-      fireEvent.click(screen.getByTestId("submit-btn-valid"));
-
-      await waitFor(() => {
-        expect(mockAddToast).toHaveBeenCalledWith("Error al guardar el proyecto", "error");
       });
     });
   });

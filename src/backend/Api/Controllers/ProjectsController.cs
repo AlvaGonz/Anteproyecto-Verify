@@ -246,6 +246,10 @@ public class ProjectsController : ControllerBase
         {
             return BadRequest(new { message = ex.Message, field = ex.ParamName });
         }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
         catch (QuotaExceededException ex)
         {
             return StatusCode(402, new {
@@ -269,6 +273,10 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
         catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
         {
             return BadRequest(new { message = ex.Message });
         }

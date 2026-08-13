@@ -96,7 +96,8 @@ export const ProjectManagePage: React.FC = React.memo(() => {
           imagenAdicional2: data.imagenAdicional2,
           imagenAdicional3: data.imagenAdicional3,
           imagenAdicional4: data.imagenAdicional4,
-          imagenAdicional5: data.imagenAdicional5
+          imagenAdicional5: data.imagenAdicional5,
+          force: data.force
         });
         addToast("Proyecto creado exitosamente", "success");
         navigate("/admin/projects");
@@ -104,8 +105,6 @@ export const ProjectManagePage: React.FC = React.memo(() => {
     } catch (error: any) {
       if (error?.response?.data?.code === "LIMIT_REACHED" || error.name === "LimitReachedError") {
         setIsLimitModalOpen(true);
-      } else {
-        addToast(error.message || "Error al guardar el proyecto", "error");
       }
       throw error;
     } finally {

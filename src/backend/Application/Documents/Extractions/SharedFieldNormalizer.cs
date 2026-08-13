@@ -22,8 +22,8 @@ public static class SharedFieldNormalizer
     {
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
         
-        // Remove spaces, punctuation, and hyphens
-        var clean = Regex.Replace(raw, @"[^a-zA-Z0-9]", "");
+        // Remove spaces, punctuation, but KEEP hyphens and colons
+        var clean = Regex.Replace(raw, @"[^a-zA-Z0-9-:]", "");
         return clean.ToUpperInvariant();
     }
 

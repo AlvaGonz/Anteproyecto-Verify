@@ -269,6 +269,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const [nombreTouched, setNombreTouched] = useState(false);
   const [ubicacionTouched, setUbicacionTouched] = useState(false);
   const [desarrolladorTouched, setDesarrolladorTouched] = useState(false);
+  const [duplicateWarningOpen, setDuplicateWarningOpen] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -490,10 +491,11 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   }, [activeMapTab, ubicacionTexto]);
 
   // ── Form submission ───────────────────────────────────────────────────────
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | boolean) => {
+    const forceSubmit = typeof e === "boolean" ? e : false;
+    const formEvent = typeof e === "object" ? e as React.FormEvent : undefined;
+    if (formEvent) formEvent.preventDefault();
     if (isSubmitting) return;
-
     const missingFields: string[] = [];
     if (!nombre.trim()) missingFields.push("Nombre del proyecto");
     if (!ubicacionTexto.trim()) missingFields.push("Ubicación (Provincia)");
@@ -532,6 +534,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           imagenAdicional3: imagenAdicional3 || undefined,
           imagenAdicional4: imagenAdicional4 || undefined,
           imagenAdicional5: imagenAdicional5 || undefined,
+          force: forceSubmit
         };
         await onSubmit(updateData);
       } else {
@@ -556,16 +559,35 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           imagenAdicional3: imagenAdicional3 || undefined,
           imagenAdicional4: imagenAdicional4 || undefined,
           imagenAdicional5: imagenAdicional5 || undefined,
+          force: forceSubmit
         };
         await onSubmit(createData);
       }
     } catch (err: any) {
-      if (err.message && err.message.includes("DUPLICATE_LOCATION")) {
+      let errorMessage = err.message || "Error al guardar el proyecto";
+      
+      if (err.response?.data) {
+        if (typeof err.response.data === "string") {
+          errorMessage = err.response.data;
+        } else if (err.response.data.title) {
+          errorMessage = err.response.data.title;
+          if (err.response.data.errors) {
+            const errors = Object.values(err.response.data.errors).flat();
+            if (errors.length > 0) {
+              errorMessage += ": " + errors.join(", ");
+            }
+          }
+        } else if (err.response.data.message) {
+           errorMessage = err.response.data.message;
+        }
+      }
+
+      if (errorMessage.includes("DUPLICATE_LOCATION")) {
         setDuplicateError("No se puede porque ya hay un proyecto en esa locación");
-        addToast("No se puede porque ya hay un proyecto en esa locación", "error");
+        setDuplicateWarningOpen(true);
       } else {
-        setError(err.message || "Error al guardar el proyecto");
-        addToast(err.message || "Error al guardar el proyecto", "error");
+        setError(errorMessage);
+        addToast(errorMessage, "error");
       }
     } finally {
       setIsSubmitting(false);
@@ -588,6 +610,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     onCancel,
     onDelete,
     handleSubmit,
+    duplicateWarningOpen,
+    setDuplicateWarningOpen,
     mapSearchText,
     setMapSearchText,
     handleSearchCoordinates,

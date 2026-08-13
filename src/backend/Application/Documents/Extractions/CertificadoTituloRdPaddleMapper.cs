@@ -65,13 +65,13 @@ public static class CertificadoTituloRdPaddleMapper
             DesignacionCatastral = ExtractField(lines, fullText, "DesignacionCatastral",
                 new[] { @"DESIGNACI[OÓ]N\s+CATASTRAL", @"PARCELA", @"SOLAR" },
                 new[] {
-                    @"(?:DESIGNACI[OÓ]N\s+CATASTRAL\s*(?:S\s*)?)([\d\-]+)",
-                    @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.]+(?:\s+\d+)?)",
-                    @"(?:Parce[l]?a\s+)([\d\.]+(?:\s+\d+)?)",
+                    @"(?:DESIGNACI[OÓ]N\s+CATASTRAL\s*(?:S\s*)?)([\d\-:]+)",
+                    @"(?:Parce[l]?a\s*(?:dl\s*DoCra\s*Ha\.|del\s*Distrito\s*Catastral\s*No\.)?\s*)([\d\.:]+(?:\s+\d+)?)",
+                    @"(?:Parce[l]?a\s+)([\d\.:]+(?:\s+\d+)?)",
                     @"(?:Solar\s+[\d\.]+\.?manzana[\d\.]+\.?dei?\s*Distrio?\s*Catastral\s*No\.?\s*[\d\.]+)",
                     @"(?:manzana[\d\.]+\.?dei?\s*Distrio?\s*Catastral\s*No\.?\s*[\d\.]+)",
                     // Noisy OCR: "como Parcela" / "Parcela dl DoCra Ha.1" / "Parcela No.<digits>"
-                    @"(?:como\s+)?[Pp]arcela\s+(?:dl\s+)?(?:DoCra\s+|de[il]\s+)?(?:Distrito\s+|Distrio\s+|Drito\s+)?(?:Catastral\s+)?(?:Ha\.|No\.?\s*)?([\d][\d\.\s]{0,15})",
+                    @"(?:como\s+)?[Pp]arcela\s+(?:dl\s+)?(?:DoCra\s+|de[il]\s+)?(?:Distrito\s+|Distrio\s+|Drito\s+)?(?:Catastral\s+)?(?:Ha\.|No\.?\s*)?([\d][\d\.\s:]{0,15})",
                 }),
             
             FechaYHoraInscripcion = ExtractField(lines, fullText, "Fecha", 
@@ -86,8 +86,12 @@ public static class CertificadoTituloRdPaddleMapper
                 }),
             
             VieneDe = ExtractField(lines, fullText, "VieneDe", 
-                new[] { @"CANCELA\s+LA\s+ANTERIOR", @"VIENE\s+DE", @"VIENEDE", @"VIENEFE" }, 
-                new[] { @"(?:cancela la anterior|viene de|vienede|vienefe)\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([\w\.\-]{2,30})" }),
+                new[] { @"CANCELA\s+LA\s+ANTERIOR", @"VIENE\s+DE", @"VIENEDE", @"VIENEFE", @"VIENE\.?D[E]?" }, 
+                new[] { 
+                    @"(?:cancela la anterior|viene de|vienede|vienefe|viene\.d)\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([\w\.\-]{2,30})",
+                    // Catch cases where noisy OCR splits VieneDe and its value across multiple words
+                    @"(?:cancela la anterior|viene de|vienede|vienefe|viene\.d).{0,50}?([LFlf]\.?\s*\d+[\s,]*[LFlf]\.?\s*\d+|\.?\d+\.?\s*[LFlf]\.?\s*\d+)"
+                }),
             
             Matricula = ExtractField(lines, fullText, "Matricula",
                 new[] { @"MATR[IÍ]CULA", @"MATRICUL", @"MATR[IÍ]CUL", @"[Mm]atric\b" },
@@ -121,7 +125,7 @@ public static class CertificadoTituloRdPaddleMapper
                 }),
             
             SuperficieM2 = ExtractField(lines, fullText, "SuperficieM2",
-                new[] { @"SUPERFICIE", @"METROS\s*CUADRADOS", @"M2", @"SUPERFICIE" },
+                new[] { @"SUPERFICIE\s+EN\s+METROS\s+CUADRADOS", @"SUPERFICIE" },
                 new[] {
                     @"(?:SUPERFICIE\s*EN\s*METROS\s*CUADRADOS|SUPERFICIE\s*M2|SUPERFICIE|SUPERFICIE|METROS\s*CUADRADOS|METR[OA]S\s*CUADRADOS)\s*([\d]+(?:[,.\s\']\d+)*)",
                     @"([\d]+(?:[,.\s\']\d+)*)\s*(?:m2|m²|m\b|mtros\.cuadrados|metros cuadrados|MTS2|metrs\s*cuadrados)",
@@ -163,7 +167,7 @@ public static class CertificadoTituloRdPaddleMapper
         // Priority 1: Use pre-parsed Lines from OCR provider (most reliable)
         if (ocrResult.Lines != null && ocrResult.Lines.Any())
         {
-            lines.AddRange(ocrResult.Lines.Select(l => l.Text));
+            lines.AddRange(ocrResult.Lines.Select(l => CleanOcrText(l.Text)));
         }
         // Priority 2: Parse from RawJson (PaddleOCR format)
         else if (!string.IsNullOrWhiteSpace(ocrResult.RawJson) && ocrResult.RawJson.Contains("('"))
@@ -171,22 +175,39 @@ public static class CertificadoTituloRdPaddleMapper
             var matches = Regex.Matches(ocrResult.RawJson.Replace("\\\"", "\""), @"\('(.*?)',\s*(\d+\.\d+)");
             foreach (Match m in matches)
             {
-                lines.Add(m.Groups[1].Value);
+                lines.Add(CleanOcrText(m.Groups[1].Value));
             }
             
             // Fallback to ExtractedText if regex found no matches
             if (lines.Count == 0 && !string.IsNullOrWhiteSpace(ocrResult.ExtractedText))
             {
-                lines.AddRange(ocrResult.ExtractedText.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries));
+                lines.AddRange(ocrResult.ExtractedText.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries).Select(CleanOcrText));
             }
         }
         // Priority 3: Split ExtractedText
         else if (!string.IsNullOrWhiteSpace(ocrResult.ExtractedText))
         {
-            lines.AddRange(ocrResult.ExtractedText.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries));
+            lines.AddRange(ocrResult.ExtractedText.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries).Select(CleanOcrText));
         }
         
         return lines;
+    }
+
+    private static string CleanOcrText(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return text;
+        
+        // Fix common OCR artifact casing and letters for Dominican Cadastral terms
+        text = text.Replace("TiTULOS", "TÍTULOS");
+        text = text.Replace("TITULOS", "TÍTULOS");
+        text = text.Replace("MATRiCULA", "MATRÍCULA");
+        text = text.Replace("MATRICULA", "MATRÍCULA");
+        text = text.Replace("DESIGNACION", "DESIGNACIÓN");
+        
+        // Fix commonly smashed Designación Catastral values like 24DC65 -> 24-DC-65
+        text = Regex.Replace(text, @"\b(\d+)\s*DC\s*(\d+)\b", "$1-DC-$2", RegexOptions.IgnoreCase);
+        
+        return text;
     }
 
     private static bool IsProximityDateLeak(string candidate, string fieldType)
@@ -196,6 +217,10 @@ public static class CertificadoTituloRdPaddleMapper
         if (fieldType == "SuperficieM2" && !Regex.IsMatch(candidate, @"\d"))
             return true;
         if (fieldType == "Fecha" && !Regex.IsMatch(candidate, @"\d"))
+            return true;
+        if (fieldType == "Matricula" && !Regex.IsMatch(candidate, @"\d"))
+            return true;
+        if (fieldType == "VieneDe" && !Regex.IsMatch(candidate, @"\d"))
             return true;
         return false;
     }

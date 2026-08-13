@@ -43,7 +43,7 @@ namespace UnitTests.Application.Documents.Extractions
             
             extraction.Oficina.RawValue.Should().Be("de Santo Domingo");
             extraction.Matricula.NormalizedValue.Should().Be("0100234567");
-            extraction.DesignacionCatastral.NormalizedValue.Should().Be("1234567");
+            extraction.DesignacionCatastral.NormalizedValue.Should().Be("12345-67");
             extraction.FechaYHoraInscripcion.RawValue.Should().Be("DE INSCRIPCION 15/01/2023");
             extraction.VieneDe.RawValue.Should().Be("54321");
             extraction.Municipio.RawValue.Should().Be("San Pedro de Macoris");
