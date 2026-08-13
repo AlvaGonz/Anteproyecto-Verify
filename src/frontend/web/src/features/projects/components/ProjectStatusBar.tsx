@@ -20,7 +20,12 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = React.memo(({ p
     );
   }
 
-  const steps = catalog ?? [];
+  const desiredOrder = ['CREADO', 'EDITADO', 'REVISION', 'PUBLICADO', 'OBSERVACION'];
+  const steps = [...(catalog ?? [])].sort((a, b) => {
+    const indexA = desiredOrder.indexOf(a.codigoUnico);
+    const indexB = desiredOrder.indexOf(b.codigoUnico);
+    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+  });
   const hasObservaciones = eligibility?.hasObservaciones || false;
   const actualStatus = eligibility?.currentStatus !== undefined ? eligibility.currentStatus : (currentStatus ?? ProjectStatus.Draft);
   const isObserved = hasObservaciones || actualStatus === ProjectStatus.Observed;
