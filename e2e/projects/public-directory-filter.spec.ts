@@ -32,6 +32,13 @@ test.describe("Public Directory Filter — E2E", () => {
     }
   ];
 
+  const wrap = (projects: unknown[]) => ({
+    items: projects,
+    totalCount: projects.length,
+    page: 1,
+    pageSize: 200,
+  });
+
   const MOCK_PROVINCES = [
     { id: "1", nombre: "Santo Domingo", latitud: 18.4861, longitud: -69.9312 },
     { id: "2", nombre: "Santiago", latitud: 19.4513, longitud: -70.6970 },
@@ -47,11 +54,26 @@ test.describe("Public Directory Filter — E2E", () => {
         body: JSON.stringify(MOCK_PROVINCES),
       });
     });
+    // Search submit requires an authenticated session (quota check)
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ id: "anon", role: "guest", email: "" }),
+        body: JSON.stringify({ id: "user-001", role: "user", email: "test@verifinca.do", name: "Test User", aceptoDescargo: true }),
+      });
+    });
+    await page.route("**/api/auth/refresh", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accessToken: "fake-jwt-token", user: { id: "user-001", role: "user" } }),
+      });
+    });
+    await page.route("**/api/projects/consume-quota", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ allowed: true }),
       });
     });
   }
@@ -67,7 +89,7 @@ test.describe("Public Directory Filter — E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(wrap(MOCK_PROJECTS)),
       });
     });
     await page.goto("/#/projects");
@@ -83,7 +105,7 @@ test.describe("Public Directory Filter — E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(wrap(MOCK_PROJECTS)),
       });
     });
     await page.goto("/#/projects");
@@ -99,7 +121,7 @@ test.describe("Public Directory Filter — E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(wrap(MOCK_PROJECTS)),
       });
     });
     await page.goto("/#/projects");
@@ -115,7 +137,7 @@ test.describe("Public Directory Filter — E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(wrap(MOCK_PROJECTS)),
       });
     });
     await page.goto("/#/projects");
@@ -134,7 +156,7 @@ test.describe("Public Directory Filter — E2E", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(wrap(MOCK_PROJECTS)),
       });
     });
     await page.goto("/#/projects");
@@ -150,7 +172,7 @@ test("clear all filters resets to full list", async ({ page }) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(wrap(MOCK_PROJECTS)),
       });
     });
     await page.goto("/#/projects");
@@ -167,7 +189,7 @@ test("clear all filters resets to full list", async ({ page }) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(MOCK_PROJECTS),
+        body: JSON.stringify(wrap(MOCK_PROJECTS)),
       });
     });
     await page.goto("/#/projects");
@@ -190,7 +212,7 @@ test("clear all filters resets to full list", async ({ page }) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(manyProjects),
+        body: JSON.stringify(wrap(manyProjects)),
       });
     });
     await page.goto("/#/projects");

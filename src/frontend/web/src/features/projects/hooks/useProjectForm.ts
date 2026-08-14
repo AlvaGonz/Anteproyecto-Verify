@@ -166,7 +166,6 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       const res = await projectsApi.uploadProjectImage(file);
-      console.log("PORTRAIT UPLOAD RESULT:", res);
       if (isSuccess(res)) {
         setImagenUrl(res.value);
       } else {

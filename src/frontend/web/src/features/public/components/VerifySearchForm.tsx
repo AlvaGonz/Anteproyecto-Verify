@@ -16,14 +16,9 @@ import {
   Check
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "../../../shared/utils/cn";
 import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
 import { useAuth } from "../../../shared/context/AuthContext";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 interface VerifySearchFormProps {
   className?: string;
@@ -135,11 +130,6 @@ const formatValue = (value: string, typeId: string): string => {
     return clean;
   } else if (typeId === "suelo") {
     const clean = value.replace(/[^0-9]/g, "");
-    if (clean.length > 3 && clean.length <= 5) {
-      return `${clean.slice(0, 3)}-${clean.slice(3)}`;
-    } else if (clean.length > 5) {
-      return `${clean.slice(0, 3)}-${clean.slice(3, 5)}-${clean.slice(5, 8)}`;
-    }
     return clean;
   } else {
     // Para Sello VeriFinca u otros

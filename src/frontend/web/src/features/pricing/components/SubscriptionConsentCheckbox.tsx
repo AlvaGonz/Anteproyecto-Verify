@@ -2,7 +2,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'react-i18next';
 
 const consentSchema = z.object({
   accepted: z.literal(true, {
@@ -22,8 +21,7 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
   billing,
   onConsent,
 }) => {
-  const { t } = useTranslation();
-
+  
   const {
     register,
     handleSubmit,
@@ -47,8 +45,7 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
 
   const billingCycleText = billing === 'yearly' ? 'año' : 'mes';
   // Fallback text if translation doesn't handle interpolation or is missing
-  const consentLabel = t('legal.consent.label', { planAmount: 'el monto correspondiente', billingCycle: billingCycleText })
-    || `He leído y acepto los Términos de Servicio, la Política de Privacidad y la Política de Facturación de VeriFinca. Autorizo el cobro automático cada ${billingCycleText}.`;
+  const consentLabel = `He leído y acepto los Términos de Servicio, la Política de Privacidad y la Política de Facturación de VeriFinca. Autorizo el cobro automático cada ${billingCycleText}.`;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full">
@@ -74,7 +71,7 @@ export const SubscriptionConsentCheckbox: React.FC<SubscriptionConsentCheckboxPr
               {consentLabel}
             </label>
             <p className="text-xs text-on-surface-variant/80">
-              {t('legal.consent.annualPenaltyWarning')}
+              {billing === 'yearly' ? 'Los planes anuales no son reembolsables después de 30 días.' : ''}
             </p>
           </div>
         </div>

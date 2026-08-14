@@ -38,7 +38,8 @@ public class ProjectServiceCategoryValidationTests
             new Mock<INotificationFactory>().Object,
             new Mock<INotificacionRepository>().Object,
             _uow.Object,
-            new Mock<global::Application.Abstractions.IAuditLogger>().Object);
+            new Mock<global::Application.Abstractions.IAuditLogger>().Object,
+            new Mock<IReglaValidacionRepository>().Object);
 
     private void MockActiveCatalog(params CategoriaProyecto[] categorias) =>
         _proyectoRepo.Setup(r => r.GetCategoriasAsync(It.IsAny<CancellationToken>()))

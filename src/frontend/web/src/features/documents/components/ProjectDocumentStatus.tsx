@@ -1,5 +1,6 @@
 import React from "react";
-import { DocumentType, DocumentStatus } from "../types";
+import { DocumentType, DocumentStatus, DocumentDto } from "../types";
+import { canonicalType } from "../utils/documentTypes";
 import { useDocuments, useDownloadDocument } from "../api/useDocuments";
 
 import {
@@ -18,6 +19,7 @@ import { m, AnimatePresence } from "framer-motion";
 interface ProjectDocumentStatusProps {
   projectId: string;
   categoriaId?: number;
+  preloadedDocuments?: DocumentDto[];
 }
 
 const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string }> = {
@@ -49,23 +51,19 @@ const ANEXO_TYPES: DocumentType[] = [
   DocumentType.CertificadoEIA,
 ];
 
-// Tipos legacy del enum backend que se mapean a su categoría canónica,
-// para que documentos subidos con el tipo antiguo aparezcan en la vista pública.
-const LEGACY_TYPE_ALIASES: Partial<Record<DocumentType, DocumentType>> = {
-  [DocumentType.TITLE]: DocumentType.CertificadoTitulo,
-  [DocumentType.LEGAL_STATUS]: DocumentType.CertificacionEstadoJuridico,
-  [DocumentType.SURVEY]: DocumentType.PlanoMensuraCatastral,
-  [DocumentType.ID]: DocumentType.CopiaCedulaIdentidad,
-  [DocumentType.NOTARIAL_POWER]: DocumentType.PoderNotarial,
-};
+// ponytail: only these 2 anexos are shown publicly; the rest are hidden but kept in ANEXO_TYPES for completeness calculation
+const VISIBLE_ANEXO_TYPES: DocumentType[] = [
+  DocumentType.CertificadoUsoSuelo,
+  DocumentType.PoderNotarial,
+];
 
-const canonicalType = (tipo: DocumentType): DocumentType => LEGACY_TYPE_ALIASES[tipo] ?? tipo;
-
-export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId }) => {
-  const { data: documents = [], isLoading: loading } = useDocuments(projectId || "");
+export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, preloadedDocuments }) => {
+  const { data: fetchedDocuments = [], isLoading: loading } = useDocuments(projectId || "");
   const { mutate: downloadDoc, isPending: isDownloading } = useDownloadDocument(projectId || "");
 
-  if (loading) return (
+  const documents = preloadedDocuments ?? fetchedDocuments;
+
+  if (loading && !preloadedDocuments) return (
     <div className="py-20 flex flex-col items-center gap-4 text-secondary/20">
       <div className="w-10 h-10 border-4 border-current border-t-transparent rounded-full animate-spin"></div>
       <span className="text-[10px] font-black uppercase tracking-widest">Auditoría Digital en curso...</span>
@@ -77,17 +75,18 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
 
   const missingCount = ESSENTIAL_TYPES.length - new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size;
 
-  // Nivel de Confianza: 5 esenciales valen 80% (16% c/u), 5 anexos valen 20% (4% c/u).
+  // Nivel de Confianza: 5 esenciales valen 80% (16% c/u), 2 anexos visibles valen 20% (10% c/u).
   // Se cuentan TIPOS ÚNICOS cubiertos — varios documentos del mismo tipo no suman más.
   const ESSENTIAL_WEIGHT = 80;
   const ANEXO_WEIGHT = 20;
   const essentialPercent = ESSENTIAL_TYPES.length > 0
     ? Math.round((new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size / ESSENTIAL_TYPES.length) * ESSENTIAL_WEIGHT)
     : ESSENTIAL_WEIGHT;
-  const anexoPercent = ANEXO_TYPES.length > 0
-    ? Math.round((new Set(uploadedAnexos.map((d: any) => canonicalType(d.tipoDocumento))).size / ANEXO_TYPES.length) * ANEXO_WEIGHT)
+  const anexoPercent = VISIBLE_ANEXO_TYPES.length > 0
+    ? Math.round((new Set(uploadedAnexos.map((d: any) => canonicalType(d.tipoDocumento))).size / VISIBLE_ANEXO_TYPES.length) * ANEXO_WEIGHT)
     : ANEXO_WEIGHT;
-  const progressPercent = essentialPercent + anexoPercent;
+  const progressPercent = Math.min(100, essentialPercent + anexoPercent);
+
 
   const renderDocItem = (typeId: DocumentType, index: number) => {
     const info = DOCUMENT_INFO[typeId];
@@ -261,7 +260,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
             <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant/60">Anexos</h3>
           </div>
           <div className="grid grid-cols-1 gap-4">
-            {ANEXO_TYPES.map((typeId, idx) => renderDocItem(typeId, idx + ESSENTIAL_TYPES.length))}
+            {VISIBLE_ANEXO_TYPES.map((typeId, idx) => renderDocItem(typeId, idx + ESSENTIAL_TYPES.length))}
           </div>
         </div>
       </div>

@@ -14,6 +14,13 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddApiServices(builder.Configuration);
 
+    // RNF-3: forzar TLS 1.2+ para todo endpoint HTTPS (Kestrel)
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ConfigureHttpsDefaults(https => https.SslProtocols =
+            System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13);
+    });
+
     var app = builder.Build();
 
     var useMock = builder.Configuration.GetValue<bool>("UseMockData");

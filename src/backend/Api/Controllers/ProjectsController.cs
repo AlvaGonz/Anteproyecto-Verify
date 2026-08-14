@@ -90,6 +90,14 @@ public class ProjectsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("estados")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<ProyectoEstadoCatalogoDto>>> GetEstadosCatalogo(CancellationToken cancellationToken)
+    {
+        var estados = await _projectService.GetEstadosCatalogoAsync(cancellationToken);
+        return Ok(estados);
+    }
+
     [HttpGet("{id:guid}")]
     [AllowAnonymous]
     public async Task<ActionResult<ProyectoDto>> GetProjectById(Guid id, CancellationToken cancellationToken)
@@ -211,7 +219,8 @@ public class ProjectsController : ControllerBase
         // Sync: projects that already have documents but stayed on CREADO/EDITADO
         // (e.g. docs uploaded before auto-promotion existed) enter REVISION here.
         var currentStatus = project.EstadoProyecto;
-        if (ProjectLifecyclePolicy.ShouldEnterReview(currentStatus, docList.Count))
+        if (ProjectLifecyclePolicy.ShouldEnterReview(currentStatus, docList.Count)
+            && currentStatus != ProjectStatusCodes.Observacion)
         {
             project = await _projectService.UpdateProjectStatusAsync(id, ProjectStatus.Revision, cancellationToken);
             currentStatus = project.EstadoProyecto;

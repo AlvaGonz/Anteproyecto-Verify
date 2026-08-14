@@ -46,7 +46,7 @@ test.describe('Dashboard Smoke Test', () => {
           proyectosRechazados: 5,
           totalConsultasRealizadas: 1250,
           totalProyectosRegistrados: 42,
-          totalOfertas: 18,
+          totalIntereses: 18,
           usuariosPorPlan: {
             "Corporativo": 25,
             "Empresa": 35,
@@ -100,7 +100,7 @@ test.describe('Dashboard Smoke Test', () => {
     await expect(page.locator('p:has-text("Total Proyectos")')).toBeVisible();
     await expect(page.locator('p:has-text("En Revision")')).toBeVisible();
     await expect(page.locator('p:has-text("Publicados")')).toBeVisible();
-    await expect(page.locator('p:has-text("Ofertas")')).toBeVisible();
+    await expect(page.locator('p:has-text("Mis Intereses")')).toBeVisible();
     
     // Check that the sparkline chart is rendered (at least has some SVG content)
     await expect(page.locator('div:has(> h3:has-text("Proyectos por Mes")) >> svg')).toBeVisible();
@@ -156,7 +156,7 @@ totalUsuarios: 0, // Non-admin users don't see total users
             proyectosRechazados: 0,
             totalConsultasRealizadas: 45,
             totalProyectosRegistrados: 3,
-            totalOfertas: 2,
+            totalIntereses: 2,
             usuariosPorPlan: {
               "Profesional": 1
             },
@@ -194,7 +194,7 @@ totalUsuarios: 0, // Non-admin users don't see total users
     await expect(page.locator('p:has-text("Total Proyectos")')).toBeVisible();
     await expect(page.locator('p:has-text("En Revision")')).toBeVisible();
     await expect(page.locator('p:has-text("Publicados")')).toBeVisible();
-    await expect(page.locator('p:has-text("Ofertas")')).toBeVisible();
+    await expect(page.locator('p:has-text("Mis Intereses")')).toBeVisible();
     
     // Check that the sparkline chart is rendered
     await expect(page.locator('div:has(> h3:has-text("Proyectos por Mes")) >> svg')).toBeVisible();

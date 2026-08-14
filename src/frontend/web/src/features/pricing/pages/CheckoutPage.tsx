@@ -3,12 +3,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import apiClient from '../../../infrastructure/api/client';
-import { ensureLegalResources } from '../../../legalResources';
+
 
 import { SubscriptionConsentCheckbox } from '../components/SubscriptionConsentCheckbox';
-import { useTranslation } from 'react-i18next';
 
-ensureLegalResources();
+
+
 
 // Load Stripe outside component to avoid recreating it
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
@@ -43,9 +43,9 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
     priceMonthly: '$60 USD',
     priceYearly: '$48 USD',
     features: [
-      'pricing.cards.pro.feature1',
-      'pricing.cards.pro.feature2',
-      'pricing.cards.pro.feature3',
+      '25 consultas /mes',
+      '5 proyectos registrables',
+      'Consultas de proyectos por QR',
     ]
   },
   empresa: {
@@ -53,10 +53,10 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
     priceMonthly: '$170 USD',
     priceYearly: '$136 USD',
     features: [
-      'pricing.cards.empresa.feature1',
-      'pricing.cards.empresa.feature2',
-      'pricing.cards.empresa.feature3',
-      'pricing.cards.empresa.feature4',
+      '100 consultas /mes',
+      '10 proyectos registrables',
+      'Multiusuario (hasta 5)',
+      'Consultas de proyectos por QR',
     ]
   },
   corporativo: {
@@ -64,16 +64,15 @@ const PLAN_DETAILS: Record<PlanId, { name: string, priceMonthly: string, priceYe
     priceMonthly: '$500 USD',
     priceYearly: '$400 USD',
     features: [
-      'pricing.cards.corporativo.feature1',
-      'pricing.cards.corporativo.feature2',
-      'pricing.cards.corporativo.feature3',
-      'pricing.cards.corporativo.feature4',
+      'Consultas ilimitadas',
+      '50 proyectos registrables',
+      'Multiusuario (hasta 30)',
+      'Consultas de proyectos por QR',
     ]
   }
 };
 
 export const CheckoutPage = () => {
-  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan') as PlanId;
   const billing = searchParams.get('billing') as BillingCycle;
@@ -164,7 +163,7 @@ export const CheckoutPage = () => {
               {planInfo.features.map((featureKey, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">check_circle</span>
-                  <span dangerouslySetInnerHTML={{ __html: t(featureKey) }} />
+                  <span>{featureKey}</span>
                 </li>
               ))}
             </ul>

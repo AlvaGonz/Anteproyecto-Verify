@@ -1,9 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
 import { motion, AnimatePresence, MotionConfig, type Variants } from "framer-motion";
-import { ensureLegalResources } from "../../../legalResources";
 import { LandingNav } from "../../../shared/components/layout/LandingNav";
 import { LandingFooter } from "../../../shared/components/layout/LandingFooter";
 import { BackToTopButton } from "../../../shared/components/ui/BackToTopButton";
@@ -18,7 +16,6 @@ import {
   AcceptableUseSection,
 } from "./LegalSections2";
 
-ensureLegalResources();
 
 const ICONS = {
   gavel: "gavel",
@@ -117,8 +114,7 @@ const CheckIcon: React.FC<{ checked: boolean }> = ({ checked }) => (
 );
 
 export const LegalPage: React.FC = () => {
-  const { t } = useTranslation();
-  const location = useLocation();
+    const location = useLocation();
 
   const [isRevealed, setIsRevealed] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState<string>("terminos");
@@ -343,7 +339,7 @@ export const LegalPage: React.FC = () => {
           {/* Nav items + checkboxes */}
           <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-0.5">
             {navItems.map((item) => {
-              const label = item.label || t(`legal.${item.id}.title`, navLabels[item.id]);
+              const label = item.label || navLabels[item.id as keyof typeof navLabels];
               return (
                 <motion.div
                   key={item.id}
@@ -452,12 +448,12 @@ export const LegalPage: React.FC = () => {
           <DpaSection isRevealed={isRevealed} ICONS={ICONS} />
           <SlaSection isRevealed={isRevealed} ICONS={ICONS} />
           <MarcoLegalSection isRevealed={isRevealed} ICONS={ICONS} />
-          <BillingSection t={t} ICONS={ICONS} />
-          <RefundsSection t={t} ICONS={ICONS} />
-          <StripeProcessorSection t={t} ICONS={ICONS} />
-          <FinancialLiabilitySection t={t} ICONS={ICONS} />
-          <PaymentDataSection t={t} ICONS={ICONS} />
-          <AcceptableUseSection t={t} ICONS={ICONS} />
+          <BillingSection  ICONS={ICONS} />
+          <RefundsSection  ICONS={ICONS} />
+          <StripeProcessorSection  ICONS={ICONS} />
+          <FinancialLiabilitySection  ICONS={ICONS} />
+          <PaymentDataSection  ICONS={ICONS} />
+          <AcceptableUseSection  ICONS={ICONS} />
         </main>
       </div>
 

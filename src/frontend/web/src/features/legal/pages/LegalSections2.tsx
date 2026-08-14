@@ -1,4 +1,3 @@
-import type { TFunction } from "i18next";
 import React from "react";
 
 /* ─── Section 5: Marco Normativo de Referencia ─── */
@@ -125,37 +124,37 @@ export const MarcoLegalSection: React.FC<{ isRevealed: boolean; ICONS: Record<st
 );
 
 /* ─── Section 6: Facturación y Suscripciones ─── */
-export const BillingSection: React.FC<{ t: TFunction; ICONS: Record<string, string> }> = ({ t, ICONS }) => (
+export const BillingSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="billing" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      VI. {t('legal.billing.title', 'Política de Facturación y Suscripciones')}
+      VI. {''}
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.billing.cycleTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.billing.cycleDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.billing.autoDebitTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.billing.autoDebitDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.billing.priceChangeTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.billing.priceChangeDesc')}
+          {""}
         </p>
       </div>
     </div>
@@ -163,37 +162,37 @@ export const BillingSection: React.FC<{ t: TFunction; ICONS: Record<string, stri
 );
 
 /* ─── Section 7: Reembolsos y Cancelaciones ─── */
-export const RefundsSection: React.FC<{ t: TFunction; ICONS: Record<string, string> }> = ({ t, ICONS }) => (
+export const RefundsSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="refunds" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      VII. {t('legal.refunds.title', 'Política de Reembolsos y Cancelaciones')}
+      VII. {''}
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.refunds.finalTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.refunds.finalDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.refunds.cancelTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.refunds.cancelDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.refunds.annualPenaltyTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px] p-4 bg-error-container/20 text-error rounded-lg border border-error/20">
-          {t('legal.refunds.annualPenaltyDesc')}
+          {""}
         </p>
       </div>
     </div>
@@ -201,31 +200,31 @@ export const RefundsSection: React.FC<{ t: TFunction; ICONS: Record<string, stri
 );
 
 /* ─── Section 8: Procesador de Pagos y Seguridad (Stripe) ─── */
-export const StripeProcessorSection: React.FC<{ t: TFunction; ICONS: Record<string, string> }> = ({ t, ICONS }) => (
+export const StripeProcessorSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="stripeProcessor" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      VIII. {t('legal.stripeProcessor.title', 'Procesador de Pagos y Seguridad (Stripe)')}
+      VIII. {''}
     </h2>
     <p className="font-body text-on-surface-variant leading-relaxed mb-8">
-      {t('legal.stripeProcessor.desc')}
+      {""}
     </p>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.stripeProcessor.acceptTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.stripeProcessor.acceptDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.stripeProcessor.cookiesTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.stripeProcessor.cookiesDesc')}
+          {""}
         </p>
       </div>
     </div>
@@ -233,37 +232,37 @@ export const StripeProcessorSection: React.FC<{ t: TFunction; ICONS: Record<stri
 );
 
 /* ─── Section 9: Responsabilidad Financiera ─── */
-export const FinancialLiabilitySection: React.FC<{ t: TFunction; ICONS: Record<string, string> }> = ({ t, ICONS }) => (
+export const FinancialLiabilitySection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="financialLiability" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      IX. {t('legal.financialLiability.title', 'Responsabilidad Financiera')}
+      IX. {''}
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.financialLiability.unauthorizedTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.financialLiability.unauthorizedDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.financialLiability.availabilityTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.financialLiability.availabilityDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.financialLiability.capTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.financialLiability.capDesc')}
+          {""}
         </p>
       </div>
     </div>
@@ -271,46 +270,46 @@ export const FinancialLiabilitySection: React.FC<{ t: TFunction; ICONS: Record<s
 );
 
 /* ─── Section 10: Tratamiento de Datos de Pago ─── */
-export const PaymentDataSection: React.FC<{ t: TFunction; ICONS: Record<string, string> }> = ({ t, ICONS }) => (
+export const PaymentDataSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="paymentData" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      X. {t('legal.paymentData.title', 'Tratamiento de Datos de Pago')}
+      X. {''}
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.paymentData.tokenTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.paymentData.tokenDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.paymentData.retentionTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.paymentData.retentionDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.paymentData.historyTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.paymentData.historyDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.paymentData.breachTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.paymentData.breachDesc')}
+          {""}
         </p>
       </div>
     </div>
@@ -318,37 +317,37 @@ export const PaymentDataSection: React.FC<{ t: TFunction; ICONS: Record<string, 
 );
 
 /* ─── Section 11: Uso Aceptable ─── */
-export const AcceptableUseSection: React.FC<{ t: TFunction; ICONS: Record<string, string> }> = ({ t, ICONS }) => (
+export const AcceptableUseSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="acceptableUse" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      XI. {t('legal.acceptableUse.title', 'Uso Aceptable')}
+      XI. {''}
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.acceptableUse.nontransferTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.acceptableUse.nontransferDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.acceptableUse.scrapingTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.acceptableUse.scrapingDesc')}
+          {""}
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {t('legal.acceptableUse.suspensionTitle')}
+          {""}
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {t('legal.acceptableUse.suspensionDesc')}
+          {""}
         </p>
       </div>
     </div>

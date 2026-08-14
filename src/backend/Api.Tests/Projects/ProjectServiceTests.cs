@@ -37,7 +37,8 @@ public class ProjectServiceTests
             Substitute.For<INotificationFactory>(),
             Substitute.For<INotificacionRepository>(),
             _uowMock,
-            Substitute.For<global::Application.Abstractions.IAuditLogger>()
+            Substitute.For<global::Application.Abstractions.IAuditLogger>(),
+            Substitute.For<IReglaValidacionRepository>()
         );
     }
 
@@ -95,7 +96,7 @@ public class ProjectServiceTests
             p.UbicacionGps == "GPS-123" &&
             p.RncDesarrollador == "RNC-123"
         ), Arg.Any<CancellationToken>());
-        await _uowMock.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _uowMock.Received(2).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

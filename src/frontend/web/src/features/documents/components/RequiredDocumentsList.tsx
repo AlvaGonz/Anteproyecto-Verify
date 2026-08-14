@@ -21,9 +21,6 @@ const REQUIRED_DOCUMENTS = [
   { id: "certificacion_ipi", label: "Certificación IPI", category: DocumentType.CertificacionIPI, categoryLabel: "CATASTRO", description: "Certificación de Impuesto sobre la Propiedad Inmobiliaria" },
   { id: "poder", label: "Poder Notarial", category: DocumentType.PoderNotarial, categoryLabel: "OTROS", description: "Requerido solo si actúa por representación", optional: true },
   { id: "uso_suelo", label: "Certificado Uso de Suelo", category: DocumentType.CertificadoUsoSuelo, categoryLabel: "USO SUELO", description: "Emitido por el ayuntamiento correspondiente", optional: true },
-  { id: "registro_mercantil", label: "Registro Mercantil", category: DocumentType.RegistroMercantil, categoryLabel: "R. MERCANTIL", description: "Copia actualizada del Registro Mercantil", optional: true },
-  { id: "rnc", label: "RNC Activo", category: DocumentType.RNC, categoryLabel: "RNC", description: "Tarjeta de Registro Nacional de Contribuyente activa", optional: true },
-  { id: "eia", label: "Certificado EIA", category: DocumentType.CertificadoEIA, categoryLabel: "EIA", description: "Estudio de Impacto Ambiental aprobado", optional: true },
 ];
 
 export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ projectId }) => {

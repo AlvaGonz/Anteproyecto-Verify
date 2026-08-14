@@ -9,15 +9,10 @@ import {
   MapPin,
   Verified,
 } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "../../../shared/utils/cn";
 import { PublicVerificationDto } from "../../certifications/types";
 
 type VerificationStatus = "verified" | "pending" | "failed" | "observation";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 interface VerificationResultCardDetailsProps {
   isUnregistered: boolean;

@@ -9,6 +9,7 @@ using Application.Abstractions.Persistence;
 using Application.Contracts.Projects;
 using Application.DTOs;
 using Application.DTOs.Common;
+using Application.DTOs.Projects;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Policies;
@@ -26,6 +27,7 @@ public class ProjectService : IProjectService
     private readonly INotificacionRepository _notificacionRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuditLogger _auditLogger;
+    private readonly IReglaValidacionRepository _reglaValidacionRepository;
 
     public ProjectService(
         IProyectoRepository proyectoRepository, 
@@ -34,7 +36,8 @@ public class ProjectService : IProjectService
         INotificationFactory notificationFactory,
         INotificacionRepository notificacionRepository,
         IUnitOfWork unitOfWork,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IReglaValidacionRepository reglaValidacionRepository)
     {
         _proyectoRepository = proyectoRepository;
         _usuarioRepository = usuarioRepository;
@@ -43,12 +46,23 @@ public class ProjectService : IProjectService
         _notificacionRepository = notificacionRepository;
         _unitOfWork = unitOfWork;
         _auditLogger = auditLogger;
+        _reglaValidacionRepository = reglaValidacionRepository;
     }
 
     public async Task<IEnumerable<ProyectoDto>> GetVisibleProjectsAsync(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var proyectos = await _proyectoRepository.GetVisibleAsync(page, pageSize, cancellationToken);
         return proyectos.Select(MapToDto);
+    }
+
+    public async Task<IEnumerable<ProyectoEstadoCatalogoDto>> GetEstadosCatalogoAsync(CancellationToken cancellationToken = default)
+    {
+        var estados = await _proyectoRepository.GetEstadosCatalogoAsync(cancellationToken);
+        return estados.Select(e => new ProyectoEstadoCatalogoDto(
+            e.Id,
+            e.CodigoUnico,
+            e.Nombre,
+            e.ColorHex));
     }
 
     public async Task<IEnumerable<ProyectoDto>> GetAllProjectsAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
@@ -274,6 +288,16 @@ public class ProjectService : IProjectService
                     SubscriptionTierPolicy.GetTierName(usuario), 
                     "PresentacionPublica", 
                     "Su plan actual (Consultor) no permite la publicación de proyectos.");
+            }
+
+            if (!string.IsNullOrEmpty(proyecto.EstatusIpi) && proyecto.EstatusIpi == "PAGO_PENDIENTE")
+            {
+                var activeRules = await _reglaValidacionRepository.GetActiveRulesAsync(
+                    (TipoProyecto)99, DocumentType.CertificacionIPI, cancellationToken);
+                if (activeRules.Any())
+                {
+                    status = ProjectStatus.ConObservacion;
+                }
             }
         }
 

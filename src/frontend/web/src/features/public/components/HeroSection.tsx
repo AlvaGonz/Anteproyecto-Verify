@@ -2,10 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { m } from "framer-motion";
 import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+
 
 export const HeroSection: React.FC = () => {
-  const { t } = useTranslation();
+
   const [code, setCode] = React.useState("");
 
   return (
@@ -81,13 +81,13 @@ export const HeroSection: React.FC = () => {
           </div>
           <div className="mt-4 flex flex-col sm:flex-row flex-wrap gap-y-3 gap-x-4 text-xs font-bold text-gray-400 uppercase tracking-widest px-4">
             <Link to="/projects" className="flex items-center gap-1.5 hover:text-primary transition-colors">
-              <Zap className="w-3.5 h-3.5 text-primary" /> {t('hero.valExpress')}
+              <Zap className="w-3.5 h-3.5 text-primary" /> Validación Express
             </Link>
             <Link to="/projects" className="flex items-center gap-1.5 sm:border-l sm:border-gray-200 sm:pl-4 hover:text-primary transition-colors">
-              <Lock className="w-3.5 h-3.5 text-primary" /> {t('hero.connNotarial')}
+              <Lock className="w-3.5 h-3.5 text-primary" /> Conexión Notarial
             </Link>
             <Link to="/projects" className="flex items-center gap-1.5 sm:border-l sm:border-gray-200 sm:pl-4 hover:text-primary transition-colors">
-              <Building2 className="w-3.5 h-3.5 text-primary" /> {t('hero.dataProcuraduria')}
+              <Building2 className="w-3.5 h-3.5 text-primary" /> Data Procuraduría
             </Link>
           </div>
         </m.div>

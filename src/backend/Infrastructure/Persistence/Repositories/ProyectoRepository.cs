@@ -233,6 +233,15 @@ public class ProyectoRepository : IProyectoRepository
             .FirstOrDefaultAsync(e => e.CodigoUnico == codigo, cancellationToken);
     }
 
+    public async Task<IEnumerable<ProyectoEstado>> GetEstadosCatalogoAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.ProyectoEstados
+            .AsNoTracking()
+            .Where(e => e.Activo)
+            .OrderBy(e => e.CreatedAtUtc)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default)
     {
         var cleanQuery = query.Replace("-", "").Replace(" ", "");
@@ -407,7 +416,7 @@ public class ProyectoRepository : IProyectoRepository
         var uploadedSet = new HashSet<DocumentType>(uploadedTypes);
 
         var essentials = new[] { DocumentType.CertificadoTitulo, DocumentType.CertificacionEstadoJuridico, DocumentType.PlanoMensuraCatastral, DocumentType.ID, DocumentType.CertificacionIPI };
-        var anexos = new[] { DocumentType.CertificadoUsoSuelo, DocumentType.RegistroMercantil, DocumentType.PoderNotarial, DocumentType.RNC, DocumentType.CertificadoEIA };
+        var anexos = new[] { DocumentType.CertificadoUsoSuelo, DocumentType.PoderNotarial };
 
         const int essentialWeight = 80;
         const int anexoWeight = 20;

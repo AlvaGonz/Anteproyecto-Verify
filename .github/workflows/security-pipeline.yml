@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - develop
+      - feat
   pull_request:
     branches:
       - main
       - develop
+      - feat
   schedule:
     - cron: '0 0 * * *' # Run daily at midnight
 

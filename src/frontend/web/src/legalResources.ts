@@ -1,4 +1,3 @@
-import i18n from "./i18n";
 
 export const legalEs = {
   complianceCenter: "Compliance Center",
@@ -345,12 +344,3 @@ export const legalEn = {
     button: "Send legal query",
   },
 };
-
-let loaded = false;
-
-export function ensureLegalResources(): void {
-  if (loaded) return;
-  i18n.addResourceBundle("es", "translation", { legal: legalEs }, true, true);
-  i18n.addResourceBundle("en", "translation", { legal: legalEn }, true, true);
-  loaded = true;
-}

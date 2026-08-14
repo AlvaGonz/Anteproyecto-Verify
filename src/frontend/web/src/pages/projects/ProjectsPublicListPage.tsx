@@ -15,7 +15,6 @@ import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
 import { VerifySearchForm } from "../../features/public/components/VerifySearchForm";
-import { VerificationNetworkGraph } from "../../features/public/components/VerificationNetworkGraph";
 import { useGlobalSearch } from "../../features/projects/api/useGlobalSearch";
 import { FileText, Activity, Home } from "lucide-react";
 
@@ -109,7 +108,7 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
 
 const ProjectsPublicListContent: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const [filtersVisible, setFiltersVisible] = useState(true);
 
   const [filters, setFilters] = useState<PublishedProjectFilters>({

@@ -1,13 +1,8 @@
 import React from "react";
 import { ShieldCheck, Lock } from "lucide-react";
 import QRCode from "react-qr-code";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "../../../shared/utils/cn";
 import { PublicVerificationDto } from "../../certifications/types";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 interface VerificationResultCardHeaderProps {
   isUnregistered: boolean;

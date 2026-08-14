@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Api.Converters;
+using Microsoft.AspNetCore.Http;
 
 public static class ServiceCollectionExtensions
 {
@@ -28,8 +29,15 @@ public static class ServiceCollectionExtensions
         // Register MediatR with Application assembly marker
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.DependencyInjection.DependencyInjection).Assembly));
 
-        var jwtSecret = configuration["Jwt:Key"]
-            ?? throw new InvalidOperationException("Jwt:Key is not configured in appsettings.");
+        var jwtSecret = configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtSecret))
+        {
+            jwtSecret = Environment.GetEnvironmentVariable("JWT_KEY");
+        }
+        if (string.IsNullOrEmpty(jwtSecret))
+        {
+            throw new InvalidOperationException("Jwt:Key is not configured in appsettings or JWT_KEY environment variable.");
+        }
 
         var jwtIssuer = configuration["Jwt:Issuer"] ?? "VeriFinca";
         var jwtAudience = configuration["Jwt:Audience"] ?? "VeriFincaUsers";
@@ -71,6 +79,19 @@ public static class ServiceCollectionExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddHttpClient(); // Register HttpClient for external API calls and proxy
+
+        // RNF-3: HSTS + redirección HTTP→HTTPS (301) fuera de Development
+        services.AddHsts(options =>
+        {
+            options.MaxAge = TimeSpan.FromDays(365);
+            options.IncludeSubDomains = true;
+        });
+        services.AddHttpsRedirection(options =>
+        {
+            options.HttpsPort = 443;
+            options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
+        });
+
         services.AddHealthChecks()
             .AddSqlServer(configuration.GetConnectionString("DefaultConnection") ?? string.Empty, name: "Database")
             .AddCheck("BlobStorage", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Blob storage ready"));

@@ -1,11 +1,6 @@
 import React from "react";
 import { CheckCircle2 } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from "../../../shared/utils/cn";
 
 interface VerificationResultCardValidationProps {
   validationItems: Array<{ label: string; checked: boolean }>;

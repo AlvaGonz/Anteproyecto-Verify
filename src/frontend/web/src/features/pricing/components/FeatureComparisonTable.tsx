@@ -6,49 +6,46 @@ const ICONS = {
 };
 
 interface FeatureComparisonTableProps {
-  t: (key: string) => string;
   isRevealed: boolean;
 }
 
-export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({
-  t,
-  isRevealed,
+export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({  isRevealed,
 }) => {
   return (
     <section
       className={`max-w-7xl mx-auto px-6 pb-24 hidden md:block reveal-section fade-up ${isRevealed ? "is-visible" : ""}`}
     >
       <h2 className="text-3xl font-headline font-bold text-center mb-12">
-        {t("pricing.comparison.title")}
+        {"Comparativa detallada"}
       </h2>
       <div className="bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface">
               <th className="py-4 px-6 font-headline font-bold text-on-surface w-1/5 border-b border-outline-variant">
-                {t("pricing.comparison.charHeader")}
+                {"Características"}
               </th>
               <th className="py-4 px-6 font-label font-semibold text-center text-on-surface w-1/5 border-b border-outline-variant">
-                {t("pricing.cards.free.title")}
+                {"Consultor"}
               </th>
               <th className="py-4 px-6 font-label font-bold text-center text-on-surface bg-primary/5 w-1/5 border-b-2 border-primary">
                 <span className="inline-block relative">
-                  {t("pricing.cards.pro.title")}
+                  {"Profesional"}
                   <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-primary rounded-full"></span>
                 </span>
               </th>
               <th className="py-4 px-6 font-label font-semibold text-center text-secondary w-1/5 border-b border-outline-variant">
-                {t("pricing.cards.empresa.title")}
+                {"Empresa"}
               </th>
               <th className="py-4 px-6 font-label font-semibold text-center text-on-surface w-1/5 border-b border-outline-variant">
-                {t("pricing.cards.corporativo.title")}
+                {"Corporativo"}
               </th>
             </tr>
           </thead>
           <tbody className="font-body text-sm">
             <tr className="bg-surface border-b border-outline-variant/30">
               <td className="py-3 px-6 text-on-surface">
-                {t("pricing.comparison.limit")}
+                {"Límite mensual"}
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
                 1
@@ -60,12 +57,12 @@ export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({
                 100
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
-                {t("pricing.comparison.unlimited")}
+                {"Ilimitado"}
               </td>
             </tr>
             <tr className="bg-surface-variant border-b border-outline-variant/30">
               <td className="py-3 px-6 text-on-surface">
-                {t("pricing.comparison.projects")}
+                {"Proyectos registrables"}
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
                 1
@@ -82,7 +79,7 @@ export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({
             </tr>
             <tr className="bg-surface">
               <td className="py-3 px-6 text-on-surface">
-                {t("pricing.comparison.qrProjects")}
+                {"Consultas de proyectos por QR"}
               </td>
               <td className="py-3 px-6 text-center text-on-surface-variant">
                 <span className="material-symbols-outlined text-outline text-sm">

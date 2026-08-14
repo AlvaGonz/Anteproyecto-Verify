@@ -19,6 +19,7 @@ public interface IProyectoRepository
     Task<IEnumerable<Proyecto>> SearchPublishedAsync(string query, CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> GetFeaturedAsync(int count, CancellationToken cancellationToken = default);
     Task<ProyectoEstado?> GetEstadoByStatusAsync(ProjectStatus status, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProyectoEstado>> GetEstadosCatalogoAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Proyecto>> SearchAsync(string query, CancellationToken cancellationToken = default);
     Task<int> CountByUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<IEnumerable<CategoriaProyecto>> GetCategoriasAsync(CancellationToken cancellationToken = default);

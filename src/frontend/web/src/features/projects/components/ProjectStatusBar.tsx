@@ -1,53 +1,18 @@
 import React from 'react';
 import { ProjectStatus } from '../types';
 import { useProjectStatusBar } from '../hooks/useProjectStatusBar';
+import { useEstadosCatalogo } from '../api/useEstadosCatalogo';
+
 interface ProjectStatusBarProps {
   projectId: string;
   currentStatus?: ProjectStatus;
 }
 
-const STEPS = [
-  {
-    status: ProjectStatus.Draft,
-    label: 'Creado',
-    activeColor: 'bg-gray-500',
-    borderColor: 'border-gray-500',
-    tooltip: 'Estado inicial del proyecto',
-  },
-  {
-    status: ProjectStatus.Edited,
-    label: 'Editado',
-    activeColor: 'bg-indigo-500',
-    borderColor: 'border-indigo-500',
-    tooltip: 'El proyecto tiene datos guardados',
-  },
-  {
-    status: ProjectStatus.InReview,
-    label: 'En Revisión',
-    activeColor: 'bg-blue-500',
-    borderColor: 'border-blue-500',
-    tooltip: 'Requiere al menos 1 documento',
-  },
-  {
-    status: ProjectStatus.Published,
-    label: 'Publicado',
-    activeColor: 'bg-green-500',
-    borderColor: 'border-green-500',
-    tooltip: 'Requiere al menos 3 documentos',
-  },
-  {
-    status: ProjectStatus.Observed,
-    label: 'Con Observaciones',
-    activeColor: 'bg-orange-500',
-    borderColor: 'border-orange-500',
-    tooltip: 'Se activa automáticamente si hay observaciones',
-  },
-];
-
 export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = React.memo(({ projectId, currentStatus }) => {
   const { eligibility, isLoading } = useProjectStatusBar(projectId);
+  const { data: catalog, isLoading: catalogLoading } = useEstadosCatalogo();
 
-  if (isLoading) {
+  if (isLoading || catalogLoading) {
     return (
       <div className="w-full flex justify-center py-4">
         <div className="animate-pulse h-12 w-full max-w-4xl bg-gray-200 rounded-full"></div>
@@ -55,35 +20,41 @@ export const ProjectStatusBar: React.FC<ProjectStatusBarProps> = React.memo(({ p
     );
   }
 
+  const steps = catalog ?? [];
   const hasObservaciones = eligibility?.hasObservaciones || false;
   const actualStatus = eligibility?.currentStatus !== undefined ? eligibility.currentStatus : (currentStatus ?? ProjectStatus.Draft);
   const isObserved = hasObservaciones || actualStatus === ProjectStatus.Observed;
   const displayStatus = isObserved ? ProjectStatus.Observed : actualStatus;
+
+  if (steps.length === 0) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto my-6 px-4">
       <div className="relative flex flex-wrap items-center justify-center gap-2 md:flex-nowrap md:justify-between md:gap-4">
         <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
 
-        {STEPS.map((step) => {
-          const isActive = displayStatus === step.status;
+        {steps.map((step) => {
+          const isActive = displayStatus === step.codigoUnico;
 
           let buttonClass = "relative z-10 flex items-center justify-center h-9 px-3.5 rounded-full font-semibold text-xs border-2 transition-all duration-300 md:h-10 md:px-6 md:text-sm ";
 
           if (isActive) {
-            buttonClass += `${step.activeColor} text-white ${step.borderColor} shadow-md`;
+            buttonClass += "text-white shadow-md";
           } else {
             buttonClass += `bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed`;
           }
 
           return (
-            <div key={step.status} className="group relative" title={step.tooltip}>
+            <div key={step.estadoId} className="group relative">
               <button
                 type="button"
                 disabled
                 className={buttonClass}
+                style={isActive ? { backgroundColor: step.colorHex, borderColor: step.colorHex } : undefined}
               >
-                {step.label}
+                {step.nombre}
               </button>
             </div>
           );

@@ -5,10 +5,7 @@ import {
   Search,
   DollarSign,
   Building2,
-  ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   AlertCircle,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
@@ -164,11 +161,10 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
         <button
           type="button"
           onClick={() => setFiltersVisible(!filtersVisible)}
-          className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors ${
-            filtersVisible
-              ? "bg-primary text-white border-primary"
-              : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-          }`}
+          className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-colors ${filtersVisible
+            ? "bg-primary text-white border-primary"
+            : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+            }`}
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -180,110 +176,110 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Sidebar - Filters */}
         {filtersVisible && (
-        <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
-          {/* Blue Box: Search + Project Types */}
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              <span className="text-primary">●</span> Búsqueda
-            </label>
-            <input
-              type="text"
-              placeholder="RNC, Cédula, Nombre..."
-              value={filters.searchQuery}
-              onChange={(e) => updateFilter("searchQuery", e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-            />
-
-            <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
-          </div>
-
-          {/* Red Box: Price Filter */}
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              <span className="text-rose-500">●</span> Precio (DOP)
-            </label>
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs font-bold text-slate-600">
-                <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
-                <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "100M+" : filters.priceRange[1].toLocaleString()}</span>
-              </div>
-              <div className="relative h-6">
-                <input
-                  type="range"
-                  min="0"
-                  max={PRICE_MAX}
-                  step={PRICE_STEPS}
-                  value={filters.priceRange[0]}
-                  onChange={(e) => handlePriceChange([parseInt(e.target.value), filters.priceRange[1]])}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                />
-                <input
-                  type="range"
-                  min="0"
-                  max={PRICE_MAX}
-                  step={PRICE_STEPS}
-                  value={filters.priceRange[1]}
-                  onChange={(e) => handlePriceChange([filters.priceRange[0], parseInt(e.target.value)])}
-                  className="absolute top-0 left-0 w-full h-1.5 bg-transparent appearance-none cursor-pointer accent-rose-500"
-                  style={{ pointerEvents: "auto" }}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                <span>0</span>
-                <span>50M</span>
-                <span>100M+</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Purple Box: Province + Lat/Lng */}
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              <span className="text-purple-500">●</span> Provincia
-            </label>
-            <select
-              value={filters.province}
-              onChange={(e) => updateFilter("province", e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-            >
-              <option value="">Todas</option>
-              {provincias?.map((p) => (
-                <option key={p.nombre} value={p.nombre}>{p.nombre}</option>
-              ))}
-            </select>
-
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
-              <span className="text-purple-500">●</span> Coordenadas (Lat, Lng)
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
+            {/* Blue Box: Search + Project Types */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <span className="text-primary">●</span> Búsqueda
+              </label>
               <input
                 type="text"
-                placeholder="Ej: 18.47186, -69.93988"
-                value={filters.latLng}
-                onChange={handleLatLngChange}
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                placeholder="RNC, Cédula, Nombre..."
+                value={filters.searchQuery}
+                onChange={(e) => updateFilter("searchQuery", e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
               />
+
+              <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
             </div>
 
-            {filters.latLng && (
-              <div className="text-[9px] font-bold text-purple-600 bg-purple-50 px-2 py-1.5 rounded-lg border border-purple-100 mt-2">
-                Se auto-asignará la provincia más cercana
+            {/* Red Box: Price Filter */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <span className="text-rose-500">●</span> Precio (DOP)
+              </label>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold text-slate-600">
+                  <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
+                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "100M+" : filters.priceRange[1].toLocaleString()}</span>
+                </div>
+                <div className="relative h-6">
+                  <input
+                    type="range"
+                    min="0"
+                    max={PRICE_MAX}
+                    step={PRICE_STEPS}
+                    value={filters.priceRange[0]}
+                    onChange={(e) => handlePriceChange([parseInt(e.target.value), filters.priceRange[1]])}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max={PRICE_MAX}
+                    step={PRICE_STEPS}
+                    value={filters.priceRange[1]}
+                    onChange={(e) => handlePriceChange([filters.priceRange[0], parseInt(e.target.value)])}
+                    className="absolute top-0 left-0 w-full h-1.5 bg-transparent appearance-none cursor-pointer accent-rose-500"
+                    style={{ pointerEvents: "auto" }}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  <span>0</span>
+                  <span>50M</span>
+                  <span>100M+</span>
+                </div>
               </div>
+            </div>
+
+            {/* Purple Box: Province + Lat/Lng */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <span className="text-purple-500">●</span> Provincia
+              </label>
+              <select
+                value={filters.province}
+                onChange={(e) => updateFilter("province", e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+              >
+                <option value="">Todas</option>
+                {provincias?.map((p) => (
+                  <option key={p.nombre} value={p.nombre}>{p.nombre}</option>
+                ))}
+              </select>
+
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 mt-4">
+                <span className="text-purple-500">●</span> Coordenadas (Lat, Lng)
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Ej: 18.47186, -69.93988"
+                  value={filters.latLng}
+                  onChange={handleLatLngChange}
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl border border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                />
+              </div>
+
+              {filters.latLng && (
+                <div className="text-[9px] font-bold text-purple-600 bg-purple-50 px-2 py-1.5 rounded-lg border border-purple-100 mt-2">
+                  Se auto-asignará la provincia más cercana
+                </div>
+              )}
+            </div>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="w-full px-3 py-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 bg-white rounded-xl border border-slate-100 shadow-sm transition-colors uppercase tracking-widest"
+              >
+                Limpiar filtros
+              </button>
             )}
           </div>
-
-          {/* Clear Filters */}
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearAllFilters}
-              className="w-full px-3 py-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 bg-white rounded-xl border border-slate-100 shadow-sm transition-colors uppercase tracking-widest"
-            >
-              Limpiar filtros
-            </button>
-          )}
-        </div>
         )}
 
         {/* Right - Grid + Pagination */}
@@ -361,13 +357,13 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
                         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
                           <span>Integridad Validada</span>
                           <span className="text-primary">
-{(project.integridadValidada !== undefined && project.integridadValidada > 0) ? `${project.integridadValidada}%` : (project.completionRate !== undefined ? `${project.completionRate}%` : "—")}
+                            {(project.integridadValidada !== undefined && project.integridadValidada > 0) ? `${project.integridadValidada}%` : (project.completionRate !== undefined ? `${project.completionRate}%` : "—")}
                           </span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                           <m.div
                             initial={{ width: 0 }}
-animate={{ width: `${project.integridadValidada ?? project.completionRate ?? 0}%` }}
+                            animate={{ width: `${project.integridadValidada ?? project.completionRate ?? 0}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
                             className="h-full bg-primary"
                           />

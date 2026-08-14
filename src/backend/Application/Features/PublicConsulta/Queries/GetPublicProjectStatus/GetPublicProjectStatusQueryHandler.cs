@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions;
 using Application.Abstractions.Persistence;
+using Application.Contracts.Documents;
 using Domain.Enums;
 
 public class GetPublicProjectStatusQueryHandler
@@ -15,19 +16,22 @@ public class GetPublicProjectStatusQueryHandler
     private readonly IValidacionRepository _validacionRepository;
     private readonly IAuditLogger _auditLogger;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IDocumentService _documentService;
 
     public GetPublicProjectStatusQueryHandler(
         ISelloIntegridadRepository selloRepository,
         IProyectoRepository proyectoRepository,
         IValidacionRepository validacionRepository,
         IAuditLogger auditLogger,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IDocumentService documentService)
     {
         _selloRepository = selloRepository;
         _proyectoRepository = proyectoRepository;
         _validacionRepository = validacionRepository;
         _auditLogger = auditLogger;
         _unitOfWork = unitOfWork;
+        _documentService = documentService;
     }
 
     public async Task<PublicProjectStatusDto?> Handle(GetPublicProjectStatusQuery request, CancellationToken cancellationToken)
@@ -74,6 +78,17 @@ public class GetPublicProjectStatusQueryHandler
             Resultado = v.Estado == ValidationStatus.Completed ? "Verificado" : "Pendiente/Con Observaciones"
         }).ToList();
 
+        var docs = await _documentService.GetProjectDocumentsAsync(proyecto.Id, cancellationToken);
+        var documentos = docs
+            .Where(d => d.Activo && d.EstadoDocumento != DocumentStatus.Invalid)
+            .Select(d => new PublicDocumentSummaryDto
+            {
+                Id = d.Id,
+                TipoDocumento = (int)d.TipoDocumento,
+                NombreArchivoOriginal = d.NombreArchivoOriginal,
+                EstadoDocumento = (int)d.EstadoDocumento
+            }).ToList();
+
         var dto = new PublicProjectStatusDto
         {
             Id = proyecto.Id,
@@ -82,7 +97,8 @@ public class GetPublicProjectStatusQueryHandler
             Ubicacion = proyecto.UbicacionTexto,
             EstadoValidacion = proyecto.Estado?.Nombre ?? "Desconocido",
             FechaEmision = sello.FechaEmisionUtc,
-            ResumenDimensiones = resumen
+            ResumenDimensiones = resumen,
+            Documentos = documentos
         };
 
         // Log audit

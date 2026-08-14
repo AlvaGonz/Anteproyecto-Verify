@@ -109,9 +109,6 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             .FirstOrDefaultAsync(p => p.Id == proyectoId);
 
         if (proyecto == null) return;
-        
-        // Si ya está publicado, no hacemos nada (a menos que ahora caiga a Con Observaciones)
-        // Wait, we need to be able to transition from Publicado to ConObservacion if average drops.
 
         var totalDocumentos = await _dbContext.Documentos.CountAsync(d => d.ProyectoId == proyectoId);
         
@@ -123,6 +120,10 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
             double sumPorcentaje = datosValidados.Sum(d => d.PorcentajeTotal);
             double average = sumPorcentaje / totalDocumentos;
+
+            var ipiNoPagado = !string.IsNullOrEmpty(proyecto.EstatusIpi) && proyecto.EstatusIpi == "PAGO_PENDIENTE";
+            var ipiRuleActive = ipiNoPagado && await _dbContext.ReglasValidacion
+                .AnyAsync(r => r.Activa && r.TipoDocumentoAplicable == Domain.Enums.DocumentType.CertificacionIPI);
 
             if (average < 50 && proyecto.Estado?.CodigoUnico != Domain.Enums.ProjectStatusCodes.Observacion)
             {
@@ -150,7 +151,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
                     await _dbContext.SaveChangesAsync();
                 }
             }
-            else if (average >= 50 && totalDocumentos >= 3 && proyecto.Estado?.CodigoUnico != Domain.Enums.ProjectStatusCodes.Publicado)
+            else if (average >= 50 && totalDocumentos >= 3 && proyecto.Estado?.CodigoUnico != Domain.Enums.ProjectStatusCodes.Publicado && !ipiRuleActive)
             {
                 var estadoPublicado = await _dbContext.ProyectoEstados
                     .FirstOrDefaultAsync(e => e.CodigoUnico == Domain.Enums.ProjectStatusCodes.Publicado);
@@ -518,7 +519,7 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
                 IsValid = percentage >= 60m,
                 MatchPercentage = percentage,
                 Message = percentage >= 99m ? "Certificación de IPI verificada." : $"Certificación de IPI validada parcialmente ({percentage}%).",
-                MatchedData = new { entity.Rnc, entity.NoCertificacion, entity.NoInmueble, entity.ParcelaNo }
+                MatchedData = new { entity.Rnc, entity.NoCertificacion, entity.NoInmueble, entity.ParcelaNo, entity.Estatus }
             };
 
             if (f1.total == 1 && f1.matched == 0) res.FailedFields.Add("Rnc");

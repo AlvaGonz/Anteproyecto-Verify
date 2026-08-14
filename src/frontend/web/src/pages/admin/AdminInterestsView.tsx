@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
-import { Search, Users, Heart, Bookmark, X, BarChart3 } from "lucide-react";
+import { Search, Users, Bookmark, X, BarChart3 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 
 interface InterestRecord {

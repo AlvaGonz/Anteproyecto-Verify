@@ -18,7 +18,6 @@ import { useProject } from "../../features/projects/api/useProjects";
 import { useCategories } from "../../features/projects/api/useCategories";
 import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
 import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
-import { IntegrityStatus } from "../../features/projects/types";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { LimitReachedModal } from "../../features/projects/components/LimitReachedModal";
@@ -153,7 +152,7 @@ export const PublishedProjectDetailPage: React.FC = () => {
   let gpsLat: number | null = null;
   let gpsLng: number | null = null;
   if (project?.ubicacionGps) {
-    const parts = project.ubicacionGps.split(",").map((s) => parseFloat(s.trim()));
+    const parts = project.ubicacionGps.split(",").map((s: any) => parseFloat(s.trim()));
     if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
       gpsLat = parts[0];
       gpsLng = parts[1];

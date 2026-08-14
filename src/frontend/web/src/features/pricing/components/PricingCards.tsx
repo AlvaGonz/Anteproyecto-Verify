@@ -6,7 +6,6 @@ const ICONS = {
 };
 
 interface PricingCardsProps {
-  t: (key: string) => string;
   isRevealed: boolean;
   prices: { profesional: string; empresa: string; corporativo: string };
   handleFreePlan: () => void;
@@ -15,9 +14,7 @@ interface PricingCardsProps {
   currentPlan?: string | null;
 }
 
-export const PricingCards: React.FC<PricingCardsProps> = ({
-  t,
-  isRevealed,
+export const PricingCards: React.FC<PricingCardsProps> = ({  isRevealed,
   prices,
   handleFreePlan,
   handlePaidPlan,
@@ -37,7 +34,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
     const isEmbossed = modalMode ? currentPlan === planKey : isDefaultPopular;
     if (!isEmbossed) return null;
     
-    const badgeText = modalMode ? "PLAN ACTUAL" : t("pricing.cards.popular");
+    const badgeText = modalMode ? "PLAN ACTUAL" : "MÁS POPULAR";
     return (
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-on-primary text-xs font-label font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm badge-pulse whitespace-nowrap">
         {badgeText}
@@ -54,35 +51,35 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
         >
           {renderBadge("consultor", false)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
-            {t("pricing.cards.free.title")}
+            {"Consultor"}
           </h3>
           <div className="mb-6 flex items-baseline">
             <span className="text-3xl font-headline font-extrabold">$0</span>
             <span className="text-on-surface-variant font-body text-sm ml-2">
-              {t("pricing.cards.period")}
+              {"/mes"}
             </span>
           </div>
           <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-            {t("pricing.cards.free.desc")}
+            {"Para usuarios ocasionales que necesitan consultas básicas de inmuebles."}
           </p>
           <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-primary text-xl check-anim check-delay-1">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.free.feature1")}
+              {"1 consultas /mes"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-primary text-xl check-anim check-delay-2">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.free.feature2")}
+              {"Datos públicos básicos"}
             </li>
             <li className="flex items-start gap-3 opacity-50">
               <span className="material-symbols-outlined text-outline text-xl">
                 {ICONS.cancel}
               </span>{" "}
-              {t("pricing.cards.free.feature3")}
+              {"Presentación pública de sus proyectos"}
             </li>
           </ul>
           <button
@@ -90,7 +87,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
             onClick={handleFreePlan}
             className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
           >
-            {t("pricing.cards.free.button")}
+            {"Comenzar gratis"}
           </button>
         </div>
 
@@ -100,46 +97,46 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
         >
           {renderBadge("profesional", true)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
-            {t("pricing.cards.pro.title")}
+            {"Profesional"}
           </h3>
           <div className="mb-6 flex items-baseline">
             <span className="text-3xl font-headline font-extrabold text-primary whitespace-nowrap">
               {prices.profesional}
             </span>
             <span className="text-on-surface-variant font-body text-sm ml-2">
-              {t("pricing.cards.period")}
+              {"/mes"}
             </span>
           </div>
           <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-            {t("pricing.cards.pro.desc")}
+            {"Herramientas completas para agentes independientes y pequeñas agencias."}
           </p>
           <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-1">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.pro.feature1")}
+              {"25 consultas /mes"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-2">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.pro.feature2")}
+              {"5 proyectos registrables"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-primary text-xl fill-icon check-anim check-delay-3">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.pro.feature3")}
+              {"Consultas de proyectos por QR"}
             </li>
           </ul>
           <button
             type="button"
             onClick={() => handlePaidPlan("profesional")}
             className="w-full py-3 rounded-lg bg-primary text-on-primary font-label font-bold hover:bg-primary-hover shadow-md transition-colors btn-interact text-center block"
-            aria-label={t("pricing.cards.pro.button")}
+            aria-label={"Elegir Profesional"}
           >
-            {t("pricing.cards.pro.button")}
+            {"Elegir Profesional"}
           </button>
         </div>
 
@@ -149,52 +146,52 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
         >
           {renderBadge("empresa", false)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
-            {t("pricing.cards.empresa.title")}
+            {"Empresa"}
           </h3>
           <div className="mb-6 flex items-baseline">
             <span className="text-3xl font-headline font-extrabold text-secondary whitespace-nowrap">
               {prices.empresa}
             </span>
             <span className="text-on-surface-variant font-body text-sm ml-2">
-              {t("pricing.cards.period")}
+              {"/mes"}
             </span>
           </div>
           <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-            {t("pricing.cards.empresa.desc")}
+            {"Volumen alto para inmobiliarias y equipos de analistas."}
           </p>
           <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-1">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.empresa.feature1")}
+              {"100 consultas /mes"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-2">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.empresa.feature2")}
+              {"10 proyectos registrables"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-3">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.empresa.feature3")}
+              {"Multiusuario (hasta 5)"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-secondary text-xl check-anim check-delay-4">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.empresa.feature4")}
+              {"Consultas de proyectos por QR"}
             </li>
           </ul>
           <button
             type="button"
             onClick={() => handlePaidPlan("empresa")}
             className="w-full py-3 rounded-lg border border-secondary text-secondary font-label font-bold hover:bg-secondary/5 transition-colors btn-interact text-center block"
-            aria-label={t("pricing.cards.empresa.button")}
+            aria-label={"Elegir Empresa"}
           >
-            {t("pricing.cards.empresa.button")}
+            {"Elegir Empresa"}
           </button>
         </div>
 
@@ -204,52 +201,52 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
         >
           {renderBadge("corporativo", false)}
           <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
-            {t("pricing.cards.corporativo.title")}
+            {"Corporativo"}
           </h3>
           <div className="mb-6 flex items-baseline">
             <span className="text-3xl font-headline font-extrabold text-on-surface whitespace-nowrap">
               {prices.corporativo}
             </span>
             <span className="text-on-surface-variant font-body text-sm ml-2">
-              {t("pricing.cards.period")}
+              {"/mes"}
             </span>
           </div>
           <p className="text-sm font-body text-on-surface-variant mb-8 flex-grow">
-            {t("pricing.cards.corporativo.desc")}
+            {"Soluciones a medida para bancos, desarrolladoras y gobierno."}
           </p>
           <ul className="space-y-4 mb-8 font-body text-sm text-on-surface">
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-1">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.corporativo.feature1")}
+              {"Consultas ilimitadas"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-2">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.corporativo.feature2")}
+              {"50 proyectos registrables"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-3">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.corporativo.feature3")}
+              {"Multiusuario (hasta 30)"}
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-on-surface text-xl check-anim check-delay-4">
                 {ICONS.checkCircle}
               </span>
-              {t("pricing.cards.corporativo.feature4")}
+              {"Consultas de proyectos por QR"}
             </li>
           </ul>
           <button
             type="button"
             onClick={() => handlePaidPlan("corporativo")}
             className="w-full py-3 rounded-lg bg-secondary text-on-secondary font-label font-bold hover:bg-secondary/90 transition-colors btn-interact text-center block text-secondary-container"
-            aria-label={t("pricing.cards.corporativo.button")}
+            aria-label={"Elegir Corporativo"}
           >
-            {t("pricing.cards.corporativo.button")}
+            {"Elegir Corporativo"}
           </button>
         </div>
       </div>
