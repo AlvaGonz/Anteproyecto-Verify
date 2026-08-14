@@ -405,7 +405,10 @@ def setup_tables():
             Departamento VARCHAR(100) NULL,
             Operacion VARCHAR(100) NULL,
             Seccion VARCHAR(100) NULL,
-            Lugar VARCHAR(100) NULL
+            Lugar VARCHAR(100) NULL,
+            MivedId UNIQUEIDENTIFIER NULL,
+            UnidadesHabitacionales INT NULL,
+            LocalesComerciales INT NULL
         );
     END
     ELSE
@@ -416,6 +419,9 @@ def setup_tables():
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Operacion') ALTER TABLE PermisoSuelo ADD Operacion VARCHAR(100) NULL;
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Seccion') ALTER TABLE PermisoSuelo ADD Seccion VARCHAR(100) NULL;
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'Lugar') ALTER TABLE PermisoSuelo ADD Lugar VARCHAR(100) NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'MivedId') ALTER TABLE PermisoSuelo ADD MivedId UNIQUEIDENTIFIER NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'UnidadesHabitacionales') ALTER TABLE PermisoSuelo ADD UnidadesHabitacionales INT NULL;
+        IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PermisoSuelo') AND name = 'LocalesComerciales') ALTER TABLE PermisoSuelo ADD LocalesComerciales INT NULL;
     END
     """)
     conn.commit()
@@ -517,7 +523,8 @@ def generate_catastro_ps_ipi_records(rncs_list):
                 muni_coords = coord_info["municipios"][municipio]
                 lat = muni_coords["lat"] + random.uniform(-0.02, 0.02)
                 lon = muni_coords["lon"] + random.uniform(-0.02, 0.02)
-                superficie = random.choice(SUPERFICIE_OPTIONS)
+                base_superficie = random.choice(SUPERFICIE_OPTIONS)
+                superficie = base_superficie * 3.44
                 base_matricula += 1
                 base_titulo += 1
                 
@@ -534,28 +541,6 @@ def generate_catastro_ps_ipi_records(rncs_list):
                 }
                 
                 ps_record = None
-                if random.random() < 0.4877:
-                    letras = "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=2))
-                    nums1 = "".join(random.choices("0123456789", k=2))
-                    nums2 = "".join(random.choices("0123456789", k=random.choice([2, 3])))
-                    num_exp = f"{letras} {nums1}{nums2}"
-                    num_permiso = str(random.randint(1000, 99999))
-                    day_offset = random.randint(0, 183)
-                    fecha_emision = start_date + datetime.timedelta(days=day_offset)
-                    tiene_permiso = random.choice(["1", "0"])
-                    
-                    ps_record = {
-                        "id": str(uuid.uuid4()).upper(), "num_permiso": num_permiso,
-                        "num_exp": num_exp, "fecha": fecha_emision.strftime("%Y-%m-%d"),
-                        "rnc": rnc, "provincia": provincia, "municipio": municipio,
-                        "lat": lat, "lon": lon, "superficie": superficie,
-                        "tiene_permiso": tiene_permiso,
-                        "departamento": random.choice(departamentos),
-                        "operacion": random.choice(["MENSURA", "DESLINDE", "SUBDIVISION", "REFUNDICION"]),
-                        "seccion": "SECCION " + str(random.randint(1, 10)),
-                        "lugar": "LUGAR " + str(random.randint(1, 100))
-                    }
-                    
                 ipi_record = None
                 if rnc not in rnc_ipi_generated:
                     rnc_ipi_generated.add(rnc)
@@ -571,6 +556,57 @@ def generate_catastro_ps_ipi_records(rncs_list):
                     }
                     
                 yield cat_record, ps_record, ipi_record
+
+
+def generate_ps_records(licencias_list, rncs_list):
+    import datetime
+    start_date = datetime.date(2026, 7, 1)
+    departamentos = ["NORTE", "SUR", "ESTE", "OESTE", "DISTRITO NACIONAL"]
+    for licencia in licencias_list:
+        mived_id = licencia["MivedId"]
+        num_permiso = licencia["NumeroPermiso"]
+        provincia = licencia["Provincia"]
+        municipio = licencia["Municipio"]
+        unidades = licencia.get("UnidadesHabitacionales", 0)
+        locales = licencia.get("LocalesComerciales", 0)
+        rnc = licencia.get("Rnc")
+        if not rnc: rnc = random.choice(rncs_list)
+        
+        letras = "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=2))
+        nums1 = "".join(random.choices("0123456789", k=2))
+        nums2 = "".join(random.choices("0123456789", k=random.choice([2, 3])))
+        num_exp = f"{letras} {nums1}{nums2}"
+        day_offset = random.randint(0, 183)
+        fecha_emision = start_date + datetime.timedelta(days=day_offset)
+        tiene_permiso = random.choice(["1", "0"])
+        
+        lat, lon = None, None
+        coord_info = PROVINCIAS_COORDENADAS.get(provincia)
+        if coord_info and municipio in coord_info["municipios"]:
+            muni_coords = coord_info["municipios"][municipio]
+            lat = muni_coords["lat"] + random.uniform(-0.02, 0.02)
+            lon = muni_coords["lon"] + random.uniform(-0.02, 0.02)
+        else:
+            lat = 18.4861 + random.uniform(-0.5, 0.5)
+            lon = -69.9312 + random.uniform(-0.5, 0.5)
+            
+        base_superficie = random.choice(SUPERFICIE_OPTIONS)
+        final_superficie = base_superficie * 3.44
+        
+        yield {
+            "id": str(uuid.uuid4()).upper(), "num_permiso": num_permiso,
+            "num_exp": num_exp, "fecha": fecha_emision.strftime("%Y-%m-%d"),
+            "rnc": rnc, "provincia": provincia, "municipio": municipio,
+            "lat": lat, "lon": lon, "superficie": final_superficie,
+            "tiene_permiso": tiene_permiso,
+            "departamento": random.choice(departamentos),
+            "operacion": random.choice(["MENSURA", "DESLINDE", "SUBDIVISION", "REFUNDICION"]),
+            "seccion": "SECCION " + str(random.randint(1, 10)),
+            "lugar": "LUGAR " + str(random.randint(1, 100)),
+            "mived_id": mived_id,
+            "unidades": unidades,
+            "locales": locales
+        }
 
 TRANSIENT_ERROR_CODES = {1205, 1204, 1222, 3960, 3961, -2, 0, 11, 64, 258, 4060, 40197, 40501, 40613, 42108, 42109}
 TRANSIENT_ERROR_MSGS = ["deadlock", "timeout", "connection", "network", "transport", "refused", "reset", "broken"]
@@ -666,10 +702,10 @@ def insert_ps_chunk(chunk_id, chunk_records, attempt=1):
         for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
             batch = chunk_records[i:i+batch_size]
             
-            sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento, Departamento, Operacion, Seccion, Lugar) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL, {ph}, {ph}, {ph}, {ph})"] * len(batch))
+            sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento, Departamento, Operacion, Seccion, Lugar, MivedId, UnidadesHabitacionales, LocalesComerciales) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
             params_ps = []
             for p in batch:
-                params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"], p["departamento"], p["operacion"], p["seccion"], p["lugar"]])
+                params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"], p["departamento"], p["operacion"], p["seccion"], p["lugar"], p.get("mived_id"), p.get("unidades"), p.get("locales")])
             cursor.execute(sql_ps, tuple(params_ps))
             if (chunk_idx + 1) % 50 == 0:
                 conn.commit()
@@ -721,27 +757,171 @@ def insert_jce_chunk(chunk_id, chunk_records, attempt=1):
     finally:
         if conn: conn.close()
 
+
+def generate_linked_records(licencias_list):
+    import datetime
+    import uuid
+    import random
+    start_date = datetime.date(2026, 7, 1)
+    departamentos = ["NORTE", "SUR", "ESTE", "OESTE", "DISTRITO NACIONAL"]
+    oficinas = ["D.N.", "SANTO DOMINGO ESTE", "SANTIAGO", "VIRTUAL", "PUERTO PLATA", "LA VEGA"]
+    
+    base_matricula = random.randint(1000000000, 2000000000)
+    base_titulo = random.randint(1000000000, 2000000000)
+    
+    for licencia in licencias_list:
+        mived_id = licencia["MivedId"]
+        num_permiso = licencia["NumeroPermiso"]
+        provincia = licencia["Provincia"]
+        municipio = licencia["Municipio"]
+        unidades = licencia.get("UnidadesHabitacionales", 0)
+        locales = licencia.get("LocalesComerciales", 0)
+        rnc = licencia.get("Rnc", '000000000')
+        
+        # --- CATASTRO TITULO ---
+        base_dc = f"{random.randint(1,99):02d}{random.randint(1,500):04d}{random.randint(100000, 999999)}"
+        dc = f"{base_dc}:{random.randint(1,100):04d}"
+        
+        lat, lon = None, None
+        coord_info = PROVINCIAS_COORDENADAS.get(provincia)
+        if coord_info and municipio in coord_info["municipios"]:
+            muni_coords = coord_info["municipios"][municipio]
+            lat = muni_coords["lat"] + random.uniform(-0.02, 0.02)
+            lon = muni_coords["lon"] + random.uniform(-0.02, 0.02)
+        else:
+            lat = 18.4861 + random.uniform(-0.5, 0.5)
+            lon = -69.9312 + random.uniform(-0.5, 0.5)
+            
+        base_superficie = random.choice(SUPERFICIE_OPTIONS)
+        final_superficie = base_superficie * 3.44
+        
+        base_matricula += 1
+        base_titulo += 1
+        
+        cat_record = {
+            "id": str(uuid.uuid4()).upper(), "dc": dc, "titulo": str(base_titulo),
+            "rnc": rnc, "provincia": provincia, "municipio": municipio,
+            "lat": lat, "lon": lon, "superficie": final_superficie, "matricula": str(base_matricula),
+            "oficina": random.choice(oficinas),
+            "fecha_inscripcion": (datetime.datetime.now() - datetime.timedelta(days=random.randint(1000, 5000))).strftime('%Y-%m-%d %H:%M:%S'),
+            "fecha_emision": (datetime.datetime.now() - datetime.timedelta(days=random.randint(100, 999))).strftime('%Y-%m-%d %H:%M:%S'),
+            "viene_de": f"{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}.{random.randint(10,999)},{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}.{random.randint(10,99)}",
+            "desig_catastral_origen": f"Parc. {random.randint(10,99)}, DC-{random.randint(1,99):02d}",
+            "desig_catastral_posicional": f"{random.randint(100000000000, 999999999999)}"
+        }
+        
+        # --- PERMISO SUELO ---
+        letras = "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=2))
+        nums1 = "".join(random.choices("0123456789", k=2))
+        nums2 = "".join(random.choices("0123456789", k=random.choice([2, 3])))
+        num_exp = f"{letras} {nums1}{nums2}"
+        day_offset = random.randint(0, 183)
+        fecha_emision_ps = start_date + datetime.timedelta(days=day_offset)
+        tiene_permiso = random.choice(["1", "0"])
+        
+        ps_record = {
+            "id": str(uuid.uuid4()).upper(), "num_permiso": num_permiso,
+            "num_exp": num_exp, "fecha": fecha_emision_ps.strftime("%Y-%m-%d"),
+            "rnc": rnc, "provincia": provincia, "municipio": municipio,
+            "lat": lat, "lon": lon, "superficie": final_superficie,
+            "tiene_permiso": tiene_permiso,
+            "departamento": random.choice(departamentos),
+            "operacion": random.choice(["MENSURA", "DESLINDE", "SUBDIVISION", "REFUNDICION"]),
+            "seccion": "SECCION " + str(random.randint(1, 10)),
+            "lugar": "LUGAR " + str(random.randint(1, 100)),
+            "mived_id": mived_id,
+            "unidades": unidades,
+            "locales": locales
+        }
+        
+        # --- PAGO IPI ---
+        cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
+        estatus_ipi = random.choice(["Pagado", "No Pagado"])
+        num_cert = str(random.randint(100000000000, 999999999999))
+        day_offset_ipi = random.randint(0, 183)
+        fecha_creacion_ipi = start_date + datetime.timedelta(days=day_offset_ipi)
+        ipi_record = {
+            "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi,
+            "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc,
+            "fecha_creacion": fecha_creacion_ipi.strftime("%Y-%m-%d")
+        }
+        
+        yield cat_record, ps_record, ipi_record
+
+
+def get_latest_csv(folder_path):
+    import glob
+    search_pattern = os.path.join(folder_path, '*.csv')
+    files = glob.glob(search_pattern)
+    if not files:
+        return None
+    return max(files, key=os.path.getctime)
+
+def import_csv_to_db(csv_path, table_name, conn_params, db_lib):
+    import csv
+    print(f'Starting import for {table_name} from {csv_path}')
+    t_start = time.time()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    ph = '%s' if db_lib == 'pymssql' else '?'
+    
+    with open(csv_path, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f, delimiter='|')
+        headers = next(reader)
+        cols = ', '.join(headers)
+        placeholders = ', '.join([ph] * len(headers))
+        sql = f'INSERT INTO {table_name} ({cols}) VALUES ({placeholders})'
+        
+        batch = []
+        batch_size = 5000
+        count = 0
+        for row in reader:
+            processed_row = tuple(val if val != '' else None for val in row)
+            batch.append(processed_row)
+            if len(batch) >= batch_size:
+                cursor.executemany(sql, batch)
+                conn.commit()
+                count += len(batch)
+                batch = []
+                if count % 100000 == 0:
+                    print(f'Imported {count} records into {table_name}...')
+        if batch:
+            cursor.executemany(sql, batch)
+            conn.commit()
+            count += len(batch)
+    conn.close()
+    t_end = time.time()
+    print(f'Successfully imported {count} records into {table_name} in {int(t_end - t_start)} seconds.')
+    return True
+
 def main():
     wait_for_database()
-    file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Bots", "DGII", "src", "DGII_RNC.TXT"))
-    if not os.path.exists(file_path):
-        print(f"Error: DGII source file not found at {file_path}")
-        sys.exit(1)
-        
-    print(f"Starting optimized seed generator...")
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM CatastroTitulo")
-        count = cursor.fetchone()[0]
-        conn.close()
-        if count >= 99999999:
-            print(f"CatastroTitulo seeds are already fully loaded ({count} records). Skipping.")
-            return
-    except Exception as e:
-        print(f"Database check failed: {e}. Proceeding.")
-
     setup_tables()
+    
+    # Check for CSV caching first
+    base_bots = os.path.join(os.path.dirname(__file__), "Bots")
+    tables_to_check = ["JCE_Ciudadano", "CatastroTitulo", "PermisoSuelo", "PagoIPI"]
+    all_csvs_found = True
+    csv_paths = {}
+    for tbl in tables_to_check:
+        folder = os.path.join(base_bots, tbl)
+        csv_file = get_latest_csv(folder) if os.path.exists(folder) else None
+        if csv_file:
+            csv_paths[tbl] = csv_file
+        else:
+            all_csvs_found = False
+            
+    if all_csvs_found:
+        print("CSV cache files found for all entities! Bypassing random generation and restoring from CSV...")
+        for tbl, path in csv_paths.items():
+            import_csv_to_db(path, tbl, conn_params, db_lib)
+        print("Restoration from CSV complete!")
+        return
+        
+    print("CSV cache files missing or incomplete. Proceeding with standard generation...")
+    # --- Standard Generation Logic Starts Here ---
+    file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Bots", "DGII", "src", "DGII_RNC.TXT"))
+
     print("Reading RNCs...")
     rncs_list, cedulas_list = get_rncs(file_path)
     print(f"Loaded {len(rncs_list)} unique RNCs and {len(cedulas_list)} cedulas.")
@@ -770,7 +950,62 @@ def main():
             except Exception as e: print(f"Worker error JCE: {e}")
     t_jce_end = time.time()
     
-    print("Submitting Catastro, PermisoSuelo and IPI tasks simultaneously...")
+
+    print("Loading LicenciaConstruccion to use as base for Linked Generation...")
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MivedId, NumeroPermiso, Provincia, Municipio, UnidadesHabitacionales, LocalesComerciales, Rnc FROM LicenciaConstruccion")
+        lic_rows = cursor.fetchall()
+        licencias_list = [{"MivedId": r[0], "NumeroPermiso": r[1], "Provincia": r[2], "Municipio": r[3], "UnidadesHabitacionales": r[4], "LocalesComerciales": r[5], "Rnc": r[6]} for r in lic_rows]
+        conn.close()
+        print(f"Loaded {len(licencias_list)} Licencias.")
+    except Exception as e:
+        print(f"Failed to load Licencias: {e}")
+        licencias_list = []
+        
+    print("Submitting Linked Generation (Catastro + PS + IPI from Licencias)...")
+    t_ps_start = time.time()
+    catastro_chunk = []
+    ps_chunk = []
+    ipi_chunk = []
+    c_count, p_count, i_count = 0, 0, 0
+    
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        futures_linked = []
+        for cat_r, ps_r, ipi_r in generate_linked_records(licencias_list):
+            catastro_chunk.append(cat_r)
+            ps_chunk.append(ps_r)
+            ipi_chunk.append(ipi_r)
+            
+            if len(catastro_chunk) >= chunk_size:
+                c_count += 1
+                futures_linked.append(executor.submit(insert_catastro_chunk, f"LINKED_CAT_{c_count}", catastro_chunk))
+                catastro_chunk = []
+            if len(ps_chunk) >= chunk_size:
+                p_count += 1
+                futures_linked.append(executor.submit(insert_ps_chunk, f"LINKED_PS_{p_count}", ps_chunk))
+                ps_chunk = []
+            if len(ipi_chunk) >= chunk_size:
+                i_count += 1
+                futures_linked.append(executor.submit(insert_ipi_chunk, f"LINKED_IPI_{i_count}", ipi_chunk))
+                ipi_chunk = []
+                
+        if catastro_chunk:
+            c_count += 1
+            futures_linked.append(executor.submit(insert_catastro_chunk, f"LINKED_CAT_{c_count}", catastro_chunk))
+        if ps_chunk:
+            p_count += 1
+            futures_linked.append(executor.submit(insert_ps_chunk, f"LINKED_PS_{p_count}", ps_chunk))
+        if ipi_chunk:
+            i_count += 1
+            futures_linked.append(executor.submit(insert_ipi_chunk, f"LINKED_IPI_{i_count}", ipi_chunk))
+            
+        for fut in as_completed(futures_linked):
+            try: fut.result()
+            except Exception as e: print(f"Worker error Linked: {e}")
+            
+    print("Submitting remaining Catastro and IPI tasks simultaneously...")
     catastro_chunk = []
     ps_chunk = []
     ipi_chunk = []
@@ -831,6 +1066,48 @@ def main():
     print(f"Catastro, PermisoSuelo e IPI: {int(m_cat_ps)} minutos {int(s_cat_ps)} segundos")
     print(f"Tiempo Total: {int(m_tot)} minutos {int(s_tot)} segundos")
     print("="*50 + "\n")
+    
+    print("Auto-exporting generated data to CSV cache for future runs...")
+    export_tables_to_csv()
+
+def export_tables_to_csv():
+    import datetime
+    import csv
+    print("Starting CSV auto-export process...")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    tables_to_export = [
+        ("PermisoSuelo", "Bots/PermisoSuelo/PermisoSuelo_{date}.csv"),
+        ("JCE_Ciudadano", "Bots/JCE_Ciudadano/JCE_Ciudadano_{date}.csv"),
+        ("CatastroTitulo", "Bots/CatastroTitulo/CatastroTitulo_{date}.csv"),
+        ("PagoIPI", "Bots/PagoIPI/PagoIPI_{date}.csv"),
+        ("ProyectosInmobiliarios", "Bots/ProyectosInmobiliarios/ProyectosInmobiliarios_{date}.csv")
+    ]
+    date_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    base_dir = os.path.dirname(__file__)
+    for table, path_template in tables_to_export:
+        rel_path = path_template.format(date=date_str)
+        full_path = os.path.join(base_dir, rel_path)
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        print(f"Exporting {table} to {full_path}...")
+        
+        cursor_raw = conn.cursor()
+        cursor_raw.execute(f"SELECT * FROM {table}")
+        col_names = [col[0] for col in cursor_raw.description]
+        
+        with open(full_path, mode='w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f, delimiter='|')
+            writer.writerow(col_names)
+            while True:
+                rows = cursor_raw.fetchmany(100000)
+                if not rows:
+                    break
+                for row in rows:
+                    str_row = [str(x) if x is not None else '' for x in row]
+                    writer.writerow(str_row)
+        print(f"Finished exporting {table}.")
+    conn.close()
+    print("All auto-exports completed successfully!")
 
 if __name__ == "__main__":
     main()
