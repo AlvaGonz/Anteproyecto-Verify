@@ -15,6 +15,8 @@ import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
 import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
+import { useDiscrepancyCheck, Discrepancy } from "../../validations/hooks/useDiscrepancyCheck";
+import { DiscrepancyAlertDialog } from "../../validations/components/DiscrepancyAlertDialog";
 
 type NumericKind = "matricula" | "superficieM2";
 
@@ -174,28 +176,47 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
   const [editingField, setEditingField] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
   const [isSaving, setIsSaving] = React.useState(false);
+  const [isDiscrepancyDialogOpen, setIsDiscrepancyDialogOpen] = React.useState(false);
+  const [discrepancies, setDiscrepancies] = React.useState<Discrepancy[]>([]);
 
+  const { checkDiscrepancies } = useDiscrepancyCheck(proyectoId);
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
   const getStatus = (fieldVal: string | undefined | null, fieldKey: string) =>
     getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
+  const getPayload = () => ({
+    matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue || "",
+    designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue || "",
+    oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue || "",
+    fechaInscripcion: extraction.fechaYHoraInscripcion?.normalizedValue || extraction.fechaYHoraInscripcion?.rawValue || "",
+    fechaEmision: "", // Titulo extraction model doesn't output this yet directly here?
+    vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue || "",
+    provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || "",
+    municipio: municipalities.find(m => m.id === selectedMunicipalityId)?.nombre || "",
+    superficieM2: extraction.superficieM2?.normalizedValue || extraction.superficieM2?.rawValue || ""
+  });
+
   const handleVerifyGobernanza = () => {
+    const payload = getPayload();
+    const foundDiscrepancies = checkDiscrepancies(payload);
+
+    if (foundDiscrepancies.length > 0) {
+      setDiscrepancies(foundDiscrepancies);
+      setIsDiscrepancyDialogOpen(true);
+      return;
+    }
+
+    proceedWithValidation();
+  };
+
+  const proceedWithValidation = () => {
+    setIsDiscrepancyDialogOpen(false);
     verifyDocument({
       documentType: 'catastro',
       proyectoId,
       documentoId,
-      payload: {
-        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue || "",
-        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue || "",
-        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue || "",
-        fechaInscripcion: extraction.fechaYHoraInscripcion?.normalizedValue || extraction.fechaYHoraInscripcion?.rawValue || "",
-        fechaEmision: "", // Titulo extraction model doesn't output this yet directly here?
-        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue || "",
-        provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || "",
-        municipio: municipalities.find(m => m.id === selectedMunicipalityId)?.nombre || "",
-        superficieM2: extraction.superficieM2?.normalizedValue || extraction.superficieM2?.rawValue || ""
-      }
+      payload: getPayload()
     });
   };
 
@@ -362,6 +383,12 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
       {renderField("Municipio", "municipio", extraction.municipio)}
       {renderField("Provincia", "provincia", extraction.provincia)}
       {renderField("Superficie M2", "superficieM2", extraction.superficieM2, false, "Ej: 1500.00")}
+      <DiscrepancyAlertDialog
+        isOpen={isDiscrepancyDialogOpen}
+        discrepancies={discrepancies}
+        onCancel={() => setIsDiscrepancyDialogOpen(false)}
+        onProceed={proceedWithValidation}
+      />
     </DocumentExtractionPanel>
   );
 };

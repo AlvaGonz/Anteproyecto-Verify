@@ -46,20 +46,48 @@ import { MiniMap } from "../../shared/components/ui/MiniMap";
 
 export const ProjectPublicDetailPage: React.FC = () => {
   const { slug, id, qrToken } = useParams<{ slug?: string; id?: string; qrToken?: string }>();
+  const isQrAccess = !!qrToken && !slug && !id;
+
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+
+  /* 
+   * Current policy: /p/:id data is publicly fetchable by backend contract.
+   * The client gate exists only to prevent content/request flash while auth state
+   * is unresolved and to preserve the existing authenticated quota behavior.
+   */
+  const publicProjectGateResolved = !authLoading;
+
   // ponytail: QR access — resolve token to project ID via public endpoint
-  const { data: qrResolvedData } = useQuery({
+  const qrQuery = useQuery({
     queryKey: ["qrProject", qrToken],
     queryFn: () => apiClient.get(`/public/projects/qr/${encodeURIComponent(qrToken!)}`).then(r => r.data),
-    enabled: !!qrToken && !slug && !id,
+    enabled: isQrAccess,
     staleTime: 0,
-  }) as any;
-  const isQrAccess = !!qrToken && !slug && !id;
-  const resolvedProjectId = isQrAccess && qrResolvedData?.id ? String(qrResolvedData.id) : "";
-  const identifier = slug || id || resolvedProjectId;
-  const { data: projectFromApi, isLoading: loading, error: fetchError } = useProject(identifier);
-  const project = isQrAccess && qrResolvedData ? (qrResolvedData as any) : projectFromApi;
-  const error = isQrAccess ? null : (fetchError ? (fetchError as Error).message : null);
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  });
+
+  const qrStatus = qrQuery.isPending
+    ? 'checking'
+    : (qrQuery.isError || !qrQuery.data)
+      ? 'denied'
+      : 'allowed';
+
+  type AccessStatus = 'checking' | 'allowed' | 'denied'; 
+  const accessStatus: AccessStatus = authLoading 
+    ? 'checking' 
+    : isQrAccess 
+      ? qrStatus
+      : publicProjectGateResolved 
+        ? 'allowed' 
+        : 'denied';
+
+  const resolvedProjectId = isQrAccess && qrQuery.data?.id ? String(qrQuery.data.id) : "";
+  const baseIdentifier = slug || id || resolvedProjectId;
+  const identifierToFetch = accessStatus === 'allowed' && !isQrAccess ? baseIdentifier : "";
+
+  const { data: projectFromApi, isLoading: loading, error: fetchError } = useProject(identifierToFetch);
+  const project = isQrAccess && qrStatus === 'allowed' ? (qrQuery.data as any) : projectFromApi;
+  const error = isQrAccess ? (qrStatus === 'denied' ? "El activo solicitado no se encuentra o el código QR es inválido." : null) : (fetchError ? (fetchError as Error).message : null);
+
   const [isInterested, setIsInterested] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
   const [showDocumentos, setShowDocumentos] = React.useState(false);
@@ -74,12 +102,12 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const { addToast } = useToast();
 
   React.useEffect(() => {
-    if (isAuthenticated && interestsList && identifier) {
-      setIsInterested(interestsList.some(i => i.id?.toLowerCase() === identifier.toLowerCase() || (i as any).proyectoId?.toLowerCase() === identifier.toLowerCase()));
+    if (isAuthenticated && interestsList && baseIdentifier) {
+      setIsInterested(interestsList.some(i => i.id?.toLowerCase() === baseIdentifier.toLowerCase() || (i as any).proyectoId?.toLowerCase() === baseIdentifier.toLowerCase()));
     } else {
       setIsInterested(false);
     }
-  }, [isAuthenticated, interestsList, identifier]);
+  }, [isAuthenticated, interestsList, baseIdentifier]);
 
   React.useEffect(() => {
     if (isAuthenticated && savedList && project) {
@@ -110,7 +138,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
     async function consumeBg() {
       try {
         const { projectsApi } = await import("../../features/projects/api/projectsApi");
-        const result = await projectsApi.consumeQuota({ projectId: identifier });
+        const result = await projectsApi.consumeQuota({ projectId: baseIdentifier });
         if (result._tag === 'Success') {
           queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"], refetchType: 'all' });
         }
@@ -122,7 +150,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
     if (authLoading) return;
     if (quotaHandledRef.current) return;
 
-    if (isAdmin || !isAuthenticated || !identifier) {
+    if (isAdmin || !isAuthenticated || !baseIdentifier) {
       setHasQuota(true);
       quotaHandledRef.current = true;
       return;
@@ -149,7 +177,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
 
     setHasQuota(true);
     consumeBg();
-  }, [identifier, isAuthenticated, isAdmin, planLimits, planLimitsLoading, authLoading]);
+  }, [baseIdentifier, isAuthenticated, isAdmin, planLimits, planLimitsLoading, authLoading]);
 
   React.useEffect(() => {
     return () => {
@@ -177,13 +205,16 @@ export const ProjectPublicDetailPage: React.FC = () => {
     (user.titularId && project.registradoPor?.titularId === user.titularId)
   );
 
-  // If we don't have quota, we can't render the details.
-  if (loading || hasQuota === null)
+  const isFetchingProject = loading && accessStatus === 'allowed' && !isQrAccess;
+  const isCheckingAccess = accessStatus === 'checking' || isFetchingProject || (accessStatus === 'allowed' && !isQrAccess && hasQuota === null);
+
+  // If we are checking access, we can't render the details.
+  if (isCheckingAccess)
     return (
       <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         <p className="mt-4 text-sm font-bold text-slate-400 uppercase tracking-widest">
-          {hasQuota === null ? "Verificando acceso..." : "Cargando proyecto..."}
+          {accessStatus === 'checking' || hasQuota === null ? "Verificando acceso..." : "Cargando proyecto..."}
         </p>
       </div>
     );
@@ -418,7 +449,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
                 <div className="w-2 h-8 bg-primary rounded-full"></div>
                 <h2 className="text-2xl md:text-3xl font-display font-black text-secondary italic tracking-tighter uppercase">Estatus de Expediente</h2>
               </div>
-              <ProjectDocumentStatus projectId={project.id} categoriaId={project.categoriaId} preloadedDocuments={isQrAccess ? (qrResolvedData as any)?.documentos : undefined} />
+              <ProjectDocumentStatus projectId={project.id} categoriaId={project.categoriaId} preloadedDocuments={isQrAccess ? (qrQuery.data as any)?.documentos : undefined} />
             </div>
           </div>
 
