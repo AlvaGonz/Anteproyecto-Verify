@@ -112,7 +112,7 @@ public class Usuario : EntityBase, IEffectivePlanUser
         Cedula = cedula;
         Activo = true;
         AccountStatus = UserAccountStatus.Active;
-        EmailVerificado = false;
+        EmailVerificado = true;
     }
 
     public void UpdateContactInfo(string telefono, string cedula)

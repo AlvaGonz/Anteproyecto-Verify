@@ -247,7 +247,8 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
         columns = [
             "MivedId", "NumeroPermiso", "NombreProyecto", "Tipologia",
             "FechaEntrada", "FechaEmision",
-            "Provincia", "Municipio", "UnidadesHabitacionales", "LocalesComerciales"
+            "Provincia", "Municipio", "UnidadesHabitacionales", "LocalesComerciales",
+            "Rnc", "NombreRazonSocial"
         ]
         count = 0
         t0 = time.time()
@@ -351,6 +352,21 @@ def main():
     except Exception as e:
         print(f"Warning during cleanup: {e}")
 
+    print("Fetching DGII data for RNC assignment...")
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT Rnc, ISNULL(NombreRazonSocial, NombreComercial) FROM DGII WHERE Rnc IS NOT NULL")
+        dgii_data = cursor.fetchall()
+        conn.close()
+        import random
+        if not dgii_data:
+            dgii_data = [('000000000', 'Desconocido')]
+        print(f"Loaded {len(dgii_data)} DGII records.")
+    except Exception as e:
+        print(f"Error loading DGII: {e}")
+        dgii_data = [('000000000', 'Desconocido')]
+
     records_generator = parse_excel(file_path)
     current_chunk = []
     chunk_count = 0
@@ -360,7 +376,10 @@ def main():
 
     with ThreadPoolExecutor(max_workers=6) as executor:
         for record in records_generator:
-            current_chunk.append(record)
+            d = random.choice(dgii_data)
+            record = list(record)
+            record.extend([d[0], d[1]])
+            current_chunk.append(tuple(record))
             if len(current_chunk) >= CHUNK_SIZE:
                 chunk_count += 1
                 chunk_copy = list(current_chunk)
