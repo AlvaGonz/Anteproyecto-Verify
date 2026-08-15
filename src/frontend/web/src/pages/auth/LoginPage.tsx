@@ -21,7 +21,7 @@ export const LoginPage: React.FC = () => {
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-64 h-64 border-2 border-white rounded-full" />
             <div className="absolute bottom-[-5%] left-[-5%] w-48 h-48 border border-white rounded-full opacity-50" />
-         </div>
+          </div>
 
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div className="mb-4 md:mb-10">
@@ -31,41 +31,38 @@ export const LoginPage: React.FC = () => {
                   alt="VeriFinca Logo"
                   className="h-9 md:h-10 w-auto"
                 />
-             </Link>
-              <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-3 md:mb-4">
-                Plataforma Certificada
-             </div>
+              </Link>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-black leading-[1.1] mb-4 md:mb-6 tracking-tighter text-white">
                 Integridad <br />
                 <span className="text-primary-light">en cada m²</span>
-             </h2>
+              </h2>
 
               <p className="text-base text-white/70 leading-relaxed font-medium max-w-[280px] hidden sm:block">
                 La solución definitiva para la validación y gestión de proyectos inmobiliarios institucionales.
-             </p>
-           </div>
+              </p>
+            </div>
 
             <div className="space-y-8 flex-1 hidden md:block">
               <div className="flex gap-5 group cursor-default">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all duration-300">
                   <ShieldCheck className="w-6 h-6 text-primary-light" />
-               </div>
+                </div>
                 <div className="flex flex-col justify-center">
                   <h4 className="font-display font-bold text-[15px] leading-tight mb-1 text-white">Cifrado de Extremo a Extremo</h4>
                   <p className="text-xs text-white/80 leading-normal">Sus datos están protegidos por estándares globales de seguridad</p>
-               </div>
-             </div>
+                </div>
+              </div>
 
               <div className="flex gap-5 group cursor-default">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all duration-300">
                   <Zap className="w-6 h-6 text-primary-light" />
-               </div>
+                </div>
                 <div className="flex flex-col justify-center">
                   <h4 className="font-display font-bold text-[15px] leading-tight mb-1 text-white">Acceso Instantáneo</h4>
                   <p className="text-xs text-white/80 leading-normal">Infraestructura optimizada para una respuesta inmediata</p>
-               </div>
-             </div>
-           </div>
+                </div>
+              </div>
+            </div>
 
             <div className="pt-8 mt-12 border-t border-white/10 hidden md:block">
               <div className="flex items-center gap-4">
@@ -73,21 +70,21 @@ export const LoginPage: React.FC = () => {
                   {[1, 2, 3, 4].map(i => (
                     <div key={i} className="w-10 h-10 rounded-full border-2 border-[#223382] bg-surface-variant/20 backdrop-blur-sm flex items-center justify-center text-[9px] font-black text-primary-light shadow-lg">PRO</div>
                   ))}
-               </div>
+                </div>
                 <div>
                   <p className="text-[11px] font-bold text-white/80 leading-tight">Únete a la red</p>
                   <p className="text-[10px] text-white/40 uppercase tracking-widest font-black">+250 PROFESIONALES</p>
-               </div>
-             </div>
-           </div>
-         </div>
-       </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Right Side: Form or Challenge */}
         <div className="flex-1 p-6 sm:p-8 md:p-12 flex items-center justify-center">
           {pendingChallenge ? <ChallengeScreen /> : <LoginForm />}
-       </div>
-     </m.div>
-   </div>
+        </div>
+      </m.div>
+    </div>
   );
 };

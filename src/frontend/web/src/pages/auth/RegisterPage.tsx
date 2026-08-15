@@ -29,16 +29,13 @@ export const RegisterPage: React.FC = () => {
                   className="h-9 md:h-10 w-auto"
                 />
               </Link>
-              <div className="inline-block px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary-light mb-3 md:mb-4">
-                Plataforma Certificada
-              </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-black leading-[1.1] mb-4 md:mb-6 tracking-tighter text-white">
                 Integridad <br />
                 <span className="text-primary-light">en cada m².</span>
               </h2>
 
               <p className="text-base text-white/70 leading-relaxed font-medium max-w-[280px] hidden sm:block">
-                La solución definitiva para la validación y gestión de proyectos inmobiliarios institucionales.
+                La solución definitiva para la validación de proyectos inmobiliarios.
               </p>
             </div>
 
