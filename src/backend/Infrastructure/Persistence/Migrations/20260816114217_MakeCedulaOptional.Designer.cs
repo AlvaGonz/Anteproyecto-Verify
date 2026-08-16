@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816114217_MakeCedulaOptional")]
+    partial class MakeCedulaOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2093,10 +2096,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TitularId");
 
-                    b.ToTable("Usuario", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_Usuario_Cedula_Rnc", "([Cedula] IS NOT NULL AND [Cedula] <> '') OR ([Rnc] IS NOT NULL AND [Rnc] <> '')");
-                        });
+                    b.ToTable("Usuario", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Validacion", b =>

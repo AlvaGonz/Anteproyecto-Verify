@@ -18,7 +18,7 @@ public class Usuario : EntityBase, IEffectivePlanUser
     public string Email => CorreoElectronico;
     public string ContrasenaHash { get; private set; } = null!;
     public string Telefono { get; private set; } = null!;
-    public string Cedula { get; private set; } = null!;
+    public string? Cedula { get; private set; }
     public string? Rnc { get; private set; }
     public string? RazonSocial { get; private set; }
     public string? NombreComercial { get; private set; }
@@ -26,7 +26,7 @@ public class Usuario : EntityBase, IEffectivePlanUser
     public string? Direccion { get; private set; }
     public string? Provincia { get; private set; }
     public string? Nickname { get; private set; }
-    public string Identificacion => Cedula;
+    public string Identificacion => Cedula ?? Rnc ?? "N/A";
 
     // Public presentation preferences — how this user is presented as the
     // responsible person on public project views (resolved by PublicIdentityResolver)
@@ -93,14 +93,14 @@ public class Usuario : EntityBase, IEffectivePlanUser
 
     private Usuario() { } // For EF Core
 
-    public Usuario(string nombre, string apellido, string correoElectronico, string contrasenaHash, UserRole rol, string telefono, string cedula)
+    public Usuario(string nombre, string apellido, string correoElectronico, string contrasenaHash, UserRole rol, string telefono, string? cedula, string? rnc = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(apellido)) throw new ArgumentException("Apellido requerido", nameof(apellido));
         if (string.IsNullOrWhiteSpace(correoElectronico)) throw new ArgumentException("Correo requerido", nameof(correoElectronico));
         if (string.IsNullOrWhiteSpace(contrasenaHash)) throw new ArgumentException("Contraseña requerida", nameof(contrasenaHash));
         if (string.IsNullOrWhiteSpace(telefono)) throw new ArgumentException("Teléfono requerido", nameof(telefono));
-        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula requerida", nameof(cedula));
+        if (string.IsNullOrWhiteSpace(cedula) && string.IsNullOrWhiteSpace(rnc)) throw new ArgumentException("Cédula o RNC requerido");
 
         Nombre = nombre;
         Apellido = apellido;
@@ -110,15 +110,16 @@ public class Usuario : EntityBase, IEffectivePlanUser
         Rol = rol;
         Telefono = telefono;
         Cedula = cedula;
+        Rnc = rnc;
         Activo = true;
         AccountStatus = UserAccountStatus.Active;
         EmailVerificado = true;
     }
 
-    public void UpdateContactInfo(string telefono, string cedula)
+    public void UpdateContactInfo(string telefono, string? cedula)
     {
         if (string.IsNullOrWhiteSpace(telefono)) throw new ArgumentException("Teléfono requerido", nameof(telefono));
-        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula requerida", nameof(cedula));
+        if (string.IsNullOrWhiteSpace(cedula) && string.IsNullOrWhiteSpace(Rnc)) throw new ArgumentException("Cédula o RNC requerido");
         Telefono = telefono;
         Cedula = cedula;
         UpdatedAtUtc = DateTime.UtcNow;

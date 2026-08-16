@@ -8,7 +8,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        builder.ToTable("Usuario"); // Removed ExcludeFromMigrations to allow additive migration
+        builder.ToTable("Usuario", t => t.HasCheckConstraint("CK_Usuario_Cedula_Rnc", "([Cedula] IS NOT NULL AND [Cedula] <> '') OR ([Rnc] IS NOT NULL AND [Rnc] <> '')")); // Removed ExcludeFromMigrations to allow additive migration
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnName("IdUsuario");
         builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
@@ -21,7 +21,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         
         builder.Property(u => u.ContrasenaHash).IsRequired().HasMaxLength(500);
         builder.Property(u => u.Telefono).IsRequired().HasMaxLength(15);
-        builder.Property(u => u.Cedula).IsRequired().HasMaxLength(15);
+        builder.Property(u => u.Cedula).IsRequired(false).HasMaxLength(15);
         builder.Property(u => u.Rol).IsRequired();
         builder.Property(u => u.Activo).IsRequired().HasDefaultValue(true);
 

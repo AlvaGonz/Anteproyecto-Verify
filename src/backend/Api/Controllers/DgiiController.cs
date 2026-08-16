@@ -26,7 +26,7 @@ public class DgiiController : ControllerBase
             return BadRequest(new { message = "RNC is required." });
         }
 
-        var cleanedRnc = new string(rnc.Where(char.IsDigit).ToArray());
+        var cleanedRnc = rnc.Replace("-", "").Trim();
 
         var record = await _context.DGII
             .FirstOrDefaultAsync(d => d.Rnc == cleanedRnc, cancellationToken);

@@ -1,4 +1,4 @@
-﻿import { z } from "zod";
+import { z } from "zod";
 
 // Dominican Cédula check-digit validation algorithm (Luhn mod-10 variant)
 export const validateCedulaCheckDigit = (cedula: string): boolean => {
@@ -52,17 +52,9 @@ export const registerSchema = z.object({
       const digits = val.replace(/\D/g, "");
       return /^(809|829|849)\d{7}$/.test(digits);
     }, "Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 8095550199)"),
-  cedula: z
-    .string()
-    .min(1, "La cédula es requerida")
-    .refine((val) => {
-      const digits = val.replace(/\D/g, "");
-      return /^\d{11}$/.test(digits);
-    }, "La cédula debe tener 11 dígitos")
-    .refine((val) => {
-      const digits = val.replace(/\D/g, "");
-      return validateCedulaCheckDigit(digits);
-    }, "Cédula inválida: el dígito verificador no es correcto"),
+  documentType: z.enum(["cedula", "rnc"]).default("cedula"),
+  cedula: z.string().optional(),
+  rnc: z.string().optional(),
   password: z
     .string()
     .min(8, "La contraseña debe tener mínimo 8 caracteres")
@@ -73,6 +65,29 @@ export const registerSchema = z.object({
   acceptedTerms: z
     .boolean()
     .refine((val) => val === true, "Debe aceptar los términos de uso y políticas de privacidad"),
+}).superRefine((data, ctx) => {
+  if (data.documentType === "cedula") {
+    const val = data.cedula || "";
+    if (!val) {
+      ctx.addIssue({ code: "custom", path: ["cedula"], message: "La cédula es requerida" });
+      return;
+    }
+    const digits = val.replace(/\D/g, "");
+    if (digits.length !== 11) {
+      ctx.addIssue({ code: "custom", path: ["cedula"], message: "La cédula debe tener 11 dígitos" });
+    } else if (!validateCedulaCheckDigit(digits)) {
+      ctx.addIssue({ code: "custom", path: ["cedula"], message: "Cédula inválida: el dígito verificador no es correcto" });
+    }
+  } else {
+    const val = data.rnc || "";
+    if (!val) {
+      ctx.addIssue({ code: "custom", path: ["rnc"], message: "El RNC es requerido" });
+      return;
+    }
+    if (val.length < 9) {
+      ctx.addIssue({ code: "custom", path: ["rnc"], message: "El RNC debe tener al menos 9 caracteres" });
+    }
+  }
 });
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 

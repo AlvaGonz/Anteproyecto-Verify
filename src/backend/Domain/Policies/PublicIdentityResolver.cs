@@ -78,7 +78,7 @@ public static class PublicIdentityResolver
         }
 
         var partes = new List<string>();
-        if (mostrarCedula) partes.Add(usuario.Cedula);
+        if (mostrarCedula) partes.Add(usuario.Cedula!);
         if (mostrarRnc) partes.Add(usuario.Rnc!);
 
         IdentificacionPublicaModo? tipo = mostrarRnc
