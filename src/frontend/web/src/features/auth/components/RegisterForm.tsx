@@ -1,5 +1,5 @@
 // react-doctor-disable no-giant-component
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "react-router-dom";
@@ -22,18 +22,68 @@ export const RegisterForm = () => {
   const [modalType, setModalType] = useState<"terms" | "privacy" | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const [documentType, setDocumentType] = useState<"cedula" | "rnc">("cedula");
+  const [isRncValid, setIsRncValid] = useState<boolean | null>(null);
+  const [isValidatingRnc, setIsValidatingRnc] = useState(false);
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    setError,
     formState: { errors: formErrors, isValid },
   } = useForm<RegisterFormValues>({ 
     resolver: zodResolver(registerSchema),
-    mode: "onChange" 
+    mode: "onChange",
+    defaultValues: { documentType: "cedula" }
   });
 
+  const toggleDocumentType = () => {
+    const newType = documentType === "cedula" ? "rnc" : "cedula";
+    setDocumentType(newType);
+    setValue("documentType", newType, { shouldValidate: true });
+    if (newType === "cedula") {
+      setValue("rnc", undefined);
+      setIsRncValid(null);
+    } else {
+      setValue("cedula", undefined);
+    }
+  };
+
+  const rncValue = watch("rnc");
+
+  useEffect(() => {
+    if (documentType !== "rnc" || !rncValue || rncValue.length < 9) {
+      setIsRncValid(null);
+      setIsValidatingRnc(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsValidatingRnc(true);
+      try {
+        const response = await fetch(`/api/dgii/rnc/${rncValue}`);
+        if (response.ok) {
+          setIsRncValid(true);
+        } else {
+          setIsRncValid(false);
+        }
+      } catch (err) {
+        setIsRncValid(false);
+      } finally {
+        setIsValidatingRnc(false);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [rncValue, documentType]);
+
 const onSubmit = (data: RegisterFormValues) => {
+     if (documentType === "rnc" && isRncValid !== true) {
+       setError("rnc", { type: "manual", message: "Debe ser un RNC válido en la DGII." });
+       return;
+     }
+
      // ponytail: extract plan/billing from redirect URL so backend stores as pendingPlanCode
      let pendingPlanCode: string | undefined;
      let pendingBillingCycle: string | undefined;
@@ -51,6 +101,7 @@ const onSubmit = (data: RegisterFormValues) => {
       ...restData,
       telefono: data.telefono ? data.telefono.replace(/\D/g, '') : "",
       cedula: data.cedula ? data.cedula.replace(/\D/g, '') : "",
+      rnc: data.rnc ? data.rnc.trim() : "",
        returnUrl: redirectUrl || undefined,
        pendingPlanCode,
        pendingBillingCycle
@@ -85,6 +136,12 @@ const password = (watch("password") as string) || "";
     let val = e.target.value.replace(/\D/g, "");
     if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
     else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
+    e.target.value = val;
+  };
+
+  const rncOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // raw value without formatting, per user request
+    const val = e.target.value;
     e.target.value = val;
   };
 
@@ -123,6 +180,11 @@ const password = (watch("password") as string) || "";
       telefonoOnChange={telefonoOnChange}
       blockNonDigits={blockNonDigits}
       cedulaOnChange={cedulaOnChange}
+      rncOnChange={rncOnChange}
+      documentType={documentType}
+      toggleDocumentType={toggleDocumentType}
+      isRncValid={isRncValid}
+      isValidatingRnc={isValidatingRnc}
       openModal={openModal}
       closeModal={closeModal}
       acceptAndCloseModal={acceptAndCloseModal}

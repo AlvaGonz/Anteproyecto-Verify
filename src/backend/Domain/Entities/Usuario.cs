@@ -93,14 +93,14 @@ public class Usuario : EntityBase, IEffectivePlanUser
 
     private Usuario() { } // For EF Core
 
-    public Usuario(string nombre, string apellido, string correoElectronico, string contrasenaHash, UserRole rol, string telefono, string cedula)
+    public Usuario(string nombre, string apellido, string correoElectronico, string contrasenaHash, UserRole rol, string telefono, string cedula, string? rnc = null)
     {
         if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre requerido", nameof(nombre));
         if (string.IsNullOrWhiteSpace(apellido)) throw new ArgumentException("Apellido requerido", nameof(apellido));
         if (string.IsNullOrWhiteSpace(correoElectronico)) throw new ArgumentException("Correo requerido", nameof(correoElectronico));
         if (string.IsNullOrWhiteSpace(contrasenaHash)) throw new ArgumentException("Contraseña requerida", nameof(contrasenaHash));
         if (string.IsNullOrWhiteSpace(telefono)) throw new ArgumentException("Teléfono requerido", nameof(telefono));
-        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula requerida", nameof(cedula));
+        if (string.IsNullOrWhiteSpace(cedula) && string.IsNullOrWhiteSpace(rnc)) throw new ArgumentException("Cédula o RNC requerido");
 
         Nombre = nombre;
         Apellido = apellido;
@@ -109,7 +109,8 @@ public class Usuario : EntityBase, IEffectivePlanUser
         ContrasenaHash = contrasenaHash;
         Rol = rol;
         Telefono = telefono;
-        Cedula = cedula;
+        Cedula = cedula ?? "";
+        Rnc = rnc;
         Activo = true;
         AccountStatus = UserAccountStatus.Active;
         EmailVerificado = true;
