@@ -8,7 +8,7 @@ public record RegisterUserCommand(
     string Email,
     string Password,
     string Telefono,
-    string Cedula,
+    string? Cedula = null,
     string? Rnc = null,
     string? ReturnUrl = null,
     string? PendingPlanCode = null,

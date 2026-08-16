@@ -177,7 +177,7 @@ export const RegisterFormLayout: React.FC<RegisterFormLayoutProps> = ({
             <button
               type="button"
               onClick={toggleDocumentType}
-              className={`absolute top-[1px] z-10 flex items-center justify-center w-[50px] h-[50px] bg-gradient-to-r from-orange-400 to-orange-500 text-white hover:from-orange-500 hover:to-orange-600 transition-all duration-500 ease-out ${
+              className={`absolute top-[1px] z-10 flex items-center justify-center w-[50px] h-[50px] bg-gradient-to-r from-orange-400 to-orange-500 text-white hover:from-orange-500 hover:to-orange-600 transition-all duration-500 ease-in-out ${
                 documentType === "cedula"
                   ? "left-[1px] rounded-l-[11px] rounded-r-none"
                   : "left-[calc(100%-51px)] rounded-l-none rounded-r-[11px]"

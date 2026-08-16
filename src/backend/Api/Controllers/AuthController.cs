@@ -73,7 +73,8 @@ public class AuthController : ControllerBase
             request.Email ?? request.CorreoElectronico ?? string.Empty,
             request.Password ?? request.Contrasena ?? string.Empty,
             request.Telefono ?? "8095550199",
-            request.Cedula ?? "40212345678",
+            request.Cedula ?? "",
+            request.Rnc,
             request.ReturnUrl,
             request.PendingPlanCode,
             request.PendingBillingCycle
@@ -685,6 +686,7 @@ public class RegisterRequestDto
     public string? Contrasena { get; set; }
     public string? Telefono { get; set; }
     public string? Cedula { get; set; }
+    public string? Rnc { get; set; }
     public string? ReturnUrl { get; set; }
     public string? PendingPlanCode { get; set; }
     public string? PendingBillingCycle { get; set; }

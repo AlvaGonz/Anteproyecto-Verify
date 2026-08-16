@@ -62,7 +62,7 @@ public class RegisterUserCommandHandler
             passwordHash,
             UserRole.User,
             request.Telefono!.Trim(),
-            request.Cedula?.Trim() ?? "",
+            request.Cedula?.Trim(),
             request.Rnc?.Trim()
         );
 

@@ -45,21 +45,34 @@ public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>
             })
             .WithMessage("Teléfono inválido. Solo códigos 809, 829 o 849 (ej: 809-555-0199).");
 
-        // Cédula: strip dashes → validate format → validate check digit
-        RuleFor(x => x.Cedula)
-            .NotEmpty().WithMessage("La cédula es requerida.")
-            .Must(c =>
-            {
-                var digits = Regex.Replace(c ?? "", @"\D", "");
-                return Regex.IsMatch(digits, @"^\d{11}$");
-            })
-            .WithMessage("La cédula debe tener 11 dígitos (formato: 001-1234567-8).")
-            .Must(c =>
-            {
-                var digits = Regex.Replace(c ?? "", @"\D", "");
-                return ValidateCedulaCheckDigit(digits);
-            })
-            .WithMessage("Cédula inválida: el dígito verificador no es correcto.");
+        // Require either Cedula or RNC
+        RuleFor(x => x).Must(x => !string.IsNullOrWhiteSpace(x.Cedula) || !string.IsNullOrWhiteSpace(x.Rnc))
+            .WithMessage("Debe proporcionar una cédula o un RNC.");
+
+        // Cédula: validate only if provided
+        When(x => !string.IsNullOrWhiteSpace(x.Cedula), () =>
+        {
+            RuleFor(x => x.Cedula)
+                .Must(c =>
+                {
+                    var digits = Regex.Replace(c ?? "", @"\D", "");
+                    return Regex.IsMatch(digits, @"^\d{11}$");
+                })
+                .WithMessage("La cédula debe tener 11 dígitos (formato: 001-1234567-8).")
+                .Must(c =>
+                {
+                    var digits = Regex.Replace(c ?? "", @"\D", "");
+                    return ValidateCedulaCheckDigit(digits);
+                })
+                .WithMessage("Cédula inválida: el dígito verificador no es correcto.");
+        });
+
+        // RNC: validate only if provided
+        When(x => !string.IsNullOrWhiteSpace(x.Rnc), () =>
+        {
+            RuleFor(x => x.Rnc)
+                .MinimumLength(9).WithMessage("El RNC debe tener al menos 9 caracteres.");
+        });
 
         RuleFor(x => x.Password)
             .NotEmpty()

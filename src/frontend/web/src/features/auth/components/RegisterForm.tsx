@@ -42,13 +42,20 @@ export const RegisterForm = () => {
   const toggleDocumentType = () => {
     const newType = documentType === "cedula" ? "rnc" : "cedula";
     setDocumentType(newType);
-    setValue("documentType", newType, { shouldValidate: true });
+    // Set value without immediate validation to free the main thread for the 60fps animation
+    setValue("documentType", newType, { shouldValidate: false });
+    
     if (newType === "cedula") {
       setValue("rnc", undefined);
       setIsRncValid(null);
     } else {
       setValue("cedula", undefined);
     }
+
+    // Trigger validation asynchronously after the animation starts
+    setTimeout(() => {
+      setValue("documentType", newType, { shouldValidate: true });
+    }, 100);
   };
 
   const rncValue = watch("rnc");
