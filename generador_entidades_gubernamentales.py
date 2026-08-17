@@ -907,18 +907,20 @@ def main():
         folder = os.path.join(base_bots, tbl)
         csv_file = get_latest_csv(folder) if os.path.exists(folder) else None
         if csv_file:
+            print(f"  [+] CSV de caché ENCONTRADO para '{tbl}': {os.path.basename(csv_file)}")
             csv_paths[tbl] = csv_file
         else:
+            print(f"  [-] CSV de caché NO ENCONTRADO para '{tbl}'.")
             all_csvs_found = False
             
     if all_csvs_found:
-        print("CSV cache files found for all entities! Bypassing random generation and restoring from CSV...")
+        print("\n=> Todos los archivos CSV fueron encontrados. Restaurando datos desde CSV...")
         for tbl, path in csv_paths.items():
             import_csv_to_db(path, tbl, conn_params, db_lib)
-        print("Restoration from CSV complete!")
+        print("¡Restauración desde CSV completada con éxito!")
         return
         
-    print("CSV cache files missing or incomplete. Proceeding with standard generation...")
+    print("\n=> Faltan archivos CSV. Se procederá a generar toda la data de manera aleatoria real...")
     # --- Standard Generation Logic Starts Here ---
     file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Bots", "DGII", "src", "DGII_RNC.TXT"))
 
