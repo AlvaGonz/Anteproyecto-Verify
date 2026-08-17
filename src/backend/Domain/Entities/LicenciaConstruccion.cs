@@ -14,4 +14,6 @@ public class LicenciaConstruccion
     public string? Municipio { get; set; }
     public int? UnidadesHabitacionales { get; set; }
     public int? LocalesComerciales { get; set; }
+    public string? Rnc { get; set; }
+    public string? NombreRazonSocial { get; set; }
 }
