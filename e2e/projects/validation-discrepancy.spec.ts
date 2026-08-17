@@ -119,8 +119,8 @@ test.describe("Discrepancy Validation E2E", () => {
     await expect(alertDialog).toBeVisible();
 
     // 5. Assert it mentions the specific discrepancies
-    await expect(alertDialog).toContainText("Provincia");
-    await expect(alertDialog).toContainText("Matrícula");
+    await expect(alertDialog).toContainText("provincia");
+    await expect(alertDialog).toContainText("matricula");
     await expect(alertDialog).toContainText("12345"); // Project matricula
     await expect(alertDialog).toContainText("67890"); // Doc matricula
     await expect(alertDialog).toContainText("La Romana"); // Project provincia
