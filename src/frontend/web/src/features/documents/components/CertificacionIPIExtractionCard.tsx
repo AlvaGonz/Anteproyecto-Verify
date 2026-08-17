@@ -6,6 +6,8 @@ import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
 import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck, AlertTriangle } from "lucide-react";
+import { useDiscrepancyCheck, Discrepancy } from "../../validations/hooks/useDiscrepancyCheck";
+import { DiscrepancyAlertDialog } from "../../validations/components/DiscrepancyAlertDialog";
 
 const isIpiNoPagado = (response: any) => {
   if (!response?.matchedData) return false;
@@ -33,18 +35,44 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  const [isDiscrepancyDialogOpen, setIsDiscrepancyDialogOpen] = React.useState(false);
+  const [discrepancies, setDiscrepancies] = React.useState<Discrepancy[]>([]);
+
+  const { checkDiscrepancies } = useDiscrepancyCheck(proyectoId);
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
   const getStatus = (fieldVal: string | undefined | null, fieldKey: string) => 
     getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
+  const getPayload = () => ({
+    rnc: "", // Depending on where it's stored, maybe empty for IPI
+    noCertificacion: extraction.numeroCertificacion?.normalizedValue || extraction.numeroCertificacion?.rawValue || "",
+    numeroInmueble: extraction.numeroInmueble?.normalizedValue || extraction.numeroInmueble?.rawValue || "",
+    noInmueble: extraction.numeroInmueble?.normalizedValue || extraction.numeroInmueble?.rawValue || "",
+    parcelaNo: extraction.parcelaNumero?.normalizedValue || extraction.parcelaNumero?.rawValue || ""
+  });
+
   const handleVerifyGobernanza = () => {
+    const payload = getPayload();
+    const foundDiscrepancies = checkDiscrepancies('certificacion-ipi', payload);
+
+    if (foundDiscrepancies.length > 0) {
+      setDiscrepancies(foundDiscrepancies);
+      setIsDiscrepancyDialogOpen(true);
+      return;
+    }
+
+    proceedWithValidation();
+  };
+
+  const proceedWithValidation = () => {
+    setIsDiscrepancyDialogOpen(false);
     verifyDocument({
       documentType: 'pagoipi',
       proyectoId,
       documentoId,
       payload: {
-        rnc: "", // Depending on where it's stored, maybe empty for IPI
+        rnc: "", 
         noCertificacion: extraction.numeroCertificacion?.normalizedValue || extraction.numeroCertificacion?.rawValue || "",
         noInmueble: extraction.numeroInmueble?.normalizedValue || extraction.numeroInmueble?.rawValue || "",
         parcelaNo: extraction.parcelaNumero?.normalizedValue || extraction.parcelaNumero?.rawValue || ""
@@ -175,6 +203,13 @@ export const CertificacionIPIExtractionCard: React.FC<CertificacionIPIExtraction
           error={verificationError}
         />
       </div>
+
+      <DiscrepancyAlertDialog
+        isOpen={isDiscrepancyDialogOpen}
+        discrepancies={discrepancies}
+        onCancel={() => setIsDiscrepancyDialogOpen(false)}
+        onProceed={proceedWithValidation}
+      />
     </DocumentExtractionPanel>
   );
 };

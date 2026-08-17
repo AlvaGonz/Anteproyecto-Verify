@@ -14,6 +14,8 @@ import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
 import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
+import { useDiscrepancyCheck, Discrepancy } from "../../validations/hooks/useDiscrepancyCheck";
+import { DiscrepancyAlertDialog } from "../../validations/components/DiscrepancyAlertDialog";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const norm = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -223,22 +225,44 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  const [isDiscrepancyDialogOpen, setIsDiscrepancyDialogOpen] = React.useState(false);
+  const [discrepancies, setDiscrepancies] = React.useState<Discrepancy[]>([]);
+
+  const { checkDiscrepancies } = useDiscrepancyCheck(proyectoId);
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
 
   const getStatus = (fieldVal: string | undefined | null, fieldKey: string) =>
     getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
+  const getPayload = () => ({
+    designacionCatastral: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
+    desigCatastralPosicional: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
+    designCatastralOrigen: extraction.designacionCatastralOrigen?.normalizedValue || extraction.designacionCatastralOrigen?.rawValue || "",
+    provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || "",
+    oficina: extraction.jurisdiccionInmobiliaria?.normalizedValue || extraction.jurisdiccionInmobiliaria?.rawValue || "",
+    superficieM2: extraction.superficieARegistrarParcelaM2?.normalizedValue || extraction.superficieARegistrarParcelaM2?.rawValue || ""
+  });
+
   const handleVerifyGobernanza = () => {
+    const payload = getPayload();
+    const foundDiscrepancies = checkDiscrepancies('plano-mensura', payload);
+
+    if (foundDiscrepancies.length > 0) {
+      setDiscrepancies(foundDiscrepancies);
+      setIsDiscrepancyDialogOpen(true);
+      return;
+    }
+
+    proceedWithValidation();
+  };
+
+  const proceedWithValidation = () => {
+    setIsDiscrepancyDialogOpen(false);
     verifyDocument({
       documentType: 'catastro',
       proyectoId,
       documentoId,
-      payload: {
-        designacionCatastral: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
-        desigCatastralPosicional: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
-        designCatastralOrigen: extraction.designacionCatastralOrigen?.normalizedValue || extraction.designacionCatastralOrigen?.rawValue || "",
-        oficina: extraction.jurisdiccionInmobiliaria?.normalizedValue || extraction.jurisdiccionInmobiliaria?.rawValue || ""
-      }
+      payload: getPayload()
     });
   };
 
@@ -401,6 +425,13 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
           error={verificationError}
         />
       </div>
+
+      <DiscrepancyAlertDialog
+        isOpen={isDiscrepancyDialogOpen}
+        discrepancies={discrepancies}
+        onCancel={() => setIsDiscrepancyDialogOpen(false)}
+        onProceed={proceedWithValidation}
+      />
     </DocumentExtractionPanel>
   );
 };

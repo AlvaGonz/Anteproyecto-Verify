@@ -1,36 +1,82 @@
 import { useProject } from "../../projects/api/useProjects";
+import { VALIDATION_RULES, DocumentType } from "../../../lib/validation-rules";
 
 export interface Discrepancy {
   field: string;
   projectValue: string;
   documentValue: string;
+  message?: string;
 }
 
 export const useDiscrepancyCheck = (projectId?: string) => {
   const { data: project } = useProject(projectId || "");
 
-  const checkDiscrepancies = (documentData: Record<string, string | number | undefined>): Discrepancy[] => {
+  const checkDiscrepancies = (
+    documentType: DocumentType,
+    documentData: Record<string, string | number | undefined>
+  ): Discrepancy[] => {
     if (!project) return [];
+
+    const rules = VALIDATION_RULES[documentType];
+    if (!rules) return [];
 
     const discrepancies: Discrepancy[] = [];
 
-    const compareField = (fieldName: string, projVal: any, docVal: any) => {
-      if (projVal !== undefined && projVal !== null && projVal !== "" && docVal !== undefined && docVal !== null && docVal !== "") {
-        // loose comparison to ignore type differences (like string "1500" vs number 1500)
-        if (String(projVal).trim() !== String(docVal).trim()) {
-          discrepancies.push({
-            field: fieldName,
-            projectValue: String(projVal),
-            documentValue: String(docVal),
-          });
-        }
-      }
+    // Map project fields if they differ in name
+    const getProjectValue = (field: string) => {
+      if (field === 'provincia') return project.ubicacionTexto;
+      return project[field as keyof typeof project];
     };
 
-    if (documentData.matricula) compareField("Matrícula", project.matricula, documentData.matricula);
-    if (documentData.designacionCatastral) compareField("Designación Catastral", project.designacionCatastral, documentData.designacionCatastral);
-    if (documentData.superficieM2) compareField("Superficie M2", project.superficieM2, documentData.superficieM2);
-    if (documentData.provincia) compareField("Provincia", project.ubicacionTexto, documentData.provincia);
+    for (const field of rules.fieldsToValidate) {
+      const projValue = getProjectValue(field);
+      const docValue = documentData[field];
+
+      if (projValue === undefined || projValue === null || projValue === "" ||
+          docValue === undefined || docValue === null || docValue === "") {
+        continue;
+      }
+
+      if (rules.matchStrategy === 'exact') {
+        const projStr = String(projValue).trim();
+        const docStr = String(docValue).trim();
+        
+        // Try numeric comparison first to avoid false positives like "1500.00" vs "1500"
+        const pNum = Number(projStr);
+        const dNum = Number(docStr);
+        const isNumericCompare = !isNaN(pNum) && !isNaN(dNum) && projStr !== "" && docStr !== "";
+
+        const isDiscrepant = isNumericCompare ? pNum !== dNum : projStr.toLowerCase() !== docStr.toLowerCase();
+
+        if (isDiscrepant) {
+          discrepancies.push({
+            field,
+            projectValue: projStr,
+            documentValue: docStr,
+            message: rules.alertMessage(projValue, docValue, field)
+          });
+        }
+      } else if (rules.matchStrategy === 'range') {
+        // Remove non-numeric characters for comparison
+        const pStr = String(projValue).replace(/[^\d.-]/g, '');
+        const dStr = String(docValue).replace(/[^\d.-]/g, '');
+        
+        const pNum = parseFloat(pStr);
+        const dNum = parseFloat(dStr);
+
+        if (!isNaN(pNum) && !isNaN(dNum)) {
+          const diff = Math.abs(pNum - dNum) / pNum;
+          if (diff > (rules.tolerance || 0)) {
+            discrepancies.push({
+              field,
+              projectValue: String(projValue),
+              documentValue: String(docValue),
+              message: rules.alertMessage(projValue, docValue, field)
+            });
+          }
+        }
+      }
+    }
 
     return discrepancies;
   };

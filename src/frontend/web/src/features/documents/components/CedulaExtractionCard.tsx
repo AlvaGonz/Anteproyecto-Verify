@@ -7,6 +7,8 @@ import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
 import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
+import { useDiscrepancyCheck, Discrepancy } from "../../validations/hooks/useDiscrepancyCheck";
+import { DiscrepancyAlertDialog } from "../../validations/components/DiscrepancyAlertDialog";
 
 interface CedulaExtractionCardProps {
   extraction: CedulaRdExtractionV1;
@@ -28,12 +30,39 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
   const [editValue, setEditValue] = React.useState("");
   const [isSaving, setIsSaving] = React.useState(false);
 
+  const [isDiscrepancyDialogOpen, setIsDiscrepancyDialogOpen] = React.useState(false);
+  const [discrepancies, setDiscrepancies] = React.useState<Discrepancy[]>([]);
+
+  const { checkDiscrepancies } = useDiscrepancyCheck(proyectoId);
   const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
   
   const getStatus = (fieldVal: string | undefined | null, fieldKey: string) => 
     getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
+  const getPayload = () => ({
+    rnc_cedula: extraction.cedulaNumber?.normalizedValue || extraction.cedulaNumber?.rawValue || "",
+    nombres: extraction.firstNames?.normalizedValue || extraction.firstNames?.rawValue || "",
+    apellidos: extraction.lastNames?.normalizedValue || extraction.lastNames?.rawValue || "",
+    nombre_desarrollador: `${extraction.firstNames?.normalizedValue || extraction.firstNames?.rawValue || ""} ${extraction.lastNames?.normalizedValue || extraction.lastNames?.rawValue || ""}`.trim(),
+    fechaNacimiento: extraction.birthDate?.normalizedValue || extraction.birthDate?.rawValue || "",
+    fechaExpiracion: extraction.expiryDate?.normalizedValue || extraction.expiryDate?.rawValue || ""
+  });
+
   const handleVerifyGobernanza = () => {
+    const payload = getPayload();
+    const foundDiscrepancies = checkDiscrepancies('cedula', payload);
+
+    if (foundDiscrepancies.length > 0) {
+      setDiscrepancies(foundDiscrepancies);
+      setIsDiscrepancyDialogOpen(true);
+      return;
+    }
+
+    proceedWithValidation();
+  };
+
+  const proceedWithValidation = () => {
+    setIsDiscrepancyDialogOpen(false);
     verifyDocument({
       documentType: 'jce',
       proyectoId,
@@ -135,6 +164,13 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
       {renderField("Apellidos", "lastNames", extraction.lastNames, false, "Ej: PEREZ GOMEZ")}
       {renderField("Fecha Nacimiento", "birthDate", extraction.birthDate, false, "Ej: 1990-05-15")}
       {renderField("Fecha Expiración", "expiryDate", extraction.expiryDate, false, "Ej: 2028-05-15")}
+
+      <DiscrepancyAlertDialog
+        isOpen={isDiscrepancyDialogOpen}
+        discrepancies={discrepancies}
+        onCancel={() => setIsDiscrepancyDialogOpen(false)}
+        onProceed={proceedWithValidation}
+      />
     </DocumentExtractionPanel>
   );
 };

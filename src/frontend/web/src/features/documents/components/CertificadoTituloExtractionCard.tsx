@@ -199,7 +199,7 @@ export const CertificadoTituloExtractionCard: React.FC<CertificadoTituloExtracti
 
   const handleVerifyGobernanza = () => {
     const payload = getPayload();
-    const foundDiscrepancies = checkDiscrepancies(payload);
+    const foundDiscrepancies = checkDiscrepancies('titulo', payload);
 
     if (foundDiscrepancies.length > 0) {
       setDiscrepancies(foundDiscrepancies);
