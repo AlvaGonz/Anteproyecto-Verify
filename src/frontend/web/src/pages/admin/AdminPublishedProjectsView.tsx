@@ -201,7 +201,7 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold text-slate-600">
                   <span>RD$ {filters.priceRange[0].toLocaleString()}</span>
-                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "100M+" : filters.priceRange[1].toLocaleString()}</span>
+                  <span>RD$ {filters.priceRange[1] >= PRICE_MAX ? "15M+" : filters.priceRange[1].toLocaleString()}</span>
                 </div>
                 <div className="relative h-6">
                   <input
@@ -224,10 +224,12 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
                     style={{ pointerEvents: "auto" }}
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                  <span>0</span>
-                  <span>50M</span>
-                  <span>100M+</span>
+                <div className="relative h-4 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  <span className="absolute left-0">500K</span>
+                  <span className="absolute" style={{ left: '13.33%', transform: 'translateX(-50%)' }}>2M</span>
+                  <span className="absolute" style={{ left: '33.33%', transform: 'translateX(-50%)' }}>5M</span>
+                  <span className="absolute" style={{ left: '66.66%', transform: 'translateX(-50%)' }}>10M</span>
+                  <span className="absolute right-0">15M+</span>
                 </div>
               </div>
             </div>
