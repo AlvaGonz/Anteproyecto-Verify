@@ -42,7 +42,7 @@ public class ProjectDocumentsSecurityApiTests : IntegrationTestBase
             UsuarioCreadorId = userId,
             CategoriaId = 16,
             DatosDesarrollador = "Developer SA",
-            RncDesarrollador = "1-01-00000-1"
+            RncDesarrollador = "101000001"
         });
 
         projectResponse.EnsureSuccessStatusCode();

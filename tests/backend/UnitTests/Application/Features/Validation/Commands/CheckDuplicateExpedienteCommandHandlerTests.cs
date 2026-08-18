@@ -1,4 +1,4 @@
-﻿namespace UnitTests.Application.Features.Validation.Commands;
+namespace UnitTests.Application.Features.Validation.Commands;
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using global::Application.Abstractions.Persistence;
 using global::Application.Features.Validation.Commands.CheckDuplicateExpediente;
 using Domain.Entities;
 using Domain.Enums;
+using global::Application.Contracts.Projects;
 using Moq;
 using Xunit;
 
@@ -30,7 +31,8 @@ public class CheckDuplicateExpedienteCommandHandlerTests
             _proyectoRepositoryMock.Object,
             _deteccionRepositoryMock.Object,
             _auditoriaRepositoryMock.Object,
-            _unitOfWorkMock.Object);
+            _unitOfWorkMock.Object,
+            new Mock<ICatastroLookupRepository>().Object);
     }
 
     [Fact]

@@ -27,14 +27,15 @@ public abstract class IntegrationTestBase : IClassFixture<VeriFincaWebFactory>
 
     protected async Task<(string Token, Guid UserId)> RegisterAndLoginAsync(string planTier)
     {
+        var uid = Guid.NewGuid().ToString("N")[..8];
         var registerResponse = await _client.PostAsJsonAsync("/api/auth/register", new
         {
             nombre = "Test",
             apellido = "User",
-            email = "test$([Guid]::NewGuid())@example.com",
+            email = $"test_{uid}@example.com",
             password = "Password123!",
             telefono = "8091234567",
-            cedula = "00100000009"
+            rnc = $"101{Random.Shared.Next(100000, 999999)}"
         });
 
         if (!registerResponse.IsSuccessStatusCode) { var regBody = await registerResponse.Content.ReadAsStringAsync(); throw new Exception("Register failed: " + regBody); }
