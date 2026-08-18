@@ -146,42 +146,45 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className={`vf-card group !p-0 overflow-hidden border-none ring-[0.5px] transition-all hover:ring-1 ${config.bg} ${config.border} hover:shadow-md ${config.glow}`}
+              className={`vf-card group !p-0 overflow-hidden border transition-all hover:shadow-lg ${config.bg} ${config.border} hover:border-${config.color.split('-')[1]}/50`}
+              style={{ backgroundColor: "var(--color-surface)" }}
             >
-              <div className="p-2">
-                <div className="flex items-start gap-2">
-                  <div className={`w-5 h-5 rounded-md ${config.bg} flex items-center justify-center flex-shrink-0 ring-[0.5px] ${config.border} group-hover:scale-110 transition-transform`}>
-                    <Icon className={`w-2.5 h-2.5 ${config.color}`} />
+              <div className="p-4 sm:p-5">
+                <div className="flex items-start gap-4">
+                  <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center flex-shrink-0 border ${config.border} group-hover:scale-105 transition-transform shadow-sm`}>
+                    <Icon className={`w-5 h-5 ${config.color}`} />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1 mb-0.5">
-                      <span className={`text-[5px] font-black px-1 py-[0.5px] rounded-full uppercase tracking-[0.1em] ${config.bg} ${config.color} ring-[0.5px] ${config.border}`}>
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className={`text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${config.bg} ${config.color} border ${config.border}`}>
                         {config.label}
                       </span>
-                      <span className="text-[6px] font-mono text-on-surface-variant/40">#{finding.codigo}</span>
+                      <span className="text-[10px] sm:text-xs font-mono text-on-surface-variant/60 bg-surface-container-low px-2 py-0.5 rounded-md border border-border/20">
+                        #{finding.codigo}
+                      </span>
                       {finding.resuelto && (
-                        <span className="text-[6px] font-black text-success flex items-center gap-0.5 uppercase tracking-wider ml-auto">
-                          <CheckCircle2 className="w-2 h-2" /> Resuelto
+                        <span className="text-[10px] sm:text-xs font-black text-success flex items-center gap-1 uppercase tracking-wider ml-auto bg-success/10 px-2 py-0.5 rounded-md">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Resuelto
                         </span>
                       )}
                     </div>
                     
-                    <h4 className="text-[10px] font-black text-secondary tracking-tight mb-0.5 group-hover:text-primary transition-colors leading-tight">
+                    <h4 className="text-sm sm:text-base font-bold text-secondary tracking-tight mb-1 group-hover:text-primary transition-colors leading-snug">
                       {finding.titulo}
                     </h4>
                     
-                    <p className="text-[8px] text-on-surface-variant/80 font-medium leading-snug mb-1">
+                    <p className="text-xs sm:text-sm text-on-surface-variant/80 font-medium leading-relaxed mb-3">
                       {finding.descripcion}
                     </p>
 
                     {finding.recomendacion && (
-                      <div className="bg-white/40 rounded p-1.5 border border-white/60 space-y-0.5">
-                        <div className="flex items-center gap-0.5 text-primary">
-                          <ArrowRight className="w-2 h-2" />
-                          <span className="text-[6px] font-black uppercase tracking-widest">Recomendación RI</span>
+                      <div className="bg-primary/5 rounded-lg p-3 border border-primary/10 space-y-1.5 mt-2">
+                        <div className="flex items-center gap-1.5 text-primary">
+                          <ArrowRight className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-black uppercase tracking-widest">Recomendación RI</span>
                         </div>
-                        <p className="text-[7px] text-secondary font-bold italic leading-tight">
+                        <p className="text-xs text-secondary font-semibold italic leading-relaxed">
                           "{finding.recomendacion}"
                         </p>
                       </div>
@@ -190,10 +193,10 @@ export const FindingsPanel: React.FC<FindingsPanelProps> = ({
                 </div>
               </div>
               
-              <div className="px-2 py-1 border-t border-black/5 bg-black/2 flex items-center justify-between">
-                <div className="flex items-center gap-1 text-on-surface-variant/60">
-                   <Clock className="w-2 h-2" />
-                   <span className="text-[6px] font-bold">DETECTADO: {toUtcDate(finding.createdAtUtc)?.toLocaleDateString() ?? ''}</span>
+              <div className="px-4 sm:px-5 py-2.5 border-t border-border/10 bg-surface-container-lowest flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-on-surface-variant/60">
+                   <Clock className="w-3.5 h-3.5" />
+                   <span className="text-[10px] font-bold tracking-wider">DETECTADO: {toUtcDate(finding.createdAtUtc)?.toLocaleDateString() ?? ''}</span>
                 </div>
               </div>
             </m.div>
