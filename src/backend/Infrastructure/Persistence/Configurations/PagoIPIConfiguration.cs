@@ -10,7 +10,13 @@ public class PagoIPIConfiguration : IEntityTypeConfiguration<PagoIPI>
     {
         builder.ToTable("PagoIPI");
         builder.HasKey(p => p.Rnc);
+        builder.Property(p => p.Rnc).HasMaxLength(20);
 
         builder.Property(p => p.Cuota_ipi).HasPrecision(18, 2);
+
+        builder.HasOne<DGII>()
+            .WithOne()
+            .HasForeignKey<PagoIPI>(p => p.Rnc)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

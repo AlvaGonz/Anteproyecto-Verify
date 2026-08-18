@@ -17,5 +17,12 @@ public class LicenciaConstruccionConfiguration : IEntityTypeConfiguration<Licenc
         builder.Property(l => l.Provincia).HasMaxLength(100);
         builder.Property(l => l.Municipio).HasMaxLength(100);
         builder.HasIndex(l => l.NumeroPermiso);
+
+        builder.Property(l => l.Rnc).HasMaxLength(20);
+
+        builder.HasOne<DGII>()
+            .WithMany()
+            .HasForeignKey(l => l.Rnc)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
