@@ -31,18 +31,32 @@ public class AccountPurgeJob : BackgroundService
             {
                 await PurgeExpiredAccountsAsync(stoppingToken);
             }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred executing AccountPurgeJob.");
+                if (!stoppingToken.IsCancellationRequested)
+                {
+                    _logger.LogError(ex, "Error occurred executing AccountPurgeJob.");
+                }
             }
 
-            // Run daily
-            var nextRun = now.Date.AddDays(1).AddHours(2); // 02:00 UTC daily
-            var delay = nextRun - DateTime.UtcNow;
-            if (delay < TimeSpan.Zero)
-                delay = TimeSpan.FromHours(1); // fallback: check again in 1 hour
+            try
+            {
+                // Run daily
+                var nextRun = now.Date.AddDays(1).AddHours(2); // 02:00 UTC daily
+                var delay = nextRun - DateTime.UtcNow;
+                if (delay < TimeSpan.Zero)
+                    delay = TimeSpan.FromHours(1); // fallback: check again in 1 hour
 
-            await Task.Delay(delay, stoppingToken);
+                await Task.Delay(delay, stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
         }
     }
 

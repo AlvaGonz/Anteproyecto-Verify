@@ -61,6 +61,8 @@ export type AuthError =
   | { _tag: "NetworkError"; message: string }
   | { _tag: "UnknownError"; message: string; original: unknown };
 
+export const HAS_SESSION_KEY = 'vf_has_session';
+
 export const AuthService = {
   async login(email: string, password: string): Promise<LoginResult> {
     try {
@@ -114,6 +116,7 @@ export const AuthService = {
       // Ignore errors on logout
     } finally {
       setAccessToken(null);
+      localStorage.removeItem(HAS_SESSION_KEY);
       // Hard delete cookies client-side as fallback to prevent 401 loops
       document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/api/auth/refresh;";
@@ -124,11 +127,17 @@ export const AuthService = {
     try {
       return await refreshAuthToken();
     } catch {
+      localStorage.removeItem(HAS_SESSION_KEY);
       return null;
     }
   },
 
   async getCurrentUser(): Promise<User | null> {
+    // Check if we even have a reason to attempt fetching the user
+    if (localStorage.getItem(HAS_SESSION_KEY) !== 'true') {
+      return null;
+    }
+
     // Fast path: use in-memory access token if available
     if (getAccessToken()) {
       try {
@@ -184,6 +193,7 @@ function finalizeAuthResponse(payload: _LoginPayload): LoginResult {
     };
   }
   setAccessToken(token);
+  localStorage.setItem(HAS_SESSION_KEY, 'true');
   return {
     succeeded: true,
     user: payload.user ?? ({} as User),

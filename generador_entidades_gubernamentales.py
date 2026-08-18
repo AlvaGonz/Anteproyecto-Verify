@@ -859,15 +859,38 @@ def get_latest_csv(folder_path):
 
 def import_csv_to_db(csv_path, table_name, conn_params, db_lib):
     import csv
+    import random
     print(f'Starting import for {table_name} from {csv_path}')
     t_start = time.time()
     conn = get_db_connection()
     cursor = conn.cursor()
     ph = '%s' if db_lib == 'pymssql' else '?'
     
+    # Query valid RNCs from DGII to guarantee referential integrity
+    valid_rncs = set()
+    valid_rncs_list = []
+    try:
+        cursor.execute("SELECT Rnc FROM DGII")
+        valid_rncs = {r[0] for r in cursor.fetchall() if r[0]}
+        valid_rncs_list = list(valid_rncs)
+        print(f"Loaded {len(valid_rncs)} valid RNCs from DGII for referential integrity.")
+    except Exception as e:
+        print(f"Warning: Could not fetch valid RNCs from DGII: {e}")
+
+    inserted_pago_ipi_rncs = set()
+    def get_unused_rnc():
+        for _ in range(100):
+            r = random.choice(valid_rncs_list)
+            if r not in inserted_pago_ipi_rncs:
+                inserted_pago_ipi_rncs.add(r)
+                return r
+        return random.choice(valid_rncs_list)
+    
     with open(csv_path, 'r', encoding='utf-8') as f:
         reader = csv.reader(f, delimiter='|')
         headers = next(reader)
+        rnc_idx = headers.index('Rnc') if 'Rnc' in headers else -1
+        
         cols = ', '.join(headers)
         placeholders = ', '.join([ph] * len(headers))
         sql = f'INSERT INTO {table_name} ({cols}) VALUES ({placeholders})'
@@ -876,7 +899,27 @@ def import_csv_to_db(csv_path, table_name, conn_params, db_lib):
         batch_size = 5000
         count = 0
         for row in reader:
-            processed_row = tuple(val if val != '' else None for val in row)
+            processed_vals = []
+            for i, val in enumerate(row):
+                if val == '':
+                    processed_vals.append(None)
+                else:
+                    if i == rnc_idx:
+                        if val in valid_rncs:
+                            if table_name == 'PagoIPI':
+                                inserted_pago_ipi_rncs.add(val)
+                        else:
+                            if valid_rncs_list:
+                                if table_name == 'PagoIPI':
+                                    val = get_unused_rnc()
+                                else:
+                                    val = random.choice(valid_rncs_list)
+                            else:
+                                # If no RNCs are loaded from DGII, keep it as is
+                                pass
+                    processed_vals.append(val)
+            
+            processed_row = tuple(processed_vals)
             batch.append(processed_row)
             if len(batch) >= batch_size:
                 cursor.executemany(sql, batch)

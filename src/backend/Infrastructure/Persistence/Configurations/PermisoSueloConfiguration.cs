@@ -14,5 +14,12 @@ public class PermisoSueloConfiguration : IEntityTypeConfiguration<PermisoSuelo>
         builder.Property(p => p.Latitud).HasPrecision(18, 6);
         builder.Property(p => p.Longitud).HasPrecision(18, 6);
         builder.Property(p => p.Superficie).HasPrecision(18, 2);
+
+        builder.Property(p => p.Rnc).HasMaxLength(20);
+
+        builder.HasOne<DGII>()
+            .WithMany()
+            .HasForeignKey(p => p.Rnc)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

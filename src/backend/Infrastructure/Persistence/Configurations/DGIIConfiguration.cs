@@ -10,7 +10,7 @@ public class DGIIConfiguration : IEntityTypeConfiguration<DGII>
     {
         builder.ToTable("DGII");
         builder.HasKey(d => d.Rnc);
-        builder.Property(d => d.Rnc).HasMaxLength(20).HasColumnType("varchar(20)");
+        builder.Property(d => d.Rnc).HasMaxLength(20);
         builder.Property(d => d.NombreRazonSocial).IsRequired().HasMaxLength(250);
         builder.Property(d => d.NombreComercial).HasMaxLength(250);
         builder.Property(d => d.Categoria).HasMaxLength(100);

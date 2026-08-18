@@ -210,7 +210,31 @@ public static class AppDbContextSeeder
             
             var rnd = new Random(1234);
             var generatedProyectos = new List<dynamic>();
-            for (int i = 0; i < 120; i++)
+
+            bool useCsvSeeds = false;
+            try 
+            {
+                var sqlPath = Path.Combine("/src/src/backend/Tools/DbSeeder/Scripts", "14_Proyectos_Realistas.sql");
+                var localSqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Tools", "DbSeeder", "Scripts", "14_Proyectos_Realistas.sql");
+                var localCsvDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "..", "Bots", "ProyectosInmobiliarios");
+
+                if (File.Exists(sqlPath) || File.Exists(localSqlPath)) 
+                {
+                    useCsvSeeds = true;
+                }
+                else if (Directory.Exists(localCsvDir) && Directory.GetFiles(localCsvDir, "*.csv").Any())
+                {
+                    useCsvSeeds = true;
+                }
+            } 
+            catch (Exception ex) 
+            {
+                logger.LogWarning(ex, "No se pudo verificar la existencia de archivos CSV/SQL. Se usará el comportamiento por defecto.");
+            }
+
+            int targetCount = useCsvSeeds ? baseProyectos.Length : 120;
+
+            for (int i = 0; i < targetCount; i++)
             {
                 if (i < baseProyectos.Length)
                 {
@@ -236,13 +260,13 @@ public static class AppDbContextSeeder
             for (int i = 0; i < 10; i++) creatorList.Add(empresaUser.Id); // 10
             for (int i = 0; i < 5; i++) creatorList.Add(dummyUsers[i].Id); // 5 (1 each)
             
-            int remaining = 120 - 26; // 94
+            int remaining = Math.Max(0, targetCount - 26);
             for (int i = 0; i < remaining; i++) {
                 creatorList.Add(corporativoUser.Id); // Unlimited
             }
 
             var proyectoEntities = new List<Proyecto>();
-            for (int i = 0; i < 120; i++)
+            for (int i = 0; i < targetCount; i++)
             {
                 var p = generatedProyectos[i];
                 var creatorId = creatorList[i];

@@ -33,11 +33,14 @@ public class SelloIntegridadRepository : ISelloIntegridadRepository
 
     public async Task<List<SelloIntegridad>> GetByProyectoIdsAsync(List<Guid> proyectoIds, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<SelloIntegridad>()
+        var sellos = await _context.Set<SelloIntegridad>()
             .Where(s => proyectoIds.Contains(s.ProyectoId))
+            .ToListAsync(cancellationToken);
+
+        return sellos
             .GroupBy(s => s.ProyectoId)
             .Select(g => g.OrderByDescending(s => s.FechaEmisionUtc).First())
-            .ToListAsync(cancellationToken);
+            .ToList();
     }
 
     public async Task<SelloIntegridad?> GetByCodigoAsync(string codigoSello, CancellationToken cancellationToken = default)

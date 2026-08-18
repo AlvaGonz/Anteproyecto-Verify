@@ -74,6 +74,14 @@ docker compose up --build -d
 ### E) Reconstruir o Reiniciar Servicios Específicos
 Si necesitas aplicar cambios en el código de la API, frontend web, scripts de base de datos o forzar la actualización de un contenedor específico sin detener todo el ecosistema, utiliza estos comandos:
 
+
+
+
+**Reconstruir solo la API (backend)(dotnet run):**
+```bash
+docker compose up --build -d api
+```
+
 **Reiniciar solo la API (backend):**
 ```bash
 docker compose restart api
