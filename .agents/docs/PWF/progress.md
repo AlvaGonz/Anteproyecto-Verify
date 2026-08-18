@@ -1,6 +1,28 @@
-# PWF Progress â€” VeriFinca
+# PWF Progress — VeriFinca
 
-## Sesión 2026-08-07 â€” RemediaciÃ³n RNF-3 (finalizaciÃ³n)
+## Sesión 2026-08-17 — Fase 0 & Fase 2: Consolidación Atómica de SaveChangesAsync (CONCERNS.md L4)
+
+**Ciclo:** Optimización de Transacciones / `ProjectService.CreateProjectAsync`
+**Estado:** ✅ COMPLETO — UnitTests 15/15 verdes en ProjectService, Api.Tests 3/3 verdes en ProjectService, IntegrationTests 3/3 verdes contra SQL Server en Testcontainers.
+
+### Trabajo Realizado
+1. **Fase 0 (Evidencia & Diagnóstico SQL Server):**
+   - Conciliación de métricas de fan-in: ~97 llamadas directas en producción (72 en Application, 25 en Infrastructure), ~140 invocaciones en tests, 298 rutas transitivas en el grafo.
+   - Verificación de Colación: Base de datos y columnas `nvarchar` en `SQL_Latin1_General_CP1_CI_AS`.
+   - Inventario de Índices: Índices FK ya presentes en `ProyectosInmobiliarios`, `Auditorias` y `Usuario`.
+   - Perfilado SQL (`SET STATISTICS IO/TIME`): Quota count (2 lecturas lógicas, 0 ms), Project by ID (2 lecturas en proyectos, 0 ms).
+2. **Fase 2 (Consolidación Atómica Acotada):**
+   - Identificación de la API de auditoría: `IAuditLogger.Append(...)` es stage-only en `AppDbContext`; `AppendAsync` realiza autocommit.
+   - Refactorización de `ProjectService.CreateProjectAsync`: Se eliminó el `SaveChangesAsync` intermedio prematuro. Ahora se agregan el `Proyecto` y la `Auditoria` inicial en memoria antes de un único `_unitOfWork.SaveChangesAsync()`.
+   - Notificación post-commit: `NotifyProjectEvent` se dispara estrictamente después de que el commit a base de datos haya sido exitoso.
+   - Pruebas Unitarias & de Integración con SQL Server:
+     - `UnitTests`: Verificación de invocación única `Times.Once` de `SaveChangesAsync`, staging de auditoría con `Append`, no ejecución de `AppendAsync`, y no envío de notificaciones ante fallo en BD.
+     - `Api.Tests`: Aserción actualizada de `Received(2)` a `Received(1)`.
+     - `IntegrationTests` (Testcontainers SQL Server): `CreateProject_Success_PersistsProjectAndAuditAtomically`, `CreateProject_CancellationBeforeCommit_DoesNotPersistPartialState`, y `CreateProject_WhenDbSaveFails_RollsBackBothProjectAndAudit` (3/3 pasados).
+
+---
+
+## Sesión 2026-08-07 — Remediación RNF-3 (finalización)
 
 **Ciclo:** OH-8 / RNF-3 (Cifrado AES-256 en reposo + TLS + hallazgos Aâ€“E)
 **Estado:** âœ… COMPLETO â€” gates UnitTests 449/458 (9 fallos pre-existentes, probado), Api.Tests 33/33, E2E: 25 fallos pre-existentes por mocks desactualizados (pendiente commit de limpieza B)
