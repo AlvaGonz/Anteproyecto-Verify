@@ -208,7 +208,7 @@ def main():
             rnc_val = f"'{u['rnc']}'" if "rnc" in u else "NULL"
             
             f.write(f"IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = '{u['id']}')\n")
-            f.write(f"INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, TitularId, Rnc) VALUES ('{u['id']}', '{u['nombre']}', '{u['apellido']}', '{u['email']}', 'HASHED_PWD', '809-555-0000', '{u['cedula']}', 2, 1, 1, '{u['plan']['id']}', GETUTCDATE(), GETUTCDATE(), {titular_val}, {rnc_val});\n")
+            f.write(f"INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, TitularId, Rnc, PerfilId) VALUES ('{u['id']}', '{u['nombre']}', '{u['apellido']}', '{u['email']}', 'HASHED_PWD', '809-555-0000', '{u['cedula']}', 2, 1, 1, '{u['plan']['id']}', GETUTCDATE(), GETUTCDATE(), {titular_val}, {rnc_val}, '{u['role']['id']}');\n")
             
             if "rnc" in u:
                 company_name = u["company_name"].replace(chr(39), chr(39)+chr(39))
@@ -231,7 +231,7 @@ def main():
         for i in range(5):
             u_id = str(uuid.uuid4()).upper()
             f.write(f"IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = '{u_id}')\n")
-            f.write(f"INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas) VALUES ('{u_id}', 'Legacy{i}', 'User{i}', 'legacy{i}@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '{plans[0]['id']}', GETUTCDATE(), GETUTCDATE(), 0);\n")
+            f.write(f"INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas, PerfilId) VALUES ('{u_id}', 'Legacy{i}', 'User{i}', 'legacy{i}@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '{plans[0]['id']}', GETUTCDATE(), GETUTCDATE(), 0, '{perfiles[0]['id']}');\n")
             f.write(f"IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '{u_id}')\n")
             f.write(f"INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('{u_id}', 'Legacy{i}', 'User{i}', 'legacy{i}@example.com', 'HASH', '809-000-0000', '000-0000000-0');\n")
 

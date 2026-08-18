@@ -29,5 +29,11 @@ public class PlanSuscripcionConfiguration : IEntityTypeConfiguration<PlanSuscrip
         builder.Property(p => p.IntegracionCrmDisponible).IsRequired().HasDefaultValue(false);
         builder.Property(p => p.SoporteTipo).IsRequired().HasMaxLength(50).HasDefaultValue("Comunidad");
         builder.Property(p => p.AccesoApi).IsRequired().HasDefaultValue(false);
+
+        builder.Property(p => p.DefaultPerfilId).IsRequired(false);
+        builder.HasOne(p => p.DefaultPerfil)
+            .WithMany()
+            .HasForeignKey(p => p.DefaultPerfilId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

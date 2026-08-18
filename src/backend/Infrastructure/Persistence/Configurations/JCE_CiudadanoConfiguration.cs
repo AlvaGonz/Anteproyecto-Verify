@@ -10,5 +10,6 @@ public class JCE_CiudadanoConfiguration : IEntityTypeConfiguration<JCE_Ciudadano
     {
         builder.ToTable("JCE_Ciudadano");
         builder.HasKey(j => j.Cedula);
+        builder.Property(j => j.Cedula).HasMaxLength(15);
     }
 }

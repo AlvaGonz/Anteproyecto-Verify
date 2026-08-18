@@ -18,6 +18,8 @@ public class ReglaValidacion : EntityBase
     public Guid CreadaPor { get; private set; }
     public Guid? ReglaAnteriorId { get; private set; }
 
+    public virtual Usuario Creador { get; private set; } = null!;
+
     private ReglaValidacion() { } // For EF Core
 
     public ReglaValidacion(
