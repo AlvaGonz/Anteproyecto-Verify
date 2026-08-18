@@ -165,8 +165,11 @@ public static class DependencyInjection
         // Validation Rules
         services.AddScoped<Application.Abstractions.Persistence.IReglaValidacionRepository, Persistence.Repositories.ReglaValidacionRepository>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.CreateRule.CreateRuleCommandHandler>();
+        services.AddScoped<Application.Features.ReglasValidacion.Commands.UpdateRule.UpdateRuleCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Commands.ToggleRuleStatus.ToggleRuleStatusCommandHandler>();
+        services.AddScoped<Application.Features.ReglasValidacion.Commands.EvaluateRule.EvaluateRuleCommandHandler>();
         services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRules.GetValidationRulesQueryHandler>();
+        services.AddScoped<Application.Features.ReglasValidacion.Queries.GetValidationRuleById.GetValidationRuleByIdQueryHandler>();
         services.AddSingleton<Application.Abstractions.Security.IJwtTokenGenerator, Security.JwtTokenGenerator>();
         services.AddSingleton<Application.Abstractions.Security.IPasswordHasher, Security.BCryptPasswordHasher>();
         services.AddScoped<Application.Abstractions.Security.IGoogleAuthService, Security.GoogleAuthService>();

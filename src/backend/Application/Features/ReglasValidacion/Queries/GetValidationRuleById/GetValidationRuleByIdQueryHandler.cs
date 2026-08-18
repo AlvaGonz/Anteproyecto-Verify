@@ -1,26 +1,26 @@
-namespace Application.Features.ReglasValidacion.Queries.GetValidationRules;
+namespace Application.Features.ReglasValidacion.Queries.GetValidationRuleById;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Abstractions.Persistence;
+using Application.Features.ReglasValidacion.Queries.GetValidationRules;
 
-public class GetValidationRulesQueryHandler
+public class GetValidationRuleByIdQueryHandler
 {
     private readonly IReglaValidacionRepository _repository;
 
-    public GetValidationRulesQueryHandler(IReglaValidacionRepository repository)
+    public GetValidationRuleByIdQueryHandler(IReglaValidacionRepository repository)
     {
         _repository = repository;
     }
 
-    public async Task<IEnumerable<ReglaValidacionDto>> Handle(GetValidationRulesQuery request, CancellationToken cancellationToken)
+    public async Task<ReglaValidacionDto?> Handle(GetValidationRuleByIdQuery request, CancellationToken cancellationToken)
     {
-        var reglas = await _repository.GetAllAsync(request.Page, request.PageSize, cancellationToken);
+        var r = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        if (r == null) return null;
 
-        return reglas.Select(r => new ReglaValidacionDto
+        return new ReglaValidacionDto
         {
             Id = r.Id,
             Codigo = r.Codigo,
@@ -38,6 +38,6 @@ public class GetValidationRulesQueryHandler
             Version = r.Version,
             FechaCreacionUtc = r.FechaCreacionUtc,
             RowVersion = r.RowVersion != null ? Convert.ToBase64String(r.RowVersion) : null
-        });
+        };
     }
 }

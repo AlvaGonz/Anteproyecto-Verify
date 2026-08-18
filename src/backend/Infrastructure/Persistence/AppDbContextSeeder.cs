@@ -60,6 +60,7 @@ public static class AppDbContextSeeder
             adminUser.AsignarPlan(Guid.Parse("99999999-9999-9999-9999-999999999999"));
             adminUser.UpdateProfileExtension("Calle El Conde 102, Zona Colonial", "Distrito Nacional", "admin_vf");
             adminUser.UpdateRnc("131-000001-2", "VeriFinca RD SRL", "VeriFinca", "Servicios inmobiliarios");
+            await SeedReglasValidacionAsync(context, adminUser.Id, logger);
 
             var freemiumUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -1733,5 +1734,57 @@ WHERE NOT EXISTS (
         var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
         var token = Convert.ToBase64String(hashBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
         return $"{Convert.ToBase64String(Encoding.UTF8.GetBytes(payload))}.{token}";
+    }
+
+    private static async Task SeedReglasValidacionAsync(AppDbContext context, Guid adminId, ILogger logger)
+    {
+        var rule8Id = Guid.Parse("00000000-0000-0000-0000-000000000008");
+        var existingRule8 = await context.ReglasValidacion.FirstOrDefaultAsync(r => r.Id == rule8Id || r.Codigo == "RULE-008-SUPERFICIE");
+        if (existingRule8 == null)
+        {
+            var rule8 = new ReglaValidacion(
+                nombre: "Tolerancia Superficie vs Mensura",
+                descripcion: "Valida que la diferencia entre la superficie declarada en el proyecto y la superficie registrada en catastro no exceda la tolerancia configurada.",
+                condicionLogica: "Math.Abs(P.SuperficieM2 - C.Superficie) / C.Superficie <= ValorUmbral",
+                tipoDocumentoAplicable: DocumentType.PlanoMensuraCatastral,
+                nivelAlerta: NivelAlerta.Media,
+                tipoProyecto: TipoProyecto.Residencial,
+                creadaPor: adminId,
+                version: 1,
+                reglaAnteriorId: null,
+                valorUmbral: 0.05m,
+                minValor: 0.01m,
+                maxValor: 0.20m,
+                expresion: "|P.SuperficieM2 - C.Superficie| / C.Superficie <= @tolerancia",
+                codigo: "RULE-008-SUPERFICIE",
+                id: rule8Id
+            );
+            await context.ReglasValidacion.AddAsync(rule8);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded Rule 8 (Tolerancia Superficie vs Mensura)");
+        }
+
+        var ruleIpiId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var existingRuleIpi = await context.ReglasValidacion.FirstOrDefaultAsync(r => r.Id == ruleIpiId || r.Codigo == "RULE-001-IPI-ESTATUS");
+        if (existingRuleIpi == null)
+        {
+            var ruleIpi = new ReglaValidacion(
+                nombre: "Denegación de Publicación por Estatus IPI",
+                descripcion: "Bloquea la publicación cuando el estatus IPI es No Pagado",
+                condicionLogica: "ipi.estatus == 'No Pagado' → BLOCK_PUBLISH",
+                tipoDocumentoAplicable: DocumentType.CertificacionIPI,
+                nivelAlerta: NivelAlerta.Critica,
+                tipoProyecto: TipoProyecto.Residencial,
+                creadaPor: adminId,
+                version: 1,
+                reglaAnteriorId: null,
+                expresion: "ipi.estatus == 'No Pagado' → DENY_PUBLISH",
+                codigo: "RULE-001-IPI-ESTATUS",
+                id: ruleIpiId
+            );
+            await context.ReglasValidacion.AddAsync(ruleIpi);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded Rule 1 (Denegación de Publicación por Estatus IPI)");
+        }
     }
 }

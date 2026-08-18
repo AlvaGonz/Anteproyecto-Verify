@@ -55,7 +55,6 @@ export const ProjectPublicDetailPage: React.FC = () => {
    * The client gate exists only to prevent content/request flash while auth state
    * is unresolved and to preserve the existing authenticated quota behavior.
    */
-  const publicProjectGateResolved = !authLoading;
 
   // ponytail: QR access — resolve token to project ID via public endpoint
   const qrQuery = useQuery({

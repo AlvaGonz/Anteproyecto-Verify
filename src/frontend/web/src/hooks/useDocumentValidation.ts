@@ -1,5 +1,5 @@
-import { useProject } from "../../projects/api/useProjects";
-import { VALIDATION_RULES, DocumentType, ValidationRule } from "../lib/validation-rules";
+import { useProject } from "../features/projects/api/useProjects";
+import { VALIDATION_RULES, DocumentType } from "../lib/validation-rules";
 import { Discrepancy } from "../features/validations/hooks/useDiscrepancyCheck";
 
 export const useDocumentValidation = (projectId?: string) => {
@@ -17,7 +17,7 @@ export const useDocumentValidation = (projectId?: string) => {
     const discrepancies: Discrepancy[] = [];
 
     for (const field of rules.fieldsToValidate) {
-      const projValue = project[field];
+      const projValue = (project as Record<string, any>)[field];
       const docValue = documentData[field];
 
       if (projValue === undefined || projValue === null || projValue === "" ||

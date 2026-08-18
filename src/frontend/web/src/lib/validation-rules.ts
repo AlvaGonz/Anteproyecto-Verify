@@ -24,7 +24,8 @@ export const VALIDATION_RULES: Record<DocumentType, ValidationRule> = {
   'plano-mensura': {
     documentType: 'plano-mensura',
     fieldsToValidate: ['designacionCatastral', 'superficieM2', 'provincia'],
-    matchStrategy: 'exact',
+    matchStrategy: 'range',
+    tolerance: 0.05, // 5% por defecto (Regla 8)
     alertMessage: (proj, doc, field) => `Fuera de rango en ${field}: Declarado (${proj || 'N/A'}) vs Oficial (${doc || 'N/A'})`
   },
   'cedula': {
