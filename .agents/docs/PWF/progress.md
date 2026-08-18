@@ -78,3 +78,33 @@
 5. **Corrección de Codificación de Test**: Se detectÃ³ y resolviÃ³ un fallo de compilaciÃ³n previo en `tests/backend/test_ipi.cs` provocado por una conversión corrupta de codificaciÃ³n a UTF-16LE, reescribiendo el archivo con codificaciÃ³n UTF-8 limpia para permitir compilaciones de espacio de trabajo sin incidencias.
 
 6. **Resolución de Conflicto de Clave Foránea en Seeding (Docker)**: Se detectó que al inicializar Docker la restauración de datos desde los archivos CSV de caché (PermisoSuelo.csv, CatastroTitulo.csv, PagoIPI.csv) fallaba con errores de clave foránea FK_PermisoSuelo_DGII_Rnc al contener RNCs antiguos o incompatibles con la base de datos de la DGII. Se actualizó la función import_csv_to_db en generador_entidades_gubernamentales.py para mapear en caliente cualquier RNC no existente a uno válido dentro de la DGII, controlando además la unicidad del Rnc en PagoIPI para prevenir colisiones de clave primaria. Verificado localmente cargando millones de registros con éxito.
+
+---
+
+## Sesión 2026-08-18 — Implementación de Regla 8: "Tolerancia Superficie vs Mensura (≤5%)"
+
+**Ciclo:** Motor de Inteligencia / RS55 / Regla 8 (Tolerancia Superficie Proyecto vs Catastro Nacional)
+**Estado:** ✅ COMPLETO — Backend build 0/0, UnitTests xUnit 8/8 verdes, Vitest 7/7 verdes, Playwright E2E 4/4 verdes.
+
+### Trabajo Realizado
+1. **Dominio e Invariantes de Negocio (`Domain.Entities.ReglaValidacion`)**:
+   - Nuevos campos mapeados: `ValorUmbral` (`decimal?`), `MinValor` (`decimal?`), `MaxValor` (`decimal?`), `Expresion` (`string?`), `Codigo` (`string?`), `RowVersion` (`byte[]?`).
+   - Invariantes de rango delegados en el método de dominio `Update(...)`: Lanza `DomainException` si el umbral se ubica fuera del rango legal admitido `[MinValor, MaxValor]` (1% a 20%).
+2. **Persistencia & Migraciones EF Core**:
+   - Configuración de precisión decimal `(18, 4)` y token de concurrencia optimista (`IsRowVersion()`) en `ReglaValidacionConfiguration.cs`.
+   - Creada migración `20260818165000_AddUmbralFieldsToReglaValidacion.cs`.
+   - Seed inicial de Regla 8 (`RULE-008-SUPERFICIE`) y Regla 1 (`RULE-001-IPI-ESTATUS`) en `AppDbContextSeeder.cs`.
+3. **Capa de Aplicación y API**:
+   - `UpdateRuleCommand` + `UpdateRuleCommandHandler`: Ejecuta actualización validando en el dominio y registrando auditoría en `IAuditLogger`.
+   - `GetValidationRuleByIdQuery` + `GetValidationRuleByIdQueryHandler`: Consulta unitaria con mapeo de token de concurrencia Base64.
+   - `EvaluateRuleCommand` + `EvaluateRuleCommandHandler`: Cálculo matemático `Math.Abs(SuperficieProyecto - SuperficieCatastro) / SuperficieCatastro <= ValorUmbral`.
+   - `ValidationRulesController`: Endpoints REST `GET /api/admin/rules/{id}`, `PUT /api/admin/rules/{id}` con captura de `DbUpdateConcurrencyException` (409 Conflict) y `POST /api/admin/rules/evaluar`.
+4. **Frontend & UX / WCAG 2.2**:
+   - Hooks TanStack Query (`useRules`, `useRule`, `useUpdateRule`, `useEvaluateRule`) y validación Zod (`toleranceRuleSchema`).
+   - Vista de edición dedicada `ToleranceRuleEdit.tsx` con slider, input numérico, feedback en tiempo real, simulador interactivo, banner de error 409 y Live Region `aria-live="polite"`.
+   - Tarjeta interactiva `ToleranceSurfaceCard` en `RulesManagePageLayout.tsx` (`#/admin/rules`).
+   - Registro de ruta en `src/frontend/web/src/router/index.tsx` (`#/admin/rules/:id/edit`).
+5. **Verificación & Suite TDD**:
+   - Backend xUnit: `ReglaValidacionDomainTests.cs` (5 tests de invariantes) y `EvaluateRuleCommandHandlerTests.cs` (3 tests de cálculo matemático).
+   - Frontend Vitest: `rule8Tolerance.test.ts` (7 tests de validación Zod y reglas de tolerancia).
+   - Playwright E2E: `rule-8-tolerance.spec.ts` (4 tests de interfaz, navegación, simulación y manejo de concurrencia 409).
