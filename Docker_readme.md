@@ -77,7 +77,7 @@ Si necesitas aplicar cambios en el código de la API, frontend web, scripts de b
 
 
 
-**Reconstruir solo la API (backend):**
+**Reconstruir solo la API (backend)(dotnet run):**
 ```bash
 docker compose up --build -d api
 ```

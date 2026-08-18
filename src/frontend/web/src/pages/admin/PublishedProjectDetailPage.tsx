@@ -441,9 +441,11 @@ export const PublishedProjectDetailPage: React.FC = () => {
               Publicado por
             </h2>
 
-            {/* Seller Header */}
-            <div className="flex items-center gap-3 mb-4 min-w-0">
-              <div className="flex-1 min-w-0">
+            {/* Seller Info Container */}
+            <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-4 mb-6 min-w-0">
+              
+              {/* Name & Title */}
+              <div className="col-span-1 min-w-0">
                 <h3 className="font-bold text-primary text-sm leading-tight break-words" data-testid="registrant-name">
                   {project.registradoPor?.presentacionPublica?.nombreMostrado ?? (project.registradoPor?.nombreCompleto || "Usuario Desconocido")}
                 </h3>
@@ -451,70 +453,74 @@ export const PublishedProjectDetailPage: React.FC = () => {
                   Responsable Registral
                 </p>
               </div>
-              <div className="w-16 h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden rounded-md">
+
+              {/* Avatar */}
+              <div className="col-start-2 row-span-2 lg:row-span-1 w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 lg:w-16 lg:h-16 bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden rounded-md shadow-sm self-start">
                 {project.registradoPor?.avatarUrl ? (
                   <img src={project.registradoPor.avatarUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 ) : (
-                  <Building2 size={24} className="text-slate-300" />
+                  <Building2 className="text-slate-300 w-1/2 h-1/2 lg:w-3/4 lg:h-3/4" />
                 )}
               </div>
-            </div>
 
-            {/* Seller Details List */}
-            <ul className="space-y-2 mb-6 text-[11px] text-slate-700 min-w-0">
-              <li className="flex gap-2 items-start min-w-0">
-                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold shrink-0">RNC/Cédula:</span> 
-                <span className="break-all min-w-0" data-testid="registrant-identification">
-                  {project.registradoPor?.presentacionPublica
-                    ? (project.registradoPor.presentacionPublica.identificacionMostrada || "N/D")
-                    : (project.cedulaRncPropietario || project.rncDesarrollador || "N/D")}
-                </span>
-              </li>
-              {project.registradoPor?.presentacionPublica ? (
-                project.registradoPor.presentacionPublica.razonSocialMostrada && (
+              {/* Details List */}
+              <div className="col-span-1 lg:col-span-2 min-w-0">
+                <ul className="space-y-2 text-[11px] text-slate-700 min-w-0">
                   <li className="flex gap-2 items-start min-w-0">
                     <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                    <span className="font-bold shrink-0">R. Social:</span> 
-                    <span className="break-words min-w-0" data-testid="registrant-razon-social">
-                      {project.registradoPor.presentacionPublica.razonSocialMostrada}
+                    <span className="font-bold shrink-0">RNC/Cédula:</span> 
+                    <span className="break-all min-w-0" data-testid="registrant-identification">
+                      {project.registradoPor?.presentacionPublica
+                        ? (project.registradoPor.presentacionPublica.identificacionMostrada || "N/D")
+                        : (project.cedulaRncPropietario || project.rncDesarrollador || "N/D")}
                     </span>
                   </li>
-                )
-              ) : (
-                <li className="flex gap-2 items-start min-w-0">
-                  <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                  <span className="font-bold shrink-0">R. Social:</span> 
-                  <span className="break-words min-w-0" data-testid="registrant-razon-social">
-                    {project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}
-                  </span>
-                </li>
-              )}
-              <li className="flex gap-2 items-start min-w-0">
-                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold shrink-0">Tel:</span> 
-                <a href={project.registradoPor?.telefono ? `tel:${project.registradoPor.telefono.replace(/\s+/g, '')}` : undefined} className="text-primary hover:underline break-all min-w-0">
-                  {project.registradoPor?.telefono || "N/D"}
-                </a>
-              </li>
-              <li className="flex gap-2 items-start min-w-0">
-                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold shrink-0">Email:</span> 
-                <a href={project.registradoPor?.email ? `mailto:${project.registradoPor.email}` : undefined} className="text-primary hover:underline break-all min-w-0">
-                  {project.registradoPor?.email || "N/D"}
-                </a>
-              </li>
-              <li className="flex gap-2 items-start min-w-0">
-                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold shrink-0">Ubicación:</span> 
-                <span className="break-words min-w-0">{project.ubicacionTexto || "N/D"}</span>
-              </li>
-              <li className="flex gap-2 items-start min-w-0">
-                <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
-                <span className="font-bold shrink-0">Dirección:</span> 
-                <span className="break-words min-w-0">{project.registradoPor?.direccion || "N/D"}</span>
-              </li>
-            </ul>
+                  {project.registradoPor?.presentacionPublica ? (
+                    project.registradoPor.presentacionPublica.razonSocialMostrada && (
+                      <li className="flex gap-2 items-start min-w-0">
+                        <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                        <span className="font-bold shrink-0">R. Social:</span> 
+                        <span className="break-words min-w-0" data-testid="registrant-razon-social">
+                          {project.registradoPor.presentacionPublica.razonSocialMostrada}
+                        </span>
+                      </li>
+                    )
+                  ) : (
+                    <li className="flex gap-2 items-start min-w-0">
+                      <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                      <span className="font-bold shrink-0">R. Social:</span> 
+                      <span className="break-words min-w-0" data-testid="registrant-razon-social">
+                        {project.registradoPor?.razonSocial || project.datosDesarrollador || "N/D"}
+                      </span>
+                    </li>
+                  )}
+                  <li className="flex gap-2 items-start min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                    <span className="font-bold shrink-0">Tel:</span> 
+                    <a href={project.registradoPor?.telefono ? `tel:${project.registradoPor.telefono.replace(/\s+/g, '')}` : undefined} className="text-primary hover:underline break-all min-w-0">
+                      {project.registradoPor?.telefono || "N/D"}
+                    </a>
+                  </li>
+                  <li className="flex gap-2 items-start min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                    <span className="font-bold shrink-0">Email:</span> 
+                    <a href={project.registradoPor?.email ? `mailto:${project.registradoPor.email}` : undefined} className="text-primary hover:underline break-all min-w-0">
+                      {project.registradoPor?.email || "N/D"}
+                    </a>
+                  </li>
+                  <li className="flex gap-2 items-start min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                    <span className="font-bold shrink-0">Ubicación:</span> 
+                    <span className="break-words min-w-0">{project.ubicacionTexto || "N/D"}</span>
+                  </li>
+                  <li className="flex gap-2 items-start min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
+                    <span className="font-bold shrink-0">Dirección:</span> 
+                    <span className="break-words min-w-0">{project.registradoPor?.direccion || "N/D"}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
 
             {/* WhatsApp badges */}
             {project.registradoPor?.telefono && (
