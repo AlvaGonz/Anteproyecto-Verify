@@ -845,7 +845,7 @@ def load_env(dotenv_path=".env"):
                     val = val.strip()
                     if (val.startswith('"') and val.endswith('"')) or (val.startswith("'") and val.endswith("'")):
                         val = val[1:-1]
-                    if key:
+                    if key and "connection" not in key.lower():
                         os.environ[key] = val
 
 # Load environment variables
@@ -884,6 +884,7 @@ class TestSuiteRunner:
         start = time.time()
         cwd = os.getcwd()
         test_commands = [
+            ["dotnet", "test", "src/backend/Api.Tests/Api.Tests.csproj"],
             ["docker", "run", "--rm", "-v", f"{cwd}:/src", "-w", "/src", "mcr.microsoft.com/dotnet/sdk:8.0", "dotnet", "test", "src/backend/Api.Tests/Api.Tests.csproj", "-q"],
             ["npx", "playwright", "test"],
             ["pytest", "--tb=short", "-q", "--no-header"],
@@ -896,8 +897,9 @@ class TestSuiteRunner:
             try:
                 is_windows = sys.platform == "win32"
                 run_shell = False if (is_windows and cmd[0] == "docker") else is_windows
+                run_cmd = " ".join(cmd) if run_shell else cmd
                 result = subprocess.run(
-                    cmd, capture_output=True, text=True,
+                    run_cmd, capture_output=True, text=True,
                     timeout=120, cwd=cwd, shell=run_shell
                 )
                 duration = round(time.time() - start, 2)
