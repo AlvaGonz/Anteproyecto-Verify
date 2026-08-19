@@ -56,3 +56,19 @@
 5. **Corrección de Codificación de Test**: Se detectÃ³ y resolviÃ³ un fallo de compilaciÃ³n previo en `tests/backend/test_ipi.cs` provocado por una conversión corrupta de codificaciÃ³n a UTF-16LE, reescribiendo el archivo con codificaciÃ³n UTF-8 limpia para permitir compilaciones de espacio de trabajo sin incidencias.
 
 6. **Resolución de Conflicto de Clave Foránea en Seeding (Docker)**: Se detectó que al inicializar Docker la restauración de datos desde los archivos CSV de caché (PermisoSuelo.csv, CatastroTitulo.csv, PagoIPI.csv) fallaba con errores de clave foránea FK_PermisoSuelo_DGII_Rnc al contener RNCs antiguos o incompatibles con la base de datos de la DGII. Se actualizó la función import_csv_to_db en generador_entidades_gubernamentales.py para mapear en caliente cualquier RNC no existente a uno válido dentro de la DGII, controlando además la unicidad del Rnc en PagoIPI para prevenir colisiones de clave primaria. Verificado localmente cargando millones de registros con éxito.
+
+## Sesión 2026-08-19 — Corrección de Migración de Base de Datos y Búsqueda por RNC o Cédula
+
+**Ciclo:** OE / Gobernanza de Datos (Claves foráneas e integridad referencial)
+**Estado:** ✅ COMPLETO. Api compila correctamente (0 advertencias, 0 errores), la base de datos se migra con éxito (100% completado), todas las pruebas unitarias y de integración pasan satisfactoriamente.
+
+### Trabajo realizado
+1. **Solución a Error de Migración 1753**: Se identificó un conflicto en el orden de las migraciones de EF Core, donde `AddJceCiudadanoForeignKey` intentaba agregar una clave foránea antes de que las longitudes de las columnas (`Usuario.Cedula` con longitud 15 y `JCE_Ciudadano.Cedula` con longitud 450) coincidieran.
+   - Se unificó la alteración de la columna `Cedula` en `JCE_Ciudadano` a `nvarchar(15)` en la misma migración `AddJceCiudadanoForeignKey` antes del establecimiento de la FK, y se hizo no-op la migración subsiguiente `FixJceCiudadanoCedulaLength`.
+   - Se manejó la eliminación de la restricción de clave primaria `PK_JCE_Ciudadano` y su posterior recreación en SQL Server durante la migración para evitar errores de dependencia de columna.
+   - Para resolver conflictos con datos huérfanos preexistentes durante las corridas de pruebas, se implementó el establecimiento de la clave foránea usando `WITH NOCHECK` y habilitando su verificación posterior mediante SQL directo.
+2. **Búsqueda Unificada por RNC y Cédula en DgiiController**: Se modificó el método `GetByRnc` en `DgiiController` para que realice un fallback a la tabla `JCE_Ciudadanos` si el RNC solicitado no está registrado en la `DGII`.
+   - Si se encuentra la identificación en `JCE_Ciudadanos`, el API devuelve un registro de contribuyente simulado (tipo Persona Física) con el nombre completo y la actividad económica adecuada, permitiendo el auto-llenado y la validación tanto de empresas como de personas físicas con cédula en el frontend de registro y creación de proyectos.
+3. **Pruebas de Integración y Calidad**: 
+   - Se agregaron pruebas de integración automatizadas en `src/backend/Api.Tests/DgiiControllerTests.cs` cubriendo los tres escenarios (búsqueda de RNC existente en DGII, fallback a Cédula de JCE_Ciudadano, y NotFound para identificaciones inexistentes).
+   - Se corrigieron incompatibilidades del script `post_task_loop.py` en Windows para preferir ejecuciones de pruebas directas en el host y no contaminar el ambiente de desarrollo local con variables de conexión a base de datos de Docker cargadas desde el archivo `.env`.
