@@ -32,6 +32,10 @@ describe('useDiscrepancyCheck', () => {
       ]
     } as any);
 
+    vi.spyOn(useRulesApi, 'useDiscrepancyEnabled').mockReturnValue({
+      data: true
+    } as any);
+
     const { result } = renderHook(() => useDiscrepancyCheck('project-1'));
     
     const discrepancies = result.current.checkDiscrepancies('plano-mensura', {
@@ -64,6 +68,10 @@ describe('useDiscrepancyCheck', () => {
       ]
     } as any);
 
+    vi.spyOn(useRulesApi, 'useDiscrepancyEnabled').mockReturnValue({
+      data: true
+    } as any);
+
     const { result } = renderHook(() => useDiscrepancyCheck('project-1'));
     
     const discrepancies = result.current.checkDiscrepancies('plano-mensura', {
@@ -74,5 +82,39 @@ describe('useDiscrepancyCheck', () => {
     const supDiscrepancy = discrepancies.find(d => d.field === 'superficieM2');
     expect(supDiscrepancy).toBeDefined();
     expect(supDiscrepancy?.field).toBe('superficieM2');
+  });
+
+  it('should return no discrepancies when global discrepancy validation is disabled', () => {
+    vi.spyOn(useProjectsApi, 'useProject').mockReturnValue({
+      data: {
+        id: 'project-1',
+        superficieM2: 1000,
+        ubicacionTexto: 'Santo Domingo',
+      }
+    } as any);
+
+    vi.spyOn(useRulesApi, 'useRules').mockReturnValue({
+      data: [
+        {
+          codigo: 'RULE-008-SUPERFICIE',
+          nombre: 'Tolerancia Superficie vs Mensura',
+          activa: true,
+          valorUmbral: 0.05
+        }
+      ]
+    } as any);
+
+    vi.spyOn(useRulesApi, 'useDiscrepancyEnabled').mockReturnValue({
+      data: false
+    } as any);
+
+    const { result } = renderHook(() => useDiscrepancyCheck('project-1'));
+    
+    const discrepancies = result.current.checkDiscrepancies('plano-mensura', {
+      superficieM2: 1500,
+      designacionCatastral: 'DC-123'
+    });
+
+    expect(discrepancies).toEqual([]);
   });
 });

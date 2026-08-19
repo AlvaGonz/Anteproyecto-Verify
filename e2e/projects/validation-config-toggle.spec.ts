@@ -303,7 +303,8 @@ test.describe("Global Discrepancy Validation Toggle E2E (TDD Gate)", () => {
     await expect(toggle).toBeVisible();
 
     await toggle.click();
-    await expect(page.locator("text=Acceso denegado").or(page.locator('[role="alert"]'))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("alert")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("alert")).toContainText("Acceso denegado");
   });
 
   test("6. Concurrency conflict (HTTP 409) is handled with clear warning", async ({ page }) => {
@@ -324,6 +325,7 @@ test.describe("Global Discrepancy Validation Toggle E2E (TDD Gate)", () => {
     await expect(toggle).toBeVisible();
 
     await toggle.click();
-    await expect(page.locator("text=modificada concurrentemente").or(page.locator('[role="alert"]'))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("alert")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("alert")).toContainText("modificada concurrentemente");
   });
 });
