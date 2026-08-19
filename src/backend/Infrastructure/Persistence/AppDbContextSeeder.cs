@@ -45,6 +45,7 @@ public static class AppDbContextSeeder
             await SeedPlanesSuscripcionAsync(context, logger);
             await SeedProyectoEstadosAsync(context, logger);
             await SeedTiposNotificacionesAsync(context, logger);
+            await SeedJceCiudadanosForDefaultUsersAsync(context, logger);
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -1286,6 +1287,38 @@ WHERE NOT EXISTS (
         }
 
         return returnUser;
+    }
+
+    private static async Task SeedJceCiudadanosForDefaultUsersAsync(AppDbContext context, ILogger logger)
+    {
+        var defaultCedulas = new[]
+        {
+            "001-1234567-8",
+            "402-0000001-1",
+            "402-0000002-1",
+            "402-0000003-1",
+            "402-0000004-1",
+            "402-0000005-1"
+        };
+
+        foreach (var formattedCedula in defaultCedulas)
+        {
+            var cleanCedula = formattedCedula.Replace("-", "");
+            var exists = await context.JCE_Ciudadanos.AnyAsync(c => c.Cedula == formattedCedula || c.Cedula == cleanCedula);
+            if (!exists)
+            {
+                logger.LogInformation("Seeding mock JCE citizen for default user: {Cedula}", formattedCedula);
+                context.JCE_Ciudadanos.Add(new Domain.Entities.JCE_Ciudadano
+                {
+                    Cedula = formattedCedula,
+                    Nombres = "CIUDADANO DEFAULT",
+                    Apellidos = "JCE MOCK",
+                    FechaNacimiento = DateTime.UtcNow.AddYears(-30),
+                    FechaExpiracion = DateTime.UtcNow.AddYears(10)
+                });
+            }
+        }
+        await context.SaveChangesAsync();
     }
 
     private static async Task<Proyecto> GetOrCreateProyectoAsync(
