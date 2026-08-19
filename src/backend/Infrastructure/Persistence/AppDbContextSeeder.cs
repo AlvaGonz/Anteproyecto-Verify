@@ -213,11 +213,11 @@ public static class AppDbContextSeeder
             var generatedProyectos = new List<dynamic>();
 
             bool useCsvSeeds = false;
+            var localCsvDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "..", "Bots", "ProyectosInmobiliarios");
             try 
             {
                 var sqlPath = Path.Combine("/src/src/backend/Tools/DbSeeder/Scripts", "14_Proyectos_Realistas.sql");
                 var localSqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Tools", "DbSeeder", "Scripts", "14_Proyectos_Realistas.sql");
-                var localCsvDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "..", "Bots", "ProyectosInmobiliarios");
 
                 if (File.Exists(sqlPath) || File.Exists(localSqlPath)) 
                 {
@@ -231,6 +231,141 @@ public static class AppDbContextSeeder
             catch (Exception ex) 
             {
                 logger.LogWarning(ex, "No se pudo verificar la existencia de archivos CSV/SQL. Se usará el comportamiento por defecto.");
+            }
+
+            if (useCsvSeeds)
+            {
+                string? csvPath = GetLatestCsvPath("/src/Bots/ProyectosInmobiliarios");
+                if (csvPath == null)
+                {
+                    csvPath = GetLatestCsvPath(localCsvDir);
+                }
+
+                if (csvPath != null)
+                {
+                    logger.LogInformation("Restoring ProyectosInmobiliarios from CSV cache: {CsvPath}", csvPath);
+                    var csvRows = ParseCsv(csvPath);
+                    var proyectoEntitiesList = new List<Proyecto>();
+
+                    // Mapeo de IDs de usuario en CSV a entidades en base de datos
+                    var userMapping = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "097be5ae-8f40-4385-a204-de294b449940", consultorUser.Id },
+                        { "e0f6d53b-b148-4665-b4b1-f2554452247c", profesionalUser.Id },
+                        { "3aacec34-f910-4ad4-8cc2-3010a6721b88", empresaUser.Id },
+                        { "21dc26ac-498c-4c17-8b90-0ff49bd45970", corporativoUser.Id } // Corporativo / Test
+                    };
+
+                    // Mapeo de IDs de estado en CSV a códigos de estado
+                    var stateMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "8006e230-79a0-40b7-ad3b-b399b564f8f8", ProjectStatusCodes.Publicado },
+                        { "4f756062-8e28-4907-b633-c6285ce2c5e5", ProjectStatusCodes.Revision },
+                        { "0694d868-a8ae-42ff-8f88-58e75f4034d2", ProjectStatusCodes.Editado },
+                        { "4793e761-8e4a-4414-b64b-ba71ff57eeb5", ProjectStatusCodes.Creado }
+                    };
+
+                    foreach (var row in csvRows)
+                    {
+                        var codigoInterno = row["CodigoInterno"];
+                        
+                        var existingProj = await context.Proyectos.FirstOrDefaultAsync(p => p.CodigoInterno == codigoInterno);
+                        if (existingProj != null)
+                        {
+                            proyectoEntitiesList.Add(existingProj);
+                            continue;
+                        }
+
+                        var nombre = row["NombreProyecto"];
+                        var ubicacionTexto = row["UbicacionTexto"];
+                        
+                        var csvUserId = row["IdUsuario"];
+                        var creatorId = userMapping.TryGetValue(csvUserId, out var mappedUserId) ? mappedUserId : corporativoUser.Id;
+
+                        var categoria = int.TryParse(row["CategoriaId"], out var catVal) ? catVal : 3;
+                        var dev = row["DatosDesarrollador"];
+                        var cat = row["DesignacionCatastral"];
+
+                        var csvStateId = row["EstadoId"];
+                        var stateCode = stateMapping.TryGetValue(csvStateId, out var mappedCode) ? mappedCode : ProjectStatusCodes.Publicado;
+                        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode);
+
+                        var proyecto = new Proyecto(nombre, ubicacionTexto, creatorId, categoria, dev, cat);
+                        if (estado != null)
+                        {
+                            proyecto.UpdateEstado(estado);
+                        }
+
+                        decimal.TryParse(row["SuperficieM2"], out var superficie);
+                        decimal.TryParse(row["ValorEstimado"], out var valor);
+                        var propietario = row.ContainsKey("Propietario") ? row["Propietario"] : "";
+                        var cedulaRncPropietario = row.ContainsKey("CedulaRncPropietario") ? row["CedulaRncPropietario"] : "";
+                        var ipi = row.ContainsKey("Ipi") ? row["Ipi"] : "";
+
+                        proyecto.UpdateDetails(
+                            nombre: nombre,
+                            ubicacionTexto: ubicacionTexto,
+                            ubicacionGps: row["UbicacionGps"],
+                            valorEstimado: valor,
+                            categoriaId: categoria,
+                            datosDesarrollador: dev,
+                            designacionCatastral: cat,
+                            propietario: propietario,
+                            cedulaRncPropietario: cedulaRncPropietario,
+                            ipi: ipi,
+                            superficieM2: superficie
+                        );
+
+                        proyecto.UpdateRncYMatricula(row["RncDesarrollador"], row["Matricula"]);
+
+                        if (DateTime.TryParse(row["CreatedAtUtc"], out var createdDate))
+                        {
+                            proyecto.CreatedAtUtc = createdDate;
+                            proyecto.UpdatedAtUtc = DateTime.TryParse(row["UpdatedAtUtc"], out var updatedDate) ? updatedDate : createdDate;
+                        }
+
+                        context.Proyectos.Add(proyecto);
+                        proyectoEntitiesList.Add(proyecto);
+                    }
+
+                    await context.SaveChangesAsync();
+                    logger.LogInformation("Successfully restored {Count} projects from CSV cache.", csvRows.Count);
+
+                    await SeedTestDocumentsAsync(context, scope.ServiceProvider, adminUser.Id, corporativoUser, proyectoEntitiesList, logger);
+                    await SeedDashboardDummyDataAsync(context, logger, adminUser, corporativoUser, freemiumUser, proyectoEntitiesList);
+
+                    var currentInterestsCsv = await context.Set<ProyectoInteresado>().CountAsync();
+                    if (currentInterestsCsv < 10)
+                    {
+                        logger.LogInformation("Seeding interests from CSV restored list...");
+                        var intereses = new List<ProyectoInteresado>();
+                        for (int i = 0; i < Math.Min(5, proyectoEntitiesList.Count); i++)
+                        {
+                            intereses.Add(new ProyectoInteresado(proyectoEntitiesList[i].Id, corporativoUser.Id, adminUser.Id));
+                        }
+                        for (int i = 5; i < Math.Min(10, proyectoEntitiesList.Count); i++)
+                        {
+                            intereses.Add(new ProyectoInteresado(proyectoEntitiesList[i].Id, corporativoUser.Id, freemiumUser.Id));
+                        }
+                        context.Set<ProyectoInteresado>().AddRange(intereses);
+                        await context.SaveChangesAsync();
+                    }
+
+                    var currentSavedCsv = await context.Set<ProyectoGuardado>().CountAsync();
+                    if (currentSavedCsv < 10)
+                    {
+                        logger.LogInformation("Seeding saved projects from CSV restored list...");
+                        var guardados = new List<ProyectoGuardado>();
+                        for (int i = 0; i < Math.Min(10, proyectoEntitiesList.Count); i++)
+                        {
+                            guardados.Add(new ProyectoGuardado(proyectoEntitiesList[i].Id, corporativoUser.Id, corporativoUser.Id));
+                        }
+                        context.Set<ProyectoGuardado>().AddRange(guardados);
+                        await context.SaveChangesAsync();
+                    }
+
+                    return;
+                }
             }
 
             int targetCount = useCsvSeeds ? baseProyectos.Length : 120;
@@ -1319,6 +1454,43 @@ WHERE NOT EXISTS (
             }
         }
         await context.SaveChangesAsync();
+    }
+
+    private static string? GetLatestCsvPath(string directoryPath)
+    {
+        if (!Directory.Exists(directoryPath)) return null;
+        var files = Directory.GetFiles(directoryPath, "*.csv");
+        if (files.Length == 0) return null;
+        return files.OrderByDescending(f => File.GetCreationTime(f)).First();
+    }
+
+    private static List<Dictionary<string, string>> ParseCsv(string csvPath)
+    {
+        var result = new List<Dictionary<string, string>>();
+        var lines = File.ReadAllLines(csvPath);
+        if (lines.Length == 0) return result;
+
+        var headers = lines[0].Split('|').Select(h => h.Trim()).ToArray();
+        for (int i = 1; i < lines.Length; i++)
+        {
+            var line = lines[i].Trim();
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            var values = line.Split('|').Select(v => v.Trim()).ToArray();
+            var dict = new Dictionary<string, string>();
+            for (int j = 0; j < headers.Length; j++)
+            {
+                if (j < values.Length)
+                {
+                    dict[headers[j]] = values[j];
+                }
+                else
+                {
+                    dict[headers[j]] = "";
+                }
+            }
+            result.Add(dict);
+        }
+        return result;
     }
 
     private static async Task<Proyecto> GetOrCreateProyectoAsync(
