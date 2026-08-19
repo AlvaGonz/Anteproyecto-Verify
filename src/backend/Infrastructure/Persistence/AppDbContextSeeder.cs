@@ -149,6 +149,22 @@ public static class AppDbContextSeeder
             var testUser = await context.Usuarios.FirstOrDefaultAsync(u => u.Id == testUserId);
             if (testUser == null)
             {
+                // Ensure JCE_Ciudadano exists to satisfy FK constraint
+                var jceTest = await context.Set<Domain.Entities.JCE_Ciudadano>().FirstOrDefaultAsync(j => j.Cedula == "402-9999999-9");
+                if (jceTest == null)
+                {
+                    jceTest = new Domain.Entities.JCE_Ciudadano
+                    {
+                        Cedula = "402-9999999-9",
+                        Nombres = "Test",
+                        Apellidos = "User",
+                        FechaNacimiento = new DateTime(1990, 1, 1),
+                        FechaExpiracion = DateTime.UtcNow.AddYears(4)
+                    };
+                    context.Set<Domain.Entities.JCE_Ciudadano>().Add(jceTest);
+                    await context.SaveChangesAsync();
+                }
+
                 testUser = new Usuario(
                     "Test",
                     "User",
@@ -212,38 +228,40 @@ public static class AppDbContextSeeder
             var rnd = new Random(1234);
             var generatedProyectos = new List<dynamic>();
 
-            bool useCsvSeeds = false;
-            try 
-            {
-                var sqlPath = Path.Combine("/src/src/backend/Tools/DbSeeder/Scripts", "14_Proyectos_Realistas.sql");
-                var localSqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Tools", "DbSeeder", "Scripts", "14_Proyectos_Realistas.sql");
-                var localCsvDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "..", "Bots", "ProyectosInmobiliarios");
+            var csvPath = @"C:\Users\Alva\Desktop\Anteproyecto-Verify\Bots\ProyectosInmobiliarios\ProyectosInmobiliarios_20260814_085516.csv";
+            bool useCsvSeeds = File.Exists(csvPath);
 
-                if (File.Exists(sqlPath) || File.Exists(localSqlPath)) 
-                {
-                    useCsvSeeds = true;
-                }
-                else if (Directory.Exists(localCsvDir) && Directory.GetFiles(localCsvDir, "*.csv").Any())
-                {
-                    useCsvSeeds = true;
-                }
-            } 
-            catch (Exception ex) 
+            if (useCsvSeeds)
             {
-                logger.LogWarning(ex, "No se pudo verificar la existencia de archivos CSV/SQL. Se usará el comportamiento por defecto.");
-            }
-
-            int targetCount = useCsvSeeds ? baseProyectos.Length : 120;
-
-            for (int i = 0; i < targetCount; i++)
-            {
-                if (i < baseProyectos.Length)
+                var lines = File.ReadAllLines(csvPath).Skip(1);
+                foreach (var line in lines)
                 {
-                    generatedProyectos.Add(baseProyectos[i]);
-                }
-                else
-                {
+                    var cols = line.Split('|');
+                    if (cols.Length < 29) continue;
                     generatedProyectos.Add(new {
+                        Nombre = cols[2],
+                        Ubicacion = cols[3],
+                        UbicacionGps = cols[4],
+                        ValorEstimado = decimal.TryParse(cols[5], out var v) ? v : 1000000m,
+                        Dev = cols[6],
+                        Rnc = cols[7],
+                        Matricula = cols[8],
+                        Categoria = int.TryParse(cols[9], out var c) ? c : 3,
+                        Cat = cols[10],
+                        Propietario = cols[18],
+                        CedulaRncPropietario = cols[19],
+                        Ipi = cols[20],
+                        SuperficieM2 = decimal.TryParse(cols[22], out var s) ? s : 500m,
+                        Status = ProjectStatus.Publicado
+                    });
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 120; i++)
+                {
+                    if (i < baseProyectos.Length) generatedProyectos.Add(baseProyectos[i]);
+                    else generatedProyectos.Add(new {
                         Nombre = $"{baseNombres[rnd.Next(baseNombres.Length)]} {baseUbicaciones[rnd.Next(baseUbicaciones.Length)]} {i}",
                         Ubicacion = $"{baseUbicaciones[rnd.Next(baseUbicaciones.Length)]}, RD",
                         Categoria = new[] { 3, 8, 12, 16 }[rnd.Next(4)],
@@ -261,19 +279,18 @@ public static class AppDbContextSeeder
             for (int i = 0; i < 10; i++) creatorList.Add(empresaUser.Id); // 10
             for (int i = 0; i < 5; i++) creatorList.Add(dummyUsers[i].Id); // 5 (1 each)
             
-            int remaining = Math.Max(0, targetCount - 26);
+            int remaining = Math.Max(0, generatedProyectos.Count - 26);
             for (int i = 0; i < remaining; i++) {
                 creatorList.Add(corporativoUser.Id); // Unlimited
             }
 
             var proyectoEntities = new List<Proyecto>();
-            for (int i = 0; i < targetCount; i++)
+            for (int i = 0; i < generatedProyectos.Count; i++)
             {
                 var p = generatedProyectos[i];
                 var creatorId = creatorList[i];
-                var currentStatus = p.Status;
+                var currentStatus = (ProjectStatus)p.Status;
 
-                // Enforce Consultor condition: no more than 1, and not Published
                 if (creatorId == consultorUser.Id && currentStatus == ProjectStatus.Publicado)
                 {
                     currentStatus = ProjectStatus.Creado;
@@ -287,14 +304,16 @@ public static class AppDbContextSeeder
                     categoria: (int)p.Categoria,
                     datosDesarrollador: (string)p.Dev,
                     designacionCatastral: (string)p.Cat,
-                    status: (ProjectStatus)currentStatus);
+                    status: currentStatus);
 
-                decimal baseSuperficie = rnd.Next(100, 1000);
-                decimal superficieCalculada = baseSuperficie * 7.9m;
-                decimal valorEstimado = rnd.Next(1000000, 50000000);
-                string ubicacionGps = $"{18.4 + rnd.NextDouble() * 1.5:F5}, {-70.6 + rnd.NextDouble() * 1.5:F5}";
-                string rnc = $"1-{rnd.Next(10, 99)}-{rnd.Next(10000, 99999)}-{rnd.Next(1, 9)}";
-                string matricula = $"001-0{rnd.Next(1, 9)}-{rnd.Next(100, 999)}";
+                string ubicacionGps = useCsvSeeds ? (string)p.UbicacionGps : $"{18.4 + rnd.NextDouble() * 1.5:F5}, {-70.6 + rnd.NextDouble() * 1.5:F5}";
+                decimal valorEstimado = useCsvSeeds ? (decimal)p.ValorEstimado : rnd.Next(1000000, 50000000);
+                string propietario = useCsvSeeds ? (string)p.Propietario : "Propietario " + p.Dev;
+                string cedulaRncPropietario = useCsvSeeds ? (string)p.CedulaRncPropietario : $"402-{rnd.Next(1000000, 9999999)}-{rnd.Next(0, 9)}";
+                string ipi = useCsvSeeds ? (string)p.Ipi : $"1-01-{rnd.Next(10000, 99999)}-{rnd.Next(0, 9)}";
+                decimal superficieCalculada = useCsvSeeds ? (decimal)p.SuperficieM2 : rnd.Next(100, 1000) * 7.9m;
+                string rnc = useCsvSeeds ? (string)p.Rnc : $"1-{rnd.Next(10, 99)}-{rnd.Next(10000, 99999)}-{rnd.Next(1, 9)}";
+                string matricula = useCsvSeeds ? (string)p.Matricula : $"001-0{rnd.Next(1, 9)}-{rnd.Next(100, 999)}";
 
                 proyecto.UpdateDetails(
                     nombre: proyecto.Nombre,
@@ -304,9 +323,9 @@ public static class AppDbContextSeeder
                     categoriaId: proyecto.CategoriaId,
                     datosDesarrollador: proyecto.DatosDesarrollador,
                     designacionCatastral: proyecto.DesignacionCatastral,
-                    propietario: "Propietario " + p.Dev,
-                    cedulaRncPropietario: $"402-{rnd.Next(1000000, 9999999)}-{rnd.Next(0, 9)}",
-                    ipi: $"1-01-{rnd.Next(10000, 99999)}-{rnd.Next(0, 9)}",
+                    propietario: propietario,
+                    cedulaRncPropietario: cedulaRncPropietario,
+                    ipi: ipi,
                     superficieM2: superficieCalculada
                 );
                 
@@ -513,6 +532,8 @@ public static class AppDbContextSeeder
 
     private static async Task SeedProvinciasAsync(AppDbContext context, ILogger logger)
     {
+        if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
+        
         var connection = context.Database.GetDbConnection();
         if (connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
         using var cmd = connection.CreateCommand();
@@ -564,6 +585,8 @@ INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES
 
     private static async Task SeedMunicipiosAsync(AppDbContext context, ILogger logger)
     {
+        if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
+        
         var connection = context.Database.GetDbConnection();
         if (connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
         using var cmd = connection.CreateCommand();
