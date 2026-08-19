@@ -4,9 +4,11 @@ const RULE_8_ID = '00000000-0000-0000-0000-000000000008';
 
 test.describe('Regla 8: Tolerancia Superficie vs Mensura (Admin Management & 1%, 5%, 20% Thresholds)', () => {
   let savedTolerancePayloads: number[] = [];
+  let savedAlertLevels: number[] = [];
 
   test.beforeEach(async ({ page }) => {
     savedTolerancePayloads = [];
+    savedAlertLevels = [];
 
     await page.addInitScript(() => {
       localStorage.setItem('vf_has_session', 'true');
@@ -119,6 +121,9 @@ test.describe('Regla 8: Tolerancia Superficie vs Mensura (Admin Management & 1%,
         const body = route.request().postDataJSON();
         if (body.valorUmbral !== undefined) {
           savedTolerancePayloads.push(body.valorUmbral);
+        }
+        if (body.nivelAlerta !== undefined) {
+          savedAlertLevels.push(body.nivelAlerta);
         }
 
         if (body.valorUmbral === 0.09) {
@@ -300,5 +305,28 @@ test.describe('Regla 8: Tolerancia Superficie vs Mensura (Admin Management & 1%,
 
     await expect(page.locator('strong:has-text("La regla fue modificada por otro usuario")')).toBeVisible({ timeout: 5000 });
     await expect(page.locator('text=Recargar Regla')).toBeVisible();
+  });
+
+  test('5. Nivel de Alerta: Cambio de estados y su impacto en mapeo backend', async ({ page }) => {
+    await page.goto(`http://localhost:3000/#/admin/rules/${RULE_8_ID}/edit`);
+    await page.waitForSelector('#rule-alert-level', { timeout: 15000 });
+
+    const alertSelect = page.locator('#rule-alert-level');
+    const saveBtn = page.locator('#save-rule-btn');
+    const successMsg = page.locator('span:text("Regla actualizada exitosamente.")');
+
+    // 1. Informativa
+    await alertSelect.selectOption('Informativa');
+    await saveBtn.click();
+    await expect(successMsg).toBeVisible();
+    await expect(successMsg).toBeHidden({ timeout: 4000 });
+
+    // 2. Advertencia
+    await alertSelect.selectOption('Advertencia');
+    await saveBtn.click();
+    await expect(successMsg).toBeVisible();
+    
+    // Verify mapped payload values: 1 (Informativa), 2 (Advertencia)
+    expect(savedAlertLevels).toEqual([1, 2]);
   });
 });

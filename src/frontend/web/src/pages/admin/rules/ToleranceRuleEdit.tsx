@@ -67,6 +67,7 @@ export const ToleranceRuleEdit: React.FC = () => {
     if (initialRule) {
       setFormData({
         nombre: initialRule.nombre,
+        codigo: initialRule.codigo || "",
         descripcion: initialRule.descripcion,
         expresion: initialRule.expresion || "|P.SuperficieM2 - C.Superficie| / C.Superficie <= @tolerancia",
         valorUmbral: initialRule.valorUmbral ?? 0.05,
@@ -127,9 +128,6 @@ export const ToleranceRuleEdit: React.FC = () => {
         Baja: 1,
         Advertencia: 2,
         Media: 2,
-        Alta: 3,
-        Bloqueante: 4,
-        Critica: 4,
       };
 
       await updateRule.mutateAsync({
@@ -385,7 +383,6 @@ export const ToleranceRuleEdit: React.FC = () => {
                 >
                   <option value="Informativa">Informativa</option>
                   <option value="Advertencia">Advertencia (Recomendada)</option>
-                  <option value="Bloqueante">Bloqueante</option>
                 </select>
                 <p className="text-[11px] text-on-surface-variant mt-1">
                   &quot;Advertencia&quot; genera un hallazgo visible en el reporte de debida diligencia.

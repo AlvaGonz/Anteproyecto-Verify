@@ -76,6 +76,24 @@ export const ToleranceSurfaceCard: React.FC = () => {
     }
   }, [rule8FromApi]);
 
+  let computedAlertLevel = 2;
+  let alertBadgeText = "Advertencia";
+  let alertBadgeClass = "bg-warning-container/30 text-amber-800 dark:text-amber-300 border-warning/30";
+
+  if (rule8FromApi) {
+    if (typeof rule8FromApi.nivelAlerta === "string") {
+      const str = (rule8FromApi.nivelAlerta as string).toLowerCase();
+      if (str.includes("info") || str.includes("baja")) computedAlertLevel = 1;
+    } else if (typeof rule8FromApi.nivelAlerta === "number") {
+      computedAlertLevel = rule8FromApi.nivelAlerta;
+    }
+    
+    if (computedAlertLevel === 1) {
+      alertBadgeText = "Informativa";
+      alertBadgeClass = "bg-primary/10 text-primary border-primary/20";
+    }
+  }
+
   const handleSave = async (overrideTolerance?: number, overrideActive?: boolean) => {
     const finalTolerance = overrideTolerance ?? tolerance;
     const finalActive = overrideActive ?? active;
@@ -98,7 +116,7 @@ export const ToleranceSurfaceCard: React.FC = () => {
         minValor: 0.01,
         maxValor: 0.20,
         tipoDocumentoAplicable: 24,
-        nivelAlerta: 2, // Advertencia
+        nivelAlerta: computedAlertLevel,
         tipoProyecto: 99,
         activa: finalActive,
         rowVersion: rule8FromApi?.rowVersion,
@@ -131,8 +149,8 @@ export const ToleranceSurfaceCard: React.FC = () => {
               <span className="text-[9px] font-black text-primary uppercase tracking-widest">
                 Plano de Mensura &middot; Catastro Nacional
               </span>
-              <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border bg-warning-container/30 text-amber-800 dark:text-amber-300 border-warning/30">
-                Advertencia
+              <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${alertBadgeClass}`}>
+                {alertBadgeText}
               </span>
             </div>
 
