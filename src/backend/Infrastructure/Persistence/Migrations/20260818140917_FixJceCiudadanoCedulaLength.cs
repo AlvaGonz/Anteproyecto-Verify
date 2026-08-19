@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,27 +10,13 @@ namespace Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Cedula",
-                table: "JCE_Ciudadano",
-                type: "nvarchar(15)",
-                maxLength: 15,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
+            // Column alteration was consolidated into the previous migration to prevent length mismatch
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Cedula",
-                table: "JCE_Ciudadano",
-                type: "nvarchar(450)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(15)",
-                oldMaxLength: 15);
+            // Column alteration was consolidated into the previous migration
         }
     }
 }
