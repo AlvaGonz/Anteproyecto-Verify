@@ -1,5 +1,6 @@
 import { useProject } from "../../projects/api/useProjects";
 import { VALIDATION_RULES, DocumentType } from "../../../lib/validation-rules";
+import { useRules } from "../../rules/api/useRules";
 
 export interface Discrepancy {
   field: string;
@@ -10,6 +11,7 @@ export interface Discrepancy {
 
 export const useDiscrepancyCheck = (projectId?: string) => {
   const { data: project } = useProject(projectId || "");
+  const { data: rulesData } = useRules();
 
   const checkDiscrepancies = (
     documentType: DocumentType,
@@ -20,6 +22,10 @@ export const useDiscrepancyCheck = (projectId?: string) => {
     const rules = VALIDATION_RULES[documentType];
     if (!rules) return [];
 
+    const rule8 = rulesData?.find((r: any) => r.codigo === 'RULE-008-SUPERFICIE' || r.nombre?.includes('Tolerancia Superficie'));
+    const isRule8Active = rule8 ? rule8.activa : true;
+    const rule8Tolerance = rule8?.valorUmbral ?? rules.tolerance;
+
     const discrepancies: Discrepancy[] = [];
 
     // Map project fields if they differ in name
@@ -29,6 +35,10 @@ export const useDiscrepancyCheck = (projectId?: string) => {
     };
 
     for (const field of rules.fieldsToValidate) {
+      if (documentType === 'plano-mensura' && field === 'superficieM2' && !isRule8Active) {
+        continue;
+      }
+
       const projValue = getProjectValue(field);
       const docValue = documentData[field];
 
@@ -66,10 +76,12 @@ export const useDiscrepancyCheck = (projectId?: string) => {
         const pNum = parseFloat(pStr);
         const dNum = parseFloat(dStr);
 
+        const toleranceToUse = (documentType === 'plano-mensura' && field === 'superficieM2') ? rule8Tolerance : rules.tolerance;
+
         if (!isNaN(pNum) && !isNaN(dNum)) {
           // Numeric comparison with tolerance
           const diff = Math.abs(pNum - dNum) / (pNum === 0 ? 1 : pNum);
-          if (diff > (rules.tolerance || 0)) {
+          if (diff > (toleranceToUse || 0)) {
             discrepancies.push({
               field,
               projectValue: String(projValue),
