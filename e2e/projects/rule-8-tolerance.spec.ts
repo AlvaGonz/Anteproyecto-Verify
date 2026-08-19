@@ -173,7 +173,15 @@ test.describe('Regla 8: Tolerancia Superficie vs Mensura (Admin Management & 1%,
     await page.waitForSelector('text=Tolerancia Superficie vs Mensura', { timeout: 15000 });
 
     const card = page.locator('.vf-card', { hasText: 'Tolerancia Superficie vs Mensura' });
-    await expect(card.locator('text=RULE-008-SUPERFICIE')).toBeVisible();
+
+    // Probar el funcionamiento del Toggle de Activa/Inactiva
+    const toggleBtn = card.locator('#rule-active-toggle');
+    await expect(toggleBtn).toBeVisible();
+    await expect(card.locator('text=Activa').first()).toBeVisible();
+    await toggleBtn.click();
+    await expect(card.locator('text=Inactiva').first()).toBeVisible();
+    await toggleBtn.click();
+    await expect(card.locator('text=Activa').first()).toBeVisible();
 
     // Estado inicial: 5% por defecto
     await expect(card.locator('text=5.0%').first()).toBeVisible();
@@ -204,6 +212,15 @@ test.describe('Regla 8: Tolerancia Superficie vs Mensura (Admin Management & 1%,
     const numberInput = page.locator('#tolerance-number-input');
     const supProyectoInput = page.locator('#sim-sup-declarada');
     const supCatastroInput = page.locator('#sim-sup-catastro');
+
+    // Test del toggle Activa/Inactiva en vista edición
+    const toggleBtn = page.locator('#rule-active-toggle');
+    await expect(toggleBtn).toBeVisible();
+    await expect(page.locator('text=Activa para validaciones').first()).toBeVisible();
+    await toggleBtn.click();
+    await expect(page.locator('text=Inactiva (Omitida)').first()).toBeVisible();
+    await toggleBtn.click();
+    await expect(page.locator('text=Activa para validaciones').first()).toBeVisible();
 
     // --- Caso A: Tolerancia estricta al 1% (0.01) ---
     await numberInput.fill('0.01');

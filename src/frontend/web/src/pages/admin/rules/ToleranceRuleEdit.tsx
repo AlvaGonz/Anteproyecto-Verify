@@ -67,7 +67,6 @@ export const ToleranceRuleEdit: React.FC = () => {
     if (initialRule) {
       setFormData({
         nombre: initialRule.nombre,
-        codigo: initialRule.codigo || "RULE-008-SUPERFICIE",
         descripcion: initialRule.descripcion,
         expresion: initialRule.expresion || "|P.SuperficieM2 - C.Superficie| / C.Superficie <= @tolerancia",
         valorUmbral: initialRule.valorUmbral ?? 0.05,
@@ -233,11 +232,10 @@ export const ToleranceRuleEdit: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <span
-            className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${
-              formData.activa
-                ? "bg-success-container text-success border-success/20"
-                : "bg-surface-container text-on-surface-variant border-outline-variant/30"
-            }`}
+            className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${formData.activa
+              ? "bg-success-container text-success border-success/20"
+              : "bg-surface-container text-on-surface-variant border-outline-variant/30"
+              }`}
           >
             {formData.activa ? "Regla Activa" : "Regla Inactiva"}
           </span>
@@ -405,14 +403,12 @@ export const ToleranceRuleEdit: React.FC = () => {
                     aria-checked={formData.activa}
                     id="rule-active-toggle"
                     onClick={() => setFormData({ ...formData, activa: !formData.activa })}
-                    className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-                      formData.activa ? "bg-primary" : "bg-on-surface-variant/30"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${formData.activa ? "bg-primary" : "bg-on-surface-variant/30"
+                      }`}
                   >
                     <span
-                      className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${
-                        formData.activa ? "translate-x-6" : "translate-x-0"
-                      }`}
+                      className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${formData.activa ? "translate-x-6" : "translate-x-0"
+                        }`}
                     />
                   </button>
                   <span className="text-sm font-bold text-secondary">
@@ -503,11 +499,10 @@ export const ToleranceRuleEdit: React.FC = () => {
             {/* Result Box */}
             {evalResult && (
               <div
-                className={`p-3 rounded-xl border text-xs flex flex-col gap-1.5 ${
-                  evalResult.cumple
-                    ? "bg-success-container/20 border-success/30 text-success"
-                    : "bg-warning-container/20 border-warning/40 text-amber-800 dark:text-amber-300"
-                }`}
+                className={`p-3 rounded-xl border text-xs flex flex-col gap-1.5 ${evalResult.cumple
+                  ? "bg-success-container/20 border-success/30 text-success"
+                  : "bg-warning-container/20 border-warning/40 text-amber-800 dark:text-amber-300"
+                  }`}
               >
                 <div className="flex items-center gap-1.5 font-bold">
                   {evalResult.cumple ? <Check className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}

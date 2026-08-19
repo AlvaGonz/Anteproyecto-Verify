@@ -131,9 +131,6 @@ export const ToleranceSurfaceCard: React.FC = () => {
               <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border bg-warning-container/30 text-amber-800 dark:text-amber-300 border-warning/30">
                 Advertencia
               </span>
-              <span className="text-[9px] font-mono font-bold bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">
-                RULE-008-SUPERFICIE
-              </span>
             </div>
 
             <h3 className="text-base font-display font-black text-secondary tracking-tight mb-1">
@@ -161,7 +158,32 @@ export const ToleranceSurfaceCard: React.FC = () => {
         </div>
 
         {/* Right: Interactive Controls */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 shrink-0 bg-surface-container/50 p-3.5 rounded-xl border border-outline-variant/20">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 shrink-0 bg-surface-container/50 p-3.5 rounded-xl border border-outline-variant/20">
+          {/* Active Toggle */}
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <div className="flex flex-col items-center gap-1.5">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={active}
+                onClick={() => setActive(!active)}
+                id="rule-active-toggle"
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${active ? "bg-primary" : "bg-on-surface-variant/30"
+                  }`}
+              >
+                <span
+                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${active ? "translate-x-6" : "translate-x-0"
+                    }`}
+                />
+              </button>
+              <span className={`text-[10px] font-black uppercase tracking-widest ${active ? "text-primary" : "text-on-surface-variant"}`}>
+                {active ? "Activa" : "Inactiva"}
+              </span>
+            </div>
+          </div>
+
+          <div className="w-px h-12 bg-outline-variant/30 hidden sm:block"></div>
+
           {/* Slider / Range */}
           <div className="flex flex-col gap-1 w-full sm:w-44">
             <div className="flex items-center justify-between text-xs font-bold text-secondary">
@@ -272,9 +294,8 @@ const IpiOposicionCard: React.FC = () => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`vf-card !p-4 md:!p-5 relative overflow-hidden border-2 transition-colors duration-300 ${
-        blockOnOposicion ? "border-error/30 bg-error/[0.02]" : "border-outline-variant/30"
-      }`}
+      className={`vf-card !p-4 md:!p-5 relative overflow-hidden border-2 transition-colors duration-300 ${blockOnOposicion ? "border-error/30 bg-error/[0.02]" : "border-outline-variant/30"
+        }`}
     >
       {/* Background decoration */}
       <div className="absolute top-0 right-0 p-4 opacity-[0.04] pointer-events-none">
@@ -283,20 +304,18 @@ const IpiOposicionCard: React.FC = () => {
 
       <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-4">
         {/* Icon + Label */}
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${
-          blockOnOposicion ? "bg-error/10 text-error" : "bg-surface-container-high text-on-surface-variant"
-        }`}>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${blockOnOposicion ? "bg-error/10 text-error" : "bg-surface-container-high text-on-surface-variant"
+          }`}>
           <FileWarning className="w-5 h-5" />
         </div>
 
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[9px] font-black text-primary uppercase tracking-widest">Certificado IPI · Estatus</span>
-            <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${
-              blockOnOposicion
-                ? "bg-error-container text-error border-error/10"
-                : "bg-success-container text-success border-success/10"
-            }`}>
+            <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${blockOnOposicion
+              ? "bg-error-container text-error border-error/10"
+              : "bg-success-container text-success border-success/10"
+              }`}>
               {blockOnOposicion ? "Bloqueante" : "Permisiva"}
             </span>
           </div>
@@ -331,14 +350,12 @@ const IpiOposicionCard: React.FC = () => {
               : "Activar bloqueo de publicación por oposición IPI"
             }
             onClick={handleToggle}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-              blockOnOposicion ? "bg-error" : "bg-on-surface-variant/30"
-            }`}
+            className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${blockOnOposicion ? "bg-error" : "bg-on-surface-variant/30"
+              }`}
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${
-                blockOnOposicion ? "translate-x-6" : "translate-x-0"
-              }`}
+              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${blockOnOposicion ? "translate-x-6" : "translate-x-0"
+                }`}
             />
           </button>
 
@@ -359,9 +376,8 @@ const IpiOposicionCard: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className={`text-[9px] font-black uppercase tracking-widest ${
-                  blockOnOposicion ? "text-error" : "text-on-surface-variant"
-                }`}
+                className={`text-[9px] font-black uppercase tracking-widest ${blockOnOposicion ? "text-error" : "text-on-surface-variant"
+                  }`}
               >
                 {blockOnOposicion ? "Activo" : "Inactivo"}
               </m.span>
