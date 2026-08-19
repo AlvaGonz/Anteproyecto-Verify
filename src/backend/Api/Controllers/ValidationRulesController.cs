@@ -14,6 +14,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Application.Features.ReglasValidacion.Commands.SetDiscrepancyEnabled;
+using Domain.Entities;
+using Domain.Enums;
+using Infrastructure.Persistence;
+
 [ApiController]
 [Route("api/admin/rules")]
 // [Authorize] // TODO: Enable when auth is fully implemented
@@ -25,6 +30,7 @@ public class ValidationRulesController : ControllerBase
     private readonly GetValidationRulesQueryHandler _getHandler;
     private readonly GetValidationRuleByIdQueryHandler _getByIdHandler;
     private readonly EvaluateRuleCommandHandler _evaluateHandler;
+    private readonly AppDbContext _context;
 
     public ValidationRulesController(
         CreateRuleCommandHandler createHandler,
@@ -32,7 +38,8 @@ public class ValidationRulesController : ControllerBase
         ToggleRuleStatusCommandHandler toggleHandler,
         GetValidationRulesQueryHandler getHandler,
         GetValidationRuleByIdQueryHandler getByIdHandler,
-        EvaluateRuleCommandHandler evaluateHandler)
+        EvaluateRuleCommandHandler evaluateHandler,
+        AppDbContext context)
     {
         _createHandler = createHandler;
         _updateHandler = updateHandler;
@@ -40,6 +47,7 @@ public class ValidationRulesController : ControllerBase
         _getHandler = getHandler;
         _getByIdHandler = getByIdHandler;
         _evaluateHandler = evaluateHandler;
+        _context = context;
     }
 
     [HttpGet]
@@ -151,6 +159,104 @@ public class ValidationRulesController : ControllerBase
         catch (ArgumentException ex)
         {
             return BadRequest(new { Mensaje = ex.Message });
+        }
+    }
+
+    [HttpGet("global/discrepancy-enabled")]
+    [HttpGet("/api/validationrules/global/discrepancy-enabled")]
+    public async Task<ActionResult<bool>> GetDiscrepancyEnabled(CancellationToken ct = default)
+    {
+        var regla = await _context.ReglasValidacion
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Codigo == "GLOBAL-DISCREPANCY-ENABLED", ct);
+
+        if (regla == null)
+        {
+            return Ok(true);
+        }
+
+        return Ok(regla.Activa && regla.ValorUmbral == 1.0m);
+    }
+
+    [HttpPut("global/discrepancy-enabled")]
+    [HttpPut("/api/validationrules/global/discrepancy-enabled")]
+    public async Task<IActionResult> SetDiscrepancyEnabled([FromBody] SetDiscrepancyEnabledDto dto, CancellationToken ct = default)
+    {
+        var userId = GetUserId();
+        var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (User.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(userRole) && 
+            !userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase) && 
+            !userRole.Equals("Administrator", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { Mensaje = "Acceso denegado. Se requiere rol de Administrador." });
+        }
+
+        var regla = await _context.ReglasValidacion
+            .FirstOrDefaultAsync(r => r.Codigo == "GLOBAL-DISCREPANCY-ENABLED", ct);
+
+        if (regla == null)
+        {
+            regla = new ReglaValidacion(
+                nombre: "Habilitar Validación de Discrepancias",
+                descripcion: "Controla si se ejecuta la comparación de discrepancias proyecto-vs-documento",
+                condicionLogica: "global.enabled == true",
+                tipoDocumentoAplicable: DocumentType.OTHER,
+                nivelAlerta: NivelAlerta.Baja,
+                tipoProyecto: TipoProyecto.Residencial,
+                creadaPor: userId ?? Guid.Empty,
+                version: 1,
+                reglaAnteriorId: null,
+                valorUmbral: dto.Enabled ? 1.0m : 0.0m,
+                minValor: 0.0m,
+                maxValor: 1.0m,
+                expresion: "global.enabled == true",
+                codigo: "GLOBAL-DISCREPANCY-ENABLED",
+                id: Guid.Parse("00000000-0000-0000-0000-000000000099")
+            );
+            if (!dto.Enabled)
+            {
+                regla.Desactivar();
+            }
+            await _context.ReglasValidacion.AddAsync(regla, ct);
+        }
+        else
+        {
+            regla.Update(
+                regla.Nombre,
+                regla.Descripcion,
+                regla.CondicionLogica,
+                regla.TipoDocumentoAplicable,
+                regla.NivelAlerta,
+                regla.TipoProyecto,
+                valorUmbral: dto.Enabled ? 1.0m : 0.0m,
+                minValor: 0.0m,
+                maxValor: 1.0m,
+                expresion: "global.enabled == true",
+                codigo: "GLOBAL-DISCREPANCY-ENABLED",
+                activa: dto.Enabled
+            );
+        }
+
+        var auditoria = new Auditoria(
+            userId,
+            TipoOperacion.ReglaModificada,
+            "ConfiguracionReglas",
+            $"Configuración global de validación de discrepancias actualizada a: {(dto.Enabled ? "Habilitada" : "Deshabilitada")}.",
+            null,
+            HttpContext.Connection.RemoteIpAddress?.ToString(),
+            Request.Headers["User-Agent"].ToString()
+        );
+        _context.Auditorias.Add(auditoria);
+
+        try
+        {
+            await _context.SaveChangesAsync(ct);
+            return NoContent();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(new { Mensaje = "La configuración fue modificada concurrentemente por otro usuario." });
         }
     }
 

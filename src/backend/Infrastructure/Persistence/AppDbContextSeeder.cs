@@ -1827,5 +1827,31 @@ WHERE NOT EXISTS (
             await context.SaveChangesAsync();
             logger.LogInformation("Seeded Rule 1 (Denegación de Publicación por Estatus IPI)");
         }
+
+        var ruleGlobalDiscrepancyId = Guid.Parse("00000000-0000-0000-0000-000000000099");
+        var existingGlobalRule = await context.ReglasValidacion.FirstOrDefaultAsync(r => r.Id == ruleGlobalDiscrepancyId || r.Codigo == "GLOBAL-DISCREPANCY-ENABLED");
+        if (existingGlobalRule == null)
+        {
+            var ruleGlobal = new ReglaValidacion(
+                nombre: "Habilitar Validación de Discrepancias",
+                descripcion: "Controla si se ejecuta la comparación de discrepancias proyecto-vs-documento",
+                condicionLogica: "global.enabled == true",
+                tipoDocumentoAplicable: DocumentType.OTHER,
+                nivelAlerta: NivelAlerta.Baja,
+                tipoProyecto: TipoProyecto.Residencial,
+                creadaPor: adminId,
+                version: 1,
+                reglaAnteriorId: null,
+                valorUmbral: 1.0m,
+                minValor: 0.0m,
+                maxValor: 1.0m,
+                expresion: "global.enabled == true",
+                codigo: "GLOBAL-DISCREPANCY-ENABLED",
+                id: ruleGlobalDiscrepancyId
+            );
+            await context.ReglasValidacion.AddAsync(ruleGlobal);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded Global Discrepancy Rule (GLOBAL-DISCREPANCY-ENABLED)");
+        }
     }
 }
