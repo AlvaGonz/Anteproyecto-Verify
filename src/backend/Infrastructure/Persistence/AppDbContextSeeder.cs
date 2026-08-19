@@ -1243,6 +1243,24 @@ WHERE NOT EXISTS (
         }
         else
         {
+            if (!string.IsNullOrEmpty(cedula))
+            {
+                var jce = await context.Set<Domain.Entities.JCE_Ciudadano>().FindAsync(cedula);
+                if (jce == null)
+                {
+                    jce = new Domain.Entities.JCE_Ciudadano
+                    {
+                        Cedula = cedula,
+                        Nombres = nombre,
+                        Apellidos = apellido,
+                        FechaNacimiento = new DateTime(1980, 1, 1),
+                        FechaExpiracion = DateTime.UtcNow.AddYears(4)
+                    };
+                    context.Set<Domain.Entities.JCE_Ciudadano>().Add(jce);
+                    await context.SaveChangesAsync();
+                }
+            }
+
             var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
             context.Usuarios.Add(user);
 
