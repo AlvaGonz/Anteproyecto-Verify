@@ -11,6 +11,14 @@ public interface IGobernanzaDeDatosService
     Task<VerificationResult> VerificarIpiAsync(IpiVerificationRequest request);
 }
 
+public class DiscrepancyCheckResult
+{
+    public string Status { get; set; } = "executed";
+    public string? Reason { get; set; }
+    public bool? HasDiscrepancies { get; set; }
+    public List<string> Findings { get; set; } = new();
+}
+
 public class VerificationResult
 {
     public bool IsValid { get; set; }
@@ -18,6 +26,7 @@ public class VerificationResult
     public string Message { get; set; } = string.Empty;
     public object? MatchedData { get; set; }
     public List<string> FailedFields { get; set; } = new();
+    public DiscrepancyCheckResult? DiscrepancyCheck { get; set; }
 }
 
 public class BaseVerificationRequest

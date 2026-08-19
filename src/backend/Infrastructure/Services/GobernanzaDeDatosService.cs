@@ -25,6 +25,31 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         _notificacionRepository = notificacionRepository;
     }
 
+    private async Task<bool> IsDiscrepancyCheckEnabledAsync()
+    {
+        var regla = await _dbContext.ReglasValidacion
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Codigo == "GLOBAL-DISCREPANCY-ENABLED");
+        return regla == null || (regla.Activa && regla.ValorUmbral == 1.0m);
+    }
+
+    private VerificationResult CreateSkippedResult()
+    {
+        return new VerificationResult
+        {
+            IsValid = true,
+            MatchPercentage = 100m,
+            Message = "Validación de discrepancias omitida por configuración administrativa.",
+            DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "skipped",
+                Reason = "disabled_by_admin",
+                HasDiscrepancies = null,
+                Findings = new List<string>()
+            }
+        };
+    }
+
     private async Task SaveValidationResultAsync(BaseVerificationRequest request, VerificationResult result)
     {
         if (request.ProyectoId == Guid.Empty || !request.DocumentoId.HasValue) return;
@@ -50,50 +75,52 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             newDato.UpdateResultados(datosOcrJson, datosMatchJson, (double)result.MatchPercentage);
             _dbContext.DatosValidados.Add(newDato);
             
-            // Note: EF Core will populate ID upon save, but we need it for Hallazgo...
-            // Wait, we can save changes first to get the ID, then add Hallazgos.
             await _dbContext.SaveChangesAsync();
             datoValidadoToUse = newDato;
         }
 
-        // Process Hallazgos
-        var currentHallazgos = await _dbContext.Hallazgos
-            .Where(h => h.DatoValidadoId == datoValidadoToUse.Id)
-            .ToListAsync();
-
-        // Mark previously failed fields that are no longer failing as resolved
-        var resolvedHallazgos = currentHallazgos.Where(h => !result.FailedFields.Contains(h.Campo ?? "")).ToList();
-        foreach (var h in resolvedHallazgos)
+        // If discrepancy check was skipped, do not generate new hallazgos
+        if (result.DiscrepancyCheck?.Status != "skipped")
         {
-            if (!h.Resuelto)
-            {
-                h.MarkAsResolved();
-                _dbContext.Hallazgos.Update(h);
-            }
-        }
+            // Process Hallazgos
+            var currentHallazgos = await _dbContext.Hallazgos
+                .Where(h => h.DatoValidadoId == datoValidadoToUse.Id)
+                .ToListAsync();
 
-        // Add or update currently failed fields
-        foreach (var failedField in result.FailedFields)
-        {
-            var existingHallazgo = currentHallazgos.FirstOrDefault(h => h.Campo == failedField);
-            if (existingHallazgo != null)
+            // Mark previously failed fields that are no longer failing as resolved
+            var resolvedHallazgos = currentHallazgos.Where(h => !result.FailedFields.Contains(h.Campo ?? "")).ToList();
+            foreach (var h in resolvedHallazgos)
             {
-                if (existingHallazgo.Resuelto)
+                if (!h.Resuelto)
                 {
-                    existingHallazgo.MarkAsUnresolved();
-                    _dbContext.Hallazgos.Update(existingHallazgo);
+                    h.MarkAsResolved();
+                    _dbContext.Hallazgos.Update(h);
                 }
             }
-            else
+
+            // Add or update currently failed fields
+            foreach (var failedField in result.FailedFields)
             {
-                var newHallazgo = new Domain.Entities.Hallazgo(
-                    request.ProyectoId,
-                    datoValidadoToUse.Id,
-                    failedField,
-                    $"El campo {failedField} no coincide con la base de datos gubernamental.",
-                    Domain.Enums.FindingSeverity.Medium
-                );
-                _dbContext.Hallazgos.Add(newHallazgo);
+                var existingHallazgo = currentHallazgos.FirstOrDefault(h => h.Campo == failedField);
+                if (existingHallazgo != null)
+                {
+                    if (existingHallazgo.Resuelto)
+                    {
+                        existingHallazgo.MarkAsUnresolved();
+                        _dbContext.Hallazgos.Update(existingHallazgo);
+                    }
+                }
+                else
+                {
+                    var newHallazgo = new Domain.Entities.Hallazgo(
+                        request.ProyectoId,
+                        datoValidadoToUse.Id,
+                        failedField,
+                        $"El campo {failedField} no coincide con la base de datos gubernamental.",
+                        Domain.Enums.FindingSeverity.Medium
+                    );
+                    _dbContext.Hallazgos.Add(newHallazgo);
+                }
             }
         }
 
@@ -241,6 +268,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
 
     public async Task<VerificationResult> VerificarCatastroAsync(CatastroVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         Domain.Entities.CatastroTitulo? entity = null;
 
         if (!string.IsNullOrEmpty(request.Matricula))
@@ -310,6 +344,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f10.total == 1 && f10.matched == 0) res.FailedFields.Add("Municipio");
             if (f11.total == 1 && f11.matched == 0) res.FailedFields.Add("SuperficieM2");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -326,12 +367,27 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Provincia)) failRes.FailedFields.Add("Provincia");
         if (!string.IsNullOrWhiteSpace(request.Municipio)) failRes.FailedFields.Add("Municipio");
         if (!string.IsNullOrWhiteSpace(request.SuperficieM2)) failRes.FailedFields.Add("SuperficieM2");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarJceAsync(JceVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         var ced = request.Cedula?.Trim();
         var entity = await _dbContext.JCE_Ciudadanos
             .FirstOrDefaultAsync(c => c.Cedula == ced || (c.Cedula != null && ced != null && c.Cedula.Contains(ced)));
@@ -363,6 +419,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f4.total == 1 && f4.matched == 0) res.FailedFields.Add("FechaNacimiento");
             if (f5.total == 1 && f5.matched == 0) res.FailedFields.Add("FechaExpiracion");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -373,12 +436,27 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Apellidos)) failRes.FailedFields.Add("Apellidos");
         if (!string.IsNullOrWhiteSpace(request.FechaNacimiento)) failRes.FailedFields.Add("FechaNacimiento");
         if (!string.IsNullOrWhiteSpace(request.FechaExpiracion)) failRes.FailedFields.Add("FechaExpiracion");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarDgiiAsync(DgiiVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         var rnc = request.Rnc?.Trim();
         var entity = await _dbContext.DGII
             .FirstOrDefaultAsync(d => d.Rnc == rnc || (d.Rnc != null && rnc != null && d.Rnc.Contains(rnc)));
@@ -406,6 +484,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f2.total == 1 && f2.matched == 0) res.FailedFields.Add("NombreRazonSocial");
             if (f3.total == 1 && f3.matched == 0) res.FailedFields.Add("ActividadEconomica");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -414,12 +499,27 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Rnc)) failRes.FailedFields.Add("Rnc");
         if (!string.IsNullOrWhiteSpace(request.NombreRazonSocial)) failRes.FailedFields.Add("NombreRazonSocial");
         if (!string.IsNullOrWhiteSpace(request.ActividadEconomica)) failRes.FailedFields.Add("ActividadEconomica");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarPermisoSueloAsync(PermisoSueloVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         Domain.Entities.PermisoSuelo? entity = null;
         
         if (!string.IsNullOrEmpty(request.NumeroPermiso))
@@ -472,6 +572,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f6.total == 1 && f6.matched == 0) res.FailedFields.Add("Seccion");
             if (f7.total == 1 && f7.matched == 0) res.FailedFields.Add("Lugar");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -484,12 +591,27 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Operacion)) failRes.FailedFields.Add("Operacion");
         if (!string.IsNullOrWhiteSpace(request.Seccion)) failRes.FailedFields.Add("Seccion");
         if (!string.IsNullOrWhiteSpace(request.Lugar)) failRes.FailedFields.Add("Lugar");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarIpiAsync(IpiVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         Domain.Entities.PagoIPI? entity = null;
         
         if (!string.IsNullOrEmpty(request.NoCertificacion))
@@ -527,6 +649,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f3.total == 1 && f3.matched == 0) res.FailedFields.Add("NoInmueble");
             if (f4.total == 1 && f4.matched == 0) res.FailedFields.Add("ParcelaNo");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
 
             if (res.IsValid)
@@ -540,6 +669,14 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.NoCertificacion)) failRes.FailedFields.Add("NoCertificacion");
         if (!string.IsNullOrWhiteSpace(request.NoInmueble)) failRes.FailedFields.Add("NoInmueble");
         if (!string.IsNullOrWhiteSpace(request.ParcelaNo)) failRes.FailedFields.Add("ParcelaNo");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
