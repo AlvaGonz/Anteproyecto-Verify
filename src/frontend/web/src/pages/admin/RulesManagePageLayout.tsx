@@ -7,6 +7,7 @@ import {
   Edit3,
   Maximize2,
   AlertTriangle,
+  ShieldAlert,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -15,6 +16,8 @@ import {
   useToggleRule,
   useRules,
   useUpdateRule,
+  useDiscrepancyEnabled,
+  useSetDiscrepancyEnabled,
 } from "../../features/rules/api/useRules";
 
 export const RulesManagePageLayout: React.FC = React.memo(() => (
@@ -41,6 +44,9 @@ export const RulesManagePageLayout: React.FC = React.memo(() => (
 
     {/* Rules Grid / List */}
     <div className="flex flex-col gap-6">
+      {/* Global Discrepancy Validation Card */}
+      <GlobalDiscrepancyCard />
+
       {/* Rule 8: Tolerancia Superficie vs Mensura */}
       <ToleranceSurfaceCard />
 
@@ -49,6 +55,146 @@ export const RulesManagePageLayout: React.FC = React.memo(() => (
     </div>
   </div>
 ));
+
+// ─── Global Discrepancy Validation Card ────────────────────────────────────────
+
+export const GlobalDiscrepancyCard: React.FC = () => {
+  const { data: isEnabled, isLoading, error: queryError } = useDiscrepancyEnabled();
+  const setDiscrepancyMutation = useSetDiscrepancyEnabled();
+
+  const [active, setActive] = React.useState<boolean>(true);
+  const [saved, setSaved] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof isEnabled === "boolean") {
+      setActive(isEnabled);
+    }
+  }, [isEnabled]);
+
+  const handleToggle = async () => {
+    const nextActive = !active;
+    setActive(nextActive);
+    setError(null);
+
+    try {
+      await setDiscrepancyMutation.mutateAsync(nextActive);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      setActive(!nextActive);
+      const msg = err?.response?.data?.mensaje || err?.message || "Error al actualizar la configuración.";
+      setError(msg);
+    }
+  };
+
+  return (
+    <m.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className={`vf-card !p-5 relative overflow-hidden border-2 transition-colors duration-300 ${
+        active ? "border-primary/20 bg-surface" : "border-warning/30 bg-warning/[0.02]"
+      }`}
+    >
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-start gap-4 flex-1">
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+              active ? "bg-primary/10 text-primary" : "bg-warning/10 text-warning"
+            }`}
+          >
+            <ShieldAlert className="w-5 h-5" />
+          </div>
+
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">
+                GOBERNANZA GLOBAL · MOTOR DE COMPARACIÓN
+              </span>
+              <span
+                className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${
+                  active
+                    ? "bg-success-container/30 text-emerald-800 dark:text-emerald-300 border-success/30"
+                    : "bg-warning-container/30 text-amber-800 dark:text-amber-300 border-warning/30"
+                }`}
+              >
+                {active ? "Activa" : "Omitida"}
+              </span>
+            </div>
+
+            <h3 className="text-base font-display font-black text-secondary tracking-tight mb-1">
+              Habilitar Validación de Discrepancias
+            </h3>
+            <p className="text-xs text-on-surface-variant font-medium leading-relaxed max-w-2xl">
+              Controla si se ejecuta la comparación automática de discrepancias entre los datos del proyecto y la extracción OCR de documentos durante la validación contra el Estado / Gobernanza.
+            </p>
+
+            {(error || queryError) && (
+              <div
+                role="alert"
+                className="mt-3 text-xs font-bold text-error flex items-center gap-1.5 bg-error-container/20 p-2 rounded-lg border border-error/20"
+              >
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{error || (queryError as any)?.message || "Error al cargar la configuración global."}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-2 shrink-0 bg-surface-container/50 p-3.5 rounded-xl border border-outline-variant/20">
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              type="button"
+              role="switch"
+              data-testid="discrepancy-validation-toggle"
+              aria-checked={active}
+              aria-label="Habilitar o deshabilitar chequeo global de discrepancias"
+              disabled={isLoading || setDiscrepancyMutation.isPending}
+              onClick={handleToggle}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 ${
+                active ? "bg-primary" : "bg-on-surface-variant/30"
+              }`}
+            >
+              <span
+                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                  active ? "translate-x-6" : "translate-x-0"
+                }`}
+              />
+            </button>
+
+            <AnimatePresence mode="wait">
+              {saved ? (
+                <m.span
+                  key="saved"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="text-[9px] font-black text-success uppercase tracking-widest flex items-center gap-1"
+                >
+                  <Check className="w-3 h-3" /> Guardado
+                </m.span>
+              ) : (
+                <m.span
+                  key="label"
+                  data-testid="discrepancy-validation-status"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className={`text-[9px] font-black uppercase tracking-widest ${
+                    active ? "text-primary" : "text-on-surface-variant"
+                  }`}
+                >
+                  {active ? "Habilitada" : "Deshabilitada"}
+                </m.span>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </m.div>
+  );
+};
 
 // ─── Rule 8: Tolerancia Superficie vs Mensura Card ─────────────────────────────
 

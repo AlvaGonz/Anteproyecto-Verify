@@ -1,6 +1,6 @@
 import { useProject } from "../../projects/api/useProjects";
 import { VALIDATION_RULES, DocumentType } from "../../../lib/validation-rules";
-import { useRules } from "../../rules/api/useRules";
+import { useRules, useDiscrepancyEnabled } from "../../rules/api/useRules";
 
 export interface Discrepancy {
   field: string;
@@ -12,11 +12,16 @@ export interface Discrepancy {
 export const useDiscrepancyCheck = (projectId?: string) => {
   const { data: project } = useProject(projectId || "");
   const { data: rulesData } = useRules();
+  const { data: isGlobalDiscrepancyEnabled } = useDiscrepancyEnabled();
 
   const checkDiscrepancies = (
     documentType: DocumentType,
     documentData: Record<string, string | number | undefined>
   ): Discrepancy[] => {
+    if (isGlobalDiscrepancyEnabled === false) {
+      return [];
+    }
+
     if (!project) return [];
 
     const rules = VALIDATION_RULES[documentType];

@@ -156,3 +156,31 @@ export const useEvaluateRule = () => {
       apiClient.post<ResultadoEvaluacionDto>("/admin/rules/evaluar", request).then((res) => res.data),
   });
 };
+
+export const useDiscrepancyEnabled = () =>
+  useQuery({
+    queryKey: ["discrepancy-enabled"],
+    queryFn: () =>
+      apiClient
+        .get<boolean>("/validationrules/global/discrepancy-enabled")
+        .then((res) => res.data),
+    staleTime: 60_000,
+  });
+
+export const useValidationConfig = useDiscrepancyEnabled;
+
+export const useSetDiscrepancyEnabled = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["discrepancy-enabled", "update"],
+    mutationFn: (enabled: boolean) =>
+      apiClient
+        .put<void>("/validationrules/global/discrepancy-enabled", { enabled })
+        .then((res) => res.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["discrepancy-enabled"] });
+      qc.invalidateQueries({ queryKey: ruleKeys.all });
+    },
+  });
+};
+

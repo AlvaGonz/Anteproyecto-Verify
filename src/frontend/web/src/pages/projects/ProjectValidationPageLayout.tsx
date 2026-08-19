@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { ValidationHUD } from "../../features/validations/components/ValidationHUD";
 import type { ValidationExecutionResult, FindingDto } from "../../features/validations/types";
+import { useDiscrepancyEnabled } from "../../features/rules/api/useRules";
 
 const ValidationSummary = lazy(() => import("../../features/validations/components/ValidationSummary").then(m => ({ default: m.ValidationSummary })));
 const ValidationRulesTable = lazy(() => import("../../features/validations/components/ValidationRulesTable").then(m => ({ default: m.ValidationRulesTable })));
@@ -41,6 +42,8 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
   handleScanComplete,
   projectStatus,
 }) => {
+  const { data: isDiscrepancyEnabled } = useDiscrepancyEnabled();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
 
@@ -90,6 +93,24 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
           </div>
         </div>
       </div>
+      )}
+
+      {isDiscrepancyEnabled === false && (
+        <div
+          data-testid="validation-bypass-warning"
+          role="alert"
+          className="mb-8 p-4 bg-amber-500/10 text-amber-800 dark:text-amber-300 rounded-2xl border border-amber-500/30 flex items-center gap-4 animate-in slide-in-from-top duration-300"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <div className="font-bold text-sm uppercase">Validación de discrepancias omitida</div>
+            <div className="text-xs opacity-90">
+              La comparación automática entre el documento y el proyecto está desactivada por configuración administrativa.
+            </div>
+          </div>
+        </div>
       )}
 
       {error && (
