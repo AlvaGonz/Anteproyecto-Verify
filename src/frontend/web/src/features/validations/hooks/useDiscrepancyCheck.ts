@@ -32,8 +32,10 @@ export const useDiscrepancyCheck = (projectId?: string) => {
       const projValue = getProjectValue(field);
       const docValue = documentData[field];
 
-      if (projValue === undefined || projValue === null || projValue === "" ||
-          docValue === undefined || docValue === null || docValue === "") {
+      const isProjEmpty = projValue === undefined || projValue === null || projValue === "";
+      const isDocEmpty = docValue === undefined || docValue === null || docValue === "";
+
+      if (isProjEmpty && isDocEmpty) {
         continue;
       }
 
@@ -65,12 +67,25 @@ export const useDiscrepancyCheck = (projectId?: string) => {
         const dNum = parseFloat(dStr);
 
         if (!isNaN(pNum) && !isNaN(dNum)) {
-          const diff = Math.abs(pNum - dNum) / pNum;
+          // Numeric comparison with tolerance
+          const diff = Math.abs(pNum - dNum) / (pNum === 0 ? 1 : pNum);
           if (diff > (rules.tolerance || 0)) {
             discrepancies.push({
               field,
               projectValue: String(projValue),
               documentValue: String(docValue),
+              message: rules.alertMessage(projValue, docValue, field)
+            });
+          }
+        } else {
+          // Fallback to exact match for non-numeric fields even if strategy is 'range'
+          const projStr = String(projValue).trim();
+          const docStr = String(docValue).trim();
+          if (projStr.toLowerCase() !== docStr.toLowerCase()) {
+            discrepancies.push({
+              field,
+              projectValue: projStr,
+              documentValue: docStr,
               message: rules.alertMessage(projValue, docValue, field)
             });
           }

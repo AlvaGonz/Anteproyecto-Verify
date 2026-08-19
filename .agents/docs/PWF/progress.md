@@ -108,3 +108,11 @@
    - Backend xUnit: `ReglaValidacionDomainTests.cs` (5 tests de invariantes) y `EvaluateRuleCommandHandlerTests.cs` (3 tests de cÃ¡lculo matemÃ¡tico).
    - Frontend Vitest: `rule8Tolerance.test.ts` (7 tests de validaciÃ³n Zod y reglas de tolerancia).
    - Playwright E2E: `rule-8-tolerance.spec.ts` (4 tests de interfaz, navegaciÃ³n, simulaciÃ³n y manejo de concurrencia 409).
+
+## Sesión 2026-08-19 — Debug Session Error 500 ReglasValidacion
+
+**Síntoma:** Error 500 al llamar a /api/admin/rules por columnas faltantes (MaxValor, MinValor, ValorUmbral).
+**Root Cause:** La migración 20260818165000_AddUmbralFieldsToReglaValidacion.cs se había creado de manera parcial y sin su archivo .Designer.cs, por lo que EF Core no actualizó el modelo en el contenedor, provocando un fallo silencioso en la base de datos.
+**Fix:** Se eliminó la migración corrupta y se regeneró utilizando dotnet ef migrations add con la variable de entorno JWT_KEY seteada. Se reconstruyó y reinició la imagen de la API (pi) usando docker compose.
+**Verificación:** La llamada a la ruta GET devuelve ahora 200 OK.
+

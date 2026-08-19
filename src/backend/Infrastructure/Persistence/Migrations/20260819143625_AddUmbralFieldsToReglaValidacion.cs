@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -25,7 +25,7 @@ namespace Infrastructure.Persistence.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<decimal>(
-                name: "ValorUmbral",
+                name: "MaxValor",
                 table: "ReglasValidacion",
                 type: "decimal(18,4)",
                 precision: 18,
@@ -40,19 +40,18 @@ namespace Infrastructure.Persistence.Migrations
                 scale: 4,
                 nullable: true);
 
+            migrationBuilder.AddColumn<byte[]>(
+                name: "RowVersion",
+                table: "ReglasValidacion",
+                type: "varbinary(max)",
+                nullable: true);
+
             migrationBuilder.AddColumn<decimal>(
-                name: "MaxValor",
+                name: "ValorUmbral",
                 table: "ReglasValidacion",
                 type: "decimal(18,4)",
                 precision: 18,
                 scale: 4,
-                nullable: true);
-
-            migrationBuilder.AddColumn<byte[]>(
-                name: "RowVersion",
-                table: "ReglasValidacion",
-                type: "rowversion",
-                rowVersion: true,
                 nullable: true);
         }
 
@@ -68,7 +67,7 @@ namespace Infrastructure.Persistence.Migrations
                 table: "ReglasValidacion");
 
             migrationBuilder.DropColumn(
-                name: "ValorUmbral",
+                name: "MaxValor",
                 table: "ReglasValidacion");
 
             migrationBuilder.DropColumn(
@@ -76,11 +75,11 @@ namespace Infrastructure.Persistence.Migrations
                 table: "ReglasValidacion");
 
             migrationBuilder.DropColumn(
-                name: "MaxValor",
+                name: "RowVersion",
                 table: "ReglasValidacion");
 
             migrationBuilder.DropColumn(
-                name: "RowVersion",
+                name: "ValorUmbral",
                 table: "ReglasValidacion");
         }
     }
