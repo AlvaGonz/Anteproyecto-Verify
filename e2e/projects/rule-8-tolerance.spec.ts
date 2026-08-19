@@ -190,14 +190,14 @@ test.describe('Regla 8: Tolerancia Superficie vs Mensura (Admin Management & 1%,
 
     // Cambiar a 1.0% (mínimo permitido)
     await rangeInput.fill('0.01');
+    await rangeInput.evaluate(e => e.dispatchEvent(new MouseEvent('mouseup', { bubbles: true })));
     await expect(card.locator('text=1.0%').first()).toBeVisible();
-    await card.locator('#save-tolerance-btn').click();
     await expect(card.locator('text=Guardado')).toBeVisible({ timeout: 5000 });
 
     // Cambiar a 20.0% (máximo permitido)
     await rangeInput.fill('0.2');
+    await rangeInput.evaluate(e => e.dispatchEvent(new MouseEvent('mouseup', { bubbles: true })));
     await expect(card.locator('text=20.0%').first()).toBeVisible();
-    await card.locator('#save-tolerance-btn').click();
     await expect(card.locator('text=Guardado')).toBeVisible({ timeout: 5000 });
 
     // Validar payloads enviados al backend
