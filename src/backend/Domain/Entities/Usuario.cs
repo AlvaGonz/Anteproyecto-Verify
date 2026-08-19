@@ -75,6 +75,10 @@ public class Usuario : EntityBase, IEffectivePlanUser
     public Guid? PlanSuscripcionId { get; private set; }
     public PlanSuscripcion? Plan { get; private set; }
     IPlanData? Domain.Policies.IEffectivePlanUser.Plan => Plan;
+
+    public Guid? PerfilId { get; private set; }
+    public virtual Perfil? Perfil { get; private set; }
+
     public int ConsultasUsadas { get; private set; }
     public int ProyectosCreados { get; private set; }
 
@@ -86,8 +90,9 @@ public class Usuario : EntityBase, IEffectivePlanUser
     Domain.Policies.IEffectivePlanUser? Domain.Policies.IEffectivePlanUser.Titular => Titular;
     public ICollection<Usuario> MiembrosEquipo { get; private set; } = new List<Usuario>();
 
-    // Navigation properties
     public ICollection<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
+
+    public JCE_Ciudadano? JceCiudadanoMock { get; private set; }
 
     int? Domain.Policies.IEffectivePlanUser.MaxUsuariosSecundarios => Plan?.MaxUsuariosSecundarios;
 
@@ -250,6 +255,12 @@ public class Usuario : EntityBase, IEffectivePlanUser
     {
         PlanSuscripcionId = planId;
         ConsultasUsadas = 0; // Reset count when changing plans
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
+    public void AsignarPerfil(Guid perfilId)
+    {
+        PerfilId = perfilId;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

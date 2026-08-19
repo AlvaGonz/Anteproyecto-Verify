@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260818141035_FixDisconnectedTables")]
+    partial class FixDisconnectedTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1177,9 +1180,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid?>("DefaultPerfilId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("ExportacionExcelDisponible")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -1251,8 +1251,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasDefaultValue(false);
 
                     b.HasKey("Idsuscripcion");
-
-                    b.HasIndex("DefaultPerfilId");
 
                     b.ToTable("PlanSuscripcion", (string)null);
                 });
@@ -2025,9 +2023,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("PendingPlanCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("PerfilId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("PlanSuscripcionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2117,8 +2112,6 @@ namespace Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UQ_Usuario_Nickname")
                         .HasFilter("[Nickname] IS NOT NULL");
-
-                    b.HasIndex("PerfilId");
 
                     b.HasIndex("PlanSuscripcionId");
 
@@ -2595,16 +2588,6 @@ namespace Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Domain.Entities.PlanSuscripcion", b =>
-                {
-                    b.HasOne("Domain.Entities.Perfil", "DefaultPerfil")
-                        .WithMany()
-                        .HasForeignKey("DefaultPerfilId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("DefaultPerfil");
-                });
-
             modelBuilder.Entity("Domain.Entities.Proyecto", b =>
                 {
                     b.HasOne("Domain.Entities.CategoriaProyecto", "CategoriaProyecto")
@@ -2799,11 +2782,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasForeignKey("Cedula")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Domain.Entities.Perfil", "Perfil")
-                        .WithMany()
-                        .HasForeignKey("PerfilId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Domain.Entities.PlanSuscripcion", "Plan")
                         .WithMany()
                         .HasForeignKey("PlanSuscripcionId")
@@ -2815,8 +2793,6 @@ namespace Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("JceCiudadanoMock");
-
-                    b.Navigation("Perfil");
 
                     b.Navigation("Plan");
 

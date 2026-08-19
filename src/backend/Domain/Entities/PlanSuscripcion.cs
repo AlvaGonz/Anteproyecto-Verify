@@ -25,6 +25,9 @@ public class PlanSuscripcion : IPlanData
     public string SoporteTipo { get; private set; } = "Comunidad";
     public bool AccesoApi { get; private set; }
 
+    public Guid? DefaultPerfilId { get; private set; }
+    public virtual Perfil? DefaultPerfil { get; private set; }
+
     private PlanSuscripcion() { } // For EF Core
 
     public static PlanSuscripcion Create(
@@ -33,7 +36,7 @@ public class PlanSuscripcion : IPlanData
         bool qrIncluido, int maxUsuariosSecundarios, int maxAlmacenamientoMb,
         bool alertasTiempoRealDisponible, bool modeloLmDisponible, bool validacionLoteDisponible,
         bool exportacionExcelDisponible, bool exportacionPdfDisponible, bool integracionCrmDisponible,
-        string soporteTipo, bool accesoApi)
+        string soporteTipo, bool accesoApi, Guid? defaultPerfilId = null)
     {
         return new PlanSuscripcion
         {
@@ -53,7 +56,8 @@ public class PlanSuscripcion : IPlanData
             ExportacionPdfDisponible = exportacionPdfDisponible,
             IntegracionCrmDisponible = integracionCrmDisponible,
             SoporteTipo = soporteTipo,
-            AccesoApi = accesoApi
+            AccesoApi = accesoApi,
+            DefaultPerfilId = defaultPerfilId
         };
     }
 
@@ -73,7 +77,7 @@ public class PlanSuscripcion : IPlanData
         bool qrIncluido, int maxUsuariosSecundarios, int maxAlmacenamientoMb,
         bool alertasTiempoRealDisponible, bool modeloLmDisponible, bool validacionLoteDisponible,
         bool exportacionExcelDisponible, bool exportacionPdfDisponible, bool integracionCrmDisponible,
-        string soporteTipo, bool accesoApi)
+        string soporteTipo, bool accesoApi, Guid? defaultPerfilId = null)
     {
         NombrePlan = nombrePlan;
         Precio = precio;
@@ -91,5 +95,6 @@ public class PlanSuscripcion : IPlanData
         IntegracionCrmDisponible = integracionCrmDisponible;
         SoporteTipo = soporteTipo;
         AccesoApi = accesoApi;
+        DefaultPerfilId = defaultPerfilId;
     }
 }

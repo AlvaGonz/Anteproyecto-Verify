@@ -8,7 +8,9 @@ Output: 14_Proyectos_Realistas.sql (IF NOT EXISTS style)
 """
 
 import os
+import glob
 import json
+import csv
 import random
 import uuid
 from datetime import datetime, timedelta
@@ -149,8 +151,8 @@ for idx, (email, apellido, telefono, plan_id) in enumerate(user_config):
     real_apellidos = demo_data["users"][idx]["apellidos"] if idx < len(demo_data["users"]) else apellido
     
     lines.append(f"IF NOT EXISTS (SELECT 1 FROM Usuario WHERE Email = '{email}')")
-    lines.append(f"    INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, TitularId, Rnc)")
-    lines.append(f"    VALUES (NEWID(), '{real_nombres}', '{real_apellidos}', '{email}', 'HASHED_PWD', '{telefono}', '{cedula}', 2, 1, 1, '{plan_id}', GETUTCDATE(), GETUTCDATE(), NULL, NULL);")
+    lines.append(f"    INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, TitularId, Rnc, PerfilId)")
+    lines.append(f"    VALUES (NEWID(), '{real_nombres}', '{real_apellidos}', '{email}', 'HASHED_PWD', '{telefono}', '{cedula}', 2, 1, 1, '{plan_id}', GETUTCDATE(), GETUTCDATE(), NULL, NULL, '196AF7D7-7984-4A15-90E6-D21EB61852A9');")
 lines.append("")
 
 project_counter = 0

@@ -50,6 +50,12 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .HasForeignKey(u => u.PlanSuscripcionId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        builder.Property(u => u.PerfilId).IsRequired(false);
+        builder.HasOne(u => u.Perfil)
+            .WithMany()
+            .HasForeignKey(u => u.PerfilId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // Profile extension fields
         builder.Property(u => u.Direccion).HasMaxLength(200).IsRequired(false);
         builder.Property(u => u.Provincia).HasMaxLength(50).IsRequired(false);
@@ -59,6 +65,13 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         // Public presentation preferences (persisted as enum names, no magic strings)
         builder.Property(u => u.NombrePublicoModo).HasConversion<string>().HasMaxLength(20).IsRequired(false);
         builder.Property(u => u.IdentificacionPublicaModo).HasConversion<string>().HasMaxLength(20).IsRequired(false);
+
+        // Mock JCE Foreign Key
+        builder.HasOne(u => u.JceCiudadanoMock)
+            .WithMany()
+            .HasForeignKey(u => u.Cedula)
+            .HasPrincipalKey(c => c.Cedula)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // Team properties
         builder.Property(u => u.TitularId).IsRequired(false);

@@ -25,6 +25,10 @@ public class ReglaValidacionConfiguration : IEntityTypeConfiguration<ReglaValida
         builder.Property(r => r.Version).IsRequired();
         builder.Property(r => r.FechaCreacionUtc).IsRequired();
         builder.Property(r => r.CreadaPor).IsRequired();
-        builder.Property(r => r.RowVersion).IsRowVersion();
+
+        builder.HasOne(r => r.Creador)
+            .WithMany()
+            .HasForeignKey(r => r.CreadaPor)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
