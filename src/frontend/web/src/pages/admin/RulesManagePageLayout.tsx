@@ -76,9 +76,12 @@ export const ToleranceSurfaceCard: React.FC = () => {
     }
   }, [rule8FromApi]);
 
-  const handleSave = async () => {
+  const handleSave = async (overrideTolerance?: number, overrideActive?: boolean) => {
+    const finalTolerance = overrideTolerance ?? tolerance;
+    const finalActive = overrideActive ?? active;
+
     setError(null);
-    if (tolerance < 0.01 || tolerance > 0.20) {
+    if (finalTolerance < 0.01 || finalTolerance > 0.20) {
       setError("La tolerancia debe estar entre 1% (0.01) y 20% (0.20)");
       return;
     }
@@ -89,15 +92,15 @@ export const ToleranceSurfaceCard: React.FC = () => {
         codigo: "RULE-008-SUPERFICIE",
         nombre: "Tolerancia Superficie vs Mensura",
         descripcion: "Valida que la diferencia entre la superficie declarada y catastro no exceda la tolerancia configurada.",
-        condicionLogica: `Math.Abs(P.SuperficieM2 - C.Superficie) / C.Superficie <= ${tolerance}`,
+        condicionLogica: `Math.Abs(P.SuperficieM2 - C.Superficie) / C.Superficie <= ${finalTolerance}`,
         expresion: "|P.SuperficieM2 - C.Superficie| / C.Superficie <= @tolerancia",
-        valorUmbral: tolerance,
+        valorUmbral: finalTolerance,
         minValor: 0.01,
         maxValor: 0.20,
         tipoDocumentoAplicable: 24,
         nivelAlerta: 2, // Advertencia
         tipoProyecto: 99,
-        activa: active,
+        activa: finalActive,
         rowVersion: rule8FromApi?.rowVersion,
       });
       setSaved(true);
@@ -166,7 +169,11 @@ export const ToleranceSurfaceCard: React.FC = () => {
                 type="button"
                 role="switch"
                 aria-checked={active}
-                onClick={() => setActive(!active)}
+                onClick={() => {
+                  const nextActive = !active;
+                  setActive(nextActive);
+                  handleSave(tolerance, nextActive);
+                }}
                 id="rule-active-toggle"
                 className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${active ? "bg-primary" : "bg-on-surface-variant/30"
                   }`}
@@ -176,9 +183,29 @@ export const ToleranceSurfaceCard: React.FC = () => {
                     }`}
                 />
               </button>
-              <span className={`text-[10px] font-black uppercase tracking-widest ${active ? "text-primary" : "text-on-surface-variant"}`}>
-                {active ? "Activa" : "Inactiva"}
-              </span>
+              <AnimatePresence mode="wait">
+                {saved ? (
+                  <m.span
+                    key="saved"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="text-[9px] font-black text-success uppercase tracking-widest flex items-center gap-1"
+                  >
+                    <Check className="w-3 h-3" /> Guardado
+                  </m.span>
+                ) : (
+                  <m.span
+                    key="label"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className={`text-[9px] font-black uppercase tracking-widest ${active ? "text-primary" : "text-on-surface-variant"}`}
+                  >
+                    {active ? "Activa" : "Inactiva"}
+                  </m.span>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -201,6 +228,8 @@ export const ToleranceSurfaceCard: React.FC = () => {
               step={0.005}
               value={tolerance}
               onChange={(e) => setTolerance(parseFloat(e.target.value))}
+              onMouseUp={() => handleSave(tolerance, active)}
+              onTouchEnd={() => handleSave(tolerance, active)}
               className="w-full h-1.5 bg-surface-container-highest rounded appearance-none cursor-pointer accent-primary"
               aria-label="Ajustar tolerancia de superficie"
             />
@@ -220,22 +249,6 @@ export const ToleranceSurfaceCard: React.FC = () => {
               <Edit3 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Detalles</span>
             </Link>
-
-            <button
-              type="button"
-              id="save-tolerance-btn"
-              onClick={handleSave}
-              disabled={updateRule.isPending}
-              className="px-3 py-1.5 text-xs font-bold text-white bg-primary hover:bg-primary-hover active:scale-95 disabled:opacity-50 rounded-lg transition-all flex items-center gap-1 shadow-sm"
-            >
-              {saved ? (
-                <>
-                  <Check className="w-3.5 h-3.5" /> Guardado
-                </>
-              ) : (
-                "Guardar"
-              )}
-            </button>
           </div>
         </div>
       </div>
@@ -379,7 +392,7 @@ const IpiOposicionCard: React.FC = () => {
                 className={`text-[9px] font-black uppercase tracking-widest ${blockOnOposicion ? "text-error" : "text-on-surface-variant"
                   }`}
               >
-                {blockOnOposicion ? "Activo" : "Inactivo"}
+                {blockOnOposicion ? "Activa" : "Inactiva"}
               </m.span>
             )}
           </AnimatePresence>
