@@ -1,5 +1,12 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-20 — Refactor UI/UX Banner Bypass de Validación (Design System Alignment)
+
+**Ciclo:** UI/UX Polish / Banner de Advertencia de Discrepancias Omitidas (`ProjectValidationPageLayout.tsx`)
+**Estado:** ✅ COMPLETO — Reemplazado banner genérico amber por tarjeta institucional VeriFinca con alta legibilidad, tokens institucionales (`primary`, `secondary`, `text-secondary`, `surface`), pill badge `Modo Bypass`, y 100% tests E2E verdes.
+
+---
+
 ## Sesión 2026-08-17 — Fase 0 & Fase 2: Consolidación Atómica de SaveChangesAsync (CONCERNS.md L4)
 
 **Ciclo:** Optimización de Transacciones / `ProjectService.CreateProjectAsync`
@@ -153,7 +160,30 @@
 1. **Re-merge de Rama y Resolución de Conflictos**:
 # PWF Progress — VeriFinca
 
-## Sesión 2026-08-17 — Fase 0 & Fase 2: Consolidación Atómica de SaveChangesAsync (CONCERNS.md L4)
+## Sesión 2026-08-20 — Persistencia y Visibilidad de Validación Documental (% Match)
+
+**Ciclo:** Persistencia de Resultados de Gobernanza y % de Match en Tarjetas de Documentos Requeridos
+**Estado:** ✅ COMPLETO — Backend GET endpoint + Service persistencia, Frontend useDocumentValidationResult con caché y fallback, Cards actualizadas (`PlanoMensura`, `CertificadoTitulo`, `CertificacionIPI`, `Cedula`, `EstadoJuridico`, `OcrReviewPanel`), Unit tests 100% verdes, TypeScript 0 errores.
+
+### Trabajo Realizado
+1. **Backend (`IGobernanzaDeDatosService.cs` & `GobernanzaDeDatosService.cs`):**
+   - Agregado método `ObtenerResultadoPorDocumentoAsync(Guid documentoId)` para consultar la entidad persistida `DatoValidado` en base de datos.
+   - Mapeo completo a `VerificationResult` incluyendo `MatchPercentage`, `MatchedData`, `FailedFields`, `DiscrepancyCheck` y mensaje contextual.
+2. **Backend API (`GobernanzaDeDatosController.cs`):**
+   - Expuesto endpoint `GET /api/gobernanzadedatos/resultado/{documentoId:guid}` con respuestas 200 OK y 404 Not Found.
+   - Backend compilado con 0 errores y tests unitarios añadidos en `GobernanzaValidationPersistenceTests.cs` (2/2 pasados).
+3. **Frontend API (`useGobernanza.ts`):**
+   - Creado hook `useDocumentValidationResult(documentoId)` con persistencia en `localStorage` y caché TanStack Query.
+   - Actualizado `useVerifyDocument` para sincronizar `queryClient` y `localStorage` inmediatamente al completar validación.
+   - Añadidos tests unitarios en `useGobernanza.test.ts` (3/3 pasados).
+4. **Frontend Tarjetas de Extracción:**
+   - Actualizadas todas las tarjetas de extracción (`PlanoMensuraExtractionCard`, `CertificadoTituloExtractionCard`, `CertificacionIPIExtractionCard`, `CedulaExtractionCard`, `EstadoJuridicoExtractionCard`, `OcrReviewPanel`) para combinar `const verificationResponse = mutationResponse || persistedResponse || null;`.
+   - Ahora el porcentaje de match (`100% Match`, etc.), feedback card y resaltado de campos permanecen visibles de forma continua tras recargar la página o cambiar de pestaña.
+5. **E2E & Calidad:**
+   - Agregado test E2E `e2e/projects/validation-persistence.spec.ts`.
+   - `tsc --noEmit` verificado con 0 errores.
+
+---
 
 **Ciclo:** Optimización de Transacciones / `ProjectService.CreateProjectAsync`
 **Estado:** ✅ COMPLETO — UnitTests 15/15 verdes en ProjectService, Api.Tests 3/3 verdes en ProjectService, IntegrationTests 3/3 verdes contra SQL Server en Testcontainers.
