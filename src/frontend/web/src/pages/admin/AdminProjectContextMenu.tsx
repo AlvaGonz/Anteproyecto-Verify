@@ -104,18 +104,68 @@ export const AdminProjectContextMenu: React.FC<AdminProjectContextMenuProps> = R
 
             <div className="my-1 border-t border-gray-100"></div>
 
-            {project.estadoProyecto === ProjectStatus.Validated && (
-              <button type="button"
+            <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+              Cambiar Estado
+            </div>
+
+            {project.estadoProyecto !== ProjectStatus.Published && (
+              <button
+                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   updateStatus({ id: project.id, status: ProjectStatus.Published });
                   onClose();
                 }}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors w-full"
+                className="flex items-center gap-3 px-4 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 transition-colors w-full text-left"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                Publicar (Terminado)
-             </button>
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Publicar (Aprobado)
+              </button>
+            )}
+
+            {project.estadoProyecto !== ProjectStatus.InReview && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  updateStatus({ id: project.id, status: ProjectStatus.InReview });
+                  onClose();
+                }}
+                className="flex items-center gap-3 px-4 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors w-full text-left"
+              >
+                <Activity className="w-3.5 h-3.5" />
+                Pasar a En Revisión
+              </button>
+            )}
+
+            {project.estadoProyecto !== ProjectStatus.Observed && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  updateStatus({ id: project.id, status: ProjectStatus.Observed });
+                  onClose();
+                }}
+                className="flex items-center gap-3 px-4 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 transition-colors w-full text-left"
+              >
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Marcar Observado
+              </button>
+            )}
+
+            {project.estadoProyecto !== ProjectStatus.Draft && project.estadoProyecto !== ProjectStatus.Edited && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  updateStatus({ id: project.id, status: ProjectStatus.Draft });
+                  onClose();
+                }}
+                className="flex items-center gap-3 px-4 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors w-full text-left"
+              >
+                <FolderKanban className="w-3.5 h-3.5" />
+                Revertir a Borrador
+              </button>
             )}
 
             <div className="my-1 border-t border-gray-100"></div>

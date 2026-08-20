@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ProjectStatus } from "../../features/projects/types";
+import { getStatusLabel } from "../../features/projects/utils/statusUtils";
 import { useProjects, useDeleteProject, useUpdateProjectStatus } from "../../features/projects/api/useProjects";
 import { useDashboardStats } from "../../features/dashboard/api/useDashboardStats";
 import { Plus, Building, FileCheck, Activity } from "lucide-react";
@@ -9,6 +10,7 @@ import { AdminPublishedProjectsView } from "./AdminPublishedProjectsView";
 import { AdminInterestsView } from "./AdminInterestsView";
 import { AdminSavedProjectsView } from "./AdminSavedProjectsView";
 import { useAuth } from "../../shared/context/AuthContext";
+import { useToast } from "../../shared/components/ui/Toast/ToastContext";
 import { Download } from "lucide-react";
 import { useInterests } from "../../features/projects/api/useProjectsInteractions";
 import { ExportInterestsModal } from "./ExportInterestsModal";
@@ -83,8 +85,34 @@ export const AdminProjectsPage: React.FC = () => {
 
   const { data: dashboardStats } = useDashboardStats();
 
-  const { mutate: deleteProject } = useDeleteProject();
-  const { mutate: updateStatus } = useUpdateProjectStatus();
+  const { addToast } = useToast();
+  const { mutate: deleteProjectMutation } = useDeleteProject();
+  const { mutate: updateStatusMutation } = useUpdateProjectStatus();
+
+  const handleUpdateStatus = useCallback(({ id, status }: { id: string; status: ProjectStatus }) => {
+    updateStatusMutation(
+      { id, status },
+      {
+        onSuccess: () => {
+          addToast(`Estado del proyecto actualizado a «${getStatusLabel(status)}»`, "success");
+        },
+        onError: (err: any) => {
+          addToast(err?.response?.data?.message || err?.message || "Error al actualizar el estado", "error");
+        },
+      }
+    );
+  }, [updateStatusMutation, addToast]);
+
+  const handleDeleteProject = useCallback((id: string) => {
+    deleteProjectMutation(id, {
+      onSuccess: () => {
+        addToast("Proyecto eliminado correctamente", "success");
+      },
+      onError: (err: any) => {
+        addToast(err?.response?.data?.message || err?.message || "Error al eliminar el proyecto", "error");
+      },
+    });
+  }, [deleteProjectMutation, addToast]);
 
   const stats = useMemo(() => ({
     total: dashboardStats?.totalProyectos ?? totalCount ?? projects.length,
@@ -230,8 +258,8 @@ export const AdminProjectsPage: React.FC = () => {
           filtered={filtered}
           totalCount={totalCount ?? projects.length}
           metrics={metrics}
-          updateStatus={updateStatus}
-          deleteProject={deleteProject}
+          updateStatus={handleUpdateStatus}
+          deleteProject={handleDeleteProject}
           page={page}
           pageSize={pageSize}
           onPageChange={goToPage}

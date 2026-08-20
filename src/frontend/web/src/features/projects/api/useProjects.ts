@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
-import type { ProyectoDto, CreateProyectoDto, LegalStatus } from "../types";
+import type { ProyectoDto, CreateProyectoDto, LegalStatus, ProjectStatus } from "../types";
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -73,8 +73,9 @@ export const useProjects = (page = 1, pageSize = 50, q?: string, estados?: strin
             totalCount: data?.totalCount || data?.TotalCount || (Array.isArray(data) ? data.length : 0),
           };
         }),
-      staleTime: 30_000,
+      staleTime: 5_000,
       gcTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
     });
 
   return {
@@ -107,8 +108,9 @@ export const useProject = (id: string) =>
       }
     },
     enabled: !!id,
-    staleTime: 60_000,
+    staleTime: 5_000,
     gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
 export const useCreateProject = () => {
@@ -138,7 +140,66 @@ export const useUpdateProjectStatus = () => {
           headers: { "Content-Type": "application/json" },
         })
         .then((res) => mapApiProject(res.data)),
-    onSuccess: (_data, variables) => {
+    onMutate: async ({ id, status }) => {
+      // Cancel outgoing refetches so they don't overwrite optimistic update
+      await qc.cancelQueries({ queryKey: projectKeys.all });
+      await qc.cancelQueries({ queryKey: projectKeys.detail(id) });
+      await qc.cancelQueries({ queryKey: ["projectStatusEligibility", id] });
+
+      const previousLists = qc.getQueriesData({ queryKey: ["projects", "list"] });
+      const previousDetail = qc.getQueryData(projectKeys.detail(id));
+      const previousEligibility = qc.getQueryData(["projectStatusEligibility", id]);
+
+      // Optimistically update all project lists in cache
+      qc.setQueriesData({ queryKey: ["projects", "list"] }, (oldData: any) => {
+        if (!oldData) return oldData;
+        const updateItem = (p: any) =>
+          p.id === id ? { ...p, estadoProyecto: status as unknown as ProjectStatus, estatusDescripcion: status } : p;
+
+        if (Array.isArray(oldData)) {
+          return oldData.map(updateItem);
+        }
+        if (oldData.projects && Array.isArray(oldData.projects)) {
+          return {
+            ...oldData,
+            projects: oldData.projects.map(updateItem),
+          };
+        }
+        return oldData;
+      });
+
+      // Optimistically update project detail
+      qc.setQueryData(projectKeys.detail(id), (oldProject: any) => {
+        if (!oldProject) return oldProject;
+        return {
+          ...oldProject,
+          estadoProyecto: status as unknown as ProjectStatus,
+          estatusDescripcion: status,
+        };
+      });
+
+      // Optimistically update projectStatusEligibility
+      qc.setQueryData(["projectStatusEligibility", id], (oldData: any) => {
+        if (!oldData) return oldData;
+        return { ...oldData, currentStatus: status };
+      });
+
+      return { previousLists, previousDetail, previousEligibility };
+    },
+    onError: (_err, { id }, context) => {
+      if (context?.previousLists) {
+        context.previousLists.forEach(([qKey, data]) => {
+          qc.setQueryData(qKey, data);
+        });
+      }
+      if (context?.previousDetail) {
+        qc.setQueryData(projectKeys.detail(id), context.previousDetail);
+      }
+      if (context?.previousEligibility) {
+        qc.setQueryData(["projectStatusEligibility", id], context.previousEligibility);
+      }
+    },
+    onSettled: (_data, _error, variables) => {
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: ["dashboardStats"] });
       qc.invalidateQueries({ queryKey: projectKeys.detail(variables.id) });

@@ -21,6 +21,8 @@ export const useProjectStatusBar = (projectId: string) => {
       throw new Error(getProjectErrorMessage(result.error) || "Failed to fetch status eligibility");
     },
     enabled: !!projectId,
+    staleTime: 5_000,
+    refetchOnWindowFocus: true,
   });
 
   const updateStatusMutation = useMutation({
@@ -31,16 +33,59 @@ export const useProjectStatusBar = (projectId: string) => {
       }
       return result.value;
     },
-    onSuccess: () => {
+    onMutate: async (newStatus: ProjectStatus) => {
+      await qc.cancelQueries({ queryKey });
+      await qc.cancelQueries({ queryKey: ["projects", projectId] });
+      await qc.cancelQueries({ queryKey: ["projects"] });
+
+      const previousEligibility = qc.getQueryData(queryKey);
+      const previousProject = qc.getQueryData(["projects", projectId]);
+
+      qc.setQueryData(queryKey, (old: any) => {
+        if (!old) return old;
+        return { ...old, currentStatus: newStatus };
+      });
+
+      qc.setQueryData(["projects", projectId], (old: any) => {
+        if (!old) return old;
+        return { ...old, estadoProyecto: newStatus, estatusDescripcion: newStatus };
+      });
+
+      qc.setQueriesData({ queryKey: ["projects", "list"] }, (oldData: any) => {
+        if (!oldData) return oldData;
+        const updateItem = (p: any) =>
+          p.id === projectId ? { ...p, estadoProyecto: newStatus, estatusDescripcion: newStatus } : p;
+        if (Array.isArray(oldData)) {
+          return oldData.map(updateItem);
+        }
+        if (oldData.projects && Array.isArray(oldData.projects)) {
+          return { ...oldData, projects: oldData.projects.map(updateItem) };
+        }
+        return oldData;
+      });
+
+      return { previousEligibility, previousProject };
+    },
+    onError: (_err, _newStatus, context) => {
+      if (context?.previousEligibility) {
+        qc.setQueryData(queryKey, context.previousEligibility);
+      }
+      if (context?.previousProject) {
+        qc.setQueryData(["projects", projectId], context.previousProject);
+      }
+      addToast("Error al actualizar el estado", "error");
+    },
+    onSettled: () => {
       // Invalidate project and eligibility queries
       qc.invalidateQueries({ queryKey: ["projects"] });
-      qc.invalidateQueries({ queryKey: ["projects", projectId] }); // ponytail: detail may depend on status
+      qc.invalidateQueries({ queryKey: ["projects", projectId] });
       qc.invalidateQueries({ queryKey }); // statusEligibility
-      qc.invalidateQueries({ queryKey: ["audit", projectId] }); // ponytail: audit may record transition
-      addToast("Estado actualizado exitosamente", "success");
+      qc.invalidateQueries({ queryKey: ["statusHistory", projectId] });
+      qc.invalidateQueries({ queryKey: ["audit", projectId] });
+      qc.invalidateQueries({ queryKey: ["dashboardStats"] });
     },
-    onError: () => {
-      addToast("Error al actualizar el estado", "error");
+    onSuccess: () => {
+      addToast("Estado actualizado exitosamente", "success");
     },
   });
 
