@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
   Save,
@@ -20,7 +20,6 @@ import {
 
 export const ToleranceRuleEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const { data: initialRule, isLoading, refetch } = useRule(id);
   const updateRule = useUpdateRule();

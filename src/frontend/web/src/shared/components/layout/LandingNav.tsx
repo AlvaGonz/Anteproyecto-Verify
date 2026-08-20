@@ -15,12 +15,9 @@ export const LandingNav: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
-  const [prevPath, setPrevPath] = useState(location.pathname);
-
-  if (location.pathname !== prevPath) {
-    setPrevPath(location.pathname);
+  useEffect(() => {
     setMobileMenuOpen(false);
-  }
+  }, [location.pathname]);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);

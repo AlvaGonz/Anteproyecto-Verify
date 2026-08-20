@@ -230,13 +230,18 @@ public static class AppDbContextSeeder
             var generatedProyectos = new List<dynamic>();
 
             bool useCsvSeeds = false;
+            var specificCsvPath = @"C:\Users\Alva\Desktop\Anteproyecto-Verify\Bots\ProyectosInmobiliarios\ProyectosInmobiliarios_20260814_085516.csv";
             var localCsvDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "..", "Bots", "ProyectosInmobiliarios");
             try 
             {
                 var sqlPath = Path.Combine("/src/src/backend/Tools/DbSeeder/Scripts", "14_Proyectos_Realistas.sql");
                 var localSqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Tools", "DbSeeder", "Scripts", "14_Proyectos_Realistas.sql");
 
-                if (File.Exists(sqlPath) || File.Exists(localSqlPath)) 
+                if (Directory.Exists("/src/Bots/ProyectosInmobiliarios") && Directory.GetFiles("/src/Bots/ProyectosInmobiliarios", "*.csv").Any())
+                {
+                    useCsvSeeds = true;
+                }
+                else if (File.Exists(specificCsvPath))
                 {
                     useCsvSeeds = true;
                 }
@@ -252,10 +257,15 @@ public static class AppDbContextSeeder
 
             if (useCsvSeeds)
             {
-                string? csvPath = GetLatestCsvPath("/src/Bots/ProyectosInmobiliarios");
-                if (csvPath == null)
+                string? csvPath = null;
+                
+                if (File.Exists(specificCsvPath))
                 {
-                    csvPath = GetLatestCsvPath(localCsvDir);
+                    csvPath = specificCsvPath;
+                }
+                else 
+                {
+                    csvPath = GetLatestCsvPath("/src/Bots/ProyectosInmobiliarios") ?? GetLatestCsvPath(localCsvDir);
                 }
 
                 if (csvPath != null)
