@@ -33,7 +33,24 @@ public class DgiiController : ControllerBase
 
         if (record == null)
         {
-            return NotFound(new { message = $"RNC {rnc} not found in DGII registry." });
+            var citizen = await _context.JCE_Ciudadanos
+                .FirstOrDefaultAsync(c => c.Cedula == cleanedRnc, cancellationToken);
+
+            if (citizen != null)
+            {
+                return Ok(new
+                {
+                    Rnc = citizen.Cedula,
+                    NombreRazonSocial = $"{citizen.Nombres} {citizen.Apellidos}".Trim(),
+                    NombreComercial = $"{citizen.Nombres} {citizen.Apellidos}".Trim(),
+                    Estado = "ACTIVO",
+                    ActividadEconomica = "PERSONA FÍSICA",
+                    Categoria = "Física",
+                    RegimenPagos = "Normal"
+                });
+            }
+
+            return NotFound(new { message = $"RNC or Cedula {rnc} not found in registries." });
         }
 
         return Ok(record);

@@ -81,6 +81,8 @@
 
 ---
 
+---
+
 ## Sesión 2026-08-18 — Implementación de Regla 8: "Tolerancia Superficie vs Mensura (≤5%)"
 
 **Ciclo:** Motor de Inteligencia / RS55 / Regla 8 (Tolerancia Superficie Proyecto vs Catastro Nacional)
@@ -109,10 +111,33 @@
    - Frontend Vitest: `rule8Tolerance.test.ts` (7 tests de validación Zod y reglas de tolerancia).
    - Playwright E2E: `rule-8-tolerance.spec.ts` (4 tests de interfaz, navegación, simulación y manejo de concurrencia 409).
 
-## Sesi�n 2026-08-19 � Debug Session Error 500 ReglasValidacion
+## Sesin 2026-08-19  Debug Session Error 500 ReglasValidacion
 
-**S�ntoma:** Error 500 al llamar a /api/admin/rules por columnas faltantes (MaxValor, MinValor, ValorUmbral).
-**Root Cause:** La migraci�n 20260818165000_AddUmbralFieldsToReglaValidacion.cs se hab�a creado de manera parcial y sin su archivo .Designer.cs, por lo que EF Core no actualiz� el modelo en el contenedor, provocando un fallo silencioso en la base de datos.
-**Fix:** Se elimin� la migraci�n corrupta y se regener� utilizando dotnet ef migrations add con la variable de entorno JWT_KEY seteada. Se reconstruy� y reinici� la imagen de la API (pi) usando docker compose.
-**Verificaci�n:** La llamada a la ruta GET devuelve ahora 200 OK.
+**Sntoma:** Error 500 al llamar a /api/admin/rules por columnas faltantes (MaxValor, MinValor, ValorUmbral).
+**Root Cause:** La migracin 20260818165000_AddUmbralFieldsToReglaValidacion.cs se haba creado de manera parcial y sin su archivo .Designer.cs, por lo que EF Core no actualiz el modelo en el contenedor, provocando un fallo silencioso en la base de datos.
+**Fix:** Se elimin la migracin corrupta y se regener utilizando dotnet ef migrations add con la variable de entorno JWT_KEY seteada. Se reconstruy y reinici la imagen de la API (pi) usando docker compose.
+**Verificacin:** La llamada a la ruta GET devuelve ahora 200 OK.
 
+---
+
+## Sesión 2026-08-19 — Corrección de Migración de Base de Datos y Búsqueda por RNC o Cédula
+
+**Ciclo:** OE / Gobernanza de Datos (Claves foráneas e integridad referencial)
+**Estado:** ✅ COMPLETO. Api compila correctamente (0 advertencias, 0 errores), la base de datos se migra con éxito (100% completado), todas las pruebas unitarias y de integración pasan satisfactoriamente.
+
+### Trabajo realizado
+1. **Solución a Error de Migración 1753**: Se identificó un conflicto en el orden de las migraciones de EF Core, donde `AddJceCiudadanoForeignKey` intentaba agregar una clave foránea antes de que las longitudes de las columnas (`Usuario.Cedula` con longitud 15 y `JCE_Ciudadano.Cedula` con longitud 450) coincidieran.
+   - Se unificó la alteración de la columna `Cedula` en `JCE_Ciudadano` a `nvarchar(15)` en la misma migración `AddJceCiudadanoForeignKey` antes del establecimiento de la FK, y se hizo no-op la migración subsiguiente `FixJceCiudadanoCedulaLength`.
+   - Se manejó la eliminación de la restricción de clave primaria `PK_JCE_Ciudadano` y su posterior recreación en SQL Server durante la migración para evitar errores de dependencia de columna.
+   - Para resolver conflictos con datos huérfanos preexistentes durante las corridas de pruebas, se implementó el establecimiento de la clave foránea usando `WITH NOCHECK` y habilitando su verificación posterior mediante SQL directo.
+2. **Búsqueda Unificada por RNC y Cédula en DgiiController**: Se modificó el método `GetByRnc` en `DgiiController` para que realice un fallback a la tabla `JCE_Ciudadanos` si el RNC solicitado no está registrado en la `DGII`.
+   - Si se encuentra la identificación en `JCE_Ciudadanos`, el API devuelve un registro de contribuyente simulado (tipo Persona Física) con el nombre completo y la actividad económica adecuada, permitiendo el auto-llenado y la validación tanto de empresas como de personas físicas con cédula en el frontend de registro y creación de proyectos.
+3. **Pruebas de Integración y Calidad**: 
+   - Se agregaron pruebas de integración automatizadas en `src/backend/Api.Tests/DgiiControllerTests.cs` cubriendo los tres escenarios (búsqueda de RNC existente en DGII, fallback a Cédula de JCE_Ciudadano, y NotFound para identificaciones inexistentes).
+   - Se corrigieron incompatibilidades del script `post_task_loop.py` en Windows para preferir ejecuciones de pruebas directas en el host y no contaminar el ambiente de desarrollo local con variables de conexión a base de datos de Docker cargadas desde el archivo `.env`.
+4. **Solución a Conflicto de Clave Foránea en Seeding (Error 547)**: Se identificó que al arrancar el API por primera vez o ejecutar pruebas, la inserción de usuarios por defecto (admin, freemium, etc.) en `AppDbContextSeeder.cs` fallaba debido a la nueva clave foránea `FK_Usuario_JCE_Ciudadano_Cedula` porque sus cédulas no existían en la tabla `JCE_Ciudadano` en ese momento del ciclo de vida.
+   - Se implementó el método `SeedJceCiudadanosForDefaultUsersAsync` para insertar ciudadanos simulados con las cédulas correspondientes en la tabla de la JCE antes de crear los usuarios de prueba, eliminando la violación de integridad referencial.
+5. **Importación Dinámica de Proyectos desde Caché CSV**: Se resolvió un fallo de semillado donde las inserciones de proyectos en `14_Proyectos_Realistas.sql` (restaurados desde la caché CSV) fallaban debido a restricciones de clave foránea porque los IDs de usuario y de estado eran estáticos del ambiente original y no coincidían con los IDs generados dinámicamente.
+   - Se implementó la lógica de lectura y parseo del CSV directamente en C# dentro de `AppDbContextSeeder.cs` (`GetLatestCsvPath`, `ParseCsv`).
+   - Se mapearon dinámicamente los IDs estáticos del CSV a los Guids generados dinámicamente de los usuarios y estados del contexto activo en el momento de la ejecución.
+   - Se modificó `generate_dummy_projects.py` para escribir un script SQL `14_Proyectos_Realistas.sql` no-op cuando se detecta el CSV, delegando el semillado al seeder de C# y evitando fallos del runner.

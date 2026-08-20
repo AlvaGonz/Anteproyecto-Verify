@@ -10,13 +10,13 @@ namespace Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // AlterColumn is now handled in 20260818140602_AddJceCiudadanoForeignKey.cs
+            // Column alteration was consolidated into the previous migration to prevent length mismatch
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // AlterColumn is now handled in 20260818140602_AddJceCiudadanoForeignKey.cs
+            // Column alteration was consolidated into the previous migration
         }
     }
 }
