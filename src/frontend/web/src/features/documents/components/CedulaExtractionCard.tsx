@@ -3,7 +3,7 @@ import { CedulaRdExtractionV1, ExtractionStatus, ExtractedField } from "../types
 import { Fingerprint } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
-import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
+import { useVerifyDocument, useDocumentValidationResult } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
 import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
@@ -34,7 +34,9 @@ export const CedulaExtractionCard: React.FC<CedulaExtractionCardProps> = ({
   const [discrepancies, setDiscrepancies] = React.useState<Discrepancy[]>([]);
 
   const { checkDiscrepancies } = useDiscrepancyCheck(proyectoId);
-  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+  const { data: persistedResponse } = useDocumentValidationResult(documentoId);
+  const { mutate: verifyDocument, data: mutationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+  const verificationResponse = mutationResponse || persistedResponse || null;
   
   const getStatus = (fieldVal: string | undefined | null, fieldKey: string) => 
     getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);

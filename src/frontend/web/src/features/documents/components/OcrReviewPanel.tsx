@@ -3,7 +3,7 @@ import { Check, Edit2, X, AlertTriangle, Save, ScanText } from 'lucide-react';
 import { OcrField, OcrFieldReviewState, OcrResult, DocumentDto, DocumentStatus } from '../types';
 import { getConfidenceColor, getReviewStateBadge } from '../utils/ocrReviewUtils';
 import { useUpdateDocumentFieldReview } from '../api/useDocumentMutations';
-import { useVerifyDocument } from '../../gobernanza/api/useGobernanza';
+import { useVerifyDocument, useDocumentValidationResult } from '../../gobernanza/api/useGobernanza';
 import { VerificationFeedbackCard } from '../../gobernanza/components/VerificationFeedbackCard';
 import { mapDocumentToVerificationPayload, getValidationStatus } from '../../gobernanza/utils/mapper';
 import { ShieldCheck } from 'lucide-react';
@@ -17,7 +17,9 @@ export const OcrReviewPanel: React.FC<OcrReviewPanelProps> = ({ document }) => {
   const [editValue, setEditValue] = useState('');
 
   const { mutate: updateField, isPending } = useUpdateDocumentFieldReview(document.proyectoId);
-  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+  const { data: persistedResponse } = useDocumentValidationResult(document.id);
+  const { mutate: verifyDocument, data: mutationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+  const verificationResponse = mutationResponse || persistedResponse || null;
 
 
   if (!document.resultadoOcrJson) {

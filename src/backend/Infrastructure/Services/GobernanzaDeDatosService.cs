@@ -735,4 +735,55 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             await _notificacionRepository.AddAsync(adminNotif, ct);
         }
     }
+
+    public async Task<VerificationResult?> ObtenerResultadoPorDocumentoAsync(Guid documentoId)
+    {
+        var dato = await _dbContext.DatosValidados
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.DocumentoId == documentoId);
+
+        if (dato == null) return null;
+
+        var jsonOptions = new System.Text.Json.JsonSerializerOptions 
+        { 
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase 
+        };
+
+        object? matchedData = null;
+        if (!string.IsNullOrEmpty(dato.DatosMatchJson) && dato.DatosMatchJson != "{}")
+        {
+            try
+            {
+                matchedData = System.Text.Json.JsonSerializer.Deserialize<object>(dato.DatosMatchJson, jsonOptions);
+            }
+            catch { }
+        }
+
+        var hallazgos = await _dbContext.Hallazgos
+            .AsNoTracking()
+            .Where(h => h.DatoValidadoId == dato.Id && !h.Resuelto)
+            .Select(h => h.Campo ?? "")
+            .ToListAsync();
+
+        bool isValid = dato.PorcentajeTotal >= 70;
+        string message = dato.PorcentajeTotal == 100 
+            ? "Validación de discrepancias omitida por configuración administrativa."
+            : (isValid ? $"Validación exitosa ({(int)dato.PorcentajeTotal}% coincidencia)" : "Validación con discrepancias o campos no coincidentes");
+
+        return new VerificationResult
+        {
+            IsValid = isValid,
+            MatchPercentage = (decimal)dato.PorcentajeTotal,
+            Message = message,
+            MatchedData = matchedData,
+            FailedFields = hallazgos,
+            DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = dato.PorcentajeTotal == 100 ? "skipped" : "executed",
+                Reason = dato.PorcentajeTotal == 100 ? "disabled_by_admin" : null,
+                HasDiscrepancies = hallazgos.Count > 0,
+                Findings = hallazgos
+            }
+        };
+    }
 }

@@ -9,6 +9,7 @@ public interface IGobernanzaDeDatosService
     Task<VerificationResult> VerificarDgiiAsync(DgiiVerificationRequest request);
     Task<VerificationResult> VerificarPermisoSueloAsync(PermisoSueloVerificationRequest request);
     Task<VerificationResult> VerificarIpiAsync(IpiVerificationRequest request);
+    Task<VerificationResult?> ObtenerResultadoPorDocumentoAsync(Guid documentoId);
 }
 
 public class DiscrepancyCheckResult

@@ -88,8 +88,8 @@ describe("CertificadoTituloExtractionCard numeric fields", () => {
     // oficina="SD" is rendered as a numeric-free text
     const oficinaLabel = screen.getByText("Oficina");
     expect(oficinaLabel).toBeInTheDocument();
-    // SD appears in the oficina span
-    expect(oficinaLabel.parentElement?.textContent).toContain("SD");
+    // SD appears in the oficina card
+    expect(screen.getByTestId("field-card-oficina").textContent).toContain("SD");
   });
 
   it("exposes numeric input via data-testid when editing", async () => {
