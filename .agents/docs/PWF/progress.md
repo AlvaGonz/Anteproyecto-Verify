@@ -141,3 +141,23 @@
    - Se implementó la lógica de lectura y parseo del CSV directamente en C# dentro de `AppDbContextSeeder.cs` (`GetLatestCsvPath`, `ParseCsv`).
    - Se mapearon dinámicamente los IDs estáticos del CSV a los Guids generados dinámicamente de los usuarios y estados del contexto activo en el momento de la ejecución.
    - Se modificó `generate_dummy_projects.py` para escribir un script SQL `14_Proyectos_Realistas.sql` no-op cuando se detecta el CSV, delegando el semillado al seeder de C# y evitando fallos del runner.
+
+---
+
+## Sesión 2026-08-20 — Toggle Global de Discrepancias y Re-merge de Rama feat
+
+**Ciclo:** OE-3 / Validación Documental y Control Global de Discrepancias
+**Estado:** ✅ COMPLETO. Re-merge limpio con `origin/BuildProyectMain` concluido, 100% de tests unitarios, de integración y E2E pasando con 0 errores (40/40 xUnit, 3/3 Vitest, 15/15 Playwright).
+
+### Trabajo realizado
+1. **Re-merge de Rama y Resolución de Conflictos**:
+   - Se integró `origin/BuildProyectMain` en `feat` manteniendo ambas fuentes de cambios (merge commit `2a956e52`).
+   - Se preservaron las migraciones y seeders de JCE y CSV dinámico junto con el semillado de la regla de discrepancia `GLOBAL-DISCREPANCY-ENABLED`.
+2. **Configuración Global de Discrepancias**:
+   - Se configuró la regla `GLOBAL-DISCREPANCY-ENABLED` en `ReglasValidacion` para habilitar/deshabilitar de forma reactiva el contraste proyecto vs. documento.
+   - Se implementó `GET /api/validationrules/global/discrepancy-enabled` y `PUT /api/validationrules/global/discrepancy-enabled` en `ValidationRulesController`.
+   - En Frontend, se integró el toggle global en `/admin/rules` y se conectó con el hook `useDiscrepancyCheck` en `/admin/projects/:id/validations`.
+3. **Verificación Integral (0 Errores)**:
+   - Backend xUnit: `Api.Tests.dll` (40/40 tests pasados).
+   - Frontend Vitest: `useDiscrepancyCheck.test.ts` (3/3 tests pasados).
+   - Playwright E2E: `rule-8-tolerance.spec.ts`, `tolerance-rule.spec.ts`, `validation-discrepancy.spec.ts`, `validation-config-toggle.spec.ts` (15/15 tests pasados).
