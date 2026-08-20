@@ -1,5 +1,18 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-20 — Extracción OCR Certificado de Título (2D Spatial & Normalizers)
+
+**Ciclo:** Extracción OCR Documental / Certificado de Título RD (`CertificadoTituloRdPaddleMapper.cs`, `PaddleOcrProvider.cs`, `SharedFieldNormalizer.cs`)
+**Estado:** ✅ COMPLETO — 102/102 tests unitarios de extracción de documentos verdes, E2E Playwright con `TP_0001.pdf` 1/1 verde (11.8s).
+- **Mejoras implementadas:**
+  1. Extracción de coordenadas 2D BoundingBox desde la salida `RawJson` de PaddleOCR en `PaddleOcrProvider.cs` mapeadas al modelo `OcrLine` / `OcrBoundingBox`.
+  2. Normalizadores robustos en `SharedFieldNormalizer.cs` (`NormalizeVieneDe`, `NormalizeDesignacionCatastral` de 16 dígitos a `050036294345:0053`, `NormalizeSuperficie`, `NormalizeOficina`, `NormalizeFecha`).
+  3. Mapeador espacial y de proximidad `CertificadoTituloRdPaddleMapper.cs` con alias de etiquetas OCR degradadas (`SUPERESTE DE MCFROD SUASNAGES`), discriminador de etiquetas vs valores narrativos y validación de tipos.
+  4. Selector de documento activo más reciente en `RequiredDocumentsList.tsx`.
+  5. Test E2E de extracción documental en `e2e/projects/ocr-certificado-titulo-extraction.spec.ts` validando el ciclo completo upload -> extracción PaddleOCR -> prellenado UI en los 8 campos requeridos.
+
+---
+
 ## Sesión 2026-08-20 — Refactor UI/UX Banner Bypass de Validación (Design System Alignment)
 
 **Ciclo:** UI/UX Polish / Banner de Advertencia de Discrepancias Omitidas (`ProjectValidationPageLayout.tsx`)

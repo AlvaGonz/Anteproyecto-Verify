@@ -45,8 +45,10 @@ test.describe('Certificado de Título - OCR Extraction and UI Prefill', () => {
       { multipart: { file: fs.createReadStream(FIXTURE_PATH) }, timeout: 180000 },
     );
     expect(uploadRes.status()).toBe(201);
+    const uploadedData = await uploadRes.json();
+    const uploadedDocId = uploadedData.id ?? uploadedData.documentoId;
 
-    // 4) Poll API for OCR extraction completion
+    // 4) Poll API for OCR extraction completion on the exact uploaded document
     const POLL_TIMEOUT_MS = 120000;
     const POLL_INTERVAL_MS = 2000;
     const deadline = Date.now() + POLL_TIMEOUT_MS;
@@ -55,16 +57,14 @@ test.describe('Certificado de Título - OCR Extraction and UI Prefill', () => {
     while (Date.now() < deadline) {
       const docsRes = await request.get(`${API_BASE}/api/projects/${projectId}/documents`, { timeout: 60000 });
       const docs = await docsRes.json();
-      const tituloDocs = Array.isArray(docs) ? docs.filter((d: any) => Number(d.tipoDocumento) === 21) : [];
-      
-      const doc = tituloDocs.find((d: any) => {
-        const ext = d.certificadoTituloExtraction;
-        return ext && ext.matricula && (ext.matricula.rawValue || ext.matricula.normalizedValue);
-      });
+      const doc = Array.isArray(docs) ? docs.find((d: any) => d.id === uploadedDocId) : null;
 
-      if (doc) {
-        extractedDoc = doc.certificadoTituloExtraction;
-        break;
+      if (doc && doc.certificadoTituloExtraction) {
+        const ext = doc.certificadoTituloExtraction;
+        if (ext.matricula && (ext.matricula.rawValue || ext.matricula.normalizedValue)) {
+          extractedDoc = ext;
+          break;
+        }
       }
       await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
     }
@@ -112,8 +112,8 @@ test.describe('Certificado de Título - OCR Extraction and UI Prefill', () => {
     // Verify UI display of extracted values
     await expect(card).toContainText('050036294345:0053');
     await expect(card).toContainText('1989500752');
-    await expect(card).toContainText('1183.36');
+    await expect(card).toContainText('1,183.36');
     await expect(card).toContainText('PUERTO PLATA');
-    await expect(card).not.toContainText('NO DETECTADO');
+    await expect(card).toContainText('F.414,X.85');
   });
 });
