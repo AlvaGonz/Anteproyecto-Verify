@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.RequiredMetadata.RequiredMetadataRule>();
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.Validity.ValidityRule>();
         services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.Consistency.ConsistencyRule>();
+        services.AddScoped<Application.Abstractions.Validation.IValidationRule, Application.Services.Validation.Rules.Consistency.DocumentDiscrepancyRule>();
 
         // Validation Handlers
         services.AddScoped<Application.Handlers.Admin.GetDashboardStatsQueryHandler>();

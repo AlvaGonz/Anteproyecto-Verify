@@ -104,16 +104,15 @@ export const ToleranceRuleEdit: React.FC = () => {
     setClientError(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const saveRule = async (dataToSave: typeof formData) => {
     setClientError(null);
     setConcurrencyError(false);
 
     // Validate with Zod
     const validation = toleranceRuleSchema.safeParse({
-      valorUmbral: formData.valorUmbral,
-      nivelAlerta: formData.nivelAlerta,
-      activa: formData.activa,
+      valorUmbral: dataToSave.valorUmbral,
+      nivelAlerta: dataToSave.nivelAlerta,
+      activa: dataToSave.activa,
     });
 
     if (!validation.success) {
@@ -132,19 +131,19 @@ export const ToleranceRuleEdit: React.FC = () => {
 
       await updateRule.mutateAsync({
         id: id || initialRule?.id || "00000000-0000-0000-0000-000000000008",
-        codigo: formData.codigo,
-        nombre: formData.nombre,
-        descripcion: formData.descripcion,
-        condicionLogica: `Math.Abs(P.SuperficieM2 - C.Superficie) / C.Superficie <= ${formData.valorUmbral}`,
-        expresion: formData.expresion,
-        valorUmbral: formData.valorUmbral,
-        minValor: formData.minValor,
-        maxValor: formData.maxValor,
+        codigo: dataToSave.codigo,
+        nombre: dataToSave.nombre,
+        descripcion: dataToSave.descripcion,
+        condicionLogica: `Math.Abs(P.SuperficieM2 - C.Superficie) / C.Superficie <= ${dataToSave.valorUmbral}`,
+        expresion: dataToSave.expresion,
+        valorUmbral: dataToSave.valorUmbral,
+        minValor: dataToSave.minValor,
+        maxValor: dataToSave.maxValor,
         tipoDocumentoAplicable: 24, // PlanoMensuraCatastral
-        nivelAlerta: alertMap[formData.nivelAlerta] ?? 2,
+        nivelAlerta: alertMap[dataToSave.nivelAlerta] ?? 2,
         tipoProyecto: 99,
-        activa: formData.activa,
-        rowVersion: formData.rowVersion,
+        activa: dataToSave.activa,
+        rowVersion: dataToSave.rowVersion,
       });
 
       setSavedSuccess(true);
@@ -162,6 +161,23 @@ export const ToleranceRuleEdit: React.FC = () => {
       }
     }
   };
+
+  const isInitialMount = React.useRef(true);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      if (initialRule) {
+        isInitialMount.current = false;
+      }
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      saveRule(formData);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData]);
 
   const handleRunBackendEval = async () => {
     if (!id) return;
@@ -237,6 +253,16 @@ export const ToleranceRuleEdit: React.FC = () => {
           >
             {formData.activa ? "Regla Activa" : "Regla Inactiva"}
           </span>
+          <button
+            id="save-rule-btn"
+            type="button"
+            onClick={() => saveRule(formData)}
+            disabled={updateRule.isPending}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-white hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Save className="w-3.5 h-3.5" />
+            Guardar Regla
+          </button>
         </div>
       </div>
 
@@ -304,7 +330,7 @@ export const ToleranceRuleEdit: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left 2 Cols: Main Edit Form */}
         <div className="lg:col-span-2">
-          <form noValidate onSubmit={handleSubmit} className="vf-card !p-6 flex flex-col gap-6 shadow-sm border border-outline-variant/30">
+          <div className="vf-card !p-6 flex flex-col gap-6 shadow-sm border border-outline-variant/30">
             {/* Tolerancia Slider + Number Input */}
             <div className="bg-surface-container/40 p-4 rounded-xl border border-outline-variant/20 flex flex-col gap-3">
               <div className="flex items-center justify-between">
@@ -425,33 +451,7 @@ export const ToleranceRuleEdit: React.FC = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant/20">
-              <button
-                type="button"
-                onClick={() => navigate("/admin/rules")}
-                className="px-4 py-2 text-xs font-bold text-on-surface-variant hover:text-secondary bg-surface-container hover:bg-surface-container-high rounded-xl transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                id="save-rule-btn"
-                disabled={updateRule.isPending}
-                className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-primary hover:bg-primary-hover active:scale-95 disabled:opacity-50 rounded-xl transition-all shadow-md shadow-primary/20"
-              >
-                {updateRule.isPending ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" /> Guardando...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" /> Guardar Cambios
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
 
         {/* Right 1 Col: Live Sandbox Simulator */}

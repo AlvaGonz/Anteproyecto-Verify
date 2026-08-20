@@ -2,6 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Tolerance Rule Configuration', () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('vf_has_session', 'true');
+    });
+
     // Navigate and login
     await page.goto('/#/login');
     await page.fill('input[name="email"]', 'admin@verifinca.do');
@@ -12,6 +16,13 @@ test.describe('Tolerance Rule Configuration', () => {
 
     // Go to the tolerance rule edit page (Rule ID: 00000000-0000-0000-0000-000000000008)
     await page.goto('/#/admin/rules/00000000-0000-0000-0000-000000000008/edit');
+
+    try {
+      await page.getByRole('button', { name: /Aceptar y Continuar/i }).click({ timeout: 3000 });
+    } catch (e) {
+      // Ignore
+    }
+
     // Wait for the UI to load by looking for the heading
     await expect(page.locator('h1', { hasText: 'Tolerancia Superficie vs Mensura' })).toBeVisible();
   });
@@ -35,6 +46,7 @@ test.describe('Tolerance Rule Configuration', () => {
     // Verify the save button is no longer present in the DOM
     await expect(page.locator('button#save-tolerance-btn')).toHaveCount(0);
 
+    // (Modal is handled in beforeEach)
     // Instead of clicking save, we toggle the state and it should auto-save
     // We expect the form to submit to the backend and show a success banner.
     const requestPromise = page.waitForRequest(
