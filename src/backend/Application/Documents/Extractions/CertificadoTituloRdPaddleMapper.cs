@@ -102,7 +102,7 @@ public static class CertificadoTituloRdPaddleMapper
 
         // 2. DesignacionCatastral
         var designacionField = ExtractFieldFromLines(lines, fullText, "DesignacionCatastral",
-            labelAliases: new[] { @"DESIGNACI[OÓ]N\s+CATASTRAL", @"DESIGNACIONCATASTRA", @"PARCELA\b", @"SOLAR\b" },
+            labelAliases: new[] { @"DESIGNACI[OÓ]N\s+CATASTRAL", @"DESIGNACIONCATASTRAL", @"DESIGNACIONCATASTRA", @"C[OÓ]DIGO\s+DESIGNACI[OÓ]N\s+CATASTRAL", @"DESIGNACI[OÓ]N", @"SOLAR\b", @"PARCELA\b" },
             negativeLabels: Array.Empty<string>(),
             valueValidator: val => Regex.IsMatch(val, @"\d") && !IsAnyKnownLabel(val),
             normalizer: SharedFieldNormalizer.NormalizeDesignacionCatastral,
@@ -129,15 +129,17 @@ public static class CertificadoTituloRdPaddleMapper
 
         // 4. VieneDe
         var vieneDeField = ExtractFieldFromLines(lines, fullText, "VieneDe",
-            labelAliases: new[] { @"^VIENE\s+DE\b", @"^VIENEDE\b", @"^VIENEFE\b", @"^VIENE\.?D[E]?\b", @"^CANCELA\s+LA\s+ANTERIOR\b" },
+            labelAliases: new[] { @"^VIENE\s+DE\b", @"^VIENEDE\b", @"^VIENEFE\b", @"^ENEF\b", @"^VIENE\.?D[E]?\b", @"^CANCELA\s+LA\s+ANTERIOR\b" },
             negativeLabels: Array.Empty<string>(),
             valueValidator: val => IsValueLike(val) && (Regex.IsMatch(val, @"\d") || Regex.IsMatch(val, @"[A-Za-z]\.\d")),
             normalizer: SharedFieldNormalizer.NormalizeVieneDe,
             regexFallbacks: new[] {
-                @"(?:cancela la anterior|viene de|vienede|vienefe|viene\.d)\s*[:\-]?\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([A-Za-z0-9\.,\-_/ ]{2,30})",
-                @"(?:cancela la anterior|viene de|vienede|vienefe|viene\.d).{0,50}?([LFlf]\.?\s*\d+[\s,]*[LFlfXxFf]\.?\s*\d+|\.?\d+\.?\s*[LFlf]\.?\s*\d+)",
+                @"(?:cancela la anterior|viene de|vienede|vienefe|enef|viene\.d)\s*[:\-]?\s*(?!JURISDICCION\b|MUNICIPIO\b|PROVINCIA\b)([A-Za-z0-9\.,\-_/ ]{2,30})",
+                @"(?:cancela la anterior|viene de|vienede|vienefe|enef|viene\.d).{0,50}?([LFlf]\.?\s*\d+[\s,]*[LFlfXxFf]\.?\s*\d+|\.?\d+\.?\s*[LFlf]\.?\s*\d+)",
                 @"\b([Ff]\.\s*\d+[\s,]*[Xx]\.?\s*\d+)\b",
-                @"\b([Ll]\.\s*\d+[\s,]*[Ff]\.?\s*\d+)\b"
+                @"\b([Ll]\.\s*\d+[\s,]*[Ff]\.?\s*\d+)\b",
+                @"\b(Parcela\s+\d+[\s,]*(?:DC|dc)[\s-]*\d+)\b",
+                @"\b(Parc\.?\s*\d+[\s,]*(?:DC|dc)[\s-]*\d+)\b"
             });
 
         // 5. Oficina: Prioritize specific OFICINA form label over general REGISTRO DE TITULOS banner
@@ -272,18 +274,18 @@ public static class CertificadoTituloRdPaddleMapper
     {
         string? rawValue = null;
 
-        for (int i = 0; i < lines.Count; i++)
+        foreach (var alias in labelAliases)
         {
-            var currentLine = lines[i];
-            var currentText = currentLine.Text.Trim();
-
-            if (negativeLabels.Any(neg => Regex.IsMatch(currentText, neg, RegexOptions.IgnoreCase)))
+            for (int i = 0; i < lines.Count; i++)
             {
-                continue;
-            }
+                var currentLine = lines[i];
+                var currentText = currentLine.Text.Trim();
 
-            foreach (var alias in labelAliases)
-            {
+                if (negativeLabels.Any(neg => Regex.IsMatch(currentText, neg, RegexOptions.IgnoreCase)))
+                {
+                    continue;
+                }
+
                 if (Regex.IsMatch(currentText, alias, RegexOptions.IgnoreCase))
                 {
                     // 1. Inline extraction: value on same line after label

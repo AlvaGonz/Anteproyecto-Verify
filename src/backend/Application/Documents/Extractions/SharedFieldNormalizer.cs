@@ -11,6 +11,13 @@ public static class SharedFieldNormalizer
     {
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
         
+        // Extract 6 to 12 digit sequence directly if present
+        var digitMatch = Regex.Match(raw, @"\b(\d{6,12})\b");
+        if (digitMatch.Success)
+        {
+            return digitMatch.Groups[1].Value;
+        }
+
         // Remove spaces, punctuation except hyphen
         var clean = Regex.Replace(raw, @"[^a-zA-Z0-9-]", "");
         clean = clean.ToUpperInvariant();
@@ -127,8 +134,8 @@ public static class SharedFieldNormalizer
             clean = Regex.Replace(clean, $@"(?i)\b{abbr}\w*\b", num);
         }
 
-        // Match dd-MM-yyyy or dd/MM/yyyy or yyyy-MM-dd
-        var matchIso = Regex.Match(clean, @"\b(\d{4})[/-](\d{1,2})[/-](\d{1,2})\b");
+        // Match dd-MM-yyyy or dd/MM/yyyy or yyyy-MM-dd (using lookaround to handle cases like 'el16/07/2015')
+        var matchIso = Regex.Match(clean, @"(?<!\d)(\d{4})[/-](\d{1,2})[/-](\d{1,2})(?!\d)");
         if (matchIso.Success)
         {
             var y = matchIso.Groups[1].Value;
@@ -137,7 +144,7 @@ public static class SharedFieldNormalizer
             return $"{d}-{m}-{y}";
         }
 
-        var matchStandard = Regex.Match(clean, @"\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b");
+        var matchStandard = Regex.Match(clean, @"(?<!\d)(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?!\d)");
         if (matchStandard.Success)
         {
             var d = matchStandard.Groups[1].Value.PadLeft(2, '0');

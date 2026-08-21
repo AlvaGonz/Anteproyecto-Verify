@@ -233,12 +233,33 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
     }
 
+    private static string NormalizeDiacritics(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+        var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
+        var sb = new System.Text.StringBuilder();
+        foreach (var c in normalized)
+        {
+            var uc = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+            if (uc != System.Globalization.UnicodeCategory.NonSpacingMark)
+            {
+                sb.Append(c);
+            }
+        }
+        return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
+    }
+
     private (int total, int matched) CompareStr(string? reqVal, string? dbVal)
     {
         if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
-        var r = reqVal.Trim().ToLowerInvariant();
-        var d = (dbVal ?? "").Trim().ToLowerInvariant();
-        bool isMatch = d.Contains(r) || r.Contains(d) || r == d;
+        var r = NormalizeDiacritics(reqVal).Trim().ToLowerInvariant();
+        var d = NormalizeDiacritics(dbVal ?? "").Trim().ToLowerInvariant();
+        
+        // Remove extraneous internal spaces/punctuation for codes and references (e.g. VieneDe "F.414, X.85" vs "F.414,X.85")
+        var rClean = System.Text.RegularExpressions.Regex.Replace(r, @"[\s\.,\-_]+", "");
+        var dClean = System.Text.RegularExpressions.Regex.Replace(d, @"[\s\.,\-_]+", "");
+        
+        bool isMatch = d.Contains(r) || r.Contains(d) || r == d || (rClean.Length > 0 && rClean == dClean);
         return (1, isMatch ? 1 : 0);
     }
 
@@ -252,9 +273,25 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
     private (int total, int matched) CompareSuperficie(string? reqVal, decimal? dbVal)
     {
         if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
-        if (!decimal.TryParse(reqVal, out var reqDec)) return (1, 0);
         if (!dbVal.HasValue) return (1, 0);
-        return (1, Math.Abs(reqDec - dbVal.Value) < 1m ? 1 : 0);
+        
+        // Clean string: e.g. "1,183.36 m²" -> "1183.36"
+        var clean = System.Text.RegularExpressions.Regex.Replace(reqVal, @"(?i)[^\d\.,]", "").Trim();
+        if (clean.Contains(',') && clean.Contains('.'))
+        {
+            clean = clean.Replace(",", "");
+        }
+        else if (clean.Contains(',') && !clean.Contains('.'))
+        {
+            clean = clean.Replace(",", ".");
+        }
+
+        if (decimal.TryParse(clean, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var reqDec))
+        {
+            return (1, Math.Abs(reqDec - dbVal.Value) < 1m ? 1 : 0);
+        }
+
+        return (1, 0);
     }
 
     private (int total, int matched) CompareDate(string? reqVal, DateTime? dbVal)
@@ -263,7 +300,51 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (dbVal == null) return (1, 0);
         var r = reqVal.Trim();
         var d = dbVal.Value.ToString("yyyy-MM-dd");
-        return (1, r.StartsWith(d) || d.StartsWith(r) ? 1 : 0);
+        if (r.StartsWith(d) || d.StartsWith(r)) return (1, 1);
+
+        // Extract DD/MM/YYYY or YYYY-MM-DD pattern from string if embedded with narrative text
+        var dateRegex = System.Text.RegularExpressions.Regex.Match(r, @"(?<!\d)(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?!\d)");
+        if (dateRegex.Success)
+        {
+            if (int.TryParse(dateRegex.Groups[1].Value, out var p1) &&
+                int.TryParse(dateRegex.Groups[2].Value, out var p2) &&
+                int.TryParse(dateRegex.Groups[3].Value, out var p3))
+            {
+                if (p3 < 100) p3 += 2000;
+
+                // Check day/month/year (standard Latin/Dominican)
+                try
+                {
+                    var dt1 = new DateTime(p3, p2, p1);
+                    if (dt1.Date == dbVal.Value.Date) return (1, 1);
+                }
+                catch {}
+
+                // Check month/day/year (US format)
+                try
+                {
+                    var dt2 = new DateTime(p3, p1, p2);
+                    if (dt2.Date == dbVal.Value.Date) return (1, 1);
+                }
+                catch {}
+            }
+        }
+
+        // Try parsing flexible dates
+        if (DateTime.TryParse(r, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var dt) ||
+            DateTime.TryParse(r, new System.Globalization.CultureInfo("es-DO"), System.Globalization.DateTimeStyles.None, out dt))
+        {
+            if (dt.Date == dbVal.Value.Date) return (1, 1);
+        }
+
+        // Try standard format patterns (e.g. DD-MM-YYYY, DD/MM/YYYY)
+        string[] formats = { "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy", "yyyy/MM/dd", "d/M/yyyy", "d-M-yyyy", "yyyy-MM-ddTHH:mm:ss" };
+        if (DateTime.TryParseExact(r, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var exactDt))
+        {
+            if (exactDt.Date == dbVal.Value.Date) return (1, 1);
+        }
+
+        return (1, 0);
     }
 
     public async Task<VerificationResult> VerificarCatastroAsync(CatastroVerificationRequest request)
