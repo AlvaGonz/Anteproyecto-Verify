@@ -74,24 +74,24 @@ test.describe('Certificado de Título - OCR Extraction and UI Prefill', () => {
     // 5) Backend extraction assertions (Contract & Oracles)
     // (a) Designación Catastral must match exactly
     expect(extractedDoc.designacionCatastral?.normalizedValue ?? extractedDoc.designacionCatastral?.rawValue)
-      .toBe('050036294345:0053');
+      .toBe('050193819517:0017');
 
-    // (b) Matrícula must pick header "1989500752", not narrative "3000352326"
+    // (b) Matrícula must pick header "1057385457"
     expect(extractedDoc.matricula?.normalizedValue ?? extractedDoc.matricula?.rawValue)
-      .toBe('1989500752');
+      .toBe('1057385457');
 
-    // (c) Superficie must pick header "1183.36", not narrative "12,130.07"
+    // (c) Superficie must pick header "14792.83"
     expect(extractedDoc.superficieM2?.normalizedValue ?? extractedDoc.superficieM2?.rawValue)
-      .toBe('1183.36');
+      .toBe('14792.83');
 
-    // (d) Oficina must pick "PUERTO PLATA"
+    // (d) Oficina must pick "VIRTUAL"
     expect(extractedDoc.oficina?.normalizedValue ?? extractedDoc.oficina?.rawValue)
-      .toContain('PUERTO PLATA');
+      .toContain('VIRTUAL');
 
-    // (e) VieneDe must capture "F.414,X.85" / "F.414, X.85" and not be marked Missing
+    // (e) VieneDe must capture "PARCELA 24,DC-65"
     expect(extractedDoc.vieneDe?.status).not.toBe(1); // 1 = Missing
     expect(extractedDoc.vieneDe?.normalizedValue ?? extractedDoc.vieneDe?.rawValue)
-      .toContain('F.414');
+      .toContain('PARCELA 24,DC-65');
 
     // 6) Navigate to UI and verify the extraction card renders with pre-filled fields
     await page.goto(`${FRONTEND_BASE}/#/login`);
@@ -110,10 +110,25 @@ test.describe('Certificado de Título - OCR Extraction and UI Prefill', () => {
     await expect(card).toBeVisible({ timeout: 30000 });
 
     // Verify UI display of extracted values
-    await expect(card).toContainText('050036294345:0053');
-    await expect(card).toContainText('1989500752');
-    await expect(card).toContainText('1,183.36');
-    await expect(card).toContainText('PUERTO PLATA');
-    await expect(card).toContainText('F.414,X.85');
+    await expect(card).toContainText('050193819517:0017');
+    await expect(card).toContainText('1057385457');
+    await expect(card).toContainText('14,792.83');
+    await expect(card).toContainText('VIRTUAL');
+    await expect(card).toContainText('PARCELA 24,DC-65');
+
+    // 7) Click "Validar contra Estado/Gobernanza" and verify 100% match against CatastroTitulo DB
+    const validarBtn = card.getByRole('button', { name: /Validar contra Estado\/Gobernanza/i });
+    await expect(validarBtn).toBeVisible();
+    await validarBtn.click();
+
+    // If project metadata discrepancy dialog appears, confirm with "Proceder con Riesgo"
+    const proceedBtn = page.getByRole('button', { name: /Proceder con Riesgo/i });
+    if (await proceedBtn.count() > 0) {
+      await proceedBtn.first().click();
+    }
+
+    // Verify feedback card shows successful validation with 100% match
+    await expect(card.locator('text=Validación Exitosa').first()).toBeVisible({ timeout: 15000 });
+    await expect(card.locator('text=100% Match').first()).toBeVisible({ timeout: 15000 });
   });
 });

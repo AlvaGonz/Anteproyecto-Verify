@@ -1,5 +1,20 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-20 — Corrección TDD Validación Catastro Título (100% Match & Resiliencia)
+
+**Ciclo:** Gobernanza de Datos / Validación Catastro Título (`GobernanzaDeDatosService.cs`, `AppDbContextSeeder.cs`, `SharedFieldNormalizer.cs`, `CertificadoTituloRdPaddleMapper.cs`, `mapper.ts`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (`GobernanzaCatastroMatchTests.cs`), 100% Verde en E2E Playwright (`ocr-certificado-titulo-extraction.spec.ts` 1 passed, 20.1s).
+- **Causa Raíz Solucionada:** El match se quedaba en 0% / 85% debido a falta de normalización de diacríticos (`San Pedro de Macorís` vs `San Pedro de Macoris`), separadores de miles en superficie (`1,183.36`), fechas OCR con palabras concatenadas (`el16/07/2015`), puntuación de `VieneDe` (`F.414, X.85`) y discrepancia de alias en `mapper.ts`.
+- **Mejoras implementadas:**
+  1. Test unitario TDD en `GobernanzaCatastroMatchTests.cs` cubriendo los datos mock provistos por el usuario y el fixture `TP_0001.pdf`.
+  2. Implementación de `NormalizeDiacritics`, `CompareDate` (con lookaround regex y soporte multi-formato), `CompareSuperficie` y `CompareStr` en `GobernanzaDeDatosService.cs`.
+  3. Seeder de base de datos `AppDbContextSeeder.cs` (`SeedCatastroTitulosAsync`) con ambos títulos de prueba persistidos.
+  4. Robustecimiento de `NormalizeFecha` en `SharedFieldNormalizer.cs` y orden de etiquetas de formulario en `CertificadoTituloRdPaddleMapper.cs`.
+  5. Sincronización de `getValidationStatus` en frontend `mapper.ts` con normalización diacrítica y prioridad de `failedFields`.
+  6. Prueba E2E en Playwright validando la extracción de los 8 campos y la retroalimentación de UI con *“Validación Exitosa”* y *“100% Match”*.
+
+---
+
 ## Sesión 2026-08-20 — Extracción OCR Certificado de Título (2D Spatial & Normalizers)
 
 **Ciclo:** Extracción OCR Documental / Certificado de Título RD (`CertificadoTituloRdPaddleMapper.cs`, `PaddleOcrProvider.cs`, `SharedFieldNormalizer.cs`)
