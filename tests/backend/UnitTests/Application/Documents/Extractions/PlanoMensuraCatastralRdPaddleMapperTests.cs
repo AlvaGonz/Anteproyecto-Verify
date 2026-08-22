@@ -419,5 +419,119 @@ namespace UnitTests.Application.Documents.Extractions
             extraction!.Seccion.NormalizedValue.Should().Be("BAIGUA");
             extraction.Lugar.NormalizedValue.Should().Be("JUANILLO");
         }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractSanPedroDeMacorisAndParcOrigin_WithAccentsAndParcFormat()
+        {
+            // Arrange
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DIRECCION REGIONAL DE MENSURAS CATASTRALES" },
+                new OcrLine { Text = "DEPARTAMENTO ESTE" },
+                new OcrLine { Text = "OPERACION SUBDIVISION" },
+                new OcrLine { Text = "DESIGNACION CATASTRAL POSICIONAL: 875568784706" },
+                new OcrLine { Text = "DESIGNACION CATASTRAL ORIGEN: Parc. 87, DC-85" },
+                new OcrLine { Text = "PROVINCIA SAN PEDRO DE MACORÍS" },
+                new OcrLine { Text = "MUNICIPIO SAN PEDRO DE MACORÍS" },
+                new OcrLine { Text = "SECCION GUAYACANES" },
+                new OcrLine { Text = "LUGAR JUAN DOLIO" },
+                new OcrLine { Text = "SUPERFICIE A REGISTRAR PARCELA: 1183.36 m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            // Act
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            // Assert
+            extraction.Should().NotBeNull();
+            extraction!.ExtractionStatus.Should().Be(ExtractionStatus.Completed);
+            extraction.DesignacionCatastralPosicional.NormalizedValue.Should().Be("875568784706");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().Be("Parc.87,DC-85");
+            extraction.Provincia.RawValue.Should().Be("SAN PEDRO DE MACORÍS");
+            extraction.Municipio.RawValue.Should().Be("SAN PEDRO DE MACORÍS");
+            extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("1183.36");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtract12DigitPositionalDcp_WhenIsolatedOrLabeled()
+        {
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "DCP: 875568784706" },
+                new OcrLine { Text = "DCO: Parc. 12, DC-04" },
+                new OcrLine { Text = "PROVINCIA: SAN PEDRO DE MACORIS" },
+                new OcrLine { Text = "MUNICIPIO: SAN PEDRO DE MACORIS" },
+                new OcrLine { Text = "SUPERFICIE: 1,183.36" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join(" ", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.DesignacionCatastralPosicional.NormalizedValue.Should().Be("875568784706");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().Be("Parc.12,DC-04");
+            extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("1183.36");
+        }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractAll5Fields_FromPM0001Fixture()
+        {
+            // Exact OCR extracted lines from PM_0001.pdf
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "REPUBLICA DOMINIC ANA" },
+                new OcrLine { Text = "PODER JUDICIAL" },
+                new OcrLine { Text = "JURISDICCION INMOBILIARIA" },
+                new OcrLine { Text = "DIRECCION REGIONAL DE MENSURAS CATASTRALES" },
+                new OcrLine { Text = "DEPARTAMENTO ESTE" },
+                new OcrLine { Text = "PLANO INDIVIDUAL" },
+                new OcrLine { Text = "Operación, SUBDIVISION" },
+                new OcrLine { Text = "DESIGNACION CATASTRAL POSICIONAL:" },
+                new OcrLine { Text = "l" },
+                new OcrLine { Text = "DCP 875568784706" },
+                new OcrLine { Text = "DESIGNACION CATASTRAL DE ORIGEN:" },
+                new OcrLine { Text = "DESIGNACION TEMPORAL Parc. 87, DC-85" },
+                new OcrLine { Text = "DISTRITO CATASTRAL No.:" },
+                new OcrLine { Text = "DESIGNACION TEMPORAL: Parc. 87, DC-85" },
+                new OcrLine { Text = "PR OVINCIA SAN PEDRO DE MACORIS" },
+                new OcrLine { Text = "MUNICIPIO: SAN PEDRO DE MACORIS" },
+                new OcrLine { Text = "SECCION:" },
+                new OcrLine { Text = "JINA JARAGUA" },
+                new OcrLine { Text = "LUGAR" },
+                new OcrLine { Text = "JUANILLO" },
+                new OcrLine { Text = "SUPERPICIE A Rl!GISTRAR PARCELA:" },
+                new OcrLine { Text = "ESCALA: 1: 1,000" },
+                new OcrLine { Text = "1183.36 m2" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join("\n", lines.Select(l => l.Text))
+            };
+
+            var extraction = PlanoMensuraCatastralRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            extraction.Should().NotBeNull();
+            extraction!.ExtractionStatus.Should().Be(ExtractionStatus.Completed);
+            extraction.DesignacionCatastralPosicional.NormalizedValue.Should().Be("875568784706");
+            extraction.DesignacionCatastralOrigen.NormalizedValue.Should().Be("Parc.87,DC-85");
+            extraction.Provincia.RawValue.Should().Contain("SAN PEDRO DE MACORIS");
+            extraction.Municipio.RawValue.Should().Contain("SAN PEDRO DE MACORIS");
+            extraction.SuperficieARegistrarParcelaM2.NormalizedValue.Should().Be("1183.36");
+        }
     }
 }

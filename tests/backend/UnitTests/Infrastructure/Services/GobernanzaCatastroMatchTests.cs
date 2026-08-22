@@ -163,4 +163,40 @@ public class GobernanzaCatastroMatchTests
         result.MatchPercentage.Should().Be(100m);
         result.FailedFields.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task VerificarCatastroAsync_ShouldReturn100PercentMatch_ForPlanoMensuraMock()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        using (var seedDb = NewDb(dbName))
+        {
+            seedDb.CatastroTitulos.Add(CreateMockCatastroTitulo());
+            await seedDb.SaveChangesAsync();
+        }
+
+        using var db = NewDb(dbName);
+        var notifFactoryMock = new Mock<INotificationFactory>();
+        var notifRepoMock = new Mock<INotificacionRepository>();
+        var service = new GobernanzaDeDatosService(db, notifFactoryMock.Object, notifRepoMock.Object);
+
+        // Plano de Mensura payload with 5 critical fields
+        var request = new CatastroVerificationRequest
+        {
+            ProyectoId = Guid.NewGuid(),
+            DocumentoId = Guid.NewGuid(),
+            TipoDocumento = "catastro",
+            DesigCatastralPosicional = "875568784706",
+            DesignCatastralOrigen = "Parc. 87, DC-85",
+            Provincia = "San Pedro de Macorís",
+            Municipio = "San Pedro de Macorís",
+            SuperficieM2 = "1183.36"
+        };
+
+        var result = await service.VerificarCatastroAsync(request);
+
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeTrue();
+        result.MatchPercentage.Should().Be(100m);
+        result.FailedFields.Should().BeEmpty();
+    }
 }

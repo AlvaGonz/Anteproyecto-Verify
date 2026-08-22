@@ -25,39 +25,39 @@ namespace Application.Documents.Extractions
             {
                 Departamento = ExtractField(lines, fullText, "Departamento",
                     new[] { @"DEPARTAMENTO" },
-                    new[] { @"DEPARTAMENTO\s*([a-zA-Z]+)", @"DEPARTAMENTO\s*([a-zA-Z]+)\b", @"(ESTE|NORTE|SUR|OESTE|CENTRAL)" }),
+                    new[] { @"DEPARTAMENTO\s*[_:\-\s]*([a-zA-Z]+)", @"(ESTE|NORTE|SUR|OESTE|CENTRAL)" }),
 
                 Operacion = ExtractField(lines, fullText, "Operacion",
                     new[] { @"OPERACION", @"OPERACIOSUBDISION", @"OPEACIONSUBDIVISIN", @"OPERACIONSUBDIVISION" },
                     new[] { @"OPERACION\s*[A-Za-z]*\s*[:\-]?\s*([A-Za-z]+)", @"(SUBDIVISION|PLANO\s*CATASTRAL|SANEAMIENTO|DESLINDE|REFUNDICION)" }),
 
                 DesignacionCatastralPosicional = ExtractField(lines, fullText, "DesignacionCatastralPosicional",
-                    new[] { @"DESIGNACION\s*CATASTRAL\s*POSICIONAL", @"DESIGNACIONCATASTRALPOSICIONAL", @"DESIGNACION\s*TEMPORA", @"DCP" },
-                    new[] { @"(?:DESIGNACION\s*CATASTRAL\s*POSICIONAL:?|DESIGNACIONCATASTRALPOSICIONAL)\s*(?:CATASTRAL\s*DE\s*ORIGEN\s*(?:CALLE|PARCELA)\s*|CATASTRALDEORIGEN\s*|DESIGNACION\s*TEMPORA(?:L)?\s*)?([\d_-]+)", @"\b(\d{12})\b", @"(505[\d_-]+)", @"(420[\d_-]+)" }),
+                    new[] { @"DESIGNACION\s*CATASTRAL\s*POSICIONAL", @"DESIGNACIONCATASTRALPOSICIONAL", @"\bDCP\b", @"\b0CP\b", @"\bOCP\b", @"POSICIONAL" },
+                    new[] { @"(?:DCP|POSICIONAL|[0OD]CP|[0OD]\.C\.P\.)[:\s_]*([0-9]{11,14})", @"\b([1-8]\d{11})\b", @"(?:DESIGNACION\s*CATASTRAL\s*POSICIONAL:?|DESIGNACIONCATASTRALPOSICIONAL)\s*(?:CATASTRAL\s*DE\s*ORIGEN\s*(?:CALLE|PARCELA)\s*|CATASTRALDEORIGEN\s*)?([\d_-]{6,16})", @"(875[\d_-]+)", @"(505[\d_-]+)", @"(420[\d_-]+)" }),
 
                 DesignacionCatastralOrigen = ExtractField(lines, fullText, "DesignacionCatastralOrigen",
-                    new[] { @"CATASTRAL DE ORIGEN(?: TEMPORAL)?", @"TEMPORAL:" },
-                    new[] { @"(?:CATASTRAL DE ORIGEN(?: TEMPORAL)?:?|TEMPORAL:)\s*([\d_-]+)", @"(420[\d_-]+)" }),
+                    new[] { @"\bCATASTRAL\s+DE\s+ORIGEN\b", @"CATASTRAL DE ORIGEN", @"DESIGNACION\s+TEMPORAL", @"TEMPORAL:", @"DESIGNACION CATASTRAL ORIGEN", @"\bDCO\b" },
+                    new[] { @"(Parc\.?\s*\d+,\s*DC-\d+)", @"(?:CATASTRAL DE ORIGEN(?: TEMPORAL)?:?|TEMPORAL:|DESIGNACION TEMPORAL:?|\bDCO:?\b)\s*(Parc\.?\s*\d+,\s*DC-\d+|[\d_-]+)", @"(420[\d_-]+)" }),
 
                 Provincia = ExtractField(lines, fullText, "Provincia",
-                    new[] { @"PROVINCIA" },
-                    new[] { @"PROVINCIA:?\s*([a-zA-Z\s]+?)(?=\s*1\s*No\.|\s*ESCALA|\s*MUNICIPIO|\s*SECCION|\s*LUGAR|\s*SUPERFICIE|$)", @"(?:PROVINCIA:?\s*)([A-Z\s]{4,})" }),
+                    new[] { @"PR\s*OVINCIA", @"PROVINCIA" },
+                    new[] { @"(?:PR\s*OVINCIA:?\s*)([A-ZÁÉÍÓÚÑ\s]{4,})", @"PROVINCIA:?\s*([a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+?)(?=\s*1\s*No\.|\s*ESCALA|\s*MUNICIPIO|\s*SECCI[OÓ]N|\s*LUGAR|\s*SUPERFICIE|\s*SUPERPICIE|$)" }),
 
                 Municipio = ExtractField(lines, fullText, "Municipio",
                     new[] { @"MUNICIPIO", @"IUNICIPIO" },
-                    new[] { @"MUNICIPIO:?\s*([a-zA-Z\s]+?)(?=\s*SECCION|\s*LUGAR|\s*PROVINCIA|\s*SUPERFICIE|$)", @"(?:MUNICIPIO:?\s*)([A-Z\s]{4,})" }),
+                    new[] { @"MUNICIPIO:?\s*([a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+?)(?=\s*SECCI[OÓ]N|\s*LUGAR|\s*PROVINCIA|\s*SUPERFICIE|\s*SUPERPICIE|$)", @"(?:MUNICIPIO:?\s*)([A-ZÁÉÍÓÚÑ\s]{4,})" }),
 
                 Seccion = ExtractField(lines, fullText, "Seccion",
                     new[] { @"SECCI[OÓ]N", @"SECCI", @"SECCION\s*[A-Z]" },
-                    new[] { @"SECCI[OÓ]N:?\s*([a-zA-Z\s]+?)(?=\s*LUGAR|\s*PROVINCIA|\s*MUNICIPIO|\s*SUPERFICIE|$)", @"(?:SECCI[OÓ]N:?\s*)([A-Z\s]{4,})", @"SECCION([A-Z]+)" }),
+                    new[] { @"SECCI[OÓ]N:?\s*([a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+?)(?=\s*LUGAR|\s*PROVINCIA|\s*MUNICIPIO|\s*SUPERFICIE|\s*SUPERPICIE|$)", @"(?:SECCI[OÓ]N:?\s*)([A-ZÁÉÍÓÚÑ\s]{4,})", @"SECCION([A-ZÁÉÍÓÚÑ]+)" }),
 
                 Lugar = ExtractField(lines, fullText, "Lugar",
                     new[] { @"LUGAR", @"LUGARTDC" },
-                    new[] { @"LUGAR:?\s*([a-zA-Z\s]+?)(?=\s*PROVINCIA|\s*MUNICIPIO|\s*SECCION|\s*SUPERFICIE|$)", @"(?:LUGAR:?\s*)([A-Z\s]{4,})", @"MUNICIPIO\s+\S+\s+([A-Z]{3,})(?=\s+(?:SECCION|SUPERFICIE|$))" }),
+                    new[] { @"LUGAR:?\s*([a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+?)(?=\s*PROVINCIA|\s*MUNICIPIO|\s*SECCI[OÓ]N|\s*SUPERFICIE|\s*SUPERPICIE|$)", @"(?:LUGAR:?\s*)([A-ZÁÉÍÓÚÑ\s]{4,})", @"MUNICIPIO\s+\S+\s+([A-ZÁÉÍÓÚÑ]{3,})(?=\s+(?:SECCION|SUPERFICIE|$))" }),
 
                 SuperficieARegistrarParcelaM2 = ExtractField(lines, fullText, "SuperficieM2",
-                    new[] { @"SUPERFICIE\s*(?:A\s*REGISTRAR\s*)?PARCELA:?", @"SUPERFICIE\s*A\s*REGISTRAR:?", @"SUPERFICIE:?", @"FICIEAREGISTRAR" },
-                    new[] { @"(?:SUPERFICIE(?: A REGISTRAR)? PARCELA:?)\s*([\d,.]+)", @"(?:SUPERFICIE A REGISTRAR|FICIEAREGISTRAR)\s*PARCELA:?\s*([\d,.]+)", @"([\d,.]+)\s*m2", @"([\d,.]+)\s*m\b" })
+                    new[] { @"SUPER[FP]ICIE\s*(?:A\s*R[E!e]?GISTRAR\s*)?PARCELA:?", @"SUPER[FP]ICIE\s*A\s*R[E!e]?GISTRAR:?", @"SUPER[FP]ICIE:?", @"SUPERPICIE", @"FICIEAREGISTRAR", @"SUPERFICIE" },
+                    new[] { @"(?:SUPER[FP]ICIE(?: A R[E!e]?GISTRAR)? PARCELA:?)\s*(?:ESCALA[^\n\r]*?)?([\d,.]+)", @"(?:SUPER[FP]ICIE A R[E!e]?GISTRAR|FICIEAREGISTRAR)\s*PARCELA:?\s*([\d,.]+)", @"([\d,.]+)\s*m2\b", @"([\d,.]+)\s*m\b" })
             };
 
             var warnings = new List<string>();
@@ -138,20 +138,50 @@ namespace Application.Documents.Extractions
                             }
                         }
                         
-                        // Check next line for proximity block if empty or too short
-                        if ((string.IsNullOrWhiteSpace(rawValue) || rawValue.Length < 3) && i + 1 < lines.Count)
+                        // Check next lines for proximity block if empty, too short, or noise
+                        if ((string.IsNullOrWhiteSpace(rawValue) || rawValue.Length < 3 || (fieldType == "DesignacionCatastralPosicional" && !Regex.IsMatch(rawValue, @"\d{6,}")) || (fieldType == "SuperficieM2" && !Regex.IsMatch(rawValue, @"\d"))) && i + 1 < lines.Count)
                         {
-                            var nextLine = lines[i + 1];
-                            if (!Regex.IsMatch(nextLine, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|HOJA|LAMINA|DESIGNACION|CALLE|PARCELA|SUPERFICIE)", RegexOptions.IgnoreCase))
+                            for (int step = 1; step <= 3 && i + step < lines.Count; step++)
                             {
-                                rawValue = nextLine;
-                            }
-                            else if (i + 2 < lines.Count)
-                            {
-                                var lineAfter = lines[i + 2];
-                                if (!Regex.IsMatch(lineAfter, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|HOJA|LAMINA|DESIGNACION|CALLE|PARCELA|SUPERFICIE)", RegexOptions.IgnoreCase))
+                                var candidate = lines[i + step].Trim();
+                                if (string.IsNullOrWhiteSpace(candidate)) continue;
+                                if (candidate.Length < 2 && !Regex.IsMatch(candidate, @"\d")) continue; // skip noise like "l" or "-"
+
+                                if (fieldType == "SuperficieM2" && Regex.IsMatch(candidate, @"^ESCALA", RegexOptions.IgnoreCase))
+                                    continue;
+
+                                if (fieldType == "DesignacionCatastralPosicional")
                                 {
-                                    rawValue = lineAfter;
+                                    var dcpMatch = Regex.Match(candidate, @"(?:DCP\s*)?([0-9_-]{8,20}|\d{6,14})");
+                                    if (dcpMatch.Success)
+                                    {
+                                        rawValue = candidate.StartsWith("DCP", StringComparison.OrdinalIgnoreCase)
+                                            ? Regex.Replace(candidate, @"^DCP\s*", "", RegexOptions.IgnoreCase).Trim()
+                                            : candidate;
+                                        break;
+                                    }
+                                }
+                                else if (fieldType == "DesignacionCatastralOrigen")
+                                {
+                                    if (Regex.IsMatch(candidate, @"(Parc\.?\s*\d+,\s*DC-\d+|[\d_-]{5,})", RegexOptions.IgnoreCase))
+                                    {
+                                        rawValue = candidate;
+                                        break;
+                                    }
+                                }
+                                else if (fieldType == "SuperficieM2")
+                                {
+                                    var supMatch = Regex.Match(candidate, @"([\d,.]+)(?:\s*m2)?", RegexOptions.IgnoreCase);
+                                    if (supMatch.Success)
+                                    {
+                                        rawValue = supMatch.Groups[1].Value;
+                                        break;
+                                    }
+                                }
+                                else if (!Regex.IsMatch(candidate, @"^(PROVINCIA|MUNICIPIO|SECCION|LUGAR|DEPARTAMENTO|TIPO|HOJA|LAMINA|DESIGNACION|CALLE|PARCELA|SUPERFICIE|SUPERPICIE)", RegexOptions.IgnoreCase))
+                                {
+                                    rawValue = candidate;
+                                    break;
                                 }
                             }
                         }
@@ -182,7 +212,7 @@ namespace Application.Documents.Extractions
             if (!string.IsNullOrWhiteSpace(rawValue)
                 && (fieldType == "DesignacionCatastralPosicional" || fieldType == "DesignacionCatastralOrigen"))
             {
-                rawValue = Regex.Replace(rawValue, @"^CATASTRALDEORIGEN", "", RegexOptions.IgnoreCase);
+                rawValue = Regex.Replace(rawValue, @"^(?:DESIGNACI[OÓ]N\s+CATASTRAL\s+DE\s+ORIGEN|DESIGNACION\s+TEMPORAL|TEMPORAL|DCO|CATASTRALDEORIGEN)\s*[:\-]?\s*", "", RegexOptions.IgnoreCase).Trim();
             }
 
             if (!string.IsNullOrWhiteSpace(rawValue) && fieldType == "SuperficieM2")
@@ -194,11 +224,18 @@ namespace Application.Documents.Extractions
             if (!string.IsNullOrWhiteSpace(rawValue))
             {
                 rawValue = rawValue.Trim().TrimEnd('.');
+                if (fieldType == "Departamento")
+                {
+                    rawValue = Regex.Replace(rawValue, @"^[_:\-\s]+|[_:\-\s]+$", "");
+                }
                 string normalizedValue = rawValue;
                 
                 // Apply SharedFieldNormalizer if needed based on fieldType
                 switch (fieldType)
                 {
+                    case "Departamento":
+                        normalizedValue = rawValue.ToUpperInvariant();
+                        break;
                     case "DesignacionCatastralPosicional":
                     case "DesignacionCatastralOrigen":
                         normalizedValue = SharedFieldNormalizer.NormalizeDesignacionCatastral(rawValue);
@@ -209,7 +246,6 @@ namespace Application.Documents.Extractions
                     case "Operacion":
                         normalizedValue = SharedFieldNormalizer.NormalizeOperacion(rawValue);
                         break;
-
                 }
 
                 return new ExtractedField

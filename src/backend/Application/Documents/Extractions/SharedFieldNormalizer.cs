@@ -33,11 +33,32 @@ public static class SharedFieldNormalizer
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
         
         var trimmed = raw.Trim();
+
+        // If it's Parc. XX, DC-XX format: e.g. "Parc. 87, DC-85" -> "Parc.87,DC-85"
+        if (Regex.IsMatch(trimmed, @"Parc\.?\s*\d+,\s*DC-\d+", RegexOptions.IgnoreCase))
+        {
+            var m = Regex.Match(trimmed, @"Parc\.?\s*(\d+),\s*DC-(\d+)", RegexOptions.IgnoreCase);
+            if (m.Success)
+            {
+                return $"Parc.{m.Groups[1].Value},DC-{m.Groups[2].Value}";
+            }
+            return Regex.Replace(trimmed, @"\s+", "");
+        }
+
         // Remove extraneous label words if caught in raw value
-        trimmed = Regex.Replace(trimmed, @"^(?:DESIGNACI[OÓ]N\s+CATASTRAL|PARCELA|SOLAR)\s*[:\-]?\s*", "", RegexOptions.IgnoreCase);
+        trimmed = Regex.Replace(trimmed, @"^(?:DESIGNACI[OÓ]N\s+CATASTRAL(?:\s+POSICIONAL|\s+DE\s+ORIGEN)?|DESIGNACION\s+TEMPORAL|PARCELA|SOLAR|DCP|DCO)\s*[:\-]?\s*", "", RegexOptions.IgnoreCase);
 
         // Clean spaces and unwanted chars, but KEEP hyphens and colons
         var clean = Regex.Replace(trimmed, @"[^a-zA-Z0-9-:]", "").ToUpperInvariant();
+
+        if (clean.StartsWith("DCP") && clean.Length > 3)
+        {
+            clean = clean.Substring(3);
+        }
+        if (clean.StartsWith("DCO") && clean.Length > 3)
+        {
+            clean = clean.Substring(3);
+        }
 
         // If it's a 16-digit sequence without colon (12 posicional + 4 suffix), format as XXXXXXXXXXXX:XXXX
         if (Regex.IsMatch(clean, @"^\d{16}$"))

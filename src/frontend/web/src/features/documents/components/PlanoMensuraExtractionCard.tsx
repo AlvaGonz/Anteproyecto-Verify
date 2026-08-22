@@ -240,7 +240,8 @@ export const PlanoMensuraExtractionCard: React.FC<PlanoMensuraExtractionCardProp
     designacionCatastral: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
     desigCatastralPosicional: extraction.designacionCatastralPosicional?.normalizedValue || extraction.designacionCatastralPosicional?.rawValue || "",
     designCatastralOrigen: extraction.designacionCatastralOrigen?.normalizedValue || extraction.designacionCatastralOrigen?.rawValue || "",
-    provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || "",
+    provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || extraction.provincia?.normalizedValue || extraction.provincia?.rawValue || "",
+    municipio: municipalities.find(m => m.id === selectedMunicipalityId)?.nombre || extraction.municipio?.normalizedValue || extraction.municipio?.rawValue || "",
     oficina: extraction.jurisdiccionInmobiliaria?.normalizedValue || extraction.jurisdiccionInmobiliaria?.rawValue || "",
     superficieM2: extraction.superficieARegistrarParcelaM2?.normalizedValue || extraction.superficieARegistrarParcelaM2?.rawValue || ""
   });

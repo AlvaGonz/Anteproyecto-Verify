@@ -18,6 +18,7 @@ export const mapDocumentToVerificationPayload = (
     case DocumentType.TITLE:
     case DocumentType.CertificacionEstadoJuridico:
     case DocumentType.LEGAL_STATUS:
+    case DocumentType.PlanoMensuraCatastral:
       return {
         apiDocType: 'catastro',
         payload: {

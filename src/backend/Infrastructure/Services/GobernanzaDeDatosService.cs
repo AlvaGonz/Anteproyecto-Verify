@@ -367,13 +367,42 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (entity == null && !string.IsNullOrEmpty(request.DesignacionCatastral))
         {
             var des = request.DesignacionCatastral.Trim();
-            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => c.CodigoDesignacionCatastral == des || (c.CodigoDesignacionCatastral != null && c.CodigoDesignacionCatastral.Contains(des)));
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => 
+                c.CodigoDesignacionCatastral == des || 
+                (c.CodigoDesignacionCatastral != null && c.CodigoDesignacionCatastral.Contains(des)) ||
+                c.DesigCatastralPosicional == des ||
+                (c.DesigCatastralPosicional != null && c.DesigCatastralPosicional.Contains(des)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.DesigCatastralPosicional))
+        {
+            var dcp = request.DesigCatastralPosicional.Trim();
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => 
+                c.DesigCatastralPosicional == dcp || 
+                (c.DesigCatastralPosicional != null && c.DesigCatastralPosicional.Contains(dcp)) ||
+                c.CodigoDesignacionCatastral == dcp ||
+                (c.CodigoDesignacionCatastral != null && c.CodigoDesignacionCatastral.Contains(dcp)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.DesignCatastralOrigen))
+        {
+            var dco = request.DesignCatastralOrigen.Trim();
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => 
+                c.DesignCatastralOrigen == dco || 
+                (c.DesignCatastralOrigen != null && c.DesignCatastralOrigen.Contains(dco)));
         }
 
         if (entity != null)
         {
             var f1 = CompareStr(request.Matricula, entity.Matricula);
-            var f2 = CompareStr(request.DesignacionCatastral, entity.CodigoDesignacionCatastral);
+            
+            (int total, int matched) f2 = (0, 0);
+            if (!string.IsNullOrWhiteSpace(request.DesignacionCatastral))
+            {
+                var matchCod = CompareStr(request.DesignacionCatastral, entity.CodigoDesignacionCatastral);
+                var matchDcp = CompareStr(request.DesignacionCatastral, entity.DesigCatastralPosicional);
+                f2 = (1, (matchCod.matched == 1 || matchDcp.matched == 1) ? 1 : 0);
+            }
 
             // Se eliminó la validación cruzada relajada por solicitud del usuario: 
             // ambas variables (Matrícula y Designación) deben coincidir estrictamente con la base de datos si fueron enviadas.
