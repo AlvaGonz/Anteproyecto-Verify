@@ -1,6 +1,26 @@
 # PWF Progress — VeriFinca
 
-## Sesión 2026-08-22 — Corrección de Seeding de Usuarios y Foreign Key DGII en Docker Compose
+## Sesión 2026-08-22 — Ingestión Híbrida 300 DPI, Filtro Anti-UTM y Validación Catastral PM_0001 (100% Match)
+
+**Ciclo:** Motor IA OCR / Planos de Mensura Catastral (`main.py`, `SPEC.md`, `PlanoMensuraCatastralRdPaddleMapper.cs`, `ocr-planos-mensura-pm0001.spec.ts`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (`PlanoMensuraCatastralRdPaddleMapperTests.cs` 16/16 passed, `GobernanzaCatastroMatchTests.cs` 4/4 passed), Playwright E2E 8/8 verdes (15.1s), Microservicio en vivo 100% match.
+- **Problema Abordado:** En `PM_0001.pdf`, el contenedor de PaddleOCR extraía erróneamente `999643229014` en Posicional (procedente de `FACTOR UTM = 0.9996432290145`), `NO DETECTADO` en Superficie (debido a baja resolución por defecto en PDF rasterizer) y `_ESTE` en Departamento.
+- **Mejoras Implementadas:**
+  1. **Especificación Técnica (`SPEC.md`):** Formalización de arquitectura híbrida, rasterización a 300 DPI con PyMuPDF, filtro anti-UTM (`0.999...`), pre-procesamiento OpenCV y criterios de match contra DB.
+  2. **Microservicio PaddleOCR (`src/microservices/paddleocr-api/main.py`):**
+     - Ingestión Híbrida (`extract_hybrid_text`): Fusión de texto vectorial nativo del PDF (`fitz.get_text`) con inferencia OCR en imágenes rasterizadas a 300 DPI (`zoom = 300 / 72`).
+     - Pre-procesamiento OpenCV (`preprocess_for_ocr`): Denoising (`fastNlMeansDenoising`) + binarización Otsu + auto-scaling a 1080p+.
+     - Filtro Anti-UTM (`filter_false_positives`): Exclusión de factores de escala `0.999...` y palabras clave `FACTOR`, `UTM`, `ESCALA`.
+     - Extracción regex de 5 campos y limpieza de `Departamento` (`_ESTE` → `ESTE`).
+  3. **Mapeador C# (`PlanoMensuraCatastralRdPaddleMapper.cs`):**
+     - Sanitización de `Departamento` (`_ESTE` → `ESTE`).
+     - Exclusión de patrones `999...` de la designación posicional de 12 dígitos.
+  4. **Suite TDD (Playwright & xUnit):**
+     - Playwright E2E: `ocr-planos-mensura-pm0001.spec.ts` (1/1 passed), `ocr-planos-mensura.spec.ts` (2/2 passed), `ocr-plano-extraction.spec.ts` (5/5 passed) — Total: 8/8 passed (15.1s).
+     - Backend xUnit: `PlanoMensuraCatastralRdPaddleMapperTests.cs` (16/16 passed), `GobernanzaCatastroMatchTests.cs` (4/4 passed).
+
+---
+
 
 **Ciclo:** Infraestructura & Seeding de Base de Datos (`AppDbContextSeeder.cs`, `AppDbContextSeederTests.cs`)
 **Estado:** ✅ COMPLETO — 100% Verde en TDD (`AppDbContextSeederTests.cs` 4/4 passed), Api.Tests 43/43 verdes, 12 usuarios y 120 proyectos confirmados en SQL Server dentro de Docker.
