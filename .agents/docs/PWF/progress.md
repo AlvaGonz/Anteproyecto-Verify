@@ -1,6 +1,17 @@
 # PWF Progress — VeriFinca
 
-## Sesión 2026-08-21 — Corrección TDD Validación Estado Jurídico (100% Match & Catastro)
+## Sesión 2026-08-22 — Corrección de Seeding de Usuarios y Foreign Key DGII en Docker Compose
+
+**Ciclo:** Infraestructura & Seeding de Base de Datos (`AppDbContextSeeder.cs`, `AppDbContextSeederTests.cs`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (`AppDbContextSeederTests.cs` 4/4 passed), Api.Tests 43/43 verdes, 12 usuarios y 120 proyectos confirmados en SQL Server dentro de Docker.
+- **Causa Raíz Diagnosticada:** Al levantar el stack con `docker compose up`, el contenedor de la API arrancaba inmediatamente mientras el contenedor `python_env` cargaba asíncronamente los 780,396 registros de la DGII en segundo plano. En `AppDbContextSeeder.SeedAsync`, `SeedCatastroTitulosAsync` se ejecutaba antes de la creación de usuarios intentando insertar registros mock con RNCs (`131950213`, `10100074474`, `133725444`). Como la tabla `DGII` aún no contenía dichos RNCs al momento del arranque de la API, SQL Server arrojaba una violación de clave foránea `FK_CatastroTitulo_DGII_Rnc` (`SqlException 547`), interrumpiendo el bloque `try/catch` de `SeedAsync` antes de crear los usuarios (`adminUser`, `freemiumUser`, `consultorUser`, `profesionalUser`, `empresaUser`, `corporativoUser`, `testUser`, etc.).
+- **Mejoras Implementadas (TDD + Ponytail):**
+  1. Nuevas pruebas unitarias TDD en `AppDbContextSeederTests.cs` (`SeedAsync_ShouldSeedAllDefaultUsers_Successfully`, `SeedAsync_ShouldSeedMockDgiiRecords_WhenDgiiIsEmpty`, `SeedAsync_ShouldSeedCatastroTitulos_Successfully`).
+  2. Implementación de `SeedDgiiForDefaultMocksAsync` en `AppDbContextSeeder.cs` para asegurar la existencia preventiva de los registros mock de DGII requeridos por `CatastroTitulo` y usuarios por defecto antes de semillar entidades dependientes.
+  3. Envoltura resiliente con try-catch en `SeedCatastroTitulosAsync` para garantizar que fallos aislados en mocks secundarios no aborten el semillado de usuarios y entidades centrales.
+  4. Verificación en vivo en Docker: Base de datos SQL Server poblada con éxito con los 12 usuarios del sistema, 120 proyectos y catastro operativo.
+
+---
 
 **Ciclo:** Gobernanza de Datos / Validación Estado Jurídico (`GobernanzaDeDatosService.cs`, `AppDbContextSeeder.cs`, `EstadoJuridicoExtractionCard.tsx`, `EstadoJuridicoRdPaddleMapper.cs`, `mapper.ts`)
 **Estado:** ✅ COMPLETO — 100% Verde en TDD (`GobernanzaCatastroMatchTests.cs`), 100% Verde en unit tests de Estado Jurídico (6/6), 0 errores TypeScript, Docker API actualizado y E2E Playwright verde (19.5s).

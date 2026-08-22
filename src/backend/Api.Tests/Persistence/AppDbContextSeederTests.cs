@@ -59,6 +59,62 @@ public class AppDbContextSeederTests : IDisposable
         Assert.Equal(120, proyectos.Count);
     }
 
+    [Fact]
+    public async Task SeedAsync_ShouldSeedAllDefaultUsers_Successfully()
+    {
+        // Act
+        await AppDbContextSeeder.SeedAsync(_serviceProvider);
+
+        // Assert
+        var users = await _context.Usuarios.ToListAsync();
+        Assert.NotEmpty(users);
+
+        var expectedEmails = new[]
+        {
+            "admin@verifinca.do",
+            "freemium@verifinca.do",
+            "consultor@verifinca.do",
+            "profesional@verifinca.do",
+            "empresa@verifinca.do",
+            "corporativo@verifinca.do",
+            "test@verifinca.do"
+        };
+
+        foreach (var email in expectedEmails)
+        {
+            Assert.Contains(users, u => u.CorreoElectronico.Equals(email, StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    [Fact]
+    public async Task SeedAsync_ShouldSeedMockDgiiRecords_WhenDgiiIsEmpty()
+    {
+        // Act
+        await AppDbContextSeeder.SeedAsync(_serviceProvider);
+
+        // Assert
+        var dgiiRecords = await _context.DGII.ToListAsync();
+        Assert.NotEmpty(dgiiRecords);
+
+        var requiredMockRncs = new[] { "131950213", "10100074474", "133725444" };
+        foreach (var rnc in requiredMockRncs)
+        {
+            Assert.Contains(dgiiRecords, d => d.Rnc == rnc);
+        }
+    }
+
+    [Fact]
+    public async Task SeedAsync_ShouldSeedCatastroTitulos_Successfully()
+    {
+        // Act
+        await AppDbContextSeeder.SeedAsync(_serviceProvider);
+
+        // Assert
+        var titulos = await _context.CatastroTitulos.ToListAsync();
+        Assert.NotEmpty(titulos);
+        Assert.Contains(titulos, t => t.Matricula == "1989500752");
+    }
+
     public void Dispose()
     {
         _context.Database.EnsureDeleted();

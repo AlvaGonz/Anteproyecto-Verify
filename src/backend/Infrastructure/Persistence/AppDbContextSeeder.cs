@@ -46,6 +46,7 @@ public static class AppDbContextSeeder
             await SeedProyectoEstadosAsync(context, logger);
             await SeedTiposNotificacionesAsync(context, logger);
             await SeedJceCiudadanosForDefaultUsersAsync(context, logger);
+            await SeedDgiiForDefaultMocksAsync(context, logger);
             await SeedCatastroTitulosAsync(context, logger);
 
             var adminUser = await GetOrCreateUsuarioAsync(
@@ -1516,6 +1517,47 @@ WHERE NOT EXISTS (
         await context.SaveChangesAsync();
     }
 
+    private static async Task SeedDgiiForDefaultMocksAsync(AppDbContext context, ILogger logger)
+    {
+        var mockRncs = new (string Rnc, string RazonSocial, string? NombreComercial)[]
+        {
+            ("131950213", "P J H LOPEZ SERVICIOS DE CONTABILIDAD SRL", "P J H LOPEZ SERVICIOS DE CONTABILIDAD"),
+            ("10100074474", "SUDARIO BARTOLO RAMOS PEÑA", null),
+            ("133725444", "RD COLLECT SRL", "RD COLLECT"),
+            ("131-000001-2", "VeriFinca RD SRL", "VeriFinca"),
+            ("1310000012", "VeriFinca RD SRL", "VeriFinca"),
+            ("131-000007-2", "Usuario Freemium SRL", null),
+            ("1310000072", "Usuario Freemium SRL", null),
+            ("131-000002-3", "Consultoría Legal RD", "Consultoría Legal"),
+            ("1310000023", "Consultoría Legal RD", "Consultoría Legal"),
+            ("131-000003-5", "Arquitectura & Desarrollo Pro", "ArquiPro"),
+            ("1310000035", "Arquitectura & Desarrollo Pro", "ArquiPro"),
+            ("131-000004-7", "Constructora del Este SRL", "ConstrEste"),
+            ("1310000047", "Constructora del Este SRL", "ConstrEste"),
+            ("131-000005-9", "Corporación Inmobiliaria RD S.A.", "Corporativo Inmobiliario"),
+            ("1310000059", "Corporación Inmobiliaria RD S.A.", "Corporativo Inmobiliario"),
+            ("131-000006-0", "Test Developer Solutions", "TestDev"),
+            ("1310000060", "Test Developer Solutions", "TestDev")
+        };
+
+        foreach (var (rnc, razonSocial, comercial) in mockRncs)
+        {
+            var exists = await context.DGII.AnyAsync(d => d.Rnc == rnc);
+            if (!exists)
+            {
+                logger.LogInformation("Seeding mock DGII record for default mock entities: {Rnc}", rnc);
+                context.DGII.Add(new Domain.Entities.DGII
+                {
+                    Rnc = rnc,
+                    NombreRazonSocial = razonSocial,
+                    NombreComercial = comercial,
+                    Estado = "ACTIVO"
+                });
+            }
+        }
+        await context.SaveChangesAsync();
+    }
+
     private static string? GetLatestCsvPath(string directoryPath)
     {
         if (!Directory.Exists(directoryPath)) return null;
@@ -2080,90 +2122,97 @@ WHERE NOT EXISTS (
 
     private static async Task SeedCatastroTitulosAsync(AppDbContext context, ILogger logger)
     {
-        var mockId = Guid.Parse("907b72e6-f8f8-4bdc-89f3-0001201d1897");
-        var existing = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.IdCatastroTitulo == mockId || c.Matricula == "1989500752");
-        if (existing == null)
+        try
         {
-            var mockTitulo = new CatastroTitulo
+            var mockId = Guid.Parse("907b72e6-f8f8-4bdc-89f3-0001201d1897");
+            var existing = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.IdCatastroTitulo == mockId || c.Matricula == "1989500752");
+            if (existing == null)
             {
-                IdCatastroTitulo = mockId,
-                CodigoDesignacionCatastral = "050036294345:0053",
-                NumeroTitulo = "1670448638",
-                Rnc = "131950213",
-                Provincia = "San Pedro de Macoris",
-                Municipio = "San Pedro de Macoris",
-                Latitud = 18.491015m,
-                Longitud = -69.269868m,
-                Superficie = 1183.36m,
-                Matricula = "1989500752",
-                Oficina = "PUERTO PLATA",
-                DesigCatastralPosicional = "875568784706",
-                DesignCatastralOrigen = "Parc. 87, DC-85",
-                FechaEmision = DateTime.Parse("2024-07-09T22:02:05"),
-                FechaInscripcion = DateTime.Parse("2018-07-31T22:02:05"),
-                VieneDe = "F.414,X.85"
-            };
+                var mockTitulo = new CatastroTitulo
+                {
+                    IdCatastroTitulo = mockId,
+                    CodigoDesignacionCatastral = "050036294345:0053",
+                    NumeroTitulo = "1670448638",
+                    Rnc = "131950213",
+                    Provincia = "San Pedro de Macoris",
+                    Municipio = "San Pedro de Macoris",
+                    Latitud = 18.491015m,
+                    Longitud = -69.269868m,
+                    Superficie = 1183.36m,
+                    Matricula = "1989500752",
+                    Oficina = "PUERTO PLATA",
+                    DesigCatastralPosicional = "875568784706",
+                    DesignCatastralOrigen = "Parc. 87, DC-85",
+                    FechaEmision = DateTime.Parse("2024-07-09T22:02:05"),
+                    FechaInscripcion = DateTime.Parse("2018-07-31T22:02:05"),
+                    VieneDe = "F.414,X.85"
+                };
 
-            await context.CatastroTitulos.AddAsync(mockTitulo);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Seeded CatastroTitulo mock (Matricula: 1989500752, Designacion: 050036294345:0053).");
+                await context.CatastroTitulos.AddAsync(mockTitulo);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded CatastroTitulo mock (Matricula: 1989500752, Designacion: 050036294345:0053).");
+            }
+
+            var mock2 = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.Matricula == "1057385457" || c.CodigoDesignacionCatastral == "050193819517:0017");
+            if (mock2 == null)
+            {
+                var mockTitulo2 = new CatastroTitulo
+                {
+                    IdCatastroTitulo = Guid.NewGuid(),
+                    CodigoDesignacionCatastral = "050193819517:0017",
+                    NumeroTitulo = "1561513566",
+                    Rnc = "10100074474",
+                    Provincia = "San Pedro de Macoris",
+                    Municipio = "Ramon Santana",
+                    Latitud = 18.552m,
+                    Longitud = -69.182m,
+                    Superficie = 14792.83m,
+                    Matricula = "1057385457",
+                    Oficina = "VIRTUAL",
+                    DesigCatastralPosicional = "050193819517",
+                    DesignCatastralOrigen = "Parcela 24,DC-65",
+                    FechaEmision = DateTime.Parse("2024-01-26"),
+                    FechaInscripcion = DateTime.Parse("2015-07-16"),
+                    VieneDe = "Parcela 24,DC-65"
+                };
+
+                await context.CatastroTitulos.AddAsync(mockTitulo2);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded CatastroTitulo mock (Matricula: 1057385457, Designacion: 050193819517:0017).");
+            }
+
+            var mock3Id = Guid.Parse("31ABE1EA-A002-4D46-83C0-000AAD5D5C61");
+            var mock3 = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.IdCatastroTitulo == mock3Id || c.Matricula == "1989501603" || c.CodigoDesignacionCatastral == "050045565100:0004");
+            if (mock3 == null)
+            {
+                var mockTitulo3 = new CatastroTitulo
+                {
+                    IdCatastroTitulo = mock3Id,
+                    CodigoDesignacionCatastral = "050045565100:0004",
+                    NumeroTitulo = "1670449489",
+                    Rnc = "133725444",
+                    Provincia = "San Pedro de Macoris",
+                    Municipio = "Consuelo",
+                    Latitud = 18.591951m,
+                    Longitud = -69.260373m,
+                    Superficie = 1497.05m,
+                    Matricula = "1989501603",
+                    Oficina = "SANTO DOMINGO ESTE",
+                    DesigCatastralPosicional = "115860565503",
+                    DesignCatastralOrigen = "Parc. 74, DC-50",
+                    FechaEmision = DateTime.Parse("2019-05-16T22:02:05"),
+                    FechaInscripcion = DateTime.Parse("2017-08-03T22:02:05"),
+                    VieneDe = "T.270,M.25"
+                };
+
+                await context.CatastroTitulos.AddAsync(mockTitulo3);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded CatastroTitulo mock for Estado Juridico (Matricula: 1989501603, Designacion: 050045565100:0004).");
+            }
         }
-
-        var mock2 = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.Matricula == "1057385457" || c.CodigoDesignacionCatastral == "050193819517:0017");
-        if (mock2 == null)
+        catch (Exception ex)
         {
-            var mockTitulo2 = new CatastroTitulo
-            {
-                IdCatastroTitulo = Guid.NewGuid(),
-                CodigoDesignacionCatastral = "050193819517:0017",
-                NumeroTitulo = "1561513566",
-                Rnc = "10100074474",
-                Provincia = "San Pedro de Macoris",
-                Municipio = "Ramon Santana",
-                Latitud = 18.552m,
-                Longitud = -69.182m,
-                Superficie = 14792.83m,
-                Matricula = "1057385457",
-                Oficina = "VIRTUAL",
-                DesigCatastralPosicional = "050193819517",
-                DesignCatastralOrigen = "Parcela 24,DC-65",
-                FechaEmision = DateTime.Parse("2024-01-26"),
-                FechaInscripcion = DateTime.Parse("2015-07-16"),
-                VieneDe = "Parcela 24,DC-65"
-            };
-
-            await context.CatastroTitulos.AddAsync(mockTitulo2);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Seeded CatastroTitulo mock (Matricula: 1057385457, Designacion: 050193819517:0017).");
-        }
-
-        var mock3Id = Guid.Parse("31ABE1EA-A002-4D46-83C0-000AAD5D5C61");
-        var mock3 = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.IdCatastroTitulo == mock3Id || c.Matricula == "1989501603" || c.CodigoDesignacionCatastral == "050045565100:0004");
-        if (mock3 == null)
-        {
-            var mockTitulo3 = new CatastroTitulo
-            {
-                IdCatastroTitulo = mock3Id,
-                CodigoDesignacionCatastral = "050045565100:0004",
-                NumeroTitulo = "1670449489",
-                Rnc = "133725444",
-                Provincia = "San Pedro de Macoris",
-                Municipio = "Consuelo",
-                Latitud = 18.591951m,
-                Longitud = -69.260373m,
-                Superficie = 1497.05m,
-                Matricula = "1989501603",
-                Oficina = "SANTO DOMINGO ESTE",
-                DesigCatastralPosicional = "115860565503",
-                DesignCatastralOrigen = "Parc. 74, DC-50",
-                FechaEmision = DateTime.Parse("2019-05-16T22:02:05"),
-                FechaInscripcion = DateTime.Parse("2017-08-03T22:02:05"),
-                VieneDe = "T.270,M.25"
-            };
-
-            await context.CatastroTitulos.AddAsync(mockTitulo3);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Seeded CatastroTitulo mock for Estado Juridico (Matricula: 1989501603, Designacion: 050045565100:0004).");
+            logger.LogWarning(ex, "Non-fatal error occurred while seeding CatastroTitulos mock data.");
         }
     }
 }
