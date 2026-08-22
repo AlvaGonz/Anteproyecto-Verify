@@ -176,14 +176,24 @@ public static class EstadoJuridicoRdPaddleMapper
                     {
                         normalizedValue = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
                     }
+                    else if (DateTime.TryParseExact(rawValue, "MMM d yyyy h:mmtt", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var exactDate))
+                    {
+                        normalizedValue = exactDate.ToString("yyyy-MM-ddTHH:mm:ss");
+                    }
                     else
                     {
-                        // Custom parsing for "Oct 1 2024 3:32PM"
-                        if (DateTime.TryParseExact(rawValue, "MMM d yyyy h:mmtt", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var exactDate))
+                        var normDate = SharedFieldNormalizer.NormalizeFecha(rawValue);
+                        if (!string.IsNullOrWhiteSpace(normDate))
                         {
-                            normalizedValue = exactDate.ToString("yyyy-MM-ddTHH:mm:ss");
+                            normalizedValue = normDate;
                         }
                     }
+                    break;
+                case "VieneDe":
+                    normalizedValue = SharedFieldNormalizer.NormalizeVieneDe(rawValue);
+                    break;
+                case "Oficina":
+                    normalizedValue = SharedFieldNormalizer.NormalizeOficina(rawValue);
                     break;
             }
 

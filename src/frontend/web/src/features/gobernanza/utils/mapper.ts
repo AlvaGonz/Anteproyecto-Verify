@@ -16,6 +16,8 @@ export const mapDocumentToVerificationPayload = (
   switch (document.tipoDocumento) {
     case DocumentType.CertificadoTitulo:
     case DocumentType.TITLE:
+    case DocumentType.CertificacionEstadoJuridico:
+    case DocumentType.LEGAL_STATUS:
       return {
         apiDocType: 'catastro',
         payload: {
@@ -31,9 +33,12 @@ export const mapDocumentToVerificationPayload = (
             return val;
           })(),
           oficina: getValue('oficina'),
-          fechaInscripcion: getValue('fechaYHoraInscripcion'),
-          fechaEmision: getValue('fechaEmision'),
+          fechaInscripcion: getValue('fechaYHoraInscripcion') || getValue('fechaInscripcion'),
+          fechaEmision: getValue('fechaHoraInscripcion') || getValue('fechaEmision'),
           vieneDe: getValue('vieneDe'),
+          superficieM2: getValue('superficieMetrosCuadrados') || getValue('superficieM2'),
+          provincia: getValue('provincia'),
+          municipio: getValue('municipio'),
           designCatastralOrigen: getValue('designCatastralOrigen'),
           desigCatastralPosicional: getValue('desigCatastralPosicional'),
         }

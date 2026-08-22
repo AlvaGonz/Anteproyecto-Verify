@@ -2136,5 +2136,34 @@ WHERE NOT EXISTS (
             await context.SaveChangesAsync();
             logger.LogInformation("Seeded CatastroTitulo mock (Matricula: 1057385457, Designacion: 050193819517:0017).");
         }
+
+        var mock3Id = Guid.Parse("31ABE1EA-A002-4D46-83C0-000AAD5D5C61");
+        var mock3 = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.IdCatastroTitulo == mock3Id || c.Matricula == "1989501603" || c.CodigoDesignacionCatastral == "050045565100:0004");
+        if (mock3 == null)
+        {
+            var mockTitulo3 = new CatastroTitulo
+            {
+                IdCatastroTitulo = mock3Id,
+                CodigoDesignacionCatastral = "050045565100:0004",
+                NumeroTitulo = "1670449489",
+                Rnc = "133725444",
+                Provincia = "San Pedro de Macoris",
+                Municipio = "Consuelo",
+                Latitud = 18.591951m,
+                Longitud = -69.260373m,
+                Superficie = 1497.05m,
+                Matricula = "1989501603",
+                Oficina = "SANTO DOMINGO ESTE",
+                DesigCatastralPosicional = "115860565503",
+                DesignCatastralOrigen = "Parc. 74, DC-50",
+                FechaEmision = DateTime.Parse("2019-05-16T22:02:05"),
+                FechaInscripcion = DateTime.Parse("2017-08-03T22:02:05"),
+                VieneDe = "T.270,M.25"
+            };
+
+            await context.CatastroTitulos.AddAsync(mockTitulo3);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded CatastroTitulo mock for Estado Juridico (Matricula: 1989501603, Designacion: 050045565100:0004).");
+        }
     }
 }

@@ -177,7 +177,8 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
     fechaInscripcion: "", // Emision is what's on Estado Juridico
     fechaEmision: extraction.fechaHoraInscripcion?.normalizedValue || extraction.fechaHoraInscripcion?.rawValue || "",
     vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue || "",
-    provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || "",
+    provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || extraction.provincia?.normalizedValue || extraction.provincia?.rawValue || "",
+    municipio: municipalities.find(m => m.id === selectedMunicipalityId)?.nombre || extraction.municipio?.normalizedValue || extraction.municipio?.rawValue || "",
     estatus: extraction.declaracionEstadoLegal?.normalizedValue || extraction.declaracionEstadoLegal?.rawValue || "",
   });
 
