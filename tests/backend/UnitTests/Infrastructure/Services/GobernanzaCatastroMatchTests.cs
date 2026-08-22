@@ -106,4 +106,61 @@ public class GobernanzaCatastroMatchTests
         result.IsValid.Should().BeTrue();
         result.FailedFields.Should().NotContain("FechaInscripcion");
     }
+
+    [Fact]
+    public async Task VerificarCatastroAsync_ShouldReturn100PercentMatch_ForEstadoJuridicoMock()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        using (var seedDb = NewDb(dbName))
+        {
+            var mockEj = new CatastroTitulo
+            {
+                IdCatastroTitulo = Guid.Parse("31ABE1EA-A002-4D46-83C0-000AAD5D5C61"),
+                CodigoDesignacionCatastral = "050045565100:0004",
+                NumeroTitulo = "1670449489",
+                Rnc = "133725444",
+                Provincia = "San Pedro de Macoris",
+                Municipio = "Consuelo",
+                Latitud = 18.591951m,
+                Longitud = -69.260373m,
+                Superficie = 1497.05m,
+                Matricula = "1989501603",
+                Oficina = "SANTO DOMINGO ESTE",
+                DesigCatastralPosicional = "115860565503",
+                DesignCatastralOrigen = "Parc. 74, DC-50",
+                FechaEmision = DateTime.Parse("2019-05-16T22:02:05"),
+                FechaInscripcion = DateTime.Parse("2017-08-03T22:02:05"),
+                VieneDe = "T.270,M.25"
+            };
+            seedDb.CatastroTitulos.Add(mockEj);
+            await seedDb.SaveChangesAsync();
+        }
+
+        using var db = NewDb(dbName);
+        var notifFactoryMock = new Mock<INotificationFactory>();
+        var notifRepoMock = new Mock<INotificacionRepository>();
+        var service = new GobernanzaDeDatosService(db, notifFactoryMock.Object, notifRepoMock.Object);
+
+        var request = new CatastroVerificationRequest
+        {
+            ProyectoId = Guid.NewGuid(),
+            DocumentoId = Guid.NewGuid(),
+            TipoDocumento = "catastro",
+            Matricula = "1989501603",
+            DesignacionCatastral = "050045565100:0004",
+            VieneDe = "T.270,M.25",
+            FechaEmision = "16-05-2019",
+            Oficina = "Santo Domingo Este",
+            Provincia = "San Pedro de Macorís",
+            Municipio = "Consuelo",
+            SuperficieM2 = "1497.05"
+        };
+
+        var result = await service.VerificarCatastroAsync(request);
+
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeTrue();
+        result.MatchPercentage.Should().Be(100m);
+        result.FailedFields.Should().BeEmpty();
+    }
 }
