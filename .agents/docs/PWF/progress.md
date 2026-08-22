@@ -1,5 +1,19 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-21 — Corrección TDD Validación Estado Jurídico (100% Match & Catastro)
+
+**Ciclo:** Gobernanza de Datos / Validación Estado Jurídico (`GobernanzaDeDatosService.cs`, `AppDbContextSeeder.cs`, `EstadoJuridicoExtractionCard.tsx`, `EstadoJuridicoRdPaddleMapper.cs`, `mapper.ts`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (`GobernanzaCatastroMatchTests.cs`), 100% Verde en unit tests de Estado Jurídico (6/6), 0 errores TypeScript, Docker API actualizado y E2E Playwright verde (19.5s).
+- **Causa Raíz Solucionada:** El match en Estado Jurídico se quedaba en 0% porque el registro mock (`IdCatastroTitulo: 31ABE1EA-A002-4D46-83C0-000AAD5D5C61`) no estaba presente en la base de datos `CatastroTitulo`, `getPayload()` en `EstadoJuridicoExtractionCard.tsx` omitía `municipio` y el fallback de `provincia`, y faltaba normalización de `VieneDe` y `Oficina` en `EstadoJuridicoRdPaddleMapper.cs`.
+- **Mejoras implementadas:**
+  1. Test unitario TDD `VerificarCatastroAsync_ShouldReturn100PercentMatch_ForEstadoJuridicoMock` en `GobernanzaCatastroMatchTests.cs`.
+  2. Inserción del registro mock en `AppDbContextSeeder.cs` y en la base de datos activa de SQL Server.
+  3. Adición de `municipio` y fallback de `provincia` en `EstadoJuridicoExtractionCard.tsx`.
+  4. Normalizaciones canónicas en `EstadoJuridicoRdPaddleMapper.cs` para `VieneDe`, `Oficina` y fechas.
+  5. Soporte de `DocumentType.CertificacionEstadoJuridico` en `mapDocumentToVerificationPayload` (`mapper.ts`).
+
+---
+
 ## Sesión 2026-08-20 — Corrección TDD Validación Catastro Título (100% Match & Resiliencia)
 
 **Ciclo:** Gobernanza de Datos / Validación Catastro Título (`GobernanzaDeDatosService.cs`, `AppDbContextSeeder.cs`, `SharedFieldNormalizer.cs`, `CertificadoTituloRdPaddleMapper.cs`, `mapper.ts`)
