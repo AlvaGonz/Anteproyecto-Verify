@@ -199,4 +199,47 @@ public class GobernanzaCatastroMatchTests
         result.MatchPercentage.Should().Be(100m);
         result.FailedFields.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task VerificarIpiAsync_ShouldReturn100PercentMatch_ForCertificacionIPI0001()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        using (var seedDb = NewDb(dbName))
+        {
+            var mockIpi = new PagoIPI
+            {
+                Rnc = "401506254",
+                NoCertificacion = "338738592876",
+                NoInmueble = "070223482149:0021",
+                ParcelaNo = "070223482149",
+                Estatus = "Pagado",
+                Cuota_ipi = 0.00m,
+                FechaCreacion = DateTime.UtcNow
+            };
+            seedDb.PagosIPI.Add(mockIpi);
+            await seedDb.SaveChangesAsync();
+        }
+
+        using var db = NewDb(dbName);
+        var notifFactoryMock = new Mock<INotificationFactory>();
+        var notifRepoMock = new Mock<INotificacionRepository>();
+        var service = new GobernanzaDeDatosService(db, notifFactoryMock.Object, notifRepoMock.Object);
+
+        var request = new IpiVerificationRequest
+        {
+            ProyectoId = Guid.NewGuid(),
+            DocumentoId = Guid.NewGuid(),
+            TipoDocumento = "pagoipi",
+            NoCertificacion = "338738592876",
+            NoInmueble = "070223482149:0021",
+            ParcelaNo = "070223482149"
+        };
+
+        var result = await service.VerificarIpiAsync(request);
+
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeTrue();
+        result.MatchPercentage.Should().Be(100m);
+        result.FailedFields.Should().BeEmpty();
+    }
 }

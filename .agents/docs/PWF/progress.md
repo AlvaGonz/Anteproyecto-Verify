@@ -1,5 +1,31 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-22 — Extracción Robusta de Certificación IPI (DGII) con PaddleOCR y Validación de Gobernanza (100% Match)
+
+**Ciclo:** Motor IA OCR / Certificación IPI (`main.py`, `CertificacionIPIRdPaddleMapper.cs`, `CertificacionIPIRdPaddleMapperTests.cs`, `GobernanzaCatastroMatchTests.cs`, `AppDbContextSeeder.cs`, `ocr-certificacion-ipi-extraction.spec.ts`, `Certificacion IPI_0001.pdf`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (`CertificacionIPIRdPaddleMapperTests.cs` 14/14 passed, `GobernanzaCatastroMatchTests.cs` 5/5 passed), Playwright E2E (`ocr-certificacion-ipi-extraction.spec.ts` 1/1 passed, 16.1s), Suite OCR completa 3/3 passed (34.6s), Microservicio en Docker y Backend C# API 100% coincidencia en vivo con `Certificacion IPI_0001.pdf`.
+- **Problema Abordado:** En `Certificacion IPI_0001.pdf`, el OCR extraía:
+  - `No. de Certificación`: `CERT761035JUICI0DEVALOR` (en lugar de `338738592876`).
+  - `No. Inmueble`: `0902161199220047` (en lugar de `070223482149:0021`).
+  - `Parcela No.`: `090216119922:4-A` (en lugar de `070223482149`).
+- **Mejoras Implementadas:**
+  1. **Microservicio PaddleOCR (`src/microservices/paddleocr-api/main.py`):**
+     - Función `extract_ipi_fields(lines)` con regexes especializadas para `NoCertificacion`, `NoInmueble` (soporta `:0021` y variantes OCR tipográficas `Inmuebie`), y `ParcelaNo` (descartando cláusulas posteriores como `, D.C. No.`).
+     - Exposición de `IpiFields` en endpoint `/api/v1/ocr/extract`.
+  2. **Mapeador C# (`src/backend/Application/Documents/Extractions/CertificacionIPIRdPaddleMapper.cs`):**
+     - Refactorización modular en `ExtractCertificacion`, `ExtractInmueble` y `ExtractParcela`.
+     - Filtro para ignorar cláusulas legales de deslinde de responsabilidad (`juicio de valor`, `declaraciones presentadas`).
+     - Normalización de parcelas preservando sub-parcelas e identificadores de 12 dígitos.
+  3. **Base de Datos & Gobernanza (`AppDbContextSeeder.cs`, `GobernanzaDeDatosService.cs`):**
+     - Semillado permanente en `SeedPagosIpiAsync` y en base de datos SQL Server Docker de registro mock (`NoCertificacion: 338738592876`, `NoInmueble: 070223482149:0021`, `ParcelaNo: 070223482149`, `Estatus: Pagado`).
+     - Mejora de lookup en `VerificarIpiAsync` para buscar por `NoCertificacion`, `NoInmueble`, `ParcelaNo` y `Rnc`.
+  4. **Suite TDD (Playwright & xUnit):**
+     - Backend xUnit (`CertificacionIPIRdPaddleMapperTests.cs` 14/14 passed, `GobernanzaCatastroMatchTests.cs` 5/5 passed).
+     - Playwright E2E (`ocr-certificacion-ipi-extraction.spec.ts` 1/1 passed, 16.1s) validando en la UI los 3 campos (`338738592876`, `070223482149:0021`, `070223482149`) y logrando **100% Match** con Gobernanza.
+     - Suite Playwright OCR global (`ocr-cedula-extraction`, `ocr-certificacion-ipi-extraction`, `ocr-planos-mensura-pm0001`): 3/3 passed (34.6s).
+
+---
+
 ## Sesión 2026-08-22 — Extracción Robusta de Cédulas Dominicanas (JCE) con PaddleOCR y TDD (100% Match)
 
 **Ciclo:** Motor IA OCR / Cédula Dominicana (`main.py`, `CedulaExtractionMapper.cs`, `CedulaRdPaddleMapperTests.cs`, `ocr-cedula-extraction.spec.ts`, `Cedula nueva_0001.pdf`)

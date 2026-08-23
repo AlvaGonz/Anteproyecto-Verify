@@ -726,12 +726,26 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         
         if (!string.IsNullOrEmpty(request.NoCertificacion))
         {
-            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == request.NoCertificacion);
+            var noCert = request.NoCertificacion.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == noCert || (p.NoCertificacion != null && p.NoCertificacion.Contains(noCert)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.NoInmueble))
+        {
+            var noInm = request.NoInmueble.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.NoInmueble == noInm || (p.NoInmueble != null && p.NoInmueble.Contains(noInm)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.ParcelaNo))
+        {
+            var parc = request.ParcelaNo.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.ParcelaNo == parc || (p.ParcelaNo != null && p.ParcelaNo.Contains(parc)));
         }
 
         if (entity == null && !string.IsNullOrEmpty(request.Rnc))
         {
-            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.Rnc == request.Rnc);
+            var rnc = request.Rnc.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.Rnc == rnc);
         }
 
         if (entity != null)

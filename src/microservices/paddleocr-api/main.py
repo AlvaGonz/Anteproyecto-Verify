@@ -345,6 +345,71 @@ def extract_cedula_fields(lines: List[str]) -> Dict[str, Any]:
     return fields
 
 
+def extract_ipi_fields(lines: List[str]) -> Dict[str, Any]:
+    """
+    Extracción especializada de campos para Certificación de IPI (DGII):
+    1. NoCertificacion (12 dígitos o código alfanumérico)
+    2. NoInmueble (12 dígitos + :0021 o alfanumérico)
+    3. ParcelaNo (12 dígitos catastrales o sub-parcela)
+    """
+    fields: Dict[str, Any] = {
+        "NoCertificacion": None,
+        "NoInmueble": None,
+        "ParcelaNo": None
+    }
+    raw_text = "\n".join(lines)
+
+    # 1. No. de Certificación
+    for line in lines:
+        if "juicio" in line.lower() or "declaraciones" in line.lower():
+            continue
+        cert_match = re.search(
+            r"(?:NO\.?\s*(?:DE\s*)?CERTIFICACI[OÓ6]N|N[ÚU]MERO\s*(?:DE\s*)?CERTIFICACI[OÓ6]N|CERTIFICACI[OÓ6]N\s*NO\.?|CERT\.?\s*NO\.?)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
+            line,
+            re.IGNORECASE
+        )
+        if cert_match:
+            val = cert_match.group(1).strip().rstrip(".,")
+            val = re.sub(r"[^A-Za-z0-9\-]", "", val)
+            if len(val) >= 4:
+                fields["NoCertificacion"] = val
+                break
+
+    if not fields["NoCertificacion"]:
+        fallback_cert = re.search(r"\b([Cc]\d{10,13})\b", raw_text)
+        if fallback_cert:
+            fields["NoCertificacion"] = fallback_cert.group(1).strip()
+
+    # 2. No. de Inmueble
+    for line in lines:
+        inm_match = re.search(
+            r"(?:NO\.?\s*INMUEB[IL1]E|N[ÚU]MERO\s*INMUEB[IL1]E|INMUEB[IL1]E\s*(?:NO\.?|N[ÚU]MERO|NUM\.?)|NO\.?\s*INM\b\.?)\s*[:\-]?\s*([0-9]{10,14}(?::[0-9]{1,4})?|[A-Z0-9\-\/:]+)",
+            line,
+            re.IGNORECASE
+        )
+        if inm_match:
+            val = inm_match.group(1).strip().rstrip(".,")
+            if len(val) >= 4 and val != "SN" and val.upper() != "CERTIFICA":
+                fields["NoInmueble"] = val
+                break
+
+    # 3. Parcela No.
+    for line in lines:
+        parc_match = re.search(
+            r"(?:(?:identificado\s*(?:camo|como)\s*)?PARCELA\s*(?:NO\.?|N[ÚU]MERO|NUM\.?)?|N[ÚU]MERO\s*DE\s*PARCELA|NO\.?\s*PARCELA)\s*[:\-]?\s*([A-Z0-9\-\/:]+)",
+            line,
+            re.IGNORECASE
+        )
+        if parc_match:
+            val = parc_match.group(1).strip().rstrip(".,")
+            val = re.sub(r"[\s,]+(?:D\.?C\.?|Solar|Manzana|Apto|Unidad).*$", "", val, flags=re.IGNORECASE).strip()
+            if len(val) >= 4:
+                fields["ParcelaNo"] = val
+                break
+
+    return fields
+
+
 def validate_against_db(extracted: Dict[str, Any], db_record: Dict[str, Any]) -> Tuple[bool, float]:
     """
     Validación contra Base de Datos:
@@ -399,7 +464,7 @@ class CatastralValidationRequest(BaseModel):
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "version": "1.3.0", "engine": "PP-OCRv4"}
+    return {"status": "healthy", "version": "1.4.0", "engine": "PP-OCRv4"}
 
 
 @app.post("/api/v1/ocr/validate-catastro")
@@ -471,13 +536,15 @@ async def extract_text(file: UploadFile = File(...)):
         filtered_lines = filter_false_positives(lines_list)
         catastral_fields = extract_catastral_fields(filtered_lines)
         cedula_fields = extract_cedula_fields(filtered_lines)
+        ipi_fields = extract_ipi_fields(filtered_lines)
 
         return {
             "Success": True,
             "ExtractedText": extracted_text.strip(),
             "RawJson": str(lines_list),
             "CatastralFields": catastral_fields,
-            "CedulaFields": cedula_fields
+            "CedulaFields": cedula_fields,
+            "IpiFields": ipi_fields
         }
 
     except Exception as e:
@@ -486,7 +553,8 @@ async def extract_text(file: UploadFile = File(...)):
             "ExtractedText": "",
             "RawJson": str(e),
             "CatastralFields": {},
-            "CedulaFields": {}
+            "CedulaFields": {},
+            "IpiFields": {}
         }
     finally:
         if temp_path and os.path.exists(temp_path):

@@ -48,6 +48,7 @@ public static class AppDbContextSeeder
             await SeedJceCiudadanosForDefaultUsersAsync(context, logger);
             await SeedDgiiForDefaultMocksAsync(context, logger);
             await SeedCatastroTitulosAsync(context, logger);
+            await SeedPagosIpiAsync(context, logger);
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -2213,6 +2214,36 @@ WHERE NOT EXISTS (
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Non-fatal error occurred while seeding CatastroTitulos mock data.");
+        }
+    }
+
+    private static async Task SeedPagosIpiAsync(AppDbContext context, ILogger logger)
+    {
+        try
+        {
+            var rncIpi = "401506254";
+            var existing = await context.PagosIPI.FirstOrDefaultAsync(p => p.Rnc == rncIpi || p.NoCertificacion == "338738592876");
+            if (existing == null)
+            {
+                var mockIpi = new PagoIPI
+                {
+                    Rnc = rncIpi,
+                    NoCertificacion = "338738592876",
+                    NoInmueble = "070223482149:0021",
+                    ParcelaNo = "070223482149",
+                    Estatus = "Pagado",
+                    Cuota_ipi = 0.00m,
+                    FechaCreacion = DateTime.UtcNow
+                };
+
+                await context.PagosIPI.AddAsync(mockIpi);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded PagoIPI mock (NoCertificacion: 338738592876, NoInmueble: 070223482149:0021).");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Non-fatal error occurred while seeding PagosIPI mock data.");
         }
     }
 }
