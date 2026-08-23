@@ -1,5 +1,19 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-23 — Corrección de Conflicto de Clave Foránea JCE en Google Login (`FK_Usuario_JCE_Ciudadano_Cedula`)
+
+**Ciclo:** Autenticación & Persistencia / Google Auth (`Usuario.cs`, `GoogleLoginUserCommandHandler.cs`, `InviteTeamMemberCommandHandler.cs`, `SettingsController.cs`, `UsuarioConfiguration.cs`, `20260823203645_AllowSocialLoginWithoutCedula.cs`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (`GoogleLoginUserCommandHandlerTests.cs` 3/3 passed, `DomainTests.cs` 12/12 passed), Migración de EF Core aplicada en SQL Server dentro de Docker, API reconstruida e iniciada exitosamente.
+- **Causa Raíz Diagnosticada:** Cuando un nuevo usuario iniciaba sesión vía Google OAuth (`POST /api/auth/google`), `GoogleLoginUserCommandHandler` instanciaba `Usuario` pasando `"00000000000"` como cédula para satisfacer una verificación rígida en el constructor de `Usuario`. Al guardar en base de datos, SQL Server disparaba `SqlException 547` violando la clave foránea `FK_Usuario_JCE_Ciudadano_Cedula` (puesto que `"00000000000"` no existe en `dbo.JCE_Ciudadano`).
+- **Mejoras Implementadas (TDD + Ponytail):**
+  1. `Usuario.cs`: Cédula y RNC ahora son opcionales con valor por defecto `null` y normalización limpia de espacios en blanco.
+  2. `GoogleLoginUserCommandHandler.cs`: Creación de usuarios de Google con `Cedula = null` y `Rnc = null`.
+  3. `InviteTeamMemberCommandHandler.cs` y `SettingsController.cs`: Eliminación de strings de cédula provisionales falsas (`"00000000000"`, `"000-0000000-0"`), pasando `null`.
+  4. `UsuarioConfiguration.cs` y Migración EF Core (`AllowSocialLoginWithoutCedula`): Modificación del Check Constraint `CK_Usuario_Cedula_Rnc` para permitir explícitamente `[SocialLogin] = 1` y miembros invitados con `[TitularId] IS NOT NULL`.
+  5. Verificación TDD: Pruebas unitarias actualizadas y aprobadas (12/12 verdes).
+
+---
+
 ## Sesión 2026-08-22 — Extracción Robusta de Certificación IPI (DGII) con PaddleOCR y Validación de Gobernanza (100% Match)
 
 **Ciclo:** Motor IA OCR / Certificación IPI (`main.py`, `CertificacionIPIRdPaddleMapper.cs`, `CertificacionIPIRdPaddleMapperTests.cs`, `GobernanzaCatastroMatchTests.cs`, `AppDbContextSeeder.cs`, `ocr-certificacion-ipi-extraction.spec.ts`, `Certificacion IPI_0001.pdf`)

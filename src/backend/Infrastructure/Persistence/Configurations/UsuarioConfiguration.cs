@@ -8,7 +8,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        builder.ToTable("Usuario", t => t.HasCheckConstraint("CK_Usuario_Cedula_Rnc", "([Cedula] IS NOT NULL AND [Cedula] <> '') OR ([Rnc] IS NOT NULL AND [Rnc] <> '')")); // Removed ExcludeFromMigrations to allow additive migration
+        builder.ToTable("Usuario", t => t.HasCheckConstraint("CK_Usuario_Cedula_Rnc", "([SocialLogin] = 1) OR ([TitularId] IS NOT NULL) OR ([Cedula] IS NOT NULL AND [Cedula] <> '') OR ([Rnc] IS NOT NULL AND [Rnc] <> '')"));
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnName("IdUsuario");
         builder.Property(u => u.Nombre).IsRequired().HasMaxLength(100);

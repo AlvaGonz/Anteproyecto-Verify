@@ -69,6 +69,8 @@ public class GoogleLoginUserCommandHandlerTests
         Assert.True(capturedUser!.EmailVerificado);
         Assert.True(capturedUser.SocialLogin);
         Assert.Equal("123", capturedUser.GoogleId);
+        Assert.Null(capturedUser.Cedula);
+        Assert.Null(capturedUser.Rnc);
     }
 
     [Fact]

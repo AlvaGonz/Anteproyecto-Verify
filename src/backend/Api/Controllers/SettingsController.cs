@@ -225,7 +225,7 @@ public class SettingsController : ControllerBase
                 contrasenaHash: hashedPassword,
                 rol: role,
                 telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
-                cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
+                cedula: string.IsNullOrWhiteSpace(request.Cedula) ? null : request.Cedula
             );
 
             user.ForzarVerificacionEmail();
@@ -653,7 +653,7 @@ public class SettingsController : ControllerBase
             contrasenaHash: hashedPassword,
             rol: UserRole.User,
             telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
-            cedula: string.IsNullOrWhiteSpace(request.Cedula) ? "00000000000" : request.Cedula
+            cedula: string.IsNullOrWhiteSpace(request.Cedula) ? null : request.Cedula
         );
 
         // Do not force email verification here, so the user remains 'Pendiente'
