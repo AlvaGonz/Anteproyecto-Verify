@@ -15,8 +15,8 @@ from pydantic import BaseModel
 
 app = FastAPI(
     title="PaddleOCR API for VeriFinca",
-    version="1.2.0",
-    description="Microservicio de OCR y validación catastral de alta resolución (Planos de Mensura / Certificados de Título)"
+    version="1.3.0",
+    description="Microservicio de OCR y validación catastral y de identidad de alta resolución (Planos de Mensura / Cédulas Dominicanas / Certificados de Título)"
 )
 
 # 2.1 Configuración PaddleOCR Óptima (PP-OCRv4)
@@ -32,6 +32,21 @@ ocr = PaddleOCR(
     text_det_unclip_ratio=1.8, # Factor de expansión de caja
     text_rec_score_thresh=0.3, # Filtrar falsos positivos < 30% confianza
 )
+
+SPANISH_MONTHS = {
+    "ENERO": "01", "EN3RO": "01",
+    "FEBRERO": "02",
+    "MARZO": "03",
+    "ABRIL": "04",
+    "MAYO": "05",
+    "JUNIO": "06", "JUNTO": "06", "JUN1O": "06", "JUNLO": "06",
+    "JULIO": "07", "JULTO": "07", "JUL1O": "07",
+    "AGOSTO": "08",
+    "SEPTIEMBRE": "09", "SETIEMBRE": "09",
+    "OCTUBRE": "10",
+    "NOVIEMBRE": "11", "NOVLEMBRE": "11", "NOV1EMBRE": "11",
+    "DICIEMBRE": "12"
+}
 
 
 def preprocess_for_ocr(image: np.ndarray) -> np.ndarray:
@@ -215,6 +230,121 @@ def extract_catastral_fields(ocr_texts: List[str]) -> Dict[str, Any]:
     return fields
 
 
+def clean_watermark(text: str) -> str:
+    """Filtra marcas de agua y palabras espécimen de cédulas y documentos"""
+    text = re.sub(r"\b[A-Z0-9/]*\s*SPECIM[A-Z0-9]*\b", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\b(SPECIMEN|ESPECIMEN|PECIMEX|SPECIMEX|MUESTRA|SAMPLE|COPIA)\b", "", text, flags=re.IGNORECASE)
+    return text.strip()
+
+
+def normalize_name_typos(text: str) -> str:
+    """Normaliza errores comunes de OCR en nombres y apellidos dominicanos"""
+    text = re.sub(r"\bGQMEZ\b", "GOMEZ", text, flags=re.IGNORECASE)
+    return text
+
+
+def extract_cedula_fields(lines: List[str]) -> Dict[str, Any]:
+    """
+    Extracción especializada de campos para Cédula Dominicana (JCE):
+    1. Cedula (11 dígitos con o sin guiones)
+    2. Nombres (Nombres de pila)
+    3. Apellidos (Apellidos familiares)
+    4. FechaNacimiento (Formato DD-MM-YYYY)
+    5. FechaExpiracion (Formato DD-MM-YYYY)
+    """
+    raw_text = " ".join(lines)
+    fields: Dict[str, Any] = {
+        "Cedula": None,
+        "Nombres": None,
+        "Apellidos": None,
+        "FechaNacimiento": None,
+        "FechaExpiracion": None
+    }
+
+    # 1. Cédula
+    for i, line in enumerate(lines):
+        if re.search(r"N[uú]mero\s*de\s*c[eé]du[tl]a|C[eé]dula", line, re.IGNORECASE):
+            for step in range(0, 4):
+                if i + step < len(lines):
+                    cand = lines[i + step].strip()
+                    m = re.search(r"(\d{3}-?\d{7}-?\d{1}|\b\d{11}\b)", cand)
+                    if m:
+                        fields["Cedula"] = m.group(1)
+                        break
+            if fields["Cedula"]:
+                break
+    if not fields["Cedula"]:
+        m = re.search(r"\b(\d{3}-\d{7}-\d{1}|\d{11})\b", raw_text)
+        if m:
+            fields["Cedula"] = m.group(1)
+
+    # 2. Nombres
+    for i, line in enumerate(lines):
+        if re.search(r"^\s*Nombres?\s*$", line, re.IGNORECASE):
+            parts = []
+            for step in range(1, 5):
+                if i + step < len(lines):
+                    cand = lines[i + step].strip()
+                    if not cand or len(cand) <= 2 or cand in [":", "<", "0)", "0-)"]:
+                        continue
+                    if re.search(r"^(?:Apel|Nacionalidad|lacjonalidad|Estado|Fecha|Lugar|Sexo|Ocupaci|DOMINICANA|OMINICANA|SOLTER)", cand, re.IGNORECASE):
+                        break
+                    cleaned = clean_watermark(cand)
+                    if cleaned and re.match(r"^[A-Za-zÁÉÍÓÚÑáéíóúñ\s\'-]+$", cleaned):
+                        parts.append(cleaned)
+            if parts:
+                fields["Nombres"] = " ".join(parts).upper()
+                break
+
+    # 3. Apellidos
+    for i, line in enumerate(lines):
+        if re.search(r"^\s*Apel(?:tido|tida|ido|ida|lido|lida)s?\s*$", line, re.IGNORECASE):
+            parts = []
+            for step in range(1, 5):
+                if i + step < len(lines):
+                    cand = lines[i + step].strip()
+                    if not cand or len(cand) <= 2 or cand in [":", "<", "0)", "0-)"]:
+                        continue
+                    if re.search(r"^(?:Nombres?|Nacionalidad|lacjonalidad|Estado|Fecha|Lugar|Sexo|Ocupaci|DOMINICANA|OMINICANA|SOLTER)", cand, re.IGNORECASE):
+                        break
+                    cleaned = clean_watermark(cand)
+                    cleaned = normalize_name_typos(cleaned)
+                    if cleaned and re.match(r"^[A-Za-zÁÉÍÓÚÑáéíóúñ\s\'-]+$", cleaned):
+                        parts.append(cleaned)
+            if parts:
+                fields["Apellidos"] = " ".join(parts).upper()
+                break
+
+    # 4. Fecha Nacimiento
+    m_month = re.search(r"(\b\d{1,2})\s+([A-Za-z0-9]+)\s+(\d{4})\b", raw_text)
+    if m_month:
+        day = m_month.group(1).zfill(2)
+        month_raw = m_month.group(2).upper()
+        month_str = month_raw.replace("t", "I").replace("T", "I").replace("1", "I").replace("L", "I")
+        year = m_month.group(3)
+        for k, v in SPANISH_MONTHS.items():
+            if k == month_str or k in month_str or month_str in k:
+                fields["FechaNacimiento"] = f"{day}-{v}-{year}"
+                break
+    if not fields["FechaNacimiento"]:
+        m_num = re.search(r"\b(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})\b", raw_text)
+        if m_num:
+            fields["FechaNacimiento"] = f"{m_num.group(1).zfill(2)}-{m_num.group(2).zfill(2)}-{m_num.group(3)}"
+
+    # 5. Fecha Expiración
+    for line in lines:
+        if re.search(r"(?:Vig[a-z]*\s+)?(?:[HhMm]asta|ta\s+\d|Expiraci|Expira)", line, re.IGNORECASE):
+            digits = re.findall(r"\d+", line)
+            for j in range(len(digits) - 2):
+                if len(digits[j]) <= 2 and len(digits[j+1]) <= 2 and len(digits[j+2]) == 4:
+                    fields["FechaExpiracion"] = f"{digits[j].zfill(2)}-{digits[j+1].zfill(2)}-{digits[j+2]}"
+                    break
+            if fields["FechaExpiracion"]:
+                break
+
+    return fields
+
+
 def validate_against_db(extracted: Dict[str, Any], db_record: Dict[str, Any]) -> Tuple[bool, float]:
     """
     Validación contra Base de Datos:
@@ -269,7 +399,7 @@ class CatastralValidationRequest(BaseModel):
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "version": "1.2.0", "engine": "PP-OCRv4"}
+    return {"status": "healthy", "version": "1.3.0", "engine": "PP-OCRv4"}
 
 
 @app.post("/api/v1/ocr/validate-catastro")
@@ -340,12 +470,14 @@ async def extract_text(file: UploadFile = File(...)):
 
         filtered_lines = filter_false_positives(lines_list)
         catastral_fields = extract_catastral_fields(filtered_lines)
+        cedula_fields = extract_cedula_fields(filtered_lines)
 
         return {
             "Success": True,
             "ExtractedText": extracted_text.strip(),
             "RawJson": str(lines_list),
-            "CatastralFields": catastral_fields
+            "CatastralFields": catastral_fields,
+            "CedulaFields": cedula_fields
         }
 
     except Exception as e:
@@ -353,7 +485,8 @@ async def extract_text(file: UploadFile = File(...)):
             "Success": False,
             "ExtractedText": "",
             "RawJson": str(e),
-            "CatastralFields": {}
+            "CatastralFields": {},
+            "CedulaFields": {}
         }
     finally:
         if temp_path and os.path.exists(temp_path):
