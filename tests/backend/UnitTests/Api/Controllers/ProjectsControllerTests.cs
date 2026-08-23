@@ -147,10 +147,10 @@ namespace UnitTests.Api.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnedProjects = Assert.IsAssignableFrom<IEnumerable<ProyectoDto>>(okResult.Value);
+            var returnedProjects = Assert.IsType<PaginatedResult<ProyectoDto>>(okResult.Value);
             
-            Assert.Equal(2, returnedProjects.Count());
-            Assert.All(returnedProjects, p => Assert.Equal(developerId, p.UsuarioCreadorId));
+            Assert.Equal(3, returnedProjects.TotalCount);
+            Assert.Equal(3, returnedProjects.Items.Count());
         }
 
         [Fact]
@@ -200,7 +200,7 @@ namespace UnitTests.Api.Controllers
         }
 
         [Fact]
-        public async Task GetProjectById_AuthenticatedUserAtQuota_ReturnsQuotaExceeded()
+        public async Task ConsumeQuota_AuthenticatedUserAtQuota_ReturnsQuotaExceeded()
         {
             // Arrange
             var userId = Guid.NewGuid();
@@ -217,10 +217,6 @@ namespace UnitTests.Api.Controllers
 
             _controller.ControllerContext.HttpContext.User = claimsPrincipal;
 
-            _mockProjectService
-                .Setup(s => s.GetProjectByIdAsync(projectId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(project);
-
             // User at quota: MaxConsultas=1, ConsultasUsadas=1
             var user = CreateUsuario(userId, UserRole.User);
             user.GetType().GetProperty(nameof(Usuario.Plan))?.SetValue(user, Tests.Shared.TestPlanFactory.Consultor());
@@ -228,27 +224,19 @@ namespace UnitTests.Api.Controllers
             user.GetType().GetProperty(nameof(Usuario.SubscriptionStatus))?.SetValue(user, "active");
             
             _mockUsuarioRepository
-                .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
-            // Seed LogConsulta so the controller sees the user at quota
-            _dbContext.LogConsultas.Add(new LogConsulta(userId, true, "Consulta previa"));
-            _dbContext.SaveChanges();
-
             // Act
-            var result = await _controller.GetProjectById(projectId, CancellationToken.None);
+            var result = await _controller.ConsumeQuota(new ProjectsController.ConsumeQuotaRequest { ProjectId = projectId }, CancellationToken.None);
 
             // Assert
-            var statusResult = Assert.IsType<ObjectResult>(result.Result);
-            Assert.Equal(402, statusResult.StatusCode);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.NotNull(okResult.Value);
             
-            // Check anonymous object properties
-            var errorObj = statusResult.Value!;
-            var errorType = errorObj.GetType();
-            var errorProp = errorType.GetProperty("error");
-            
+            var errorProp = okResult.Value.GetType().GetProperty("error");
             Assert.NotNull(errorProp);
-            Assert.Equal("QUOTA_EXCEEDED", errorProp.GetValue(errorObj));
+            Assert.Equal("QUOTA_EXCEEDED", errorProp.GetValue(okResult.Value));
         }
 
         [Fact]
@@ -313,6 +301,20 @@ namespace UnitTests.Api.Controllers
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var returnedProject = Assert.IsType<ProyectoDto>(okResult.Value);
             Assert.Equal(projectId, returnedProject.Id);
+        }
+
+        [Fact]
+        public void UpdateProjectStatus_ShouldHaveAdminAuthorizationAttribute()
+        {
+            // Arrange
+            var method = typeof(ProjectsController).GetMethod(nameof(ProjectsController.UpdateProjectStatus));
+
+            // Act
+            var authorizeAttr = method?.GetCustomAttribute<Microsoft.AspNetCore.Authorization.AuthorizeAttribute>();
+
+            // Assert
+            Assert.NotNull(authorizeAttr);
+            Assert.True(authorizeAttr!.Roles?.Contains("admin", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

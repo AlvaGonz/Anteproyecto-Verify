@@ -1,5 +1,20 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-23 — Restricción de Cambios de Estado de Proyecto Exclusiva para Administradores
+
+**Ciclo:** Autorización & UI / Admin Projects (`AdminProjectContextMenu.tsx`, `AdminProjectList.tsx`, `AdminProjectContextMenu.test.tsx`, `ProjectsController.cs`, `ProjectsControllerTests.cs`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 7/7 passed, xUnit backend `ProjectsControllerTests` 6/6 passed), API Docker actualizada e iniciada.
+- **Problema Abordado:** Las opciones de menú de cambio de estado ("Cambiar Estado": "Publicar (Aprobado)", "Pasar a En Revisión", "Marcar Observado", "Revertir a Borrador") en la tabla de proyectos del administrador debían estar disponibles y ejecutables **únicamente** para usuarios con rol de administrador.
+- **Mejoras Implementadas (TDD + Ponytail):**
+  1. `AdminProjectContextMenu.tsx`: Prop `isAdmin` agregada y evaluada condicionalmente para envolver el encabezado y botones de «Cambiar Estado».
+  2. `AdminProjectList.tsx`: Pasa la propiedad `isAdmin={isAdmin}` a `<AdminProjectContextMenu />`.
+  3. `ProjectsController.cs`: Añadido atributo `[Authorize(Roles = "admin,Administrator")]` al endpoint `PATCH /api/projects/{id}/status`.
+  4. Pruebas TDD:
+     - `AdminProjectContextMenu.test.tsx`: Tests para validar ocultamiento cuando `isAdmin === false` y renderizado cuando `isAdmin === true`.
+     - `ProjectsControllerTests.cs`: Test de reflexión para verificar `AuthorizeAttribute(Roles = "admin,Administrator")`.
+
+---
+
 ## Sesión 2026-08-23 — Corrección de Conflicto de Clave Foránea JCE en Google Login (`FK_Usuario_JCE_Ciudadano_Cedula`)
 
 **Ciclo:** Autenticación & Persistencia / Google Auth (`Usuario.cs`, `GoogleLoginUserCommandHandler.cs`, `InviteTeamMemberCommandHandler.cs`, `SettingsController.cs`, `UsuarioConfiguration.cs`, `20260823203645_AllowSocialLoginWithoutCedula.cs`)

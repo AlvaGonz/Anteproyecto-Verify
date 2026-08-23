@@ -166,6 +166,7 @@ export const AdminProjectList: React.FC<AdminProjectListProps> = React.memo(({ 
                       onClose={() => setOpenMenuId(null)}
                       updateStatus={updateStatus}
                       deleteProject={deleteProject}
+                      isAdmin={isAdmin}
                     />
                     <Link
                       to={`/admin/projects/${project.id}/edit`}

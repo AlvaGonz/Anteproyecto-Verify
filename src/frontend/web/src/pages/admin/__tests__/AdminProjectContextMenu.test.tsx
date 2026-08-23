@@ -114,4 +114,39 @@ describe('AdminProjectContextMenu - destructive delete confirmation', () => {
     expect(deleteProject).toHaveBeenCalledTimes(1);
     expect(deleteProject).toHaveBeenCalledWith('project-1');
   });
+
+  describe('role-based visibility for Cambiar Estado options', () => {
+    it('does NOT render Cambiar Estado section or status action buttons when isAdmin is false', () => {
+      render(
+        <MemoryRouter>
+          <AdminProjectContextMenu {...defaultProps} isAdmin={false} />
+        </MemoryRouter>
+      );
+
+      expect(screen.queryByText(/cambiar estado/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /publicar \(aprobado\)/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /pasar a en revisión/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /marcar observado/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /revertir a borrador/i })).not.toBeInTheDocument();
+
+      // Navigation links should still be accessible
+      expect(screen.getByRole('link', { name: /validaciones/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /documentos/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /hallazgos/i })).toBeInTheDocument();
+    });
+
+    it('renders Cambiar Estado section and status action buttons when isAdmin is true', () => {
+      render(
+        <MemoryRouter>
+          <AdminProjectContextMenu {...defaultProps} isAdmin={true} />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText(/cambiar estado/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /publicar \(aprobado\)/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /pasar a en revisión/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /marcar observado/i })).toBeInTheDocument();
+    });
+  });
 });
+
