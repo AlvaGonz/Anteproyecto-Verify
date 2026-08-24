@@ -10,10 +10,12 @@ import { fetchMunicipalities } from "../api/geo";
 import { Loader2 } from "lucide-react";
 import { DocumentExtractionPanel } from "./reusable/DocumentExtractionPanel";
 import { ExtractionFieldCard } from "./reusable/ExtractionFieldCard";
-import { useVerifyDocument } from "../../gobernanza/api/useGobernanza";
+import { useVerifyDocument, useDocumentValidationResult } from "../../gobernanza/api/useGobernanza";
 import { VerificationFeedbackCard } from "../../gobernanza/components/VerificationFeedbackCard";
 import { getValidationStatus } from "../../gobernanza/utils/mapper";
 import { ShieldCheck } from "lucide-react";
+import { useDiscrepancyCheck, Discrepancy } from "../../validations/hooks/useDiscrepancyCheck";
+import { DiscrepancyAlertDialog } from "../../validations/components/DiscrepancyAlertDialog";
 
 interface EstadoJuridicoExtractionCardProps {
   extraction: EstadoJuridicoRdExtractionV1;
@@ -156,24 +158,50 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
   const [editValue, setEditValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const { mutate: verifyDocument, data: verificationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+  const [isDiscrepancyDialogOpen, setIsDiscrepancyDialogOpen] = React.useState(false);
+  const [discrepancies, setDiscrepancies] = React.useState<Discrepancy[]>([]);
+
+  const { checkDiscrepancies } = useDiscrepancyCheck(proyectoId);
+  const { data: persistedResponse } = useDocumentValidationResult(documentoId);
+  const { mutate: verifyDocument, data: mutationResponse, isPending: isVerifying, error: verificationError } = useVerifyDocument();
+  const verificationResponse = mutationResponse || persistedResponse || null;
 
   const getStatus = (fieldVal: string | undefined | null, fieldKey: string) =>
     getValidationStatus(fieldVal, verificationResponse?.matchedData, fieldKey, verificationResponse?.failedFields);
 
+  const getPayload = () => ({
+    matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue || "",
+    designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue || "",
+    superficieM2: extraction.superficieMetrosCuadrados?.normalizedValue || extraction.superficieMetrosCuadrados?.rawValue || "",
+    oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue || "",
+    fechaInscripcion: "", // Emision is what's on Estado Juridico
+    fechaEmision: extraction.fechaHoraInscripcion?.normalizedValue || extraction.fechaHoraInscripcion?.rawValue || "",
+    vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue || "",
+    provincia: provinces.find(p => p.id === selectedProvinceId)?.nombre || extraction.provincia?.normalizedValue || extraction.provincia?.rawValue || "",
+    municipio: municipalities.find(m => m.id === selectedMunicipalityId)?.nombre || extraction.municipio?.normalizedValue || extraction.municipio?.rawValue || "",
+    estatus: extraction.declaracionEstadoLegal?.normalizedValue || extraction.declaracionEstadoLegal?.rawValue || "",
+  });
+
   const handleVerifyGobernanza = () => {
+    const payload = getPayload();
+    const foundDiscrepancies = checkDiscrepancies('estado-juridico', payload);
+
+    if (foundDiscrepancies.length > 0) {
+      setDiscrepancies(foundDiscrepancies);
+      setIsDiscrepancyDialogOpen(true);
+      return;
+    }
+
+    proceedWithValidation();
+  };
+
+  const proceedWithValidation = () => {
+    setIsDiscrepancyDialogOpen(false);
     verifyDocument({
       documentType: 'catastro',
       proyectoId,
       documentoId,
-      payload: {
-        matricula: extraction.matricula?.normalizedValue || extraction.matricula?.rawValue || "",
-        designacionCatastral: extraction.designacionCatastral?.normalizedValue || extraction.designacionCatastral?.rawValue || "",
-        oficina: extraction.oficina?.normalizedValue || extraction.oficina?.rawValue || "",
-        fechaInscripcion: "", // Emision is what's on Estado Juridico
-        fechaEmision: extraction.fechaHoraInscripcion?.normalizedValue || extraction.fechaHoraInscripcion?.rawValue || "",
-        vieneDe: extraction.vieneDe?.normalizedValue || extraction.vieneDe?.rawValue || ""
-      }
+      payload: getPayload()
     });
   };
 
@@ -340,6 +368,13 @@ export const EstadoJuridicoExtractionCard: React.FC<EstadoJuridicoExtractionCard
           error={verificationError}
         />
       </div>
+
+      <DiscrepancyAlertDialog
+        isOpen={isDiscrepancyDialogOpen}
+        discrepancies={discrepancies}
+        onCancel={() => setIsDiscrepancyDialogOpen(false)}
+        onProceed={proceedWithValidation}
+      />
     </DocumentExtractionPanel>
   );
 };

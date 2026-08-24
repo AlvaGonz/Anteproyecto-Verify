@@ -29,6 +29,10 @@ export interface CatastroVerificationRequest extends BaseVerificationRequest {
   vieneDe?: string;
   designCatastralOrigen?: string;
   desigCatastralPosicional?: string;
+  superficie?: string;
+  superficieM2?: string;
+  provincia?: string;
+  municipio?: string;
 }
 
 export interface JceVerificationRequest extends BaseVerificationRequest {

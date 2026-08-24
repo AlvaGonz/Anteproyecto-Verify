@@ -45,7 +45,7 @@ public class PersistenceTests
             .Options;
 
         var usuario = new Usuario("Test", "User", "test@example.com", "hash", UserRole.User, "8095550199", "40212345678");
-        var proyecto = new Proyecto("Test Project", "Test Location", usuario.Id);
+        var proyecto = new Proyecto("Test Project", "Test Location", usuario.Id, 16);
 
         // Act
         using (var context = new AppDbContext(options))

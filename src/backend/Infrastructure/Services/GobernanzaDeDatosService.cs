@@ -25,6 +25,31 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         _notificacionRepository = notificacionRepository;
     }
 
+    private async Task<bool> IsDiscrepancyCheckEnabledAsync()
+    {
+        var regla = await _dbContext.ReglasValidacion
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Codigo == "GLOBAL-DISCREPANCY-ENABLED");
+        return regla == null || (regla.Activa && regla.ValorUmbral == 1.0m);
+    }
+
+    private VerificationResult CreateSkippedResult()
+    {
+        return new VerificationResult
+        {
+            IsValid = true,
+            MatchPercentage = 100m,
+            Message = "Validación de discrepancias omitida por configuración administrativa.",
+            DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "skipped",
+                Reason = "disabled_by_admin",
+                HasDiscrepancies = null,
+                Findings = new List<string>()
+            }
+        };
+    }
+
     private async Task SaveValidationResultAsync(BaseVerificationRequest request, VerificationResult result)
     {
         if (request.ProyectoId == Guid.Empty || !request.DocumentoId.HasValue) return;
@@ -50,50 +75,52 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             newDato.UpdateResultados(datosOcrJson, datosMatchJson, (double)result.MatchPercentage);
             _dbContext.DatosValidados.Add(newDato);
             
-            // Note: EF Core will populate ID upon save, but we need it for Hallazgo...
-            // Wait, we can save changes first to get the ID, then add Hallazgos.
             await _dbContext.SaveChangesAsync();
             datoValidadoToUse = newDato;
         }
 
-        // Process Hallazgos
-        var currentHallazgos = await _dbContext.Hallazgos
-            .Where(h => h.DatoValidadoId == datoValidadoToUse.Id)
-            .ToListAsync();
-
-        // Mark previously failed fields that are no longer failing as resolved
-        var resolvedHallazgos = currentHallazgos.Where(h => !result.FailedFields.Contains(h.Campo ?? "")).ToList();
-        foreach (var h in resolvedHallazgos)
+        // If discrepancy check was skipped, do not generate new hallazgos
+        if (result.DiscrepancyCheck?.Status != "skipped")
         {
-            if (!h.Resuelto)
-            {
-                h.MarkAsResolved();
-                _dbContext.Hallazgos.Update(h);
-            }
-        }
+            // Process Hallazgos
+            var currentHallazgos = await _dbContext.Hallazgos
+                .Where(h => h.DatoValidadoId == datoValidadoToUse.Id)
+                .ToListAsync();
 
-        // Add or update currently failed fields
-        foreach (var failedField in result.FailedFields)
-        {
-            var existingHallazgo = currentHallazgos.FirstOrDefault(h => h.Campo == failedField);
-            if (existingHallazgo != null)
+            // Mark previously failed fields that are no longer failing as resolved
+            var resolvedHallazgos = currentHallazgos.Where(h => !result.FailedFields.Contains(h.Campo ?? "")).ToList();
+            foreach (var h in resolvedHallazgos)
             {
-                if (existingHallazgo.Resuelto)
+                if (!h.Resuelto)
                 {
-                    existingHallazgo.MarkAsUnresolved();
-                    _dbContext.Hallazgos.Update(existingHallazgo);
+                    h.MarkAsResolved();
+                    _dbContext.Hallazgos.Update(h);
                 }
             }
-            else
+
+            // Add or update currently failed fields
+            foreach (var failedField in result.FailedFields)
             {
-                var newHallazgo = new Domain.Entities.Hallazgo(
-                    request.ProyectoId,
-                    datoValidadoToUse.Id,
-                    failedField,
-                    $"El campo {failedField} no coincide con la base de datos gubernamental.",
-                    Domain.Enums.FindingSeverity.Medium
-                );
-                _dbContext.Hallazgos.Add(newHallazgo);
+                var existingHallazgo = currentHallazgos.FirstOrDefault(h => h.Campo == failedField);
+                if (existingHallazgo != null)
+                {
+                    if (existingHallazgo.Resuelto)
+                    {
+                        existingHallazgo.MarkAsUnresolved();
+                        _dbContext.Hallazgos.Update(existingHallazgo);
+                    }
+                }
+                else
+                {
+                    var newHallazgo = new Domain.Entities.Hallazgo(
+                        request.ProyectoId,
+                        datoValidadoToUse.Id,
+                        failedField,
+                        $"El campo {failedField} no coincide con la base de datos gubernamental.",
+                        Domain.Enums.FindingSeverity.Medium
+                    );
+                    _dbContext.Hallazgos.Add(newHallazgo);
+                }
             }
         }
 
@@ -206,12 +233,33 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         }
     }
 
+    private static string NormalizeDiacritics(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+        var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
+        var sb = new System.Text.StringBuilder();
+        foreach (var c in normalized)
+        {
+            var uc = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+            if (uc != System.Globalization.UnicodeCategory.NonSpacingMark)
+            {
+                sb.Append(c);
+            }
+        }
+        return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
+    }
+
     private (int total, int matched) CompareStr(string? reqVal, string? dbVal)
     {
         if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
-        var r = reqVal.Trim().ToLowerInvariant();
-        var d = (dbVal ?? "").Trim().ToLowerInvariant();
-        bool isMatch = d.Contains(r) || r.Contains(d) || r == d;
+        var r = NormalizeDiacritics(reqVal).Trim().ToLowerInvariant();
+        var d = NormalizeDiacritics(dbVal ?? "").Trim().ToLowerInvariant();
+        
+        // Remove extraneous internal spaces/punctuation for codes and references (e.g. VieneDe "F.414, X.85" vs "F.414,X.85")
+        var rClean = System.Text.RegularExpressions.Regex.Replace(r, @"[\s\.,\-_]+", "");
+        var dClean = System.Text.RegularExpressions.Regex.Replace(d, @"[\s\.,\-_]+", "");
+        
+        bool isMatch = d.Contains(r) || r.Contains(d) || r == d || (rClean.Length > 0 && rClean == dClean);
         return (1, isMatch ? 1 : 0);
     }
 
@@ -225,9 +273,25 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
     private (int total, int matched) CompareSuperficie(string? reqVal, decimal? dbVal)
     {
         if (string.IsNullOrWhiteSpace(reqVal)) return (0, 0);
-        if (!decimal.TryParse(reqVal, out var reqDec)) return (1, 0);
         if (!dbVal.HasValue) return (1, 0);
-        return (1, Math.Abs(reqDec - dbVal.Value) < 1m ? 1 : 0);
+        
+        // Clean string: e.g. "1,183.36 m²" -> "1183.36"
+        var clean = System.Text.RegularExpressions.Regex.Replace(reqVal, @"(?i)[^\d\.,]", "").Trim();
+        if (clean.Contains(',') && clean.Contains('.'))
+        {
+            clean = clean.Replace(",", "");
+        }
+        else if (clean.Contains(',') && !clean.Contains('.'))
+        {
+            clean = clean.Replace(",", ".");
+        }
+
+        if (decimal.TryParse(clean, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var reqDec))
+        {
+            return (1, Math.Abs(reqDec - dbVal.Value) < 1m ? 1 : 0);
+        }
+
+        return (1, 0);
     }
 
     private (int total, int matched) CompareDate(string? reqVal, DateTime? dbVal)
@@ -236,11 +300,62 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (dbVal == null) return (1, 0);
         var r = reqVal.Trim();
         var d = dbVal.Value.ToString("yyyy-MM-dd");
-        return (1, r.StartsWith(d) || d.StartsWith(r) ? 1 : 0);
+        if (r.StartsWith(d) || d.StartsWith(r)) return (1, 1);
+
+        // Extract DD/MM/YYYY or YYYY-MM-DD pattern from string if embedded with narrative text
+        var dateRegex = System.Text.RegularExpressions.Regex.Match(r, @"(?<!\d)(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?!\d)");
+        if (dateRegex.Success)
+        {
+            if (int.TryParse(dateRegex.Groups[1].Value, out var p1) &&
+                int.TryParse(dateRegex.Groups[2].Value, out var p2) &&
+                int.TryParse(dateRegex.Groups[3].Value, out var p3))
+            {
+                if (p3 < 100) p3 += 2000;
+
+                // Check day/month/year (standard Latin/Dominican)
+                try
+                {
+                    var dt1 = new DateTime(p3, p2, p1);
+                    if (dt1.Date == dbVal.Value.Date) return (1, 1);
+                }
+                catch {}
+
+                // Check month/day/year (US format)
+                try
+                {
+                    var dt2 = new DateTime(p3, p1, p2);
+                    if (dt2.Date == dbVal.Value.Date) return (1, 1);
+                }
+                catch {}
+            }
+        }
+
+        // Try parsing flexible dates
+        if (DateTime.TryParse(r, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var dt) ||
+            DateTime.TryParse(r, new System.Globalization.CultureInfo("es-DO"), System.Globalization.DateTimeStyles.None, out dt))
+        {
+            if (dt.Date == dbVal.Value.Date) return (1, 1);
+        }
+
+        // Try standard format patterns (e.g. DD-MM-YYYY, DD/MM/YYYY)
+        string[] formats = { "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy", "yyyy/MM/dd", "d/M/yyyy", "d-M-yyyy", "yyyy-MM-ddTHH:mm:ss" };
+        if (DateTime.TryParseExact(r, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var exactDt))
+        {
+            if (exactDt.Date == dbVal.Value.Date) return (1, 1);
+        }
+
+        return (1, 0);
     }
 
     public async Task<VerificationResult> VerificarCatastroAsync(CatastroVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         Domain.Entities.CatastroTitulo? entity = null;
 
         if (!string.IsNullOrEmpty(request.Matricula))
@@ -252,13 +367,42 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (entity == null && !string.IsNullOrEmpty(request.DesignacionCatastral))
         {
             var des = request.DesignacionCatastral.Trim();
-            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => c.CodigoDesignacionCatastral == des || (c.CodigoDesignacionCatastral != null && c.CodigoDesignacionCatastral.Contains(des)));
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => 
+                c.CodigoDesignacionCatastral == des || 
+                (c.CodigoDesignacionCatastral != null && c.CodigoDesignacionCatastral.Contains(des)) ||
+                c.DesigCatastralPosicional == des ||
+                (c.DesigCatastralPosicional != null && c.DesigCatastralPosicional.Contains(des)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.DesigCatastralPosicional))
+        {
+            var dcp = request.DesigCatastralPosicional.Trim();
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => 
+                c.DesigCatastralPosicional == dcp || 
+                (c.DesigCatastralPosicional != null && c.DesigCatastralPosicional.Contains(dcp)) ||
+                c.CodigoDesignacionCatastral == dcp ||
+                (c.CodigoDesignacionCatastral != null && c.CodigoDesignacionCatastral.Contains(dcp)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.DesignCatastralOrigen))
+        {
+            var dco = request.DesignCatastralOrigen.Trim();
+            entity = await _dbContext.CatastroTitulos.FirstOrDefaultAsync(c => 
+                c.DesignCatastralOrigen == dco || 
+                (c.DesignCatastralOrigen != null && c.DesignCatastralOrigen.Contains(dco)));
         }
 
         if (entity != null)
         {
             var f1 = CompareStr(request.Matricula, entity.Matricula);
-            var f2 = CompareStr(request.DesignacionCatastral, entity.CodigoDesignacionCatastral);
+            
+            (int total, int matched) f2 = (0, 0);
+            if (!string.IsNullOrWhiteSpace(request.DesignacionCatastral))
+            {
+                var matchCod = CompareStr(request.DesignacionCatastral, entity.CodigoDesignacionCatastral);
+                var matchDcp = CompareStr(request.DesignacionCatastral, entity.DesigCatastralPosicional);
+                f2 = (1, (matchCod.matched == 1 || matchDcp.matched == 1) ? 1 : 0);
+            }
 
             // Se eliminó la validación cruzada relajada por solicitud del usuario: 
             // ambas variables (Matrícula y Designación) deben coincidir estrictamente con la base de datos si fueron enviadas.
@@ -310,6 +454,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f10.total == 1 && f10.matched == 0) res.FailedFields.Add("Municipio");
             if (f11.total == 1 && f11.matched == 0) res.FailedFields.Add("SuperficieM2");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -326,12 +477,27 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Provincia)) failRes.FailedFields.Add("Provincia");
         if (!string.IsNullOrWhiteSpace(request.Municipio)) failRes.FailedFields.Add("Municipio");
         if (!string.IsNullOrWhiteSpace(request.SuperficieM2)) failRes.FailedFields.Add("SuperficieM2");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarJceAsync(JceVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         var ced = request.Cedula?.Trim();
         var entity = await _dbContext.JCE_Ciudadanos
             .FirstOrDefaultAsync(c => c.Cedula == ced || (c.Cedula != null && ced != null && c.Cedula.Contains(ced)));
@@ -363,6 +529,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f4.total == 1 && f4.matched == 0) res.FailedFields.Add("FechaNacimiento");
             if (f5.total == 1 && f5.matched == 0) res.FailedFields.Add("FechaExpiracion");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -373,12 +546,27 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Apellidos)) failRes.FailedFields.Add("Apellidos");
         if (!string.IsNullOrWhiteSpace(request.FechaNacimiento)) failRes.FailedFields.Add("FechaNacimiento");
         if (!string.IsNullOrWhiteSpace(request.FechaExpiracion)) failRes.FailedFields.Add("FechaExpiracion");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarDgiiAsync(DgiiVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         var rnc = request.Rnc?.Trim();
         var entity = await _dbContext.DGII
             .FirstOrDefaultAsync(d => d.Rnc == rnc || (d.Rnc != null && rnc != null && d.Rnc.Contains(rnc)));
@@ -406,6 +594,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f2.total == 1 && f2.matched == 0) res.FailedFields.Add("NombreRazonSocial");
             if (f3.total == 1 && f3.matched == 0) res.FailedFields.Add("ActividadEconomica");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -414,12 +609,27 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Rnc)) failRes.FailedFields.Add("Rnc");
         if (!string.IsNullOrWhiteSpace(request.NombreRazonSocial)) failRes.FailedFields.Add("NombreRazonSocial");
         if (!string.IsNullOrWhiteSpace(request.ActividadEconomica)) failRes.FailedFields.Add("ActividadEconomica");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarPermisoSueloAsync(PermisoSueloVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         Domain.Entities.PermisoSuelo? entity = null;
         
         if (!string.IsNullOrEmpty(request.NumeroPermiso))
@@ -472,6 +682,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f6.total == 1 && f6.matched == 0) res.FailedFields.Add("Seccion");
             if (f7.total == 1 && f7.matched == 0) res.FailedFields.Add("Lugar");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
             return res;
         }
@@ -484,22 +701,51 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.Operacion)) failRes.FailedFields.Add("Operacion");
         if (!string.IsNullOrWhiteSpace(request.Seccion)) failRes.FailedFields.Add("Seccion");
         if (!string.IsNullOrWhiteSpace(request.Lugar)) failRes.FailedFields.Add("Lugar");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
 
     public async Task<VerificationResult> VerificarIpiAsync(IpiVerificationRequest request)
     {
+        if (!await IsDiscrepancyCheckEnabledAsync())
+        {
+            var skipped = CreateSkippedResult();
+            await SaveValidationResultAsync(request, skipped);
+            return skipped;
+        }
+
         Domain.Entities.PagoIPI? entity = null;
         
         if (!string.IsNullOrEmpty(request.NoCertificacion))
         {
-            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == request.NoCertificacion);
+            var noCert = request.NoCertificacion.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == noCert || (p.NoCertificacion != null && p.NoCertificacion.Contains(noCert)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.NoInmueble))
+        {
+            var noInm = request.NoInmueble.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.NoInmueble == noInm || (p.NoInmueble != null && p.NoInmueble.Contains(noInm)));
+        }
+
+        if (entity == null && !string.IsNullOrEmpty(request.ParcelaNo))
+        {
+            var parc = request.ParcelaNo.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.ParcelaNo == parc || (p.ParcelaNo != null && p.ParcelaNo.Contains(parc)));
         }
 
         if (entity == null && !string.IsNullOrEmpty(request.Rnc))
         {
-            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.Rnc == request.Rnc);
+            var rnc = request.Rnc.Trim();
+            entity = await _dbContext.PagosIPI.FirstOrDefaultAsync(p => p.Rnc == rnc);
         }
 
         if (entity != null)
@@ -527,6 +773,13 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
             if (f3.total == 1 && f3.matched == 0) res.FailedFields.Add("NoInmueble");
             if (f4.total == 1 && f4.matched == 0) res.FailedFields.Add("ParcelaNo");
 
+            res.DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = "executed",
+                HasDiscrepancies = res.FailedFields.Any(),
+                Findings = res.FailedFields.ToList()
+            };
+
             await SaveValidationResultAsync(request, res);
 
             if (res.IsValid)
@@ -540,6 +793,14 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
         if (!string.IsNullOrWhiteSpace(request.NoCertificacion)) failRes.FailedFields.Add("NoCertificacion");
         if (!string.IsNullOrWhiteSpace(request.NoInmueble)) failRes.FailedFields.Add("NoInmueble");
         if (!string.IsNullOrWhiteSpace(request.ParcelaNo)) failRes.FailedFields.Add("ParcelaNo");
+
+        failRes.DiscrepancyCheck = new DiscrepancyCheckResult
+        {
+            Status = "executed",
+            HasDiscrepancies = failRes.FailedFields.Any(),
+            Findings = failRes.FailedFields.ToList()
+        };
+
         await SaveValidationResultAsync(request, failRes);
         return failRes;
     }
@@ -597,5 +858,56 @@ public class GobernanzaDeDatosService : IGobernanzaDeDatosService
                 $"[Admin] {mensaje}", enlace, proyecto.Id, "Proyecto", ct);
             await _notificacionRepository.AddAsync(adminNotif, ct);
         }
+    }
+
+    public async Task<VerificationResult?> ObtenerResultadoPorDocumentoAsync(Guid documentoId)
+    {
+        var dato = await _dbContext.DatosValidados
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.DocumentoId == documentoId);
+
+        if (dato == null) return null;
+
+        var jsonOptions = new System.Text.Json.JsonSerializerOptions 
+        { 
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase 
+        };
+
+        object? matchedData = null;
+        if (!string.IsNullOrEmpty(dato.DatosMatchJson) && dato.DatosMatchJson != "{}")
+        {
+            try
+            {
+                matchedData = System.Text.Json.JsonSerializer.Deserialize<object>(dato.DatosMatchJson, jsonOptions);
+            }
+            catch { }
+        }
+
+        var hallazgos = await _dbContext.Hallazgos
+            .AsNoTracking()
+            .Where(h => h.DatoValidadoId == dato.Id && !h.Resuelto)
+            .Select(h => h.Campo ?? "")
+            .ToListAsync();
+
+        bool isValid = dato.PorcentajeTotal >= 70;
+        string message = dato.PorcentajeTotal == 100 
+            ? "Validación de discrepancias omitida por configuración administrativa."
+            : (isValid ? $"Validación exitosa ({(int)dato.PorcentajeTotal}% coincidencia)" : "Validación con discrepancias o campos no coincidentes");
+
+        return new VerificationResult
+        {
+            IsValid = isValid,
+            MatchPercentage = (decimal)dato.PorcentajeTotal,
+            Message = message,
+            MatchedData = matchedData,
+            FailedFields = hallazgos,
+            DiscrepancyCheck = new DiscrepancyCheckResult
+            {
+                Status = dato.PorcentajeTotal == 100 ? "skipped" : "executed",
+                Reason = dato.PorcentajeTotal == 100 ? "disabled_by_admin" : null,
+                HasDiscrepancies = hallazgos.Count > 0,
+                Findings = hallazgos
+            }
+        };
     }
 }

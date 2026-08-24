@@ -22,63 +22,9 @@ public static class CertificacionIPIRdPaddleMapper
 
         extraction = extraction with
         {
-            NumeroCertificacion = ExtractField(lines, fullText, "NumeroCertificacion",
-                // Label patterns - flexible for OCR variations (ó→6, ó→o, missing spaces)
-                new[] { 
-                    @"NO\.?\s*DE\s*CERTIFICACI[OÓ6]N",
-                    @"N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ6]N", 
-                    @"CERTIFICACI[OÓ6]N\s*N[ÚU]MERO",
-                    @"CERTIFICACION\s*NO\.?",
-                    @"CERT\.?\s*NO\.?",
-                    @"NO\.?\s*CERTIFICACION",
-                    @"NUMERO\s*CERTIFICACION",
-                    // ponytail: OCR merges "No.deCertificacion" into one blob
-                    @"NO\.?DE\s*CERTIFICACI[OÓ6]N",
-                    @"NO\.DE\.CERTIFICACI[OÓ6]N"
-                },
-                // Regex patterns - capture alphanumeric with hyphens
-                new[] { 
-                    @"(?:NO\.\s*DE\s*CERTIFICACI[OÓ6]N|N[ÚU]MERO\s*DE\s*CERTIFICACI[OÓ6]N|CERTIFICACI[OÓ6]N\s*N[ÚU]MERO|CERTIFICACION\s*NO|NO\s*CERTIFICACION|NUMERO\s*CERTIFICACION)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
-                    // ponytail: DGII merged blob — "No.deCertificaci6nC0121952878225"
-                    @"NO\.?DE\s*CERTIFICACI[OÓ6]N\s*([A-Z0-9]{10,})",
-                    @"NO\.DE\.CERTIFICACI[OÓ6]N\s*([A-Z0-9]{10,})",
-                    @"(?:CERTIFICACI[OÓ6]N\s*)([A-Z0-9\-\/]{6,})",
-                    @"(?:NO\s*DE\s*CERTIFICACION\s*)([A-Z0-9\-\/]{6,})",
-                    // ponytail: DGII format — C followed by 10+ digits
-                    @"\b([Cc]\d{10,})\b",
-                    @"\b([Cc]\d{13})\b"
-                }),
-
-            NumeroInmueble = ExtractField(lines, fullText, "NumeroInmueble",
-                // Label patterns - more flexible for OCR variations
-                new[] { 
-                    @"NO\.?\s*INMUEBLE", 
-                    @"NO\.?\s*INM\.?",
-                    @"N[ÚU]MERO\s*INMUEBLE", 
-                    @"INMUEBLE\s*N[ÚU]MERO",
-                    @"INMUEBLE\s*NO\.?",
-                    @"NUMERO\s*INMUEBLE"
-                },
-                // Regex patterns - capture alphanumeric with hyphens
-                new[] { 
-                    @"(?:NO\.\s*INMUEBLE|N[ÚU]MERO\s*INMUEBLE|INMUEBLE\s*N[ÚU]MERO|INMUEBLE\s*NO|NO\s*INMUEBLE|NUMERO\s*INMUEBLE)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
-                    @"(?:INMUEBLE\s*)([A-Z0-9\-\/]{4,})"
-                }),
-
-            ParcelaNumero = ExtractField(lines, fullText, "ParcelaNumero",
-                // Label patterns - more flexible for OCR variations
-                new[] { 
-                    @"PARCELA\s*NO\.?", 
-                    @"PARCELA\s*N[ÚU]MERO", 
-                    @"N[ÚU]MERO\s*DE\s*PARCELA",
-                    @"NO\.?\s*PARCELA",
-                    @"NUMERO\s*PARCELA"
-                },
-                // Regex patterns - capture alphanumeric with hyphens (cadastral format)
-                new[] { 
-                    @"(?:PARCELA\s*NO\.|PARCELA\s*N[ÚU]MERO|N[ÚU]MERO\s*DE\s*PARCELA|PARCELA\s*NO|NO\s*PARCELA|NUMERO\s*PARCELA)\s*[:\-]?\s*([A-Z0-9\-\/]+)",
-                    @"(?:PARCELA\s*)([A-Z0-9\-\/]{4,})"
-                })
+            NumeroCertificacion = ExtractCertificacion(lines, fullText),
+            NumeroInmueble = ExtractInmueble(lines, fullText),
+            ParcelaNumero = ExtractParcela(lines, fullText)
         };
 
         var warnings = new List<string>();
@@ -120,86 +66,218 @@ public static class CertificacionIPIRdPaddleMapper
         {
             lines.AddRange(ocrResult.Lines.Select(l => l.Text));
         }
-        else
+        else if (!string.IsNullOrWhiteSpace(ocrResult.ExtractedText))
         {
             lines.AddRange(ocrResult.ExtractedText.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries));
         }
         return lines;
     }
 
-    private static ExtractedField ExtractField(List<string> lines, string fullText, string fieldType, string[] labelPatterns, string[] regexPatterns)
+    private static ExtractedField ExtractCertificacion(List<string> lines, string fullText)
     {
-        string? rawValue = null;
+        string? raw = null;
 
-        // Layer 1 & 2: Labeled field extraction + proximity
+        // 1. Direct line scan with label + value
         for (int i = 0; i < lines.Count; i++)
         {
-            var line = lines[i];
-            foreach (var labelPattern in labelPatterns)
-            {
-                if (Regex.IsMatch(line, labelPattern, RegexOptions.IgnoreCase))
-                {
-                    // Check if value is on the same line after the label
-                    var inlineMatch = Regex.Match(line, $@"{labelPattern}\s*[:\-]?\s*(.+)", RegexOptions.IgnoreCase);
-                    if (inlineMatch.Success && !string.IsNullOrWhiteSpace(inlineMatch.Groups[1].Value))
-                    {
-                        var val = inlineMatch.Groups[1].Value.Trim();
-                        if (val != "." && val != ":" && val != "-")
-                        {
-                            rawValue = val;
-                            break;
-                        }
-                    }
+            var line = lines[i].Trim();
 
-                    // Check next line for proximity block (not another all-caps label)
-                    if (i + 1 < lines.Count && !Regex.IsMatch(lines[i + 1], @"^[A-ZÁÉÍÓÚ\s\.\:\-]+$"))
+            // Ignore legal disclaimers mentioning juicio de valor
+            if (line.Contains("juicio", System.StringComparison.OrdinalIgnoreCase) ||
+                line.Contains("declaraciones presentadas", System.StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            // Check inline "No. de Certificación: 338738592876" or "No.deCertificaci6nC0121952878225"
+            var m = Regex.Match(line, @"(?:NO\.?\s*(?:DE\s*)?CERTIFICACI[OÓ6]N|N[ÚU]MERO\s*(?:DE\s*)?CERTIFICACI[OÓ6]N|CERTIFICACI[OÓ6]N\s*NO\.?|CERT\.?\s*NO\.?)\s*[:\-]?\s*([A-Z0-9\-\/]+)", RegexOptions.IgnoreCase);
+            if (m.Success && !string.IsNullOrWhiteSpace(m.Groups[1].Value))
+            {
+                raw = m.Groups[1].Value.Trim();
+                break;
+            }
+
+            // Check proximity (label on line, value on next line)
+            if (Regex.IsMatch(line, @"^(?:NO\.?\s*(?:DE\s*)?CERTIFICACI[OÓ6]N|N[ÚU]MERO\s*(?:DE\s*)?CERTIFICACI[OÓ6]N|CERTIFICACI[OÓ6]N\s*NO\.?|CERT\.?\s*NO\.?)\s*[:\-]?$", RegexOptions.IgnoreCase))
+            {
+                if (i + 1 < lines.Count)
+                {
+                    var next = lines[i + 1].Trim();
+                    if (!string.IsNullOrWhiteSpace(next) && !next.Contains("CERTIFICA", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        rawValue = lines[i + 1];
+                        raw = next;
                         break;
                     }
                 }
             }
-            if (rawValue != null) break;
         }
 
-        // Layer 3: Regex fallback
-        if (string.IsNullOrWhiteSpace(rawValue))
+        // 2. Regex fallback in fullText
+        if (string.IsNullOrWhiteSpace(raw))
         {
-            foreach (var p in regexPatterns)
+            var m = Regex.Match(fullText, @"(?:NO\.?\s*(?:DE\s*)?CERTIFICACI[OÓ6]N|N[ÚU]MERO\s*(?:DE\s*)?CERTIFICACI[OÓ6]N)\s*[:\-]?\s*([A-Z0-9\-\/]{6,})", RegexOptions.IgnoreCase);
+            if (m.Success)
             {
-                var match = Regex.Match(fullText, p, RegexOptions.IgnoreCase);
-                if (match.Success)
+                raw = m.Groups[1].Value.Trim();
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            var m = Regex.Match(fullText, @"\b([Cc]\d{10,13})\b");
+            if (m.Success)
+            {
+                raw = m.Groups[1].Value.Trim();
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(raw))
+        {
+            raw = raw.Trim().TrimEnd('.', ',');
+            // Clean out prefix labels if accidentally captured
+            raw = Regex.Replace(raw, @"^(?:NO\.?\s*(?:DE\s*)?CERTIFICACI[OÓ6]N\s*[:\-]?)+", "", RegexOptions.IgnoreCase).Trim();
+
+            // Extract alphanumeric characters only, preserving hyphens if in code like CERT-2024-001234
+            string normalized = raw.Contains('-') 
+                ? Regex.Replace(raw, @"[^A-Za-z0-9\-]", "").ToUpperInvariant()
+                : Regex.Replace(raw, @"[^A-Za-z0-9]", "").ToUpperInvariant();
+
+            if (normalized.Length >= 4)
+            {
+                return new ExtractedField
                 {
-                    rawValue = match.Groups.Count > 1 ? match.Groups[1].Value : match.Value;
+                    RawValue = raw,
+                    NormalizedValue = normalized,
+                    Confidence = 0.9,
+                    Status = FieldStatus.Valid,
+                    SourcePage = 1
+                };
+            }
+        }
+
+        return new ExtractedField { Status = FieldStatus.Missing };
+    }
+
+    private static ExtractedField ExtractInmueble(List<string> lines, string fullText)
+    {
+        string? raw = null;
+
+        // 1. Direct line scan
+        for (int i = 0; i < lines.Count; i++)
+        {
+            var line = lines[i].Trim();
+
+            // Check if line is ONLY a label, then value is on next line (proximity)
+            if (Regex.IsMatch(line, @"^(?:NO\.?\s*INMUEB[IL1]E|INMUEB[IL1]E\s*(?:NO\.?|N[ÚU]MERO|NUM\.?)|N[ÚU]MERO\s*INMUEB[IL1]E|NO\.?\s*INM\b\.?)\s*[:\-]?$", RegexOptions.IgnoreCase))
+            {
+                if (i + 1 < lines.Count)
+                {
+                    var next = lines[i + 1].Trim().TrimEnd(',', '.');
+                    if (next.Length >= 4 && !Regex.IsMatch(next, @"^(?:PARCELA|CERTIFICACION|TITULO)", RegexOptions.IgnoreCase))
+                    {
+                        raw = next;
+                        break;
+                    }
+                }
+            }
+
+            // Match inline: "Inmuebie no. 070223482149:0021" or "inmueble no.136400513193" or "NO. INMUEBLE: INM-456789"
+            var m = Regex.Match(line, @"(?:NO\.?\s*INMUEB[IL1]E|N[ÚU]MERO\s*INMUEB[IL1]E|INMUEB[IL1]E\s*(?:NO\.?|N[ÚU]MERO|NUM\.?)|NO\.?\s*INM\b\.?)\s*[:\-]?\s*([0-9]{10,14}(?::[0-9]{1,4})?|[A-Z0-9\-\/:]+)", RegexOptions.IgnoreCase);
+            if (m.Success && !string.IsNullOrWhiteSpace(m.Groups[1].Value))
+            {
+                var val = m.Groups[1].Value.Trim().TrimEnd(',', '.');
+                if (val.Length >= 4 && val != "SN" && !val.Equals("CERTIFICA", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    raw = val;
                     break;
                 }
             }
         }
 
-        // Layer 4: Canonical Normalization — field-specific per DGII format
-        // DGII IPI certificate fields have distinct formats:
-        //   Inmueble No.   → pure digits (e.g. 458901236754)
-        //   Parcela No.    → catastral: digits, colons, hyphens (e.g. 150106256710:4-A)
-        //   Certificación  → alphanumeric with optional prefix (e.g. C0348921465789)
-        if (!string.IsNullOrWhiteSpace(rawValue))
+        // 2. Full text regex fallback
+        if (string.IsNullOrWhiteSpace(raw))
         {
-            rawValue = rawValue.Trim().TrimEnd('.');
-            string normalizedValue = fieldType switch
+            var m = Regex.Match(fullText, @"(?:NO\.?\s*INMUEB[IL1]E|N[ÚU]MERO\s*INMUEB[IL1]E|INMUEB[IL1]E\s*(?:NO\.?|N[ÚU]MERO|NUM\.?)|NO\.?\s*INM\b\.?)\s*[:\-]?\s*([0-9]{10,14}(?::[0-9]{1,4})?|[A-Z0-9\-\/:]+)", RegexOptions.IgnoreCase);
+            if (m.Success)
             {
-                // DGII format: pure digits, no hyphens, no colons
-                "NumeroInmueble" => Regex.Replace(rawValue, @"[^0-9]", ""),
-                // Catastral format: digits, optional :digits, optional -letter(s). Truncate noise. (e.g. 150106256710:4-A)
-                "ParcelaNumero" => NormalizeParcela(rawValue),
-                // Certificate format: alphanumeric only, preserve C prefix (e.g. C0348921465789)
-                "NumeroCertificacion" => Regex.Replace(rawValue, @"[^A-Za-z0-9]", "").ToUpperInvariant(),
-                _ => SharedFieldNormalizer.NormalizeDesignacionCatastral(rawValue)
-            };
+                raw = m.Groups[1].Value.Trim().TrimEnd(',', '.');
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(raw))
+        {
+            raw = raw.Trim().TrimEnd('.', ',');
+            string normalized = raw.Trim();
 
             return new ExtractedField
             {
-                RawValue = rawValue,
-                NormalizedValue = normalizedValue,
-                Confidence = 0.8,
+                RawValue = raw,
+                NormalizedValue = normalized,
+                Confidence = 0.9,
+                Status = FieldStatus.Valid,
+                SourcePage = 1
+            };
+        }
+
+        return new ExtractedField { Status = FieldStatus.Missing };
+    }
+
+    private static ExtractedField ExtractParcela(List<string> lines, string fullText)
+    {
+        string? raw = null;
+
+        // 1. Direct line scan
+        for (int i = 0; i < lines.Count; i++)
+        {
+            var line = lines[i].Trim();
+
+            // Check proximity (label only on line)
+            if (Regex.IsMatch(line, @"^(?:(?:identificado\s*(?:camo|como)\s*)?PARCELA\s*(?:NO\.?|N[ÚU]MERO|NUM\.?)|N[ÚU]MERO\s*DE\s*PARCELA|NO\.?\s*PARCELA)\s*[:\-]?$", RegexOptions.IgnoreCase))
+            {
+                if (i + 1 < lines.Count)
+                {
+                    var next = lines[i + 1].Trim().TrimEnd(',', '.');
+                    if (next.Length >= 4 && !Regex.IsMatch(next, @"^(?:INMUEBLE|CERTIFICACION|TITULO)", RegexOptions.IgnoreCase))
+                    {
+                        raw = next;
+                        break;
+                    }
+                }
+            }
+
+            // Match inline "Parcela No. 070223482149, D.C. No." or "Parcela No.309466754512:4-A" or "PARCELA NO.: 3094667545124-AD"
+            var m = Regex.Match(line, @"(?:(?:identificado\s*(?:camo|como)\s*)?PARCELA\s*(?:NO\.?|N[ÚU]MERO|NUM\.?)|N[ÚU]MERO\s*DE\s*PARCELA|NO\.?\s*PARCELA)\s*[:\-]?\s*([A-Z0-9\-\/:]+)", RegexOptions.IgnoreCase);
+            if (m.Success && !string.IsNullOrWhiteSpace(m.Groups[1].Value))
+            {
+                var val = m.Groups[1].Value.Trim().TrimEnd(',', '.');
+                if (val.Length >= 4)
+                {
+                    raw = val;
+                    break;
+                }
+            }
+        }
+
+        // 2. Full text regex fallback
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            var m = Regex.Match(fullText, @"(?:(?:identificado\s*(?:camo|como)\s*)?PARCELA\s*(?:NO\.?|N[ÚU]MERO|NUM\.?))\s*[:\-]?\s*([A-Z0-9\-\/:]+)", RegexOptions.IgnoreCase);
+            if (m.Success)
+            {
+                raw = m.Groups[1].Value.Trim().TrimEnd(',', '.');
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(raw))
+        {
+            raw = raw.Trim().TrimEnd('.', ',');
+            string normalized = NormalizeParcela(raw);
+
+            return new ExtractedField
+            {
+                RawValue = raw,
+                NormalizedValue = normalized,
+                Confidence = 0.9,
                 Status = FieldStatus.Valid,
                 SourcePage = 1
             };
@@ -214,18 +292,21 @@ public static class CertificacionIPIRdPaddleMapper
     /// </summary>
     private static string NormalizeParcela(string raw)
     {
-        var clean = Regex.Replace(raw, @"[^A-Za-z0-9:-]", "");
+        // Stop before any trailing D.C., Solar, Manzana, Apto labels
+        var cleaned = Regex.Replace(raw, @"[\s,]+(?:D\.?C\.?|Solar|Manzana|Apto|Unidad).*$", "", RegexOptions.IgnoreCase).Trim();
+
+        var clean = Regex.Replace(cleaned, @"[^A-Za-z0-9:-]", "");
 
         if (!clean.Contains(':'))
         {
-            var repair = Regex.Match(clean, @"^(\d{10,})(\d)(-[A-Za-z]{1,2})$");
+            var repair = Regex.Match(clean, @"^(\d{10,12})(\d)(-[A-Za-z0-9]{1,2})$");
             if (repair.Success)
             {
                 clean = $"{repair.Groups[1].Value}:{repair.Groups[2].Value}{repair.Groups[3].Value}";
             }
         }
 
-        var match = Regex.Match(clean, @"^(\d+(:\d+)?(-[A-Z])?)");
+        var match = Regex.Match(clean, @"^(\d+(?::\d+(?:-[A-Za-z])?|-[A-Za-z]+)?)", RegexOptions.IgnoreCase);
         return match.Success ? match.Groups[1].Value.ToUpperInvariant() : clean.ToUpperInvariant();
     }
 }

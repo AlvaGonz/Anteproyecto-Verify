@@ -34,12 +34,12 @@ test.describe('Public Project Route (/p/:id) Authorization Gate', () => {
     // The frontend tries to refresh the token on startup
     await page.route('**/api/auth/refresh', async route => {
       await authPromise;
-      await route.fulfill({ status: 401 }); // Unauthenticated
+      await route.fulfill({ status: 200, json: { accessToken: "test-token" } }); // Authenticated
     });
 
     await page.route('**/api/auth/me', async route => {
       await authPromise;
-      await route.fulfill({ status: 401 }); // Unauthenticated
+      await route.fulfill({ status: 200, json: { id: "test-user", role: "user" } }); // Authenticated
     });
 
     // Navigate to the public project page
@@ -61,6 +61,31 @@ test.describe('Public Project Route (/p/:id) Authorization Gate', () => {
     // After auth resolves, the project data fetch should happen, and the project content should appear
     await expect(page.locator('text=Test Project Content')).toBeVisible();
     expect(projectRequestMade).toBe(true);
+  });
+
+  test('redirects unauthenticated users on direct /p/:id access', async ({ page }) => {
+    let projectRequestMade = false;
+    await page.route(`**/api/projects/${TEST_PROJECT_ID}`, async route => {
+      projectRequestMade = true;
+      await route.fulfill({ json: mockProjectData });
+    });
+
+    await page.route('**/api/auth/refresh', async route => {
+      await route.fulfill({ status: 401 }); // Unauthenticated
+    });
+
+    await page.route('**/api/auth/me', async route => {
+      await route.fulfill({ status: 401 }); // Unauthenticated
+    });
+
+    // Navigate to the public project page
+    await page.goto(`/#/p/${TEST_PROJECT_ID}`);
+
+    // We should be redirected to the login page
+    await expect(page).toHaveURL(/.*#\/login/);
+
+    // The private endpoint should NEVER be called
+    expect(projectRequestMade).toBe(false);
   });
 
   test('handles QR routes with valid token, bypassing private project request entirely', async ({ page }) => {

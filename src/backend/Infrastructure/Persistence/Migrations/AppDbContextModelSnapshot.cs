@@ -1564,6 +1564,10 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<bool>("Activa")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Codigo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("CondicionLogica")
                         .IsRequired()
                         .HasMaxLength(2000)
@@ -1580,8 +1584,20 @@ namespace Infrastructure.Persistence.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("Expresion")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime>("FechaCreacionUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("MaxValor")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("MinValor")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("NivelAlerta")
                         .HasColumnType("int");
@@ -1594,6 +1610,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("ReglaAnteriorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<byte[]>("RowVersion")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<int>("TipoDocumentoAplicable")
                         .HasColumnType("int");
 
@@ -1603,6 +1622,10 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal?>("ValorUmbral")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<int>("Version")
                         .HasColumnType("int");
 
@@ -1610,7 +1633,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CreadaPor");
 
-                    b.ToTable("ReglasValidacion");
+                    b.ToTable("ReglasValidacion", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Reporte", b =>
@@ -2131,7 +2154,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.ToTable("Usuario", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Usuario_Cedula_Rnc", "([Cedula] IS NOT NULL AND [Cedula] <> '') OR ([Rnc] IS NOT NULL AND [Rnc] <> '')");
+                            t.HasCheckConstraint("CK_Usuario_Cedula_Rnc", "([SocialLogin] = 1) OR ([TitularId] IS NOT NULL) OR ([Cedula] IS NOT NULL AND [Cedula] <> '') OR ([Rnc] IS NOT NULL AND [Rnc] <> '')");
                         });
                 });
 

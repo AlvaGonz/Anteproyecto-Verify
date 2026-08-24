@@ -5,6 +5,18 @@ const MOCK_DOCUMENT_ID = "doc-001";
 
 test.describe("Discrepancy Validation E2E", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("vf_has_session", "true");
+    });
+
+    await page.route("**/api/validationrules/global/discrepancy-enabled", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: "true"
+      });
+    });
+
     // Mock user auth
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({
@@ -119,8 +131,8 @@ test.describe("Discrepancy Validation E2E", () => {
     await expect(alertDialog).toBeVisible();
 
     // 5. Assert it mentions the specific discrepancies
-    await expect(alertDialog).toContainText("Provincia");
-    await expect(alertDialog).toContainText("Matrícula");
+    await expect(alertDialog).toContainText("provincia");
+    await expect(alertDialog).toContainText("matricula");
     await expect(alertDialog).toContainText("12345"); // Project matricula
     await expect(alertDialog).toContainText("67890"); // Doc matricula
     await expect(alertDialog).toContainText("La Romana"); // Project provincia

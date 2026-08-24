@@ -14,6 +14,7 @@ const ProjectManageLayout = lazy(() => import("../pages/projects/ProjectManageLa
 const ProjectValidationPage = lazy(() => import("../pages/projects/ProjectValidationPage").then(m => ({ default: m.ProjectValidationPage })));
 const ProjectReportsPage = lazy(() => import("../pages/admin/ProjectReportsPage").then(m => ({ default: m.ProjectReportsPage })));
 const RulesManagePage = lazy(() => import("../pages/admin/RulesManagePage").then(m => ({ default: m.RulesManagePage })));
+const ToleranceRuleEdit = lazy(() => import("../pages/admin/rules/ToleranceRuleEdit").then(m => ({ default: m.ToleranceRuleEdit })));
 const SettingsPage = lazy(() => import("../pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
 const PublicVerifyResultPage = lazy(() => import("../pages/public/PublicVerifyResultPage").then(m => ({ default: m.PublicVerifyResultPage })));
 const LoginPage = lazy(() => import("../pages/auth/LoginPage").then(m => ({ default: m.LoginPage })));
@@ -71,7 +72,8 @@ const ProjectManageShell = () => (
 
 const AdminRulesGuard = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
-  if (user?.role !== "admin") return <Navigate to="/admin/dashboard" replace />;
+  const isAdmin = user?.role === "admin" || user?.role === "Administrator";
+  if (!isAdmin) return <Navigate to="/admin/dashboard" replace />;
   return <>{children}</>;
 };
 
@@ -303,6 +305,10 @@ export const router = createHashRouter([
           {
             path: "rules",
             element: <AdminRulesGuard><RulesManagePage /></AdminRulesGuard>,
+          },
+          {
+            path: "rules/:id/edit",
+            element: <AdminRulesGuard><ToleranceRuleEdit /></AdminRulesGuard>,
           },
           {
             path: "settings",

@@ -1,5 +1,6 @@
 namespace Application.Features.ReglasValidacion.Queries.GetValidationRules;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,15 +23,21 @@ public class GetValidationRulesQueryHandler
         return reglas.Select(r => new ReglaValidacionDto
         {
             Id = r.Id,
+            Codigo = r.Codigo,
             Nombre = r.Nombre,
             Descripcion = r.Descripcion,
             CondicionLogica = r.CondicionLogica,
+            Expresion = r.Expresion,
+            ValorUmbral = r.ValorUmbral,
+            MinValor = r.MinValor,
+            MaxValor = r.MaxValor,
             TipoDocumentoAplicable = r.TipoDocumentoAplicable.ToString(),
             NivelAlerta = r.NivelAlerta.ToString(),
             TipoProyecto = r.TipoProyecto.ToString(),
             Activa = r.Activa,
             Version = r.Version,
-            FechaCreacionUtc = r.FechaCreacionUtc
+            FechaCreacionUtc = r.FechaCreacionUtc,
+            RowVersion = r.RowVersion != null ? Convert.ToBase64String(r.RowVersion) : null
         });
     }
 }

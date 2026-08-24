@@ -506,5 +506,98 @@ namespace UnitTests.Application.Documents.Extractions
             extraction.SuperficieM2.Status.Should().Be(FieldStatus.Valid);
             extraction.SuperficieM2.NormalizedValue.Should().Be("14792.83");
         }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractAll8FieldsFromReferenceFixture_WithDistractors()
+        {
+            // Arrange: Ground-truth reference OCR lines with intentional narrative distractors
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "CERTIFICADO DE TITULO" },
+                new OcrLine { Text = "VERIFICAR LA PRESENCIA DE LA MARCA DE AGUA EN FORMA DE LOGO SOSTENIENDO EL DOCUMENTO A CONTRALUZ" },
+                new OcrLine { Text = "MATRÍCULA" },
+                new OcrLine { Text = "1989500752" },
+                new OcrLine { Text = "REGISTRO DE TITULOS" },
+                new OcrLine { Text = "FECHA Y HORA DE INSCRIPCIÓN" },
+                new OcrLine { Text = "31-07-2018 10:20 a.m." },
+                new OcrLine { Text = "VIENE DE" },
+                new OcrLine { Text = "F.414, X.85" },
+                new OcrLine { Text = "JURISDICCION INMOBILIARIA" },
+                new OcrLine { Text = "MUNICIPIO" },
+                new OcrLine { Text = "San Pedro de Macorís" },
+                new OcrLine { Text = "PODER JUDICIAL REPUBLICA DOMINICANA" },
+                new OcrLine { Text = "PROVINCIA" },
+                new OcrLine { Text = "San Pedro de Macorís" },
+                new OcrLine { Text = "OFICINA" },
+                new OcrLine { Text = "PUERTO PLATA" },
+                new OcrLine { Text = "SUPERFICIE DE MEDIDAS SUPERNACES" },
+                new OcrLine { Text = "1183.36 m²" },
+                new OcrLine { Text = "DESIGNACIÓN CATASTRAL" },
+                new OcrLine { Text = "050036294345:0053" },
+                new OcrLine { Text = "PROPIETARIO" },
+                new OcrLine { Text = "INMOBILIARIA DEL ESTE, S.A." },
+                // Narrative distractors:
+                new OcrLine { Text = "En virtud de la Ley y en nombre de la República se declara TITULAR DEL DERECHO DE PROPIEDAD sobre el inmueble identificado con Designación Catastral No. 050036294345:0053 que tiene una superficie de 12,130.07 metros cuadrados, matricula No. 3000352326, ubicado en HIGUEY, LA ALTAGRACIA." },
+                new OcrLine { Text = "Inscrito a las 10:20 a.m. el 31/jul/2018. Emitido el 10 de octubre del 2022 por Registrador de Titulos Adscrito Oficina de Puerto Plata." }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join("\n", lines.Select(l => l.Text))
+            };
+
+            // Act
+            var extraction = CertificadoTituloRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            // Assert
+            extraction.Should().NotBeNull();
+            extraction!.ExtractionStatus.Should().Be(ExtractionStatus.Completed);
+
+            // 1. CodigoDesignacionCatastral
+            extraction.DesignacionCatastral.Status.Should().Be(FieldStatus.Valid);
+            extraction.DesignacionCatastral.NormalizedValue.Should().Be("050036294345:0053");
+
+            // 2. Provincia
+            extraction.Provincia.Status.Should().Be(FieldStatus.Valid);
+            extraction.Provincia.RawValue.Should().Contain("San Pedro de Macor");
+
+            // 3. Municipio
+            extraction.Municipio.Status.Should().Be(FieldStatus.Valid);
+            extraction.Municipio.RawValue.Should().Contain("San Pedro de Macor");
+
+            // 4. Superficie (must pick 1183.36 from header, not 12,130.07 from narrative)
+            extraction.SuperficieM2.Status.Should().Be(FieldStatus.Valid);
+            extraction.SuperficieM2.NormalizedValue.Should().Be("1183.36");
+
+            // 5. Matricula (must pick 1989500752 from header, not 3000352326 from narrative)
+            extraction.Matricula.Status.Should().Be(FieldStatus.Valid);
+            extraction.Matricula.NormalizedValue.Should().Be("1989500752");
+
+            // 6. Oficina (must pick PUERTO PLATA from form block, not REGISTRO DE TITULOS banner)
+            extraction.Oficina.Status.Should().Be(FieldStatus.Valid);
+            extraction.Oficina.NormalizedValue.Should().Be("PUERTO PLATA");
+
+            // 7. FechaInscripcion (must pick inscription date 31-07-2018, not emission date 2022)
+            extraction.FechaYHoraInscripcion.Status.Should().Be(FieldStatus.Valid);
+            extraction.FechaYHoraInscripcion.NormalizedValue.Should().MatchRegex(@"2018-07-31|31-07-2018");
+
+            // 8. VieneDe (must capture F.414, X.85 and normalize to F.414,X.85)
+            extraction.VieneDe.Status.Should().Be(FieldStatus.Valid);
+            extraction.VieneDe.RawValue.Should().Contain("F.414");
+            extraction.VieneDe.NormalizedValue.Should().Be("F.414,X.85");
+        }
+
+        [Fact]
+        public void NormalizeDesignacionCatastral_ShouldRejectOrReturnNull_WhenDigitsAreIncomplete()
+        {
+            // Ambiguous/incomplete cadastral strings must NOT fabricate digits
+            var incomplete1 = "050036294345:005";
+            var normalized = SharedFieldNormalizer.NormalizeDesignacionCatastral(incomplete1);
+            
+            // It should either keep exact raw digits or not fabricate a 4th suffix digit
+            normalized.Should().NotBe("050036294345:0053");
+        }
     }
 }

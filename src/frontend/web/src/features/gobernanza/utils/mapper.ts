@@ -16,6 +16,9 @@ export const mapDocumentToVerificationPayload = (
   switch (document.tipoDocumento) {
     case DocumentType.CertificadoTitulo:
     case DocumentType.TITLE:
+    case DocumentType.CertificacionEstadoJuridico:
+    case DocumentType.LEGAL_STATUS:
+    case DocumentType.PlanoMensuraCatastral:
       return {
         apiDocType: 'catastro',
         payload: {
@@ -31,9 +34,12 @@ export const mapDocumentToVerificationPayload = (
             return val;
           })(),
           oficina: getValue('oficina'),
-          fechaInscripcion: getValue('fechaYHoraInscripcion'),
-          fechaEmision: getValue('fechaEmision'),
+          fechaInscripcion: getValue('fechaYHoraInscripcion') || getValue('fechaInscripcion'),
+          fechaEmision: getValue('fechaHoraInscripcion') || getValue('fechaEmision'),
           vieneDe: getValue('vieneDe'),
+          superficieM2: getValue('superficieMetrosCuadrados') || getValue('superficieM2'),
+          provincia: getValue('provincia'),
+          municipio: getValue('municipio'),
           designCatastralOrigen: getValue('designCatastralOrigen'),
           desigCatastralPosicional: getValue('desigCatastralPosicional'),
         }
@@ -114,20 +120,14 @@ export const getValidationStatus = (
   
   if (matchedData === undefined) return { status: null, message: '' };
 
-  const normalizedUi = String(uiValue || '').trim().toLowerCase();
-
-  if (normalizedUi === '') {
-    return { status: 'error', message: '' };
-  }
-
   const nameMap: Record<string, string> = {
       'fechaYHoraInscripcion': 'FechaInscripcion',
       'fechaHoraInscripcion': 'FechaEmision',
-      'superficieM2': 'SuperficieM2',
-      'superficieMetrosCuadrados': 'SuperficieM2',
-      'superficieARegistrarParcelaM2': 'SuperficieM2',
+      'superficieM2': 'Superficie',
+      'superficieMetrosCuadrados': 'Superficie',
+      'superficieARegistrarParcelaM2': 'Superficie',
       'vieneDe': 'VieneDe',
-      'designacionCatastral': 'DesignacionCatastral',
+      'designacionCatastral': 'CodigoDesignacionCatastral',
       'designacionCatastralPosicional': 'DesigCatastralPosicional',
       'designacionCatastralOrigen': 'DesignCatastralOrigen',
       'cedulaNumber': 'Cedula',
@@ -144,27 +144,22 @@ export const getValidationStatus = (
       'provincia': 'Provincia'
   };
 
-  // If we know the field name, we compare directly with that field in the DB.
-  if (fieldName) {
-    const mappedName = nameMap[fieldName] || fieldName;
-    const actualKey = Object.keys(matchedData).find(k => k.toLowerCase() === mappedName.toLowerCase() || k.toLowerCase() === fieldName.toLowerCase());
-    
-    if (actualKey) {
-      const dbValue = String(matchedData[actualKey] || '').trim().toLowerCase();
-      if (dbValue === normalizedUi) {
-        return { status: 'check', message: '' };
-      }
-      if (dbValue !== '' && (dbValue.includes(normalizedUi) || normalizedUi.includes(dbValue))) {
-        return { status: 'warning', message: '' };
-      }
-      return { status: 'error', message: '' };
-    }
-  }
+  const normalize = (val: any) =>
+    String(val || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[,\.:\s]/g, '')
+      .toLowerCase();
 
-  // If no fieldName provided or not found in matchedData, check failedFields as fallback
+  // If backend provided failedFields list, it is the authoritative validation source
   if (fieldName && failedFields) {
     const mappedName = nameMap[fieldName] || fieldName;
-    const isFailed = failedFields.some(f => f.toLowerCase() === mappedName.toLowerCase() || f.toLowerCase() === fieldName.toLowerCase());
+    const isFailed = failedFields.some(
+      f => f.toLowerCase() === mappedName.toLowerCase() ||
+           f.toLowerCase() === fieldName.toLowerCase() ||
+           (fieldName === 'designacionCatastral' && f.toLowerCase() === 'designacioncatastral') ||
+           (fieldName === 'superficieM2' && f.toLowerCase() === 'superficie')
+    );
     
     if (isFailed) {
       return { status: 'error', message: '' };
@@ -172,6 +167,26 @@ export const getValidationStatus = (
     return { status: 'check', message: '' };
   }
 
-  // Fallback if everything else fails (should not happen with proper field mapping)
-  return { status: 'error', message: '' };
+  const normalizedUi = normalize(uiValue);
+  if (normalizedUi === '') {
+    return { status: 'error', message: '' };
+  }
+
+  // If we know the field name, we compare directly with that field in the DB.
+  if (fieldName) {
+    const mappedName = nameMap[fieldName] || fieldName;
+    const actualKey = Object.keys(matchedData).find(
+      k => k.toLowerCase() === mappedName.toLowerCase() || k.toLowerCase() === fieldName.toLowerCase()
+    );
+    
+    if (actualKey) {
+      const dbValue = normalize(matchedData[actualKey]);
+      if (dbValue === normalizedUi || (dbValue !== '' && (dbValue.includes(normalizedUi) || normalizedUi.includes(dbValue)))) {
+        return { status: 'check', message: '' };
+      }
+      return { status: 'error', message: '' };
+    }
+  }
+
+  return { status: 'check', message: '' };
 };

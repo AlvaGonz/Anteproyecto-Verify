@@ -169,9 +169,8 @@ public class ProjectService : IProjectService
         }
         
         await _proyectoRepository.AddAsync(proyecto, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // ponytail: log creation as initial status entry for history timeline
+        // ponytail: log creation as initial status entry for history timeline (staged before single commit)
         await _auditLogger.Append(new AuditEntryDto
         {
             UsuarioId = dto.UsuarioCreadorId,
@@ -182,6 +181,7 @@ public class ProjectService : IProjectService
             EstadoAnteriorId = null,
             EstadoNuevoId = estadoCreado.Id
         }, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         await NotifyProjectEvent(usuario, proyecto, TipoNotificacionId.ProyectoCreado,

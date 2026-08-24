@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -36,7 +36,7 @@ namespace Infrastructure.Persistence.Migrations
                 name: "JCE_Ciudadano",
                 columns: table => new
                 {
-                    Cedula = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Cedula = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Nombres = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Apellidos = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),

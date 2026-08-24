@@ -57,4 +57,14 @@ public class GobernanzaDeDatosController : ControllerBase
         var result = await _gobernanzaService.VerificarIpiAsync(request);
         return Ok(result);
     }
+
+    [HttpGet("resultado/{documentoId:guid}")]
+    [ProducesResponseType(typeof(VerificationResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ObtenerResultadoPorDocumento(Guid documentoId)
+    {
+        var result = await _gobernanzaService.ObtenerResultadoPorDocumentoAsync(documentoId);
+        if (result == null) return NotFound();
+        return Ok(result);
+    }
 }

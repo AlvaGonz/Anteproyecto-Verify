@@ -283,6 +283,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/status")]
+    [Authorize(Roles = "admin,Administrator")]
     public async Task<ActionResult<ProyectoDto>> UpdateProjectStatus(Guid id, [FromBody] string statusCode, CancellationToken cancellationToken)
     {
         if (!ProjectStatusCodes.TryParseCodigoUnico(statusCode, out var status))

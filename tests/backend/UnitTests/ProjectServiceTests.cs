@@ -1,4 +1,4 @@
-﻿namespace UnitTests;
+namespace UnitTests;
 
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,9 @@ public class ProjectServiceTests
     private readonly Mock<IUsuarioRepository> _usuarioRepositoryMock;
     private readonly Mock<IEmailNotificationService> _emailNotificationServiceMock;
     private readonly Mock<INotificationFactory> _notificationFactoryMock;
+    private readonly Mock<INotificacionRepository> _notificacionRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<global::Application.Abstractions.IAuditLogger> _auditLoggerMock;
     private readonly ProjectService _projectService;
 
     public ProjectServiceTests()
@@ -30,15 +32,17 @@ public class ProjectServiceTests
         _usuarioRepositoryMock = new Mock<IUsuarioRepository>();
         _emailNotificationServiceMock = new Mock<IEmailNotificationService>();
         _notificationFactoryMock = new Mock<INotificationFactory>();
+        _notificacionRepositoryMock = new Mock<INotificacionRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _auditLoggerMock = new Mock<global::Application.Abstractions.IAuditLogger>();
         _projectService = new ProjectService(
             _proyectoRepositoryMock.Object,
             _usuarioRepositoryMock.Object,
             _emailNotificationServiceMock.Object,
             _notificationFactoryMock.Object,
-            new Mock<INotificacionRepository>().Object,
+            _notificacionRepositoryMock.Object,
             _unitOfWorkMock.Object,
-            new Mock<global::Application.Abstractions.IAuditLogger>().Object,
+            _auditLoggerMock.Object,
             new Mock<IReglaValidacionRepository>().Object);
     }
 
@@ -79,6 +83,44 @@ public class ProjectServiceTests
         Assert.Equal("DevData", result.DatosDesarrollador);
         Assert.Equal("DC-123", result.DesignacionCatastral);
         Assert.Equal(ProjectStatusCodes.Creado, result.EstadoProyecto);
+
+        // Assert single atomic save & audit staging
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _auditLoggerMock.Verify(a => a.Append(It.Is<global::Application.Abstractions.AuditEntryDto>(e => e.ReferenciaExpedienteId == result.Id && e.Accion == "Creación"), It.IsAny<CancellationToken>()), Times.Once);
+        _auditLoggerMock.Verify(a => a.AppendAsync(It.IsAny<global::Application.Abstractions.AuditEntryDto>(), It.IsAny<CancellationToken>()), Times.Never);
+        _notificationFactoryMock.Verify(f => f.CreateAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), result.Id, "Proyecto", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateProject_WhenSaveFails_DoesNotSendNotification_AndThrowsException()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var dto = new CreateProyectoDto("Test", "Location", userId, 8, "DevData", null, "DC-123");
+        
+        var plan = Tests.Shared.TestPlanFactory.Profesional();
+        var user = new Usuario("Test", "User", "test@test.com", "hash", UserRole.User, "123456", "40200000000");
+        user.GetType().GetProperty("Id")?.SetValue(user, userId);
+        user.GetType().GetProperty("Plan")?.SetValue(user, plan);
+        user.UpdateStripeSubscription("mock_sub", "active", DateTime.UtcNow.AddMonths(1));
+        
+        _usuarioRepositoryMock.Setup(r => r.GetByIdWithPlanAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        var estadoCreado = new ProyectoEstado(ProjectStatusCodes.Creado, "Creado", "desc", "cond", "#9BACD8");
+        _proyectoRepositoryMock.Setup(r => r.GetCategoriasAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CategoriaProyecto>
+            {
+                new CategoriaProyecto { Id = 8, Nombre = "COMERCIAL Y OFICINAS", Activo = true },
+            });
+        _proyectoRepositoryMock.Setup(r => r.GetEstadoByStatusAsync(ProjectStatus.Creado, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(estadoCreado);
+        _proyectoRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Proyecto>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException("DB commit failure"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _projectService.CreateProjectAsync(dto));
+
+        _notificationFactoryMock.Verify(f => f.CreateAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _notificacionRepositoryMock.Verify(n => n.AddAsync(It.IsAny<Notificacion>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

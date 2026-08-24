@@ -3,10 +3,22 @@ import {
   LayoutDashboard,
   Check,
   FileWarning,
+  Sliders,
+  Edit3,
+  Maximize2,
+  AlertTriangle,
+  ShieldAlert,
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useCreateRule, useToggleRule } from "../../features/rules/api/useRules";
+import {
+  useCreateRule,
+  useToggleRule,
+  useRules,
+  useUpdateRule,
+  useDiscrepancyEnabled,
+  useSetDiscrepancyEnabled,
+} from "../../features/rules/api/useRules";
 
 export const RulesManagePageLayout: React.FC = React.memo(() => (
   <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
@@ -30,12 +42,383 @@ export const RulesManagePageLayout: React.FC = React.memo(() => (
       </div>
     </div>
 
-    {/* IPI Oposición Rule Banner — first-class configurable parameter */}
-    <div className="mb-8">
+    {/* Rules Grid / List */}
+    <div className="flex flex-col gap-6">
+      {/* Global Discrepancy Validation Card */}
+      <GlobalDiscrepancyCard />
+
+      {/* Rule 8: Tolerancia Superficie vs Mensura */}
+      <ToleranceSurfaceCard />
+
+      {/* Rule 1: IPI Oposición Rule Banner */}
       <IpiOposicionCard />
     </div>
   </div>
 ));
+
+// ─── Global Discrepancy Validation Card ────────────────────────────────────────
+
+export const GlobalDiscrepancyCard: React.FC = () => {
+  const { data: isEnabled, isLoading, error: queryError } = useDiscrepancyEnabled();
+  const setDiscrepancyMutation = useSetDiscrepancyEnabled();
+
+  const [active, setActive] = React.useState<boolean>(true);
+  const [saved, setSaved] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof isEnabled === "boolean") {
+      setActive(isEnabled);
+    }
+  }, [isEnabled]);
+
+  const handleToggle = async () => {
+    const nextActive = !active;
+    setActive(nextActive);
+    setError(null);
+
+    try {
+      await setDiscrepancyMutation.mutateAsync(nextActive);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      setActive(!nextActive);
+      const msg = err?.response?.data?.mensaje || err?.message || "Error al actualizar la configuración.";
+      setError(msg);
+    }
+  };
+
+  return (
+    <m.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className={`vf-card !p-5 relative overflow-hidden border-2 transition-colors duration-300 ${
+        active ? "border-primary/20 bg-surface" : "border-warning/30 bg-warning/[0.02]"
+      }`}
+    >
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-start gap-4 flex-1">
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+              active ? "bg-primary/10 text-primary" : "bg-warning/10 text-warning"
+            }`}
+          >
+            <ShieldAlert className="w-5 h-5" />
+          </div>
+
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">
+                GOBERNANZA GLOBAL · MOTOR DE COMPARACIÓN
+              </span>
+              <span
+                className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${
+                  active
+                    ? "bg-success-container/30 text-emerald-800 dark:text-emerald-300 border-success/30"
+                    : "bg-warning-container/30 text-amber-800 dark:text-amber-300 border-warning/30"
+                }`}
+              >
+                {active ? "Activa" : "Omitida"}
+              </span>
+            </div>
+
+            <h3 className="text-base font-display font-black text-secondary tracking-tight mb-1">
+              Habilitar Validación de Discrepancias
+            </h3>
+            <p className="text-xs text-on-surface-variant font-medium leading-relaxed max-w-2xl">
+              Controla si se ejecuta la comparación automática de discrepancias entre los datos del proyecto y la extracción OCR de documentos durante la validación contra el Estado / Gobernanza.
+            </p>
+
+            {(error || queryError) && (
+              <div
+                role="alert"
+                className="mt-3 text-xs font-bold text-error flex items-center gap-1.5 bg-error-container/20 p-2 rounded-lg border border-error/20"
+              >
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{error || (queryError as any)?.message || "Error al cargar la configuración global."}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-2 shrink-0 bg-surface-container/50 p-3.5 rounded-xl border border-outline-variant/20">
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              type="button"
+              role="switch"
+              data-testid="discrepancy-validation-toggle"
+              aria-checked={active}
+              aria-label="Habilitar o deshabilitar chequeo global de discrepancias"
+              disabled={isLoading || setDiscrepancyMutation.isPending}
+              onClick={handleToggle}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 ${
+                active ? "bg-primary" : "bg-on-surface-variant/30"
+              }`}
+            >
+              <span
+                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                  active ? "translate-x-6" : "translate-x-0"
+                }`}
+              />
+            </button>
+
+            <AnimatePresence mode="wait">
+              {saved ? (
+                <m.span
+                  key="saved"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="text-[9px] font-black text-success uppercase tracking-widest flex items-center gap-1"
+                >
+                  <Check className="w-3 h-3" /> Guardado
+                </m.span>
+              ) : (
+                <m.span
+                  key="label"
+                  data-testid="discrepancy-validation-status"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className={`text-[9px] font-black uppercase tracking-widest ${
+                    active ? "text-primary" : "text-on-surface-variant"
+                  }`}
+                >
+                  {active ? "Habilitada" : "Deshabilitada"}
+                </m.span>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </m.div>
+  );
+};
+
+// ─── Rule 8: Tolerancia Superficie vs Mensura Card ─────────────────────────────
+
+const RULE_8_ID = "00000000-0000-0000-0000-000000000008";
+
+export const ToleranceSurfaceCard: React.FC = () => {
+  const { data: rulesList } = useRules();
+  const updateRule = useUpdateRule();
+
+  const rule8FromApi = rulesList?.find(
+    (r) => r.id === RULE_8_ID || r.codigo === "RULE-008-SUPERFICIE"
+  );
+
+  const [tolerance, setTolerance] = React.useState<number>(0.05);
+  const [active, setActive] = React.useState<boolean>(true);
+  const [saved, setSaved] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (rule8FromApi) {
+      if (rule8FromApi.valorUmbral !== undefined && rule8FromApi.valorUmbral !== null) {
+        setTolerance(rule8FromApi.valorUmbral);
+      }
+      setActive(rule8FromApi.activa);
+    }
+  }, [rule8FromApi]);
+
+  let computedAlertLevel = 2;
+  let alertBadgeText = "Advertencia";
+  let alertBadgeClass = "bg-warning-container/30 text-amber-800 dark:text-amber-300 border-warning/30";
+
+  if (rule8FromApi) {
+    if (typeof rule8FromApi.nivelAlerta === "string") {
+      const str = (rule8FromApi.nivelAlerta as string).toLowerCase();
+      if (str.includes("info") || str.includes("baja")) computedAlertLevel = 1;
+    } else if (typeof rule8FromApi.nivelAlerta === "number") {
+      computedAlertLevel = rule8FromApi.nivelAlerta;
+    }
+    
+    if (computedAlertLevel === 1) {
+      alertBadgeText = "Informativa";
+      alertBadgeClass = "bg-primary/10 text-primary border-primary/20";
+    }
+  }
+
+  const handleSave = async (overrideTolerance?: number, overrideActive?: boolean) => {
+    const finalTolerance = overrideTolerance ?? tolerance;
+    const finalActive = overrideActive ?? active;
+
+    setError(null);
+    if (finalTolerance < 0.01 || finalTolerance > 0.20) {
+      setError("La tolerancia debe estar entre 1% (0.01) y 20% (0.20)");
+      return;
+    }
+
+    try {
+      await updateRule.mutateAsync({
+        id: rule8FromApi?.id || RULE_8_ID,
+        codigo: "RULE-008-SUPERFICIE",
+        nombre: "Tolerancia Superficie vs Mensura",
+        descripcion: "Valida que la diferencia entre la superficie declarada y catastro no exceda la tolerancia configurada.",
+        condicionLogica: `Math.Abs(P.SuperficieM2 - C.Superficie) / C.Superficie <= ${finalTolerance}`,
+        expresion: "|P.SuperficieM2 - C.Superficie| / C.Superficie <= @tolerancia",
+        valorUmbral: finalTolerance,
+        minValor: 0.01,
+        maxValor: 0.20,
+        tipoDocumentoAplicable: 24,
+        nivelAlerta: computedAlertLevel,
+        tipoProyecto: 99,
+        activa: finalActive,
+        rowVersion: rule8FromApi?.rowVersion,
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      setError(err?.response?.data?.mensaje || "Error al guardar la regla.");
+    }
+  };
+
+  const currentRuleId = rule8FromApi?.id || RULE_8_ID;
+
+  return (
+    <m.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="vf-card !p-5 relative overflow-hidden border-2 border-primary/20 bg-surface shadow-sm"
+    >
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        {/* Left: Info */}
+        <div className="flex items-start gap-4 flex-1">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+            <Maximize2 className="w-5 h-5" />
+          </div>
+
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest">
+                Plano de Mensura &middot; Catastro Nacional
+              </span>
+              <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${alertBadgeClass}`}>
+                {alertBadgeText}
+              </span>
+            </div>
+
+            <h3 className="text-base font-display font-black text-secondary tracking-tight mb-1">
+              Tolerancia Superficie vs Mensura
+            </h3>
+            <p className="text-xs text-on-surface-variant font-medium leading-relaxed max-w-2xl">
+              Valida que la variación entre la superficie del proyecto y la mensura catastral no exceda la tolerancia permitida (
+              <strong className="text-secondary">{(tolerance * 100).toFixed(1)}%</strong>).
+            </p>
+
+            {/* DSL Preview */}
+            <div className="mt-2 inline-flex items-center gap-2 bg-surface-container border border-outline-variant/20 rounded-lg px-2.5 py-1">
+              <code className="text-[10px] font-mono font-bold text-primary">
+                |P.SuperficieM2 - C.Superficie| / C.Superficie &le; {(tolerance * 100).toFixed(1)}%
+              </code>
+            </div>
+
+            {error && (
+              <div className="mt-2 text-xs font-bold text-error flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                <span>{error}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right: Interactive Controls */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 shrink-0 bg-surface-container/50 p-3.5 rounded-xl border border-outline-variant/20">
+          {/* Active Toggle */}
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <div className="flex flex-col items-center gap-1.5">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={active}
+                onClick={() => {
+                  const nextActive = !active;
+                  setActive(nextActive);
+                  handleSave(tolerance, nextActive);
+                }}
+                id="rule-active-toggle"
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${active ? "bg-primary" : "bg-on-surface-variant/30"
+                  }`}
+              >
+                <span
+                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${active ? "translate-x-6" : "translate-x-0"
+                    }`}
+                />
+              </button>
+              <AnimatePresence mode="wait">
+                {saved ? (
+                  <m.span
+                    key="saved"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="text-[9px] font-black text-success uppercase tracking-widest flex items-center gap-1"
+                  >
+                    <Check className="w-3 h-3" /> Guardado
+                  </m.span>
+                ) : (
+                  <m.span
+                    key="label"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className={`text-[9px] font-black uppercase tracking-widest ${active ? "text-primary" : "text-on-surface-variant"}`}
+                  >
+                    {active ? "Activa" : "Inactiva"}
+                  </m.span>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <div className="w-px h-12 bg-outline-variant/30 hidden sm:block"></div>
+
+          {/* Slider / Range */}
+          <div className="flex flex-col gap-1 w-full sm:w-44">
+            <div className="flex items-center justify-between text-xs font-bold text-secondary">
+              <span className="flex items-center gap-1 text-[11px]">
+                <Sliders className="w-3.5 h-3.5 text-primary" /> Umbral:
+              </span>
+              <span className="font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                {(tolerance * 100).toFixed(1)}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0.01}
+              max={0.20}
+              step={0.005}
+              value={tolerance}
+              onChange={(e) => setTolerance(parseFloat(e.target.value))}
+              onMouseUp={() => handleSave(tolerance, active)}
+              onTouchEnd={() => handleSave(tolerance, active)}
+              className="w-full h-1.5 bg-surface-container-highest rounded appearance-none cursor-pointer accent-primary"
+              aria-label="Ajustar tolerancia de superficie"
+            />
+            <div className="flex justify-between text-[9px] font-mono text-on-surface-variant">
+              <span>1%</span>
+              <span>20%</span>
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <Link
+              to={`/admin/rules/${currentRuleId}/edit`}
+              className="p-2 text-xs font-bold text-on-surface-variant hover:text-primary bg-surface hover:bg-surface-container-high rounded-lg border border-outline-variant/30 transition-colors flex items-center gap-1.5"
+              aria-label="Editar regla de tolerancia completa"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Detalles</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </m.div>
+  );
+};
 
 // ─── IPI Oposición Configurable Card ──────────────────────────────────────────
 
@@ -88,9 +471,8 @@ const IpiOposicionCard: React.FC = () => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`vf-card !p-4 md:!p-5 relative overflow-hidden border-2 transition-colors duration-300 ${
-        blockOnOposicion ? "border-error/30 bg-error/[0.02]" : "border-outline-variant/30"
-      }`}
+      className={`vf-card !p-4 md:!p-5 relative overflow-hidden border-2 transition-colors duration-300 ${blockOnOposicion ? "border-error/30 bg-error/[0.02]" : "border-outline-variant/30"
+        }`}
     >
       {/* Background decoration */}
       <div className="absolute top-0 right-0 p-4 opacity-[0.04] pointer-events-none">
@@ -99,20 +481,18 @@ const IpiOposicionCard: React.FC = () => {
 
       <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-4">
         {/* Icon + Label */}
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${
-          blockOnOposicion ? "bg-error/10 text-error" : "bg-surface-container-high text-on-surface-variant"
-        }`}>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${blockOnOposicion ? "bg-error/10 text-error" : "bg-surface-container-high text-on-surface-variant"
+          }`}>
           <FileWarning className="w-5 h-5" />
         </div>
 
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[9px] font-black text-primary uppercase tracking-widest">Certificado IPI · Estatus</span>
-            <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${
-              blockOnOposicion
-                ? "bg-error-container text-error border-error/10"
-                : "bg-success-container text-success border-success/10"
-            }`}>
+            <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border ${blockOnOposicion
+              ? "bg-error-container text-error border-error/10"
+              : "bg-success-container text-success border-success/10"
+              }`}>
               {blockOnOposicion ? "Bloqueante" : "Permisiva"}
             </span>
           </div>
@@ -147,14 +527,12 @@ const IpiOposicionCard: React.FC = () => {
               : "Activar bloqueo de publicación por oposición IPI"
             }
             onClick={handleToggle}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-              blockOnOposicion ? "bg-error" : "bg-on-surface-variant/30"
-            }`}
+            className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${blockOnOposicion ? "bg-error" : "bg-on-surface-variant/30"
+              }`}
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${
-                blockOnOposicion ? "translate-x-6" : "translate-x-0"
-              }`}
+              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${blockOnOposicion ? "translate-x-6" : "translate-x-0"
+                }`}
             />
           </button>
 
@@ -175,11 +553,10 @@ const IpiOposicionCard: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className={`text-[9px] font-black uppercase tracking-widest ${
-                  blockOnOposicion ? "text-error" : "text-on-surface-variant"
-                }`}
+                className={`text-[9px] font-black uppercase tracking-widest ${blockOnOposicion ? "text-error" : "text-on-surface-variant"
+                  }`}
               >
-                {blockOnOposicion ? "Activo" : "Inactivo"}
+                {blockOnOposicion ? "Activa" : "Inactiva"}
               </m.span>
             )}
           </AnimatePresence>

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { ValidationHUD } from "../../features/validations/components/ValidationHUD";
 import type { ValidationExecutionResult, FindingDto } from "../../features/validations/types";
+import { useDiscrepancyEnabled } from "../../features/rules/api/useRules";
 
 const ValidationSummary = lazy(() => import("../../features/validations/components/ValidationSummary").then(m => ({ default: m.ValidationSummary })));
 const ValidationRulesTable = lazy(() => import("../../features/validations/components/ValidationRulesTable").then(m => ({ default: m.ValidationRulesTable })));
@@ -41,6 +42,8 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
   handleScanComplete,
   projectStatus,
 }) => {
+  const { data: isDiscrepancyEnabled } = useDiscrepancyEnabled();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
 
@@ -92,14 +95,44 @@ export const ProjectValidationPageLayout: React.FC<ProjectValidationPageLayoutPr
       </div>
       )}
 
+      {isDiscrepancyEnabled === false && (
+        <div
+          data-testid="validation-bypass-warning"
+          role="alert"
+          className="mb-8 p-4 sm:p-5 bg-white/95 dark:bg-surface-container-low/90 rounded-2xl border border-primary/30 shadow-raised hover:shadow-floating transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in slide-in-from-top duration-300 relative overflow-hidden group"
+        >
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary-hover to-secondary" />
+
+          <div className="flex items-start sm:items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
+            <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 text-primary shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                <span className="font-display font-black text-sm text-secondary uppercase tracking-wider">
+                  Validación de discrepancias omitida
+                </span>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest bg-primary/15 text-primary border border-primary/25">
+                  Modo Bypass
+                </span>
+              </div>
+              <p className="text-xs font-medium text-text-secondary leading-relaxed">
+                La comparación automática entre el documento y el proyecto está desactivada por configuración administrativa.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && (
-        <div className="mb-8 p-4 bg-error/10 text-error rounded-2xl border border-error/20 flex items-center gap-4 animate-in slide-in-from-top duration-300">
-          <div className="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center">
+        <div className="mb-8 p-4 sm:p-5 bg-white/95 dark:bg-surface-container-low/90 rounded-2xl border border-error/30 shadow-raised flex items-center gap-4 animate-in slide-in-from-top duration-300 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-error" />
+          <div className="w-11 h-11 rounded-xl bg-error/10 border border-error/20 flex items-center justify-center shrink-0 text-error">
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
-            <div className="font-bold text-sm uppercase">Fallo en el Protocolo</div>
-            <div className="text-xs opacity-80">{error}</div>
+            <div className="font-display font-black text-sm text-error uppercase tracking-wider">Fallo en el Protocolo</div>
+            <div className="text-xs font-medium text-text-secondary mt-0.5">{error}</div>
           </div>
         </div>
       )}

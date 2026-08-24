@@ -52,12 +52,16 @@ vi.mock("../../provinces/api/useProvinces", () => ({
   }),
 }));
 
+import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
+
 const queryClient = new QueryClient();
 
 const renderWithAuth = (ui: React.ReactElement) =>
   render(
     <QueryClientProvider client={queryClient}>
-      {ui}
+      <ToastProvider>
+        {ui}
+      </ToastProvider>
     </QueryClientProvider>
   );
 

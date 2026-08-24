@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import {
   IntegrityStatus,
 } from "../../features/projects/types";
@@ -55,7 +55,6 @@ export const ProjectPublicDetailPage: React.FC = () => {
    * The client gate exists only to prevent content/request flash while auth state
    * is unresolved and to preserve the existing authenticated quota behavior.
    */
-  const publicProjectGateResolved = !authLoading;
 
   // ponytail: QR access — resolve token to project ID via public endpoint
   const qrQuery = useQuery({
@@ -76,7 +75,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
     ? 'checking' 
     : isQrAccess 
       ? qrStatus
-      : publicProjectGateResolved 
+      : isAuthenticated 
         ? 'allowed' 
         : 'denied';
 
@@ -218,6 +217,11 @@ export const ProjectPublicDetailPage: React.FC = () => {
         </p>
       </div>
     );
+
+  // If they are denied because they are not logged in and it's a direct link, redirect to login
+  if (accessStatus === 'denied' && !isQrAccess && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (hasQuota === false)
     return (

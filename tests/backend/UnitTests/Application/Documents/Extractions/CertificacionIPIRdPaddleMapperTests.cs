@@ -288,5 +288,53 @@ namespace UnitTests.Application.Documents.Extractions
             var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
             extraction!.ParcelaNumero.NormalizedValue.Should().Be("123456789014:5-C");
         }
+
+        [Fact]
+        public void MapFromOcrResult_ShouldExtractAll3Fields_FromCertificacionIPI0001Fixture()
+        {
+            // Arrange - Real OCR lines from Certificacion IPI_0001.pdf
+            var lines = new List<OcrLine>
+            {
+                new OcrLine { Text = "Reptblica Oomintcani" },
+                new OcrLine { Text = "MINISTERIO DE HACIENDA" },
+                new OcrLine { Text = "DIRECCION GENERAL DE IVIPUESTOS INTERNOS" },
+                new OcrLine { Text = "RNC: 4-01-50625-4" },
+                new OcrLine { Text = "CERTIFICACION" },
+                new OcrLine { Text = "No. de Certificaci6n: 338738592876" },
+                new OcrLine { Text = "La DIrecclón General de Impuestos Internos CERTIFICA: que el Inmuebie no. 070223482149:0021," },
+                new OcrLine { Text = "ubicado en la AVENIDA REPUBLICA DE COLOMBIA, No. SN , 5ector de CARMEN MARIA" },
+                new OcrLine { Text = "RESIDENCIAL, identificado camo Parcela No. 070223482149, D.C. No. $DC. Apto/Unidad" },
+                new OcrLine { Text = "4-A, selar 8B, Manzana sM. sANTO DOMINGo De GUzMAN  DIstRItO NACIonAL : con un" },
+                new OcrLine { Text = "area de mejora de 3g.20 Mtc2, amparado en el Certlficado de Titulo-Matricula No." },
+                new OcrLine { Text = "IP1" },
+                new OcrLine { Text = "Dicho inmuable fue valorado en la suma de RD$2,50o,00o.00 para fines fiscoles." },
+                new OcrLine { Text = "Dada an 1a OFICINA VIRTUAL, a Ios seis (6} dias del mes de agosto del ano dos mil" },
+                new OcrLine { Text = "velntluno (2021)." },
+                new OcrLine { Text = "Esta certificación no constituva un juixie, de valor. sabre la veraridad de las declaraciones presentadas por a" }
+            };
+
+            var ocrResult = new OcrResult
+            {
+                Success = true,
+                Lines = lines,
+                ExtractedText = string.Join("\n", lines.Select(l => l.Text))
+            };
+
+            // Act
+            var extraction = CertificacionIPIRdPaddleMapper.MapFromOcrResult(ocrResult);
+
+            // Assert
+            extraction.Should().NotBeNull();
+            extraction!.ExtractionStatus.Should().Be(ExtractionStatus.Completed);
+
+            extraction.NumeroCertificacion.Status.Should().Be(FieldStatus.Valid);
+            extraction.NumeroCertificacion.NormalizedValue.Should().Be("338738592876");
+
+            extraction.NumeroInmueble.Status.Should().Be(FieldStatus.Valid);
+            extraction.NumeroInmueble.NormalizedValue.Should().Be("070223482149:0021");
+
+            extraction.ParcelaNumero.Status.Should().Be(FieldStatus.Valid);
+            extraction.ParcelaNumero.NormalizedValue.Should().Be("070223482149");
+        }
     }
 }

@@ -58,8 +58,9 @@ public class GoogleLoginUserCommandHandler
                 profile.Email.Trim().ToLower(),
                 dummyHash,
                 UserRole.User,
-                "0000000000", // dummy default
-                "00000000000" // dummy default
+                "0000000000",
+                null,
+                null
             );
 
             user.VincularGoogleAccount(profile.Sub);

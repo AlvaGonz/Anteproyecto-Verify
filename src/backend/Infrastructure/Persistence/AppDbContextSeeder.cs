@@ -46,6 +46,9 @@ public static class AppDbContextSeeder
             await SeedProyectoEstadosAsync(context, logger);
             await SeedTiposNotificacionesAsync(context, logger);
             await SeedJceCiudadanosForDefaultUsersAsync(context, logger);
+            await SeedDgiiForDefaultMocksAsync(context, logger);
+            await SeedCatastroTitulosAsync(context, logger);
+            await SeedPagosIpiAsync(context, logger);
 
             var adminUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -61,6 +64,7 @@ public static class AppDbContextSeeder
             adminUser.AsignarPlan(Guid.Parse("99999999-9999-9999-9999-999999999999"));
             adminUser.UpdateProfileExtension("Calle El Conde 102, Zona Colonial", "Distrito Nacional", "admin_vf");
             adminUser.UpdateRnc("131-000001-2", "VeriFinca RD SRL", "VeriFinca", "Servicios inmobiliarios");
+            await SeedReglasValidacionAsync(context, adminUser.Id, logger);
 
             var freemiumUser = await GetOrCreateUsuarioAsync(
                 context,
@@ -149,6 +153,22 @@ public static class AppDbContextSeeder
             var testUser = await context.Usuarios.FirstOrDefaultAsync(u => u.Id == testUserId);
             if (testUser == null)
             {
+                // Ensure JCE_Ciudadano exists to satisfy FK constraint
+                var jceTest = await context.Set<Domain.Entities.JCE_Ciudadano>().FirstOrDefaultAsync(j => j.Cedula == "402-9999999-9");
+                if (jceTest == null)
+                {
+                    jceTest = new Domain.Entities.JCE_Ciudadano
+                    {
+                        Cedula = "402-9999999-9",
+                        Nombres = "Test",
+                        Apellidos = "User",
+                        FechaNacimiento = new DateTime(1990, 1, 1),
+                        FechaExpiracion = DateTime.UtcNow.AddYears(4)
+                    };
+                    context.Set<Domain.Entities.JCE_Ciudadano>().Add(jceTest);
+                    await context.SaveChangesAsync();
+                }
+
                 testUser = new Usuario(
                     "Test",
                     "User",
@@ -213,13 +233,18 @@ public static class AppDbContextSeeder
             var generatedProyectos = new List<dynamic>();
 
             bool useCsvSeeds = false;
+            var specificCsvPath = @"C:\Users\Alva\Desktop\Anteproyecto-Verify\Bots\ProyectosInmobiliarios\ProyectosInmobiliarios_20260814_085516.csv";
             var localCsvDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "..", "Bots", "ProyectosInmobiliarios");
             try 
             {
                 var sqlPath = Path.Combine("/src/src/backend/Tools/DbSeeder/Scripts", "14_Proyectos_Realistas.sql");
                 var localSqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Tools", "DbSeeder", "Scripts", "14_Proyectos_Realistas.sql");
 
-                if (File.Exists(sqlPath) || File.Exists(localSqlPath)) 
+                if (Directory.Exists("/src/Bots/ProyectosInmobiliarios") && Directory.GetFiles("/src/Bots/ProyectosInmobiliarios", "*.csv").Any())
+                {
+                    useCsvSeeds = true;
+                }
+                else if (File.Exists(specificCsvPath))
                 {
                     useCsvSeeds = true;
                 }
@@ -235,10 +260,15 @@ public static class AppDbContextSeeder
 
             if (useCsvSeeds)
             {
-                string? csvPath = GetLatestCsvPath("/src/Bots/ProyectosInmobiliarios");
-                if (csvPath == null)
+                string? csvPath = null;
+                
+                if (File.Exists(specificCsvPath))
                 {
-                    csvPath = GetLatestCsvPath(localCsvDir);
+                    csvPath = specificCsvPath;
+                }
+                else 
+                {
+                    csvPath = GetLatestCsvPath("/src/Bots/ProyectosInmobiliarios") ?? GetLatestCsvPath(localCsvDir);
                 }
 
                 if (csvPath != null)
@@ -364,11 +394,12 @@ public static class AppDbContextSeeder
                         await context.SaveChangesAsync();
                     }
 
+                    await SeedReglasValidacionAsync(context, adminUser.Id, logger);
                     return;
                 }
             }
 
-            int targetCount = useCsvSeeds ? baseProyectos.Length : 120;
+            int targetCount = 120;
 
             for (int i = 0; i < targetCount; i++)
             {
@@ -396,19 +427,18 @@ public static class AppDbContextSeeder
             for (int i = 0; i < 10; i++) creatorList.Add(empresaUser.Id); // 10
             for (int i = 0; i < 5; i++) creatorList.Add(dummyUsers[i].Id); // 5 (1 each)
             
-            int remaining = Math.Max(0, targetCount - 26);
+            int remaining = Math.Max(0, generatedProyectos.Count - 26);
             for (int i = 0; i < remaining; i++) {
                 creatorList.Add(corporativoUser.Id); // Unlimited
             }
 
             var proyectoEntities = new List<Proyecto>();
-            for (int i = 0; i < targetCount; i++)
+            for (int i = 0; i < generatedProyectos.Count; i++)
             {
                 var p = generatedProyectos[i];
                 var creatorId = creatorList[i];
-                var currentStatus = p.Status;
+                var currentStatus = (ProjectStatus)p.Status;
 
-                // Enforce Consultor condition: no more than 1, and not Published
                 if (creatorId == consultorUser.Id && currentStatus == ProjectStatus.Publicado)
                 {
                     currentStatus = ProjectStatus.Creado;
@@ -422,14 +452,16 @@ public static class AppDbContextSeeder
                     categoria: (int)p.Categoria,
                     datosDesarrollador: (string)p.Dev,
                     designacionCatastral: (string)p.Cat,
-                    status: (ProjectStatus)currentStatus);
+                    status: currentStatus);
 
-                decimal baseSuperficie = rnd.Next(100, 1000);
-                decimal superficieCalculada = baseSuperficie * 7.9m;
-                decimal valorEstimado = rnd.Next(1000000, 50000000);
-                string ubicacionGps = $"{18.4 + rnd.NextDouble() * 1.5:F5}, {-70.6 + rnd.NextDouble() * 1.5:F5}";
-                string rnc = $"1-{rnd.Next(10, 99)}-{rnd.Next(10000, 99999)}-{rnd.Next(1, 9)}";
-                string matricula = $"001-0{rnd.Next(1, 9)}-{rnd.Next(100, 999)}";
+                string ubicacionGps = useCsvSeeds ? (string)p.UbicacionGps : $"{18.4 + rnd.NextDouble() * 1.5:F5}, {-70.6 + rnd.NextDouble() * 1.5:F5}";
+                decimal valorEstimado = useCsvSeeds ? (decimal)p.ValorEstimado : rnd.Next(1000000, 50000000);
+                string propietario = useCsvSeeds ? (string)p.Propietario : "Propietario " + p.Dev;
+                string cedulaRncPropietario = useCsvSeeds ? (string)p.CedulaRncPropietario : $"402-{rnd.Next(1000000, 9999999)}-{rnd.Next(0, 9)}";
+                string ipi = useCsvSeeds ? (string)p.Ipi : $"1-01-{rnd.Next(10000, 99999)}-{rnd.Next(0, 9)}";
+                decimal superficieCalculada = useCsvSeeds ? (decimal)p.SuperficieM2 : rnd.Next(100, 1000) * 7.9m;
+                string rnc = useCsvSeeds ? (string)p.Rnc : $"1-{rnd.Next(10, 99)}-{rnd.Next(10000, 99999)}-{rnd.Next(1, 9)}";
+                string matricula = useCsvSeeds ? (string)p.Matricula : $"001-0{rnd.Next(1, 9)}-{rnd.Next(100, 999)}";
 
                 proyecto.UpdateDetails(
                     nombre: proyecto.Nombre,
@@ -439,9 +471,9 @@ public static class AppDbContextSeeder
                     categoriaId: proyecto.CategoriaId,
                     datosDesarrollador: proyecto.DatosDesarrollador,
                     designacionCatastral: proyecto.DesignacionCatastral,
-                    propietario: "Propietario " + p.Dev,
-                    cedulaRncPropietario: $"402-{rnd.Next(1000000, 9999999)}-{rnd.Next(0, 9)}",
-                    ipi: $"1-01-{rnd.Next(10000, 99999)}-{rnd.Next(0, 9)}",
+                    propietario: propietario,
+                    cedulaRncPropietario: cedulaRncPropietario,
+                    ipi: ipi,
                     superficieM2: superficieCalculada
                 );
                 
@@ -631,6 +663,8 @@ public static class AppDbContextSeeder
                 logger.LogWarning($"Skipping domain seeding due to missing tables: {ex.Message}");
             }
 
+            await SeedReglasValidacionAsync(context, adminUser.Id, logger);
+
             logger.LogInformation("Prototype demo data seeding completed successfully.");
             // await SeedDgiiAsync(context, logger); // Handled by python_env container (up_DGII.py) to prevent race conditions & memory issues
 
@@ -648,6 +682,8 @@ public static class AppDbContextSeeder
 
     private static async Task SeedProvinciasAsync(AppDbContext context, ILogger logger)
     {
+        if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
+        
         var connection = context.Database.GetDbConnection();
         if (connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
         using var cmd = connection.CreateCommand();
@@ -699,6 +735,8 @@ INSERT INTO Provincia (NombreProvincia, Latitud, Longitud) VALUES
 
     private static async Task SeedMunicipiosAsync(AppDbContext context, ILogger logger)
     {
+        if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
+        
         var connection = context.Database.GetDbConnection();
         if (connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
         using var cmd = connection.CreateCommand();
@@ -1378,6 +1416,24 @@ WHERE NOT EXISTS (
         }
         else
         {
+            if (!string.IsNullOrEmpty(cedula))
+            {
+                var jce = await context.Set<Domain.Entities.JCE_Ciudadano>().FindAsync(cedula);
+                if (jce == null)
+                {
+                    jce = new Domain.Entities.JCE_Ciudadano
+                    {
+                        Cedula = cedula,
+                        Nombres = nombre,
+                        Apellidos = apellido,
+                        FechaNacimiento = new DateTime(1980, 1, 1),
+                        FechaExpiracion = DateTime.UtcNow.AddYears(4)
+                    };
+                    context.Set<Domain.Entities.JCE_Ciudadano>().Add(jce);
+                    await context.SaveChangesAsync();
+                }
+            }
+
             var user = new Usuario(nombre, apellido, correoElectronico, contrasenaHash, rol, telefono, cedula);
             context.Usuarios.Add(user);
 
@@ -1459,6 +1515,47 @@ WHERE NOT EXISTS (
                     Apellidos = "JCE MOCK",
                     FechaNacimiento = DateTime.UtcNow.AddYears(-30),
                     FechaExpiracion = DateTime.UtcNow.AddYears(10)
+                });
+            }
+        }
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedDgiiForDefaultMocksAsync(AppDbContext context, ILogger logger)
+    {
+        var mockRncs = new (string Rnc, string RazonSocial, string? NombreComercial)[]
+        {
+            ("131950213", "P J H LOPEZ SERVICIOS DE CONTABILIDAD SRL", "P J H LOPEZ SERVICIOS DE CONTABILIDAD"),
+            ("10100074474", "SUDARIO BARTOLO RAMOS PEÑA", null),
+            ("133725444", "RD COLLECT SRL", "RD COLLECT"),
+            ("131-000001-2", "VeriFinca RD SRL", "VeriFinca"),
+            ("1310000012", "VeriFinca RD SRL", "VeriFinca"),
+            ("131-000007-2", "Usuario Freemium SRL", null),
+            ("1310000072", "Usuario Freemium SRL", null),
+            ("131-000002-3", "Consultoría Legal RD", "Consultoría Legal"),
+            ("1310000023", "Consultoría Legal RD", "Consultoría Legal"),
+            ("131-000003-5", "Arquitectura & Desarrollo Pro", "ArquiPro"),
+            ("1310000035", "Arquitectura & Desarrollo Pro", "ArquiPro"),
+            ("131-000004-7", "Constructora del Este SRL", "ConstrEste"),
+            ("1310000047", "Constructora del Este SRL", "ConstrEste"),
+            ("131-000005-9", "Corporación Inmobiliaria RD S.A.", "Corporativo Inmobiliario"),
+            ("1310000059", "Corporación Inmobiliaria RD S.A.", "Corporativo Inmobiliario"),
+            ("131-000006-0", "Test Developer Solutions", "TestDev"),
+            ("1310000060", "Test Developer Solutions", "TestDev")
+        };
+
+        foreach (var (rnc, razonSocial, comercial) in mockRncs)
+        {
+            var exists = await context.DGII.AnyAsync(d => d.Rnc == rnc);
+            if (!exists)
+            {
+                logger.LogInformation("Seeding mock DGII record for default mock entities: {Rnc}", rnc);
+                context.DGII.Add(new Domain.Entities.DGII
+                {
+                    Rnc = rnc,
+                    NombreRazonSocial = razonSocial,
+                    NombreComercial = comercial,
+                    Estado = "ACTIVO"
                 });
             }
         }
@@ -1947,5 +2044,209 @@ WHERE NOT EXISTS (
         var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
         var token = Convert.ToBase64String(hashBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
         return $"{Convert.ToBase64String(Encoding.UTF8.GetBytes(payload))}.{token}";
+    }
+
+    private static async Task SeedReglasValidacionAsync(AppDbContext context, Guid adminId, ILogger logger)
+    {
+        var rule8Id = Guid.Parse("00000000-0000-0000-0000-000000000008");
+        var existingRule8 = await context.ReglasValidacion.FirstOrDefaultAsync(r => r.Id == rule8Id || r.Codigo == "RULE-008-SUPERFICIE");
+        if (existingRule8 == null)
+        {
+            var rule8 = new ReglaValidacion(
+                nombre: "Tolerancia Superficie vs Mensura",
+                descripcion: "Valida que la diferencia entre la superficie declarada en el proyecto y la superficie registrada en catastro no exceda la tolerancia configurada.",
+                condicionLogica: "Math.Abs(P.SuperficieM2 - C.Superficie) / C.Superficie <= ValorUmbral",
+                tipoDocumentoAplicable: DocumentType.PlanoMensuraCatastral,
+                nivelAlerta: NivelAlerta.Media,
+                tipoProyecto: TipoProyecto.Residencial,
+                creadaPor: adminId,
+                version: 1,
+                reglaAnteriorId: null,
+                valorUmbral: 0.05m,
+                minValor: 0.01m,
+                maxValor: 0.20m,
+                expresion: "|P.SuperficieM2 - C.Superficie| / C.Superficie <= @tolerancia",
+                codigo: "RULE-008-SUPERFICIE",
+                id: rule8Id
+            );
+            await context.ReglasValidacion.AddAsync(rule8);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded Rule 8 (Tolerancia Superficie vs Mensura)");
+        }
+
+        var ruleIpiId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var existingRuleIpi = await context.ReglasValidacion.FirstOrDefaultAsync(r => r.Id == ruleIpiId || r.Codigo == "RULE-001-IPI-ESTATUS");
+        if (existingRuleIpi == null)
+        {
+            var ruleIpi = new ReglaValidacion(
+                nombre: "Denegación de Publicación por Estatus IPI",
+                descripcion: "Bloquea la publicación cuando el estatus IPI es No Pagado",
+                condicionLogica: "ipi.estatus == 'No Pagado' → BLOCK_PUBLISH",
+                tipoDocumentoAplicable: DocumentType.CertificacionIPI,
+                nivelAlerta: NivelAlerta.Critica,
+                tipoProyecto: TipoProyecto.Residencial,
+                creadaPor: adminId,
+                version: 1,
+                reglaAnteriorId: null,
+                expresion: "ipi.estatus == 'No Pagado' → DENY_PUBLISH",
+                codigo: "RULE-001-IPI-ESTATUS",
+                id: ruleIpiId
+            );
+            await context.ReglasValidacion.AddAsync(ruleIpi);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded Rule 1 (Denegación de Publicación por Estatus IPI)");
+        }
+
+        var ruleGlobalDiscrepancyId = Guid.Parse("00000000-0000-0000-0000-000000000099");
+        var existingGlobalRule = await context.ReglasValidacion.FirstOrDefaultAsync(r => r.Id == ruleGlobalDiscrepancyId || r.Codigo == "GLOBAL-DISCREPANCY-ENABLED");
+        if (existingGlobalRule == null)
+        {
+            var ruleGlobal = new ReglaValidacion(
+                nombre: "Habilitar Validación de Discrepancias",
+                descripcion: "Controla si se ejecuta la comparación de discrepancias proyecto-vs-documento",
+                condicionLogica: "global.enabled == true",
+                tipoDocumentoAplicable: DocumentType.OTHER,
+                nivelAlerta: NivelAlerta.Baja,
+                tipoProyecto: TipoProyecto.Residencial,
+                creadaPor: adminId,
+                version: 1,
+                reglaAnteriorId: null,
+                valorUmbral: 1.0m,
+                minValor: 0.0m,
+                maxValor: 1.0m,
+                expresion: "global.enabled == true",
+                codigo: "GLOBAL-DISCREPANCY-ENABLED",
+                id: ruleGlobalDiscrepancyId
+            );
+            await context.ReglasValidacion.AddAsync(ruleGlobal);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded Global Discrepancy Rule (GLOBAL-DISCREPANCY-ENABLED)");
+        }
+    }
+
+    private static async Task SeedCatastroTitulosAsync(AppDbContext context, ILogger logger)
+    {
+        try
+        {
+            var mockId = Guid.Parse("907b72e6-f8f8-4bdc-89f3-0001201d1897");
+            var existing = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.IdCatastroTitulo == mockId || c.Matricula == "1989500752");
+            if (existing == null)
+            {
+                var mockTitulo = new CatastroTitulo
+                {
+                    IdCatastroTitulo = mockId,
+                    CodigoDesignacionCatastral = "050036294345:0053",
+                    NumeroTitulo = "1670448638",
+                    Rnc = "131950213",
+                    Provincia = "San Pedro de Macoris",
+                    Municipio = "San Pedro de Macoris",
+                    Latitud = 18.491015m,
+                    Longitud = -69.269868m,
+                    Superficie = 1183.36m,
+                    Matricula = "1989500752",
+                    Oficina = "PUERTO PLATA",
+                    DesigCatastralPosicional = "875568784706",
+                    DesignCatastralOrigen = "Parc. 87, DC-85",
+                    FechaEmision = DateTime.Parse("2024-07-09T22:02:05"),
+                    FechaInscripcion = DateTime.Parse("2018-07-31T22:02:05"),
+                    VieneDe = "F.414,X.85"
+                };
+
+                await context.CatastroTitulos.AddAsync(mockTitulo);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded CatastroTitulo mock (Matricula: 1989500752, Designacion: 050036294345:0053).");
+            }
+
+            var mock2 = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.Matricula == "1057385457" || c.CodigoDesignacionCatastral == "050193819517:0017");
+            if (mock2 == null)
+            {
+                var mockTitulo2 = new CatastroTitulo
+                {
+                    IdCatastroTitulo = Guid.NewGuid(),
+                    CodigoDesignacionCatastral = "050193819517:0017",
+                    NumeroTitulo = "1561513566",
+                    Rnc = "10100074474",
+                    Provincia = "San Pedro de Macoris",
+                    Municipio = "Ramon Santana",
+                    Latitud = 18.552m,
+                    Longitud = -69.182m,
+                    Superficie = 14792.83m,
+                    Matricula = "1057385457",
+                    Oficina = "VIRTUAL",
+                    DesigCatastralPosicional = "050193819517",
+                    DesignCatastralOrigen = "Parcela 24,DC-65",
+                    FechaEmision = DateTime.Parse("2024-01-26"),
+                    FechaInscripcion = DateTime.Parse("2015-07-16"),
+                    VieneDe = "Parcela 24,DC-65"
+                };
+
+                await context.CatastroTitulos.AddAsync(mockTitulo2);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded CatastroTitulo mock (Matricula: 1057385457, Designacion: 050193819517:0017).");
+            }
+
+            var mock3Id = Guid.Parse("31ABE1EA-A002-4D46-83C0-000AAD5D5C61");
+            var mock3 = await context.CatastroTitulos.FirstOrDefaultAsync(c => c.IdCatastroTitulo == mock3Id || c.Matricula == "1989501603" || c.CodigoDesignacionCatastral == "050045565100:0004");
+            if (mock3 == null)
+            {
+                var mockTitulo3 = new CatastroTitulo
+                {
+                    IdCatastroTitulo = mock3Id,
+                    CodigoDesignacionCatastral = "050045565100:0004",
+                    NumeroTitulo = "1670449489",
+                    Rnc = "133725444",
+                    Provincia = "San Pedro de Macoris",
+                    Municipio = "Consuelo",
+                    Latitud = 18.591951m,
+                    Longitud = -69.260373m,
+                    Superficie = 1497.05m,
+                    Matricula = "1989501603",
+                    Oficina = "SANTO DOMINGO ESTE",
+                    DesigCatastralPosicional = "115860565503",
+                    DesignCatastralOrigen = "Parc. 74, DC-50",
+                    FechaEmision = DateTime.Parse("2019-05-16T22:02:05"),
+                    FechaInscripcion = DateTime.Parse("2017-08-03T22:02:05"),
+                    VieneDe = "T.270,M.25"
+                };
+
+                await context.CatastroTitulos.AddAsync(mockTitulo3);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded CatastroTitulo mock for Estado Juridico (Matricula: 1989501603, Designacion: 050045565100:0004).");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Non-fatal error occurred while seeding CatastroTitulos mock data.");
+        }
+    }
+
+    private static async Task SeedPagosIpiAsync(AppDbContext context, ILogger logger)
+    {
+        try
+        {
+            var rncIpi = "401506254";
+            var existing = await context.PagosIPI.FirstOrDefaultAsync(p => p.Rnc == rncIpi || p.NoCertificacion == "338738592876");
+            if (existing == null)
+            {
+                var mockIpi = new PagoIPI
+                {
+                    Rnc = rncIpi,
+                    NoCertificacion = "338738592876",
+                    NoInmueble = "070223482149:0021",
+                    ParcelaNo = "070223482149",
+                    Estatus = "Pagado",
+                    Cuota_ipi = 0.00m,
+                    FechaCreacion = DateTime.UtcNow
+                };
+
+                await context.PagosIPI.AddAsync(mockIpi);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded PagoIPI mock (NoCertificacion: 338738592876, NoInmueble: 070223482149:0021).");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Non-fatal error occurred while seeding PagosIPI mock data.");
+        }
     }
 }

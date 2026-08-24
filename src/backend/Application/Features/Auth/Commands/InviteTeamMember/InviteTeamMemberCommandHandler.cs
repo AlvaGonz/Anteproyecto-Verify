@@ -64,7 +64,7 @@ public class InviteTeamMemberCommandHandler
             contrasenaHash,
             titular.Rol,
             request.Telefono ?? "000-0000000",
-            "000-0000000-0" // Provisional DNI
+            null // Provisional DNI - empty until member completes profile
         );
 
         nuevoUsuario.AsignarTitular(request.TitularId);

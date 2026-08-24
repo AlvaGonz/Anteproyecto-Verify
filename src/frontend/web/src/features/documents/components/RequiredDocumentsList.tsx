@@ -93,7 +93,10 @@ export const RequiredDocumentsList: React.FC<{ projectId: string }> = ({ project
 
       <div className="space-y-4 relative z-10">
         {REQUIRED_DOCUMENTS.map((doc) => {
-          const uploadedDoc = documents.find((u: any) => u.tipoDocumento === doc.category && u.activo);
+          const categoryDocs = documents
+            .filter((u: any) => u.tipoDocumento === doc.category && u.activo)
+            .sort((a: any, b: any) => new Date(b.createdAtUtc || 0).getTime() - new Date(a.createdAtUtc || 0).getTime());
+          const uploadedDoc = categoryDocs[0];
           const isUploaded = !!uploadedDoc;
 
           const availableDocs = documents

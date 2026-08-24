@@ -55,20 +55,65 @@ public class PaddleOcrProvider : IOcrProvider
                 var text = result.TryGetProperty("ExtractedText", out var textProp) ? textProp.GetString() : string.Empty;
                 var rawJson = result.TryGetProperty("RawJson", out var rawProp) ? rawProp.GetString() : responseString;
                 
-                // Parse RawJson into OcrLine objects for better field extraction
+                // Parse RawJson into OcrLine objects with bounding boxes for spatial region extraction
                 var lines = new List<OcrLine>();
-                if (!string.IsNullOrWhiteSpace(rawJson) && rawJson.Contains("('"))
+                if (!string.IsNullOrWhiteSpace(rawJson))
                 {
-                    var matches = Regex.Matches(rawJson.Replace("\\\"", "\""), @"\('(.*?)',\s*(\d+\.\d+)");
-                    foreach (Match m in matches)
+                    var cleanJson = rawJson.Replace("\\\"", "\"");
+                    // Pattern matches: [[[x1, y1], [x2, y2], [x3, y3], [x4, y4]], ('text', confidence)]
+                    var bboxMatches = Regex.Matches(cleanJson, @"\[\s*\[\s*\[\s*([\d\.\-]+)\s*,\s*([\d\.\-]+)\s*\]\s*,\s*\[\s*([\d\.\-]+)\s*,\s*([\d\.\-]+)\s*\]\s*,\s*\[\s*([\d\.\-]+)\s*,\s*([\d\.\-]+)\s*\]\s*,\s*\[\s*([\d\.\-]+)\s*,\s*([\d\.\-]+)\s*\]\s*\]\s*,\s*\(\s*['""](.*?)['""]\s*,\s*([\d\.\-]+)\s*\)\s*\]");
+                    
+                    if (bboxMatches.Count > 0)
                     {
-                        if (m.Groups.Count > 1 && !string.IsNullOrWhiteSpace(m.Groups[1].Value))
+                        foreach (Match m in bboxMatches)
                         {
-                            lines.Add(new OcrLine 
-                            { 
-                                Text = m.Groups[1].Value,
-                                Confidence = double.TryParse(m.Groups[2].Value, out var c) ? c : 0.9
-                            });
+                            if (m.Groups.Count >= 11 && !string.IsNullOrWhiteSpace(m.Groups[9].Value))
+                            {
+                                double.TryParse(m.Groups[1].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var x1);
+                                double.TryParse(m.Groups[2].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var y1);
+                                double.TryParse(m.Groups[3].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var x2);
+                                double.TryParse(m.Groups[4].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var y2);
+                                double.TryParse(m.Groups[5].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var x3);
+                                double.TryParse(m.Groups[6].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var y3);
+                                double.TryParse(m.Groups[7].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var x4);
+                                double.TryParse(m.Groups[8].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var y4);
+                                
+                                var textVal = m.Groups[9].Value;
+                                double.TryParse(m.Groups[10].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var conf);
+
+                                var minX = Math.Min(Math.Min(x1, x2), Math.Min(x3, x4));
+                                var maxX = Math.Max(Math.Max(x1, x2), Math.Max(x3, x4));
+                                var minY = Math.Min(Math.Min(y1, y2), Math.Min(y3, y4));
+                                var maxY = Math.Max(Math.Max(y1, y2), Math.Max(y3, y4));
+
+                                lines.Add(new OcrLine
+                                {
+                                    Text = textVal,
+                                    Confidence = conf > 0 ? conf : 0.9,
+                                    BoundingBox = new OcrBoundingBox
+                                    {
+                                        Left = minX,
+                                        Top = minY,
+                                        Right = maxX,
+                                        Bottom = maxY
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    else if (cleanJson.Contains("('"))
+                    {
+                        var matches = Regex.Matches(cleanJson, @"\('(.*?)',\s*(\d+\.\d+)");
+                        foreach (Match m in matches)
+                        {
+                            if (m.Groups.Count > 1 && !string.IsNullOrWhiteSpace(m.Groups[1].Value))
+                            {
+                                lines.Add(new OcrLine 
+                                { 
+                                    Text = m.Groups[1].Value,
+                                    Confidence = double.TryParse(m.Groups[2].Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var c) ? c : 0.9
+                                });
+                            }
                         }
                     }
                 }

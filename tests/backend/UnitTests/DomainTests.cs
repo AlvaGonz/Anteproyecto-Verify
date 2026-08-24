@@ -1,4 +1,4 @@
-﻿namespace UnitTests;
+namespace UnitTests;
 
 using System;
 using Domain.Entities;
@@ -28,6 +28,20 @@ public class DomainTests
         Assert.Equal(rol, usuario.Rol);
         Assert.True(usuario.Activo);
         Assert.NotEqual(Guid.Empty, usuario.Id);
+    }
+
+    [Fact]
+    public void Usuario_Should_Create_Without_Cedula_Or_Rnc_For_Social_Login()
+    {
+        // Act
+        var usuario = new Usuario("Google", "User", "google@example.com", "[NO_PASSWORD]", UserRole.User, "0000000000");
+
+        // Assert
+        Assert.Null(usuario.Cedula);
+        Assert.Null(usuario.Rnc);
+        Assert.Equal("Google User", usuario.NombreCompleto);
+        Assert.Equal("google@example.com", usuario.CorreoElectronico);
+        Assert.True(usuario.Activo);
     }
 
     [Fact]

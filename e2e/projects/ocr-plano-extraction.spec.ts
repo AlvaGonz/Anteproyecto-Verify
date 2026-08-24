@@ -110,6 +110,9 @@ function buildDocuments() {
 
 test.describe("OCR Plano Extraction - PLANO 505483687149", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("vf_has_session", "true");
+    });
     await page.route("**/api/auth/me", async (route) => {
       await route.fulfill({
         status: 200,

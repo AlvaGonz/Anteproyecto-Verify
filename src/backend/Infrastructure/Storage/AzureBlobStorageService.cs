@@ -16,8 +16,11 @@ public class AzureBlobStorageService : IBlobStorageService
 
     public AzureBlobStorageService(IOptions<AzureBlobOptions> options)
     {
-        var blobServiceClient = new BlobServiceClient(options.Value.ConnectionString);
-        _containerClient = blobServiceClient.GetBlobContainerClient(options.Value.ContainerName);
+        var connStr = string.IsNullOrWhiteSpace(options.Value.ConnectionString)
+            ? "UseDevelopmentStorage=true"
+            : options.Value.ConnectionString;
+        var blobServiceClient = new BlobServiceClient(connStr);
+        _containerClient = blobServiceClient.GetBlobContainerClient(string.IsNullOrWhiteSpace(options.Value.ContainerName) ? "verifinca-documents" : options.Value.ContainerName);
     }
 
     public async Task<UploadResult> UploadAsync(Stream stream, string fileName, string contentType, CancellationToken cancellationToken = default)

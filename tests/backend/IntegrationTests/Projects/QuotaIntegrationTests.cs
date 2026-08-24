@@ -23,7 +23,7 @@ public class QuotaIntegrationTests : IntegrationTestBase
 
     private static CreateProyectoDto ValidCreateProjectDto(Guid userId) => new(
         "Test Project Int", "Santo Domingo", userId,
-        16, "Developer SA", "CAT-001");
+        16, "Developer SA", RncDesarrollador: null, DesignacionCatastral: "CAT-001");
 
     [Fact]
     public async Task POST_CreateProject_ConsultorAlreadyHas1_Returns402()
