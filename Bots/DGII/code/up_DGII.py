@@ -286,8 +286,14 @@ def insert_chunk(chunk_id, chunk_records, attempt=1):
                             batch_success = True
                             break
                         else:
-                            print(f"    [Chunk {chunk_id}] PK violation on first attempt! This indicates duplicate data already exists in the table.")
-                            # We break instead of retry because a first-attempt PK violation is a hard error
+                            print(f"    [Chunk {chunk_id}] PK violation! Falling back to row-by-row insert to salvage missing records...")
+                            for row_data in batch:
+                                try:
+                                    cursor.execute(f"INSERT INTO DGII ({cols_str}) VALUES {row_placeholder}", tuple(row_data))
+                                except Exception as row_e:
+                                    pass
+                            conn.commit()
+                            batch_success = True
                             break
                     
                     if conn:
@@ -369,7 +375,7 @@ def main():
         cursor.execute("SELECT COUNT(*) FROM DGII")
         count = cursor.fetchone()[0]
         conn.close()
-        if count >= 780000:
+        if count >= 770000:
             print(f"DGII table is already fully loaded ({count} records). Skipping mount.")
             return
     except Exception as e:

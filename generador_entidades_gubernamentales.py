@@ -453,22 +453,17 @@ def setup_tables():
     conn.close()
     print("Table setup/update complete!")
 
-def get_rncs(file_path):
-    rncs = []
-    cedulas = []
-    with open(file_path, "r", encoding="latin-1") as f:
-        for line in f:
-            l = line.strip()
-            if not l: continue
-            parts = l.split("|")
-            if parts and parts[0].strip():
-                rnc = parts[0].strip()
-                if rnc.isdigit():
-                    if len(rnc) in [9, 11]:
-                        rncs.append(rnc)
-                    if len(rnc) == 11:
-                        cedulas.append(rnc)
-    return sorted(list(set(rncs))), sorted(list(set(cedulas)))
+def get_rncs(file_path=None):
+    # Fetch from database instead of text file to ensure referential integrity
+    print("Fetching unique RNCs directly from DGII table to ensure referential integrity...")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT Rnc FROM DGII")
+    rncs = [row[0] for row in cursor.fetchall()]
+    cedulas = [r for r in rncs if len(r) == 11]
+    conn.close()
+    return rncs, cedulas
 
 def generate_jce_records(cedulas_list):
     import datetime
@@ -501,13 +496,12 @@ def generate_jce_records(cedulas_list):
 def generate_ipi_records(rncs_list):
     pass # Replaced by integrated generator
 
-def generate_catastro_ps_ipi_records(rncs_list):
+def generate_catastro_ps_ipi_records(rncs_list, rnc_ipi_generated):
     import datetime
     base_matricula = random.randint(1000000000, 2000000000)
     base_titulo = random.randint(1000000000, 2000000000)
     start_date = datetime.date(2026, 7, 1)
     
-    rnc_ipi_generated = set()
     oficinas = ["D.N.", "SANTO DOMINGO ESTE", "SANTIAGO", "VIRTUAL", "PUERTO PLATA", "LA VEGA"]
     departamentos = ["NORTE", "SUR", "ESTE", "OESTE", "DISTRITO NACIONAL"]
     
@@ -623,142 +617,39 @@ def is_transient_error(e):
             return True
     return False
 
-def insert_ipi_chunk(chunk_id, chunk_records, attempt=1):
-    max_retries = 10
-    print(f"[IPI Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
-    conn = None
+def write_to_csv(writer, record, fields):
+    if not record: return
+    row = [str(record.get(f, '')) if record.get(f) is not None else '' for f in fields]
+    writer.writerow(row)
+
+def execute_bulk_insert(table_name, csv_filename):
+    print(f"[{table_name}] Executing BULK INSERT from {csv_filename}...")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    # Path inside the sqlserver container
+    container_path = f"/usr/config/seeds/{csv_filename}"
+    sql = f"""
+    BULK INSERT {table_name}
+    FROM '{container_path}'
+    WITH (
+        FIELDTERMINATOR = '|',
+        ROWTERMINATOR = '\n',
+        CODEPAGE = '65001',
+        BATCHSIZE = 100000,
+        TABLOCK
+    )
+    """
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        ph = "%s" if db_lib == "pymssql" else "?"
-        batch_size = 300
-        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
-            batch = chunk_records[i:i+batch_size]
-            sql_ipi = f"INSERT INTO PagoIPI (Rnc, Cuota_ipi, Estatus, NoCertificacion, NoInmueble, ParcelaNo, FechaCreacion) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
-            params_ipi = []
-            for r in batch: params_ipi.extend([r["rnc"], r["cuota_ipi"], r["estatus_ipi"], r.get("no_cert"), r.get("no_inmueble"), r.get("parcela_no"), r.get("fecha_creacion")])
-            cursor.execute(sql_ipi, tuple(params_ipi))
-            if (chunk_idx + 1) % 50 == 0:
-                conn.commit()
+        cursor.execute(sql)
         conn.commit()
-        return len(chunk_records)
+        print(f"[{table_name}] BULK INSERT completed successfully!")
     except Exception as e:
-        if conn:
-            try: conn.rollback()
-            except: pass
-        if attempt < max_retries and is_transient_error(e):
-            wait = (2 ** attempt) + (attempt * 0.5)
-            print(f"[IPI Worker {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
-            time.sleep(wait)
-            return insert_ipi_chunk(chunk_id, chunk_records, attempt + 1)
-        raise e
+        print(f"[{table_name}] BULK INSERT failed: {e}")
     finally:
-        if conn: conn.close()
-
-def insert_catastro_chunk(chunk_id, chunk_records, attempt=1):
-    max_retries = 10
-    print(f"[Catastro Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        ph = "%s" if db_lib == "pymssql" else "?"
-        batch_size = 200 # Incrementado a 200 para menos llamadas (límite 2100 params)
-        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
-            batch = chunk_records[i:i+batch_size]
-            
-            sql_cat = f"INSERT INTO CatastroTitulo (IdCatastroTitulo, CodigoDesignacionCatastral, NumeroTitulo, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, Matricula, Oficina, FechaInscripcion, FechaEmision, VieneDe, DesignCatastralOrigen, DesigCatastralPosicional) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
-            params_cat = []
-            for r in batch: 
-                params_cat.extend([r["id"], r["dc"], r["titulo"], r["rnc"], r["provincia"], r["municipio"], r["lat"], r["lon"], r["superficie"], r["matricula"], r["oficina"], r["fecha_inscripcion"], r["fecha_emision"], r["viene_de"], r["desig_catastral_origen"], r["desig_catastral_posicional"]])
-            cursor.execute(sql_cat, tuple(params_cat))
-            if (chunk_idx + 1) % 50 == 0:
-                conn.commit()
-        conn.commit()
-        return len(chunk_records)
-    except Exception as e:
-        if conn:
-            try: conn.rollback()
-            except: pass
-        if attempt < max_retries and is_transient_error(e):
-            wait = (2 ** attempt) + (attempt * 0.5)
-            print(f"[Catastro Worker {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
-            time.sleep(wait)
-            return insert_catastro_chunk(chunk_id, chunk_records, attempt + 1)
-        raise e
-    finally:
-        if conn: conn.close()
-
-def insert_ps_chunk(chunk_id, chunk_records, attempt=1):
-    if not chunk_records: return 0
-    max_retries = 10
-    print(f"[PermisoSuelo Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        ph = "%s" if db_lib == "pymssql" else "?"
-        batch_size = 180 # Incrementado a 180 para menos llamadas
-        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
-            batch = chunk_records[i:i+batch_size]
-            
-            sql_ps = f"INSERT INTO PermisoSuelo (IdPSuelo, NumeroPermiso, NumeroExpediente, FechaEmision, Rnc, Provincia, Municipio, Latitud, Longitud, Superficie, TienePermiso, Documento, Departamento, Operacion, Seccion, Lugar, MivedId, UnidadesHabitacionales, LocalesComerciales) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, NULL, {ph}, {ph}, {ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
-            params_ps = []
-            for p in batch:
-                params_ps.extend([p["id"], p["num_permiso"], p["num_exp"], p["fecha"], p["rnc"], p["provincia"], p["municipio"], p["lat"], p["lon"], p["superficie"], p["tiene_permiso"], p["departamento"], p["operacion"], p["seccion"], p["lugar"], p.get("mived_id"), p.get("unidades"), p.get("locales")])
-            cursor.execute(sql_ps, tuple(params_ps))
-            if (chunk_idx + 1) % 50 == 0:
-                conn.commit()
-        conn.commit()
-        return len(chunk_records)
-    except Exception as e:
-        if conn:
-            try: conn.rollback()
-            except: pass
-        if attempt < max_retries and is_transient_error(e):
-            wait = (2 ** attempt) + (attempt * 0.5)
-            print(f"[PermisoSuelo Worker {chunk_id}] Transient error (attempt {attempt}/{max_retries}): {e}. Retrying in {wait}s...")
-            time.sleep(wait)
-            return insert_ps_chunk(chunk_id, chunk_records, attempt + 1)
-        raise e
-    finally:
-        if conn: conn.close()
+        conn.close()
 
 
-def insert_jce_chunk(chunk_id, chunk_records, attempt=1):
-    if not chunk_records: return 0
-    max_retries = 10
-    print(f"[JCE Worker {chunk_id}] Attempt {attempt}/{max_retries} — {len(chunk_records)} records...")
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        ph = "%s" if db_lib == "pymssql" else "?"
-        batch_size = 300
-        for chunk_idx, i in enumerate(range(0, len(chunk_records), batch_size)):
-            batch = chunk_records[i:i+batch_size]
-            sql = f"INSERT INTO JCE_Ciudadano (Cedula, Nombres, Apellidos, FechaNacimiento, FechaExpiracion) VALUES " + ", ".join([f"({ph}, {ph}, {ph}, {ph}, {ph})"] * len(batch))
-            params = []
-            for r in batch: params.extend([r["cedula"], r["nombres"], r["apellidos"], r["fnac"], r["fexp"]])
-            cursor.execute(sql, tuple(params))
-            if (chunk_idx + 1) % 50 == 0:
-                conn.commit()
-        conn.commit()
-        return len(chunk_records)
-    except Exception as e:
-        if conn:
-            try: conn.rollback()
-            except: pass
-        if attempt < max_retries and is_transient_error(e):
-            wait = (2 ** attempt) + (attempt * 0.5)
-            time.sleep(wait)
-            return insert_jce_chunk(chunk_id, chunk_records, attempt + 1)
-        raise e
-    finally:
-        if conn: conn.close()
-
-
-def generate_linked_records(licencias_list):
+def generate_linked_records(licencias_list, rncs_list, rnc_ipi_generated):
     import datetime
     import uuid
     import random
@@ -776,7 +667,8 @@ def generate_linked_records(licencias_list):
         municipio = licencia["Municipio"]
         unidades = licencia.get("UnidadesHabitacionales", 0)
         locales = licencia.get("LocalesComerciales", 0)
-        rnc = licencia.get("Rnc", '000000000')
+        rnc = licencia.get("Rnc")
+        if not rnc: rnc = random.choice(rncs_list)
         
         # --- CATASTRO TITULO ---
         base_dc = f"{random.randint(1,99):02d}{random.randint(1,500):04d}{random.randint(100000, 999999)}"
@@ -835,16 +727,19 @@ def generate_linked_records(licencias_list):
         }
         
         # --- PAGO IPI ---
-        cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
-        estatus_ipi = random.choice(["Pagado", "No Pagado"])
-        num_cert = str(random.randint(100000000000, 999999999999))
-        day_offset_ipi = random.randint(0, 183)
-        fecha_creacion_ipi = start_date + datetime.timedelta(days=day_offset_ipi)
-        ipi_record = {
-            "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi,
-            "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc,
-            "fecha_creacion": fecha_creacion_ipi.strftime("%Y-%m-%d")
-        }
+        ipi_record = None
+        if rnc not in rnc_ipi_generated:
+            rnc_ipi_generated.add(rnc)
+            cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
+            estatus_ipi = random.choice(["Pagado", "No Pagado"])
+            num_cert = str(random.randint(100000000000, 999999999999))
+            day_offset_ipi = random.randint(0, 183)
+            fecha_creacion_ipi = start_date + datetime.timedelta(days=day_offset_ipi)
+            ipi_record = {
+                "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi,
+                "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc,
+                "fecha_creacion": fecha_creacion_ipi.strftime("%Y-%m-%d")
+            }
         
         yield cat_record, ps_record, ipi_record
 
@@ -979,26 +874,23 @@ def main():
     
     t_start = time.time()
     
-    print("Submitting JCE tasks...")
-    chunk_size = 150000
-    jce_chunk = []
-    jce_count = 0
-    t_jce_start = time.time()
-    with ThreadPoolExecutor(max_workers=12) as executor:
-        futures_jce = []
-        for rec in generate_jce_records(cedulas_list):
-            jce_chunk.append(rec)
-            if len(jce_chunk) >= chunk_size:
-                jce_count += 1
-                futures_jce.append(executor.submit(insert_jce_chunk, f"JCE_{jce_count}", jce_chunk))
-                jce_chunk = []
-        if jce_chunk:
-            jce_count += 1
-            futures_jce.append(executor.submit(insert_jce_chunk, f"JCE_{jce_count}", jce_chunk))
-        print("Waiting for JCE completion...")
-        for fut in as_completed(futures_jce):
-            try: fut.result()
-            except Exception as e: print(f"Worker error JCE: {e}")
+    print("Generating JCE Ciudadano records to CSV...")
+    import csv
+    base_dir = os.path.dirname(__file__)
+    seeds_dir = os.path.join(base_dir, "src", "backend", "Tools", "DbSeeder", "Scripts")
+    os.makedirs(seeds_dir, exist_ok=True)
+    
+    path_jce = os.path.join(seeds_dir, "JCE_bulk.csv")
+    f_jce = open(path_jce, 'w', encoding='utf-8', newline='')
+    w_jce = csv.writer(f_jce, delimiter='|', lineterminator='\n')
+    
+    jce_fields = ["cedula", "nombres", "apellidos", "fnac", "fexp"]
+    for record in generate_jce_records(cedulas_list):
+        write_to_csv(w_jce, record, jce_fields)
+        
+    f_jce.close()
+    print("Executing BULK INSERT for JCE Ciudadano...")
+    execute_bulk_insert("JCE_Ciudadano", "JCE_bulk.csv")
     t_jce_end = time.time()
     
 
@@ -1015,94 +907,49 @@ def main():
         print(f"Failed to load Licencias: {e}")
         licencias_list = []
         
-    print("Submitting Linked Generation (Catastro + PS + IPI from Licencias)...")
-    t_ps_start = time.time()
-    catastro_chunk = []
-    ps_chunk = []
-    ipi_chunk = []
-    c_count, p_count, i_count = 0, 0, 0
+    print("Generating Catastro, PermisoSuelo and PagoIPI records to CSV...")
+    path_cat = os.path.join(seeds_dir, "Catastro_bulk.csv")
+    path_ps = os.path.join(seeds_dir, "PS_bulk.csv")
+    path_ipi = os.path.join(seeds_dir, "IPI_bulk.csv")
+
+    f_cat = open(path_cat, 'w', encoding='utf-8', newline='')
+    w_cat = csv.writer(f_cat, delimiter='|', lineterminator='\n')
+    cat_fields = ["id", "dc", "titulo", "rnc", "provincia", "municipio", "lat", "lon", "superficie", "matricula", "oficina", "fecha_inscripcion", "fecha_emision", "viene_de", "desig_catastral_origen", "desig_catastral_posicional"]
+
+    f_ps = open(path_ps, 'w', encoding='utf-8', newline='')
+    w_ps = csv.writer(f_ps, delimiter='|', lineterminator='\n')
+    ps_fields = ["id", "num_permiso", "num_exp", "fecha", "rnc", "provincia", "municipio", "lat", "lon", "superficie", "tiene_permiso", "documento", "departamento", "operacion", "seccion", "lugar", "mived_id", "unidades", "locales"]
+
+    f_ipi = open(path_ipi, 'w', encoding='utf-8', newline='')
+    w_ipi = csv.writer(f_ipi, delimiter='|', lineterminator='\n')
+    ipi_fields = ["rnc", "cuota_ipi", "estatus_ipi", "no_cert", "no_inmueble", "parcela_no", "fecha_creacion"]
     
-    with ThreadPoolExecutor(max_workers=12) as executor:
-        futures_linked = []
-        for cat_r, ps_r, ipi_r in generate_linked_records(licencias_list):
-            catastro_chunk.append(cat_r)
-            ps_chunk.append(ps_r)
-            ipi_chunk.append(ipi_r)
+    global_rnc_ipi_generated = set()
+    
+    print("Writing Linked Generation (Catastro + PS + IPI from Licencias)...")
+    for cat_r, ps_r, ipi_r in generate_linked_records(licencias_list, rncs_list, global_rnc_ipi_generated):
+        write_to_csv(w_cat, cat_r, cat_fields)
+        write_to_csv(w_ps, ps_r, ps_fields)
+        write_to_csv(w_ipi, ipi_r, ipi_fields)
             
-            if len(catastro_chunk) >= chunk_size:
-                c_count += 1
-                futures_linked.append(executor.submit(insert_catastro_chunk, f"LINKED_CAT_{c_count}", catastro_chunk))
-                catastro_chunk = []
-            if len(ps_chunk) >= chunk_size:
-                p_count += 1
-                futures_linked.append(executor.submit(insert_ps_chunk, f"LINKED_PS_{p_count}", ps_chunk))
-                ps_chunk = []
-            if len(ipi_chunk) >= chunk_size:
-                i_count += 1
-                futures_linked.append(executor.submit(insert_ipi_chunk, f"LINKED_IPI_{i_count}", ipi_chunk))
-                ipi_chunk = []
-                
-        if catastro_chunk:
-            c_count += 1
-            futures_linked.append(executor.submit(insert_catastro_chunk, f"LINKED_CAT_{c_count}", catastro_chunk))
-        if ps_chunk:
-            p_count += 1
-            futures_linked.append(executor.submit(insert_ps_chunk, f"LINKED_PS_{p_count}", ps_chunk))
-        if ipi_chunk:
-            i_count += 1
-            futures_linked.append(executor.submit(insert_ipi_chunk, f"LINKED_IPI_{i_count}", ipi_chunk))
-            
-        for fut in as_completed(futures_linked):
-            try: fut.result()
-            except Exception as e: print(f"Worker error Linked: {e}")
-            
-    print("Submitting remaining Catastro and IPI tasks simultaneously...")
-    catastro_chunk = []
-    ps_chunk = []
-    ipi_chunk = []
-    c_count = 0
-    p_count = 0
-    i_count = 0
+    print("Writing remaining Catastro and IPI records...")
     t_cat_ps_start = time.time()
     
-    with ThreadPoolExecutor(max_workers=12) as executor:
-        futures_all = []
-        for cat_r, ps_r, ipi_r in generate_catastro_ps_ipi_records(rncs_list):
-            catastro_chunk.append(cat_r)
-            if ps_r is not None:
-                ps_chunk.append(ps_r)
-            if ipi_r is not None:
-                ipi_chunk.append(ipi_r)
-                
-            if len(catastro_chunk) >= chunk_size:
-                c_count += 1
-                futures_all.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
-                catastro_chunk = []
-                
-            if len(ps_chunk) >= chunk_size:
-                p_count += 1
-                futures_all.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
-                ps_chunk = []
-                
-            if len(ipi_chunk) >= chunk_size:
-                i_count += 1
-                futures_all.append(executor.submit(insert_ipi_chunk, f"IPI_{i_count}", ipi_chunk))
-                ipi_chunk = []
-                
-        if catastro_chunk:
-            c_count += 1
-            futures_all.append(executor.submit(insert_catastro_chunk, f"CAT_{c_count}", catastro_chunk))
-        if ps_chunk:
-            p_count += 1
-            futures_all.append(executor.submit(insert_ps_chunk, f"PS_{p_count}", ps_chunk))
-        if ipi_chunk:
-            i_count += 1
-            futures_all.append(executor.submit(insert_ipi_chunk, f"IPI_{i_count}", ipi_chunk))
+    for cat_r, ps_r, ipi_r in generate_catastro_ps_ipi_records(rncs_list, global_rnc_ipi_generated):
+        write_to_csv(w_cat, cat_r, cat_fields)
+        write_to_csv(w_ps, ps_r, ps_fields)
+        write_to_csv(w_ipi, ipi_r, ipi_fields)
             
-        print("Waiting for Catastro, PS, IPI completion...")
-        for fut in as_completed(futures_all):
-            try: fut.result()
-            except Exception as e: print(f"Worker error CAT/PS/IPI: {e}")
+    f_cat.close()
+    f_ps.close()
+    f_ipi.close()
+
+    print("Executing BULK INSERT for Catastro, PermisoSuelo, and PagoIPI...")
+    # SQL Server expects missing columns to be handled, but we have to ensure the columns match perfectly
+    # or specify a format file. Our python CSV exactly matches the target table layout.
+    execute_bulk_insert("CatastroTitulo", "Catastro_bulk.csv")
+    execute_bulk_insert("PermisoSuelo", "PS_bulk.csv")
+    execute_bulk_insert("PagoIPI", "IPI_bulk.csv")
                 
     t_cat_ps_end = time.time()
             
