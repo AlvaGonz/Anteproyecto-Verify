@@ -453,22 +453,17 @@ def setup_tables():
     conn.close()
     print("Table setup/update complete!")
 
-def get_rncs(file_path):
-    rncs = []
-    cedulas = []
-    with open(file_path, "r", encoding="latin-1") as f:
-        for line in f:
-            l = line.strip()
-            if not l: continue
-            parts = l.split("|")
-            if parts and parts[0].strip():
-                rnc = parts[0].strip()
-                if rnc.isdigit():
-                    if len(rnc) in [9, 11]:
-                        rncs.append(rnc)
-                    if len(rnc) == 11:
-                        cedulas.append(rnc)
-    return sorted(list(set(rncs))), sorted(list(set(cedulas)))
+def get_rncs(file_path=None):
+    # Fetch from database instead of text file to ensure referential integrity
+    print("Fetching unique RNCs directly from DGII table to ensure referential integrity...")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT Rnc FROM DGII")
+    rncs = [row[0] for row in cursor.fetchall()]
+    cedulas = [r for r in rncs if len(r) == 11]
+    conn.close()
+    return rncs, cedulas
 
 def generate_jce_records(cedulas_list):
     import datetime
@@ -501,13 +496,12 @@ def generate_jce_records(cedulas_list):
 def generate_ipi_records(rncs_list):
     pass # Replaced by integrated generator
 
-def generate_catastro_ps_ipi_records(rncs_list):
+def generate_catastro_ps_ipi_records(rncs_list, rnc_ipi_generated):
     import datetime
     base_matricula = random.randint(1000000000, 2000000000)
     base_titulo = random.randint(1000000000, 2000000000)
     start_date = datetime.date(2026, 7, 1)
     
-    rnc_ipi_generated = set()
     oficinas = ["D.N.", "SANTO DOMINGO ESTE", "SANTIAGO", "VIRTUAL", "PUERTO PLATA", "LA VEGA"]
     departamentos = ["NORTE", "SUR", "ESTE", "OESTE", "DISTRITO NACIONAL"]
     
@@ -758,7 +752,7 @@ def insert_jce_chunk(chunk_id, chunk_records, attempt=1):
         if conn: conn.close()
 
 
-def generate_linked_records(licencias_list):
+def generate_linked_records(licencias_list, rncs_list, rnc_ipi_generated):
     import datetime
     import uuid
     import random
@@ -776,7 +770,8 @@ def generate_linked_records(licencias_list):
         municipio = licencia["Municipio"]
         unidades = licencia.get("UnidadesHabitacionales", 0)
         locales = licencia.get("LocalesComerciales", 0)
-        rnc = licencia.get("Rnc", '000000000')
+        rnc = licencia.get("Rnc")
+        if not rnc: rnc = random.choice(rncs_list)
         
         # --- CATASTRO TITULO ---
         base_dc = f"{random.randint(1,99):02d}{random.randint(1,500):04d}{random.randint(100000, 999999)}"
@@ -835,16 +830,19 @@ def generate_linked_records(licencias_list):
         }
         
         # --- PAGO IPI ---
-        cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
-        estatus_ipi = random.choice(["Pagado", "No Pagado"])
-        num_cert = str(random.randint(100000000000, 999999999999))
-        day_offset_ipi = random.randint(0, 183)
-        fecha_creacion_ipi = start_date + datetime.timedelta(days=day_offset_ipi)
-        ipi_record = {
-            "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi,
-            "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc,
-            "fecha_creacion": fecha_creacion_ipi.strftime("%Y-%m-%d")
-        }
+        ipi_record = None
+        if rnc not in rnc_ipi_generated:
+            rnc_ipi_generated.add(rnc)
+            cuota_ipi = round(random.uniform(500.0, 25000.0), 2)
+            estatus_ipi = random.choice(["Pagado", "No Pagado"])
+            num_cert = str(random.randint(100000000000, 999999999999))
+            day_offset_ipi = random.randint(0, 183)
+            fecha_creacion_ipi = start_date + datetime.timedelta(days=day_offset_ipi)
+            ipi_record = {
+                "rnc": rnc, "cuota_ipi": cuota_ipi, "estatus_ipi": estatus_ipi,
+                "no_cert": num_cert, "no_inmueble": dc, "parcela_no": base_dc,
+                "fecha_creacion": fecha_creacion_ipi.strftime("%Y-%m-%d")
+            }
         
         yield cat_record, ps_record, ipi_record
 
@@ -1022,9 +1020,11 @@ def main():
     ipi_chunk = []
     c_count, p_count, i_count = 0, 0, 0
     
+    global_rnc_ipi_generated = set()
+    
     with ThreadPoolExecutor(max_workers=12) as executor:
         futures_linked = []
-        for cat_r, ps_r, ipi_r in generate_linked_records(licencias_list):
+        for cat_r, ps_r, ipi_r in generate_linked_records(licencias_list, rncs_list, global_rnc_ipi_generated):
             catastro_chunk.append(cat_r)
             ps_chunk.append(ps_r)
             ipi_chunk.append(ipi_r)
@@ -1067,7 +1067,7 @@ def main():
     
     with ThreadPoolExecutor(max_workers=12) as executor:
         futures_all = []
-        for cat_r, ps_r, ipi_r in generate_catastro_ps_ipi_records(rncs_list):
+        for cat_r, ps_r, ipi_r in generate_catastro_ps_ipi_records(rncs_list, global_rnc_ipi_generated):
             catastro_chunk.append(cat_r)
             if ps_r is not None:
                 ps_chunk.append(ps_r)
