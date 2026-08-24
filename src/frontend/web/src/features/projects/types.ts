@@ -26,6 +26,7 @@ export interface ProyectoDto {
   nombre: string;
   ubicacionTexto: string;
   ubicacionGps?: string;
+  cercania?: string;
   valorEstimado?: number;
   categoriaId: number;
   categoriaNombre: string;
@@ -69,6 +70,7 @@ export interface CreateProyectoDto {
   rncDesarrollador?: string;
   designacionCatastral?: string;
   ubicacionGps?: string;
+  cercania?: string;
   matricula?: string;
   propietario?: string;
   cedulaRncPropietario?: string;
@@ -88,6 +90,7 @@ export interface UpdateProyectoDto {
   nombre: string;
   ubicacionTexto: string;
   ubicacionGps?: string;
+  cercania?: string;
   valorEstimado?: number;
   categoriaId: number;
   datosDesarrollador?: string;

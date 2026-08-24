@@ -11,6 +11,8 @@ interface ProjectFormDetailsFieldsProps {
   superficieM2: string | number;
   setSuperficieM2: (v: string | number) => void;
   duplicateError?: string | null;
+  cercania: string;
+  setCercania: (v: string) => void;
 }
 
 export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> = ({
@@ -23,6 +25,8 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
   superficieM2,
   setSuperficieM2: _setSuperficieM2,
   duplicateError,
+  cercania,
+  setCercania: _setCercania,
 }) => (
   <div className="vf-card p-8 space-y-5 bg-white/90 backdrop-blur-md">
     <h3 className="text-lg font-bold text-[var(--color-text-primary)] border-b border-[var(--color-border)]/20 pb-2">
@@ -51,6 +55,25 @@ export const ProjectFormDetailsFields: React.FC<ProjectFormDetailsFieldsProps> =
         </p>
       )}
     </div>
+
+    {/* Referencia de Cercanía */}
+    {cercania && (
+      <div className="animate-fade-in">
+        <label htmlFor="cercania" className="block text-sm font-semibold text-[var(--color-text-primary)] mb-1.5">
+          Referencia de Cercanía (OSM)
+        </label>
+        <div className="relative">
+          <input
+            id="cercania"
+            type="text"
+            disabled={true}
+            value={cercania}
+            className="vf-input pl-10 bg-gray-50 cursor-not-allowed border-gray-200"
+          />
+          <MapPin className="absolute left-3.5 top-4 w-4 h-4 text-primary opacity-60" />
+        </div>
+      </div>
+    )}
 
     {/* Designación Catastral */}
     <div>

@@ -23,7 +23,7 @@ public static class ApplicationBuilderExtensions
 
         // RNF-3: fuera de Development el API jamás sirve contenido en claro
         // (el entorno dev/docker corre HTTP puro, donde no aplica redirigir).
-        if (!app.Environment.IsDevelopment())
+        if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
         {
             app.UseHsts();
             app.UseHttpsRedirection();

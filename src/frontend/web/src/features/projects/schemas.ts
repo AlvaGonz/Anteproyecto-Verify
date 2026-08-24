@@ -18,6 +18,7 @@ export const createProjectSchema = z.object({
     .max(100, "Designación catastral demasiado larga")
     .optional()
     .or(z.literal("")),
+  cercania: z.string().max(1000).optional(),
   valorEstimado: z
     .number({ error: () => "Debe ser un número" })
     .positive({ error: "El valor debe ser positivo" })

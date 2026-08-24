@@ -4,4 +4,5 @@ public record ProyectoEstadoCatalogoDto(
     Guid EstadoId,
     string CodigoUnico,
     string Nombre,
-    string ColorHex);
+    string ColorHex,
+    bool Activo);

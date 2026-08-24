@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { projectsApi } from "../projectsApi";
+import {
   ProjectStatus,
   IntegrityStatus,
 } from "../../types";

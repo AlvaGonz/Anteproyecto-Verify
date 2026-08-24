@@ -287,6 +287,38 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
 
   // Map Search State
   const [mapSearchText, setMapSearchText] = useState("");
+  const [cercania, setCercania] = useState(initialData?.cercania ?? "");
+
+  const fetchNearbyPoi = useCallback(async (lat: number, lng: number) => {
+    try {
+      const osmRes = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=18&addressdetails=1`
+      );
+      if (osmRes.ok) {
+        const osmData = await osmRes.json();
+        const placeLat = parseFloat(osmData.lat);
+        const placeLon = parseFloat(osmData.lon);
+        
+        // Simple Euclidean distance in meters
+        const dLat = (placeLat - lat) * 111139;
+        const dLng = (placeLon - lng) * 111139 * Math.cos(lat * Math.PI / 180);
+        const distance = Math.sqrt(dLat * dLat + dLng * dLng);
+        
+        const addr = osmData.address;
+        let reference = "";
+        // If distance is <= 10m and there's a valid address object, check for POIs
+        if (addr && distance <= 10) {
+          const poi = addr.amenity || addr.shop || addr.tourism || addr.historic || addr.leisure || addr.office || addr.government || addr.building || addr.industrial;
+          if (poi) {
+            reference = `Cerca de: ${poi}`;
+          }
+        }
+        setCercania(reference);
+      }
+    } catch (err) {
+      console.error("Error fetching OSM Nominatim:", err);
+    }
+  }, []);
 
   const handleSearchCoordinates = useCallback(async () => {
     const map = leafletMapRef.current;
@@ -301,6 +333,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       map.flyTo([lat, lng], 13, { duration: 1.2 });
 
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
+      fetchNearbyPoi(lat, lng);
 
       skipFlyToRef.current = true;
       let closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
@@ -364,6 +397,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     map.on("click", async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
+      fetchNearbyPoi(lat, lng);
 
       skipFlyToRef.current = true;
       const closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
@@ -517,6 +551,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           nombre,
           ubicacionTexto,
           ubicacionGps: ubicacionGps || undefined,
+          cercania: cercania || undefined,
           valorEstimado: valorEstimado === "" ? undefined : Number(valorEstimado),
           categoriaId,
           datosDesarrollador: datosDesarrollador || undefined,
@@ -547,6 +582,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
           rncDesarrollador: rncDesarrollador || undefined,
           designacionCatastral: designacionCatastral || undefined,
           ubicacionGps: ubicacionGps || undefined,
+          cercania: cercania || undefined,
           matricula: matricula || undefined,
           superficieM2: superficieM2 === "" ? undefined : Number(superficieM2),
           propietario: propietario || undefined,
@@ -634,6 +670,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       valorEstimado, setValorEstimado,
       superficieM2, setSuperficieM2,
       duplicateError,
+      cercania, setCercania,
     } as const,
     documentSection: {
       portraitUrl: imagenUrl,

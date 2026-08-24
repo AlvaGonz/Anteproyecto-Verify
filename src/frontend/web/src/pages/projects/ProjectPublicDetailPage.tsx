@@ -561,6 +561,19 @@ export const ProjectPublicDetailPage: React.FC = () => {
                           </div>
                         </div>
                       )}
+                      {project.cercania && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <MapPin className="w-4 h-4 text-primary animate-pulse" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400 block mb-0.5">Referencia Cercanía</span>
+                            <span className="text-sm font-bold text-emerald-300 break-words block">
+                              {project.cercania}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                       {project.registradoPor.direccion && (
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">

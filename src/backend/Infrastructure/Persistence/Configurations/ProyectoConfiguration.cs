@@ -16,6 +16,7 @@ public class ProyectoConfiguration : IEntityTypeConfiguration<Proyecto>
         builder.Property(p => p.Nombre).HasColumnName("NombreProyecto").IsRequired().HasMaxLength(200);
         builder.Property(p => p.UbicacionTexto).IsRequired().HasMaxLength(500);
         builder.Property(p => p.UbicacionGps).HasMaxLength(100);
+        builder.Property(p => p.Cercania).HasColumnName("Cercania").HasMaxLength(1000);
         builder.Property(p => p.ImagenUrl).HasMaxLength(2048);
         builder.Property(p => p.ImagenAdicional1).HasMaxLength(2048);
         builder.Property(p => p.ImagenAdicional2).HasMaxLength(2048);

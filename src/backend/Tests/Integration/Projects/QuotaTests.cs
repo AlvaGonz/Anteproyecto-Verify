@@ -16,7 +16,7 @@ public class QuotaTests : IntegrationTestBase
         ubicacionTexto = "Santo Domingo, DN",
         categoriaId = 16,
         datosDesarrollador = "Dev SA",
-        designacionCatastral = "CAT-001",
+        designacionCatastral = $"CAT-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}",
         usuarioCreadorId = userId
     };
 

@@ -25,5 +25,6 @@ public record UpdateProyectoDto(
     string? ImagenAdicional4 = null,
     string? ImagenAdicional5 = null,
     Guid? ProvinciaId = null,
+    string? Cercania = null,
     bool Force = false
 );

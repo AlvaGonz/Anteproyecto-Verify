@@ -38,7 +38,12 @@ public record ProyectoDto(
     string? PlanNombre = null,
     Guid? ProvinciaId = null,
     string? ProvinciaNombre = null,
-    int IntegridadValidada = 0
+    int IntegridadValidada = 0,
+    string? Cercania = null,
+    Guid? EstadoId = null,
+    string? EstadoNombre = null,
+    string? EstadoColorHex = null,
+    bool? EstadoActivo = null
 );
 
 public record ProjectRegistrantDto(
@@ -89,5 +94,6 @@ public record CreateProyectoDto(
     string? ImagenAdicional4 = null,
     string? ImagenAdicional5 = null,
     Guid? ProvinciaId = null,
+    string? Cercania = null,
     bool Force = false
 );

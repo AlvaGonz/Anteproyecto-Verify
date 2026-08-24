@@ -55,6 +55,21 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         int checkDigit = (10 - (sum % 10)) % 10;
         var cedula = $"{baseDigits.Substring(0, 3)}-{baseDigits.Substring(3, 7)}-{checkDigit}";
 
+        // Enforce FK_Usuario_JCE_Ciudadano_Cedula by adding to mock JCE first
+        using (var scope = Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.JCE_Ciudadanos.Add(new Domain.Entities.JCE_Ciudadano
+            {
+                Cedula = cedula,
+                Nombres = "Test",
+                Apellidos = "User",
+                FechaNacimiento = DateTime.UtcNow.AddYears(-30),
+                FechaExpiracion = DateTime.UtcNow.AddYears(10)
+            });
+            await db.SaveChangesAsync();
+        }
+
         var registerResponse = await Client.PostAsJsonAsync(
             "/api/auth/register", new
             {

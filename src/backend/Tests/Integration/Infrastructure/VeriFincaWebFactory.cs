@@ -63,6 +63,7 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
                     "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;" +
                     "BlobEndpoint=http://localhost:10000/devstoreaccount1;",
                 ["AzureBlob:ContainerName"] = "verifinca-documents",
+                ["Storage:AesEncryptionKey"] = Convert.ToBase64String(System.Linq.Enumerable.Repeat((byte)7, 32).ToArray()),
                 ["IsTestingEnvironment"] = "true"
             });
         });

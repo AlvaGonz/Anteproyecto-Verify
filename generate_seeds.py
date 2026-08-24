@@ -199,6 +199,15 @@ def main():
         u["email"] = f"{u['nombre'].lower()}.{u['apellido'].lower()}.{idx}@example.com"
         u["cedula"] = f"402-0000{str(idx).zfill(3)}-1"
 
+    # JCE_Ciudadano - Seed citizens to satisfy FK on Cedula
+    with open(f"{output_dir}/04b_JceCiudadano.sql", "w") as f:
+        f.write("-- Seed for JCE_Ciudadano (Mock Citizens)\n")
+        f.write("SET NOCOUNT ON;\n")
+        f.write("SET QUOTED_IDENTIFIER ON;\n")
+        for u in users:
+            f.write(f"IF NOT EXISTS (SELECT 1 FROM JCE_Ciudadano WHERE Cedula = '{u['cedula']}')\n")
+            f.write(f"INSERT INTO JCE_Ciudadano (Cedula, Nombres, Apellidos, FechaNacimiento, FechaExpiracion) VALUES ('{u['cedula']}', '{u['nombre']}', '{u['apellido']}', '1985-05-15', '2030-05-15');\n")
+
     with open(f"{output_dir}/05_Usuario.sql", "w") as f:
         f.write("-- Seed for Usuario\n")
         f.write("SET NOCOUNT ON;\n")
@@ -215,25 +224,6 @@ def main():
                 comercial_name = u["comercial_name"].replace(chr(39), chr(39)+chr(39))
                 f.write(f"IF NOT EXISTS (SELECT 1 FROM DGII WHERE Rnc = '{u['rnc']}')\n")
                 f.write(f"INSERT INTO DGII (Rnc, NombreRazonSocial, NombreComercial, Estado, Categoria, FechaModificacion) VALUES ('{u['rnc']}', '{company_name}', '{comercial_name}', 'ACTIVO', 'INMOBILIARIA', GETUTCDATE());\n")
-
-    # UsuarioLegacy - Seed UsuarioLegacy and match with Usuario
-    with open(f"{output_dir}/06_UsuarioLegacy.sql", "w") as f:
-        f.write("-- Seed for UsuarioLegacy\n")
-        f.write("SET NOCOUNT ON;\n")
-        f.write("SET QUOTED_IDENTIFIER ON;\n")
-        
-        # 1. Insert modern users into UsuarioLegacy
-        for u in users:
-            f.write(f"IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '{u['id']}')\n")
-            f.write(f"INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('{u['id']}', '{u['nombre']}', '{u['apellido']}', '{u['email']}', 'HASHED_PWD', '809-555-0000', '{u['cedula']}');\n")
-            
-        # 2. Insert 5 legacy users to both Usuario and UsuarioLegacy
-        for i in range(5):
-            u_id = str(uuid.uuid4()).upper()
-            f.write(f"IF NOT EXISTS (SELECT 1 FROM Usuario WHERE IdUsuario = '{u_id}')\n")
-            f.write(f"INSERT INTO Usuario (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula, Rol, Activo, EmailVerificado, PlanSuscripcionId, CreatedAtUtc, UpdatedAtUtc, ConsultasUsadas, PerfilId) VALUES ('{u_id}', 'Legacy{i}', 'User{i}', 'legacy{i}@example.com', 'HASH', '809-000-0000', '000-0000000-0', 2, 1, 1, '{plans[0]['id']}', GETUTCDATE(), GETUTCDATE(), 0, '{perfiles[0]['id']}');\n")
-            f.write(f"IF NOT EXISTS (SELECT 1 FROM UsuarioLegacy WHERE IdUsuario = '{u_id}')\n")
-            f.write(f"INSERT INTO UsuarioLegacy (IdUsuario, Nombre, Apellido, Email, ContrasenaHash, Telefono, Cedula) VALUES ('{u_id}', 'Legacy{i}', 'User{i}', 'legacy{i}@example.com', 'HASH', '809-000-0000', '000-0000000-0');\n")
 
     # Pagos & LogPagos
     api_id = str(uuid.uuid4()).upper()

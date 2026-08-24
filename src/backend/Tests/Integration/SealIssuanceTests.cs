@@ -42,8 +42,8 @@ public class SealIssuanceTests : IntegrationTestBase
                 "CAT-SEAL-ISSUE");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");
             projIdProp?.SetValue(project, projectId);
-            var estadoCreado = await db.ProyectoEstados.FirstAsync();
-            project.UpdateEstado(estadoCreado.Id);
+            var estadoPublicado = await db.ProyectoEstados.FirstAsync(e => e.CodigoUnico == "PUBLICADO");
+            project.UpdateEstado(estadoPublicado.Id);
             
             db.Proyectos.Add(project);
             await db.SaveChangesAsync();
@@ -86,8 +86,8 @@ var project = new Proyecto(
                 "CAT-SEAL-DUP");
             var projIdProp = typeof(Domain.Common.EntityBase).GetProperty("Id");
             projIdProp?.SetValue(project, projectId);
-            var estadoCreado = await db.ProyectoEstados.FirstAsync();
-            project.UpdateEstado(estadoCreado.Id);
+            var estadoPublicado = await db.ProyectoEstados.FirstAsync(e => e.CodigoUnico == "PUBLICADO");
+            project.UpdateEstado(estadoPublicado.Id);
             db.Proyectos.Add(project);
 
             var existingSeal = new SelloIntegridad(
