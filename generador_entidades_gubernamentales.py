@@ -878,13 +878,18 @@ def import_csv_to_db(csv_path, table_name, conn_params, db_lib):
         print(f"Warning: Could not fetch valid RNCs from DGII: {e}")
 
     inserted_pago_ipi_rncs = set()
+    available_rncs = list(valid_rncs)
+    random.shuffle(available_rncs) # Shuffle to pop randomly without loops
+    
     def get_unused_rnc():
-        for _ in range(100):
-            r = random.choice(valid_rncs_list)
+        # Pop from available RNCs to guarantee uniqueness
+        while available_rncs:
+            r = available_rncs.pop()
             if r not in inserted_pago_ipi_rncs:
                 inserted_pago_ipi_rncs.add(r)
                 return r
-        return random.choice(valid_rncs_list)
+        # Fallback if we run out of valid RNCs
+        raise ValueError("No more valid, unused RNCs available for PagoIPI.")
     
     with open(csv_path, 'r', encoding='utf-8') as f:
         reader = csv.reader(f, delimiter='|')
@@ -907,13 +912,17 @@ def import_csv_to_db(csv_path, table_name, conn_params, db_lib):
                     if i == rnc_idx:
                         if val in valid_rncs:
                             if table_name == 'PagoIPI':
-                                inserted_pago_ipi_rncs.add(val)
+                                # If this RNC is already used during this run, force a new one
+                                if val in inserted_pago_ipi_rncs:
+                                    val = get_unused_rnc()
+                                else:
+                                    inserted_pago_ipi_rncs.add(val)
                         else:
-                            if valid_rncs_list:
+                            if valid_rncs:
                                 if table_name == 'PagoIPI':
                                     val = get_unused_rnc()
                                 else:
-                                    val = random.choice(valid_rncs_list)
+                                    val = random.choice(list(valid_rncs))
                             else:
                                 # If no RNCs are loaded from DGII, keep it as is
                                 pass
@@ -934,8 +943,9 @@ def import_csv_to_db(csv_path, table_name, conn_params, db_lib):
             count += len(batch)
     conn.close()
     t_end = time.time()
-    print(f'Successfully imported {count} records into {table_name} in {int(t_end - t_start)} seconds.')
-    return True
+    elapsed_time = int(t_end - t_start)
+    print(f'[Hilo-{table_name}] Successfully imported {count} records into {table_name} in {elapsed_time} seconds.')
+    return elapsed_time
 
 def main():
     wait_for_database()
@@ -946,21 +956,50 @@ def main():
     tables_to_check = ["JCE_Ciudadano", "CatastroTitulo", "PermisoSuelo", "PagoIPI"]
     all_csvs_found = True
     csv_paths = {}
+    found_flags = {}
+    
     for tbl in tables_to_check:
         folder = os.path.join(base_bots, tbl)
         csv_file = get_latest_csv(folder) if os.path.exists(folder) else None
         if csv_file:
             print(f"  [+] CSV de caché ENCONTRADO para '{tbl}': {os.path.basename(csv_file)}")
             csv_paths[tbl] = csv_file
+            found_flags[tbl] = True
         else:
             print(f"  [-] CSV de caché NO ENCONTRADO para '{tbl}'.")
-            all_csvs_found = False
+            found_flags[tbl] = False
+            
+    all_csvs_found = all(found_flags.values())
             
     if all_csvs_found:
-        print("\n=> Todos los archivos CSV fueron encontrados. Restaurando datos desde CSV...")
-        for tbl, path in csv_paths.items():
-            import_csv_to_db(path, tbl, conn_params, db_lib)
-        print("¡Restauración desde CSV completada con éxito!")
+        print("\n=> Todos los archivos CSV fueron encontrados (variables booleanas = True). Restaurando datos simultáneamente...")
+        t_global_start = time.time()
+        
+        # 2. Uso de ThreadPoolExecutor para cargar los CSV en paralelo (simultáneamente)
+        import_times = {}
+        with ThreadPoolExecutor(max_workers=len(tables_to_check)) as executor:
+            futures = {
+                executor.submit(import_csv_to_db, path, tbl, conn_params, db_lib): tbl
+                for tbl, path in csv_paths.items()
+            }
+            
+            for future in as_completed(futures):
+                tbl = futures[future]
+                try:
+                    elapsed = future.result()
+                    import_times[tbl] = elapsed
+                except Exception as e:
+                    print(f"[!] Error importando {tbl}: {e}")
+                    
+        t_global_end = time.time()
+        
+        print("\n" + "="*50)
+        print("--- Resumen de Carga desde CSV ---")
+        for tbl in tables_to_check:
+            if tbl in import_times:
+                print(f"{tbl}: {import_times[tbl]} segundos")
+        print(f"Tiempo Total de Carga Paralela: {int(t_global_end - t_global_start)} segundos")
+        print("="*50 + "\n")
         return
         
     print("\n=> Faltan archivos CSV. Se procederá a generar toda la data de manera aleatoria real...")
