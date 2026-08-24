@@ -24,7 +24,6 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         return searchType.ToLowerInvariant() switch
         {
             "rnc" => await SearchRncAsync(query, cancellationToken),
-            "cedula" => await SearchCedulaAsync(query, cancellationToken),
             "suelo" => await SearchSueloAsync(query, cancellationToken),
             "ipi" => await SearchIpiAsync(query, cancellationToken),
             "cert" => await SearchCertAsync(query, cancellationToken),
@@ -59,37 +58,6 @@ public class GlobalSearchRepository : IGlobalSearchRepository
             .ToListAsync(ct);
 
         await BuildGraphAndDocumentsAsync(result, query, dgii.NombreRazonSocial, "Entidad", proyectos, ct);
-
-        return result;
-    }
-
-    private async Task<SearchResultDto?> SearchCedulaAsync(string query, CancellationToken ct)
-    {
-        var cleanQuery = query.Replace("-", "").Trim();
-        var persona = await _context.JCE_Ciudadanos.FirstOrDefaultAsync(c => c.Cedula.Replace("-", "") == cleanQuery, ct);
-        if (persona == null) return null;
-
-        var result = new SearchResultDto
-        {
-            TipoConsulta = "Cédula",
-            EsValido = true,
-            TituloPrincipal = "Ciudadano Registrado",
-            Detalles = new Dictionary<string, string>
-            {
-                // Mask cedula based on user requirement
-                { "Cédula", MaskCedula(persona.Cedula) },
-                { "Nombres", persona.Nombres },
-                { "Apellidos", persona.Apellidos },
-                { "Nacimiento", persona.FechaNacimiento.ToString("yyyy-MM-dd") }
-            }
-        };
-
-        var proyectos = await _context.Proyectos
-            .Include(p => p.Estado)
-            .Where(p => p.CedulaRncPropietario != null && p.CedulaRncPropietario.Replace("-", "") == cleanQuery)
-            .ToListAsync(ct);
-
-        await BuildGraphAndDocumentsAsync(result, query, "Ciudadano Registrado", "Ciudadano", proyectos, ct);
 
         return result;
     }
@@ -218,17 +186,5 @@ public class GlobalSearchRepository : IGlobalSearchRepository
                 .ToListAsync(ct);
             result.DocumentosRelacionados = documentos;
         }
-    }
-
-    private string MaskCedula(string cedula)
-    {
-        if (string.IsNullOrWhiteSpace(cedula) || cedula.Length < 11) return cedula;
-        // e.g. 402-1234567-8 -> 402-***4567-*
-        var clean = cedula.Replace("-", "");
-        if (clean.Length == 11)
-        {
-            return $"{clean.Substring(0, 3)}-***{clean.Substring(6, 4)}-*";
-        }
-        return "***";
     }
 }
