@@ -590,7 +590,7 @@ export const ProjectsPublicListPage: React.FC = () => {
                                 <ul className="space-y-3 mt-2">
                                   {data.proyectosRelacionados.map((p) => (
                                     <li key={p.id} className="p-4 bg-slate-900/50 rounded-xl hover:bg-slate-700 transition-colors border border-slate-700/50">
-                                      <a href={`/#/projects/${p.id}`} className="block">
+                                      <a href={`/#/p/${p.id}`} className="block">
                                         <span className="block font-bold text-slate-100 text-base">{p.nombre}</span>
                                         <span className="mt-2 flex items-center text-xs text-slate-400 font-medium tracking-wide">
                                           <Activity className="h-3.5 w-3.5 mr-1.5 text-primary" /> {p.estado}
