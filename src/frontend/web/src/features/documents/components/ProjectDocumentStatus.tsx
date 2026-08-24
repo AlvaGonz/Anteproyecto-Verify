@@ -1,7 +1,7 @@
 import React from "react";
 import { DocumentType, DocumentStatus, DocumentDto } from "../types";
 import { canonicalType } from "../utils/documentTypes";
-import { useDocuments, useDownloadDocument } from "../api/useDocuments";
+import { useDocuments } from "../api/useDocuments";
 
 import {
   AlertTriangle,
@@ -10,8 +10,7 @@ import {
   FileCheck2,
   Lock,
   Building2,
-  Gavel,
-  Download
+  Gavel
 } from "lucide-react";
 
 import { m, AnimatePresence } from "framer-motion";
@@ -59,7 +58,6 @@ const VISIBLE_ANEXO_TYPES: DocumentType[] = [
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, preloadedDocuments }) => {
   const { data: fetchedDocuments = [], isLoading: loading } = useDocuments(projectId || "");
-  const { mutate: downloadDoc, isPending: isDownloading } = useDownloadDocument(projectId || "");
 
   const documents = preloadedDocuments ?? fetchedDocuments;
 
@@ -170,16 +168,6 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               </div>
             )}
 
-            {(isVerificado || isPending || isObservado) && doc?.id && (
-              <button
-                onClick={() => downloadDoc({ id: doc.id, fileName: doc.nombreArchivoOriginal })}
-                disabled={isDownloading}
-                className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50 flex items-center justify-center shrink-0"
-                title="Descargar Documento"
-              >
-                <Download className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
       </m.div>
@@ -236,7 +224,7 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
               <h4 className="text-sm font-black uppercase tracking-wider text-amber-600 mb-1 italic">Advertencia de Integridad</h4>
               <p className="text-secondary/70 text-sm leading-relaxed font-medium">
                 Se detectaron <strong>{missingCount} documentos esenciales</strong> ausentes o fuera de norma.
-                Este expediente requiere atención inmediata para alcanzar el Sello de Integridad Suprema.
+                Este expediente requiere atención inmediata para alcanzar el Sello de Integridad.
               </p>
             </div>
           </m.div>
