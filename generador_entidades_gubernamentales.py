@@ -859,88 +859,53 @@ def get_latest_csv(folder_path):
 
 def import_csv_to_db(csv_path, table_name, conn_params, db_lib):
     import csv
-    import random
-    print(f'Starting import for {table_name} from {csv_path}')
+    print(f'[Hilo-{table_name}] Starting import for {table_name} from {os.path.basename(csv_path)}')
     t_start = time.time()
     conn = get_db_connection()
     cursor = conn.cursor()
     ph = '%s' if db_lib == 'pymssql' else '?'
     
-    # Query valid RNCs from DGII to guarantee referential integrity
-    valid_rncs = set()
-    valid_rncs_list = []
-    try:
-        cursor.execute("SELECT Rnc FROM DGII")
-        valid_rncs = {r[0] for r in cursor.fetchall() if r[0]}
-        valid_rncs_list = list(valid_rncs)
-        print(f"Loaded {len(valid_rncs)} valid RNCs from DGII for referential integrity.")
-    except Exception as e:
-        print(f"Warning: Could not fetch valid RNCs from DGII: {e}")
-
-    inserted_pago_ipi_rncs = set()
-    available_rncs = list(valid_rncs)
-    random.shuffle(available_rncs) # Shuffle to pop randomly without loops
-    
-    def get_unused_rnc():
-        # Pop from available RNCs to guarantee uniqueness
-        while available_rncs:
-            r = available_rncs.pop()
-            if r not in inserted_pago_ipi_rncs:
-                inserted_pago_ipi_rncs.add(r)
-                return r
-        # Fallback if we run out of valid RNCs
-        raise ValueError("No more valid, unused RNCs available for PagoIPI.")
-    
     with open(csv_path, 'r', encoding='utf-8') as f:
         reader = csv.reader(f, delimiter='|')
         headers = next(reader)
-        rnc_idx = headers.index('Rnc') if 'Rnc' in headers else -1
+        num_cols = len(headers)
         
         cols = ', '.join(headers)
-        placeholders = ', '.join([ph] * len(headers))
-        sql = f'INSERT INTO {table_name} ({cols}) VALUES ({placeholders})'
         
-        batch = []
-        batch_size = 5000
+        # SQL Server parameter limit is 2100 per query. We calculate how many rows we can insert at once.
+        max_rows_per_query = max(1, 2000 // num_cols)
+        
+        flat_batch = []
         count = 0
+        rows_in_batch = 0
+        
         for row in reader:
-            processed_vals = []
-            for i, val in enumerate(row):
-                if val == '':
-                    processed_vals.append(None)
-                else:
-                    if i == rnc_idx:
-                        if val in valid_rncs:
-                            if table_name == 'PagoIPI':
-                                # If this RNC is already used during this run, force a new one
-                                if val in inserted_pago_ipi_rncs:
-                                    val = get_unused_rnc()
-                                else:
-                                    inserted_pago_ipi_rncs.add(val)
-                        else:
-                            if valid_rncs:
-                                if table_name == 'PagoIPI':
-                                    val = get_unused_rnc()
-                                else:
-                                    val = random.choice(list(valid_rncs))
-                            else:
-                                # If no RNCs are loaded from DGII, keep it as is
-                                pass
-                    processed_vals.append(val)
+            processed_vals = [val if val != '' else None for val in row]
+            flat_batch.extend(processed_vals)
+            count += 1
+            rows_in_batch += 1
             
-            processed_row = tuple(processed_vals)
-            batch.append(processed_row)
-            if len(batch) >= batch_size:
-                cursor.executemany(sql, batch)
-                conn.commit()
-                count += len(batch)
-                batch = []
-                if count % 100000 == 0:
-                    print(f'Imported {count} records into {table_name}...')
-        if batch:
-            cursor.executemany(sql, batch)
-            conn.commit()
-            count += len(batch)
+            if rows_in_batch >= max_rows_per_query:
+                row_placeholders = '(' + ', '.join([ph] * num_cols) + ')'
+                all_placeholders = ', '.join([row_placeholders] * rows_in_batch)
+                sql = f'INSERT INTO {table_name} ({cols}) VALUES {all_placeholders}'
+                cursor.execute(sql, tuple(flat_batch))
+                
+                flat_batch = []
+                rows_in_batch = 0
+                
+                # Commit every 50,000 rows
+                if count % 50000 < max_rows_per_query:
+                    conn.commit()
+                    print(f'[Hilo-{table_name}] Imported {count} records...')
+                    
+        if flat_batch:
+            row_placeholders = '(' + ', '.join([ph] * num_cols) + ')'
+            all_placeholders = ', '.join([row_placeholders] * rows_in_batch)
+            sql = f'INSERT INTO {table_name} ({cols}) VALUES {all_placeholders}'
+            cursor.execute(sql, tuple(flat_batch))
+            
+        conn.commit()
     conn.close()
     t_end = time.time()
     elapsed_time = int(t_end - t_start)
@@ -997,8 +962,10 @@ def main():
         print("--- Resumen de Carga desde CSV ---")
         for tbl in tables_to_check:
             if tbl in import_times:
-                print(f"{tbl}: {import_times[tbl]} segundos")
-        print(f"Tiempo Total de Carga Paralela: {int(t_global_end - t_global_start)} segundos")
+                m, s = divmod(import_times[tbl], 60)
+                print(f"{tbl}: {int(m)} minutos {int(s)} segundos")
+        m_tot, s_tot = divmod(t_global_end - t_global_start, 60)
+        print(f"Tiempo Total de Carga Paralela: {int(m_tot)} minutos {int(s_tot)} segundos")
         print("="*50 + "\n")
         return
         
