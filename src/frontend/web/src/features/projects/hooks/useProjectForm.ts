@@ -330,7 +330,12 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       const lat = parseFloat(match[1]);
       const lng = parseFloat(match[2]);
 
-      map.flyTo([lat, lng], 13, { duration: 1.2 });
+      const targetZoom = 17;
+      if (Math.abs(map.getZoom() - targetZoom) > 1) {
+        map.flyTo([lat, lng], targetZoom, { duration: 1.2 });
+      } else {
+        map.flyTo([lat, lng], map.getZoom(), { duration: 0.5 });
+      }
 
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
       fetchNearbyPoi(lat, lng);
@@ -396,6 +401,48 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     // Click to drop marker + capture GPS + generate catastral code
     map.on("click", async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
+      
+      // 1. Validar si es calle o cuerpo de agua
+      try {
+        const osmRes = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=18&addressdetails=1`
+        );
+        if (osmRes.ok) {
+          const osmData = await osmRes.json();
+          const category = osmData.category || "";
+          const type = osmData.type || "";
+          
+          if (
+            category === "highway" || 
+            category === "waterway" || 
+            type === "water" || 
+            type === "sea" || 
+            type === "ocean" || 
+            type === "river" ||
+            type === "bay"
+          ) {
+            window.alert("Estás seleccionando una opción no válida. Debes seleccionar una parcela con distribución catastral.");
+            setUbicacionGps("");
+            if (markerRef.current) {
+              markerRef.current.remove();
+              markerRef.current = null;
+            }
+            return; // Abort processing
+          }
+        }
+      } catch (err) {
+        console.error("OSM validation failed", err);
+      }
+
+      // 2. Control de Zoom Automático (Zoom 17)
+      const targetZoom = 17;
+      const currentZoom = map.getZoom();
+      if (Math.abs(currentZoom - targetZoom) > 1) {
+        map.flyTo([lat, lng], targetZoom, { duration: 1.0 });
+      } else {
+        map.flyTo([lat, lng], currentZoom, { duration: 0.5 });
+      }
+
       setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
       fetchNearbyPoi(lat, lng);
 

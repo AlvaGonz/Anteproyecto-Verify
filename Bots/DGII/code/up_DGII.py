@@ -369,7 +369,7 @@ def main():
         cursor.execute("SELECT COUNT(*) FROM DGII")
         count = cursor.fetchone()[0]
         conn.close()
-        if count >= 780000:
+        if count >= 770000:
             print(f"DGII table is already fully loaded ({count} records). Skipping mount.")
             return
     except Exception as e:
