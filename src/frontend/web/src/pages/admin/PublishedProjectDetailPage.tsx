@@ -14,6 +14,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import { maskCedula } from "../../shared/utils/masking";
 import { useProject } from "../../features/projects/api/useProjects";
 import { useCategories } from "../../features/projects/api/useCategories";
 import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
@@ -470,9 +471,13 @@ export const PublishedProjectDetailPage: React.FC = () => {
                     <div className="w-1.5 h-1.5 rounded-sm bg-primary mt-1.5 shrink-0" />
                     <span className="font-bold shrink-0">RNC/Cédula:</span> 
                     <span className="break-all min-w-0" data-testid="registrant-identification">
-                      {project.registradoPor?.presentacionPublica
-                        ? (project.registradoPor.presentacionPublica.identificacionMostrada || "N/D")
-                        : (project.cedulaRncPropietario || project.rncDesarrollador || "N/D")}
+                      {(() => {
+                        const id = project.registradoPor?.presentacionPublica
+                          ? (project.registradoPor.presentacionPublica.identificacionMostrada || "N/D")
+                          : (project.cedulaRncPropietario || project.rncDesarrollador || "N/D");
+                        if (id === "N/D" || !id) return id;
+                        return maskCedula(id);
+                      })()}
                     </span>
                   </li>
                   {project.registradoPor?.presentacionPublica ? (

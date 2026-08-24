@@ -11,6 +11,7 @@ import {
   ChevronsRight,
   Search,
 } from "lucide-react";
+import { maskCedula } from "@/shared/utils/masking";
 import { m, AnimatePresence } from "framer-motion";
 import { LandingNav } from "../../features/public/components/LandingNav";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
@@ -547,12 +548,19 @@ export const ProjectsPublicListPage: React.FC = () => {
                             </h3>
 
                             <dl className="space-y-3">
-                              {Object.entries(data.detalles).map(([key, value]) => (
-                                <div key={key} className="flex flex-col">
-                                  <dt className="text-xs font-bold uppercase tracking-wider text-slate-400">{key}</dt>
-                                  <dd className="mt-0.5 text-sm font-medium text-slate-100 break-words">{value as string}</dd>
-                                </div>
-                              ))}
+                              {Object.entries(data.detalles).map(([key, value]) => {
+                                let displayValue = value as string;
+                                // Mask cedula to protect sensitive data
+                                if (key.toLowerCase().includes('cédula') || key.toLowerCase().includes('cedula')) {
+                                  displayValue = maskCedula(displayValue);
+                                }
+                                return (
+                                  <div key={key} className="flex flex-col">
+                                    <dt className="text-xs font-bold uppercase tracking-wider text-slate-400">{key}</dt>
+                                    <dd className="mt-0.5 text-sm font-medium text-slate-100 break-words">{displayValue}</dd>
+                                  </div>
+                                );
+                              })}
                             </dl>
                           </div>
                         </div>
