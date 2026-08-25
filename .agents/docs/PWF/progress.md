@@ -1,6 +1,20 @@
 # PWF Progress — VeriFinca
 
-## Sesión 2026-08-23 — Restricción de Cambios de Estado de Proyecto Exclusiva para Administradores
+## Sesión 2026-08-24 — Unificación de Búsqueda Pública en Hero Section sin Dropdown (TDD + Ponytail)
+
+**Ciclo:** UI & Búsqueda Global / Frontend (`VerifySearchForm.tsx`, `HeroSection.tsx`, `VerifySearchForm.test.tsx`, `HeroSection.test.tsx`, `ProjectsPublicListPage.test.tsx`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 20/20 tests passed en `VerifySearchForm.test.tsx`, `HeroSection.test.tsx` y `ProjectsPublicListPage.test.tsx`), `tsc --noEmit` limpio, dotnet tests 43/43 passed.
+- **Problema Abordado:** El componente de búsqueda en la página de inicio (`http://localhost:3000/#/` en `HeroSection.tsx`) no poseía la funcionalidad completa de búsqueda de `VerifySearchForm` (detección automática de tipo, validación, verificación/consumo de cuota con `projectsApi.consumeQuota`, manejo de autenticación/redirección a login, navegación a `/projects?type=...&q=...`). Al mismo tiempo, se requería no incluir el menú desplegable (dropdown) en el buscador del Hero, manteniendo su estética limpia.
+- **Mejoras Implementadas (TDD + Ponytail):**
+  1. `VerifySearchForm.tsx`: Componente unificado con soporte para `variant="light"` (Hero bar horizontal estilizado sin dropdown) y `variant="dark"` (tarjeta con dropdown para la página de proyectos).
+  2. Función `detectSearchType`: Detección automática inteligente (`cert`, `rnc`, `ipi`, `suelo`).
+  3. `HeroSection.tsx`: Reutilización limpia y directa de `<VerifySearchForm variant="light" />` eliminando duplicación de código (~30 líneas reemplazadas por una).
+  4. Pruebas TDD:
+     - `VerifySearchForm.test.tsx`: 11 pruebas unitarias cubriendo detección de tipos, comportamiento de variante light sin dropdown, redirección de usuarios no autenticados, consumo de cuota y navegación, y comportamiento de variante dark con dropdown.
+     - `HeroSection.test.tsx`: Prueba de renderizado e integración de HeroSection con el formulario de búsqueda unificado.
+     - `ProjectsPublicListPage.test.tsx`: Pruebas de integración de la lista pública de proyectos.
+
+---
 
 **Ciclo:** Autorización & UI / Admin Projects (`AdminProjectContextMenu.tsx`, `AdminProjectList.tsx`, `AdminProjectContextMenu.test.tsx`, `ProjectsController.cs`, `ProjectsControllerTests.cs`)
 **Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 7/7 passed, xUnit backend `ProjectsControllerTests` 6/6 passed), API Docker actualizada e iniciada.
