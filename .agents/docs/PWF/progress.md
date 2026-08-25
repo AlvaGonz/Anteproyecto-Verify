@@ -2,17 +2,18 @@
 
 ## Sesión 2026-08-24 — Unificación de Búsqueda Pública en Hero Section sin Dropdown (TDD + Ponytail)
 
-**Ciclo:** UI & Búsqueda Global / Frontend (`VerifySearchForm.tsx`, `HeroSection.tsx`, `VerifySearchForm.test.tsx`, `HeroSection.test.tsx`, `ProjectsPublicListPage.test.tsx`)
-**Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 20/20 tests passed en `VerifySearchForm.test.tsx`, `HeroSection.test.tsx` y `ProjectsPublicListPage.test.tsx`), `tsc --noEmit` limpio, dotnet tests 43/43 passed.
-- **Problema Abordado:** El componente de búsqueda en la página de inicio (`http://localhost:3000/#/` en `HeroSection.tsx`) no poseía la funcionalidad completa de búsqueda de `VerifySearchForm` (detección automática de tipo, validación, verificación/consumo de cuota con `projectsApi.consumeQuota`, manejo de autenticación/redirección a login, navegación a `/projects?type=...&q=...`). Al mismo tiempo, se requería no incluir el menú desplegable (dropdown) en el buscador del Hero, manteniendo su estética limpia.
+**Ciclo:** UI & Búsqueda Global / Frontend (`VerifySearchForm.tsx`, `HeroSection.tsx`, `VerifySearchForm.test.tsx`, `HeroSection.test.tsx`, `ProjectsPublicListPage.tsx`, `ProjectsPublicListPage.test.tsx`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 21/21 tests passed en `VerifySearchForm.test.tsx`, `HeroSection.test.tsx` y `ProjectsPublicListPage.test.tsx`), `tsc --noEmit` limpio, dotnet tests 43/43 passed.
+- **Problema Abordado:**
+  1. El componente de búsqueda en la página de inicio (`http://localhost:3000/#/` en `HeroSection.tsx` / `VerifySearchForm.tsx` con `variant="light"`) no debe obligar a los usuarios a registrarse ni iniciar sesión al pulsar «Consultar Ahora».
+  2. Si el usuario escribe el nombre de un proyecto o término general/cercano, debe ser redirigido directamente a la búsqueda y filtro del directorio en `http://localhost:3000/#/projects` (poblando el input del filtro lateral `searchQuery` y filtrando la lista de proyectos publicados).
 - **Mejoras Implementadas (TDD + Ponytail):**
-  1. `VerifySearchForm.tsx`: Componente unificado con soporte para `variant="light"` (Hero bar horizontal estilizado sin dropdown) y `variant="dark"` (tarjeta con dropdown para la página de proyectos).
-  2. Función `detectSearchType`: Detección automática inteligente (`cert`, `rnc`, `ipi`, `suelo`).
-  3. `HeroSection.tsx`: Reutilización limpia y directa de `<VerifySearchForm variant="light" />` eliminando duplicación de código (~30 líneas reemplazadas por una).
-  4. Pruebas TDD:
-     - `VerifySearchForm.test.tsx`: 11 pruebas unitarias cubriendo detección de tipos, comportamiento de variante light sin dropdown, redirección de usuarios no autenticados, consumo de cuota y navegación, y comportamiento de variante dark con dropdown.
-     - `HeroSection.test.tsx`: Prueba de renderizado e integración de HeroSection con el formulario de búsqueda unificado.
-     - `ProjectsPublicListPage.test.tsx`: Pruebas de integración de la lista pública de proyectos.
+  1. `VerifySearchForm.tsx`: En `variant="light"`, se eliminó el bloqueo de autenticación obligatoria. Si el usuario ingresa un nombre de proyecto (detectado como `"suelo"` o texto general), redirige a `/projects?search=${encodeURIComponent(query)}`. Si es código (`cert`, `rnc`, `ipi`), redirige a `/projects?type=${type}&q=${query}`.
+  2. `ProjectsPublicListPage.tsx`: Inicializa y sincroniza en reactividad `filters.searchQuery` desde los parámetros de URL (`?search=` o `?q=`), alimentando de inmediato el campo de búsqueda del filtro lateral y filtrando el directorio.
+  3. Pruebas TDD:
+     - `VerifySearchForm.test.tsx`: Pruebas de consulta pública sin autenticación y redirección adecuada.
+     - `HeroSection.test.tsx`: Integración completa con placeholder actualizado.
+     - `ProjectsPublicListPage.test.tsx`: Prueba de inicialización de búsqueda desde URL y filtrado reactivo del directorio (21/21 tests verdes).
 
 ---
 
