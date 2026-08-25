@@ -9,13 +9,13 @@
 
 | Field | Value |
 |---|---|
-| **Audit Date** | 2026-07-30 18:21:01 |
-| **Session** | `debug-session` |
+| **Audit Date** | 2026-08-24 22:30:53 |
+| **Session** | `61a64507-19f1-4ca1-9521-a71fd8b7c646` |
 | **Verdict** | ❌ FAIL |
 | **Risk Level** | 🟠 HIGH RISK |
 | **Quality Score** | 100/100 |
-| **Run Duration** | 155.68s |
-| **Routing Decision** | Score=4 → PRIMARY (security-sensitive patterns found) |
+| **Run Duration** | 20.31s |
+| **Routing Decision** | Score=0 → FAST (low-risk changes) |
 | **Commit Convention** | ✅ Conventional |
 | **PR Policy (Danger)** | 1 policy issues |
 
@@ -25,12 +25,23 @@
 
 | Metric | Value |
 |---|---|
-| Runner | `docker` |
-| Verdict | ⏱️ TIMEOUT — Test suite exceeded 120s |
-| Duration | 120s |
+| Runner | `dotnet` |
+| Verdict | ✅ PASS |
+| Duration | 16.77s |
 | Block Pipeline | ✅ No |
 
 ```text
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Domain -> C:\Users\Alva\Desktop\Anteproyecto-Verify\src\backend\Domain\bin\Debug\net8.0\Domain.dll
+  Application -> C:\Users\Alva\Desktop\Anteproyecto-Verify\src\backend\Application\bin\Debug\net8.0\Application.dll
+  Infrastructure -> C:\Users\Alva\Desktop\Anteproyecto-Verify\src\backend\Infrastructure\bin\Debug\net8.0\Infrastructure.dll
+  Api -> C:\Users\Alva\Desktop\Anteproyecto-Verify\src\backend\Api\bin\Debug\net8.0\Api.dll
+  Api.Tests -> C:\Users\Alva\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll
+Test run for C:\Users\Alva\Desktop\Anteproyecto-Verify\src\backend\Api.Tests\bin\Debug\net8.0\Api.Tests.dll (.NETCoreApp,Version=v8.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    43, Skipped:     0, Total:    43, Duration: 9 s - Api.Tests.dll (net8.0)
 
 ```
 
@@ -40,9 +51,9 @@
 
 | Metric | Value |
 |---|---|
-| New Code Constructs | 20 |
-| New Test Lines | 5 |
-| Coverage Ratio | 25% |
+| New Code Constructs | 0 |
+| New Test Lines | 0 |
+| Coverage Ratio | 0% |
 | Adequate Coverage | ✅ Yes |
 
 ---
@@ -108,7 +119,7 @@ _None._
 
 ## 📚 Lessons Extracted (Archivist)
 
-_See `.agents/sessions/debug-session/lessons.md`_
+_See `.agents/sessions/61a64507-19f1-4ca1-9521-a71fd8b7c646/lessons.md`_
 
 ---
 
@@ -118,8 +129,8 @@ _See `.agents/sessions/debug-session/lessons.md`_
 |---|---|---|
 | Watchdog Anomalies | 1 | ⚠️ ANOMALY DETECTED |
 | Verdict Consistency | — | ✅ Consistent |
-| Token Budget Used | 44,382 / 60,000 | ✅ OK |
-| API Calls Made | 12 / 20 | ✅ |
+| Token Budget Used | 8,164 / 60,000 | ✅ OK |
+| API Calls Made | 9 / 20 | ✅ |
 | Supply Chain | — | ✅ Validated |
 | Files Verified | 0 / 2 | — |
 
