@@ -1,4 +1,4 @@
-﻿import "@testing-library/jest-dom";
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { HeroSection } from "./HeroSection";
@@ -33,7 +33,7 @@ describe("HeroSection Component", () => {
     );
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/Seguridad técnica y jurídica en un clic/i);
-    expect(screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Nombre del proyecto o código de verificación.../i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Consultar Ahora/i })).toBeInTheDocument();
     expect(screen.queryByText(/Tipo:/i)).not.toBeInTheDocument();
   });

@@ -68,11 +68,11 @@ export const SEARCH_TYPES = [
 export const detectSearchType = (value: string): string => {
   const cleanStr = value.trim().toUpperCase();
   if (/^VF-\d{4}-[A-Z0-9]{4,10}$/.test(cleanStr) || cleanStr.startsWith("VF")) return "cert";
-  
+
   const numbersOnly = cleanStr.replace(/[^0-9]/g, "");
   if (numbersOnly.length === 12) return "ipi";
   if (numbersOnly.length === 9 || numbersOnly.length === 11) return "rnc";
-  
+
   return "suelo";
 };
 
@@ -134,7 +134,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
   const [searchType, setSearchType] = useState(SEARCH_TYPES[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [manualTypeSelected, setManualTypeSelected] = useState(false);
-  
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -166,34 +166,39 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     }
 
     if (code.trim()) {
-      if (!isAuthenticated) {
+      if (isDark && !isAuthenticated) {
         addToast("Debe iniciar sesión para realizar consultas.", "info");
         navigate("/login");
         return;
       }
 
-      const { projectsApi } = await import("../../projects/api/projectsApi");
-      const result = await projectsApi.consumeQuota({ codigo: code.trim() });
-      if (result._tag === 'Failure') {
-        const errorTag = (result as any).error?._tag || result.error?._tag;
-        if (errorTag === 'LimitReached') {
-          if (user?.role === 'Administrator') {
-            console.warn("Quota limit reached but bypassed for Administrator.");
-          } else {
-            addToast("Límite de consultas alcanzado. Mejora tu plan para continuar.", "error");
-            return;
+      if (isAuthenticated) {
+        const { projectsApi } = await import("../../projects/api/projectsApi");
+        const result = await projectsApi.consumeQuota({ codigo: code.trim() });
+        if (result._tag === 'Failure') {
+          const errorTag = (result as any).error?._tag || result.error?._tag;
+          if (errorTag === 'LimitReached') {
+            if (user?.role === 'Administrator') {
+              console.warn("Quota limit reached but bypassed for Administrator.");
+            } else if (isDark) {
+              addToast("Límite de consultas alcanzado. Mejora tu plan para continuar.", "error");
+              return;
+            }
+          } else if (errorTag !== 'Unauthorized') {
+            console.warn("Quota check failed, but proceeding with search.", result);
           }
-        } else if (errorTag !== 'Unauthorized') {
-          console.warn("Quota check failed, but proceeding with search.", result);
         }
+        queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
       }
-      
-      queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
-      
+
       if (onSearch) {
         onSearch(effectiveType, code.trim());
       } else {
-        navigate(`/projects?type=${encodeURIComponent(effectiveType)}&q=${encodeURIComponent(code.trim())}`);
+        if (!isDark && effectiveType === "suelo") {
+          navigate(`/projects?search=${encodeURIComponent(code.trim())}`);
+        } else {
+          navigate(`/projects?type=${encodeURIComponent(effectiveType)}&q=${encodeURIComponent(code.trim())}`);
+        }
       }
     }
   };
@@ -232,7 +237,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
           <input
             type="text"
             required
-            placeholder="Nombre del proyecto o código de radicación..."
+            placeholder="Nombre del proyecto o código de verificación..."
             aria-label="Buscar proyecto"
             value={code}
             onChange={handleInputChange}

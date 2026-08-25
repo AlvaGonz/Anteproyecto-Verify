@@ -180,4 +180,21 @@ describe("ProjectsPublicListPage", () => {
     expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
     expect(screen.getByText("Plaza Central Mall")).toBeInTheDocument();
   });
+
+  it("initializes search query from URL parameter and filters projects", async () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/projects?search=Torre"]}>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ProjectsPublicListPage />
+          </Suspense>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const searchInput = (await screen.findByPlaceholderText(/RNC/i)) as HTMLInputElement;
+    expect(searchInput.value).toBe("Torre");
+    expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
+    expect(screen.queryByText("Residencial Terra Noble")).not.toBeInTheDocument();
+  });
 });

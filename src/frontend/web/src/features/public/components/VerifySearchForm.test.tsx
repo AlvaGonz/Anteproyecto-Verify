@@ -78,8 +78,8 @@ describe("VerifySearchForm - Light Variant (Landing Page Hero)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      user: { id: "user-1", email: "test@example.com", role: "User" },
+      isAuthenticated: false,
+      user: null,
     });
     mockConsumeQuota.mockResolvedValue({ _tag: "Success" });
   });
@@ -87,57 +87,50 @@ describe("VerifySearchForm - Light Variant (Landing Page Hero)", () => {
   it("should render the hero search bar without any dropdown", () => {
     renderForm("light");
 
-    expect(screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Nombre del proyecto o código de verificación.../i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Consultar Ahora/i })).toBeInTheDocument();
     expect(screen.queryByText(/Tipo:/i)).not.toBeInTheDocument();
   });
 
-  it("should redirect to /login when an unauthenticated user submits a search", async () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      user: null,
-    });
-
+  it("should NOT redirect to /login when an unauthenticated user submits a search on light variant", async () => {
     renderForm("light");
 
-    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
-    fireEvent.change(input, { target: { value: "VF-2026-X83L" } });
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de verificación.../i);
+    fireEvent.change(input, { target: { value: "Torre Bella" } });
 
     const button = screen.getByRole("button", { name: /Consultar Ahora/i });
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith("/login");
+      expect(mockNavigate).not.toHaveBeenCalledWith("/login");
+      expect(mockNavigate).toHaveBeenCalledWith("/projects?search=Torre%20Bella");
     });
-    expect(mockConsumeQuota).not.toHaveBeenCalled();
   });
 
-  it("should consume quota and navigate to /projects with detected cert type", async () => {
+  it("should navigate to /projects with detected cert type for certificate code", async () => {
     renderForm("light");
 
-    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de verificación.../i);
     fireEvent.change(input, { target: { value: "VF-2026-X83L" } });
 
     const button = screen.getByRole("button", { name: /Consultar Ahora/i });
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(mockConsumeQuota).toHaveBeenCalledWith({ codigo: "VF-2026-X83L" });
       expect(mockNavigate).toHaveBeenCalledWith("/projects?type=cert&q=VF-2026-X83L");
     });
   });
 
-  it("should consume quota and navigate to /projects with detected rnc type", async () => {
+  it("should navigate to /projects with detected rnc type for RNC code", async () => {
     renderForm("light");
 
-    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de verificación.../i);
     fireEvent.change(input, { target: { value: "101234567" } });
 
     const button = screen.getByRole("button", { name: /Consultar Ahora/i });
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(mockConsumeQuota).toHaveBeenCalledWith({ codigo: "101234567" });
       expect(mockNavigate).toHaveBeenCalledWith("/projects?type=rnc&q=101234567");
     });
   });
@@ -146,7 +139,7 @@ describe("VerifySearchForm - Light Variant (Landing Page Hero)", () => {
     const onSearchMock = vi.fn();
     renderForm("light", onSearchMock);
 
-    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de verificación.../i);
     fireEvent.change(input, { target: { value: "Torre Bella" } });
 
     const button = screen.getByRole("button", { name: /Consultar Ahora/i });
