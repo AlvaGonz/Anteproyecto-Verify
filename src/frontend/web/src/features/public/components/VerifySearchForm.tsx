@@ -15,10 +15,7 @@ import {
   Building2,
   Check
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "../../../shared/utils/cn";
-import { useToast } from "../../../shared/components/ui/Toast/ToastContext";
-import { useAuth } from "../../../shared/context/AuthContext";
 
 interface VerifySearchFormProps {
   className?: string;
@@ -137,9 +134,6 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { addToast } = useToast();
-  const { user, isAuthenticated } = useAuth();
 
   const isDark = variant === "dark";
 
@@ -153,7 +147,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const effectiveType = manualTypeSelected ? searchType.id : detectSearchType(code.trim());
 
@@ -166,31 +160,6 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
     }
 
     if (code.trim()) {
-      if (isDark && !isAuthenticated) {
-        addToast("Debe iniciar sesión para realizar consultas.", "info");
-        navigate("/login");
-        return;
-      }
-
-      if (isAuthenticated) {
-        const { projectsApi } = await import("../../projects/api/projectsApi");
-        const result = await projectsApi.consumeQuota({ codigo: code.trim() });
-        if (result._tag === 'Failure') {
-          const errorTag = (result as any).error?._tag || result.error?._tag;
-          if (errorTag === 'LimitReached') {
-            if (user?.role === 'Administrator') {
-              console.warn("Quota limit reached but bypassed for Administrator.");
-            } else if (isDark) {
-              addToast("Límite de consultas alcanzado. Mejora tu plan para continuar.", "error");
-              return;
-            }
-          } else if (errorTag !== 'Unauthorized') {
-            console.warn("Quota check failed, but proceeding with search.", result);
-          }
-        }
-        queryClient.invalidateQueries({ queryKey: ["subscription", "my-status"] });
-      }
-
       if (onSearch) {
         onSearch(effectiveType, code.trim());
       } else {

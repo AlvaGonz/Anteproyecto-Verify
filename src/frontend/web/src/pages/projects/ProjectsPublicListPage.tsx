@@ -110,6 +110,7 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
 const ProjectsPublicListContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filtersVisible, setFiltersVisible] = useState(true);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const initialSearch = searchParams.get("search") || (searchParams.get("type") === "suelo" || !searchParams.get("type") ? searchParams.get("q") : "") || "";
 
@@ -124,6 +125,13 @@ const ProjectsPublicListContent: React.FC = () => {
   useEffect(() => {
     const qParam = searchParams.get("search") || (searchParams.get("type") === "suelo" || !searchParams.get("type") ? searchParams.get("q") : "") || "";
     setFilters((prev) => (prev.searchQuery !== qParam ? { ...prev, searchQuery: qParam } : prev));
+
+    if (qParam) {
+      setFiltersVisible(true);
+      setTimeout(() => {
+        searchContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
   }, [searchParams]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -222,7 +230,7 @@ const ProjectsPublicListContent: React.FC = () => {
           {filtersVisible && (
             <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
               {/* Blue Box: Search + Project Types */}
-              <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <div ref={searchContainerRef} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm scroll-mt-28">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   <span className="text-primary">●</span> Búsqueda
                 </label>

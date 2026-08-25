@@ -3,8 +3,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { VerifySearchForm, detectSearchType } from "./VerifySearchForm";
 import { MemoryRouter } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -16,39 +14,11 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-// Mock useAuth
-const mockUseAuth = vi.fn().mockReturnValue({
-  isAuthenticated: true,
-  user: { id: "user-1", email: "test@example.com", role: "User" },
-});
-vi.mock("../../../shared/context/AuthContext", () => ({
-  useAuth: () => mockUseAuth(),
-}));
-
-// Mock projectsApi.consumeQuota
-const mockConsumeQuota = vi.fn().mockResolvedValue({ _tag: "Success" });
-vi.mock("../../projects/api/projectsApi", () => ({
-  projectsApi: {
-    consumeQuota: (...args: any[]) => mockConsumeQuota(...args),
-  },
-}));
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: false },
-    mutations: { retry: false },
-  },
-});
-
 const renderForm = (variant: "light" | "dark" = "light", onSearch?: (type: string, query: string) => void) =>
   render(
-    <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <MemoryRouter>
-          <VerifySearchForm variant={variant} onSearch={onSearch} />
-        </MemoryRouter>
-      </ToastProvider>
-    </QueryClientProvider>
+    <MemoryRouter>
+      <VerifySearchForm variant={variant} onSearch={onSearch} />
+    </MemoryRouter>
   );
 
 describe("detectSearchType helper", () => {
@@ -77,11 +47,6 @@ describe("detectSearchType helper", () => {
 describe("VerifySearchForm - Light Variant (Landing Page Hero)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      user: null,
-    });
-    mockConsumeQuota.mockResolvedValue({ _tag: "Success" });
   });
 
   it("should render the hero search bar without any dropdown", () => {
@@ -154,10 +119,6 @@ describe("VerifySearchForm - Light Variant (Landing Page Hero)", () => {
 describe("VerifySearchForm - Dark Variant (Projects Page)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      user: { id: "user-1", email: "test@example.com", role: "User" },
-    });
   });
 
   it("should render the dropdown selector with type options", () => {
@@ -187,7 +148,6 @@ describe("VerifySearchForm - Dark Variant (Projects Page)", () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockConsumeQuota).toHaveBeenCalledWith({ codigo: "101234567" });
       expect(mockNavigate).toHaveBeenCalledWith("/projects?type=rnc&q=101234567");
     });
   });
