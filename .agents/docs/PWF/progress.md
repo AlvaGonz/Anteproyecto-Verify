@@ -1,19 +1,18 @@
 # PWF Progress — VeriFinca
 
-## Sesión 2026-08-24 — Unificación de Búsqueda Pública en Hero Section sin Dropdown (TDD + Ponytail)
+## Sesión 2026-08-24 — Unificación de Búsqueda Pública, Política de Cuotas y Auto-Scroll en Directorio (TDD + Ponytail)
 
 **Ciclo:** UI & Búsqueda Global / Frontend (`VerifySearchForm.tsx`, `HeroSection.tsx`, `VerifySearchForm.test.tsx`, `HeroSection.test.tsx`, `ProjectsPublicListPage.tsx`, `ProjectsPublicListPage.test.tsx`)
 **Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 21/21 tests passed en `VerifySearchForm.test.tsx`, `HeroSection.test.tsx` y `ProjectsPublicListPage.test.tsx`), `tsc --noEmit` limpio, dotnet tests 43/43 passed.
 - **Problema Abordado:**
-  1. El componente de búsqueda en la página de inicio (`http://localhost:3000/#/` en `HeroSection.tsx` / `VerifySearchForm.tsx` con `variant="light"`) no debe obligar a los usuarios a registrarse ni iniciar sesión al pulsar «Consultar Ahora».
-  2. Si el usuario escribe el nombre de un proyecto o término general/cercano, debe ser redirigido directamente a la búsqueda y filtro del directorio en `http://localhost:3000/#/projects` (poblando el input del filtro lateral `searchQuery` y filtrando la lista de proyectos publicados).
+  1. El buscador público no debe deducir cuotas de consulta en las búsquedas genéricas ni de formularios; el consumo de consulta solo se descuenta de forma estricta cuando el usuario ingresa/accede efectivamente a la vista pública de detalle de un proyecto (`ProjectPublicDetailPage`).
+  2. Al realizar una búsqueda por nombre de proyecto desde el Hero o URL, la página debe auto-desplazarse (`scrollIntoView`) de manera suave hacia el recuadro de búsqueda lateral del directorio para que el usuario visualice inmediatamente el campo `● Búsqueda` y los resultados filtrados.
 - **Mejoras Implementadas (TDD + Ponytail):**
-  1. `VerifySearchForm.tsx`: En `variant="light"`, se eliminó el bloqueo de autenticación obligatoria. Si el usuario ingresa un nombre de proyecto (detectado como `"suelo"` o texto general), redirige a `/projects?search=${encodeURIComponent(query)}`. Si es código (`cert`, `rnc`, `ipi`), redirige a `/projects?type=${type}&q=${query}`.
-  2. `ProjectsPublicListPage.tsx`: Inicializa y sincroniza en reactividad `filters.searchQuery` desde los parámetros de URL (`?search=` o `?q=`), alimentando de inmediato el campo de búsqueda del filtro lateral y filtrando el directorio.
+  1. `VerifySearchForm.tsx`: Se eliminó el consumo prematuro de cuota (`projectsApi.consumeQuota`), haciendo las búsquedas ultraligeras y sin bloqueos de autenticación.
+  2. `ProjectsPublicListPage.tsx`: Añadida referencia (`searchContainerRef`) y auto-scroll suave (`scrollIntoView({ behavior: 'smooth', block: 'center' })`) cuando se detecta un parámetro de búsqueda de proyecto, asegurando que el recuadro lateral del filtro quede centrado y visible en pantalla.
   3. Pruebas TDD:
-     - `VerifySearchForm.test.tsx`: Pruebas de consulta pública sin autenticación y redirección adecuada.
-     - `HeroSection.test.tsx`: Integración completa con placeholder actualizado.
-     - `ProjectsPublicListPage.test.tsx`: Prueba de inicialización de búsqueda desde URL y filtrado reactivo del directorio (21/21 tests verdes).
+     - `VerifySearchForm.test.tsx`: 11 pruebas unitarias actualizadas y simplificadas.
+     - `HeroSection.test.tsx` y `ProjectsPublicListPage.test.tsx`: 10 pruebas unitarias e integración (21/21 tests verdes).
 
 ---
 
