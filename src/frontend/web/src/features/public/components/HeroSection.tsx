@@ -72,7 +72,7 @@ export const HeroSection: React.FC = () => {
               />
             </div>
             <Link
-              to={code ? `/projects/verify/${code}` : "/projects"}
+              to={code ? `/projects?type=cert&q=${encodeURIComponent(code)}` : "/projects"}
               className="w-full sm:w-auto bg-secondary text-white px-10 py-4 rounded-2xl font-display font-black text-lg hover:bg-primary active:scale-95 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2"
             >
               Consultar Ahora

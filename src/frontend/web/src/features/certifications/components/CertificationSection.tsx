@@ -78,7 +78,7 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
   const hasSeal = selloData && (selloData.vigente !== false && selloData.estado !== "Revocado" && selloData.estado !== "Expirado");
   const sealCode = selloData?.codigoSello || selloData?.codigoQR || "";
   const qrToken = selloData?.qrToken || "";
-  const qrUrl = qrToken ? `${window.location.origin}/#/q/${qrToken}` : "";
+  const qrUrl = `${window.location.origin}/#/p/${projectId}`;
   const accessCount = selloData?.contadorAccesos ?? selloData?.accessCount ?? 0;
   const sealStatus = selloData?.estado === "Revocado" ? 4 : selloData?.estado === "Expirado" ? 3 : 2;
 

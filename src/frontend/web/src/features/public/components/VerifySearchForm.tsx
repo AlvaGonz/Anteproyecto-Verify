@@ -195,11 +195,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
       if (onSearch) {
         onSearch(searchType.id, code.trim());
       } else {
-        if (searchType.id === "cert") {
-          navigate(`/projects/verify/${encodeURIComponent(code.trim())}`);
-        } else {
-          navigate(`/projects?type=${encodeURIComponent(searchType.id)}&q=${encodeURIComponent(code.trim())}`);
-        }
+        navigate(`/projects?type=${encodeURIComponent(searchType.id)}&q=${encodeURIComponent(code.trim())}`);
       }
     }
   };
