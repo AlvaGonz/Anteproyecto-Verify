@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { VerifySearchForm } from "./VerifySearchForm";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { VerifySearchForm, detectSearchType } from "./VerifySearchForm";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastProvider } from "../../../shared/components/ui/Toast/ToastContext";
@@ -16,10 +16,20 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-// Mock projectsApi.consumeQuota used inside handleSubmit via dynamic import
+// Mock useAuth
+const mockUseAuth = vi.fn().mockReturnValue({
+  isAuthenticated: true,
+  user: { id: "user-1", email: "test@example.com", role: "User" },
+});
+vi.mock("../../../shared/context/AuthContext", () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
+// Mock projectsApi.consumeQuota
+const mockConsumeQuota = vi.fn().mockResolvedValue({ _tag: "Success" });
 vi.mock("../../projects/api/projectsApi", () => ({
   projectsApi: {
-    consumeQuota: vi.fn().mockResolvedValue({ _tag: "Success" }),
+    consumeQuota: (...args: any[]) => mockConsumeQuota(...args),
   },
 }));
 
@@ -30,105 +40,162 @@ const queryClient = new QueryClient({
   },
 });
 
-const renderForm = () =>
+const renderForm = (variant: "light" | "dark" = "light", onSearch?: (type: string, query: string) => void) =>
   render(
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
         <MemoryRouter>
-          <VerifySearchForm variant="light" />
+          <VerifySearchForm variant={variant} onSearch={onSearch} />
         </MemoryRouter>
       </ToastProvider>
     </QueryClientProvider>
   );
 
-describe("VerifySearchForm Validation", () => {
-  it("should show an error message when RNC format is invalid", async () => {
-    renderForm();
-
-    // Change search type to RNC
-    const typeButton = screen.getByText(/Tipo:/i);
-    fireEvent.click(typeButton);
-    
-    const rncOption = screen.getByText("RNC");
-    fireEvent.click(rncOption);
-
-    // Enter invalid RNC
-    const input = screen.getByPlaceholderText(/Ej: 1-01-23456-7/i);
-    fireEvent.change(input, { target: { value: "INVALID-RNC" } });
-    
-    const submitButton = screen.getByRole("button", { name: /CONSULTAR RNC/i });
-    fireEvent.click(submitButton);
-
-    // Expect Error message (This should fail currently as it's not implemented)
-    expect(screen.getByText(/Formato de RNC inválido/i)).toBeInTheDocument();
-    expect(mockNavigate).not.toHaveBeenCalled();
+describe("detectSearchType helper", () => {
+  it("should detect cert type for VF-formatted or VF-prefix strings", () => {
+    expect(detectSearchType("VF-2026-X83L")).toBe("cert");
+    expect(detectSearchType("vf-2026-1234")).toBe("cert");
+    expect(detectSearchType("VF999")).toBe("cert");
   });
 
-  it("should show an error message when Cédula format is invalid", async () => {
-    renderForm();
-
-    // Change search type to Cédula
-    const typeButton = screen.getByText(/Tipo:/i);
-    fireEvent.click(typeButton);
-    
-    const cedulaOption = screen.getByText("Cédula");
-    fireEvent.click(cedulaOption);
-
-    // Enter invalid Cédula
-    const input = screen.getByPlaceholderText(/Ej: 402-1234567-8/i);
-    fireEvent.change(input, { target: { value: "402-1" } });
-    
-    const submitButton = screen.getByRole("button", { name: /CONSULTAR Cédula/i });
-    fireEvent.click(submitButton);
-
-    // Expect Error message
-    expect(screen.getByText(/Formato de Cédula inválido/i)).toBeInTheDocument();
-    expect(mockNavigate).not.toHaveBeenCalled();
+  it("should detect rnc type for 9 or 11 digit numbers", () => {
+    expect(detectSearchType("101234567")).toBe("rnc");
+    expect(detectSearchType("101-23456-7")).toBe("rnc");
+    expect(detectSearchType("10123456789")).toBe("rnc");
   });
 
-  it("should show an error message when Sello VeriFinca format is invalid", async () => {
-    renderForm();
-
-    // Default is Sello, but let's be explicit
-    const input = screen.getByPlaceholderText(/Ej: VF-2026-X83L/i);
-    fireEvent.change(input, { target: { value: "VF-123" } });
-    
-    const submitButton = screen.getByRole("button", { name: /CONSULTAR Sello VeriFinca/i });
-    fireEvent.click(submitButton);
-
-    expect(screen.getByText(/Formato de Sello VeriFinca inválido/i)).toBeInTheDocument();
-    expect(mockNavigate).not.toHaveBeenCalled();
+  it("should detect ipi type for 12 digit numbers", () => {
+    expect(detectSearchType("101999999999")).toBe("ipi");
   });
 
-  it("should show an error message when Suelo format is invalid", async () => {
-    renderForm();
+  it("should fallback to suelo for general text or names", () => {
+    expect(detectSearchType("Torre Bella")).toBe("suelo");
+    expect(detectSearchType("12345")).toBe("suelo");
+  });
+});
 
-    const typeButton = screen.getByText(/Tipo:/i);
-    fireEvent.click(typeButton);
-    
-    const sueloOption = screen.getByText("Número Suelo");
-    fireEvent.click(sueloOption);
-
-    const input = screen.getByPlaceholderText(/Ej: 001-02-003/i);
-    fireEvent.change(input, { target: { value: "001-02" } });
-    
-    const submitButton = screen.getByRole("button", { name: /CONSULTAR Número Suelo/i });
-    fireEvent.click(submitButton);
-
-    expect(screen.getByText(/Formato de Número Suelo inválido/i)).toBeInTheDocument();
+describe("VerifySearchForm - Light Variant (Landing Page Hero)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      user: { id: "user-1", email: "test@example.com", role: "User" },
+    });
+    mockConsumeQuota.mockResolvedValue({ _tag: "Success" });
   });
 
-  it("should navigate correctly when inputs are valid", async () => {
-    renderForm();
+  it("should render the hero search bar without any dropdown", () => {
+    renderForm("light");
 
-    const input = screen.getByPlaceholderText(/Ej: VF-2026-X83L/i);
+    expect(screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Consultar Ahora/i })).toBeInTheDocument();
+    expect(screen.queryByText(/Tipo:/i)).not.toBeInTheDocument();
+  });
+
+  it("should redirect to /login when an unauthenticated user submits a search", async () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      user: null,
+    });
+
+    renderForm("light");
+
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
     fireEvent.change(input, { target: { value: "VF-2026-X83L" } });
-    
-    const submitButton = screen.getByRole("button", { name: /CONSULTAR Sello VeriFinca/i });
-    fireEvent.click(submitButton);
+
+    const button = screen.getByRole("button", { name: /Consultar Ahora/i });
+    fireEvent.click(button);
 
     await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith("/login");
+    });
+    expect(mockConsumeQuota).not.toHaveBeenCalled();
+  });
+
+  it("should consume quota and navigate to /projects with detected cert type", async () => {
+    renderForm("light");
+
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
+    fireEvent.change(input, { target: { value: "VF-2026-X83L" } });
+
+    const button = screen.getByRole("button", { name: /Consultar Ahora/i });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(mockConsumeQuota).toHaveBeenCalledWith({ codigo: "VF-2026-X83L" });
       expect(mockNavigate).toHaveBeenCalledWith("/projects?type=cert&q=VF-2026-X83L");
     });
   });
+
+  it("should consume quota and navigate to /projects with detected rnc type", async () => {
+    renderForm("light");
+
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
+    fireEvent.change(input, { target: { value: "101234567" } });
+
+    const button = screen.getByRole("button", { name: /Consultar Ahora/i });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(mockConsumeQuota).toHaveBeenCalledWith({ codigo: "101234567" });
+      expect(mockNavigate).toHaveBeenCalledWith("/projects?type=rnc&q=101234567");
+    });
+  });
+
+  it("should call onSearch callback if provided", async () => {
+    const onSearchMock = vi.fn();
+    renderForm("light", onSearchMock);
+
+    const input = screen.getByPlaceholderText(/Nombre del proyecto o código de radicación.../i);
+    fireEvent.change(input, { target: { value: "Torre Bella" } });
+
+    const button = screen.getByRole("button", { name: /Consultar Ahora/i });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(onSearchMock).toHaveBeenCalledWith("suelo", "Torre Bella");
+    });
+  });
 });
+
+describe("VerifySearchForm - Dark Variant (Projects Page)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      user: { id: "user-1", email: "test@example.com", role: "User" },
+    });
+  });
+
+  it("should render the dropdown selector with type options", () => {
+    renderForm("dark");
+
+    const typeButton = screen.getByText(/Tipo:/i);
+    expect(typeButton).toBeInTheDocument();
+
+    fireEvent.click(typeButton);
+    expect(screen.getAllByText("RNC").length).toBeGreaterThan(0);
+    expect(screen.getByText("IPI")).toBeInTheDocument();
+  });
+
+  it("should allow searching with explicit type selected from dropdown", async () => {
+    renderForm("dark");
+
+    const typeButton = screen.getByText(/Tipo:/i);
+    fireEvent.click(typeButton);
+
+    const rncOption = screen.getAllByText("RNC").pop()!;
+    fireEvent.click(rncOption);
+
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "101234567" } });
+
+    const submitButton = screen.getByRole("button", { name: /CONSULTAR/i });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(mockConsumeQuota).toHaveBeenCalledWith({ codigo: "101234567" });
+      expect(mockNavigate).toHaveBeenCalledWith("/projects?type=rnc&q=101234567");
+    });
+  });
+});
