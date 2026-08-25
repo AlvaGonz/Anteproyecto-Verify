@@ -1528,6 +1528,7 @@ WHERE NOT EXISTS (
             ("131950213", "P J H LOPEZ SERVICIOS DE CONTABILIDAD SRL", "P J H LOPEZ SERVICIOS DE CONTABILIDAD"),
             ("10100074474", "SUDARIO BARTOLO RAMOS PEÑA", null),
             ("133725444", "RD COLLECT SRL", "RD COLLECT"),
+            ("401506254", "MOCK IPI RNC", "MOCK IPI RNC"),
             ("131-000001-2", "VeriFinca RD SRL", "VeriFinca"),
             ("1310000012", "VeriFinca RD SRL", "VeriFinca"),
             ("131-000007-2", "Usuario Freemium SRL", null),
