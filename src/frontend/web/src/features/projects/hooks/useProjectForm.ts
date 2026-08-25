@@ -7,7 +7,6 @@ import { useAuth } from "../../../shared/context/AuthContext";
 import { apiClient } from "../../../infrastructure/api/client";
 import { projectsApi } from "../api/projectsApi";
 import { isSuccess } from "@/shared/utils/functional";
-import { getProjectErrorMessage } from "../types";
 import { useProvinces } from "../../provinces/api/useProvinces";
 import { useCategories } from "../api/useCategories";
 
@@ -64,6 +63,7 @@ const getClosestProvincia = (provinces: ProvinciaInfo[], lat: number, lng: numbe
 
 export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: ProjectFormProps) {
   const queryClient = useQueryClient();
+  const activeProcessControllerRef = useRef<AbortController | null>(null);
   const { user } = useAuth();
   const { addToast } = useToast();
 
@@ -281,7 +281,6 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
-  const [polygonCoords, setPolygonCoords] = useState<[number, number][]>([]);
 
   // RI iframe ref (for postMessage targeting)
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -290,79 +289,277 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const [mapSearchText, setMapSearchText] = useState("");
   const [cercania, setCercania] = useState(initialData?.cercania ?? "");
 
-  const fetchNearbyPoi = useCallback(async (lat: number, lng: number) => {
-    try {
-      const osmRes = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=18&addressdetails=1`
-      );
-      if (osmRes.ok) {
-        const osmData = await osmRes.json();
-        const placeLat = parseFloat(osmData.lat);
-        const placeLon = parseFloat(osmData.lon);
-        
-        // 1. Fetch exact building name using Overpass API
-        let reference = "";
-        try {
-          const overpassQuery = `[out:json];(way["building"](around:20,${lat},${lng});way["amenity"](around:20,${lat},${lng});way["leisure"](around:20,${lat},${lng});way["shop"](around:20,${lat},${lng});way["historic"](around:20,${lat},${lng}););out tags;`;
-          
-          const opRes = await fetch("https://overpass-api.de/api/interpreter", {
-            method: "POST",
-            body: overpassQuery
-          });
-          
-          if (opRes.ok) {
-            const opData = await opRes.json();
-            if (opData.elements && opData.elements.length > 0) {
-              let bestElement = null;
-              let bestScore = Infinity;
-              
-              for (const el of opData.elements) {
-                if (el.type === "way" && el.geometry) {
-                  const coords = el.geometry.map((g: any) => [g.lon, g.lat] as [number, number]);
-                  const area = calculatePolygonArea(coords);
-                  if (area > 0 && area < 40000) {
-                    const inside = isPointInPolygon([lng, lat], coords);
-                    let score = Infinity;
-                    if (inside) {
-                      score = area;
-                    } else {
-                      const dist = getDistanceToLineString([lng, lat], coords);
-                      score = dist + 1000000;
-                    }
-                    if (score < bestScore) {
-                      bestScore = score;
-                      bestElement = el;
-                    }
-                  }
-                }
-              }
-              if (bestElement && bestElement.tags && bestElement.tags.name) {
-                reference = bestElement.tags.name;
-              }
-            }
-          }
-        } catch (e) {
-          console.error("Overpass name fetch error", e);
-        }
+  const processLocation = useCallback(async (lat: number, lng: number, map: L.Map | null) => {
+    if (!map) return;
 
-        // 2. Fallback to Nominatim if Overpass didn't find a specific name
-        if (!reference) {
-          const addr = osmData.address;
-          if (distance <= 50) {
-            const poiName = osmData.name || (osmData.display_name ? osmData.display_name.split(',')[0].trim() : "");
-            if (poiName && poiName !== "unnamed") {
-              reference = poiName;
-            } else if (addr) {
-               const poi = addr.amenity || addr.shop || addr.tourism || addr.historic || addr.leisure || addr.office || addr.government || addr.building || addr.industrial;
-               if (poi) reference = poi;
+    // Abort previous in-flight requests to avoid race conditions (falsos positivos/negativos)
+    if (activeProcessControllerRef.current) {
+      activeProcessControllerRef.current.abort();
+    }
+    const abortController = new AbortController();
+    activeProcessControllerRef.current = abortController;
+    const signal = abortController.signal;
+
+    // Control de Zoom Automático (Zoom 17)
+    const targetZoom = 17;
+    const currentZoom = map.getZoom();
+    if (Math.abs(currentZoom - targetZoom) > 1) {
+      map.flyTo([lat, lng], targetZoom, { duration: 1.0 });
+    } else {
+      map.flyTo([lat, lng], currentZoom, { duration: 0.5 });
+    }
+
+    // 1. Initial State Updates
+    setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
+    skipFlyToRef.current = true;
+    const closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
+    setUbicacionTexto(closestProvName);
+
+    // 2. Fire 3 Requests in Parallel for Blazing Speed
+    const nominatimPromise = fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=18&addressdetails=1&polygon_geojson=1`, { signal })
+      .then(res => res.ok ? res.json() : null)
+      .catch(() => null);
+
+    // Using nwr (node, way, relation) to catch complexes like university campuses
+    const overpassQuery = `[out:json][timeout:3];(nwr["building"](around:5,${lat},${lng});nwr["amenity"](around:5,${lat},${lng});nwr["leisure"](around:5,${lat},${lng});nwr["natural"="water"](around:5,${lat},${lng});nwr["waterway"](around:5,${lat},${lng}););out geom tags;`;
+    const timeoutId = setTimeout(() => {
+        if (!signal.aborted) abortController.abort();
+    }, 3500); // Prevent hanging
+    const overpassPromise = fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: overpassQuery, signal })
+      .then(res => { clearTimeout(timeoutId); return res.ok ? res.json() : null; })
+      .catch(() => { clearTimeout(timeoutId); return null; });
+
+    const catastroPromise = projectsApi.lookupCatastroByGps(lat.toString(), lng.toString())
+      .catch(() => null);
+
+    let nomResult, opResult, catResult;
+    try {
+      [nomResult, opResult, catResult] = await Promise.allSettled([
+        nominatimPromise,
+        overpassPromise,
+        catastroPromise
+      ]);
+    } catch (e) {
+      return; // if Promise.allSettled throws (unlikely)
+    }
+
+    // Abort processing ONLY if a new click came in while waiting (Race condition prevention)
+    if (activeProcessControllerRef.current !== abortController) return;
+
+    const nomData = nomResult.status === "fulfilled" ? nomResult.value : null;
+    const opData = opResult.status === "fulfilled" ? opResult.value : null;
+    const catData = catResult.status === "fulfilled" ? catResult.value : null;
+
+    // 3. Nominatim Validation & Address
+    let nomName = "";
+    let addr: any = null;
+    
+    let isSeaBlocked = false;
+    if (nomData && nomData.error) {
+      isSeaBlocked = true;
+    }
+
+    if (nomData && !nomData.error) {
+      const osmClass = nomData.class || nomData.category || "";
+      const type = nomData.type || "";
+      addr = nomData.address;
+      nomName = nomData.name || (nomData.display_name ? nomData.display_name.split(",")[0].trim() : "");
+      
+      let isHighwayBlocked = false;
+      if (osmClass === "highway") {
+        if (nomData.geojson && nomData.geojson.type === "LineString") {
+          const coords = nomData.geojson.coordinates as [number, number][];
+          const dist = getDistanceToLineString([lng, lat], coords);
+          if (dist < 10) {
+            isHighwayBlocked = true;
+          } else if (dist > 150) {
+            isSeaBlocked = true;
+          }
+        } else {
+          isHighwayBlocked = true;
+        }
+      } else if (nomData.lat && nomData.lon) {
+        const dy = lat - parseFloat(nomData.lat);
+        const dx = (lng - parseFloat(nomData.lon)) * Math.cos(lat * Math.PI / 180);
+        const distToSnapped = Math.sqrt(dx * dx + dy * dy) * 111320;
+        if (distToSnapped > 250) {
+          isSeaBlocked = true;
+        }
+      }
+
+      if (
+        isHighwayBlocked ||
+        isSeaBlocked ||
+        osmClass === "waterway" || 
+        osmClass === "natural" ||
+        (osmClass === "place" && type === "sea") ||
+        type === "water" || type === "sea" || type === "ocean" || type === "river" || type === "bay"
+      ) {
+        setInvalidLocationModalOpen(true);
+        setUbicacionGps("");
+        setDesignacionCatastral("");
+        setMatricula("");
+        setCercania("");
+        setSuperficieM2("");
+        setPropietario("");
+        setCedulaRncPropietario("");
+        if (markerRef.current) {
+          markerRef.current.remove();
+          markerRef.current = null;
+        }
+        if (polygonRef.current) {
+            polygonRef.current.remove();
+            polygonRef.current = null;
+        }
+        return; // Abort processing
+      }
+    }
+
+    // 4. Overpass Processing (Polygon + Exact Name)
+    let calculatedArea = 15;
+    let reference = "";
+
+    if (opData && opData.elements && opData.elements.length > 0) {
+      // Check if Overpass found water
+      const isWaterOverpass = opData.elements.some((el: any) => 
+        el.tags && (el.tags.natural === "water" || el.tags.waterway)
+      );
+
+      if (isWaterOverpass) {
+        setInvalidLocationModalOpen(true);
+        setUbicacionGps("");
+        setDesignacionCatastral("");
+        setMatricula("");
+        setCercania("");
+        setSuperficieM2("");
+        setPropietario("");
+        setCedulaRncPropietario("");
+        if (markerRef.current) {
+          markerRef.current.remove();
+          markerRef.current = null;
+        }
+        if (polygonRef.current) {
+            polygonRef.current.remove();
+            polygonRef.current = null;
+        }
+        return; // Abort processing
+      }
+
+      let bestElement: any = null;
+      let bestScore = Infinity;
+      
+      for (const el of opData.elements) {
+        if (el.type === "way" && el.geometry) {
+          const coords = el.geometry.map((g: any) => [g.lon, g.lat] as [number, number]);
+          const area = calculatePolygonArea(coords);
+          if (area > 0 && area < 40000) {
+            const inside = isPointInPolygon([lng, lat], coords);
+            let score = Infinity;
+            if (inside) {
+              score = area;
+            } else {
+              const dist = getDistanceToLineString([lng, lat], coords);
+              if (dist < 2) {
+                score = dist + 1000000;
+              } else {
+                continue;
+              }
+            }
+            if (score < bestScore) {
+              bestScore = score;
+              bestElement = { ...el, area, coords };
             }
           }
         }
-        
-        setCercania(reference);
       }
-    } catch (err) {
-      console.error("Error fetching OSM Nominatim:", err);
+      
+      if (bestElement) {
+        calculatedArea = Math.round(bestElement.area);
+        const leafletCoords = bestElement.coords.map((c: any) => [c[1], c[0]] as L.LatLngTuple);
+        if (polygonRef.current) polygonRef.current.remove();
+        polygonRef.current = L.polygon(leafletCoords, { color: 'blue', weight: 2, fillOpacity: 0.2 }).addTo(map);
+        
+        if (bestElement.tags && bestElement.tags.name) {
+          reference = bestElement.tags.name;
+        }
+      } else {
+        if (polygonRef.current) polygonRef.current.remove();
+      }
+    } else {
+      if (polygonRef.current) polygonRef.current.remove();
+    }
+
+    // Fallback: If Overpass failed or found no buildings, try Nominatim geojson
+    if (!polygonRef.current && nomData && nomData.geojson && (nomData.geojson.type === "Polygon" || nomData.geojson.type === "MultiPolygon")) {
+      try {
+        const geom = nomData.geojson.type === "Polygon" ? nomData.geojson.coordinates[0] : nomData.geojson.coordinates[0][0];
+        const coords = geom.map((c: any) => [c[0], c[1]] as [number, number]);
+        const area = calculatePolygonArea(coords);
+        if (area > 0 && area < 40000) {
+          calculatedArea = Math.round(area);
+          const leafletCoords = coords.map(c => [c[1], c[0]] as L.LatLngTuple);
+          polygonRef.current = L.polygon(leafletCoords, { color: 'green', weight: 2, fillOpacity: 0.2 }).addTo(map);
+        }
+      } catch (e) {
+        console.warn("Could not draw fallback Nominatim polygon", e);
+      }
+    }
+
+    // 4.b Fallback to Nominatim name if Overpass failed or had no name
+    if (!reference && nomData) {
+      const osmClass = nomData.class || nomData.category || "";
+      const isRoadOrWaterOrPlace = (osmClass === "highway" || osmClass === "waterway" || osmClass === "natural" || osmClass === "boundary" || osmClass === "place" || osmClass === "landuse");
+      
+      // Filter out words that denote a street, waterbody, or administrative region, case insensitive
+      const isStreetName = /^(calle|avenida|ave\.?|av\.?|c\/|carretera|camino|autopista|autovía|río|rio|mar|océano|lago|arroyo|provincia|municipio|ciudad|paraje|sector|barrio|distrito)\b/i.test(nomName);
+
+      if (!isRoadOrWaterOrPlace && nomName && nomName !== "unnamed" && !isStreetName) {
+        reference = nomName;
+      } else if (addr) {
+        const poi = addr.amenity || addr.shop || addr.tourism || addr.historic || addr.leisure || addr.office || addr.government || addr.building || addr.industrial;
+        if (poi && !/^(calle|avenida|ave\.?|av\.?|c\/|carretera|camino|autopista|autovía|río|rio|mar|océano|lago|arroyo|provincia|municipio|ciudad|paraje|sector|barrio|distrito)\b/i.test(poi)) {
+          reference = poi;
+        }
+      }
+    }
+    
+    setSuperficieM2(calculatedArea.toString());
+    setCercania(reference);
+
+    // 5. Catastro Data
+    let catastroSuccess = false;
+    
+    if (catData && (catData as any)._tag === "Success") {
+      const catastro = (catData as any).value;
+      if (catastro.designacionCatastral) setDesignacionCatastral(catastro.designacionCatastral);
+      if (catastro.matricula) setMatricula(catastro.matricula);
+      if (catastro.superficieM2) setSuperficieM2(catastro.superficieM2);
+      if (catastro.propietario) setPropietario(catastro.propietario);
+      if (catastro.cedulaRncPropietario) setCedulaRncPropietario(catastro.cedulaRncPropietario);
+      if (catastro.ipi) setIpi(catastro.ipi);
+      if (catastro.estatusIpi) setEstatusIpi(catastro.estatusIpi);
+      catastroSuccess = true;
+    } else if (catData && (catData as any).designacionCatastral) {
+      const catastro = catData as any;
+      if (catastro.designacionCatastral) setDesignacionCatastral(catastro.designacionCatastral);
+      if (catastro.matricula) setMatricula(catastro.matricula);
+      if (catastro.superficieM2) setSuperficieM2(catastro.superficieM2);
+      if (catastro.propietario) setPropietario(catastro.propietario);
+      catastroSuccess = true;
+    }
+
+    if (!catastroSuccess) {
+      const randomParcel = Math.floor(Math.random() * 500) + 1;
+      const matchedProv = provinciasRef.current.find(p => p.nombre === closestProvName);
+      const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
+      setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+    }
+
+    // 6. Update Marker
+    if (markerRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+    } else {
+      markerRef.current = L.marker([lat, lng]).addTo(map);
     }
   }, []);
 
@@ -370,61 +567,14 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     const map = leafletMapRef.current;
     if (!map || !mapSearchText.trim()) return;
 
-    // Parse lat, lng from mapSearchText (e.g. "18.47186, -69.93988")
     const match = mapSearchText.match(/([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+)/);
     if (match) {
       const lat = parseFloat(match[1]);
       const lng = parseFloat(match[2]);
-
-      const targetZoom = 17;
-      if (Math.abs(map.getZoom() - targetZoom) > 1) {
-        map.flyTo([lat, lng], targetZoom, { duration: 1.2 });
-      } else {
-        map.flyTo([lat, lng], map.getZoom(), { duration: 0.5 });
-      }
-
-      setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
-      fetchNearbyPoi(lat, lng);
-
-      skipFlyToRef.current = true;
-      let closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
-      setUbicacionTexto(closestProvName);
-
-      try {
-        const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        if (isSuccess(result)) {
-          const catastroData = result.value;
-          if (catastroData.designacionCatastral) setDesignacionCatastral(catastroData.designacionCatastral);
-          if (catastroData.matricula) setMatricula(catastroData.matricula);
-          if (catastroData.superficieM2) setSuperficieM2(catastroData.superficieM2);
-          if (catastroData.propietario) setPropietario(catastroData.propietario);
-          if (catastroData.cedulaRncPropietario) setCedulaRncPropietario(catastroData.cedulaRncPropietario);
-          if (catastroData.ipi) setIpi(catastroData.ipi);
-          if (catastroData.estatusIpi) setEstatusIpi(catastroData.estatusIpi);
-          skipFlyToRef.current = true;
-          closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
-          setUbicacionTexto(closestProvName);
-        } else {
-          throw new Error(getProjectErrorMessage(result.error));
-        }
-      } catch (error) {
-        console.error("No catastro data found:", error);
-        // Fallback for demo purposes if no real data is found
-        const randomParcel = Math.floor(Math.random() * 500) + 1;
-        const matchedProv = provinciasRef.current.find(p => p.nombre === closestProvName);
-        const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
-        setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
-      }
-
-      if (markerRef.current) {
-        markerRef.current.setLatLng([lat, lng]);
-      } else {
-        markerRef.current = L.marker([lat, lng]).addTo(map);
-      }
+      await processLocation(lat, lng, map);
     }
-  }, [mapSearchText]);
+  }, [mapSearchText, processLocation]);
 
-  // Keep a ref to the latest ubicacionTexto so the postMessage listener
   const [invalidLocationModalOpen, setInvalidLocationModalOpen] = useState(false);
   const polygonRef = useRef<L.Polygon | null>(null);
 
@@ -513,170 +663,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     // Click to drop marker + capture GPS + generate catastral code
     map.on("click", async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
-      
-      // 1. Validar si es calle o cuerpo de agua
-      try {
-        const osmRes = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=18&addressdetails=1&polygon_geojson=1`
-        );
-        if (osmRes.ok) {
-          const osmData = await osmRes.json();
-          const osmClass = osmData.class || "";
-          const type = osmData.type || "";
-          
-          let isHighwayBlocked = false;
-          if (osmClass === "highway") {
-            // Check exact distance to the line to allow clicking empty lots that snap to highways
-            if (osmData.geojson && osmData.geojson.type === "LineString") {
-              const coords = osmData.geojson.coordinates as [number, number][];
-              const dist = getDistanceToLineString([lng, lat], coords);
-              if (dist < 10) { // If click is within 10 meters of the road center, block it
-                isHighwayBlocked = true;
-              }
-            } else {
-              isHighwayBlocked = true; // Fallback block if no LineString
-            }
-          }
-
-          if (
-            isHighwayBlocked ||
-            osmClass === "waterway" || 
-            osmClass === "natural" ||
-            osmClass === "place" && type === "sea" ||
-            type === "water" || 
-            type === "sea" || 
-            type === "ocean" || 
-            type === "river" ||
-            type === "bay"
-          ) {
-            setInvalidLocationModalOpen(true);
-            setUbicacionGps("");
-            if (markerRef.current) {
-              markerRef.current.remove();
-              markerRef.current = null;
-            }
-            if (polygonRef.current) {
-                polygonRef.current.remove();
-                polygonRef.current = null;
-            }
-            return; // Abort processing
-          }
-        }
-      } catch (err) {
-        console.error("OSM validation failed", err);
-      }
-
-      // 2. Control de Zoom Automático (Zoom 17)
-      const targetZoom = 17;
-      const currentZoom = map.getZoom();
-      if (Math.abs(currentZoom - targetZoom) > 1) {
-        map.flyTo([lat, lng], targetZoom, { duration: 1.0 });
-      } else {
-        map.flyTo([lat, lng], currentZoom, { duration: 0.5 });
-      }
-
-      setUbicacionGps(`${lat.toFixed(6)},${lng.toFixed(6)}`);
-      fetchNearbyPoi(lat, lng);
-
-      skipFlyToRef.current = true;
-      const closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
-      setUbicacionTexto(closestProvName);
-
-      try {
-        const result = await projectsApi.lookupCatastroByGps(lat.toString(), lng.toString());
-        if (isSuccess(result)) {
-          const catastroData = result.value;
-          setDesignacionCatastral(catastroData.designacionCatastral || "");
-          setMatricula(catastroData.matricula || "");
-          setSuperficieM2(catastroData.superficieM2 || "");
-          setPropietario(catastroData.propietario || "");
-          setCedulaRncPropietario(catastroData.cedulaRncPropietario || "");
-          setIpi(catastroData.ipi || "");
-          setEstatusIpi(catastroData.estatusIpi || "");
-        } else {
-          throw new Error(getProjectErrorMessage(result.error));
-        }
-      } catch (error) {
-        console.error("No catastro data found:", error);
-        skipFlyToRef.current = true;
-        const closestProvName = getClosestProvincia(provinciasRef.current, lat, lng);
-        setUbicacionTexto(closestProvName);
-        const randomParcel = Math.floor(Math.random() * 500) + 1;
-        const matchedProv = provinciasRef.current.find(p => p.nombre === closestProvName);
-        const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
-        setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
-      }
-
-      // Draw Polygon if we have it, and calculate Area
-      try {
-        let calculatedArea = 15; // Fallback 15m2
-        
-        const overpassQuery = `[out:json];(way["building"](around:20,${lat},${lng});way["amenity"](around:20,${lat},${lng});way["leisure"](around:20,${lat},${lng});way["shop"](around:20,${lat},${lng});way["historic"](around:20,${lat},${lng});way["tourism"](around:20,${lat},${lng});way["office"](around:20,${lat},${lng});way["craft"](around:20,${lat},${lng}););out geom;`;
-        
-        const opRes = await fetch("https://overpass-api.de/api/interpreter", {
-          method: "POST",
-          body: overpassQuery
-        });
-        
-        if (opRes.ok) {
-          const opData = await opRes.json();
-          if (opData.elements && opData.elements.length > 0) {
-            let bestElement = null;
-            let bestScore = Infinity; // Lower score is better
-            
-            for (const el of opData.elements) {
-              if (el.type === "way" && el.geometry) {
-                const coords = el.geometry.map((g: any) => [g.lon, g.lat] as [number, number]);
-                const area = calculatePolygonArea(coords);
-                if (area > 0 && area < 40000) {
-                  const inside = isPointInPolygon([lng, lat], coords);
-                  let score = Infinity;
-                  if (inside) {
-                    score = area; // If inside, prefer the smallest enclosing polygon (building > campus)
-                  } else {
-                    const dist = getDistanceToLineString([lng, lat], coords);
-                    score = dist + 1000000; // If outside, prefer closest polygon, but always worse than inside
-                  }
-                  
-                  if (score < bestScore) {
-                    bestScore = score;
-                    bestElement = { ...el, area, coords };
-                  }
-                }
-              }
-            }
-            
-            if (bestElement) {
-              // Only draw if < 40000 m2
-              if (bestElement.area < 40000) {
-                calculatedArea = Math.round(bestElement.area);
-                const leafletCoords = bestElement.coords.map((c: any) => [c[1], c[0]] as L.LatLngTuple);
-                
-                if (polygonRef.current) {
-                  polygonRef.current.remove();
-                }
-                polygonRef.current = L.polygon(leafletCoords, { color: 'blue', weight: 2, fillOpacity: 0.2 }).addTo(map);
-              } else {
-                if (polygonRef.current) polygonRef.current.remove();
-              }
-            } else {
-              if (polygonRef.current) polygonRef.current.remove();
-            }
-          } else {
-            if (polygonRef.current) polygonRef.current.remove();
-          }
-        }
-        
-        setSuperficieM2(calculatedArea.toString());
-      } catch (err) {
-        setSuperficieM2("15");
-      }
-
-      if (markerRef.current) {
-        markerRef.current.setLatLng([lat, lng]);
-      } else {
-        markerRef.current = L.marker([lat, lng]).addTo(map);
-      }
+      await processLocation(lat, lng, map);
     });
 
     // Settle layout then force a size recalculation
