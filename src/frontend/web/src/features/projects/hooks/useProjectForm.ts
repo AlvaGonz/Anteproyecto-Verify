@@ -281,6 +281,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  const [polygonCoords, setPolygonCoords] = useState<[number, number][]>([]);
 
   // RI iframe ref (for postMessage targeting)
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -299,20 +300,65 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         const placeLat = parseFloat(osmData.lat);
         const placeLon = parseFloat(osmData.lon);
         
-        // Simple Euclidean distance in meters
-        const dLat = (placeLat - lat) * 111139;
-        const dLng = (placeLon - lng) * 111139 * Math.cos(lat * Math.PI / 180);
-        const distance = Math.sqrt(dLat * dLat + dLng * dLng);
-        
-        const addr = osmData.address;
+        // 1. Fetch exact building name using Overpass API
         let reference = "";
-        // If distance is <= 10m and there's a valid address object, check for POIs
-        if (addr && distance <= 10) {
-          const poi = addr.amenity || addr.shop || addr.tourism || addr.historic || addr.leisure || addr.office || addr.government || addr.building || addr.industrial;
-          if (poi) {
-            reference = `Cerca de: ${poi}`;
+        try {
+          const overpassQuery = `[out:json];(way["building"](around:20,${lat},${lng});way["amenity"](around:20,${lat},${lng});way["leisure"](around:20,${lat},${lng});way["shop"](around:20,${lat},${lng});way["historic"](around:20,${lat},${lng}););out tags;`;
+          
+          const opRes = await fetch("https://overpass-api.de/api/interpreter", {
+            method: "POST",
+            body: overpassQuery
+          });
+          
+          if (opRes.ok) {
+            const opData = await opRes.json();
+            if (opData.elements && opData.elements.length > 0) {
+              let bestElement = null;
+              let bestScore = Infinity;
+              
+              for (const el of opData.elements) {
+                if (el.type === "way" && el.geometry) {
+                  const coords = el.geometry.map((g: any) => [g.lon, g.lat] as [number, number]);
+                  const area = calculatePolygonArea(coords);
+                  if (area > 0 && area < 40000) {
+                    const inside = isPointInPolygon([lng, lat], coords);
+                    let score = Infinity;
+                    if (inside) {
+                      score = area;
+                    } else {
+                      const dist = getDistanceToLineString([lng, lat], coords);
+                      score = dist + 1000000;
+                    }
+                    if (score < bestScore) {
+                      bestScore = score;
+                      bestElement = el;
+                    }
+                  }
+                }
+              }
+              if (bestElement && bestElement.tags && bestElement.tags.name) {
+                reference = bestElement.tags.name;
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Overpass name fetch error", e);
+        }
+
+        // 2. Fallback to Nominatim if Overpass didn't find a specific name
+        if (!reference) {
+          const addr = osmData.address;
+          if (distance <= 50) {
+            const poiName = osmData.name || (osmData.display_name ? osmData.display_name.split(',')[0].trim() : "");
+            if (poiName && poiName !== "unnamed") {
+              reference = poiName;
+            } else if (addr) {
+               const poi = addr.amenity || addr.shop || addr.tourism || addr.historic || addr.leisure || addr.office || addr.government || addr.building || addr.industrial;
+               if (poi) reference = poi;
+            }
           }
         }
+        
         setCercania(reference);
       }
     } catch (err) {
@@ -379,6 +425,72 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
   }, [mapSearchText]);
 
   // Keep a ref to the latest ubicacionTexto so the postMessage listener
+  const [invalidLocationModalOpen, setInvalidLocationModalOpen] = useState(false);
+  const polygonRef = useRef<L.Polygon | null>(null);
+
+  // Helper for simple area calculation (meters)
+  const calculatePolygonArea = (coordinates: [number, number][]): number => {
+    if (coordinates.length < 3) return 0;
+    let area = 0;
+    let sumLat = 0;
+    for(let i=0; i<coordinates.length; i++) sumLat += coordinates[i][1];
+    const avgLat = sumLat / coordinates.length;
+    const metersPerDegLat = 111320;
+    const metersPerDegLon = 111320 * Math.cos(avgLat * Math.PI / 180);
+
+    for (let i = 0; i < coordinates.length; i++) {
+      const j = (i + 1) % coordinates.length;
+      const x1 = coordinates[i][0] * metersPerDegLon;
+      const y1 = coordinates[i][1] * metersPerDegLat;
+      const x2 = coordinates[j][0] * metersPerDegLon;
+      const y2 = coordinates[j][1] * metersPerDegLat;
+      area += x1 * y2 - x2 * y1;
+    }
+    return Math.abs(area / 2);
+  };
+
+  // Helper for point in polygon check
+  const isPointInPolygon = (point: [number, number], vs: [number, number][]) => {
+    const x = point[0], y = point[1];
+    let inside = false;
+    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+      const xi = vs[i][0], yi = vs[i][1];
+      const xj = vs[j][0], yj = vs[j][1];
+      const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / ((yj - yi) || 1) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  };
+
+  // Helper to find shortest distance from point to LineString segment (in meters)
+  const pointToSegmentDistance = (px: number, py: number, ax: number, ay: number, bx: number, by: number): number => {
+    const l2 = (bx - ax) * (bx - ax) + (by - ay) * (by - ay);
+    if (l2 === 0) return Math.sqrt((px - ax) * (px - ax) + (py - ay) * (py - ay));
+    let t = ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    const projx = ax + t * (bx - ax);
+    const projy = ay + t * (by - ay);
+    return Math.sqrt((px - projx) * (px - projx) + (py - projy) * (py - projy));
+  };
+
+  const getDistanceToLineString = (point: [number, number], lineCoords: [number, number][]): number => {
+    let minDistance = Infinity;
+    const degToMetersLat = 111320;
+    const degToMetersLon = 111320 * Math.cos(point[1] * Math.PI / 180);
+    const pX = point[0] * degToMetersLon;
+    const pY = point[1] * degToMetersLat;
+
+    for (let i = 0; i < lineCoords.length - 1; i++) {
+      const aX = lineCoords[i][0] * degToMetersLon;
+      const aY = lineCoords[i][1] * degToMetersLat;
+      const bX = lineCoords[i+1][0] * degToMetersLon;
+      const bY = lineCoords[i+1][1] * degToMetersLat;
+      const dist = pointToSegmentDistance(pX, pY, aX, aY, bX, bY);
+      if (dist < minDistance) minDistance = dist;
+    }
+    return minDistance;
+  };
+
   // always has the current province without needing to re-register
   const ubicacionTextoRef = useRef(ubicacionTexto);
   useEffect(() => { ubicacionTextoRef.current = ubicacionTexto; }, [ubicacionTexto]);
@@ -405,27 +517,47 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
       // 1. Validar si es calle o cuerpo de agua
       try {
         const osmRes = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=18&addressdetails=1`
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=18&addressdetails=1&polygon_geojson=1`
         );
         if (osmRes.ok) {
           const osmData = await osmRes.json();
-          const category = osmData.category || "";
+          const osmClass = osmData.class || "";
           const type = osmData.type || "";
           
+          let isHighwayBlocked = false;
+          if (osmClass === "highway") {
+            // Check exact distance to the line to allow clicking empty lots that snap to highways
+            if (osmData.geojson && osmData.geojson.type === "LineString") {
+              const coords = osmData.geojson.coordinates as [number, number][];
+              const dist = getDistanceToLineString([lng, lat], coords);
+              if (dist < 10) { // If click is within 10 meters of the road center, block it
+                isHighwayBlocked = true;
+              }
+            } else {
+              isHighwayBlocked = true; // Fallback block if no LineString
+            }
+          }
+
           if (
-            category === "highway" || 
-            category === "waterway" || 
+            isHighwayBlocked ||
+            osmClass === "waterway" || 
+            osmClass === "natural" ||
+            osmClass === "place" && type === "sea" ||
             type === "water" || 
             type === "sea" || 
             type === "ocean" || 
             type === "river" ||
             type === "bay"
           ) {
-            window.alert("Estás seleccionando una opción no válida. Debes seleccionar una parcela con distribución catastral.");
+            setInvalidLocationModalOpen(true);
             setUbicacionGps("");
             if (markerRef.current) {
               markerRef.current.remove();
               markerRef.current = null;
+            }
+            if (polygonRef.current) {
+                polygonRef.current.remove();
+                polygonRef.current = null;
             }
             return; // Abort processing
           }
@@ -473,6 +605,71 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         const matchedProv = provinciasRef.current.find(p => p.nombre === closestProvName);
         const prefix = matchedProv ? matchedProv.dcPrefix : "DC-01";
         setDesignacionCatastral(`Parc. ${randomParcel}, ${prefix}`);
+      }
+
+      // Draw Polygon if we have it, and calculate Area
+      try {
+        let calculatedArea = 15; // Fallback 15m2
+        
+        const overpassQuery = `[out:json];(way["building"](around:20,${lat},${lng});way["amenity"](around:20,${lat},${lng});way["leisure"](around:20,${lat},${lng});way["shop"](around:20,${lat},${lng});way["historic"](around:20,${lat},${lng});way["tourism"](around:20,${lat},${lng});way["office"](around:20,${lat},${lng});way["craft"](around:20,${lat},${lng}););out geom;`;
+        
+        const opRes = await fetch("https://overpass-api.de/api/interpreter", {
+          method: "POST",
+          body: overpassQuery
+        });
+        
+        if (opRes.ok) {
+          const opData = await opRes.json();
+          if (opData.elements && opData.elements.length > 0) {
+            let bestElement = null;
+            let bestScore = Infinity; // Lower score is better
+            
+            for (const el of opData.elements) {
+              if (el.type === "way" && el.geometry) {
+                const coords = el.geometry.map((g: any) => [g.lon, g.lat] as [number, number]);
+                const area = calculatePolygonArea(coords);
+                if (area > 0 && area < 40000) {
+                  const inside = isPointInPolygon([lng, lat], coords);
+                  let score = Infinity;
+                  if (inside) {
+                    score = area; // If inside, prefer the smallest enclosing polygon (building > campus)
+                  } else {
+                    const dist = getDistanceToLineString([lng, lat], coords);
+                    score = dist + 1000000; // If outside, prefer closest polygon, but always worse than inside
+                  }
+                  
+                  if (score < bestScore) {
+                    bestScore = score;
+                    bestElement = { ...el, area, coords };
+                  }
+                }
+              }
+            }
+            
+            if (bestElement) {
+              // Only draw if < 40000 m2
+              if (bestElement.area < 40000) {
+                calculatedArea = Math.round(bestElement.area);
+                const leafletCoords = bestElement.coords.map((c: any) => [c[1], c[0]] as L.LatLngTuple);
+                
+                if (polygonRef.current) {
+                  polygonRef.current.remove();
+                }
+                polygonRef.current = L.polygon(leafletCoords, { color: 'blue', weight: 2, fillOpacity: 0.2 }).addTo(map);
+              } else {
+                if (polygonRef.current) polygonRef.current.remove();
+              }
+            } else {
+              if (polygonRef.current) polygonRef.current.remove();
+            }
+          } else {
+            if (polygonRef.current) polygonRef.current.remove();
+          }
+        }
+        
+        setSuperficieM2(calculatedArea.toString());
+      } catch (err) {
+        setSuperficieM2("15");
       }
 
       if (markerRef.current) {
@@ -695,6 +892,8 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     handleSubmit,
     duplicateWarningOpen,
     setDuplicateWarningOpen,
+    invalidLocationModalOpen,
+    setInvalidLocationModalOpen,
     mapSearchText,
     setMapSearchText,
     handleSearchCoordinates,

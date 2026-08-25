@@ -24,6 +24,8 @@ interface ProjectFormLayoutProps {
   handleSearchCoordinates: () => void;
   duplicateWarningOpen: boolean;
   setDuplicateWarningOpen: (val: boolean) => void;
+  invalidLocationModalOpen: boolean;
+  setInvalidLocationModalOpen: (val: boolean) => void;
   // ponytail: grouped to keep interface slim, spread into sub-components
   basicFields: React.ComponentProps<typeof ProjectFormBasicFields>;
   detailsFields: React.ComponentProps<typeof ProjectFormDetailsFields>;
@@ -48,6 +50,8 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
   handleSearchCoordinates,
   duplicateWarningOpen,
   setDuplicateWarningOpen,
+  invalidLocationModalOpen,
+  setInvalidLocationModalOpen,
   basicFields,
   detailsFields,
   documentSection,
@@ -216,6 +220,28 @@ export const ProjectFormLayout: React.FC<ProjectFormLayoutProps> = ({
               className="vf-btn-primary bg-red-600 hover:bg-red-700"
             >
               Sí, Registrar Duplicado
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {invalidLocationModalOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+        <div className="bg-[#1e293b] rounded-xl shadow-2xl max-w-md w-full p-6 animate-scale-in border border-gray-700">
+          <div className="mb-4">
+            <h3 className="text-white text-lg font-semibold">Alerta: Conflicto Detectado</h3>
+          </div>
+          <p className="text-blue-200/80 mb-6 leading-relaxed">
+            Estás seleccionando una opción no válida. Debes seleccionar una parcela con distribución catastral.
+          </p>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setInvalidLocationModalOpen(false)}
+              className="px-6 py-2 bg-[#312e81] hover:bg-[#3730a3] text-white rounded-lg border border-[#4338ca] transition-colors shadow-[0_0_15px_rgba(67,56,202,0.3)]"
+            >
+              Aceptar
             </button>
           </div>
         </div>
