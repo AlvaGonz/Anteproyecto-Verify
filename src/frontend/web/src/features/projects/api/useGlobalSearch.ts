@@ -29,6 +29,7 @@ export interface DocumentoBasicDto {
   nombre: string;
   tipo: string;
   estado: string;
+  proyectoNombre?: string;
 }
 
 export interface SearchResultDto {

@@ -24,9 +24,9 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         return searchType.ToLowerInvariant() switch
         {
             "rnc" => await SearchRncAsync(query, cancellationToken),
-            "cedula" => await SearchCedulaAsync(query, cancellationToken),
             "suelo" => await SearchSueloAsync(query, cancellationToken),
             "ipi" => await SearchIpiAsync(query, cancellationToken),
+            "cert" => await SearchCertAsync(query, cancellationToken),
             _ => null
         };
     }
@@ -34,7 +34,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
     private async Task<SearchResultDto?> SearchRncAsync(string query, CancellationToken ct)
     {
         var cleanQuery = query.Replace("-", "").Trim();
-        var dgii = await _context.DGII.FirstOrDefaultAsync(d => d.Rnc == cleanQuery || d.Rnc == query, ct);
+        var dgii = await _context.DGII.FirstOrDefaultAsync(d => d.Rnc.Replace("-", "") == cleanQuery, ct);
         if (dgii == null) return null;
 
         var result = new SearchResultDto
@@ -53,7 +53,8 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         // Buscar proyectos asociados
         var proyectos = await _context.Proyectos
             .Include(p => p.Estado)
-            .Where(p => p.RncDesarrollador == cleanQuery || p.CedulaRncPropietario == cleanQuery || p.RncDesarrollador == query || p.CedulaRncPropietario == query)
+            .Where(p => (p.RncDesarrollador != null && p.RncDesarrollador.Replace("-", "") == cleanQuery) || 
+                        (p.CedulaRncPropietario != null && p.CedulaRncPropietario.Replace("-", "") == cleanQuery))
             .ToListAsync(ct);
 
         await BuildGraphAndDocumentsAsync(result, query, dgii.NombreRazonSocial, "Entidad", proyectos, ct);
@@ -61,41 +62,10 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         return result;
     }
 
-    private async Task<SearchResultDto?> SearchCedulaAsync(string query, CancellationToken ct)
-    {
-        var cleanQuery = query.Replace("-", "").Trim();
-        var persona = await _context.JCE_Ciudadanos.FirstOrDefaultAsync(c => c.Cedula == cleanQuery || c.Cedula == query, ct);
-        if (persona == null) return null;
-
-        var result = new SearchResultDto
-        {
-            TipoConsulta = "Cédula",
-            EsValido = true,
-            TituloPrincipal = "Ciudadano Registrado",
-            Detalles = new Dictionary<string, string>
-            {
-                // Mask cedula based on user requirement
-                { "Cédula", MaskCedula(persona.Cedula) },
-                { "Nombres", persona.Nombres },
-                { "Apellidos", persona.Apellidos },
-                { "Nacimiento", persona.FechaNacimiento.ToString("yyyy-MM-dd") }
-            }
-        };
-
-        var proyectos = await _context.Proyectos
-            .Include(p => p.Estado)
-            .Where(p => p.CedulaRncPropietario == cleanQuery || p.CedulaRncPropietario == query)
-            .ToListAsync(ct);
-
-        await BuildGraphAndDocumentsAsync(result, query, "Ciudadano Registrado", "Ciudadano", proyectos, ct);
-
-        return result;
-    }
-
     private async Task<SearchResultDto?> SearchSueloAsync(string query, CancellationToken ct)
     {
         var cleanQuery = query.Replace("-", "").Trim();
-        var licencia = await _context.LicenciasConstruccion.FirstOrDefaultAsync(l => l.NumeroPermiso == cleanQuery || l.NumeroPermiso == query, ct);
+        var licencia = await _context.LicenciasConstruccion.FirstOrDefaultAsync(l => l.NumeroPermiso.Replace("-", "").Contains(cleanQuery), ct);
         if (licencia == null) return null;
 
         var result = new SearchResultDto
@@ -124,7 +94,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository
     private async Task<SearchResultDto?> SearchIpiAsync(string query, CancellationToken ct)
     {
         var cleanQuery = query.Replace("-", "").Trim();
-        var ipi = await _context.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion == cleanQuery || p.NoCertificacion == query, ct);
+        var ipi = await _context.PagosIPI.FirstOrDefaultAsync(p => p.NoCertificacion != null && p.NoCertificacion.Replace("-", "") == cleanQuery, ct);
         if (ipi == null) return null;
 
         var result = new SearchResultDto
@@ -142,10 +112,40 @@ public class GlobalSearchRepository : IGlobalSearchRepository
 
         var proyectos = await _context.Proyectos
             .Include(p => p.Estado)
-            .Where(p => p.Ipi == cleanQuery || p.Ipi == query)
+            .Where(p => p.Ipi != null && p.Ipi.Replace("-", "") == cleanQuery)
             .ToListAsync(ct);
 
         await BuildGraphAndDocumentsAsync(result, query, $"IPI {ipi.NoCertificacion}", "Impuesto", proyectos, ct);
+
+        return result;
+    }
+
+    private async Task<SearchResultDto?> SearchCertAsync(string query, CancellationToken ct)
+    {
+        var cleanQuery = query.Trim();
+        var sello = await _context.SellosIntegridad.FirstOrDefaultAsync(s => s.CodigoSello == cleanQuery, ct);
+        if (sello == null) return null;
+
+        var result = new SearchResultDto
+        {
+            TipoConsulta = "Certificación",
+            EsValido = true,
+            TituloPrincipal = sello.Nombre,
+            Detalles = new Dictionary<string, string>
+            {
+                { "Código", sello.CodigoSello },
+                { "Nivel", sello.Nivel.ToString() },
+                { "Estado", sello.Estado.ToString() },
+                { "Emisión", sello.FechaEmisionUtc.ToString("yyyy-MM-dd") }
+            }
+        };
+
+        var proyectos = await _context.Proyectos
+            .Include(p => p.Estado)
+            .Where(p => p.Id == sello.ProyectoId)
+            .ToListAsync(ct);
+
+        await BuildGraphAndDocumentsAsync(result, cleanQuery, sello.Nombre, "Certificado", proyectos, ct);
 
         return result;
     }
@@ -175,28 +175,18 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         if (proyectoIds.Any())
         {
             var documentos = await _context.Documentos
+                .Include(d => d.Proyecto)
                 .Where(d => proyectoIds.Contains(d.ProyectoId) && d.Activo)
                 .Select(d => new DocumentoBasicDto
                 {
                     Id = d.Id,
                     Nombre = d.NombreArchivoOriginal,
                     Tipo = d.TipoDocumento.ToString(),
-                    Estado = d.EstadoDocumento.ToString()
+                    Estado = d.EstadoDocumento.ToString(),
+                    ProyectoNombre = d.Proyecto != null ? d.Proyecto.Nombre : "Desconocido"
                 })
                 .ToListAsync(ct);
             result.DocumentosRelacionados = documentos;
         }
-    }
-
-    private string MaskCedula(string cedula)
-    {
-        if (string.IsNullOrWhiteSpace(cedula) || cedula.Length < 11) return cedula;
-        // e.g. 402-1234567-8 -> 402-***4567-*
-        var clean = cedula.Replace("-", "");
-        if (clean.Length == 11)
-        {
-            return $"{clean.Substring(0, 3)}-***{clean.Substring(6, 4)}-*";
-        }
-        return "***";
     }
 }

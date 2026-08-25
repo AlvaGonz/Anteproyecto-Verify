@@ -13,6 +13,7 @@ import { StatusHistory } from "../../features/reports/components/StatusHistory";
 import { ProjectDocumentStatus } from "../../features/documents/components/ProjectDocumentStatus";
 import { LandingFooter } from "../../features/public/components/LandingFooter";
 import { toUtcDate } from "../../shared/utils/dates";
+import { maskCedula } from "../../shared/utils/masking";
 import {
   ArrowLeft,
   MapPin,
@@ -545,9 +546,12 @@ export const ProjectPublicDetailPage: React.FC = () => {
                             <div className="min-w-0">
                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5">RNC/Cédula</span>
                               <span className="text-sm font-medium text-white/90 break-words block" data-testid="public-registrant-identification">
-                                {project.registradoPor.presentacionPublica
-                                  ? project.registradoPor.presentacionPublica.identificacionMostrada
-                                  : (project.cedulaRncPropietario || project.rncDesarrollador)}
+                                {(() => {
+                                  const id = project.registradoPor.presentacionPublica
+                                    ? project.registradoPor.presentacionPublica.identificacionMostrada
+                                    : (project.cedulaRncPropietario || project.rncDesarrollador);
+                                  return maskCedula(id);
+                                })()}
                               </span>
                             </div>
                           </div>

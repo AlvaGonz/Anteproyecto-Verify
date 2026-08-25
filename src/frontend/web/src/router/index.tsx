@@ -16,7 +16,7 @@ const ProjectReportsPage = lazy(() => import("../pages/admin/ProjectReportsPage"
 const RulesManagePage = lazy(() => import("../pages/admin/RulesManagePage").then(m => ({ default: m.RulesManagePage })));
 const ToleranceRuleEdit = lazy(() => import("../pages/admin/rules/ToleranceRuleEdit").then(m => ({ default: m.ToleranceRuleEdit })));
 const SettingsPage = lazy(() => import("../pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
-const PublicVerifyResultPage = lazy(() => import("../pages/public/PublicVerifyResultPage").then(m => ({ default: m.PublicVerifyResultPage })));
+
 const LoginPage = lazy(() => import("../pages/auth/LoginPage").then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import("../pages/auth/RegisterPage").then(m => ({ default: m.RegisterPage })));
 const EmailVerifiedPage = lazy(() => import("../pages/auth/EmailVerifiedPage").then(m => ({ default: m.EmailVerifiedPage })));
@@ -51,7 +51,7 @@ const SuspenseLayout = () => (
 
 const NavigateToVerifyResult: React.FC = () => {
   const { code } = useParams<{ code: string }>();
-  return <Navigate to={`/projects/verify/${code}`} replace />;
+  return <Navigate to={`/projects?type=cert&q=${encodeURIComponent(code || "")}`} replace />;
 };
 
 // Persistent Admin Shell — wraps all /admin/* routes without remounting
@@ -169,7 +169,7 @@ export const router = createHashRouter([
       },
       {
         path: "/projects/verify/:code",
-        element: <PublicVerifyResultPage />,
+        element: <NavigateToVerifyResult />,
       },
       {
         path: "/health",

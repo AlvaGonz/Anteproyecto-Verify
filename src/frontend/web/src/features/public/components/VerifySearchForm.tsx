@@ -12,7 +12,6 @@ import {
   MapPin,
   FileText,
   Building2,
-  User,
   Check
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -62,16 +61,7 @@ const SEARCH_TYPES = [
     title: "Registro RNC",
     subtitle: "Búsqueda por Registro Nacional de Contribuyentes",
     example: "101234567"
-  },
-  {
-    id: "cedula",
-    label: "Cédula",
-    icon: User,
-    placeholder: "Ej: 402-1234567-8",
-    title: "Documento Cédula",
-    subtitle: "Búsqueda por número de identidad personal",
-    example: "402-1234567-8"
-  },
+  }
 ];
 
 const VALIDATION_PATTERNS = {
@@ -94,11 +84,6 @@ const VALIDATION_PATTERNS = {
     regex: /^\d{12}$/,
     example: "101999999999",
     name: "IPI"
-  },
-  cedula: {
-    regex: /^\d{3}-\d{7}-\d$/,
-    example: "402-1234567-8",
-    name: "Cédula"
   }
 } as const;
 
@@ -210,11 +195,7 @@ export const VerifySearchForm: React.FC<VerifySearchFormProps> = ({
       if (onSearch) {
         onSearch(searchType.id, code.trim());
       } else {
-        if (searchType.id === "cert") {
-          navigate(`/projects/verify/${encodeURIComponent(code.trim())}`);
-        } else {
-          navigate(`/projects?type=${encodeURIComponent(searchType.id)}&q=${encodeURIComponent(code.trim())}`);
-        }
+        navigate(`/projects?type=${encodeURIComponent(searchType.id)}&q=${encodeURIComponent(code.trim())}`);
       }
     }
   };

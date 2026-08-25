@@ -20,6 +20,7 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
     public VeriFincaWebFactory(string connectionString)
     {
         _connectionString = connectionString;
+        Environment.SetEnvironmentVariable("JWT_KEY", "test-secret-key-min-32-chars-long!!");
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -52,11 +53,11 @@ public sealed class VeriFincaWebFactory : WebApplicationFactory<Program>
             // Override JWT settings for tests (use a known test secret)
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["JwtSettings:Secret"] =
+                ["Jwt:Key"] =
                     "test-secret-key-min-32-chars-long!!",
-                ["JwtSettings:Issuer"] = "verifinca-test",
-                ["JwtSettings:Audience"] = "verifinca-test-client",
-                ["JwtSettings:ExpirationMinutes"] = "60",
+                ["Jwt:Issuer"] = "verifinca-test",
+                ["Jwt:Audience"] = "verifinca-test-client",
+                ["Jwt:ExpiresInMinutes"] = "60",
                 ["Stripe:SecretKey"] = "sk_test_dummy_for_integration_tests",
                 ["AzureBlob:ConnectionString"] =
                     "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;" +

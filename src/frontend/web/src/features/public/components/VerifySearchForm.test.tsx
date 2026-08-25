@@ -128,7 +128,7 @@ describe("VerifySearchForm Validation", () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith("/projects/verify/VF-2026-X83L");
+      expect(mockNavigate).toHaveBeenCalledWith("/projects?type=cert&q=VF-2026-X83L");
     });
   });
 });
