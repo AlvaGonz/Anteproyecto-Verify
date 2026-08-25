@@ -175,13 +175,15 @@ public class GlobalSearchRepository : IGlobalSearchRepository
         if (proyectoIds.Any())
         {
             var documentos = await _context.Documentos
+                .Include(d => d.Proyecto)
                 .Where(d => proyectoIds.Contains(d.ProyectoId) && d.Activo)
                 .Select(d => new DocumentoBasicDto
                 {
                     Id = d.Id,
                     Nombre = d.NombreArchivoOriginal,
                     Tipo = d.TipoDocumento.ToString(),
-                    Estado = d.EstadoDocumento.ToString()
+                    Estado = d.EstadoDocumento.ToString(),
+                    ProyectoNombre = d.Proyecto != null ? d.Proyecto.Nombre : "Desconocido"
                 })
                 .ToListAsync(ct);
             result.DocumentosRelacionados = documentos;

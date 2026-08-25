@@ -12,7 +12,6 @@ import {
   MapPin,
   FileText,
   Building2,
-  User,
   Check
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";

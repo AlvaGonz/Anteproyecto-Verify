@@ -617,11 +617,25 @@ export const ProjectsPublicListPage: React.FC = () => {
                               data.documentosRelacionados?.length > 0 ? (
                                 <ul className="space-y-3 mt-2">
                                   {data.documentosRelacionados.map((d) => (
-                                    <li key={d.id} className="p-4 bg-slate-900/50 rounded-xl border border-slate-700/50 flex flex-col gap-1">
-                                      <span className="block font-bold text-slate-100 text-sm break-words">{d.nombre}</span>
-                                      <span className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-primary mt-1">
-                                        <FileText className="w-3 h-3" /> {d.tipo}
-                                      </span>
+                                    <li key={d.id} className="p-4 bg-slate-900/50 rounded-xl border border-slate-700/50 flex flex-col gap-2 transition-all hover:bg-slate-800/50 group">
+                                      <div className="flex flex-col gap-1 min-w-0">
+                                        <span className="block font-bold text-slate-100 text-sm break-words group-hover:text-primary transition-colors">{d.nombre}</span>
+                                        <span className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-slate-400 mt-0.5">
+                                          <FileText className="w-3 h-3 text-primary" /> {d.tipo}
+                                        </span>
+                                      </div>
+                                      
+                                      <div className="pt-2.5 mt-1 border-t border-slate-700/50 flex items-center gap-2.5">
+                                        <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                                          <Building2 className="w-3 h-3 text-primary" />
+                                        </div>
+                                        <div className="flex flex-col min-w-0">
+                                          <span className="text-[9px] uppercase font-bold tracking-widest text-slate-500 mb-0.5">Pertenece al Proyecto</span>
+                                          <span className="text-xs font-medium text-slate-200 truncate">
+                                            {d.proyectoNombre || "No asignado"}
+                                          </span>
+                                        </div>
+                                      </div>
                                     </li>
                                   ))}
                                 </ul>
