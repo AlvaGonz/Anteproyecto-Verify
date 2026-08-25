@@ -72,6 +72,7 @@ public class ProyectoRepository : IProyectoRepository
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
+            .OrderByDescending(p => p.UpdatedAtUtc ?? p.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -96,6 +97,7 @@ public class ProyectoRepository : IProyectoRepository
         }
 
         return await query
+            .OrderByDescending(p => p.UpdatedAtUtc ?? p.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -117,6 +119,7 @@ public class ProyectoRepository : IProyectoRepository
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
+            .OrderByDescending(p => p.UpdatedAtUtc ?? p.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -136,6 +139,7 @@ public class ProyectoRepository : IProyectoRepository
             .Include(p => p.Estado)
             .Include(p => p.CategoriaProyecto)
             .Where(p => p.Estado.CodigoUnico != draftCode)
+            .OrderByDescending(p => p.UpdatedAtUtc ?? p.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -153,6 +157,7 @@ public class ProyectoRepository : IProyectoRepository
                 .ThenInclude(u => u.Plan)
             .Include(p => p.Estado)
             .Where(p => p.Estado.CodigoUnico == publicadoCode || p.Estado.CodigoUnico == conObservacionCode)
+            .OrderByDescending(p => p.UpdatedAtUtc ?? p.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -174,7 +179,7 @@ public class ProyectoRepository : IProyectoRepository
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
-            .OrderByDescending(p => p.CreatedAtUtc)
+            .OrderByDescending(p => p.UpdatedAtUtc ?? p.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
