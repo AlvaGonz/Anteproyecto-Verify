@@ -41,6 +41,8 @@ export const AdminProjectsPage: React.FC = () => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const pageSize = 20;
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isExportProjectsModalOpen, setIsExportProjectsModalOpen] = useState(false);
   const { data: intereses = [] } = useInterests(activeTab === "intereses");
@@ -73,9 +75,9 @@ export const AdminProjectsPage: React.FC = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, estadosParam]);
+  }, [debouncedSearch, estadosParam, startDate, endDate]);
 
-  const { data: rawProjects = [], totalCount, isLoading } = useProjects(page, pageSize, debouncedSearch || undefined, estadosParam);
+  const { data: rawProjects = [], totalCount, isLoading } = useProjects(page, pageSize, debouncedSearch || undefined, estadosParam, startDate || undefined, endDate || undefined);
   const projects = rawProjects;
 
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -242,7 +244,6 @@ export const AdminProjectsPage: React.FC = () => {
 
       {activeTab === "proyectos" ? (
         <AdminProjectsPageLayout
-          
           isAdmin={user?.role === "admin" || user?.role === "owner"}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -255,14 +256,18 @@ export const AdminProjectsPage: React.FC = () => {
           openMenuId={openMenuId}
           setOpenMenuId={setOpenMenuId}
           isLoading={isLoading}
-          filtered={filtered}
+          filtered={projects}
           totalCount={totalCount ?? projects.length}
           metrics={metrics}
           updateStatus={handleUpdateStatus}
           deleteProject={handleDeleteProject}
           page={page}
           pageSize={pageSize}
-          onPageChange={goToPage}
+          onPageChange={setPage}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
         />
       ) : activeTab === "publicados" ? (
         <AdminPublishedProjectsView />

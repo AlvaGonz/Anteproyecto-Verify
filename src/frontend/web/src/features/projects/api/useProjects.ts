@@ -6,8 +6,8 @@ import { sortProjectsByRecentUpdate } from "../utils/sortUtils";
 
 export const projectKeys = {
   all: ["projects"] as const,
-  list: (page?: number, pageSize?: number, q?: string, estados?: string) =>
-    ["projects", "list", page, pageSize, q ?? "", estados ?? ""] as const,
+  list: (page?: number, pageSize?: number, q?: string, estados?: string, startDate?: string, endDate?: string) =>
+    ["projects", "list", page, pageSize, q ?? "", estados ?? "", startDate ?? "", endDate ?? ""] as const,
   detail: (id: string) => ["projects", id] as const,
   // ponytail: keep raw string keys for statusEligibility/validation/findings/audit
   // to match existing usage in other files until those files are updated
@@ -53,13 +53,13 @@ interface PaginatedProjectsResponse {
   pageSize: number;
 }
 
-export const useProjects = (page = 1, pageSize = 50, q?: string, estados?: string) => {
+export const useProjects = (page = 1, pageSize = 50, q?: string, estados?: string, startDate?: string, endDate?: string) => {
   const query = useQuery({
-    queryKey: projectKeys.list(page, pageSize, q, estados),
+    queryKey: projectKeys.list(page, pageSize, q, estados, startDate, endDate),
     queryFn: () =>
       apiClient
         .get<PaginatedProjectsResponse>("/projects", {
-          params: { page, pageSize, q: q || undefined, estados: estados || undefined },
+          params: { page, pageSize, q: q || undefined, estados: estados || undefined, startDate: startDate || undefined, endDate: endDate || undefined },
         })
         .then((res) => {
           const data = res.data as any;

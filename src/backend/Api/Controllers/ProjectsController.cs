@@ -60,6 +60,8 @@ public class ProjectsController : ControllerBase
         [FromQuery] int pageSize = 50,
         [FromQuery] string? q = null,
         [FromQuery] string? estados = null,
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null,
         CancellationToken cancellationToken = default)
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -71,7 +73,7 @@ public class ProjectsController : ControllerBase
                 if (loggedInUser != null)
                 {
                     Guid? filterUserId = loggedInUser.Rol != UserRole.Administrator ? userId : null;
-                    var result = await _projectService.GetAllProjectsWithCountAsync(filterUserId, page, pageSize, q, estados, cancellationToken);
+                    var result = await _projectService.GetAllProjectsWithCountAsync(filterUserId, page, pageSize, q, estados, startDate, endDate, cancellationToken);
                     
                     return Ok(result);
                 }

@@ -19,6 +19,10 @@ interface AdminProjectToolbarProps {
   setSelectedStatuses: (v: ProjectStatus[]) => void;
   isFilterDropdownOpen: boolean;
   setIsFilterDropdownOpen: (v: boolean) => void;
+  startDate: string;
+  setStartDate: (v: string) => void;
+  endDate: string;
+  setEndDate: (v: string) => void;
 }
 
 export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
@@ -30,6 +34,10 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
   setSelectedStatuses,
   isFilterDropdownOpen,
   setIsFilterDropdownOpen,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
 }) => (
   <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-4 w-full">
     <div className="relative flex-1 group w-full">
@@ -80,7 +88,7 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
       <button type="button"
         onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
         className={`p-3 rounded-2xl transition-all ${
-          selectedStatuses.length > 0
+          selectedStatuses.length > 0 || startDate || endDate
             ? "text-primary bg-primary/10 hover:bg-primary/20"
             : "text-gray-400 hover:text-gray-900 hover:bg-gray-100"
         }`}
@@ -131,11 +139,37 @@ export const AdminProjectToolbar: React.FC<AdminProjectToolbarProps> = ({
                 </label>
               );
             })}
-            {selectedStatuses.length > 0 && (
+            <div className="pt-2 border-t border-gray-100 mt-2">
+              <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Filtrar por fecha</p>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase">Desde</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full mt-1 p-1.5 text-xs bg-gray-50 border-none rounded-lg focus:ring-1 focus:ring-primary/20 transition-all text-gray-700 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase">Hasta</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full mt-1 p-1.5 text-xs bg-gray-50 border-none rounded-lg focus:ring-1 focus:ring-primary/20 transition-all text-gray-700 font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {(selectedStatuses.length > 0 || startDate || endDate) && (
               <button type="button"
                 onClick={() => {
                   setSelectedStatuses([]);
                   setActiveFilter("all");
+                  setStartDate("");
+                  setEndDate("");
                   setIsFilterDropdownOpen(false);
                 }}
                 className="w-full text-center text-xs font-black text-red-500 hover:text-red-700 pt-2 border-t border-gray-100 block"

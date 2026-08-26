@@ -25,6 +25,10 @@ interface AdminProjectsPageLayoutProps {
   page: number;
   pageSize: number;
   onPageChange: (page: number) => void;
+  startDate: string;
+  setStartDate: (v: string) => void;
+  endDate: string;
+  setEndDate: (v: string) => void;
 }
 
 export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = React.memo(({  isAdmin,
@@ -47,6 +51,10 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = R
   page,
   pageSize,
   onPageChange,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
 }) => {
   return (
     <div className="space-y-6">
@@ -61,6 +69,10 @@ export const AdminProjectsPageLayout: React.FC<AdminProjectsPageLayoutProps> = R
         setSelectedStatuses={setSelectedStatuses}
         isFilterDropdownOpen={isFilterDropdownOpen}
         setIsFilterDropdownOpen={setIsFilterDropdownOpen}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
       />
 
       <AdminProjectList

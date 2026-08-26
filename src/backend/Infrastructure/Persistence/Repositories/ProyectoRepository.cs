@@ -29,7 +29,7 @@ public class ProyectoRepository : IProyectoRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetAllWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, string? searchTerm = null, string? estados = null, CancellationToken cancellationToken = default)
+    public async Task<(IEnumerable<Proyecto> Items, int TotalCount)> GetAllWithCountAsync(Guid? usuarioId = null, int page = 1, int pageSize = 50, string? searchTerm = null, string? estados = null, DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Proyectos
             .AsNoTracking()
@@ -67,6 +67,16 @@ public class ProyectoRepository : IProyectoRepository
             {
                 query = query.Where(p => p.Estado != null && codigos.Contains(p.Estado.CodigoUnico));
             }
+        }
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(p => p.CreatedAtUtc >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(p => p.CreatedAtUtc <= endDate.Value);
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
