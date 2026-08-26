@@ -18,6 +18,8 @@ import { maskCedula } from "../../shared/utils/masking";
 import { useProject } from "../../features/projects/api/useProjects";
 import { useCategories } from "../../features/projects/api/useCategories";
 import { useProjectsInteractions, useInterests, useSavedProjects } from "../../features/projects/api/useProjectsInteractions";
+import { useDocuments } from "../../features/documents/api/useDocuments";
+import { calculateConfidenceLevel } from "../../features/documents/utils/confidenceLevel";
 import { getDefaultProjectImage } from "../../features/projects/api/usePublishedProjects";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useToast } from "../../shared/components/ui/Toast/ToastContext";
@@ -160,9 +162,13 @@ export const PublishedProjectDetailPage: React.FC = () => {
     }
   }
 
+  const { data: fetchedDocuments = [], isLoading: loadingDocs } = useDocuments(id || "");
+  const confidencePercent = calculateConfidenceLevel(fetchedDocuments);
+
   const getIntegrityLabel = () => {
-    if (!project || !project.integridadValidada || project.integridadValidada === 0) return "Proyecto dummy sin Integridad";
-    return `${project.integridadValidada}%`;
+    if (loadingDocs) return "Calculando...";
+    if (!project) return "N/D";
+    return `${confidencePercent}%`;
   };
 
   if (isLoading || hasQuota === null) {

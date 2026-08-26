@@ -417,71 +417,65 @@ public class ProyectoRepository : IProyectoRepository
 
     public async Task<int> GetDocumentCompletionRateAsync(Guid proyectoId, int categoryId, CancellationToken cancellationToken = default)
     {
-        var requiredTypes = GetRequiredDocumentTypesForCategory(categoryId);
-
-        var uploadedTypes = await _context.Documentos
+        var rawUploadedTypes = await _context.Documentos
             .AsNoTracking()
             .Where(d => d.ProyectoId == proyectoId
                 && d.Activo
-                && d.EstadoDocumento != DocumentStatus.Invalid
-                && requiredTypes.Contains(d.TipoDocumento))
+                && d.EstadoDocumento != DocumentStatus.Invalid)
             .Select(d => d.TipoDocumento)
             .Distinct()
             .ToListAsync(cancellationToken);
 
-        var uploadedSet = new HashSet<DocumentType>(uploadedTypes);
+        var uploadedSet = new HashSet<DocumentType>(rawUploadedTypes.Select(CanonicalDocType));
 
-        var essentials = new[] { DocumentType.CertificadoTitulo, DocumentType.CertificacionEstadoJuridico, DocumentType.PlanoMensuraCatastral, DocumentType.ID, DocumentType.CertificacionIPI };
-        var anexos = new[] { DocumentType.CertificadoUsoSuelo, DocumentType.PoderNotarial };
+        var essentials = new[]
+        {
+            DocumentType.CertificadoTitulo,
+            DocumentType.CertificacionEstadoJuridico,
+            DocumentType.PlanoMensuraCatastral,
+            DocumentType.ID,
+            DocumentType.CertificacionIPI
+        };
+
+        var visibleAnexos = new[]
+        {
+            DocumentType.CertificadoUsoSuelo,
+            DocumentType.PoderNotarial
+        };
+
+        var allAnexos = new[]
+        {
+            DocumentType.CertificadoUsoSuelo,
+            DocumentType.RegistroMercantil,
+            DocumentType.PoderNotarial,
+            DocumentType.RNC,
+            DocumentType.CertificadoEIA
+        };
 
         const int essentialWeight = 80;
         const int anexoWeight = 20;
 
         int essentialCount = essentials.Count(t => uploadedSet.Contains(t));
-        int anexoCount = anexos.Count(t => uploadedSet.Contains(t));
+        int anexoCount = allAnexos.Count(t => uploadedSet.Contains(t));
 
         int essentialPercent = essentials.Length > 0
             ? (int)Math.Round((double)essentialCount / essentials.Length * essentialWeight)
             : essentialWeight;
-        int anexoPercent = anexos.Length > 0
-            ? (int)Math.Round((double)anexoCount / anexos.Length * anexoWeight)
+        int anexoPercent = visibleAnexos.Length > 0
+            ? (int)Math.Round((double)anexoCount / visibleAnexos.Length * anexoWeight)
             : anexoWeight;
 
         return Math.Min(essentialPercent + anexoPercent, 100);
     }
 
-    private static List<DocumentType> GetRequiredDocumentTypesForCategory(int categoryId)
+    private static DocumentType CanonicalDocType(DocumentType tipo) => tipo switch
     {
-        // Same logic as DOCUMENT_INFO in ProjectDocumentStatus.tsx
-        var allTypes = new Dictionary<DocumentType, List<int>>
-        {
-            { DocumentType.TITLE, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.LEGAL_STATUS, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.SURVEY, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.ID, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.NOTARIAL_POWER, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.OTHER, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.CertificadoTitulo, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.CertificacionEstadoJuridico, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.PlanoMensuraCatastral, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.CertificadoUsoSuelo, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.CertificacionIPI, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.RegistroMercantil, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.PoderNotarial, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.RNC, new List<int> { 1, 2, 3, 4, 99 } },
-            { DocumentType.CertificadoEIA, new List<int> { 1, 2, 3, 4, 99 } },
-        };
-
-        var result = new List<DocumentType>();
-        foreach (var kvp in allTypes)
-        {
-            if (kvp.Value.Contains(categoryId))
-            {
-                result.Add(kvp.Key);
-            }
-        }
-        return result;
-    }
+        DocumentType.TITLE => DocumentType.CertificadoTitulo,
+        DocumentType.LEGAL_STATUS => DocumentType.CertificacionEstadoJuridico,
+        DocumentType.SURVEY => DocumentType.PlanoMensuraCatastral,
+        DocumentType.NOTARIAL_POWER => DocumentType.PoderNotarial,
+        _ => tipo
+    };
 
     public async Task<bool> ExistsProvinciaAsync(Guid provinciaId, CancellationToken cancellationToken = default)
     {

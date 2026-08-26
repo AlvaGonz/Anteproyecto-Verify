@@ -34,27 +34,11 @@ const DOCUMENT_INFO: Record<string, { name: string; entity: string; norm: string
   [DocumentType.CertificadoEIA]: { name: "Certificado EIA", entity: "Min. Medio Ambiente", norm: "Ley 64-00" },
 };
 
-const ESSENTIAL_TYPES: DocumentType[] = [
-  DocumentType.CertificadoTitulo,
-  DocumentType.CertificacionEstadoJuridico,
-  DocumentType.PlanoMensuraCatastral,
-  DocumentType.CopiaCedulaIdentidad,
-  DocumentType.CertificacionIPI,
-];
-
-const ANEXO_TYPES: DocumentType[] = [
-  DocumentType.CertificadoUsoSuelo,
-  DocumentType.RegistroMercantil,
-  DocumentType.PoderNotarial,
-  DocumentType.RNC,
-  DocumentType.CertificadoEIA,
-];
-
-// ponytail: only these 2 anexos are shown publicly; the rest are hidden but kept in ANEXO_TYPES for completeness calculation
-const VISIBLE_ANEXO_TYPES: DocumentType[] = [
-  DocumentType.CertificadoUsoSuelo,
-  DocumentType.PoderNotarial,
-];
+import {
+  calculateConfidenceLevel,
+  ESSENTIAL_TYPES,
+  VISIBLE_ANEXO_TYPES
+} from "../utils/confidenceLevel";
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, preloadedDocuments }) => {
   const { data: fetchedDocuments = [], isLoading: loading } = useDocuments(projectId || "");
@@ -69,21 +53,9 @@ export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ pr
   );
 
   const uploadedEssentials = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ESSENTIAL_TYPES.includes(canonicalType(d.tipoDocumento)));
-  const uploadedAnexos = documents.filter((d: any) => d.estadoDocumento !== DocumentStatus.Invalid && ANEXO_TYPES.includes(canonicalType(d.tipoDocumento)));
-
   const missingCount = ESSENTIAL_TYPES.length - new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size;
 
-  // Nivel de Confianza: 5 esenciales valen 80% (16% c/u), 2 anexos visibles valen 20% (10% c/u).
-  // Se cuentan TIPOS ÚNICOS cubiertos — varios documentos del mismo tipo no suman más.
-  const ESSENTIAL_WEIGHT = 80;
-  const ANEXO_WEIGHT = 20;
-  const essentialPercent = ESSENTIAL_TYPES.length > 0
-    ? Math.round((new Set(uploadedEssentials.map((d: any) => canonicalType(d.tipoDocumento))).size / ESSENTIAL_TYPES.length) * ESSENTIAL_WEIGHT)
-    : ESSENTIAL_WEIGHT;
-  const anexoPercent = VISIBLE_ANEXO_TYPES.length > 0
-    ? Math.round((new Set(uploadedAnexos.map((d: any) => canonicalType(d.tipoDocumento))).size / VISIBLE_ANEXO_TYPES.length) * ANEXO_WEIGHT)
-    : ANEXO_WEIGHT;
-  const progressPercent = Math.min(100, essentialPercent + anexoPercent);
+  const progressPercent = calculateConfidenceLevel(documents);
 
 
   const renderDocItem = (typeId: DocumentType, index: number) => {

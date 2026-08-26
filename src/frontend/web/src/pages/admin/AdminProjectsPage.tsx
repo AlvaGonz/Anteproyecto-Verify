@@ -131,11 +131,7 @@ export const AdminProjectsPage: React.FC = () => {
     ];
   }, [stats]);
 
-  const filtered = projects;
-
-  const goToPage = useCallback((newPage: number) => {
-    setPage(newPage);
-  }, []);
+  // unused filtering removed
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">

@@ -355,13 +355,13 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
                         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
                           <span>Integridad Validada</span>
                           <span className="text-primary">
-                            {(project.integridadValidada !== undefined && project.integridadValidada > 0) ? `${project.integridadValidada}%` : (project.completionRate !== undefined ? `${project.completionRate}%` : "—")}
+                            {project.completionRate !== undefined ? `${project.completionRate}%` : (project.integridadValidada !== undefined && project.integridadValidada > 0 ? `${project.integridadValidada}%` : "0%")}
                           </span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                           <m.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${project.integridadValidada ?? project.completionRate ?? 0}%` }}
+                            animate={{ width: `${project.completionRate ?? project.integridadValidada ?? 0}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
                             className="h-full bg-primary"
                           />

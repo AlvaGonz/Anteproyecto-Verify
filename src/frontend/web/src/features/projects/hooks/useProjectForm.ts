@@ -505,7 +505,7 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
         const area = calculatePolygonArea(coords);
         if (area > 0 && area < 40000) {
           calculatedArea = Math.round(area);
-          const leafletCoords = coords.map(c => [c[1], c[0]] as L.LatLngTuple);
+          const leafletCoords = coords.map((c: any) => [c[1], c[0]] as L.LatLngTuple);
           polygonRef.current = L.polygon(leafletCoords, { color: 'green', weight: 2, fillOpacity: 0.2 }).addTo(map);
         }
       } catch (e) {
