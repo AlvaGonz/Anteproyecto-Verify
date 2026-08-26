@@ -74,6 +74,69 @@ public class ProyectoRepositoryTests : IDisposable
         Assert.Contains(result.Items, p => p.Nombre == "Test2");
     }
 
+    [Fact]
+    public async Task GetDocumentCompletionRateAsync_TwoEssentialsOneAnexo_Returns42Percent()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = new Usuario("Test", "User", "test@test.com", "123", Domain.Enums.UserRole.User, "001", "hash");
+        user.GetType().GetProperty("Id")?.SetValue(user, userId);
+
+        var projectId = Guid.NewGuid();
+        var proyecto = new Proyecto("Test Category 16", "Loc", userId, 16);
+        proyecto.GetType().GetProperty("Id")?.SetValue(proyecto, projectId);
+
+        var doc1 = new Documento(projectId, Domain.Enums.DocumentType.TITLE, "title.pdf", "title.pdf", "/path", "application/pdf", ".pdf", 100, userId);
+        var doc2 = new Documento(projectId, Domain.Enums.DocumentType.CertificacionEstadoJuridico, "status.pdf", "status.pdf", "/path", "application/pdf", ".pdf", 100, userId);
+        var doc3 = new Documento(projectId, Domain.Enums.DocumentType.CertificadoUsoSuelo, "uso.pdf", "uso.pdf", "/path", "application/pdf", ".pdf", 100, userId);
+
+        await _context.Usuarios.AddAsync(user);
+        await _context.Proyectos.AddAsync(proyecto);
+        await _context.Documentos.AddRangeAsync(doc1, doc2, doc3);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var rate = await _repository.GetDocumentCompletionRateAsync(projectId, 16, default);
+
+        // Assert: 2 essentials (32%) + 1 anexo (10%) = 42%
+        Assert.Equal(42, rate);
+    }
+
+    [Fact]
+    public async Task GetDocumentCompletionRateAsync_AllDocuments_Returns100Percent()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = new Usuario("Test", "User", "test@test.com", "123", Domain.Enums.UserRole.User, "001", "hash");
+        user.GetType().GetProperty("Id")?.SetValue(user, userId);
+
+        var projectId = Guid.NewGuid();
+        var proyecto = new Proyecto("Complete Project", "Loc", userId, 8);
+        proyecto.GetType().GetProperty("Id")?.SetValue(proyecto, projectId);
+
+        var docs = new[]
+        {
+            new Documento(projectId, Domain.Enums.DocumentType.CertificadoTitulo, "doc.pdf", "doc.pdf", "/p", "application/pdf", ".pdf", 1, userId),
+            new Documento(projectId, Domain.Enums.DocumentType.CertificacionEstadoJuridico, "doc.pdf", "doc.pdf", "/p", "application/pdf", ".pdf", 1, userId),
+            new Documento(projectId, Domain.Enums.DocumentType.PlanoMensuraCatastral, "doc.pdf", "doc.pdf", "/p", "application/pdf", ".pdf", 1, userId),
+            new Documento(projectId, Domain.Enums.DocumentType.ID, "doc.pdf", "doc.pdf", "/p", "application/pdf", ".pdf", 1, userId),
+            new Documento(projectId, Domain.Enums.DocumentType.CertificacionIPI, "doc.pdf", "doc.pdf", "/p", "application/pdf", ".pdf", 1, userId),
+            new Documento(projectId, Domain.Enums.DocumentType.CertificadoUsoSuelo, "doc.pdf", "doc.pdf", "/p", "application/pdf", ".pdf", 1, userId),
+            new Documento(projectId, Domain.Enums.DocumentType.NOTARIAL_POWER, "doc.pdf", "doc.pdf", "/p", "application/pdf", ".pdf", 1, userId),
+        };
+
+        await _context.Usuarios.AddAsync(user);
+        await _context.Proyectos.AddAsync(proyecto);
+        await _context.Documentos.AddRangeAsync(docs);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var rate = await _repository.GetDocumentCompletionRateAsync(projectId, 8, default);
+
+        // Assert
+        Assert.Equal(100, rate);
+    }
+
     public void Dispose()
     {
         _context.Database.EnsureDeleted();
