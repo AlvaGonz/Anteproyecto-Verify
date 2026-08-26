@@ -28,6 +28,7 @@ export interface PublicProjectSearchResultDto {
   cedulaRncPropietario?: string;
   completionRate: number;
   integridadValidada: number;
+  createdAtUtc?: string;
 }
 
 interface UsePublishedProjectsParams {
@@ -74,6 +75,8 @@ export interface PublishedProjectFilters {
   priceRange: [number, number];
   province: string;
   latLng?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export function filterPublishedProjects(
@@ -121,6 +124,18 @@ export function filterPublishedProjects(
         // Check if project's lat/lng is close (within ~10km)
         // We'll do this via provincia auto-assignment in the filter
       }
+    }
+
+    // Date Range filter
+    if (filters.dateFrom) {
+      if (!p.createdAtUtc) return false;
+      if (new Date(p.createdAtUtc) < new Date(filters.dateFrom)) return false;
+    }
+
+    if (filters.dateTo) {
+      if (!p.createdAtUtc) return false;
+      const dateToInclusive = new Date(`${filters.dateTo}T23:59:59.999Z`);
+      if (new Date(p.createdAtUtc) > dateToInclusive) return false;
     }
 
     return true;

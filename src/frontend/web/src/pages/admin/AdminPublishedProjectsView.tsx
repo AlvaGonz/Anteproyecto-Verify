@@ -16,6 +16,7 @@ import {
   PRICE_MAX,
   PRICE_STEPS,
   getDefaultProjectImage,
+  filterPublishedProjects,
 } from "../../features/projects/api/usePublishedProjects";
 import { ProjectTypeFilter } from "../../features/projects/components/ProjectTypeFilter";
 import { useProvinces } from "../../features/provinces/api/useProvinces";
@@ -29,6 +30,8 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
     priceRange: [0, PRICE_MAX],
     province: "",
     latLng: "",
+    dateFrom: "",
+    dateTo: "",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,42 +41,7 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
   const { data: publishedProjects = [], isLoading } = usePublishedProjects({ pageSize: 200 });
 
   const filteredProjects = useMemo(() => {
-    return publishedProjects.filter((p) => {
-      if (filters.searchQuery) {
-        const q = filters.searchQuery.toLowerCase();
-        const matches =
-          (p.rncDesarrollador?.toLowerCase().includes(q) ?? false) ||
-          (p.nombreProyecto?.toLowerCase().includes(q) ?? false) ||
-          (p.designacionCatastral?.toLowerCase().includes(q) ?? false);
-        if (!matches) return false;
-      }
-
-      if (filters.projectTypes.length > 0 && p.categoriaId !== undefined && p.categoriaId !== null) {
-        if (!filters.projectTypes.includes(p.categoriaId)) return false;
-      }
-
-      if (p.valorEstimado !== undefined && p.valorEstimado !== null) {
-        if (p.valorEstimado < filters.priceRange[0]) return false;
-        if (filters.priceRange[1] < PRICE_MAX && p.valorEstimado > filters.priceRange[1]) return false;
-      } else {
-        if (filters.priceRange[0] > 0) return false;
-      }
-
-      if (filters.province && p.ubicacionTexto) {
-        if (!p.ubicacionTexto.toLowerCase().includes(filters.province.toLowerCase())) {
-          return false;
-        }
-      }
-
-      if (filters.latLng) {
-        const match = filters.latLng.match(/([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+)/);
-        if (match) {
-          // future: geolocation matching logic
-        }
-      }
-
-      return true;
-    });
+    return filterPublishedProjects(publishedProjects, filters);
   }, [publishedProjects, filters]);
 
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage) || 1;
@@ -113,6 +81,8 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
       priceRange: [0, PRICE_MAX],
       province: "",
       latLng: "",
+      dateFrom: "",
+      dateTo: "",
     });
     setCurrentPage(1);
   };
@@ -123,7 +93,9 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
     filters.priceRange[0] > 0 ||
     filters.priceRange[1] < PRICE_MAX ||
     filters.province ||
-    filters.latLng;
+    filters.latLng ||
+    filters.dateFrom ||
+    filters.dateTo;
 
   if (isLoading) {
     return (
@@ -191,6 +163,30 @@ export const AdminPublishedProjectsView: React.FC = React.memo(() => {
               />
 
               <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
+
+              <div className="pt-2 border-t border-slate-100 mt-2">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Filtrar por fecha</p>
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase">Desde</label>
+                    <input
+                      type="date"
+                      value={filters.dateFrom}
+                      onChange={(e) => updateFilter("dateFrom", e.target.value)}
+                      className="w-full mt-1 p-1.5 text-xs bg-slate-50 border-none rounded-lg focus:ring-1 focus:ring-primary/20 transition-all text-slate-700 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase">Hasta</label>
+                    <input
+                      type="date"
+                      value={filters.dateTo}
+                      onChange={(e) => updateFilter("dateTo", e.target.value)}
+                      className="w-full mt-1 p-1.5 text-xs bg-slate-50 border-none rounded-lg focus:ring-1 focus:ring-primary/20 transition-all text-slate-700 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Red Box: Price Filter */}

@@ -21,53 +21,18 @@ vi.mock("../../features/projects/api/useGlobalSearch", () => ({
 }));
 
 const MOCK_PROJECTS = [
-  { id: "1", nombreProyecto: "Residencial Terra Noble", categoriaId: 16, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 5000000, completionRate: 100 },
-  { id: "2", nombreProyecto: "Torre San Gerónimo", categoriaId: 8, estadoValidacion: "Verificado", ubicacionTexto: "Santiago", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 8000000, completionRate: 100 },
-  { id: "3", nombreProyecto: "Plaza Central Mall", categoriaId: 8, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 3000000, completionRate: 80 }
+  { id: "1", nombreProyecto: "Residencial Terra Noble", categoriaId: 16, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 5000000, completionRate: 100, createdAtUtc: "2026-08-12T10:00:00Z" },
+  { id: "2", nombreProyecto: "Torre San Gerónimo", categoriaId: 8, estadoValidacion: "Verificado", ubicacionTexto: "Santiago", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 8000000, completionRate: 100, createdAtUtc: "2026-08-14T15:00:00Z" },
+  { id: "3", nombreProyecto: "Plaza Central Mall", categoriaId: 8, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 3000000, completionRate: 80, createdAtUtc: "2026-08-20T08:00:00Z" }
 ];
 
-vi.mock("../../features/projects/api/usePublishedProjects", () => ({
-  useSuspensePublishedProjects: () => ({ data: MOCK_PROJECTS }),
-  filterPublishedProjects: (projects: typeof MOCK_PROJECTS, filters: any) =>
-    projects.filter((p) => {
-      if (filters.searchQuery) {
-        const q = filters.searchQuery.toLowerCase();
-        if (!p.nombreProyecto.toLowerCase().includes(q)) return false;
-      }
-      if (filters.projectTypes.length > 0 && p.categoriaId) {
-        if (!filters.projectTypes.includes(p.categoriaId)) return false;
-      }
-      if (p.valorEstimado !== undefined && p.valorEstimado !== null) {
-        if (p.valorEstimado < filters.priceRange[0] || p.valorEstimado > filters.priceRange[1]) return false;
-      }
-      if (filters.province && p.ubicacionTexto) {
-        if (!p.ubicacionTexto.toLowerCase().includes(filters.province.toLowerCase())) return false;
-      }
-      return true;
-    }),
-  PROJECT_CATEGORIES: [
-    { value: 1, label: "ALBERGUES" },
-    { value: 2, label: "ALMACENES" },
-    { value: 3, label: "APARTAMENTOS" },
-    { value: 4, label: "CENTROS DE RECREACIÓN Y DEPORTES" },
-    { value: 5, label: "CENTROS DE SALUD" },
-    { value: 6, label: "COLEGIOS Y CENTROS EDUCATIVOS" },
-    { value: 7, label: "COMBINADOS" },
-    { value: 8, label: "COMERCIAL Y OFICINAS" },
-    { value: 9, label: "DEPÓSITOS" },
-    { value: 10, label: "ESTACIÓN DE COMBUSTIBLE" },
-    { value: 11, label: "ESTRUCTURAS ESPECIALES" },
-    { value: 12, label: "HOSPEDAJE" },
-    { value: 13, label: "OBRAS DE ORDEN SOCIAL" },
-    { value: 14, label: "PARQUEOS" },
-    { value: 15, label: "SERVICIOS DE TRANSPORTE" },
-    { value: 16, label: "VIVIENDAS" },
-  ],
-  PROVINCIAS: ["Distrito Nacional", "Santo Domingo", "Santiago"],
-  PRICE_MAX: 15_000_000,
-  PRICE_STEPS: 100_000,
-  getDefaultProjectImage: () => "",
-}));
+vi.mock("../../features/projects/api/usePublishedProjects", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../features/projects/api/usePublishedProjects")>();
+  return {
+    ...actual,
+    useSuspensePublishedProjects: () => ({ data: MOCK_PROJECTS }),
+  };
+});
 
 vi.mock("../../shared/context/AuthContext", () => ({
   useAuth: () => ({
@@ -152,8 +117,9 @@ describe("ProjectsPublicListPage", () => {
 
   it("renders cumulative type checkboxes", async () => {
     renderPage();
+    const { fireEvent } = await import("@testing-library/react");
     const toggleButton = await screen.findByRole("button", { name: /Tipo \(acumulativo\)/i });
-    toggleButton.click();
+    fireEvent.click(toggleButton);
     expect(await screen.findByText("ALBERGUES")).toBeInTheDocument();
     expect(screen.getByText("ALMACENES")).toBeInTheDocument();
     expect(screen.getByText("APARTAMENTOS")).toBeInTheDocument();
@@ -196,5 +162,49 @@ describe("ProjectsPublicListPage", () => {
     expect(searchInput.value).toBe("Torre");
     expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
     expect(screen.queryByText("Residencial Terra Noble")).not.toBeInTheDocument();
+  });
+
+  it("renders date filter inputs (Desde and Hasta)", async () => {
+    renderPage();
+    expect(await screen.findByText("Filtrar por fecha")).toBeInTheDocument();
+    expect(screen.getByText("Desde")).toBeInTheDocument();
+    expect(screen.getByText("Hasta")).toBeInTheDocument();
+  });
+
+  it("filters projects by date range Desde and Hasta correctly", async () => {
+    const { fireEvent } = await import("@testing-library/react");
+    renderPage();
+    await screen.findByText("Filtrar por fecha");
+
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    expect(dateInputs.length).toBe(2);
+
+    const [desdeInput, hastaInput] = dateInputs as unknown as [HTMLInputElement, HTMLInputElement];
+
+    // Filter between 2026-08-12 and 2026-08-14
+    fireEvent.change(desdeInput, { target: { value: "2026-08-12" } });
+    fireEvent.change(hastaInput, { target: { value: "2026-08-14" } });
+
+    // Should include project 1 (Aug 12) and project 2 (Aug 14), but exclude project 3 (Aug 20)
+    expect(screen.getByText("Residencial Terra Noble")).toBeInTheDocument();
+    expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
+    expect(screen.queryByText("Plaza Central Mall")).not.toBeInTheDocument();
+  });
+
+  it("resets date filter inputs when Limpiar filtros is clicked", async () => {
+    const { fireEvent } = await import("@testing-library/react");
+    renderPage();
+    await screen.findByText("Filtrar por fecha");
+
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    const [desdeInput, hastaInput] = dateInputs as unknown as [HTMLInputElement, HTMLInputElement];
+
+    fireEvent.change(desdeInput, { target: { value: "2026-08-12" } });
+    fireEvent.change(hastaInput, { target: { value: "2026-08-14" } });
+
+    const clearBtn = await screen.findByRole("button", { name: /Limpiar filtros/i });
+    fireEvent.click(clearBtn);
+
+    expect(screen.getByText("Plaza Central Mall")).toBeInTheDocument();
   });
 });

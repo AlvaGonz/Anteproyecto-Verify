@@ -76,7 +76,8 @@ public class ProyectoRepository : IProyectoRepository
 
         if (endDate.HasValue)
         {
-            query = query.Where(p => p.CreatedAtUtc <= endDate.Value);
+            var endOfDay = endDate.Value.Date.AddDays(1);
+            query = query.Where(p => p.CreatedAtUtc < endOfDay);
         }
 
         var totalCount = await query.CountAsync(cancellationToken);

@@ -81,7 +81,8 @@ totalCount = count;
                 RncDesarrollador = p.RncDesarrollador,
                 CedulaRncPropietario = p.CedulaRncPropietario,
                 CompletionRate = completionRate,
-                IntegridadValidada = (int)Math.Round(integridadValidada)
+                IntegridadValidada = (int)Math.Round(integridadValidada),
+                CreatedAtUtc = p.CreatedAtUtc
             });
         }
 

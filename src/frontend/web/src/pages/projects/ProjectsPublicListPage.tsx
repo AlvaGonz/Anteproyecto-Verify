@@ -120,6 +120,8 @@ const ProjectsPublicListContent: React.FC = () => {
     priceRange: [0, PRICE_MAX],
     province: "",
     latLng: "",
+    dateFrom: "",
+    dateTo: "",
   });
 
   useEffect(() => {
@@ -183,6 +185,8 @@ const ProjectsPublicListContent: React.FC = () => {
       priceRange: [0, PRICE_MAX],
       province: "",
       latLng: "",
+      dateFrom: "",
+      dateTo: "",
     });
     setCurrentPage(1);
   };
@@ -193,7 +197,9 @@ const ProjectsPublicListContent: React.FC = () => {
     filters.priceRange[0] > 0 ||
     filters.priceRange[1] < PRICE_MAX ||
     filters.province ||
-    filters.latLng;
+    filters.latLng ||
+    filters.dateFrom ||
+    filters.dateTo;
 
   return (
     <>
@@ -229,7 +235,7 @@ const ProjectsPublicListContent: React.FC = () => {
           {/* Left Sidebar - Filters */}
           {filtersVisible && (
             <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
-              {/* Blue Box: Search + Project Types */}
+              {/* Blue Box: Search + Project Types + Date Filter */}
               <div ref={searchContainerRef} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm scroll-mt-28">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   <span className="text-primary">●</span> Búsqueda
@@ -243,6 +249,30 @@ const ProjectsPublicListContent: React.FC = () => {
                 />
 
                 <ProjectTypeFilter selected={filters.projectTypes} onToggle={toggleProjectType} />
+
+                <div className="pt-2 border-t border-slate-100 mt-2">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Filtrar por fecha</p>
+                  <div className="space-y-2">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Desde</label>
+                      <input
+                        type="date"
+                        value={filters.dateFrom || ""}
+                        onChange={(e) => updateFilter("dateFrom", e.target.value)}
+                        className="w-full mt-1 p-1.5 text-xs bg-slate-50 border-none rounded-lg focus:ring-1 focus:ring-primary/20 transition-all text-slate-700 font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Hasta</label>
+                      <input
+                        type="date"
+                        value={filters.dateTo || ""}
+                        onChange={(e) => updateFilter("dateTo", e.target.value)}
+                        className="w-full mt-1 p-1.5 text-xs bg-slate-50 border-none rounded-lg focus:ring-1 focus:ring-primary/20 transition-all text-slate-700 font-medium"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Red Box: Price Filter */}

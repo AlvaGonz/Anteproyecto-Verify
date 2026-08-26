@@ -33,6 +33,7 @@ public class PublicProjectSearchResultDto
     public string? CedulaRncPropietario { get; set; }
     public int CompletionRate { get; set; }
     public int IntegridadValidada { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
 }
 
 public class PublicProjectSearchResponseDto
