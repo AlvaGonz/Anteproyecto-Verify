@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../infrastructure/api/client";
 import type { ProyectoDto as ApiProyectoDto } from "./types";
 import type { ProyectoDto, CreateProyectoDto, LegalStatus, ProjectStatus } from "../types";
+import { sortProjectsByRecentUpdate } from "../utils/sortUtils";
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -31,6 +32,7 @@ const mapApiProject = (apiProj: ApiProyectoDto): ProyectoDto => ({
   estadoIntegridad: apiProj.estadoIntegridad,
   usuarioCreadorId: String(apiProj.usuarioCreadorId),
   createdAtUtc: apiProj.createdAtUtc,
+  updatedAtUtc: apiProj.updatedAtUtc,
   imagenUrl: apiProj.imagenUrl,
   imagenAdicional1: apiProj.imagenAdicional1,
   imagenAdicional2: apiProj.imagenAdicional2,
@@ -68,8 +70,10 @@ export const useProjects = (page = 1, pageSize = 50, q?: string, estados?: strin
           } else {
             items = data?.items || data?.Items || data?.data || [];
           }
+          const mappedProjects = items.map(mapApiProject);
+          const sortedProjects = sortProjectsByRecentUpdate(mappedProjects);
           return {
-            projects: items.map(mapApiProject),
+            projects: sortedProjects,
             totalCount: data?.totalCount || data?.TotalCount || (Array.isArray(data) ? data.length : 0),
           };
         }),

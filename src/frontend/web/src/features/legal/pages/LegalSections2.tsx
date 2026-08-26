@@ -127,34 +127,34 @@ export const MarcoLegalSection: React.FC<{ isRevealed: boolean; ICONS: Record<st
 export const BillingSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="billing" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      VI. {''}
+      Facturación y Suscripciones
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Planes de Suscripción
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          VeriFinca ofrece planes mensuales y anuales, cobrados al inicio de cada ciclo de facturación.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Métodos de Pago
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Aceptamos tarjetas de crédito y transferencias a través de Stripe de manera segura y tokenizada.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Renovación Automática
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Las suscripciones se renuevan automáticamente, salvo cancelación previa al término del ciclo actual.
         </p>
       </div>
     </div>
@@ -165,34 +165,34 @@ export const BillingSection: React.FC<{ ICONS: Record<string, string> }> = ({ IC
 export const RefundsSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="refunds" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      VII. {''}
+      Reembolsos y Cancelaciones
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Política de Reembolso
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          No se efectuarán reembolsos por períodos parciales de uso o servicios no utilizados.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Proceso de Cancelación
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          El usuario puede cancelar la suscripción en cualquier momento a través de su panel de administración.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Penalidad Anual
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px] p-4 bg-error-container/20 text-error rounded-lg border border-error/20">
-          {""}
+          La cancelación anticipada de un plan anual conllevará una penalidad administrativa equivalente a 2 meses.
         </p>
       </div>
     </div>
@@ -203,28 +203,28 @@ export const RefundsSection: React.FC<{ ICONS: Record<string, string> }> = ({ IC
 export const StripeProcessorSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="stripeProcessor" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      VIII. {''}
+      Procesador de Pagos y Seguridad (Stripe)
     </h2>
     <p className="font-body text-on-surface-variant leading-relaxed mb-8">
-      {""}
+      VeriFinca utiliza la pasarela de pagos Stripe para un procesamiento seguro y confiable.
     </p>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Aceptación de Términos
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Al realizar transacciones, el usuario acepta de manera implícita los términos de servicio de Stripe.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Cookies de Terceros
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Stripe puede requerir la utilización de cookies de seguridad para prevenir fraudes durante la transacción.
         </p>
       </div>
     </div>
@@ -235,34 +235,34 @@ export const StripeProcessorSection: React.FC<{ ICONS: Record<string, string> }>
 export const FinancialLiabilitySection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="financialLiability" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      IX. {''}
+      Responsabilidad Financiera
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Cargos No Autorizados
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          No nos responsabilizamos por cargos no autorizados originados por negligencia en el cuidado de sus credenciales.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Disponibilidad del Servicio
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          La pasarela de pago puede experimentar intermitencias fuera del control de VeriFinca.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Límite de Responsabilidad
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          En cualquier caso, la responsabilidad de VeriFinca se limita al equivalente de las suscripciones abonadas en el último año.
         </p>
       </div>
     </div>
@@ -273,43 +273,43 @@ export const FinancialLiabilitySection: React.FC<{ ICONS: Record<string, string>
 export const PaymentDataSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="paymentData" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      X. {''}
+      Tratamiento de Datos de Pago
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Tokenización de Tarjetas
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          VeriFinca no almacena datos de tarjetas de crédito. Toda información es tokenizada por nuestro procesador de pago.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Retención de Registros
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Conservamos historiales de facturación con fines legales y de auditoría contable.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Historial de Transacciones
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Los usuarios registrados pueden consultar su historial de pagos directamente en el sistema.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Notificación de Brechas
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Cualquier compromiso comprobado del procesador de pagos será notificado conforme a las normativas de seguridad de datos.
         </p>
       </div>
     </div>
@@ -320,34 +320,34 @@ export const PaymentDataSection: React.FC<{ ICONS: Record<string, string> }> = (
 export const AcceptableUseSection: React.FC<{ ICONS: Record<string, string> }> = ({ ICONS }) => (
   <section id="acceptableUse" className="scroll-mt-32 mt-16">
     <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 pb-4 border-b border-outline-variant/50">
-      XI. {''}
+      Uso Aceptable
     </h2>
     <div className="space-y-6">
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Cuenta Personal e Intransferible
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          Las cuentas registradas están diseñadas para uso exclusivo del titular, quedando estrictamente prohibida su cesión.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Prohibición de Scraping (Ley 53-07)
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          La extracción automatizada de los registros está sancionada por la legislación de protección de datos de la RD.
         </p>
       </div>
       <div>
         <h3 className="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">{ICONS.fiberManualRecord}</span>
-          {""}
+          Suspensión Inmediata
         </h3>
         <p className="text-on-surface-variant font-body leading-relaxed text-[15px]">
-          {""}
+          VeriFinca se reserva la potestad de inhabilitar aquellas cuentas que vulneren estas políticas de uso aceptable de manera flagrante.
         </p>
       </div>
     </div>

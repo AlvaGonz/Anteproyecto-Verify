@@ -2,7 +2,23 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { Suspense } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ProjectsPublicListPage } from "./ProjectsPublicListPage";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+    mutations: { retry: false },
+  },
+});
+
+vi.mock("../../features/projects/api/useGlobalSearch", () => ({
+  useGlobalSearch: () => ({
+    data: null,
+    isLoading: false,
+    error: null,
+  }),
+}));
 
 const MOCK_PROJECTS = [
   { id: "1", nombreProyecto: "Residencial Terra Noble", categoriaId: 16, estadoValidacion: "Verificado", ubicacionTexto: "Santo Domingo", estadoIntegridad: 1, estadoJuridico: 1, estadoProyecto: "PUBLICADO", valorEstimado: 5000000, completionRate: 100 },
@@ -94,11 +110,13 @@ vi.mock("../../features/provinces/api/useProvinces", () => ({
 describe("ProjectsPublicListPage", () => {
   const renderPage = () =>
     render(
-      <MemoryRouter>
-        <Suspense fallback={<div>Loading...</div>}>
-          <ProjectsPublicListPage />
-        </Suspense>
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ProjectsPublicListPage />
+          </Suspense>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
 
   it("renders the hero title and search form", async () => {
@@ -128,12 +146,14 @@ describe("ProjectsPublicListPage", () => {
 
   it("renders filter sidebar with search input", async () => {
     renderPage();
-    const searchInput = await screen.findByPlaceholderText("RNC, Cédula, Nombre...");
+    const searchInput = await screen.findByPlaceholderText(/RNC/i);
     expect(searchInput).toBeInTheDocument();
   });
 
   it("renders cumulative type checkboxes", async () => {
     renderPage();
+    const toggleButton = await screen.findByRole("button", { name: /Tipo \(acumulativo\)/i });
+    toggleButton.click();
     expect(await screen.findByText("ALBERGUES")).toBeInTheDocument();
     expect(screen.getByText("ALMACENES")).toBeInTheDocument();
     expect(screen.getByText("APARTAMENTOS")).toBeInTheDocument();
@@ -159,5 +179,22 @@ describe("ProjectsPublicListPage", () => {
     expect(await screen.findByText("Residencial Terra Noble")).toBeInTheDocument();
     expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
     expect(screen.getByText("Plaza Central Mall")).toBeInTheDocument();
+  });
+
+  it("initializes search query from URL parameter and filters projects", async () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/projects?search=Torre"]}>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ProjectsPublicListPage />
+          </Suspense>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const searchInput = (await screen.findByPlaceholderText(/RNC/i)) as HTMLInputElement;
+    expect(searchInput.value).toBe("Torre");
+    expect(screen.getByText("Torre San Gerónimo")).toBeInTheDocument();
+    expect(screen.queryByText("Residencial Terra Noble")).not.toBeInTheDocument();
   });
 });

@@ -1,13 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { m } from "framer-motion";
-import { Search, ChevronRight, Zap, Lock, Building2 } from "lucide-react";
-
+import { Zap, Lock, Building2 } from "lucide-react";
+import { VerifySearchForm } from "./VerifySearchForm";
 
 export const HeroSection: React.FC = () => {
-
-  const [code, setCode] = React.useState("");
-
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden px-6 md:px-12 pt-20">
       {/* Abstract Background Elements */}
@@ -59,26 +56,8 @@ export const HeroSection: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="max-w-3xl"
         >
-          <div className="bg-white p-2 rounded-3xl flex flex-col sm:flex-row items-center shadow-2xl shadow-secondary/10 border border-gray-100 group focus-within:ring-4 focus-within:ring-primary/5 transition-all">
-            <div className="flex-1 w-full flex items-center px-4">
-              <Search className="w-5 h-5 text-gray-300 group-focus-within:text-primary" />
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Nombre del proyecto o código de radicación..."
-                aria-label="Buscar proyecto"
-                className="w-full bg-transparent border-none focus:ring-0 px-3 py-4 text-base font-bold placeholder:text-gray-300 outline-none"
-              />
-            </div>
-            <Link
-              to={code ? `/projects?type=cert&q=${encodeURIComponent(code)}` : "/projects"}
-              className="w-full sm:w-auto bg-secondary text-white px-10 py-4 rounded-2xl font-display font-black text-lg hover:bg-primary active:scale-95 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2"
-            >
-              Consultar Ahora
-              <ChevronRight className="w-5 h-5" />
-            </Link>
-          </div>
+          <VerifySearchForm variant="light" />
+
           <div className="mt-4 flex flex-col sm:flex-row flex-wrap gap-y-3 gap-x-4 text-xs font-bold text-gray-400 uppercase tracking-widest px-4">
             <Link to="/projects" className="flex items-center gap-1.5 hover:text-primary transition-colors">
               <Zap className="w-3.5 h-3.5 text-primary" /> Validación Express
@@ -95,3 +74,4 @@ export const HeroSection: React.FC = () => {
     </section>
   );
 };
+

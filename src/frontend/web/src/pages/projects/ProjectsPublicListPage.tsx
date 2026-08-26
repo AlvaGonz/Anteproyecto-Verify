@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo, useRef, Suspense, FC } from "react";
+import React, { useState, useMemo, memo, useRef, Suspense, FC, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
@@ -108,17 +108,31 @@ const ProjectCard: FC<ProjectCardProps> = memo(({ project, idx }) => (
 ));
 
 const ProjectsPublicListContent: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filtersVisible, setFiltersVisible] = useState(true);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const initialSearch = searchParams.get("search") || (searchParams.get("type") === "suelo" || !searchParams.get("type") ? searchParams.get("q") : "") || "";
 
   const [filters, setFilters] = useState<PublishedProjectFilters>({
-    searchQuery: "",
+    searchQuery: initialSearch,
     projectTypes: [],
     priceRange: [0, PRICE_MAX],
     province: "",
     latLng: "",
   });
+
+  useEffect(() => {
+    const qParam = searchParams.get("search") || (searchParams.get("type") === "suelo" || !searchParams.get("type") ? searchParams.get("q") : "") || "";
+    setFilters((prev) => (prev.searchQuery !== qParam ? { ...prev, searchQuery: qParam } : prev));
+
+    if (qParam) {
+      setFiltersVisible(true);
+      setTimeout(() => {
+        searchContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [searchParams]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
@@ -216,7 +230,7 @@ const ProjectsPublicListContent: React.FC = () => {
           {filtersVisible && (
             <div className="w-full lg:w-[200px] xl:w-[220px] shrink-0 space-y-6">
               {/* Blue Box: Search + Project Types */}
-              <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <div ref={searchContainerRef} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm scroll-mt-28">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   <span className="text-primary">●</span> Búsqueda
                 </label>
@@ -470,7 +484,27 @@ const DirectorySkeleton = () => (
 );
 
 export const ProjectsPublicListPage: React.FC = () => {
-  const [activeSearch, setActiveSearch] = useState<{ type: string; query: string } | null>(null);
+  const [searchParams] = useSearchParams();
+  const typeParam = searchParams.get("type");
+  const qParam = searchParams.get("q");
+
+  const [activeSearch, setActiveSearch] = useState<{ type: string; query: string } | null>(() => {
+    if (typeParam && qParam && typeParam !== "suelo") {
+      return { type: typeParam, query: qParam };
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    const t = searchParams.get("type");
+    const q = searchParams.get("q");
+    if (t && q && t !== "suelo") {
+      setActiveSearch({ type: t, query: q });
+    } else if (!t || t === "suelo") {
+      setActiveSearch(null);
+    }
+  }, [searchParams]);
+
   const [activeTab, setActiveTab] = useState<"proyectos" | "documentos">("proyectos");
 
   const { data, isLoading, error } = useGlobalSearch(

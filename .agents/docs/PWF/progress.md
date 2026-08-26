@@ -1,6 +1,20 @@
 # PWF Progress — VeriFinca
 
-## Sesión 2026-08-23 — Restricción de Cambios de Estado de Proyecto Exclusiva para Administradores
+## Sesión 2026-08-24 — Unificación de Búsqueda Pública, Política de Cuotas y Auto-Scroll en Directorio (TDD + Ponytail)
+
+**Ciclo:** UI & Búsqueda Global / Frontend (`VerifySearchForm.tsx`, `HeroSection.tsx`, `VerifySearchForm.test.tsx`, `HeroSection.test.tsx`, `ProjectsPublicListPage.tsx`, `ProjectsPublicListPage.test.tsx`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 21/21 tests passed en `VerifySearchForm.test.tsx`, `HeroSection.test.tsx` y `ProjectsPublicListPage.test.tsx`), `tsc --noEmit` limpio, dotnet tests 43/43 passed.
+- **Problema Abordado:**
+  1. El buscador público no debe deducir cuotas de consulta en las búsquedas genéricas ni de formularios; el consumo de consulta solo se descuenta de forma estricta cuando el usuario ingresa/accede efectivamente a la vista pública de detalle de un proyecto (`ProjectPublicDetailPage`).
+  2. Al realizar una búsqueda por nombre de proyecto desde el Hero o URL, la página debe auto-desplazarse (`scrollIntoView`) de manera suave hacia el recuadro de búsqueda lateral del directorio para que el usuario visualice inmediatamente el campo `● Búsqueda` y los resultados filtrados.
+- **Mejoras Implementadas (TDD + Ponytail):**
+  1. `VerifySearchForm.tsx`: Se eliminó el consumo prematuro de cuota (`projectsApi.consumeQuota`), haciendo las búsquedas ultraligeras y sin bloqueos de autenticación.
+  2. `ProjectsPublicListPage.tsx`: Añadida referencia (`searchContainerRef`) y auto-scroll suave (`scrollIntoView({ behavior: 'smooth', block: 'center' })`) cuando se detecta un parámetro de búsqueda de proyecto, asegurando que el recuadro lateral del filtro quede centrado y visible en pantalla.
+  3. Pruebas TDD:
+     - `VerifySearchForm.test.tsx`: 11 pruebas unitarias actualizadas y simplificadas.
+     - `HeroSection.test.tsx` y `ProjectsPublicListPage.test.tsx`: 10 pruebas unitarias e integración (21/21 tests verdes).
+
+---
 
 **Ciclo:** Autorización & UI / Admin Projects (`AdminProjectContextMenu.tsx`, `AdminProjectList.tsx`, `AdminProjectContextMenu.test.tsx`, `ProjectsController.cs`, `ProjectsControllerTests.cs`)
 **Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest frontend 7/7 passed, xUnit backend `ProjectsControllerTests` 6/6 passed), API Docker actualizada e iniciada.
