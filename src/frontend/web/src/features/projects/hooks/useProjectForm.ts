@@ -420,10 +420,18 @@ export function useProjectForm({ initialData, onSubmit, onCancel, onDelete }: Pr
     let reference = "";
 
     if (opData && opData.elements && opData.elements.length > 0) {
-      // Check if Overpass found water
-      const isWaterOverpass = opData.elements.some((el: any) => 
-        el.tags && (el.tags.natural === "water" || el.tags.waterway)
-      );
+      // Check if Overpass found water and the point is actually inside it (or <5m away)
+      const isWaterOverpass = opData.elements.some((el: any) => {
+        if (el.tags && (el.tags.natural === "water" || el.tags.waterway)) {
+          if (el.type === "way" && el.geometry) {
+            const coords = el.geometry.map((g: any) => [g.lon, g.lat] as [number, number]);
+            if (isPointInPolygon([lng, lat], coords)) return true;
+            if (getDistanceToLineString([lng, lat], coords) < 5) return true;
+          }
+          return false;
+        }
+        return false;
+      });
 
       if (isWaterOverpass) {
         setInvalidLocationModalOpen(true);
