@@ -37,7 +37,7 @@ const mockActiveSeal = {
   vigente: true,
 };
 
-function setupMocks(page: import('@playwright/test').Page) {
+function setupMocks(page: import('@playwright/test').Page, accessCountOverride?: number | (() => number)) {
   // Set auth token/session in localStorage
   page.addInitScript(() => {
     localStorage.setItem('vf_has_session', 'true');
@@ -103,9 +103,19 @@ function setupMocks(page: import('@playwright/test').Page) {
     route.fulfill({ status: 200, json: mockSealedProject })
   );
 
-  page.route(`**/api/proyectos/${SEALED_PROJECT_ID}/sello-integridad`, (route) =>
-    route.fulfill({ status: 200, json: mockActiveSeal })
-  );
+  page.route(`**/api/proyectos/${SEALED_PROJECT_ID}/sello-integridad`, (route) => {
+    const count = typeof accessCountOverride === 'function'
+      ? accessCountOverride()
+      : (accessCountOverride ?? mockActiveSeal.contadorAccesos);
+    return route.fulfill({
+      status: 200,
+      json: {
+        ...mockActiveSeal,
+        contadorAccesos: count,
+        accessCount: count,
+      }
+    });
+  });
 
   page.route('**/api/projects/**/status-eligibility', (route) =>
     route.fulfill({ status: 200, json: { documentCount: 1, hasObservaciones: false, currentStatus: 'PUBLICADO' } })
@@ -256,5 +266,91 @@ test.describe('Integrity Seal Print & PDF Output', () => {
     await page.emulateMedia({ media: 'screen' });
     await expect(page.getByRole('heading', { name: 'Certificación Verificable', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: /Imprimir/i })).toBeVisible();
+  });
+
+  test('8. QR code encodes public bypass route /#/q/:qrToken rather than /#/p/:id', async ({ page }) => {
+    await setupMocks(page);
+    await page.goto(`http://localhost:3000/#/admin/projects/${SEALED_PROJECT_ID}/validations`);
+
+    await expect(page.getByRole('heading', { name: 'Certificación Verificable', exact: true })).toBeVisible({ timeout: 15000 });
+
+    // Look at the QR component
+    const qrElement = page.locator('[data-testid="integrity-seal-qr"]').first();
+    await expect(qrElement).toBeVisible();
+  });
+
+  test('9. Unauthenticated visitor scanning QR bypasses login and views project via /#/q/:qrToken', async ({ page }) => {
+    // No auth cookies or localStorage
+    await page.route(`**/api/public/projects/qr/${encodeURIComponent(qrToken)}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        json: {
+          id: SEALED_PROJECT_ID,
+          codigoPublico: sealCode,
+          nombreProyecto: 'Torre Residencial Vista Real',
+          ubicacion: 'Santo Domingo, Distrito Nacional',
+          estadoValidacion: 'PUBLICADO',
+          fechaEmision: '2026-08-01T00:00:00Z',
+          resumenDimensiones: [
+            { dimension: 'TitularidadInmueble', resultado: 'Verificado' },
+            { dimension: 'LicenciaConstruccion', resultado: 'Verificado' }
+          ],
+          documentosPublicos: []
+        }
+      });
+    });
+
+    // Directly access QR bypass route
+    await page.goto(`http://localhost:3000/#/q/${encodeURIComponent(qrToken)}`);
+
+    // Should load project name directly without redirecting to /login
+    await expect(page.getByText('Torre Residencial Vista Real').first()).toBeVisible({ timeout: 15000 });
+    expect(page.url()).toContain(`/#/q/${encodeURIComponent(qrToken)}`);
+    expect(page.url()).not.toContain('/login');
+  });
+
+  test('10. Access count increments with 1 to 3 visits and displays updated count on admin validations page', async ({ page }) => {
+    let accessCount = 0;
+
+    await setupMocks(page, () => accessCount);
+
+    // Mock the public QR endpoint tracking visits
+    await page.route(`**/api/public/projects/qr/${encodeURIComponent(qrToken)}`, async (route) => {
+      accessCount += 1;
+      await route.fulfill({
+        status: 200,
+        json: {
+          id: SEALED_PROJECT_ID,
+          codigoPublico: sealCode,
+          nombreProyecto: 'Torre Residencial Vista Real',
+          ubicacion: 'Santo Domingo, Distrito Nacional',
+          estadoValidacion: 'PUBLICADO',
+          fechaEmision: '2026-08-01T00:00:00Z',
+          resumenDimensiones: [],
+          documentosPublicos: []
+        }
+      });
+    });
+
+    // Visit 1
+    await page.goto(`http://localhost:3000/#/q/${encodeURIComponent(qrToken)}`);
+    await expect(page.getByText('Torre Residencial Vista Real').first()).toBeVisible();
+    expect(accessCount).toBe(1);
+
+    // Visit 2 (subsequent scan/visit)
+    await page.reload();
+    await expect(page.getByText('Torre Residencial Vista Real').first()).toBeVisible();
+    expect(accessCount).toBe(2);
+
+    // Visit 3 (subsequent scan/visit)
+    await page.reload();
+    await expect(page.getByText('Torre Residencial Vista Real').first()).toBeVisible();
+    expect(accessCount).toBe(3);
+
+    // Now go to admin validations page and verify Consultas Recibidas shows 3
+    await page.goto(`http://localhost:3000/#/admin/projects/${SEALED_PROJECT_ID}/validations`);
+    await expect(page.getByRole('heading', { name: 'Certificación Verificable', exact: true })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Consultas Recibidas')).toBeVisible();
+    await expect(page.getByText('3', { exact: true })).toBeVisible();
   });
 });

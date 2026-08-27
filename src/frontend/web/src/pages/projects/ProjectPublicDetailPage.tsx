@@ -63,6 +63,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
     queryFn: () => apiClient.get(`/public/projects/qr/${encodeURIComponent(qrToken!)}`).then(r => r.data),
     enabled: isQrAccess,
     staleTime: 0,
+    gcTime: 0,
   });
 
   const qrStatus = qrQuery.isPending
@@ -85,7 +86,14 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const identifierToFetch = accessStatus === 'allowed' && !isQrAccess ? baseIdentifier : "";
 
   const { data: projectFromApi, isLoading: loading, error: fetchError } = useProject(identifierToFetch);
-  const project = isQrAccess && qrStatus === 'allowed' ? (qrQuery.data as any) : projectFromApi;
+  const rawProject = isQrAccess && qrStatus === 'allowed' ? (qrQuery.data as any) : projectFromApi;
+  const project = rawProject ? {
+    ...rawProject,
+    id: String(rawProject.id || ""),
+    nombre: rawProject.nombre || rawProject.nombreProyecto || "Proyecto Verificado",
+    ubicacionTexto: rawProject.ubicacionTexto || rawProject.ubicacion || "",
+    codigoInterno: rawProject.codigoInterno || rawProject.codigoPublico || "",
+  } : null;
   const error = isQrAccess ? (qrStatus === 'denied' ? "El activo solicitado no se encuentra o el código QR es inválido." : null) : (fetchError ? (fetchError as Error).message : null);
 
   const [isInterested, setIsInterested] = React.useState(false);

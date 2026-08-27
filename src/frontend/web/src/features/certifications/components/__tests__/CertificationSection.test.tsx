@@ -57,15 +57,14 @@ describe("CertificationSection", () => {
     vi.clearAllMocks();
   });
 
-  it("codifica el QR con la URL directa del proyecto, no una intermedia", () => {
+  it("codifica el QR con la URL de verificación pública /#/q/token para permitir bypass de acceso", () => {
     render(<CertificationSection projectId="proj-123" projectStatus="PUBLICADO" />);
 
     const qrValues = screen.getAllByTestId("qr-value");
     expect(qrValues.length).toBeGreaterThan(0);
     const qrValue = qrValues[0].textContent ?? "";
-    expect(qrValue).toContain("/#/p/proj-123");
+    expect(qrValue).toContain("/#/q/token");
     expect(qrValue).not.toContain("qrserver");
-    expect(qrValue).not.toContain("/q/");
   });
 
   it("renders dedicated print root with data-print-ready attribute and metadata", () => {
