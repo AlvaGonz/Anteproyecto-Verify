@@ -1,5 +1,24 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-27 (III) — Corrección de Seeder de Proyectos Inmobiliarios desde CSV en Docker
+
+**Ciclo:** Backend & Base de Datos / Seeding (`AppDbContextSeeder.cs`, `ProyectosInmobiliarios_20260814_085516.csv`)
+**Estado:** ✅ COMPLETO — Se restauraron exitosamente los 120 proyectos desde el archivo CSV con la distribución precisa entre usuarios (Consultor: 1, Profesional: 5, Empresa: 10, Freemium: 31, Corporativo: 73).
+- **Problema Abordado:**
+  1. Al iniciar la API en Docker, los proyectos inmobiliarios no se poblaban en la base de datos debido a que `AppDbContextSeeder.cs` arrojaba `KeyNotFoundException: The given key 'CodigoInterno' was not present in the dictionary` en la línea 362.
+  2. La causa raíz fue que el archivo `ProyectosInmobiliarios_20260814_085516.csv` carecía de fila de cabecera (`headers`), por lo que el método `ParseCsv` tomaba la primera fila de datos como nombres de columnas. Además, los GUIDs de `IdUsuario` y `EstadoId` en el CSV no coincidían con el mapeo hardcodeado previo.
+- **Mejoras Implementadas:**
+  1. **Detección Automática de Cabecera en `ParseCsv` (`AppDbContextSeeder.cs`):**
+     - Se añadió un fallback con `DefaultProyectoCsvHeaders` que auto-detecta si la primera línea contiene cabeceras (`CodigoInterno`, `NombreProyecto`, etc.) o datos directos.
+     - Se utilizó `StringComparer.OrdinalIgnoreCase` y extracción segura mediante `.TryGetValue(...)` para evitar excepciones en caso de columnas faltantes.
+  2. **Actualización de Mapeos de Usuarios y Estados:**
+     - Se integraron los GUIDs actuales del CSV para los usuarios (`2BC69554-6440-4B0E-A9B5-18757599EE1C` -> Consultor, `EE7DAFEA-A030-4959-A55E-4C40DBBE91A7` -> Profesional, `09E58353-1699-45B6-8275-EBE259250170` -> Empresa, `8B5288AF-FF7B-41C1-9E6A-FCE656831EAA` -> Corporativo, `FBC9BA82-5E4C-4EBF-98A1-FCA54900E106` -> Freemium).
+     - Se mapearon todos los GUIDs de estado (`EC57F714...` -> Publicado, `7A58C470...` -> Revisión, `1F8F8E74...` -> Creado, `3CD6BB60...` -> Editado, `C97EFC82...` -> Observación).
+  3. **Verificación en Docker:**
+     - Se reconstruyó la imagen de la API y se confirmó en los logs de Docker `Successfully restored 120 projects from CSV cache.` y la correcta asignación en base de datos.
+
+---
+
 ## Sesión 2026-08-27 (II) — Corrección de Error 500 en Landing Page por Clave Foránea en Logs de Auditoría
 
 **Ciclo:** Backend & Base de Datos / Auditorías (`AuditoriaService.cs`, `PublicProjectController.cs`, `SearchPublicProjectsQueryHandler.cs`)
