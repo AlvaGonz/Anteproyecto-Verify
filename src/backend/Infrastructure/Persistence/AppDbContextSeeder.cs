@@ -277,14 +277,62 @@ public static class AppDbContextSeeder
                     var csvRows = ParseCsv(csvPath);
                     var proyectoEntitiesList = new List<Proyecto>();
 
-                    // Mapeo de IDs de usuario en CSV a entidades en base de datos
+                    // Mapeo de IDs de usuario en CSV a entidades en base de datos (USANDO LOS ID REALES DE LA BD)
                     var userMapping = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase)
                     {
-                        { "097be5ae-8f40-4385-a204-de294b449940", consultorUser.Id },
-                        { "e0f6d53b-b148-4665-b4b1-f2554452247c", profesionalUser.Id },
-                        { "3aacec34-f910-4ad4-8cc2-3010a6721b88", empresaUser.Id },
-                        { "21dc26ac-498c-4c17-8b90-0ff49bd45970", corporativoUser.Id } // Corporativo / Test
+                        { "097be5ae-8f40-4385-a204-de294b449940", consultorUser.Id }, // Consultor
+                        { "e0f6d53b-b148-4665-b4b1-f2554452247c", profesionalUser.Id }, // Profesional
+                        { "3aacec34-f910-4ad4-8cc2-3010a6721b88", empresaUser.Id }, // Empresa
+                        { "21dc26ac-498c-4c17-8b90-0ff49bd45970", corporativoUser.Id }  // Corporativo
                     };
+
+                    // === NUEVA LÓGICA DE ASIGNACIÓN ===
+                    int consultorCount = 0;
+                    int profesionalCount = 0;
+                    int empresaCount = 0;
+                    
+                    foreach (var row in csvRows)
+                    {
+                        var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
+                        var csvStateId = row.ContainsKey("EstadoId") ? row["EstadoId"] : "";
+                        
+                        if (csvUserId.Equals("097be5ae-8f40-4385-a204-de294b449940", StringComparison.OrdinalIgnoreCase)) // Consultor
+                        {
+                            bool isPublicado = csvStateId.Equals("8006e230-79a0-40b7-ad3b-b399b564f8f8", StringComparison.OrdinalIgnoreCase);
+                            if (consultorCount >= 1 || (!isPublicado && consultorCount == 0)) 
+                            {
+                                // Mover excedente o no publicado a Corporativo
+                                row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970";
+                            }
+                            else
+                            {
+                                consultorCount++;
+                            }
+                        }
+                        else if (csvUserId.Equals("e0f6d53b-b148-4665-b4b1-f2554452247c", StringComparison.OrdinalIgnoreCase)) // Profesional
+                        {
+                            if (profesionalCount >= 5)
+                            {
+                                row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970";
+                            }
+                            else
+                            {
+                                profesionalCount++;
+                            }
+                        }
+                        else if (csvUserId.Equals("3aacec34-f910-4ad4-8cc2-3010a6721b88", StringComparison.OrdinalIgnoreCase)) // Empresa
+                        {
+                            if (empresaCount >= 10)
+                            {
+                                row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970";
+                            }
+                            else
+                            {
+                                empresaCount++;
+                            }
+                        }
+                    }
+                    // ==================================
 
                     // Mapeo de IDs de estado en CSV a códigos de estado
                     var stateMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -309,8 +357,8 @@ public static class AppDbContextSeeder
                         var nombre = row["NombreProyecto"];
                         var ubicacionTexto = row["UbicacionTexto"];
                         
-                        var csvUserId = row["IdUsuario"];
-                        var creatorId = userMapping.TryGetValue(csvUserId, out var mappedUserId) ? mappedUserId : corporativoUser.Id;
+                        var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
+                        var creatorId = userMapping.TryGetValue(csvUserId, out var mappedUserId) ? mappedUserId : corporativoUser.Id; // Corporativo por defecto
 
                         var categoria = int.TryParse(row["CategoriaId"], out var catVal) ? catVal : 3;
                         var dev = row["DatosDesarrollador"];
