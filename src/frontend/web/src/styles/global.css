@@ -192,37 +192,114 @@ h4 {
   }
 
   /* Print optimization */
+  .integrity-seal-print,
+  .print-only {
+    display: none;
+  }
+
   @media print {
-    .print\:hidden {
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+
+    html,
+    body {
+      width: 100% !important;
+      min-width: 0 !important;
+      height: auto !important;
+      min-height: 0 !important;
+      overflow: visible !important;
+      background: #ffffff !important;
+      color: #111144 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Reset layout constraints and overflow in print */
+    #root,
+    .admin-layout,
+    main,
+    div {
+      overflow: visible !important;
+      max-height: none !important;
+      height: auto !important;
+    }
+
+    /* Hide screen-only elements and administrative layout */
+    body * {
+      visibility: hidden;
+    }
+
+    /* Reveal dedicated print root and its descendants */
+    .integrity-seal-print,
+    .integrity-seal-print * {
+      visibility: visible !important;
+    }
+
+    .integrity-seal-print {
+      display: block !important;
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+      background: #ffffff !important;
+      color: #111144 !important;
+      box-shadow: none !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    .integrity-seal-print .qr-container {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    .integrity-seal-print img,
+    .integrity-seal-print svg,
+    .integrity-seal-print canvas {
+      max-width: 100% !important;
+      height: auto !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    .print\:hidden,
+    .screen-only,
+    .no-print,
+    .integrity-seal-screen,
+    button,
+    nav,
+    aside,
+    header,
+    footer,
+    [role="dialog"],
+    .vf-hud-grid {
       display: none !important;
+      visibility: hidden !important;
     }
 
     .print\:shadow-none {
-      shadow: none !important;
-    }
-
-    body {
-      background: white !important;
+      box-shadow: none !important;
     }
 
     .animate-fade-in-up {
       opacity: 1 !important;
       transform: none !important;
-    }
-
-    /* ─── PDF / Print margins ───────────────────────────────────────────────
-       @page sets the physical page margin (browser PDF dialog).
-       The padding on main is a react-to-print safety net — some renderers
-       ignore @page. Adjust the values below to taste:
-         - @page margin  → outer whitespace on the physical page
-         - main padding  → inner breathing room around the content block
-       ──────────────────────────────────────────────────────────────────── */
-    @page {
-      margin: 20mm 18mm 20mm 22mm; /* top right bottom left */
-    }
-
-    main {
-      padding: 0 2rem 0 2.5rem; /* extra left buffer inside the content box */
     }
   }
 }

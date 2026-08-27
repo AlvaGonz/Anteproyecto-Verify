@@ -135,22 +135,22 @@ test.describe('Integrity Seal Print & PDF Output', () => {
     await page.goto(`http://localhost:3000/#/admin/projects/${SEALED_PROJECT_ID}/validations`);
 
     // Verify section header is visible on screen
-    await expect(page.getByText('Certificación Verificable')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { name: 'Certificación Verificable', exact: true })).toBeVisible({ timeout: 15000 });
 
     // Assert print root exists in DOM
     const printRoot = page.locator('[data-testid="integrity-seal-print-root"]');
     await expect(printRoot).toBeAttached({ timeout: 10000 });
 
     // Assert verification code, QR, and seal metadata are present inside print root
-    await expect(printRoot.getByText(sealCode, { exact: false })).toBeAttached();
-    await expect(printRoot.locator('svg')).toBeAttached();
+    await expect(printRoot.getByText(sealCode).first()).toBeAttached();
+    await expect(printRoot.locator('svg').first()).toBeAttached();
   });
 
   test('2. Print mode excludes admin layout and avoids horizontal scrolling', async ({ page }) => {
     await setupMocks(page);
     await page.goto(`http://localhost:3000/#/admin/projects/${SEALED_PROJECT_ID}/validations`);
 
-    await expect(page.getByText('Certificación Verificable')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { name: 'Certificación Verificable', exact: true })).toBeVisible({ timeout: 15000 });
 
     // Emulate print media
     await page.emulateMedia({ media: 'print' });
@@ -211,7 +211,7 @@ test.describe('Integrity Seal Print & PDF Output', () => {
     await setupMocks(page);
 
     await page.goto(`http://localhost:3000/#/admin/projects/${SEALED_PROJECT_ID}/validations`);
-    await expect(page.getByText('Certificación Verificable')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { name: 'Certificación Verificable', exact: true })).toBeVisible({ timeout: 15000 });
 
     // Track calls to window.print()
     let printCalled = false;
@@ -254,7 +254,7 @@ test.describe('Integrity Seal Print & PDF Output', () => {
 
     // Switch back to screen
     await page.emulateMedia({ media: 'screen' });
-    await expect(page.getByText('Certificación Verificable')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Certificación Verificable', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: /Imprimir/i })).toBeVisible();
   });
 });

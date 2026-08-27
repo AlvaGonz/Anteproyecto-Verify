@@ -33,6 +33,18 @@ vi.mock("../../api/useCertifications", () => ({
   }),
 }));
 
+vi.mock("../../../projects/api/useProjects", () => ({
+  useProject: () => ({
+    data: {
+      id: "proj-123",
+      nombre: "Residencial Las Palmas",
+      codigoInterno: "VF-LP-001",
+      ubicacionTexto: "Santo Domingo",
+    },
+    isLoading: false,
+  }),
+}));
+
 vi.mock("../../../settings/api/useSettings", () => ({
   usePlanLimits: () => ({
     planLimits: { qrIncluido: true },
@@ -48,9 +60,28 @@ describe("CertificationSection", () => {
   it("codifica el QR con la URL directa del proyecto, no una intermedia", () => {
     render(<CertificationSection projectId="proj-123" projectStatus="PUBLICADO" />);
 
-    const qrValue = screen.getByTestId("qr-value").textContent ?? "";
+    const qrValues = screen.getAllByTestId("qr-value");
+    expect(qrValues.length).toBeGreaterThan(0);
+    const qrValue = qrValues[0].textContent ?? "";
     expect(qrValue).toContain("/#/p/proj-123");
     expect(qrValue).not.toContain("qrserver");
     expect(qrValue).not.toContain("/q/");
+  });
+
+  it("renders dedicated print root with data-print-ready attribute and metadata", () => {
+    render(<CertificationSection projectId="proj-123" projectStatus="PUBLICADO" />);
+
+    const printRoot = screen.getByTestId("integrity-seal-print-root");
+    expect(printRoot).toBeDefined();
+    expect(printRoot.getAttribute("data-print-ready")).toBe("true");
+    expect(printRoot.textContent).toContain("VERIFINCA-20260804-ABC12345");
+    expect(printRoot.textContent).toContain("Residencial Las Palmas");
+  });
+
+  it("renders accessible print button", () => {
+    render(<CertificationSection projectId="proj-123" projectStatus="PUBLICADO" />);
+
+    const printBtn = screen.getByRole("button", { name: /Imprimir/i });
+    expect(printBtn).toBeDefined();
   });
 });

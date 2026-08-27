@@ -33,7 +33,8 @@ export default defineConfig({
     },
     {
       name: "frontend",
-      testDir: "./e2e/projects",
+      testDir: ".",
+      testMatch: /(e2e\/projects|tests\/e2e)\/.*\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
         baseURL: process.env.FRONTEND_URL ?? "http://localhost:3000",
