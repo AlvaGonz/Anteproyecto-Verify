@@ -14,7 +14,8 @@ describe('UserFormModal', () => {
   };
 
   const formData: CreateUserDto = {
-    name: 'Test',
+    nombre: 'Test',
+    apellido: 'User',
     email: 'test@example.com',
     role: 'user',
     telefono: '',
@@ -23,7 +24,8 @@ describe('UserFormModal', () => {
 
   const editingUser: UserSettings = {
     id: 'user-1',
-    name: 'Test',
+    nombre: 'Test',
+    apellido: 'User',
     email: 'test@example.com',
     role: 'user',
     telefono: '',

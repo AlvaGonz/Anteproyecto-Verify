@@ -44,7 +44,7 @@ export const SettingsPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<UserSettings | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "" });
+  const [formData, setFormData] = useState<CreateUserDto>({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", rnc: "" });
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const isManagementTier = user?.plan === "Corporativo" || user?.plan === "Empresa";
@@ -80,15 +80,36 @@ export const SettingsPage: React.FC = () => {
       return;
     }
 
-    if (!editingUser && !formData.cedula) {
-      addToast("La cédula es obligatoria", "error");
-      return;
+    if (!editingUser) {
+      const hasCedula = !!formData.cedula && formData.cedula.trim() !== "";
+      const hasRnc = !!formData.rnc && formData.rnc.trim() !== "";
+
+      if (!hasCedula && !hasRnc) {
+        addToast("Debe proporcionar una cédula o un RNC", "error");
+        return;
+      }
+      if (hasCedula && hasRnc) {
+        addToast("No puede proporcionar una cédula y un RNC al mismo tiempo", "error");
+        return;
+      }
     }
-    // Cédula is immutable in edit mode, so its check digit is only validated on create
+    // Cédula check digit
     if (!editingUser && formData.cedula) {
       const cedDigits = formData.cedula.replace(/\D/g, "");
       if (cedDigits.length > 0 && !validateCedulaCheckDigit(cedDigits)) {
         addToast("Cédula inválida o dígito verificador incorrecto", "error");
+        return;
+      }
+    }
+    // RNC validation
+    if (!editingUser && formData.rnc) {
+      const rncDigits = formData.rnc.replace(/\D/g, "");
+      if (rncDigits.length !== 9 && rncDigits.length !== 11) {
+        addToast("El RNC debe tener 9 u 11 dígitos", "error");
+        return;
+      }
+      if (rncDigits.length === 11 && !validateCedulaCheckDigit(rncDigits)) {
+        addToast("RNC (Cédula) inválido o dígito verificador incorrecto", "error");
         return;
       }
     }
@@ -131,14 +152,14 @@ export const SettingsPage: React.FC = () => {
   const handleEditClick = (u: UserSettings) => {
     setEditingUser(u);
     setFormError(null);
-    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "" });
+    setFormData({ nombre: u.nombre, apellido: u.apellido, email: u.email, role: (["admin", "user"].includes(u.role) ? u.role : "user") as CreateUserDto["role"], telefono: u.telefono || "", cedula: u.cedula || "", rnc: u.rnc || "" });
     setIsModalOpen(true);
   };
 
   const handleAddNewClick = () => {
     setEditingUser(null);
     setFormError(null);
-    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", password: "", planNombre: "Consultor" });
+    setFormData({ nombre: "", apellido: "", email: "", role: "user", telefono: "", cedula: "", rnc: "", password: "", planNombre: "Consultor" });
     setIsModalOpen(true);
   };
 

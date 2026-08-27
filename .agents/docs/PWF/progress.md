@@ -1,5 +1,18 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-27 (III) — Restauración de Usuarios Sembrados y Creación Resiliente de Usuarios desde Administrador
+
+**Ciclo:** Administración & Base de Datos (`05_Usuario.sql`, `SettingsController.cs`, `UserFormModal.tsx`, `SettingsPage.tsx`)
+**Estado:** ✅ COMPLETO — Ingestión correcta de 135+ usuarios en base de datos, y soporte dual Cédula/RNC resiliente a claves foráneas JCE/DGII.
+- **Problemas Abordados:**
+  1. Los 135 usuarios sembrados extendidos no cargaban porque el script `05_Usuario.sql` fallaba debido a columnas inexistentes (`CorreoElectronico` y `Genero`), cancelando todo el lote.
+  2. La creación de usuarios desde el administrador fallaba con error 500 (violación de clave foránea `FK_Usuario_JCE_Ciudadano_Cedula`) si se ingresaba una cédula nueva. Además, no permitía registrar RNC para planes empresariales, los cuales pueden tener 9 u 11 dígitos (formato Cédula).
+- **Mejoras Implementadas:**
+  1. **Saneamiento de 05_Usuario.sql:** Corrección de nombres de columnas y eliminación de atributos sobrantes. Se ejecutó la siembra con éxito en vivo.
+  2. **Identificación Dual en Formulario del Admin:** Se añadió un selector interactivo entre Cédula y RNC en el formulario del Administrador (`UserFormModal.tsx`).
+  3. **Soporte de RNC de 11 dígitos (Cédula):** El campo de RNC permite ingresar hasta 11 dígitos (formato de Persona Física). Si el número supera los 9 dígitos, se aplica automáticamente la máscara de formato de Cédula (`000-0000000-0`) y se valida con el algoritmo Luhn mod-10.
+  4. **Mock Data Automático en Gobernanza:** En `SettingsController.cs`, si la Cédula o RNC ingresados no existen en las bases de datos gubernamentales simuladas (`JCE_Ciudadano` / `DGII`), el backend los registra automáticamente. Si el RNC ingresado es de 11 dígitos, se registra en **ambas** bases de datos gubernamentales para evitar colisiones de clave foránea en cualquier validación de identidad posterior.
+
 ## Sesión 2026-08-27 (II) — Corrección de Error 500 en Landing Page por Clave Foránea en Logs de Auditoría
 
 **Ciclo:** Backend & Base de Datos / Auditorías (`AuditoriaService.cs`, `PublicProjectController.cs`, `SearchPublicProjectsQueryHandler.cs`)

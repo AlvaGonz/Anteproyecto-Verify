@@ -182,8 +182,14 @@ public class SettingsController : ControllerBase
             return BadRequest(new { Message = "El correo electrónico es obligatorio." });
         if (string.IsNullOrWhiteSpace(request.Telefono))
             return BadRequest(new { Message = "El teléfono es obligatorio." });
-        if (string.IsNullOrWhiteSpace(request.Cedula))
-            return BadRequest(new { Message = "La cédula es obligatoria." });
+        bool hasCedula = !string.IsNullOrWhiteSpace(request.Cedula);
+        bool hasRnc = !string.IsNullOrWhiteSpace(request.Rnc);
+
+        if (!hasCedula && !hasRnc)
+            return BadRequest(new { Message = "Debe proporcionar una cédula o un RNC." });
+
+        if (hasCedula && hasRnc)
+            return BadRequest(new { Message = "No puede proporcionar una cédula y un RNC al mismo tiempo." });
 
         if (request.Nombre != null && request.Nombre.Any(char.IsDigit))
             return BadRequest(new { Message = "El nombre no puede contener números." });
@@ -202,6 +208,21 @@ public class SettingsController : ControllerBase
             }
         }
 
+        string? cleanCedula = null;
+        if (!string.IsNullOrWhiteSpace(request.Cedula))
+        {
+            var digits = System.Text.RegularExpressions.Regex.Replace(request.Cedula, @"\D", "");
+            cleanCedula = digits.Length == 11
+                ? $"{digits.Substring(0, 3)}-{digits.Substring(3, 7)}-{digits.Substring(10, 1)}"
+                : request.Cedula.Trim();
+        }
+
+        string? cleanRnc = null;
+        if (!string.IsNullOrWhiteSpace(request.Rnc))
+        {
+            cleanRnc = request.Rnc.Trim();
+        }
+
         UserRole role = request.Role.ToLower() switch
         {
             "admin" => UserRole.Administrator,
@@ -218,6 +239,62 @@ public class SettingsController : ControllerBase
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
+            if (!string.IsNullOrEmpty(cleanCedula))
+            {
+                var jce = await _context.JCE_Ciudadanos.FirstOrDefaultAsync(c => c.Cedula == cleanCedula, cancellationToken);
+                if (jce == null)
+                {
+                    jce = new Domain.Entities.JCE_Ciudadano
+                    {
+                        Cedula = cleanCedula,
+                        Nombres = nombre,
+                        Apellidos = apellido,
+                        FechaNacimiento = new DateTime(1980, 1, 1),
+                        FechaExpiracion = DateTime.UtcNow.AddYears(4)
+                    };
+                    _context.JCE_Ciudadanos.Add(jce);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(cleanRnc))
+            {
+                var dgii = await _context.DGII.FirstOrDefaultAsync(d => d.Rnc == cleanRnc, cancellationToken);
+                if (dgii == null)
+                {
+                    dgii = new Domain.Entities.DGII
+                    {
+                        Rnc = cleanRnc,
+                        NombreRazonSocial = $"{nombre} {apellido} (Empresa)",
+                        Estado = "ACTIVO",
+                        ActividadEconomica = "CONSTRUCCION",
+                        FechaModificacion = DateTime.UtcNow
+                    };
+                    _context.DGII.Add(dgii);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+
+                var rncDigits = System.Text.RegularExpressions.Regex.Replace(cleanRnc, @"\D", "");
+                if (rncDigits.Length == 11)
+                {
+                    var formattedRncCedula = $"{rncDigits.Substring(0, 3)}-{rncDigits.Substring(3, 7)}-{rncDigits.Substring(10, 1)}";
+                    var jce = await _context.JCE_Ciudadanos.FirstOrDefaultAsync(c => c.Cedula == formattedRncCedula, cancellationToken);
+                    if (jce == null)
+                    {
+                        jce = new Domain.Entities.JCE_Ciudadano
+                        {
+                            Cedula = formattedRncCedula,
+                            Nombres = nombre,
+                            Apellidos = apellido,
+                            FechaNacimiento = new DateTime(1980, 1, 1),
+                            FechaExpiracion = DateTime.UtcNow.AddYears(4)
+                        };
+                        _context.JCE_Ciudadanos.Add(jce);
+                        await _context.SaveChangesAsync(cancellationToken);
+                    }
+                }
+            }
+
             var user = new Usuario(
                 nombre: nombre,
                 apellido: apellido,
@@ -225,7 +302,8 @@ public class SettingsController : ControllerBase
                 contrasenaHash: hashedPassword,
                 rol: role,
                 telefono: string.IsNullOrWhiteSpace(request.Telefono) ? "0000000000" : request.Telefono,
-                cedula: string.IsNullOrWhiteSpace(request.Cedula) ? null : request.Cedula
+                cedula: cleanCedula,
+                rnc: cleanRnc
             );
 
             user.ForzarVerificacionEmail();
@@ -798,7 +876,8 @@ public class CreateUserDto
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = "user";
     public string Telefono { get; set; } = "0000000000";
-    public string Cedula { get; set; } = "00000000000";
+    public string? Cedula { get; set; }
+    public string? Rnc { get; set; }
     public string? Password { get; set; }
     public string? PlanNombre { get; set; }
 }

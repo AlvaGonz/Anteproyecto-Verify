@@ -35,6 +35,16 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   );
   
   const [showPassword, setShowPassword] = useState(false);
+  const [documentType, setDocumentType] = useState<"cedula" | "rnc">("cedula");
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (editingUser) {
+      setDocumentType(editingUser.rnc ? "rnc" : "cedula");
+    } else {
+      setDocumentType("cedula");
+    }
+  }, [editingUser, isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -123,6 +133,42 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
             )}
           </div>
 
+          {!editingUser && (
+            <div>
+              <span className="block text-xs font-bold text-[#8a9bb4] uppercase mb-1">Tipo de Identificación</span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDocumentType("cedula");
+                    update({ rnc: "", cedula: "" });
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold border transition-colors ${
+                    documentType === "cedula"
+                      ? "bg-[#223382] text-white border-[#223382]"
+                      : "bg-white text-text-secondary border-border hover:bg-surface"
+                  }`}
+                >
+                  Cédula
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDocumentType("rnc");
+                    update({ cedula: "", rnc: "" });
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold border transition-colors ${
+                    documentType === "rnc"
+                      ? "bg-[#223382] text-white border-[#223382]"
+                      : "bg-white text-text-secondary border-border hover:bg-surface"
+                  }`}
+                >
+                  RNC
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="uf-telefono" className="block text-xs font-bold text-text-secondary uppercase mb-1">Teléfono</label>
@@ -145,32 +191,63 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="uf-cedula" className="block text-xs font-bold text-text-secondary uppercase mb-1">Cédula</label>
-              <input
-                id="uf-cedula"
-                type="text"
-                required={!editingUser}
-                readOnly={!!editingUser}
-                value={formData.cedula || ""}
-                onChange={editingUser ? undefined : e => {
-                  let val = e.target.value.replace(/\D/g, "");
-                  if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
-                  else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
-                  update({ cedula: val });
-                }}
-                onKeyDown={editingUser ? undefined : (e) => {
-                  const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
-                  if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
-                    e.preventDefault();
-                  }
-                }}
-                className={`vf-input w-full ${editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""
-                  }`}
-                placeholder="000-0000000-0"
-              />
+              <label htmlFor="uf-identificacion" className="block text-xs font-bold text-text-secondary uppercase mb-1">
+                {documentType === "cedula" ? "Cédula" : "RNC"}
+              </label>
+              {documentType === "cedula" ? (
+                <input
+                  id="uf-cedula"
+                  type="text"
+                  required={!editingUser}
+                  readOnly={!!editingUser}
+                  value={formData.cedula || ""}
+                  onChange={editingUser ? undefined : e => {
+                    let val = e.target.value.replace(/\D/g, "");
+                    if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
+                    else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
+                    update({ cedula: val, rnc: "" });
+                  }}
+                  onKeyDown={editingUser ? undefined : (e) => {
+                    const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
+                    if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  className={`vf-input w-full ${editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""}`}
+                  placeholder="000-0000000-0"
+                />
+              ) : (
+                <input
+                  id="uf-rnc"
+                  type="text"
+                  required={!editingUser}
+                  readOnly={!!editingUser}
+                  maxLength={13}
+                  value={formData.rnc || ""}
+                  onChange={editingUser ? undefined : e => {
+                    let val = e.target.value.replace(/\D/g, "");
+                    if (val.length > 9) {
+                      val = val.slice(0, 11);
+                      if (val.length > 3 && val.length <= 10) val = `${val.slice(0, 3)}-${val.slice(3)}`;
+                      else if (val.length > 10) val = `${val.slice(0, 3)}-${val.slice(3, 10)}-${val.slice(10, 11)}`;
+                    } else {
+                      val = val.slice(0, 9);
+                    }
+                    update({ rnc: val, cedula: "" });
+                  }}
+                  onKeyDown={editingUser ? undefined : (e) => {
+                    const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"];
+                    if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  className={`vf-input w-full ${editingUser ? "bg-surface-raised/30 opacity-60 cursor-not-allowed select-none" : ""}`}
+                  placeholder="000000000 o 000-0000000-0"
+                />
+              )}
               {editingUser && (
                 <p className="text-[10px] text-amber-600 mt-1 flex items-center gap-1">
-                  <span>⚠</span> La cédula es un dato de identidad legal y no puede modificarse.
+                  <span>⚠</span> La identificación es un dato de identidad legal y no puede modificarse.
                 </p>
               )}
             </div>
