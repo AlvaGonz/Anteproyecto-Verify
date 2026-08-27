@@ -126,6 +126,14 @@ public class Proyecto : EntityBase
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
+    public void ReasignarUsuario(Guid nuevoUsuarioCreadorId)
+    {
+        if (nuevoUsuarioCreadorId == Guid.Empty)
+            throw new ArgumentException("Nuevo usuario creador requerido", nameof(nuevoUsuarioCreadorId));
+        UsuarioCreadorId = nuevoUsuarioCreadorId;
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
+
     public void UpdateEstadoJuridico(EstadoJuridico newStatus)
     {
         EstadoJuridico = newStatus;

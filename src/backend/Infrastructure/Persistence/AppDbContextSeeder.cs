@@ -277,76 +277,16 @@ public static class AppDbContextSeeder
                     var csvRows = ParseCsv(csvPath);
                     var proyectoEntitiesList = new List<Proyecto>();
 
-                    var freemiumId = freemiumUser.Id;
-
                     // Mapeo de IDs de usuario en CSV a entidades en base de datos (USANDO LOS ID REALES DE LA BD)
+                    // El CSV contiene los IdUsuario reales de los usuarios creados/obtenidos anteriormente.
                     var userMapping = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase)
                     {
-                        { "097be5ae-8f40-4385-a204-de294b449940", consultorUser.Id }, // Consultor
-                        { "e0f6d53b-b148-4665-b4b1-f2554452247c", profesionalUser.Id }, // Profesional
-                        { "3aacec34-f910-4ad4-8cc2-3010a6721b88", empresaUser.Id }, // Empresa
-                        { "21dc26ac-498c-4c17-8b90-0ff49bd45970", corporativoUser.Id },  // Corporativo
-                        { "FREEMIUM_ID_VIRTUAL", freemiumId } // Freemium (Mapeo virtual para desvío)
+                        { consultorUser.Id.ToString(), consultorUser.Id },     // Consultor
+                        { profesionalUser.Id.ToString(), profesionalUser.Id }, // Profesional
+                        { empresaUser.Id.ToString(), empresaUser.Id },         // Empresa
+                        { corporativoUser.Id.ToString(), corporativoUser.Id }, // Corporativo
+                        { freemiumUser.Id.ToString(), freemiumUser.Id }        // Freemium
                     };
-
-                    // === NUEVA LÓGICA DE ASIGNACIÓN ===
-                    int consultorCount = 0;
-                    int profesionalCount = 0;
-                    int empresaCount = 0;
-                    int reroutedToFreemium = 0;
-                    
-                    foreach (var row in csvRows)
-                    {
-                        var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
-                        var csvStateId = row.ContainsKey("EstadoId") ? row["EstadoId"] : "";
-                        
-                        if (csvUserId.Equals("097be5ae-8f40-4385-a204-de294b449940", StringComparison.OrdinalIgnoreCase)) // Consultor
-                        {
-                            bool isPublicado = csvStateId.Equals("8006e230-79a0-40b7-ad3b-b399b564f8f8", StringComparison.OrdinalIgnoreCase);
-                            if (consultorCount >= 1 || (!isPublicado && consultorCount == 0)) 
-                            {
-                                // Mover excedente o no publicado a Corporativo o Freemium
-                                if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
-                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
-                            }
-                            else
-                            {
-                                consultorCount++;
-                            }
-                        }
-                        else if (csvUserId.Equals("e0f6d53b-b148-4665-b4b1-f2554452247c", StringComparison.OrdinalIgnoreCase)) // Profesional
-                        {
-                            if (profesionalCount >= 5)
-                            {
-                                if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
-                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
-                            }
-                            else
-                            {
-                                profesionalCount++;
-                            }
-                        }
-                        else if (csvUserId.Equals("3aacec34-f910-4ad4-8cc2-3010a6721b88", StringComparison.OrdinalIgnoreCase)) // Empresa
-                        {
-                            if (empresaCount >= 10)
-                            {
-                                if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
-                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
-                            }
-                            else
-                            {
-                                empresaCount++;
-                            }
-                        }
-                        else if (csvUserId.Equals("21dc26ac-498c-4c17-8b90-0ff49bd45970", StringComparison.OrdinalIgnoreCase)) // Ya era Corporativo
-                        {
-                            if (reroutedToFreemium < 30) {
-                                row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL";
-                                reroutedToFreemium++;
-                            }
-                        }
-                    }
-                    // ==================================
 
                     // Mapeo de IDs de estado en CSV a códigos de estado
                     var stateMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -354,23 +294,16 @@ public static class AppDbContextSeeder
                         { "8006e230-79a0-40b7-ad3b-b399b564f8f8", ProjectStatusCodes.Publicado },
                         { "4f756062-8e28-4907-b633-c6285ce2c5e5", ProjectStatusCodes.Revision },
                         { "0694d868-a8ae-42ff-8f88-58e75f4034d2", ProjectStatusCodes.Editado },
-                        { "4793e761-8e4a-4414-b64b-ba71ff57eeb5", ProjectStatusCodes.Creado }
+                        { "4793e761-8e4a-4414-b64b-ba71ff57eeb5", ProjectStatusCodes.Creado },
+                        { "e82f586d-b007-4f1f-b6cc-3ff2acb5442a", ProjectStatusCodes.Observacion }
                     };
 
                     foreach (var row in csvRows)
                     {
                         var codigoInterno = row["CodigoInterno"];
-                        
-                        var existingProj = await context.Proyectos.FirstOrDefaultAsync(p => p.CodigoInterno == codigoInterno);
-                        if (existingProj != null)
-                        {
-                            proyectoEntitiesList.Add(existingProj);
-                            continue;
-                        }
-
                         var nombre = row["NombreProyecto"];
                         var ubicacionTexto = row["UbicacionTexto"];
-                        
+
                         var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
                         var creatorId = userMapping.TryGetValue(csvUserId, out var mappedUserId) ? mappedUserId : corporativoUser.Id; // Corporativo por defecto
 
@@ -381,6 +314,18 @@ public static class AppDbContextSeeder
                         var csvStateId = row["EstadoId"];
                         var stateCode = stateMapping.TryGetValue(csvStateId, out var mappedCode) ? mappedCode : ProjectStatusCodes.Publicado;
                         var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode);
+
+                        var existingProj = await context.Proyectos.FirstOrDefaultAsync(p => p.CodigoInterno == codigoInterno);
+                        if (existingProj != null)
+                        {
+                            // Reasignar/actualizar el proyecto existente para reflejar el reparto del CSV
+                            if (existingProj.UsuarioCreadorId != creatorId)
+                                existingProj.ReasignarUsuario(creatorId);
+                            if (estado != null && existingProj.Estado == null || (estado != null && existingProj.Estado != null && existingProj.EstadoId != estado.Id))
+                                existingProj.UpdateEstado(estado);
+                            proyectoEntitiesList.Add(existingProj);
+                            continue;
+                        }
 
                         var proyecto = new Proyecto(nombre, ubicacionTexto, creatorId, categoria, dev, cat);
                         if (estado != null)
