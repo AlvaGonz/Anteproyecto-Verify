@@ -25,6 +25,9 @@
      * En `CertificationSection.tsx`, se corrigió la codificación de la URL del QR para utilizar la ruta pública segura con token `/#/q/${qrToken}` en lugar del enlace privado administrativo `/#/p/${projectId}`.
      * En `ProjectPublicDetailPage.tsx`, se normalizaron los campos del DTO de consulta pública (`nombreProyecto` -> `nombre`, `ubicacion` -> `ubicacionTexto`) y se configuró `gcTime: 0` en `qrQuery` para garantizar que cada escaneo/visita consulte y registre el acceso en tiempo real.
      * Se implementaron pruebas unitarias backend (`GetPublicProjectStatusQueryHandlerTests.cs`) y E2E frontend (`integrity-seal-print.spec.ts`) validando que las visitas 1 a 3 a la URL del QR (`/#/q/:qrToken`) incrementan progresivamente el contador `Consultas Recibidas` en la pantalla administrativa de validaciones (`/admin/projects/:id/validations`).
+  6. **Detalles del Publicador (Responsable Registral) y Especificaciones Técnicas en Consulta Pública:**
+     * En `PublicProjectStatusDto.cs` y `GetPublicProjectStatusQueryHandler.cs`, se extendió la respuesta para incluir `RegistradoPor` (con resolución de identidad pública según `PublicIdentityResolver`), así como las especificaciones completas (`DatosDesarrollador`, `RncDesarrollador`, `CreatedAtUtc`, `CategoriaNombre`, `ValorEstimado`, `SuperficieM2`, `Cercania`, etc.).
+     * En `useSettings.ts`, `useDocuments.ts` y `ProjectDocumentStatus.tsx`, se agregó el flag `enabled` para evitar llamadas redundantes no autenticadas a `/api/v1/subscriptions/my-status` y `/api/projects/:id/documents` cuando se visualiza mediante QR anónimo, eliminando por completo los errores 401 en consola.
 
 ---
 - **Problema Abordado:**
