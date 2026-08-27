@@ -335,12 +335,6 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
                 <div className="qr-container p-2 border-2 border-[#111144] rounded-xl bg-white">
                   <CertificationQr url={qrUrl} size={160} />
                 </div>
-                <p className="text-xs font-mono font-bold mt-2 text-[#111144]">
-                  {sealCode}
-                </p>
-                <p className="text-[10px] text-[#5C5C5C] break-all max-w-[200px] mt-0.5">
-                  {qrUrl}
-                </p>
               </div>
 
               {/* Metadata Details */}
@@ -404,24 +398,6 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
                       </span>
                     </div>
                   )}
-
-                  <div>
-                    <span className="text-[11px] font-bold text-[#5C5C5C] uppercase tracking-wider block">
-                      Nivel de Certificación
-                    </span>
-                    <span className="text-xs text-[#111144] font-semibold">
-                      {selloData?.nivel || "Estándar VeriFinca"}
-                    </span>
-                  </div>
-
-                  <div>
-                    <span className="text-[11px] font-bold text-[#5C5C5C] uppercase tracking-wider block">
-                      Consultas Recibidas
-                    </span>
-                    <span className="text-xs text-[#111144] font-semibold">
-                      {accessCount}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
