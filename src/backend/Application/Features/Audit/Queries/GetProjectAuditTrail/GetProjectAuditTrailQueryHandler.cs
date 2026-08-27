@@ -49,7 +49,8 @@ public class GetProjectAuditTrailQueryHandler
             a.Detalle,
             a.IpOrigen,
             a.UserAgent,
-            a.FechaEventoUtc
+            a.FechaEventoUtc,
+            a.Proyecto != null ? a.Proyecto.CodigoInterno : "N/A"
         ));
     }
 }

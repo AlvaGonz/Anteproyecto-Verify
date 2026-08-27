@@ -64,6 +64,7 @@ export const AuditLogPage: React.FC = () => {
       usuarioId: l.idUsuario ? String(l.idUsuario) : null,
       userEmail: l.nombreUsuario || "Desconocido",
       detalle: l.descripcion || "Sin detalles",
+      codigo: l.codigo || "N/A",
     })) as unknown as AuditDto[];
 
     if (debouncedSearch) {
@@ -173,7 +174,7 @@ export const AuditLogPage: React.FC = () => {
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">Timestamp (UTC)</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">Usuario</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">Evento</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">Proyecto</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">Código</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">Detalle</th>
               </tr>
             </thead>
@@ -214,7 +215,7 @@ export const AuditLogPage: React.FC = () => {
                       {getStatusBadge(log.tipoEvento)}
                     </td>
                     <td className="px-8 py-5 font-mono text-xs font-bold text-primary/80">
-                      {log.proyectoId?.substring(0, 8) || "N/A"}
+                      {log.codigo || "N/A"}
                     </td>
                     <td className="px-8 py-5">
                       <p className="text-sm text-text-secondary font-medium max-w-md truncate md:whitespace-normal group-hover:text-secondary transition-colors">

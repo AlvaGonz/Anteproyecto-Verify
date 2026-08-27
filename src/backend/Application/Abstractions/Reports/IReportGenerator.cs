@@ -9,4 +9,5 @@ public interface IReportGenerator
 {
     Task<byte[]> GeneratePdfAsync(ReporteHallazgosDto reporte, CancellationToken cancellationToken = default);
     Task<byte[]> GenerateExcelAsync(ReporteHallazgosDto reporte, CancellationToken cancellationToken = default);
+    Task<byte[]> GenerateAuditLogPdfAsync(string userNombreCompleto, IEnumerable<Application.DTOs.Audit.AuditDto> logs, CancellationToken cancellationToken = default);
 }

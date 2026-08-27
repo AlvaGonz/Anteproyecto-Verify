@@ -13,5 +13,6 @@ public record AuditDto(
     string? Detalle,
     string? IpOrigen,
     string? UserAgent,
-    DateTime FechaEventoUtc
+    DateTime FechaEventoUtc,
+    string? Codigo = null
 );

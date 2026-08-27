@@ -35,7 +35,10 @@ public class AdminAuditController : ControllerBase
     [HttpGet("api/reports/global-audit")]
     public async Task<IActionResult> ExportGlobalAuditTrail(CancellationToken cancellationToken)
     {
-        var csvBytes = await _exportHandler.HandleAsync(cancellationToken);
-        return File(csvBytes, "text/csv", $"global_audit_trail_{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
+        var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        Guid? currentUserId = !string.IsNullOrEmpty(userIdString) ? Guid.Parse(userIdString) : null;
+
+        var pdfBytes = await _exportHandler.HandlePdfAsync(currentUserId, cancellationToken);
+        return File(pdfBytes, "application/pdf", $"global_audit_trail_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf");
     }
 }

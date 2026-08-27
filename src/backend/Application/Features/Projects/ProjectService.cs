@@ -99,7 +99,7 @@ public class ProjectService : IProjectService
         var proyecto = await _proyectoRepository.GetByIdAsync(id, cancellationToken);
         if (proyecto == null) return null;
 
-        await _auditLogger.Append(new AuditEntryDto
+        await _auditLogger.AppendAsync(new AuditEntryDto
         {
             UsuarioId = proyecto.UsuarioCreadorId,
             TipoOperacion = TipoOperacion.ConsultaPublica,
