@@ -10,7 +10,8 @@
 - **Mejoras Implementadas:**
   1. **Aislamiento de Raíz de Impresión (`data-testid="integrity-seal-print-root"`):**
      * Se separó la vista de pantalla (`integrity-seal-screen`) de la representación imprimible dedicada (`integrity-seal-print`).
-     * Se diseñó un certificado formal con marco perimetral, membrete institucional ("VERIFINCA — Certificación Verificable de Integridad"), metadatos completos del proyecto (`project.nombre`, `project.codigoInterno`, código de validación, estado de integridad, fechas formateadas UTC, consultas registradas, aviso legal bajo Ley 126-02 y Ley 172-13).
+     * Se diseñó un certificado formal con marco perimetral, membrete institucional ("VERIFINCA — Certificación Verificable de Integridad"), metadatos esenciales del proyecto (`project.nombre`, `project.codigoInterno`, código de validación, estado de integridad, fechas formateadas UTC y aviso legal bajo Ley 126-02 y Ley 172-13).
+     * Se retiraron del diseño imprimible los subtítulos de texto redundantes debajo del QR (código duplicado y URL local) así como las secciones de "Nivel de Certificación" y "Consultas Recibidas" para mayor limpieza visual.
   2. **Reglas de Impresión CSS (@media print y @page):**
      * Configuración `@page { size: A4 portrait; margin: 12mm; }`.
      * Desactivación de restricciones de altura y overflow en `#root`, `.admin-layout`, `main`, y contenedores.
