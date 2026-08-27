@@ -21,6 +21,8 @@ public class AuditoriaRepository : IAuditoriaRepository
     public async Task<IEnumerable<Auditoria>> GetByProyectoIdAsync(Guid proyectoId, CancellationToken cancellationToken = default)
     {
         return await _context.Auditorias
+            .Include(a => a.Proyecto)
+            .Include(a => a.Usuario)
             .AsNoTracking()
             .Where(a => a.ProyectoId == proyectoId)
             .ToListAsync(cancellationToken);
@@ -29,6 +31,8 @@ public class AuditoriaRepository : IAuditoriaRepository
     public async Task<IEnumerable<Auditoria>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Auditorias
+            .Include(a => a.Proyecto)
+            .Include(a => a.Usuario)
             .AsNoTracking()
             .OrderByDescending(a => a.FechaEventoUtc)
             .ToListAsync(cancellationToken);
@@ -36,7 +40,10 @@ public class AuditoriaRepository : IAuditoriaRepository
 
     public async Task<IEnumerable<Auditoria>> GetFilteredAsync(string? tipoEvento, DateTime? fromDate, DateTime? toDate, CancellationToken cancellationToken = default)
     {
-        var query = _context.Auditorias.AsNoTracking();
+        var query = _context.Auditorias
+            .Include(a => a.Proyecto)
+            .Include(a => a.Usuario)
+            .AsNoTracking();
 
         if (!string.IsNullOrEmpty(tipoEvento))
         {
@@ -53,7 +60,7 @@ public class AuditoriaRepository : IAuditoriaRepository
             query = query.Where(a => a.FechaEventoUtc <= toDate.Value);
         }
 
-return await query
+        return await query
             .OrderByDescending(a => a.FechaEventoUtc)
             .ToListAsync(cancellationToken);
     }

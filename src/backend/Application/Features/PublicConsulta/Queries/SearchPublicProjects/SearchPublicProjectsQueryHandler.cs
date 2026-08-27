@@ -88,7 +88,7 @@ totalCount = count;
 
         await _auditLogger.AppendAsync(new AuditEntryDto
         {
-            UsuarioId = null,
+            UsuarioId = request.UsuarioId,
             TipoOperacion = TipoOperacion.ConsultaPublica,
             Accion = "Búsqueda pública de proyectos",
             Resultado = $"Encontrados: {results.Count} para término {request.Query}, página {page}",

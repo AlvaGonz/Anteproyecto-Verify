@@ -10,6 +10,7 @@ public class SearchPublicProjectsQuery
     public int PageSize { get; set; } = 12;
     public string? IpOrigen { get; set; }
     public string? UserAgent { get; set; }
+    public Guid? UsuarioId { get; set; }
 }
 
 public class PublicProjectSearchResultDto

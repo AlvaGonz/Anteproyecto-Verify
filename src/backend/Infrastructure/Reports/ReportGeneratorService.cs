@@ -325,4 +325,142 @@ public class ReportGeneratorService : IReportGenerator
         workbook.SaveAs(stream);
         return Task.FromResult(stream.ToArray());
     }
+
+    public Task<byte[]> GenerateAuditLogPdfAsync(string userNombreCompleto, IEnumerable<Application.DTOs.Audit.AuditDto> logs, CancellationToken cancellationToken = default)
+    {
+        var document = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(1.5f, Unit.Centimetre);
+                page.PageColor(Colors.White);
+                page.DefaultTextStyle(x => x.FontSize(9).FontFamily("Helvetica"));
+
+                // Header with Centered Logo
+                page.Header().Element(compose => 
+                {
+                    compose.Column(column =>
+                    {
+                        column.Item().AlignCenter().Text("V E R I F I N C A")
+                            .FontSize(24).Bold().FontColor("#1A365D"); // Deep Navy Blue
+                        
+                        column.Item().AlignCenter().PaddingTop(2).Text("SISTEMA DE VERIFICACIÓN Y AUTENTICACIÓN INTEGRAL DE PROYECTOS")
+                            .FontSize(7).SemiBold().FontColor(Colors.Grey.Darken2);
+                        
+                        column.Item().PaddingTop(8).LineHorizontal(1.5f).LineColor("#1A365D");
+                        
+                        column.Item().PaddingTop(10).Row(row =>
+                        {
+                            row.RelativeItem().Column(infoCol =>
+                            {
+                                infoCol.Item().Text(t => 
+                                {
+                                    t.Span("Estos logs pertenecen al usuario: ").Bold();
+                                    t.Span(userNombreCompleto);
+                                });
+                                infoCol.Item().Text(t => 
+                                {
+                                    t.Span("Exportado en la fecha: ").Bold();
+                                    t.Span($"{DateTime.UtcNow:dd/MM/yyyy HH:mm:ss} UTC");
+                                });
+                            });
+                        });
+                        
+                        column.Item().PaddingTop(5).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten2);
+                    });
+                });
+
+                // Content: Table of Audit Logs
+                page.Content().PaddingTop(15).Element(compose =>
+                {
+                    compose.Column(column =>
+                    {
+                        column.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(90);  // Timestamp
+                                columns.RelativeColumn(1.2f); // Usuario
+                                columns.ConstantColumn(80);  // Evento (Badge)
+                                columns.ConstantColumn(80);  // Código
+                                columns.RelativeColumn(2f);   // Detalle
+                            });
+
+                            table.Header(header =>
+                            {
+                                static IContainer HeaderCellStyle(IContainer c) => c.Background("#1A365D").PaddingVertical(6).PaddingHorizontal(5).AlignLeft();
+                                
+                                header.Cell().Element(HeaderCellStyle).Text("Timestamp (UTC)").Bold().FontColor(Colors.White).FontSize(8);
+                                header.Cell().Element(HeaderCellStyle).Text("Usuario").Bold().FontColor(Colors.White).FontSize(8);
+                                header.Cell().Element(HeaderCellStyle).Text("Evento").Bold().FontColor(Colors.White).FontSize(8);
+                                header.Cell().Element(HeaderCellStyle).Text("Código").Bold().FontColor(Colors.White).FontSize(8);
+                                header.Cell().Element(HeaderCellStyle).Text("Detalle").Bold().FontColor(Colors.White).FontSize(8);
+                            });
+
+                            int index = 0;
+                            foreach (var log in logs)
+                            {
+                                var background = index % 2 == 0 ? "#FFFFFF" : "#F7FAFC"; // Alternating row color
+                                index++;
+
+                                static IContainer CellStyle(IContainer c, string bg) => c.Background(bg).BorderBottom(0.5f).BorderColor("#E2E8F0").PaddingVertical(5).PaddingHorizontal(5).AlignLeft();
+
+                                table.Cell().Element(c => CellStyle(c, background)).Text(log.FechaEventoUtc.ToString("dd/MM/yyyy HH:mm:ss")).FontSize(7.5f);
+                                table.Cell().Element(c => CellStyle(c, background)).Text(log.UsuarioId?.ToString().Substring(0, 8) ?? "SISTEMA").FontSize(7.5f);
+                                
+                                // Evento Badge
+                                table.Cell().Element(c => CellStyle(c, background)).Element(cell =>
+                                {
+                                    var text = log.Accion ?? "General";
+                                    var bgBadge = "#E2E8F0";
+                                    var textBadge = "#4A5568";
+
+                                    if (log.TipoEvento == "ProjectCreated")
+                                    {
+                                        text = "Creación";
+                                        bgBadge = "#EBF8FF"; // Light Blue
+                                        textBadge = "#2B6CB0"; // Blue
+                                    }
+                                    else if (log.TipoEvento == "DocumentUploaded")
+                                    {
+                                        text = "Carga Doc";
+                                        bgBadge = "#E6FFFA"; // Light Teal/Emerald
+                                        textBadge = "#319795"; // Teal
+                                    }
+                                    else if (log.TipoEvento == "ValidationExecuted")
+                                    {
+                                        text = "Validación";
+                                        bgBadge = "#FEEBC8"; // Light Orange
+                                        textBadge = "#DD6B20"; // Orange
+                                    }
+
+                                    cell.Background(bgBadge)
+                                        .PaddingVertical(1)
+                                        .PaddingHorizontal(4)
+                                        .Border(0.5f)
+                                        .BorderColor(bgBadge)
+                                        .Text(text)
+                                        .Bold()
+                                        .FontSize(6.5f)
+                                        .FontColor(textBadge);
+                                });
+
+                                // Código
+                                table.Cell().Element(c => CellStyle(c, background)).Text(log.Codigo ?? "N/A").FontSize(7.5f).FontFamily("Courier New").Bold();
+                                
+                                // Detalle
+                                table.Cell().Element(c => CellStyle(c, background)).Text(log.Detalle ?? "").FontSize(7.5f);
+                            }
+                        });
+                    });
+                });
+
+                // Footer
+                page.Footer().Element(ComposeFooter);
+            });
+        });
+
+        return Task.FromResult(document.GeneratePdf());
+    }
 }

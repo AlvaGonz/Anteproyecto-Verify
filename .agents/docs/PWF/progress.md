@@ -1,5 +1,25 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-27 — Corrección de Exportación de Logs a PDF y Columna de Código en Historial
+
+**Ciclo:** Reportes & Auditoría (`ReportGeneratorService.cs`, `AdminAuditController.cs`, `ExportGlobalAuditTrailQueryHandler.cs`, `GetProjectAuditTrailQueryHandler.cs`, `AuditLogPage.tsx`, `types.ts`, `IReportGenerator.cs`, `AuditoriaRepository.cs`)
+**Estado:** ✅ COMPLETO — Compilación exitosa, contenedor de API Docker recreado e iniciado en vivo.
+- **Problema Abordado:**
+  1. El botón "Exportar Logs" en la pantalla de auditoría (`/admin/audit-log`) descargaba un CSV y forzaba la extensión `.pdf` en el guardado del cliente frontend, generando un PDF corrupto e ilegible.
+  2. La columna "Proyecto" en la tabla de logs estaba casi siempre vacía (`N/A`) para eventos que no correspondían a un ID de proyecto específico. El usuario solicitó cambiarla por "Código" para desplegar el código interno del proyecto, o el código/email/nickname del usuario según correspondiera.
+- **Mejoras Implementadas:**
+  1. **Generación de PDF en Backend (QuestPDF):**
+     * Se implementó `GenerateAuditLogPdfAsync` en `ReportGeneratorService.cs` utilizando **QuestPDF** con el logo institucional de "VeriFinca" centrado y los datos del usuario emisor del reporte con la fecha y hora UTC.
+     * Se diseñó una tabla estilizada de logs con alternancia de colores e insignias de colores personalizadas para cada tipo de evento (creaciones, cargas de documentos, validaciones, etc.).
+     * El endpoint `/api/reports/global-audit` se modificó en `AdminAuditController.cs` para obtener el ID del usuario actual mediante los claims del contexto HTTP y llamar a `HandlePdfAsync` sirviendo el flujo del PDF generado.
+  2. **Columna "Código" e Identificadores Reales:**
+     * Se actualizó `AuditoriaRepository.cs` para incluir las relaciones de navegación `Proyecto` y `Usuario` (`.Include()`) en los queries filtrados.
+     * Se añadió la propiedad `Codigo` al DTO de auditoría (`AuditDto`) y se mapeó dinámicamente en los handlers de consulta (`GetGlobalAuditTrailQueryHandler.cs` y `GetProjectAuditTrailQueryHandler.cs`), resolviendo el código interno del proyecto o nickname/correo del usuario.
+     * Se renombró la columna en la interfaz web de "Proyecto" a "Código" y se renderiza `log.codigo` de forma nativa.
+     * Se revertieron los cambios accidentales en la lógica de mapeo de las columnas "Usuario" y "Evento" en el frontend para asegurar que se muestre la información descriptiva original sin alteraciones (como las descripciones de las acciones y el indicador de sistema).
+
+---
+
 ## Sesión 2026-08-24 — Unificación de Búsqueda Pública, Política de Cuotas y Auto-Scroll en Directorio (TDD + Ponytail)
 
 **Ciclo:** UI & Búsqueda Global / Frontend (`VerifySearchForm.tsx`, `HeroSection.tsx`, `VerifySearchForm.test.tsx`, `HeroSection.test.tsx`, `ProjectsPublicListPage.tsx`, `ProjectsPublicListPage.test.tsx`)

@@ -49,15 +49,32 @@ public class ProyectoRepository : IProyectoRepository
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var term = searchTerm.Trim().ToLower();
+            
+            DateTime? parsedDate = null;
+            if (term.Contains('/') || term.Contains('-'))
+            {
+                string[] formats = { "d/M/yyyy", "d-M-yyyy", "yyyy-MM-dd", "d/M", "d-M", "dd/MM/yyyy", "dd-MM-yyyy" };
+                if (DateTime.TryParseExact(term, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var tempDate))
+                {
+                    parsedDate = tempDate;
+                }
+                else if (DateTime.TryParse(term, out var tempDate2))
+                {
+                    parsedDate = tempDate2;
+                }
+            }
+
             query = query.Where(p =>
                 (p.Nombre != null && p.Nombre.ToLower().Contains(term)) ||
+                (p.CodigoInterno != null && p.CodigoInterno.ToLower().Contains(term)) ||
                 (p.DesignacionCatastral != null && p.DesignacionCatastral.ToLower().Contains(term)) ||
                 (p.Matricula != null && p.Matricula.ToLower().Contains(term)) ||
                 (p.UbicacionTexto != null && p.UbicacionTexto.ToLower().Contains(term)) ||
                 (p.UbicacionGps != null && p.UbicacionGps.ToLower().Contains(term)) ||
                 (p.DatosDesarrollador != null && p.DatosDesarrollador.ToLower().Contains(term)) ||
                 (p.RncDesarrollador != null && p.RncDesarrollador.ToLower().Contains(term)) ||
-                (p.CedulaRncPropietario != null && p.CedulaRncPropietario.ToLower().Contains(term)));
+                (p.CedulaRncPropietario != null && p.CedulaRncPropietario.ToLower().Contains(term)) ||
+                (parsedDate.HasValue && (p.CreatedAtUtc.Date == parsedDate.Value.Date || (p.UpdatedAtUtc.HasValue && p.UpdatedAtUtc.Value.Date == parsedDate.Value.Date))));
         }
 
         if (!string.IsNullOrWhiteSpace(estados))

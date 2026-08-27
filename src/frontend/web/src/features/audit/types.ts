@@ -10,6 +10,7 @@ export interface AuditDto {
   ipOrigen?: string;
   userAgent?: string;
   fechaEventoUtc: string;
+  codigo?: string;
 }
 
 export interface AuditFilters {

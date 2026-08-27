@@ -45,13 +45,18 @@ public class PublicProjectController : ControllerBase
     [ResponseCache(Duration = 120, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "q", "page", "pageSize" })]
     public async Task<IActionResult> Search([FromQuery] string? q, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, CancellationToken ct = default)
     {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+            ?? User.FindFirst("sub")?.Value;
+        Guid? loggedInUserId = string.IsNullOrEmpty(userIdClaim) ? null : Guid.Parse(userIdClaim);
+
         var query = new Application.Features.PublicConsulta.Queries.SearchPublicProjects.SearchPublicProjectsQuery
         {
             Query = q ?? "",
             Page = page,
             PageSize = pageSize,
             IpOrigen = HttpContext.Connection.RemoteIpAddress?.ToString(),
-            UserAgent = Request.Headers["User-Agent"].ToString()
+            UserAgent = Request.Headers["User-Agent"].ToString(),
+            UsuarioId = loggedInUserId
         };
 
         var result = await _searchHandler.Handle(query, ct);
