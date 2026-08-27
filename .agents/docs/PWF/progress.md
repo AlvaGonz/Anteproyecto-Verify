@@ -21,9 +21,10 @@
      * Accesibilidad completa en botones (`aria-label="Imprimir certificación"`, `aria-label="Descargar código QR en formato SVG"`).
      * Accesibilidad en QR (`data-testid="integrity-seal-qr"`, `aria-label="Código QR de verificación de integridad"`, `role="img"`).
      * Estado `data-print-ready="true"` habilitado una vez que los activos del sello y el código QR están listos.
-  4. **Pruebas Automatizadas TDD:**
-     * `e2e/projects/integrity-seal-print.spec.ts` y `tests/e2e/integrity-seal-print.spec.ts`: 7 pruebas E2E en Playwright validando renderizado completo, exclusión del layout admin en print media, ausencia de scroll horizontal, bounding box no recortado del QR y contenedor, atributo de preparación y tolerancia tras cambio de medios.
-     * `CertificationSection.test.tsx`: 3 pruebas unitarias en Vitest.
+  5. **Bypass de Acceso Público Vía Token QR y Conteo de Consultas (TDD + Ponytail):**
+     * En `CertificationSection.tsx`, se corrigió la codificación de la URL del QR para utilizar la ruta pública segura con token `/#/q/${qrToken}` en lugar del enlace privado administrativo `/#/p/${projectId}`.
+     * En `ProjectPublicDetailPage.tsx`, se normalizaron los campos del DTO de consulta pública (`nombreProyecto` -> `nombre`, `ubicacion` -> `ubicacionTexto`) y se configuró `gcTime: 0` en `qrQuery` para garantizar que cada escaneo/visita consulte y registre el acceso en tiempo real.
+     * Se implementaron pruebas unitarias backend (`GetPublicProjectStatusQueryHandlerTests.cs`) y E2E frontend (`integrity-seal-print.spec.ts`) validando que las visitas 1 a 3 a la URL del QR (`/#/q/:qrToken`) incrementan progresivamente el contador `Consultas Recibidas` en la pantalla administrativa de validaciones (`/admin/projects/:id/validations`).
 
 ---
 - **Problema Abordado:**
