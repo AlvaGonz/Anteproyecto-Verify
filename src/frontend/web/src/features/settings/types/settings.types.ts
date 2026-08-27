@@ -58,6 +58,7 @@ export interface CreateUserDto {
   role: "admin" | "user";
   telefono?: string;
   cedula?: string;
+  rnc?: string;
   password?: string;
   planNombre?: string;
 }
