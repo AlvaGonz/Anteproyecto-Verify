@@ -1,5 +1,22 @@
 # PWF Progress — VeriFinca
 
+## Sesión 2026-08-27 (II) — Corrección de Error 500 en Landing Page por Clave Foránea en Logs de Auditoría
+
+**Ciclo:** Backend & Base de Datos / Auditorías (`AuditoriaService.cs`, `PublicProjectController.cs`, `SearchPublicProjectsQueryHandler.cs`)
+**Estado:** ✅ COMPLETO — Compilación exitosa, contenedor de la API reconstruido, y verificación de landing page y buscador 100% verde en local sin excepciones (HTTP 200 OK).
+- **Problema Abordado:**
+  1. La Landing Page o búsquedas públicas realizadas por usuarios anónimos retornaban Error 500 (Internal Server Error) debido a una violación de clave foránea `FK_Auditorias_Usuario_UsuarioId` en la tabla `Auditorias` al intentar insertar el log de auditoría con un `UsuarioId` no nulo (procedente de tokens JWT locales antiguos o inválidos del navegador) pero inexistente en la base de datos `Usuario` (ej: tras una limpieza de base de datos local).
+- **Mejoras Implementadas:**
+  1. **Validación de Existencia de Usuario en `AuditoriaService.cs`:**
+     - Se inyectó `IUsuarioRepository` en `AuditoriaService`.
+     - En el método `Append`, se realiza una comprobación en la base de datos de la existencia del `UsuarioId` recibido.
+     - Si el `UsuarioId` no se encuentra en la base de datos, se reestablece a `null` de forma segura, permitiendo el guardado del log como una acción anónima/pública en lugar de arrojar una violación de clave foránea.
+  2. **Compilación y Despliegue en Docker:**
+     - Se validó la compilación del proyecto backend y se reconstruyó la imagen de Docker para la API (`api` service).
+     - Se verificó mediante un subagente de navegación que la landing page local y las búsquedas públicas ("residencial") cargan y operan con normalidad en `http://localhost:3000` devolviendo código HTTP 200 y sin errores de consola.
+
+---
+
 ## Sesión 2026-08-27 — Aislamiento y Corrección del Sello de Integridad ("Certificación Verificable") en Impresión y PDF
 
 **Ciclo:** Frontend / Certificaciones (`CertificationSection.tsx`, `CertificationQr.tsx`, `global.css`, `CertificationSection.test.tsx`, `integrity-seal-print.spec.ts`)

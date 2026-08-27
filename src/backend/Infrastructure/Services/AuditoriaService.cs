@@ -9,18 +9,37 @@ using Domain.Entities;
 public class AuditoriaService : IAuditLogger
 {
     private readonly IAuditoriaRepository _auditoriaRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public AuditoriaService(IAuditoriaRepository auditoriaRepository, IUnitOfWork unitOfWork)
+    public AuditoriaService(
+        IAuditoriaRepository auditoriaRepository,
+        IUsuarioRepository usuarioRepository,
+        IUnitOfWork unitOfWork)
     {
         _auditoriaRepository = auditoriaRepository;
+        _usuarioRepository = usuarioRepository;
         _unitOfWork = unitOfWork;
     }
 
     public async Task Append(AuditEntryDto entry, CancellationToken cancellationToken = default)
     {
+        System.Guid? usuarioId = entry.UsuarioId;
+        if (usuarioId.HasValue && usuarioId.Value != System.Guid.Empty)
+        {
+            var user = await _usuarioRepository.GetByIdAsync(usuarioId.Value, cancellationToken);
+            if (user == null)
+            {
+                usuarioId = null;
+            }
+        }
+        else
+        {
+            usuarioId = null;
+        }
+
         var auditoria = new Auditoria(
-            entry.UsuarioId,
+            usuarioId,
             entry.TipoOperacion,
             entry.Accion,
             entry.Resultado,
