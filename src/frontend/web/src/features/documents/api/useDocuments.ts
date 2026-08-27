@@ -33,11 +33,11 @@ const mapApiDocument = (apiDoc: ApiDocumentoDto): DocumentDto => ({
   fileUrl: apiDoc.fileUrl,
 });
 
-export const useDocuments = (projectId: string) =>
+export const useDocuments = (projectId: string, options?: { enabled?: boolean }) =>
   useQuery({
     queryKey: documentKeys.byProject(projectId),
     queryFn: () => apiClient.get<ApiDocumentoDto[]>(`/projects/${projectId}/documents`).then(res => res.data.map(mapApiDocument)),
-    enabled: !!projectId,
+    enabled: options?.enabled !== undefined ? (options.enabled && !!projectId) : !!projectId,
     staleTime: 0,
     refetchOnMount: true,
   });

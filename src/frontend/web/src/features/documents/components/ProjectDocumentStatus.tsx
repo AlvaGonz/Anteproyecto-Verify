@@ -41,7 +41,10 @@ import {
 } from "../utils/confidenceLevel";
 
 export const ProjectDocumentStatus: React.FC<ProjectDocumentStatusProps> = ({ projectId, preloadedDocuments }) => {
-  const { data: fetchedDocuments = [], isLoading: loading } = useDocuments(projectId || "");
+  const { data: fetchedDocuments = [], isLoading: loading } = useDocuments(
+    projectId || "",
+    { enabled: !preloadedDocuments && !!projectId }
+  );
 
   const documents = preloadedDocuments ?? fetchedDocuments;
 

@@ -279,23 +279,55 @@ test.describe('Integrity Seal Print & PDF Output', () => {
     await expect(qrElement).toBeVisible();
   });
 
-  test('9. Unauthenticated visitor scanning QR bypasses login and views project via /#/q/:qrToken', async ({ page }) => {
-    // No auth cookies or localStorage
+  test('9. Unauthenticated visitor scanning QR bypasses login and views project via /#/q/:qrToken with publisher details and specs', async ({ page }) => {
+    const consoleErrors: string[] = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    // Mock public QR endpoint with rich details
     await page.route(`**/api/public/projects/qr/${encodeURIComponent(qrToken)}`, async (route) => {
       await route.fulfill({
         status: 200,
         json: {
           id: SEALED_PROJECT_ID,
           codigoPublico: sealCode,
-          nombreProyecto: 'Torre Residencial Vista Real',
-          ubicacion: 'Santo Domingo, Distrito Nacional',
+          codigoInterno: 'VF-SEAL-ACTIVE',
+          nombreProyecto: 'Villa Santiago 116',
+          nombre: 'Villa Santiago 116',
+          ubicacion: 'Puerto Plata, RD',
+          ubicacionTexto: 'Puerto Plata, RD',
+          datosDesarrollador: 'Constructora del Norte',
+          valorEstimado: 4500000,
+          superficieM2: 250.5,
+          categoriaNombre: 'Residencial',
+          createdAtUtc: '2026-01-01T00:00:00Z',
           estadoValidacion: 'PUBLICADO',
           fechaEmision: '2026-08-01T00:00:00Z',
+          registradoPor: {
+            id: 'user-001',
+            nombreCompleto: 'Maria Almonte',
+            razonSocial: 'Inmobiliaria Almonte SRL',
+            rol: 'Professional',
+            email: 'maria@inmobiliaria.com',
+            telefono: '8095551234',
+            avatarUrl: null,
+            fechaRegistro: '2026-01-01T00:00:00Z',
+            verificado: true,
+            presentacionPublica: {
+              nombreMostrado: 'Maria Almonte',
+              identificacionMostrada: '001-0000000-1',
+              identificacionTipo: 'cedula',
+              razonSocialMostrada: 'Inmobiliaria Almonte SRL'
+            }
+          },
           resumenDimensiones: [
             { dimension: 'TitularidadInmueble', resultado: 'Verificado' },
             { dimension: 'LicenciaConstruccion', resultado: 'Verificado' }
           ],
-          documentosPublicos: []
+          documentos: []
         }
       });
     });
@@ -304,9 +336,24 @@ test.describe('Integrity Seal Print & PDF Output', () => {
     await page.goto(`http://localhost:3000/#/q/${encodeURIComponent(qrToken)}`);
 
     // Should load project name directly without redirecting to /login
-    await expect(page.getByText('Torre Residencial Vista Real').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Villa Santiago 116').first()).toBeVisible({ timeout: 15000 });
     expect(page.url()).toContain(`/#/q/${encodeURIComponent(qrToken)}`);
     expect(page.url()).not.toContain('/login');
+
+    // Assert publisher / registrant details card is visible
+    await expect(page.getByText('Responsable Registral')).toBeVisible();
+    await expect(page.getByTestId('public-registrant-name')).toContainText('Maria Almonte');
+    await expect(page.getByTestId('public-registrant-razon-social').first()).toContainText('Inmobiliaria Almonte SRL');
+    await expect(page.getByText('maria@inmobiliaria.com')).toBeVisible();
+    await expect(page.getByText('8095551234').first()).toBeVisible();
+
+    // Assert technical specs are visible
+    await expect(page.getByText('Constructora del Norte')).toBeVisible();
+    await expect(page.getByText('250.5 m²')).toBeVisible();
+
+    // Verify no 401 unauthorized console errors were generated
+    const unauthorizedErrors = consoleErrors.filter(e => e.includes('401'));
+    expect(unauthorizedErrors).toHaveLength(0);
   });
 
   test('10. Access count increments with 1 to 3 visits and displays updated count on admin validations page', async ({ page }) => {

@@ -206,7 +206,7 @@ export const MySubscriptionStatusSchema = z.object({
 
 export type MySubscriptionStatus = z.infer<typeof MySubscriptionStatusSchema>;
 
-export const useMySubscription = (options?: { refetchInterval?: number }) =>
+export const useMySubscription = (options?: { refetchInterval?: number; enabled?: boolean }) =>
   useQuery<MySubscriptionStatus>({
     queryKey: ["subscription", "my-status"],
     queryFn: async () => {
@@ -218,6 +218,7 @@ export const useMySubscription = (options?: { refetchInterval?: number }) =>
         throw err;
       }
     },
+    enabled: options?.enabled ?? true,
     staleTime: 0,
     gcTime: 1000 * 30,
     refetchOnWindowFocus: true,
@@ -225,8 +226,8 @@ export const useMySubscription = (options?: { refetchInterval?: number }) =>
     retry: 1,
   });
 
-export const usePlanLimits = () => {
-  const { data, isLoading, isError, refetch } = useMySubscription();
+export const usePlanLimits = (options?: { enabled?: boolean }) => {
+  const { data, isLoading, isError, refetch } = useMySubscription({ enabled: options?.enabled });
   
   return {
     planLimits: data?.planLimits ?? null,

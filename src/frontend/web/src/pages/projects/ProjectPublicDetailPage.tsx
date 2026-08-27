@@ -128,7 +128,7 @@ export const ProjectPublicDetailPage: React.FC = () => {
   const [showQuotaModal, setShowQuotaModal] = React.useState(false);
   const [quotaError, setQuotaError] = React.useState<{ used?: number; max?: number } | null>(null);
   const isAdmin = user?.role === "admin" || user?.role === "owner";
-  const { planLimits, isLoading: planLimitsLoading } = usePlanLimits();
+  const { planLimits, isLoading: planLimitsLoading } = usePlanLimits({ enabled: isAuthenticated && !isQrAccess });
   const quotaHandledRef = React.useRef(false);
 
   // Parse GPS coordinates
