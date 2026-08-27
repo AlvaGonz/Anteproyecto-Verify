@@ -281,11 +281,16 @@ public static class AppDbContextSeeder
                     var csvRows = ParseCsv(csvPath);
                     var proyectoEntitiesList = new List<Proyecto>();
 
-                    var freemiumId = freemiumUser.Id;
-
                     // Mapeo de IDs de usuario en CSV a entidades en base de datos (USANDO LOS ID REALES DE LA BD)
+                    // El CSV contiene los IdUsuario reales de los usuarios creados/obtenidos anteriormente.
                     var userMapping = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase)
                     {
+                        { consultorUser.Id.ToString(), consultorUser.Id },     // Consultor
+                        { profesionalUser.Id.ToString(), profesionalUser.Id }, // Profesional
+                        { empresaUser.Id.ToString(), empresaUser.Id },         // Empresa
+                        { corporativoUser.Id.ToString(), corporativoUser.Id }, // Corporativo
+                        { freemiumUser.Id.ToString(), freemiumUser.Id }        // Freemium
+                    };
                         // Current CSV GUIDs
                         { "2BC69554-6440-4B0E-A9B5-18757599EE1C", consultorUser.Id },
                         { "EE7DAFEA-A030-4959-A55E-4C40DBBE91A7", profesionalUser.Id },
@@ -374,11 +379,17 @@ public static class AppDbContextSeeder
                         { "8006e230-79a0-40b7-ad3b-b399b564f8f8", ProjectStatusCodes.Publicado },
                         { "4f756062-8e28-4907-b633-c6285ce2c5e5", ProjectStatusCodes.Revision },
                         { "0694d868-a8ae-42ff-8f88-58e75f4034d2", ProjectStatusCodes.Editado },
-                        { "4793e761-8e4a-4414-b64b-ba71ff57eeb5", ProjectStatusCodes.Creado }
+                        { "4793e761-8e4a-4414-b64b-ba71ff57eeb5", ProjectStatusCodes.Creado },
+                        { "e82f586d-b007-4f1f-b6cc-3ff2acb5442a", ProjectStatusCodes.Observacion }
                     };
 
                     foreach (var row in csvRows)
                     {
+                        var codigoInterno = row["CodigoInterno"];
+                        var nombre = row["NombreProyecto"];
+                        var ubicacionTexto = row["UbicacionTexto"];
+
+                        var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
                         var codigoInterno = row.TryGetValue("CodigoInterno", out var codVal) ? codVal : "";
                         if (string.IsNullOrWhiteSpace(codigoInterno)) continue;
                         
@@ -401,6 +412,19 @@ public static class AppDbContextSeeder
 
                         var csvStateId = row.TryGetValue("EstadoId", out var sVal) ? sVal : "";
                         var stateCode = stateMapping.TryGetValue(csvStateId, out var mappedCode) ? mappedCode : ProjectStatusCodes.Publicado;
+                        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode);
+
+                        var existingProj = await context.Proyectos.FirstOrDefaultAsync(p => p.CodigoInterno == codigoInterno);
+                        if (existingProj != null)
+                        {
+                            // Reasignar/actualizar el proyecto existente para reflejar el reparto del CSV
+                            if (existingProj.UsuarioCreadorId != creatorId)
+                                existingProj.ReasignarUsuario(creatorId);
+                            if (estado != null && existingProj.Estado == null || (estado != null && existingProj.Estado != null && existingProj.EstadoId != estado.Id))
+                                existingProj.UpdateEstado(estado);
+                            proyectoEntitiesList.Add(existingProj);
+                            continue;
+                        }
                         var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode)
                                      ?? await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == ProjectStatusCodes.Publicado);
 
