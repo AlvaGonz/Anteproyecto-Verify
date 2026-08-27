@@ -1,9 +1,30 @@
 # PWF Progress — VeriFinca
 
-## Sesión 2026-08-27 — Corrección de Exportación de Logs a PDF y Columna de Código en Historial
+## Sesión 2026-08-27 — Aislamiento y Corrección del Sello de Integridad ("Certificación Verificable") en Impresión y PDF
 
-**Ciclo:** Reportes & Auditoría (`ReportGeneratorService.cs`, `AdminAuditController.cs`, `ExportGlobalAuditTrailQueryHandler.cs`, `GetProjectAuditTrailQueryHandler.cs`, `AuditLogPage.tsx`, `types.ts`, `IReportGenerator.cs`, `AuditoriaRepository.cs`)
-**Estado:** ✅ COMPLETO — Compilación exitosa, contenedor de API Docker recreado e iniciado en vivo.
+**Ciclo:** Frontend / Certificaciones (`CertificationSection.tsx`, `CertificationQr.tsx`, `global.css`, `CertificationSection.test.tsx`, `integrity-seal-print.spec.ts`)
+**Estado:** ✅ COMPLETO — 100% Verde en TDD (Vitest unit tests 5/5 passed, Playwright E2E 7/7 tests passed con trazas y comprobaciones de aislamiento/bounding box).
+- **Problema Abordado:**
+  1. Al invocar "Imprimir" / generar PDF en la sección de "Certificación Verificable" del proyecto (`/admin/projects/:id/validations`), el diálogo del navegador y PDF resultante imprimían el layout completo administrativo (`AdminLayout`, barra lateral, encabezados, botones, scrollbars).
+  2. Debido a los contenedores con `h-[100dvh] overflow-hidden` y `max-w-7xl` del shell administrativo, el sello de integridad quedaba recortado con scroll horizontal y vertical, perdiendo legibilidad del código QR y metadatos.
+- **Mejoras Implementadas:**
+  1. **Aislamiento de Raíz de Impresión (`data-testid="integrity-seal-print-root"`):**
+     * Se separó la vista de pantalla (`integrity-seal-screen`) de la representación imprimible dedicada (`integrity-seal-print`).
+     * Se diseñó un certificado formal con marco perimetral, membrete institucional ("VERIFINCA — Certificación Verificable de Integridad"), metadatos completos del proyecto (`project.nombre`, `project.codigoInterno`, código de validación, estado de integridad, fechas formateadas UTC, consultas registradas, aviso legal bajo Ley 126-02 y Ley 172-13).
+  2. **Reglas de Impresión CSS (@media print y @page):**
+     * Configuración `@page { size: A4 portrait; margin: 12mm; }`.
+     * Desactivación de restricciones de altura y overflow en `#root`, `.admin-layout`, `main`, y contenedores.
+     * Ocultamiento automático de sidebar, barra de navegación, botones, diálogos y controles interactivos (`display: none !important; visibility: hidden !important;`).
+     * Posicionamiento absoluto y expansión al 100% de `.integrity-seal-print` evitando desbordamiento y saltos de página partidos (`break-inside: avoid; page-break-inside: avoid;`).
+  3. **Accesibilidad y Atributo de Disponibilidad de Impresión (`data-print-ready="true"`):**
+     * Accesibilidad completa en botones (`aria-label="Imprimir certificación"`, `aria-label="Descargar código QR en formato SVG"`).
+     * Accesibilidad en QR (`data-testid="integrity-seal-qr"`, `aria-label="Código QR de verificación de integridad"`, `role="img"`).
+     * Estado `data-print-ready="true"` habilitado una vez que los activos del sello y el código QR están listos.
+  4. **Pruebas Automatizadas TDD:**
+     * `e2e/projects/integrity-seal-print.spec.ts` y `tests/e2e/integrity-seal-print.spec.ts`: 7 pruebas E2E en Playwright validando renderizado completo, exclusión del layout admin en print media, ausencia de scroll horizontal, bounding box no recortado del QR y contenedor, atributo de preparación y tolerancia tras cambio de medios.
+     * `CertificationSection.test.tsx`: 3 pruebas unitarias en Vitest.
+
+---
 - **Problema Abordado:**
   1. El botón "Exportar Logs" en la pantalla de auditoría (`/admin/audit-log`) descargaba un CSV y forzaba la extensión `.pdf` en el guardado del cliente frontend, generando un PDF corrupto e ilegible.
   2. La columna "Proyecto" en la tabla de logs estaba casi siempre vacía (`N/A`) para eventos que no correspondían a un ID de proyecto específico. El usuario solicitó cambiarla por "Código" para desplegar el código interno del proyecto, o el código/email/nickname del usuario según correspondiera.
