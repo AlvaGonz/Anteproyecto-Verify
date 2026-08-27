@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- Municipio — Static reference data (158 municipalities of Dominican Republic)
 -- Source: OCHA COD-AB (HDX) - https://data.humdata.org/dataset/cod-ab-dom
 -- Coordinates extracted from do.json (2026-06-27)
