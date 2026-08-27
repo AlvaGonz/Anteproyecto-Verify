@@ -262,7 +262,11 @@ public static class AppDbContextSeeder
             {
                 string? csvPath = null;
                 
-                if (File.Exists(specificCsvPath))
+                if (File.Exists("/src/Bots/ProyectosInmobiliarios/ProyectosInmobiliarios_20260814_085516.csv"))
+                {
+                    csvPath = "/src/Bots/ProyectosInmobiliarios/ProyectosInmobiliarios_20260814_085516.csv";
+                }
+                else if (File.Exists(specificCsvPath))
                 {
                     csvPath = specificCsvPath;
                 }
@@ -282,6 +286,14 @@ public static class AppDbContextSeeder
                     // Mapeo de IDs de usuario en CSV a entidades en base de datos (USANDO LOS ID REALES DE LA BD)
                     var userMapping = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase)
                     {
+                        // Current CSV GUIDs
+                        { "2BC69554-6440-4B0E-A9B5-18757599EE1C", consultorUser.Id },
+                        { "EE7DAFEA-A030-4959-A55E-4C40DBBE91A7", profesionalUser.Id },
+                        { "09E58353-1699-45B6-8275-EBE259250170", empresaUser.Id },
+                        { "8B5288AF-FF7B-41C1-9E6A-FCE656831EAA", corporativoUser.Id },
+                        { "FBC9BA82-5E4C-4EBF-98A1-FCA54900E106", freemiumUser.Id },
+
+                        // Legacy CSV GUIDs
                         { "097be5ae-8f40-4385-a204-de294b449940", consultorUser.Id }, // Consultor
                         { "e0f6d53b-b148-4665-b4b1-f2554452247c", profesionalUser.Id }, // Profesional
                         { "3aacec34-f910-4ad4-8cc2-3010a6721b88", empresaUser.Id }, // Empresa
@@ -297,17 +309,17 @@ public static class AppDbContextSeeder
                     
                     foreach (var row in csvRows)
                     {
-                        var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
-                        var csvStateId = row.ContainsKey("EstadoId") ? row["EstadoId"] : "";
+                        var csvUserId = row.TryGetValue("IdUsuario", out var uId) ? uId : "";
+                        var csvStateId = row.TryGetValue("EstadoId", out var sId) ? sId : "";
                         
                         if (csvUserId.Equals("097be5ae-8f40-4385-a204-de294b449940", StringComparison.OrdinalIgnoreCase)) // Consultor
                         {
-                            bool isPublicado = csvStateId.Equals("8006e230-79a0-40b7-ad3b-b399b564f8f8", StringComparison.OrdinalIgnoreCase);
+                            bool isPublicado = csvStateId.Equals("8006e230-79a0-40b7-ad3b-b399b564f8f8", StringComparison.OrdinalIgnoreCase) || csvStateId.Equals("EC57F714-E4BA-425D-906C-F7D8BEB9D1E8", StringComparison.OrdinalIgnoreCase);
                             if (consultorCount >= 1 || (!isPublicado && consultorCount == 0)) 
                             {
                                 // Mover excedente o no publicado a Corporativo o Freemium
                                 if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
-                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
+                                else { row["IdUsuario"] = "8B5288AF-FF7B-41C1-9E6A-FCE656831EAA"; }
                             }
                             else
                             {
@@ -319,7 +331,7 @@ public static class AppDbContextSeeder
                             if (profesionalCount >= 5)
                             {
                                 if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
-                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
+                                else { row["IdUsuario"] = "8B5288AF-FF7B-41C1-9E6A-FCE656831EAA"; }
                             }
                             else
                             {
@@ -331,7 +343,7 @@ public static class AppDbContextSeeder
                             if (empresaCount >= 10)
                             {
                                 if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
-                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
+                                else { row["IdUsuario"] = "8B5288AF-FF7B-41C1-9E6A-FCE656831EAA"; }
                             }
                             else
                             {
@@ -351,6 +363,14 @@ public static class AppDbContextSeeder
                     // Mapeo de IDs de estado en CSV a códigos de estado
                     var stateMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                     {
+                        // Current CSV GUIDs
+                        { "EC57F714-E4BA-425D-906C-F7D8BEB9D1E8", ProjectStatusCodes.Publicado },
+                        { "7A58C470-924E-444A-B375-90AEF22AAA17", ProjectStatusCodes.Revision },
+                        { "1F8F8E74-FC08-49F8-9BF2-07D44DF45E13", ProjectStatusCodes.Creado },
+                        { "3CD6BB60-6785-47D6-9C62-2F85AFA735EB", ProjectStatusCodes.Editado },
+                        { "C97EFC82-142A-427C-9436-48543EB172AB", ProjectStatusCodes.Observacion },
+
+                        // Legacy GUIDs
                         { "8006e230-79a0-40b7-ad3b-b399b564f8f8", ProjectStatusCodes.Publicado },
                         { "4f756062-8e28-4907-b633-c6285ce2c5e5", ProjectStatusCodes.Revision },
                         { "0694d868-a8ae-42ff-8f88-58e75f4034d2", ProjectStatusCodes.Editado },
@@ -359,7 +379,8 @@ public static class AppDbContextSeeder
 
                     foreach (var row in csvRows)
                     {
-                        var codigoInterno = row["CodigoInterno"];
+                        var codigoInterno = row.TryGetValue("CodigoInterno", out var codVal) ? codVal : "";
+                        if (string.IsNullOrWhiteSpace(codigoInterno)) continue;
                         
                         var existingProj = await context.Proyectos.FirstOrDefaultAsync(p => p.CodigoInterno == codigoInterno);
                         if (existingProj != null)
@@ -368,19 +389,20 @@ public static class AppDbContextSeeder
                             continue;
                         }
 
-                        var nombre = row["NombreProyecto"];
-                        var ubicacionTexto = row["UbicacionTexto"];
+                        var nombre = row.TryGetValue("NombreProyecto", out var nVal) && !string.IsNullOrWhiteSpace(nVal) ? nVal : "Proyecto " + codigoInterno;
+                        var ubicacionTexto = row.TryGetValue("UbicacionTexto", out var uVal) && !string.IsNullOrWhiteSpace(uVal) ? uVal : "Santo Domingo, República Dominicana";
                         
-                        var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
+                        var csvUserId = row.TryGetValue("IdUsuario", out var uIdVal) ? uIdVal : "";
                         var creatorId = userMapping.TryGetValue(csvUserId, out var mappedUserId) ? mappedUserId : corporativoUser.Id; // Corporativo por defecto
 
-                        var categoria = int.TryParse(row["CategoriaId"], out var catVal) ? catVal : 3;
-                        var dev = row["DatosDesarrollador"];
-                        var cat = row["DesignacionCatastral"];
+                        var categoria = int.TryParse(row.TryGetValue("CategoriaId", out var cVal) ? cVal : "", out var catVal) ? catVal : 3;
+                        var dev = row.TryGetValue("DatosDesarrollador", out var dVal) ? dVal : "";
+                        var cat = row.TryGetValue("DesignacionCatastral", out var dcVal) ? dcVal : "";
 
-                        var csvStateId = row["EstadoId"];
+                        var csvStateId = row.TryGetValue("EstadoId", out var sVal) ? sVal : "";
                         var stateCode = stateMapping.TryGetValue(csvStateId, out var mappedCode) ? mappedCode : ProjectStatusCodes.Publicado;
-                        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode);
+                        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode)
+                                     ?? await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == ProjectStatusCodes.Publicado);
 
                         var proyecto = new Proyecto(nombre, ubicacionTexto, creatorId, categoria, dev, cat);
                         if (estado != null)
@@ -388,32 +410,35 @@ public static class AppDbContextSeeder
                             proyecto.UpdateEstado(estado);
                         }
 
-                        decimal.TryParse(row["SuperficieM2"], out var superficie);
-                        decimal.TryParse(row["ValorEstimado"], out var valor);
-                        var propietario = row.ContainsKey("Propietario") ? row["Propietario"] : "";
-                        var cedulaRncPropietario = row.ContainsKey("CedulaRncPropietario") ? row["CedulaRncPropietario"] : "";
-                        var ipi = row.ContainsKey("Ipi") ? row["Ipi"] : "";
+                        decimal.TryParse(row.TryGetValue("SuperficieM2", out var supVal) ? supVal : "", NumberStyles.Any, CultureInfo.InvariantCulture, out var superficie);
+                        decimal.TryParse(row.TryGetValue("ValorEstimado", out var valVal) ? valVal : "", NumberStyles.Any, CultureInfo.InvariantCulture, out var valor);
+                        var propietario = row.TryGetValue("Propietario", out var pVal) ? pVal : "";
+                        var cedulaRncPropietario = row.TryGetValue("CedulaRncPropietario", out var crpVal) ? crpVal : "";
+                        var ipi = row.TryGetValue("Ipi", out var ipiVal) ? ipiVal : "";
+                        var gps = row.TryGetValue("UbicacionGps", out var gpsVal) ? gpsVal : "";
 
                         proyecto.UpdateDetails(
                             nombre: nombre,
                             ubicacionTexto: ubicacionTexto,
-                            ubicacionGps: row["UbicacionGps"],
-                            valorEstimado: valor,
+                            ubicacionGps: string.IsNullOrWhiteSpace(gps) ? null : gps,
+                            valorEstimado: valor > 0 ? valor : null,
                             categoriaId: categoria,
-                            datosDesarrollador: dev,
-                            designacionCatastral: cat,
-                            propietario: propietario,
-                            cedulaRncPropietario: cedulaRncPropietario,
-                            ipi: ipi,
-                            superficieM2: superficie
+                            datosDesarrollador: string.IsNullOrWhiteSpace(dev) ? null : dev,
+                            designacionCatastral: string.IsNullOrWhiteSpace(cat) ? null : cat,
+                            propietario: string.IsNullOrWhiteSpace(propietario) ? null : propietario,
+                            cedulaRncPropietario: string.IsNullOrWhiteSpace(cedulaRncPropietario) ? null : cedulaRncPropietario,
+                            ipi: string.IsNullOrWhiteSpace(ipi) ? null : ipi,
+                            superficieM2: superficie > 0 ? superficie : null
                         );
 
-                        proyecto.UpdateRncYMatricula(row["RncDesarrollador"], row["Matricula"]);
+                        var rncDev = row.TryGetValue("RncDesarrollador", out var rncVal) ? rncVal : null;
+                        var mat = row.TryGetValue("Matricula", out var matVal) ? matVal : null;
+                        proyecto.UpdateRncYMatricula(rncDev, mat);
 
-                        if (DateTime.TryParse(row["CreatedAtUtc"], out var createdDate))
+                        if (DateTime.TryParse(row.TryGetValue("CreatedAtUtc", out var crtVal) ? crtVal : "", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var createdDate))
                         {
                             proyecto.CreatedAtUtc = createdDate;
-                            proyecto.UpdatedAtUtc = DateTime.TryParse(row["UpdatedAtUtc"], out var updatedDate) ? updatedDate : createdDate;
+                            proyecto.UpdatedAtUtc = DateTime.TryParse(row.TryGetValue("UpdatedAtUtc", out var updVal) ? updVal : "", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var updatedDate) ? updatedDate : createdDate;
                         }
 
                         context.Proyectos.Add(proyecto);
@@ -1633,29 +1658,40 @@ WHERE NOT EXISTS (
         return files.OrderByDescending(f => File.GetCreationTime(f)).First();
     }
 
+    private static readonly string[] DefaultProyectoCsvHeaders = new[]
+    {
+        "IdProyecto", "CodigoInterno", "NombreProyecto", "UbicacionTexto", "UbicacionGps",
+        "ValorEstimado", "DatosDesarrollador", "RncDesarrollador", "Matricula", "CategoriaId",
+        "DesignacionCatastral", "EstadoJuridico", "EstadoIntegridad", "SelladoBloqueado", "IdUsuario",
+        "CreatedAtUtc", "UpdatedAtUtc", "ImagenUrl", "Propietario", "CedulaRncPropietario",
+        "Ipi", "EstatusIpi", "SuperficieM2", "ImagenAdicional1", "ImagenAdicional2",
+        "ImagenAdicional3", "ImagenAdicional4", "ImagenAdicional5", "EstadoId", "ProvinciaId"
+    };
+
     private static List<Dictionary<string, string>> ParseCsv(string csvPath)
     {
         var result = new List<Dictionary<string, string>>();
+        if (!File.Exists(csvPath)) return result;
         var lines = File.ReadAllLines(csvPath);
         if (lines.Length == 0) return result;
 
-        var headers = lines[0].Split('|').Select(h => h.Trim()).ToArray();
-        for (int i = 1; i < lines.Length; i++)
+        var firstLine = lines[0].Trim();
+        var firstParts = firstLine.Split('|').Select(h => h.Trim()).ToArray();
+        
+        bool hasHeader = firstParts.Any(p => p.Equals("CodigoInterno", StringComparison.OrdinalIgnoreCase) || p.Equals("NombreProyecto", StringComparison.OrdinalIgnoreCase) || p.Equals("IdProyecto", StringComparison.OrdinalIgnoreCase));
+        
+        string[] headers = hasHeader ? firstParts : DefaultProyectoCsvHeaders;
+        int startIndex = hasHeader ? 1 : 0;
+
+        for (int i = startIndex; i < lines.Length; i++)
         {
             var line = lines[i].Trim();
             if (string.IsNullOrWhiteSpace(line)) continue;
             var values = line.Split('|').Select(v => v.Trim()).ToArray();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             for (int j = 0; j < headers.Length; j++)
             {
-                if (j < values.Length)
-                {
-                    dict[headers[j]] = values[j];
-                }
-                else
-                {
-                    dict[headers[j]] = "";
-                }
+                dict[headers[j]] = j < values.Length ? values[j] : "";
             }
             result.Add(dict);
         }
