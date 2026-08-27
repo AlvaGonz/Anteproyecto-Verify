@@ -35,8 +35,13 @@ public class ExportGlobalAuditTrailQueryHandler
 
         foreach (var log in orderedLogs)
         {
-            var detalle = log.Detalle?.Replace("\"", "\"\"") ?? "";
-            csvBuilder.AppendLine($"{log.Id},{log.ProyectoId},{log.FechaEventoUtc:O},{log.TipoEvento},{log.Accion},{log.Entidad},{log.EntidadId},{log.UsuarioId},\"{detalle}\"");
+            string resolvedDetalle = "Éxito";
+            var val = (log.Resultado ?? log.Detalle ?? "").ToLower();
+            if (val.Contains("fallo") || val.Contains("falló") || val.Contains("fallido") || val.Contains("error") || val.Contains("fail") || val.Contains("throttled") || val.Contains("incorrecto"))
+            {
+                resolvedDetalle = "Fallido";
+            }
+            csvBuilder.AppendLine($"{log.Id},{log.ProyectoId},{log.FechaEventoUtc:O},{log.TipoEvento},{log.Accion},{log.Entidad},{log.EntidadId},{log.UsuarioId},\"{resolvedDetalle}\"");
         }
 
         return Encoding.UTF8.GetBytes(csvBuilder.ToString());
@@ -77,6 +82,13 @@ public class ExportGlobalAuditTrailQueryHandler
                 codigo = a.EntidadId.Length > 8 ? a.EntidadId.Substring(0, 8) : a.EntidadId;
             }
 
+            string resolvedDetalle = "Éxito";
+            var val = (a.Resultado ?? a.Detalle ?? "").ToLower();
+            if (val.Contains("fallo") || val.Contains("falló") || val.Contains("fallido") || val.Contains("error") || val.Contains("fail") || val.Contains("throttled") || val.Contains("incorrecto"))
+            {
+                resolvedDetalle = "Fallido";
+            }
+
             return new Application.DTOs.Audit.AuditDto(
                 a.Id,
                 a.ProyectoId,
@@ -85,7 +97,7 @@ public class ExportGlobalAuditTrailQueryHandler
                 a.Accion,
                 a.Entidad,
                 a.EntidadId,
-                a.Detalle,
+                resolvedDetalle,
                 a.IpOrigen,
                 a.UserAgent,
                 a.FechaEventoUtc,

@@ -49,6 +49,13 @@ public class GetGlobalAuditTrailQueryHandler
                 codigo = a.EntidadId.Length > 8 ? a.EntidadId.Substring(0, 8) : a.EntidadId;
             }
 
+            string resolvedDetalle = "Éxito";
+            var val = (a.Resultado ?? a.Detalle ?? "").ToLower();
+            if (val.Contains("fallo") || val.Contains("falló") || val.Contains("fallido") || val.Contains("error") || val.Contains("fail") || val.Contains("throttled") || val.Contains("incorrecto"))
+            {
+                resolvedDetalle = "Fallido";
+            }
+
             return new AuditDto(
                 a.Id,
                 a.ProyectoId,
@@ -57,7 +64,7 @@ public class GetGlobalAuditTrailQueryHandler
                 a.Accion,
                 a.Entidad,
                 a.EntidadId,
-                a.Detalle,
+                resolvedDetalle,
                 a.IpOrigen,
                 a.UserAgent,
                 a.FechaEventoUtc,

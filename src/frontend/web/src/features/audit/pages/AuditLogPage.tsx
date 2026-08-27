@@ -25,6 +25,15 @@ const getStatusBadge = (tipoEvento: string) => {
   }
 };
 
+const getDetalleBadge = (detalle: string) => {
+  const isFallido = (detalle || "").toLowerCase().includes("fallido");
+  if (isFallido) {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">Fallido</span>;
+  }
+  return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold">Éxito</span>;
+};
+
+
 export const AuditLogPage: React.FC = () => {
   const [filters, setFilters] = useState<AuditFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,7 +72,7 @@ export const AuditLogPage: React.FC = () => {
       tipoEvento: l.accion || "General",
       usuarioId: l.idUsuario ? String(l.idUsuario) : null,
       userEmail: l.nombreUsuario || "Desconocido",
-      detalle: l.descripcion || "Sin detalles",
+      detalle: l.detalle || "Éxito",
       codigo: l.codigo || "N/A",
     })) as unknown as AuditDto[];
 
@@ -218,9 +227,7 @@ export const AuditLogPage: React.FC = () => {
                       {log.codigo || "N/A"}
                     </td>
                     <td className="px-8 py-5">
-                      <p className="text-sm text-text-secondary font-medium max-w-md truncate md:whitespace-normal group-hover:text-secondary transition-colors">
-                        {log.detalle}
-                      </p>
+                      {getDetalleBadge(log.detalle)}
                     </td>
                   </tr>
                 ))

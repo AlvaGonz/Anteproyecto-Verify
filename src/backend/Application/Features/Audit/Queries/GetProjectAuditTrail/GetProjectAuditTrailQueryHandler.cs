@@ -38,19 +38,28 @@ public class GetProjectAuditTrailQueryHandler
             query = query.Where(a => a.FechaEventoUtc <= toDate.Value);
         }
 
-        return query.OrderByDescending(a => a.FechaEventoUtc).Select(a => new AuditDto(
-            a.Id,
-            a.ProyectoId,
-            a.UsuarioId,
-            a.TipoEvento,
-            a.Accion,
-            a.Entidad,
-            a.EntidadId,
-            a.Detalle,
-            a.IpOrigen,
-            a.UserAgent,
-            a.FechaEventoUtc,
-            a.Proyecto != null ? a.Proyecto.CodigoInterno : "N/A"
-        ));
+        return query.OrderByDescending(a => a.FechaEventoUtc).ToList().Select(a => {
+            string resolvedDetalle = "Éxito";
+            var val = (a.Resultado ?? a.Detalle ?? "").ToLower();
+            if (val.Contains("fallo") || val.Contains("falló") || val.Contains("fallido") || val.Contains("error") || val.Contains("fail") || val.Contains("throttled") || val.Contains("incorrecto"))
+            {
+                resolvedDetalle = "Fallido";
+            }
+
+            return new AuditDto(
+                a.Id,
+                a.ProyectoId,
+                a.UsuarioId,
+                a.TipoEvento,
+                a.Accion,
+                a.Entidad,
+                a.EntidadId,
+                resolvedDetalle,
+                a.IpOrigen,
+                a.UserAgent,
+                a.FechaEventoUtc,
+                a.Proyecto != null ? a.Proyecto.CodigoInterno : "N/A"
+            );
+        });
     }
 }
