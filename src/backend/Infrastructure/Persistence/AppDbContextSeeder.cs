@@ -289,8 +289,8 @@ public static class AppDbContextSeeder
                         { profesionalUser.Id.ToString(), profesionalUser.Id }, // Profesional
                         { empresaUser.Id.ToString(), empresaUser.Id },         // Empresa
                         { corporativoUser.Id.ToString(), corporativoUser.Id }, // Corporativo
-                        { freemiumUser.Id.ToString(), freemiumUser.Id }        // Freemium
-                    };
+                        { freemiumUser.Id.ToString(), freemiumUser.Id },       // Freemium
+
                         // Current CSV GUIDs
                         { "2BC69554-6440-4B0E-A9B5-18757599EE1C", consultorUser.Id },
                         { "EE7DAFEA-A030-4959-A55E-4C40DBBE91A7", profesionalUser.Id },
@@ -303,7 +303,7 @@ public static class AppDbContextSeeder
                         { "e0f6d53b-b148-4665-b4b1-f2554452247c", profesionalUser.Id }, // Profesional
                         { "3aacec34-f910-4ad4-8cc2-3010a6721b88", empresaUser.Id }, // Empresa
                         { "21dc26ac-498c-4c17-8b90-0ff49bd45970", corporativoUser.Id },  // Corporativo
-                        { "FREEMIUM_ID_VIRTUAL", freemiumId } // Freemium (Mapeo virtual para desvío)
+                        { "FREEMIUM_ID_VIRTUAL", freemiumUser.Id } // Freemium (Mapeo virtual para desvío)
                     };
 
                     // === NUEVA LÓGICA DE ASIGNACIÓN ===
@@ -385,20 +385,8 @@ public static class AppDbContextSeeder
 
                     foreach (var row in csvRows)
                     {
-                        var codigoInterno = row["CodigoInterno"];
-                        var nombre = row["NombreProyecto"];
-                        var ubicacionTexto = row["UbicacionTexto"];
-
-                        var csvUserId = row.ContainsKey("IdUsuario") ? row["IdUsuario"] : "";
                         var codigoInterno = row.TryGetValue("CodigoInterno", out var codVal) ? codVal : "";
                         if (string.IsNullOrWhiteSpace(codigoInterno)) continue;
-                        
-                        var existingProj = await context.Proyectos.FirstOrDefaultAsync(p => p.CodigoInterno == codigoInterno);
-                        if (existingProj != null)
-                        {
-                            proyectoEntitiesList.Add(existingProj);
-                            continue;
-                        }
 
                         var nombre = row.TryGetValue("NombreProyecto", out var nVal) && !string.IsNullOrWhiteSpace(nVal) ? nVal : "Proyecto " + codigoInterno;
                         var ubicacionTexto = row.TryGetValue("UbicacionTexto", out var uVal) && !string.IsNullOrWhiteSpace(uVal) ? uVal : "Santo Domingo, República Dominicana";
@@ -412,7 +400,8 @@ public static class AppDbContextSeeder
 
                         var csvStateId = row.TryGetValue("EstadoId", out var sVal) ? sVal : "";
                         var stateCode = stateMapping.TryGetValue(csvStateId, out var mappedCode) ? mappedCode : ProjectStatusCodes.Publicado;
-                        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode);
+                        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode)
+                                     ?? await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == ProjectStatusCodes.Publicado);
 
                         var existingProj = await context.Proyectos.FirstOrDefaultAsync(p => p.CodigoInterno == codigoInterno);
                         if (existingProj != null)
@@ -420,13 +409,11 @@ public static class AppDbContextSeeder
                             // Reasignar/actualizar el proyecto existente para reflejar el reparto del CSV
                             if (existingProj.UsuarioCreadorId != creatorId)
                                 existingProj.ReasignarUsuario(creatorId);
-                            if (estado != null && existingProj.Estado == null || (estado != null && existingProj.Estado != null && existingProj.EstadoId != estado.Id))
+                            if (estado != null && (existingProj.Estado == null || existingProj.EstadoId != estado.Id))
                                 existingProj.UpdateEstado(estado);
                             proyectoEntitiesList.Add(existingProj);
                             continue;
                         }
-                        var estado = await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == stateCode)
-                                     ?? await context.ProyectoEstados.FirstOrDefaultAsync(e => e.CodigoUnico == ProjectStatusCodes.Publicado);
 
                         var proyecto = new Proyecto(nombre, ubicacionTexto, creatorId, categoria, dev, cat);
                         if (estado != null)
