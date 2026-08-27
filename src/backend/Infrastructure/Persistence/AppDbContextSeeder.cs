@@ -277,19 +277,23 @@ public static class AppDbContextSeeder
                     var csvRows = ParseCsv(csvPath);
                     var proyectoEntitiesList = new List<Proyecto>();
 
+                    var freemiumId = freemiumUser.Id;
+
                     // Mapeo de IDs de usuario en CSV a entidades en base de datos (USANDO LOS ID REALES DE LA BD)
                     var userMapping = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase)
                     {
                         { "097be5ae-8f40-4385-a204-de294b449940", consultorUser.Id }, // Consultor
                         { "e0f6d53b-b148-4665-b4b1-f2554452247c", profesionalUser.Id }, // Profesional
                         { "3aacec34-f910-4ad4-8cc2-3010a6721b88", empresaUser.Id }, // Empresa
-                        { "21dc26ac-498c-4c17-8b90-0ff49bd45970", corporativoUser.Id }  // Corporativo
+                        { "21dc26ac-498c-4c17-8b90-0ff49bd45970", corporativoUser.Id },  // Corporativo
+                        { "FREEMIUM_ID_VIRTUAL", freemiumId } // Freemium (Mapeo virtual para desvío)
                     };
 
                     // === NUEVA LÓGICA DE ASIGNACIÓN ===
                     int consultorCount = 0;
                     int profesionalCount = 0;
                     int empresaCount = 0;
+                    int reroutedToFreemium = 0;
                     
                     foreach (var row in csvRows)
                     {
@@ -301,8 +305,9 @@ public static class AppDbContextSeeder
                             bool isPublicado = csvStateId.Equals("8006e230-79a0-40b7-ad3b-b399b564f8f8", StringComparison.OrdinalIgnoreCase);
                             if (consultorCount >= 1 || (!isPublicado && consultorCount == 0)) 
                             {
-                                // Mover excedente o no publicado a Corporativo
-                                row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970";
+                                // Mover excedente o no publicado a Corporativo o Freemium
+                                if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
+                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
                             }
                             else
                             {
@@ -313,7 +318,8 @@ public static class AppDbContextSeeder
                         {
                             if (profesionalCount >= 5)
                             {
-                                row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970";
+                                if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
+                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
                             }
                             else
                             {
@@ -324,11 +330,19 @@ public static class AppDbContextSeeder
                         {
                             if (empresaCount >= 10)
                             {
-                                row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970";
+                                if (reroutedToFreemium < 30) { row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL"; reroutedToFreemium++; }
+                                else { row["IdUsuario"] = "21dc26ac-498c-4c17-8b90-0ff49bd45970"; }
                             }
                             else
                             {
                                 empresaCount++;
+                            }
+                        }
+                        else if (csvUserId.Equals("21dc26ac-498c-4c17-8b90-0ff49bd45970", StringComparison.OrdinalIgnoreCase)) // Ya era Corporativo
+                        {
+                            if (reroutedToFreemium < 30) {
+                                row["IdUsuario"] = "FREEMIUM_ID_VIRTUAL";
+                                reroutedToFreemium++;
                             }
                         }
                     }
