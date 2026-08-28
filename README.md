@@ -34,7 +34,7 @@
 
 ## 1. Resumen del Proyecto
 
-**VeriFinca** es una plataforma integral diseñada para mitigar el fraude inmobiliario en la República Dominicana mediante la automatización de la validación cruzada entre la documentación aportada por desarrolladores y las bases de datos oficiales del Estado (Registro Inmobiliario, Dirección General de Impuestos Internos - DGII, Catastro Nacional, Ministerio de la Vivienda y Edificaciones - MIVED, Junta Central Electoral - JCE) y burós de crédito (TransUnion DR).
+**VeriFinca** es una plataforma integral diseñada para mitigar el fraude inmobiliario en la República Dominicana mediante la automatización de la validación cruzada entre la documentación aportada por desarrolladores y las bases de datos oficiales del Estado (Registro Inmobiliario, Dirección General de Impuestos Internos - DGII, Catastro Nacional, Ministerio de la Vivienda y Edificaciones - MIVED, Junta Central Electoral - JCE) y estado del IPI.
 
 La plataforma emite **Sellos Digitales de Integridad** verificables públicamente mediante códigos QR tokenizados y certificados PDF firmados criptográficamente (RSA-2048) en estricto cumplimiento con la **Ley 126-02** (Comercio Electrónico y Firmas Digitales) y la **Ley 172-13** (Protección Integral de Datos Personales y Crediticios).
 
