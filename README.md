@@ -8,11 +8,22 @@
 ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4.3-38bdf8)
 ![Stripe](https://img.shields.io/badge/Billing-Stripe_Subscriptions-635bff)
 
-# VeriFinca — Plataforma de Verificación y Autenticación de Proyectos Inmobiliarios
+<br />
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/frontend/web/public/brand/logotipo/LOGOTIPO%20WHITE.optimized.svg">
+    <img alt="VeriFinca Logo" src="src/frontend/web/public/brand/logotipo/LOGOTIPO.optimized.svg" width="360" />
+  </picture>
+</p>
+
+<h1 align="center">VeriFinca — Plataforma de Verificación y Autenticación de Proyectos Inmobiliarios</h1>
+
+<p align="center">
+  <em>Sistema web de verificación y autenticación integral de proyectos inmobiliarios para prevención de estafas financieras mediante la validación de documentación legal, financiera y de propiedad en la República Dominicana.</em>
+</p>
 
 > **Proyecto de Grado** — Universidad Central del Este (UCE), Escuela de Ingeniería de Software, Año 2026
->
-> **Título:** *Sistema web de verificación y autenticación integral de proyectos inmobiliarios para prevención de estafas financieras mediante la validación de documentación legal, financiera y de propiedad en la República Dominicana.*
 
 > [!TIP]
 > 📚 **Portal de Documentación Oficial y Arquitectura:**  

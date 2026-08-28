@@ -15,6 +15,7 @@
      - Tabla completa de scripts y comandos de ejecución (`package.json`).
      - Tabla detallada de variables de entorno requeridas/opcionales (`.env.development`).
      - Integración del portal interactivo de documentación en Mintlify Wiki ([https://mintlify.wiki/AlvaGonz/Anteproyecto-Verify/architecture](https://mintlify.wiki/AlvaGonz/Anteproyecto-Verify/architecture)).
+     - Inclusión del logotipo oficial en formato vectorial optimizado con compatibilidad automática para temas claro y oscuro (`<picture>` tag).
      - Protocolo de pruebas, cobertura mínima y directivas de cumplimiento normativo.
 
 ---
