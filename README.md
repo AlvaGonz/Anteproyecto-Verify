@@ -1,6 +1,7 @@
 ![Stack](https://img.shields.io/badge/stack-React_19_%2B_ASP.NET_Core_8-blue)
 ![Microservice](https://img.shields.io/badge/OCR-PaddleOCR_2.8_%2B_FastAPI-green)
 ![MCP](https://img.shields.io/badge/codebase--memory--mcp-mandatory-critical)
+![Documentation](https://img.shields.io/badge/Docs-Mintlify_Wiki-00D084?logo=gitbook&logoColor=white)
 ![License](https://img.shields.io/badge/thesis-UCE_2026-orange)
 ![EF Core](https://img.shields.io/badge/EF_Core-8.0.2-purple)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)
@@ -12,6 +13,11 @@
 > **Proyecto de Grado** — Universidad Central del Este (UCE), Escuela de Ingeniería de Software, Año 2026
 >
 > **Título:** *Sistema web de verificación y autenticación integral de proyectos inmobiliarios para prevención de estafas financieras mediante la validación de documentación legal, financiera y de propiedad en la República Dominicana.*
+
+> [!TIP]
+> 📚 **Portal de Documentación Oficial y Arquitectura:**  
+> Toda la documentación técnica, guías interactivas, especificaciones detalladas (TRD/PRD) y diagramas del sistema están organizados y publicados en:  
+> 🌐 **[https://mintlify.wiki/AlvaGonz/Anteproyecto-Verify/architecture](https://mintlify.wiki/AlvaGonz/Anteproyecto-Verify/architecture)**
 
 ---
 
@@ -416,8 +422,22 @@ Todos los asistentes y agentes que operan en este repositorio deben cumplir rigu
 
 ---
 
-## 12. Licencia y Créditos
+## 12. Documentación Oficial y Wiki Interactiva
+
+Toda la documentación técnica, arquitectónica y operativa del proyecto ha sido consolidada en un portal web interactivo powered by Mintlify:
+
+- 🌐 **Portal Wiki:** [https://mintlify.wiki/AlvaGonz/Anteproyecto-Verify/architecture](https://mintlify.wiki/AlvaGonz/Anteproyecto-Verify/architecture)
+- **Contenidos incluidos:**
+  - Diagramas C4 (Context, Containers, Components) y flujos de secuencia interactivos.
+  - Documentos de requerimientos técnicos y de producto (`TRD_VeriFinca.md` y `PRD_VeriFinca.md`).
+  - Matriz de validación documental y reglas de negocio para República Dominicana.
+  - Registros de decisiones arquitectónicas (`ADRs`).
+
+---
+
+## 13. Licencia y Créditos
 
 Este proyecto es un trabajo de grado desarrollado para la **Universidad Central del Este (UCE)**, Escuela de Ingeniería de Software, República Dominicana, 2026.
 Todos los derechos reservados.
+
 
